@@ -163,3 +163,24 @@ When primary data source (repository, database, API) is inaccessible, perform a 
 - **Option 3:** Defer analysis — Document limitation and move to other tasks; revisit when access available
 
 **What We DO Know:** From architecture report, substantial context inferred about fleet management control plane, .NET 8 + Go codebase, OneBranch + EV2 deployment, 19 tenants, multi-cloud support, sophisticated Kubernetes patterns.
+
+---
+
+## Decision 6: Playwright/Edge Browser Access for ADO Repository Analysis
+
+**Date:** 2026-03-02  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Team Tools & Access
+
+When Azure DevOps API access is unavailable, team may use **Playwright CLI with Microsoft Edge browser and Tamir's default user profile** to browse and extract information from ADO repositories directly via web interface.
+
+**Applies to:** ADO repository browsing, manifest extraction, commit history review, pipeline analysis when MCP API fails  
+**Does NOT apply when:** Direct code access is available, or repository is hosted on GitHub/local filesystem
+
+**Rationale:**
+- MCP Azure DevOps API has experienced intermittent 503 errors during code analysis tasks
+- Playwright + Edge with user profile provides authenticated web access as fallback
+- Unblocks repository analysis without waiting for infrastructure fixes
+
+**Related:** Used in guide synthesis when Data (agent-6) encountered 503 error; enabled Data (agent-8) and B'Elanna to complete component catalog and infrastructure analysis

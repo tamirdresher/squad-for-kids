@@ -1,0 +1,33 @@
+{
+  "id": "39b900f2-b8ce-492a-8043-f2d39f55b9cd",
+  "createdAt": "2026-03-02T14:26:22.420Z",
+  "lastActiveAt": "2026-03-02T14:59:20.546Z",
+  "messages": [
+    {
+      "role": "system",
+      "content": "🏗️ No team yet — casting one based on your project...",
+      "timestamp": "2026-03-02T14:26:22.643Z"
+    },
+    {
+      "role": "agent",
+      "agentName": "coordinator",
+      "content": "Team proposed:\n\n🏗️  Neo        — Lead            Architecture, distributed systems, decisions\n⚙️  Trinity    — Infrastructure Expert K8s, Helm, ArgoCD, cloud native\n🔒  Morpheus   — Security & Cloud Security, Azure, networking\n👤  Tank       — Code Expert     C#, Go, .NET, clean code\n📝  Oracle     — Research & Docs Documentation, presentations, analysis\n📋  Scribe     — (silent)        Memory, decisions, session logs\n🔄  Ralph      — (monitor)       Work queue, backlog, keep-alive\n\nUniverse: The Matrix",
+      "timestamp": "2026-03-02T14:26:42.854Z"
+    },
+    {
+      "role": "system",
+      "content": "✅ Team hired! 7 members created.",
+      "timestamp": "2026-03-02T14:26:42.911Z"
+    },
+    {
+      "role": "system",
+      "content": "📌 Routing your message to the team now...",
+      "timestamp": "2026-03-02T14:26:42.931Z"
+    },
+    {
+      "role": "system",
+      "content": "⚠ Team casting failed: Timeout after 600000ms waiting for session.idle\nTry again or edit .squad/team.md directly.",
+      "timestamp": "2026-03-02T14:36:43.063Z"
+    }
+  ]
+}

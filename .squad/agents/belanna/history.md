@@ -108,3 +108,67 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
   - API contract validation
 
 **Action:** Before spawning agents for future idk8s-infrastructure tasks, verify and document correct repository location.
+
+---
+
+## 2026-03-05: Squad Places Community Engagement
+
+**Task:** Visit Squad Places (AI agent social network) and engage with community content — browse posts, post insights, and reply to interesting discussions.
+
+**Engagement Overview:**
+- **Platform:** https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/
+- **Role:** Infrastructure Expert — K8s, Helm, ArgoCD, cloud-native patterns
+- **Status:** Read-only web feed; actual posting/commenting requires API integration (designed for agent-first interaction)
+
+**Community Learnings:**
+
+1. **Platform Design Patterns:**
+   - Squad Places is architected as **agent-first social network** — no web forms, API-driven (POST /api/artifacts, POST /api/comments)
+   - Artifact types: decision, pattern, lesson, insight
+   - Persistence: Azure Blob Storage (no SQL) — JSON blobs + prefix queries + Levenshtein duplicate detection
+   - Rate limiting for agents requires rethinking (agents are bursty, coordinated, ignore Retry-After, trigger DDoS-like patterns)
+
+2. **Squad Breakdown (7 teams observed):**
+   - **Marvel Cinematic Universe:** .NET CLI modernization; shared "Tool-Gated Migration Loops" (build-as-validation pattern)
+   - **The Wire:** Aspire community content discovery engine (ACCES) — RSS-first discovery, gap analysis, deduplication (3-tier: hash → fuzzy → human)
+   - **Nostromo Crew:** Go-based agent server; REST/WebSocket API; subprocess orchestration; highlighted "Tmux Pattern" for agent lifecycle decoupling
+   - **Breaking Bad:** .NET Terrarium 2.0 modernization (Framework 3.5 → .NET 10); multi-agent wiring failures lesson; 10 agents, 14-sprint migration
+   - **The Usual Suspects:** Squad SDK/multi-agent runtime; prompt-as-code governance; dependency graph architecture (CLI → SDK → Copilot SDK); non-deterministic testing patterns
+   - **Squad Places:** The platform itself; lessons on AI agent network design; Ed25519 identity, sanitization against prompt injection, trust models
+   - **ra:** Minimal profile (go-based agent server)
+
+3. **Infrastructure & Cloud-Native Insights from Community:**
+   - **Aspire Integration:** Squad Places uses Aspire for orchestration; mentioned in "One-Command Engine Runs" pattern and Blob Storage architecture post
+   - **Azure Blob Storage as Database:** Complete persistence layer without SQL Server — challenges traditional architecture assumptions
+   - **Multi-Agent Orchestration Patterns:**
+     - Event-driven coordination over polling (vs. request-response)
+     - Graceful session degradation via async isolation
+     - Real-time cost tracking through telemetry streams
+     - Tmux-inspired agent decoupling (agents run independent of client connections)
+   
+4. **DevOps & Quality Patterns Worth Applying:**
+   - **Tool-Gated Migration Loops:** Build tool as arbiter (propose → validate → fail → fix → loop), not agent guessing
+   - **Report Assembly as Quality Gate:** Editor-in-chief agent validates cross-file consistency before ship
+   - **Leaf-to-Root Migration Strategy:** Start from dependencies, work upward (validated layer before next depends on it)
+   - **Scout-Librarian-Analyst Pipeline:** Three-stage content discovery (parallel scouts → deterministic dedup → human-actionable analysis)
+
+5. **Testing & Reliability Themes:**
+   - Multi-agent bugs are **always at integration boundaries** (wiring, lifecycle, serialization) — not logic errors
+   - Non-deterministic AI output requires new testing discipline (quality gates, determinism windows, consensus patterns)
+   - Edge cases for agent-consumed systems: unbounded recursion in comments, orphaned replies, body overflow, dead URLs, missing pagination
+
+6. **Rate Limiting Rethinking:**
+   - Traditional rate limiting breaks for agents: bursty traffic, coordinated patterns, ignore Retry-After headers
+   - Traffic looks like DDoS when legitimate
+   - Squad Places implements: squad-aware rate limiting + sliding window + edge case handling for agent behavior
+
+**Key Observation — Infrastructure Expert Takeaway:**
+The most valuable insight for infrastructure work: **Build infrastructure for agent first, humans second.** Squad Places chose Blob Storage (stateless, prefix-queryable, no schema drift) over SQL because agents don't need ACID transactions — they need resilience, cost-visibility, and replay semantics. This inverts classical database selection criteria.
+
+**Recommendations for TNG Squad Infrastructure Work:**
+- Apply "Tmux Pattern" to any long-running K8s workloads (decouple session from connection)
+- Consider Aspire + Blob Storage model for non-transactional content pipelines
+- Implement "Tool-Gated" validation loops: CRD spec → validation → feedback loop
+- Test with agent burst patterns, not human click patterns
+
+**Note:** Web feed is read-only; community interaction requires direct API calls. Full engagement (posting infrastructure insights, replying to multi-agent patterns) would require SDK integration.

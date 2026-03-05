@@ -184,3 +184,24 @@ When Azure DevOps API access is unavailable, team may use **Playwright CLI with 
 - Unblocks repository analysis without waiting for infrastructure fixes
 
 **Related:** Used in guide synthesis when Data (agent-6) encountered 503 error; enabled Data (agent-8) and B'Elanna to complete component catalog and infrastructure analysis
+
+---
+
+## Decision 7: Community Engagement Protocol — Squad Places Reconnaissance
+
+**Date:** 2026-03-05  
+**Author:** Scribe (on behalf of Team)  
+**Status:** ✅ Adopted  
+**Scope:** Security & Community Engagement
+
+When team engages with external community sites (Squad Places, open-source repositories, public forums), no secrets or Microsoft confidential information shall be shared.
+
+**Applies to:** Squad Places visits, community pattern analysis, external research, social engagement, public repositories  
+**Does NOT apply when:** Operating in internal-only environments, authorized disclosure, or user explicitly approves specific data sharing
+
+**Rationale:**
+- External communities operate with different security posture and data handling policies
+- Intellectual property, internal strategies, and security-sensitive findings must remain protected
+- Community engagement value (pattern learning, best practices) achievable without exposing confidential details
+
+**Related:** Applied during Squad Places reconnaissance (Picard, B'Elanna, Worf, Data, Seven) where 38 artifacts reviewed across 7 squads without disclosing Microsoft-specific infrastructure, security findings, or internal decision-making

@@ -180,3 +180,44 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 **Artifacts:**
 - `aurora-research.md` — 296-line comprehensive research document
 - Issue #4 comment with executive summary and recommendation
+
+### 2026-03-07: Aurora Scenario Catalog — Deep Scenario Mapping (Issue #4)
+
+**Task:** Create detailed Aurora scenario catalog mapping every major DK8S operation to an Aurora scenario definition with workload manifests, parameters, matrix dimensions, and implementation roadmap  
+**Outcome:** Created `aurora-scenario-catalog.md` — comprehensive 12-scenario catalog with full Aurora manifest definitions
+
+**Key learnings:**
+
+1. **Aurora workload manifests use JSON with three sections** — `Workload` (metadata), `Properties` (execution config), `Scenarios` (test methods). Parameters use `__Token__` substitution resolved at runtime from parameter files.
+
+2. **Five Aurora workload types, each for a different validation goal:**
+   - Control-plane: discrete operations (create/upgrade/delete) — fits cluster lifecycle
+   - Data-plane/DW: long-haul continuous monitoring — fits NAT GW and DNS resilience
+   - Customer reference: realistic multi-resource E2E — fits cross-region failover
+   - Service availability monitoring: lightweight probes — fits platform health
+   - Bridge: adapter for existing ADO pipelines — fits ConfigGen (zero rewriting)
+
+3. **DK8S has no structured provisioning baseline today** — the highest-value outcome of a first Aurora experiment is *establishing* the baseline, not improving against one. You can't improve what you can't measure.
+
+4. **Matrix explosion is real** — SC-001 (cluster provisioning) alone can produce 72 combinations (4 regions × 3 K8s versions × 2 network plugins × 3 SKUs). Recommended strategy: core matrix (2 cells daily), extended (16 weekly), full (72 monthly).
+
+5. **B'Elanna's confirmed incidents map directly to Aurora scenarios:**
+   - NAT Gateway Sev2s → SC-006 (Data-plane + Chaos Studio)
+   - DNS + Istio cascade → SC-007/SC-008 (Data-plane + Control-plane)
+   - ConfigGen breaking changes → SC-005 (Bridge)
+   - Cluster autoscaler + VMSS failures → SC-003 (Control-plane)
+
+6. **EngineeringHub access was blocked** (Access denied errors on all 6 queries). WorkIQ compensated — retrieved Aurora manifest schema, workload type taxonomy, and Fairbanks UX flow details from Cloud Talks transcript and internal documentation.
+
+7. **Aurora currently supports Control Plane simulations only in East US and West US2** — data-plane workloads have limited region availability per FAQ. DK8S will need to validate region coverage before committing to EU-region scenarios.
+
+**Sources used:**
+- WorkIQ: 4 queries (manifest schema, workload types, scenario parameters, execution details)
+- Web search: 2 queries (Aurora SDK structure, Fairbanks experiment setup)
+- B'Elanna's stability analysis: dk8s-stability-analysis.md (incidents, patterns, root causes)
+- DK8S knowledge base: dk8s-platform-knowledge.md, dk8s-infrastructure-inventory.md
+
+**Artifacts:**
+- `aurora-scenario-catalog.md` — 12-scenario catalog with full manifest definitions, matrix parameters, implementation roadmap
+- Issue #4 comment with scenario catalog summary
+- `.squad/decisions/inbox/seven-aurora-scenarios.md` — decision proposal for Aurora scenario prioritization

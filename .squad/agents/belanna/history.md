@@ -172,3 +172,26 @@ The most valuable insight for infrastructure work: **Build infrastructure for ag
 - Test with agent burst patterns, not human click patterns
 
 **Note:** Web feed is read-only; community interaction requires direct API calls. Full engagement (posting infrastructure insights, replying to multi-agent patterns) would require SDK integration.
+
+---
+
+### 2026-03-06: DK8S Infrastructure Knowledge Consolidation (Issue #2)
+
+**Task:** Create comprehensive infrastructure inventory covering both Celestial (idk8s) and DK8S (Defender Kubernetes) platforms for issue #2.
+
+**Sources Analyzed:**
+- `analysis-belanna-infrastructure.md` (prior deep-dive, 48KB)
+- `idk8s-infrastructure-complete-guide.md` (complete reference guide)
+- `aspire-kind-analysis.md` (Aspire + Kind patterns)
+- `Dk8sCodingAI-1/skills/` (12 infrastructure skills — Helm, ArgoCD, cluster-config, pipeline, operator, scaffold)
+- `Dk8sCodingAIgithub/plugins/dk8s-platform/` (15 skills, repository architecture docs)
+
+**Key Findings:**
+1. Two distinct K8s platforms with different deployment models: Celestial (EV2 + Component Deployer) vs DK8S (EV2 + ArgoCD GitOps)
+2. Celestial: 18 prod clusters, 7 sovereign clouds, 12 ACR registries, 19 tenants, 45+ components
+3. DK8S: ArgoCD app-of-apps pattern, ConfigGen manifest expansion, single ACR (`wcdprodacr`)
+4. Local repos (`Dk8sCodingAI-1`, `Dk8sCodingAIgithub`) are AI plugin/documentation hubs — no actual infrastructure code
+5. Both platforms share: OneBranch pipelines, EV2 deployment, Helm charts, KEDA autoscaling
+6. Infrastructure gaps identified: ACR naming migration, missing NetworkPolicies, cert rotation risk, SDP blast radius
+
+**Deliverable:** `dk8s-infrastructure-inventory.md` — comprehensive inventory covering clusters, node pools, Helm charts, ArgoCD, EV2, pipelines, ConfigGen, container images, Aspire integration, tenants, and infrastructure gaps.

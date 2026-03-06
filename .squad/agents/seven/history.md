@@ -155,3 +155,28 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 6. **BasePlatformRP sits above both platforms** as an ARM RP abstraction layer — early stage, 22 issues identified
 7. **Deleted content recovery**: Dk8sCodingAIgithub had significant content consolidated into plugin structure (commit c5bc68d) — the squad config, agent definitions, and skill files were refactored, not lost
 8. **Cross-team AI tooling**: Both platforms have sophisticated AI agent configurations — Dk8sCodingAI has 15 specialized skills for platform operations including on-call triage
+
+### 2026-03-06: Aurora Research for DK8S (Issue #4)
+
+**Task:** Research Aurora validation platform and assess feasibility for DK8S adoption  
+**Outcome:** Created comprehensive `aurora-research.md` with platform analysis, meeting notes, feasibility assessment, and phased integration roadmap
+
+**Key learnings:**
+1. **Aurora is a validation platform, not config management** — critical distinction. The issue title implies config management connection but Aurora addresses E2E testing, resiliency, and deployment gating. Config management remains a separate DK8S workstream.
+2. **Aurora Bridge is the lowest-friction entry point** — connects existing ADO pipelines to Aurora without test rewriting. DK8S can start here immediately.
+3. **Custom workload development required for K8s scenarios** — Aurora has no out-of-the-box Kubernetes operator or Helm chart validation workloads. DK8S would need to build these using the .NET SDK.
+4. **WorkIQ is highly effective for meeting content extraction** — retrieved detailed meeting notes, shared files, presenter names, and discussion topics from the Aurora Cloud Talks session despite no transcript being enabled.
+5. **EngineeringHub has comprehensive Aurora documentation** — 10+ onboarding docs, TSGs, and tutorials under the Azure Aurora service tree node. The DIV onboarding TSG is particularly relevant for mandatory compliance.
+6. **No organic DK8S-Aurora connection exists** — searched Teams messages and emails for past week, zero mentions of Aurora in DK8S context. This is a new exploration, not continuation of existing work.
+7. **DIV (Deployment Integrated Validation) may become mandatory** — tracked as S360 KPI. Early voluntary adoption gives DK8S a head start.
+8. **Aurora Resiliency + Chaos Studio is the highest-value use case** — DK8S currently has no structured fault injection or AZ-down validation for its Defender infrastructure clusters.
+
+**Sources used:**
+- EngineeringHub: 6 Aurora documentation pages fetched and analyzed
+- WorkIQ: 4 queries (meeting content, meeting link details, Aurora mentions, DK8S-Aurora connection)
+- Web search: Azure Aurora / Microsoft Aurora disambiguation
+- DK8S knowledge base: dk8s-platform-knowledge.md, dk8s-infrastructure-inventory.md
+
+**Artifacts:**
+- `aurora-research.md` — 296-line comprehensive research document
+- Issue #4 comment with executive summary and recommendation

@@ -1,0 +1,928 @@
+- application [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - button "Open office app launcher" [ref=e13]:
+            - img [ref=e15]
+          - img [ref=e17]
+        - generic [ref=e33]: MS
+      - search [ref=e40]:
+        - button [ref=e41]:
+          - img [ref=e42]
+        - combobox "Type \"with:\" to narrow your search to a person" [ref=e2713]
+      - generic [ref=e50]:
+        - button "Settings and more" [ref=e52]:
+          - img [ref=e55]
+        - button "Your profile, status Available, Out of office" [ref=e59]:
+          - img "Profile picture of Tamir Dresher." [ref=e60]:
+            - generic [ref=e61]: TD
+            - img [ref=e62]
+            - img "available out of office" [ref=e63]:
+              - img [ref=e65]
+    - group [ref=e70]:
+      - img [ref=e72]
+      - generic [ref=e74]: Stay in the know. Turn on desktop notifications.
+      - button "Turn on" [ref=e76]
+      - button "Close" [ref=e78]:
+        - img [ref=e80]
+    - generic [ref=e84]:
+      - generic [ref=e86]:
+        - navigation "Apps" [ref=e88]:
+          - generic "Activity (Ctrl+Shift+1)" [ref=e90]:
+            - button "Activity (Ctrl+Shift+1)" [ref=e91]:
+              - generic [ref=e92]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Activity
+            - generic: "4"
+            - generic [ref=e93]: 4 new activities
+          - generic "Chat (Ctrl+Shift+2)" [ref=e95]:
+            - button "Chat (Ctrl+Shift+2)" [pressed] [ref=e96]:
+              - generic [ref=e97]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Chat
+            - generic: "40"
+            - generic [ref=e98]: 40 new notifications
+          - generic "Calendar (Ctrl+Shift+3)" [ref=e100]:
+            - button "Calendar (Ctrl+Shift+3)" [ref=e101]:
+              - generic [ref=e102]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calendar
+          - generic "Calls (Ctrl+Shift+4)" [ref=e104]:
+            - button "Calls (Ctrl+Shift+4)" [ref=e105]:
+              - generic [ref=e106]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calls
+            - generic [ref=e107]: New missed calls
+          - generic "OneDrive (Ctrl+Shift+5)" [ref=e109]:
+            - button "OneDrive (Ctrl+Shift+5)" [ref=e110]:
+              - generic [ref=e111]:
+                - generic:
+                  - generic:
+                    - img "OneDrive"
+                    - img
+                  - generic: OneDrive
+          - generic "Copilot (Ctrl+Shift+6)" [ref=e113]:
+            - button "Copilot (Ctrl+Shift+6)" [ref=e114]:
+              - generic [ref=e115]:
+                - generic:
+                  - generic:
+                    - img "Copilot"
+                    - img
+                  - generic: Copilot
+          - status [ref=e116]
+        - generic [ref=e117]:
+          - generic "View more apps" [ref=e118]:
+            - button "View more apps" [ref=e119]:
+              - generic [ref=e120]:
+                - generic:
+                  - generic:
+                    - img
+            - generic [ref=e121]: New activities
+          - generic "Apps" [ref=e123]:
+            - button "Apps" [ref=e124]:
+              - generic [ref=e125]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Apps
+      - generic [ref=e128]: Has context menu
+    - generic [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - heading "Chat" [level=1] [ref=e134]
+          - toolbar "Rail actions" [ref=e135]:
+            - button "More list options" [ref=e137]:
+              - img [ref=e140]
+            - button "Close filter text box" [ref=e2707] [cursor=pointer]:
+              - img [ref=e2708]
+            - button "New message (Alt+Shift+N)" [ref=e146]:
+              - img [ref=e148]
+            - button "New items" [ref=e150]:
+              - img [ref=e152]
+        - generic "Filter" [ref=e155]:
+          - generic [ref=e2711]:
+            - textbox "Filter by name or group name" [active] [ref=e2712]: Tamir Dresher
+            - button "Clear filter text" [ref=e2715]:
+              - img [ref=e2717]
+          - generic [ref=e156]:
+            - toolbar "Filter options" [ref=e157]:
+              - generic [ref=e159]:
+                - button "Unread (Ctrl+Alt+U)" [ref=e161]: Unread
+                - button "Channels (Ctrl+Alt+A)" [ref=e163]: Channels
+                - button "Chats (Ctrl+Alt+C)" [ref=e165]: Chats
+            - button "More filters" [ref=e167]:
+              - img [ref=e169]
+        - tree "Filter active" [ref=e2719]:
+          - generic [ref=e2720]:
+            - treeitem "Copilot" [level=1] [ref=e2721] [cursor=pointer]:
+              - generic [ref=e2722]:
+                - img [ref=e2725]
+                - generic [ref=e2727]: Copilot
+            - treeitem "Discover" [level=1] [ref=e2728] [cursor=pointer]:
+              - generic [ref=e2729]:
+                - img [ref=e2732]
+                - generic [ref=e2734]: Discover
+            - treeitem "Unread Mentions" [level=1] [ref=e2735] [cursor=pointer]:
+              - generic [ref=e2736]:
+                - img [ref=e2739]
+                - generic [ref=e2741]: Mentions
+            - treeitem "Unread Tag mentions" [level=1] [ref=e2742] [cursor=pointer]:
+              - generic [ref=e2743]:
+                - img [ref=e2746]
+                - generic [ref=e2748]: Tag mentions
+            - treeitem "Unread Followed threads" [level=1] [ref=e2749] [cursor=pointer]:
+              - generic [ref=e2750]:
+                - img [ref=e2753]
+                - generic [ref=e2755]: Followed threads
+            - treeitem "Drafts" [level=1] [ref=e2756] [cursor=pointer]:
+              - generic [ref=e2757]:
+                - img [ref=e2760]
+                - generic [ref=e2762]: Drafts
+            - treeitem "Saved" [level=1] [ref=e2763] [cursor=pointer]:
+              - generic [ref=e2764]:
+                - img [ref=e2767]
+                - generic [ref=e2769]: Saved
+            - separator [ref=e2770]
+          - treeitem "Favorites" [expanded] [level=1] [ref=e2771] [cursor=pointer]:
+            - generic [ref=e2772]:
+              - img [ref=e2774]
+              - generic [ref=e2777]: Favorites
+            - group [ref=e2778]:
+              - treeitem "Chat Tamir Dresher (You)" [level=2] [ref=e2779]:
+                - generic [ref=e2780]:
+                  - generic [ref=e2784]:
+                    - img [ref=e2785]
+                    - img [ref=e2786]:
+                      - img [ref=e2788]
+                  - generic [ref=e2792]:
+                    - generic [ref=e2793]: Tamir Dresher
+                    - text: (You)
+              - treeitem "Group chat RP Hub Has pinned messages" [level=2] [ref=e2794]:
+                - generic [ref=e2795]:
+                  - img [ref=e2798]
+                  - generic [ref=e2800]: RP Hub
+          - treeitem "Chats" [expanded] [level=1] [ref=e2801] [cursor=pointer]:
+            - generic [ref=e2802]:
+              - img [ref=e2804]
+              - generic [ref=e2807]: Chats
+            - group [ref=e2808]:
+              - treeitem "Meeting chat Brainstorm Cluster creation automation via MCP" [level=2] [ref=e2809]:
+                - generic [ref=e2810]:
+                  - img [ref=e2813]:
+                    - img [ref=e2815]
+                  - generic [ref=e2818]: Brainstorm Cluster creation automation via MCP
+              - treeitem "Group chat Ami, Brady, and Jon" [level=2] [ref=e2819]:
+                - generic [ref=e2820]:
+                  - img [ref=e2823]
+                  - generic [ref=e2825]: Ami, Brady, and Jon
+              - treeitem "Unread message Group chat OneSoc Interviewers Has pinned messages Everyone at mention" [level=2] [ref=e2826]:
+                - generic [ref=e2827]:
+                  - img [ref=e2830]
+                  - generic [ref=e2832]: OneSoc Interviewers
+                  - img [ref=e2835]
+              - treeitem "Chat Efi Shtain Away" [level=2] [ref=e2837]:
+                - generic [ref=e2838]:
+                  - generic [ref=e2842]:
+                    - img [ref=e2843]
+                    - img [ref=e2844]:
+                      - img [ref=e2846]
+                  - generic [ref=e2849]: Efi Shtain
+              - treeitem "Unread message Group chat DK8S Platform leads" [level=2] [ref=e2850]:
+                - generic [ref=e2851]:
+                  - img [ref=e2854]
+                  - generic [ref=e2856]: DK8S Platform leads
+              - treeitem "Group chat Moshe and Roy" [level=2] [ref=e2857]:
+                - generic [ref=e2858]:
+                  - img [ref=e2861]
+                  - generic [ref=e2863]: Moshe and Roy
+              - treeitem "Group chat Michael and Ramaprakash" [level=2] [ref=e2864]:
+                - generic [ref=e2865]:
+                  - img [ref=e2868]
+                  - generic [ref=e2870]: Michael and Ramaprakash
+              - treeitem "Unread message Group chat ArgoCD + Karpenter ILDC Has pinned messages" [level=2] [ref=e2871]:
+                - generic [ref=e2872]:
+                  - img [ref=e2875]
+                  - generic [ref=e2877]: ArgoCD + Karpenter ILDC
+              - treeitem "Chat Naama Ben David Available" [level=2] [ref=e2878]:
+                - generic [ref=e2879]:
+                  - generic [ref=e2883]:
+                    - img [ref=e2884]
+                    - img [ref=e2885]:
+                      - img [ref=e2887]
+                  - generic [ref=e2890]: Naama Ben David
+              - treeitem "Meeting chat IDP LT | Weekly Staff ( Org Updates & LT Discussion)" [level=2] [ref=e2891]:
+                - generic [ref=e2892]:
+                  - img [ref=e2895]:
+                    - img [ref=e2897]
+                  - generic [ref=e2900]: IDP LT | Weekly Staff ( Org Updates & LT Discussion)
+              - treeitem "Chat Gaurav Bhandare Away" [level=2] [ref=e2901]:
+                - generic [ref=e2902]:
+                  - generic [ref=e2906]:
+                    - img [ref=e2907]
+                    - img [ref=e2908]:
+                      - img [ref=e2910]
+                  - generic [ref=e2913]: Gaurav Bhandare
+              - treeitem "Group chat [DK8s] improved DK8s platform intro and success stories" [level=2] [ref=e2914]:
+                - generic [ref=e2915]:
+                  - img [ref=e2918]
+                  - generic [ref=e2920]: "[DK8s] improved DK8s platform intro and success stories"
+              - treeitem "Group chat Supercharge with AI Has pinned messages" [level=2] [ref=e2921]:
+                - generic [ref=e2922]:
+                  - img [ref=e2925]
+                  - generic [ref=e2927]: Supercharge with AI
+              - treeitem "Unread message Meeting chat Runtime Platform | Weekly Operational Review Has pinned messages" [level=2] [ref=e2928]:
+                - generic [ref=e2929]:
+                  - img [ref=e2932]:
+                    - img [ref=e2934]
+                  - generic [ref=e2937]: Runtime Platform | Weekly Operational Review
+              - treeitem "Unread message Group chat DK8s -access and permissions" [level=2] [ref=e2938]:
+                - generic [ref=e2939]:
+                  - img [ref=e2942]
+                  - generic [ref=e2944]: DK8s -access and permissions
+              - treeitem "Group chat DK8S | Core [Chat] Has pinned messages" [level=2] [ref=e2945]:
+                - generic [ref=e2946]:
+                  - img [ref=e2949]
+                  - generic [ref=e2951]: DK8S | Core [Chat]
+              - treeitem "Group chat Efi and Saurabh" [level=2] [ref=e2952]:
+                - generic [ref=e2953]:
+                  - img [ref=e2956]
+                  - generic [ref=e2958]: Efi and Saurabh
+              - treeitem "Unread message Group chat ArgoCD Dev 🐙" [level=2] [ref=e2959]:
+                - generic [ref=e2960]:
+                  - img [ref=e2963]
+                  - generic [ref=e2965]: ArgoCD Dev 🐙
+              - 'treeitem "Unread message Meeting chat Runtime Platform (Defender K8S Platform) : Feature Discussion & Design Review Has pinned messages" [level=2] [ref=e2966]':
+                - generic [ref=e2967]:
+                  - img [ref=e2970]:
+                    - img [ref=e2972]
+                  - generic [ref=e2975]: "Runtime Platform (Defender K8S Platform) : Feature Discussion & Design Review"
+              - treeitem "Chat Shir Levin (TALENT SOLUTIONS LTD) Away" [level=2] [ref=e2976]:
+                - generic [ref=e2977]:
+                  - generic [ref=e2981]:
+                    - img [ref=e2982]
+                    - img [ref=e2983]:
+                      - img [ref=e2985]
+                  - generic [ref=e2988]: Shir Levin (TALENT SOLUTIONS LTD)
+              - treeitem "Thrive Global Bot Unknown Thrive Global" [level=2] [ref=e2989]:
+                - generic [ref=e2990]:
+                  - button "Thrive Global Bot Unknown" [ref=e2993]:
+                    - img [ref=e2994]
+                  - generic [ref=e2996]: Thrive Global
+              - treeitem "Group chat CIENG - DK8S Cluster Has pinned messages" [level=2] [ref=e2997]:
+                - generic [ref=e2998]:
+                  - img [ref=e3001]
+                  - generic [ref=e3003]: CIENG - DK8S Cluster
+              - treeitem "Group chat Andy, Brady, Helen, +5" [level=2] [ref=e3004]:
+                - generic [ref=e3005]:
+                  - img [ref=e3008]
+                  - generic [ref=e3010]: Andy, Brady, Helen, +5
+              - treeitem "Chat Ofek Finkelstein Away" [level=2] [ref=e3011]:
+                - generic [ref=e3012]:
+                  - generic [ref=e3016]:
+                    - img [ref=e3017]
+                    - img [ref=e3018]:
+                      - img [ref=e3020]
+                  - generic [ref=e3023]: Ofek Finkelstein
+              - treeitem "Chat Sashwat Kondepudi Away" [level=2] [ref=e3024]:
+                - generic [ref=e3025]:
+                  - generic [ref=e3029]:
+                    - img [ref=e3030]
+                    - img [ref=e3031]:
+                      - img [ref=e3033]
+                  - generic [ref=e3036]: Sashwat Kondepudi
+              - treeitem "Unread See more Everyone at mention" [level=2] [ref=e3037]:
+                - generic [ref=e3038]:
+                  - generic [ref=e3040]:
+                    - text: See more
+                    - img [ref=e3041]
+                  - img [ref=e3045]
+        - status [ref=e3047]
+        - generic:
+          - generic [ref=e1662]: Unread message
+          - generic [ref=e1663]: Last message
+          - generic [ref=e1664]: Group chat
+          - generic [ref=e1665]: Meeting chat
+          - generic [ref=e1666]: Chat
+          - generic [ref=e1667]: Personal at mention
+          - generic [ref=e1668]: Everyone at mention
+          - generic [ref=e1669]: Important
+          - generic [ref=e1670]: Urgent
+          - generic [ref=e1671]: Draft
+          - generic [ref=e1672]: Draft
+          - generic [ref=e1673]: Muted
+          - generic [ref=e1674]: Meeting in progress
+          - generic [ref=e1675]: Meet now in progress
+          - generic [ref=e1676]: You can't send messages because you are not a member of the chat.
+          - generic [ref=e1677]: Private
+          - generic [ref=e1678]: Shared
+          - generic [ref=e1679]: Has context menu
+          - generic [ref=e1680]: Channel at mention
+          - generic [ref=e1681]: Team at mention
+          - generic [ref=e1682]: Personal at mention
+          - generic [ref=e1683]: Unread
+          - generic [ref=e1684]: Unread
+          - generic [ref=e1685]: Meeting in progress
+          - generic [ref=e1686]: Unread
+          - generic [ref=e1687]: Channel
+          - generic [ref=e1688]: Team
+          - generic [ref=e1689]: Has pinned messages
+          - generic [ref=e1690]: See more
+          - generic [ref=e1691]: Community
+          - generic [ref=e1692]: Temporarily shown
+          - generic [ref=e1693]: Has context menu
+        - generic [ref=e1694]: Has context menu
+      - slider "Resize left panel" [ref=e1708]
+    - generic [ref=e1714]:
+      - generic [ref=e1715]:
+        - button "Change the group profile picture" [ref=e1718]:
+          - generic [ref=e1719]:
+            - img [ref=e1721]
+            - img [ref=e1723]
+        - generic [ref=e1728]:
+          - heading "Chat participants" [level=2] [ref=e1730]:
+            - list "Chat participants" [ref=e1731]:
+              - generic [ref=e1732]:
+                - listitem "Ami busy" [ref=e3048] [cursor=pointer]:
+                  - generic [ref=e1734]:
+                    - img "busy" [ref=e1735]:
+                      - img [ref=e1737]
+                    - generic [ref=e1739]: Ami
+                - text: ","
+              - listitem "Brady available" [ref=e1741] [cursor=pointer]:
+                - generic [ref=e1742]:
+                  - img "available" [ref=e1743]:
+                    - img [ref=e1745]
+                  - generic [ref=e1747]: Brady
+              - text: ", +2"
+          - button "Name group chat" [ref=e1748]:
+            - img [ref=e1750]
+      - generic [ref=e1752]:
+        - generic [ref=e1753]:
+          - tablist [ref=e1754]:
+            - tab "Chat" [selected] [ref=e1756] [cursor=pointer]:
+              - generic [ref=e1759]: Chat
+            - tab "Shared" [ref=e1760] [cursor=pointer]:
+              - generic [ref=e1763]: Shared
+            - tab "Add a tab" [ref=e1764]:
+              - img [ref=e1766]
+          - generic [ref=e1769]: Has context menu
+        - status [ref=e1770]
+      - toolbar "Chat actions" [ref=e1771]:
+        - generic [ref=e1773]:
+          - button "Meet now" [ref=e1774]:
+            - img [ref=e1776]
+            - generic [ref=e1778]: Meet now
+          - button "More call options" [ref=e1779]:
+            - img [ref=e1781]
+        - button "Add people, agents, and bots, 4 participants" [ref=e1783]:
+          - img [ref=e1785]
+          - text: "4"
+        - separator [ref=e1787]
+        - generic "Sidepane Features" [ref=e1788]:
+          - button "Open Copilot" [ref=e1789]:
+            - img [ref=e1791]
+          - button "Open notes" [ref=e1794]:
+            - img [ref=e1796]
+          - button "Open Agents and bots" [ref=e1798]:
+            - img [ref=e1800]
+        - button "More chat options" [ref=e1803]:
+          - img [ref=e1805]
+    - generic [ref=e1812]:
+      - generic [ref=e1815]:
+        - generic [ref=e1821]:
+          - generic [ref=e1823]:
+            - heading "Jon Gallant added Tamir Dresher and 2 others to the chat." [level=6] [ref=e1824]
+            - group "Jon Gallant added Tamir Dresher and 2 others to the chat." [ref=e1826]:
+              - generic [ref=e1828]:
+                - img [ref=e1829]
+                - img [ref=e1831]
+                - group [ref=e1833]:
+                  - generic [ref=e1834]:
+                    - button "Jon Gallant" [ref=e1835]:
+                      - button "Jon Gallant" [ref=e1836]
+                    - text: added
+                    - button "Tamir Dresher" [ref=e1837]:
+                      - button "Tamir Dresher" [ref=e1838]
+                    - text: and 2 others to the chat.
+          - generic [ref=e1842]:
+            - heading "I'm helping you both secure your tunnel imp... by Jon Gallant" [level=4] [ref=e1843]
+            - generic [ref=e1845]:
+              - generic [ref=e1846]:
+                - generic [ref=e1850]: Jon Gallant
+                - time [ref=e1851]: Yesterday 6:50 AM
+              - generic [ref=e1852]:
+                - generic [ref=e1855]:
+                  - img [ref=e1856]
+                  - img [ref=e1857]:
+                    - img [ref=e1859]
+                - group "Jon Gallant I'm helping you both secure your tunnel implementations. Might be a good idea to merge them or one use the other... 2 Green heart reactions. Yesterday at 6:50 AM." [ref=e1862]:
+                  - button "More message options" [ref=e1863]
+                  - generic "I'm helping you both secure your tunnel implementations. Might be a good idea to merge them or one use the other..." [ref=e1864]:
+                    - paragraph [ref=e1865]: I'm helping you both secure your tunnel implementations. Might be a good idea to merge them or one use the other...
+                  - toolbar "Reaction summary" [ref=e1866]:
+                    - button "2 Green heart reactions." [ref=e1868]:
+                      - generic [ref=e1869]:
+                        - img "💚" [ref=e1871]
+                        - generic [ref=e1872]: 2 Green heart reactions.
+                        - generic [ref=e1873]: "2"
+                    - button "More reactions" [ref=e1875]:
+                      - img [ref=e1877]
+          - generic [ref=e1883]:
+            - heading "Thank you, Jon by Brady Gaster" [level=4] [ref=e1884]
+            - generic [ref=e1886]:
+              - generic [ref=e1887]:
+                - generic [ref=e1891]: Brady Gaster
+                - time [ref=e1892]: Yesterday 6:51 AM
+              - generic [ref=e1893]:
+                - generic [ref=e1896]:
+                  - img [ref=e1897]
+                  - img [ref=e1898]:
+                    - img [ref=e1900]
+                - group "Brady Gaster Thank you, Jon Yesterday at 6:51 AM." [ref=e1903]:
+                  - button "More message options" [ref=e1904]
+                  - generic "Thank you, Jon" [ref=e1905]:
+                    - paragraph [ref=e1906]:
+                      - text: Thank you,
+                      - button "Mentioned Jon" [ref=e1907]: Jon
+          - generic [ref=e1911]:
+            - heading "For reference, here’s what I’ve put togethe... by Ami Schreiber" [level=4] [ref=e1912]
+            - generic [ref=e1914]:
+              - generic [ref=e1915]:
+                - generic [ref=e1919]: Ami Schreiber
+                - time [ref=e1920]: Yesterday 6:53 AM
+              - generic [ref=e1921]:
+                - generic [ref=e1924]:
+                  - img [ref=e1925]
+                  - img [ref=e1926]:
+                    - img [ref=e1928]
+                - group "Ami Schreiber For reference, here’s what I’ve put together. It comes with a companion iOS app. I’ll add everyone to TestFlight so you can kick the tires. Link https://github.com/shribr/agent-dashboard Yesterday at 6:53 AM." [ref=e1931]:
+                  - button "More message options" [ref=e1932]
+                  - generic "For reference, here’s what I’ve put together. It comes with a companion iOS app. I’ll add everyone to TestFlight so you can kick the tires. Link https://github.com/shribr/agent-dashboard" [ref=e1933]:
+                    - paragraph [ref=e1934]:
+                      - text: For reference, here’s what I’ve put together. It comes with a companion iOS app. I’ll add everyone to TestFlight so you can kick the tires.
+                      - link "Link https://github.com/shribr/agent-dashboard" [ref=e1935] [cursor=pointer]:
+                        - /url: https://github.com/shribr/agent-dashboard
+                        - text: https://github.com/shribr/agent-dashboard
+          - generic [ref=e1939]:
+            - heading "Also added everyone as collaborators for th... by Ami Schreiber" [level=4] [ref=e1940]
+            - generic [ref=e1942]:
+              - generic [ref=e1943]:
+                - generic [ref=e1947]: Ami Schreiber
+                - time [ref=e1948]: Yesterday 6:58 AM
+                - generic "Edited Yesterday at 7:06 AM" [ref=e1951]: Edited
+              - generic [ref=e1952]:
+                - generic [ref=e1955]:
+                  - img [ref=e1956]
+                  - img [ref=e1957]:
+                    - img [ref=e1959]
+                - group "Ami Schreiber Also added everyone as collaborators for the repo. 1 Like reaction with medium light skin tone. Yesterday at 6:58 AM. Edited" [ref=e1962]:
+                  - button "More message options" [ref=e1963]
+                  - generic "Also added everyone as collaborators for the repo." [ref=e1964]:
+                    - generic [ref=e1965]: Also added everyone as collaborators for the repo.
+                  - toolbar "Reaction summary" [ref=e1966]:
+                    - button "1 Like reaction with medium light skin tone." [ref=e1968]:
+                      - generic [ref=e1969]:
+                        - img "👍🏼" [ref=e1971]
+                        - generic [ref=e1972]: 1 Like reaction with medium light skin tone.
+                    - button "More reactions" [ref=e1974]:
+                      - img [ref=e1976]
+          - generic [ref=e1982]:
+            - heading "Link https://github.com/shribr/agent-dashbo... by Jon Gallant" [level=4] [ref=e1983]
+            - generic [ref=e1985]:
+              - generic [ref=e1986]:
+                - generic [ref=e1990]: Jon Gallant
+                - time [ref=e1991]: Yesterday 8:31 AM
+              - generic [ref=e1992]:
+                - generic [ref=e1995]:
+                  - img [ref=e1996]
+                  - img [ref=e1997]:
+                    - img [ref=e1999]
+                - group "Jon Gallant Link https://github.com/shribr/agent-dashboard-pr/issues/5 Yesterday at 8:31 AM." [ref=e2002]:
+                  - button "More message options" [ref=e2003]
+                  - generic "Link https://github.com/shribr/agent-dashboard-pr/issues/5" [ref=e2004]:
+                    - paragraph [ref=e2005]:
+                      - link "Link https://github.com/shribr/agent-dashboard-pr/issues/5" [ref=e2006] [cursor=pointer]:
+                        - /url: https://github.com/shribr/agent-dashboard-pr/issues/5
+                        - text: https://github.com/shribr/agent-dashboard-pr/issues/5
+          - generic [ref=e2010]:
+            - heading "Link https://github.com/tamirdresher/cli-tu... by Jon Gallant" [level=4] [ref=e2011]
+            - generic [ref=e2013]:
+              - generic:
+                - generic [ref=e2017]: Jon Gallant
+                - time [ref=e2018]: Yesterday 8:32 AM
+              - group "Jon Gallant Link https://github.com/tamirdresher/cli-tunnel-pr/issues/12 Yesterday at 8:32 AM." [ref=e2021]:
+                - button "More message options" [ref=e2022]
+                - generic "Link https://github.com/tamirdresher/cli-tunnel-pr/issues/12" [ref=e2023]:
+                  - paragraph [ref=e2024]:
+                    - link "Link https://github.com/tamirdresher/cli-tunnel-pr/issues/12" [ref=e2025] [cursor=pointer]:
+                      - /url: https://github.com/tamirdresher/cli-tunnel-pr/issues/12
+                      - text: https://github.com/tamirdresher/cli-tunnel-pr/issues/12
+          - generic [ref=e2029]:
+            - heading "keep in mind that copilot team is building ... by Jon Gallant" [level=4] [ref=e2030]
+            - generic [ref=e2032]:
+              - generic:
+                - generic [ref=e2036]: Jon Gallant
+                - time [ref=e2037]: Yesterday 8:32 AM
+              - group "Jon Gallant keep in mind that copilot team is building the official version, so all of this will likely be moot as soon as they do Yesterday at 8:32 AM." [ref=e2040]:
+                - button "More message options" [ref=e2041]
+                - generic "keep in mind that copilot team is building the official version, so all of this will likely be moot as soon as they do" [ref=e2042]:
+                  - paragraph [ref=e2043]: keep in mind that copilot team is building the official version, so all of this will likely be moot as soon as they do
+          - generic [ref=e2047]:
+            - heading "Ok. Either way, it’s a cool exercise. Any c... by Ami Schreiber" [level=4] [ref=e2048]
+            - generic [ref=e2050]:
+              - generic [ref=e2051]:
+                - generic [ref=e2055]: Ami Schreiber
+                - time [ref=e2056]: Yesterday 8:49 AM
+              - generic [ref=e2057]:
+                - generic [ref=e2060]:
+                  - img [ref=e2061]
+                  - img [ref=e2062]:
+                    - img [ref=e2064]
+                - group "Ami Schreiber Ok. Either way, it’s a cool exercise. Any chance we can help with that? Yesterday at 8:49 AM." [ref=e2067]:
+                  - button "More message options" [ref=e2068]
+                  - generic "Ok. Either way, it’s a cool exercise. Any chance we can help with that?" [ref=e2069]:
+                    - generic [ref=e2070]: Ok. Either way, it’s a cool exercise. Any chance we can help with that?
+          - generic [ref=e2074]:
+            - heading "Also, for the security assessment, were the... by Ami Schreiber" [level=4] [ref=e2075]
+            - generic [ref=e2077]:
+              - generic:
+                - generic [ref=e2081]: Ami Schreiber
+                - time [ref=e2082]: Yesterday 8:51 AM
+              - group "Ami Schreiber Also, for the security assessment, were the 11 critical issues not based on the original scan? Did the rescan still find the same issues? Yesterday at 8:51 AM." [ref=e2085]:
+                - button "More message options" [ref=e2086]
+                - generic "Also, for the security assessment, were the 11 critical issues not based on the original scan? Did the rescan still find the same issues?" [ref=e2087]:
+                  - generic [ref=e2088]: Also, for the security assessment, were the 11 critical issues not based on the original scan? Did the rescan still find the same issues?
+          - generic [ref=e2092]:
+            - heading "Also, I removed Cloudflare as an option to ... by Ami Schreiber" [level=4] [ref=e2093]
+            - generic [ref=e2095]:
+              - generic:
+                - generic [ref=e2099]: Ami Schreiber
+                - time [ref=e2100]: Yesterday 8:55 AM
+              - group "Ami Schreiber Also, I removed Cloudflare as an option to simplify things a bit so I’m not sure why the security scanner still thinks it’s in the codebase. Yesterday at 8:55 AM." [ref=e2103]:
+                - button "More message options" [ref=e2104]
+                - generic "Also, I removed Cloudflare as an option to simplify things a bit so I’m not sure why the security scanner still thinks it’s in the codebase." [ref=e2105]:
+                  - generic [ref=e2106]: Also, I removed Cloudflare as an option to simplify things a bit so I’m not sure why the security scanner still thinks it’s in the codebase.
+          - generic [ref=e2110]:
+            - heading "Hi Ami Schreiber I'll add you as contribu... by Tamir Dresher" [level=4] [ref=e2111]
+            - generic [ref=e2113]:
+              - generic [ref=e2114]:
+                - time [ref=e2115]: Yesterday 9:20 AM
+                - generic [ref=e2119]: Tamir Dresher
+              - group "Tamir Dresher Hi Ami Schreiber I'll add you as contributor in a sec 1 Like reaction. Yesterday at 9:20 AM." [ref=e2122]:
+                - button "More message options" [ref=e2123]
+                - generic "Hi Ami Schreiber I'll add you as contributor in a sec" [ref=e2124]:
+                  - paragraph [ref=e2125]:
+                    - text: Hi
+                    - button "Mentioned Ami Schreiber" [ref=e2126]: Ami Schreiber
+                    - text: I'll add you as contributor in a sec
+                - toolbar "Reaction summary" [ref=e2127]:
+                  - button "1 Like reaction." [ref=e2129]:
+                    - generic [ref=e2130]:
+                      - img "👍" [ref=e2132]
+                      - generic [ref=e2133]: 1 Like reaction.
+                  - button "More reactions" [ref=e2135]:
+                    - img [ref=e2137]
+          - generic [ref=e2143]:
+            - heading "Begin Reference, https://github.com/tamirdr... by Tamir Dresher" [level=4] [ref=e2144]
+            - generic [ref=e2146]:
+              - generic [ref=e2147]:
+                - time [ref=e2148]: Yesterday 9:53 AM
+                - generic [ref=e2152]: Tamir Dresher
+              - group "Tamir Dresher Begin Reference, https://github.com/tamirdresher/cli-tunnel-pr/issues/12, Jon Gallant, 3/2/2026 8:32 AM, End reference Jon Gallant i commented in the issue, can you take a look please? Yesterday at 9:53 AM." [ref=e2155]:
+                - button "More message options" [ref=e2156]
+                - generic "Begin Reference, https://github.com/tamirdresher/cli-tunnel-pr/issues/12, Jon Gallant, 3/2/2026 8:32 AM, End reference Jon Gallant i commented in the issue, can you take a look please?" [ref=e2157]:
+                  - group "Begin Reference, https://github.com/tamirdresher/cli-tunnel-pr/issues/12, Jon Gallant, 3/2/2026 8:32 AM, End reference" [ref=e2158] [cursor=pointer]:
+                    - generic [ref=e2161]:
+                      - generic [ref=e2162]:
+                        - generic [ref=e2163]: Jon Gallant
+                        - generic [ref=e2164]: 3/2/2026 8:32 AM
+                      - generic [ref=e2165]: https://github.com/tamirdresher/cli-tunnel-pr/issues/12
+                  - paragraph [ref=e2166]:
+                    - button "Mentioned Jon Gallant" [ref=e2167]: Jon Gallant
+                    - text: i commented in the issue, can you take a look please?
+          - generic [ref=e2171]:
+            - heading "Here's the PR that copilot says solves almo... by Jon Gallant" [level=4] [ref=e2172]
+            - generic [ref=e2174]:
+              - generic [ref=e2175]:
+                - generic [ref=e2179]: Jon Gallant
+                - time [ref=e2180]: Yesterday 7:44 PM
+              - generic [ref=e2181]:
+                - generic [ref=e2184]:
+                  - img [ref=e2185]
+                  - img [ref=e2186]:
+                    - img [ref=e2188]
+                - group "Jon Gallant Here's the PR that copilot says solves almost all the issues. Link https://github.com/tamirdresher/cli-tunnel-pr/pull/11 I haven't test it. 1 Heart reaction. 1 Party popper reaction. Yesterday at 7:44 PM." [ref=e2191]:
+                  - button "More message options" [ref=e2192]
+                  - generic "Here's the PR that copilot says solves almost all the issues. Link https://github.com/tamirdresher/cli-tunnel-pr/pull/11 I haven't test it." [ref=e2193]:
+                    - paragraph [ref=e2194]:
+                      - text: Here's the PR that copilot says solves almost all the issues.
+                      - link "Link https://github.com/tamirdresher/cli-tunnel-pr/pull/11" [ref=e2195] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher/cli-tunnel-pr/pull/11
+                        - text: https://github.com/tamirdresher/cli-tunnel-pr/pull/11
+                      - text: I haven't test it.
+                  - toolbar "Reaction summary" [ref=e2196]:
+                    - button "1 Heart reaction." [pressed] [ref=e2198]:
+                      - generic [ref=e2199]:
+                        - img "❤️" [ref=e2201]
+                        - generic [ref=e2202]: 1 Heart reaction.
+                    - button "1 Party popper reaction." [ref=e2203]:
+                      - generic [ref=e2204]:
+                        - img "🎉" [ref=e2206]
+                        - generic [ref=e2207]: 1 Party popper reaction.
+                    - button "More reactions" [ref=e2209]:
+                      - img [ref=e2211]
+          - generic [ref=e2217]:
+            - heading "Jon Gallant Can you please run another sec... by Ami Schreiber" [level=4] [ref=e2218]
+            - generic [ref=e2220]:
+              - generic [ref=e2221]:
+                - generic [ref=e2225]: Ami Schreiber
+                - time [ref=e2226]: Yesterday 8:37 PM
+              - generic [ref=e2227]:
+                - generic [ref=e2230]:
+                  - img [ref=e2231]
+                  - img [ref=e2232]:
+                    - img [ref=e2234]
+                - group "Ami Schreiber Jon Gallant Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration. Yesterday at 8:37 PM." [ref=e2237]:
+                  - button "More message options" [ref=e2238]
+                  - generic "Jon Gallant Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration." [ref=e2239]:
+                    - paragraph [ref=e2240]:
+                      - button "Mentioned Jon Gallant" [ref=e2241]: Jon Gallant
+                      - text: Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration.
+          - generic [ref=e2245]:
+            - heading "also - i made a lot of changes to the code ... by Brady Gaster" [level=4] [ref=e2246]
+            - generic [ref=e2248]:
+              - generic [ref=e2249]:
+                - generic [ref=e2253]: Brady Gaster
+                - time [ref=e2254]: Yesterday 8:38 PM
+              - generic [ref=e2255]:
+                - generic [ref=e2258]:
+                  - img [ref=e2259]
+                  - img [ref=e2260]:
+                    - img [ref=e2262]
+                - group "Brady Gaster also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated. Yesterday at 8:38 PM." [ref=e2265]:
+                  - button "More message options" [ref=e2266]
+                  - generic "also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated." [ref=e2267]:
+                    - paragraph [ref=e2268]: also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated.
+          - generic [ref=e2272]:
+            - heading "Begin Reference, also - i made a lot of cha... by Ami Schreiber" [level=4] [ref=e2273]
+            - generic [ref=e2275]:
+              - generic [ref=e2276]:
+                - generic [ref=e2280]: Ami Schreiber
+                - time [ref=e2281]: Yesterday 8:39 PM
+              - generic [ref=e2282]:
+                - generic [ref=e2285]:
+                  - img [ref=e2286]
+                  - img [ref=e2287]:
+                    - img [ref=e2289]
+                - group "Ami Schreiber Begin Reference, also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated., Brady Gaster, 3/2/2026 8:38 PM, End reference Are you talking about my repo or Tamir's? Yesterday at 8:39 PM." [ref=e2292]:
+                  - button "More message options" [ref=e2293]
+                  - generic "Begin Reference, also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated., Brady Gaster, 3/2/2026 8:38 PM, End reference Are you talking about my repo or Tamir's?" [ref=e2294]:
+                    - group "Begin Reference, also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated., Brady Gaster, 3/2/2026 8:38 PM, End reference" [ref=e2295] [cursor=pointer]:
+                      - generic [ref=e2298]:
+                        - generic [ref=e2299]:
+                          - generic [ref=e2300]: Brady Gaster
+                          - generic [ref=e2301]: 3/2/2026 8:38 PM
+                        - generic [ref=e2302]: also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated.
+                    - paragraph [ref=e2303]: Are you talking about my repo or Tamir's?
+          - generic [ref=e2307]:
+            - heading "Squad-PR by Brady Gaster" [level=4] [ref=e2308]
+            - generic [ref=e2310]:
+              - generic [ref=e2311]:
+                - generic [ref=e2315]: Brady Gaster
+                - time [ref=e2316]: Yesterday 8:40 PM
+              - generic [ref=e2317]:
+                - generic [ref=e2320]:
+                  - img [ref=e2321]
+                  - img [ref=e2322]:
+                    - img [ref=e2324]
+                - group "Brady Gaster Squad-PR Yesterday at 8:40 PM." [ref=e2327]:
+                  - button "More message options" [ref=e2328]
+                  - generic "Squad-PR" [ref=e2329]:
+                    - paragraph [ref=e2330]: Squad-PR
+          - generic [ref=e2334]:
+            - heading "Begin Reference, Squad-PR, Brady Gaster, 3/... by Ami Schreiber" [level=4] [ref=e2335]
+            - generic [ref=e2337]:
+              - generic [ref=e2338]:
+                - generic [ref=e2342]: Ami Schreiber
+                - time [ref=e2343]: Yesterday 8:40 PM
+              - generic [ref=e2344]:
+                - generic [ref=e2347]:
+                  - img [ref=e2348]
+                  - img [ref=e2349]:
+                    - img [ref=e2351]
+                - group "Ami Schreiber Begin Reference, Squad-PR, Brady Gaster, 3/2/2026 8:40 PM, End reference Just making sure. Smile 1 Like reaction with medium light skin tone. Yesterday at 8:40 PM." [ref=e2354]:
+                  - button "More message options" [ref=e2355]
+                  - generic "Begin Reference, Squad-PR, Brady Gaster, 3/2/2026 8:40 PM, End reference Just making sure. Smile" [ref=e2356]:
+                    - group "Begin Reference, Squad-PR, Brady Gaster, 3/2/2026 8:40 PM, End reference" [ref=e2357] [cursor=pointer]:
+                      - generic [ref=e2360]:
+                        - generic [ref=e2361]:
+                          - generic [ref=e2362]: Brady Gaster
+                          - generic [ref=e2363]: 3/2/2026 8:40 PM
+                        - generic [ref=e2364]: Squad-PR
+                    - paragraph [ref=e2365]:
+                      - text: Just making sure.
+                      - generic "Smile" [ref=e2366]:
+                        - img "🙂" [ref=e2367]
+                  - toolbar "Reaction summary" [ref=e2368]:
+                    - button "1 Like reaction with medium light skin tone." [ref=e2370]:
+                      - generic [ref=e2371]:
+                        - img "👍🏼" [ref=e2373]
+                        - generic [ref=e2374]: 1 Like reaction with medium light skin tone.
+                    - button "More reactions" [ref=e2376]:
+                      - img [ref=e2378]
+          - generic [ref=e2384]:
+            - heading "np mate, thanks for being thorough. Smile by Brady Gaster" [level=4] [ref=e2385]
+            - generic [ref=e2387]:
+              - generic [ref=e2388]:
+                - generic [ref=e2392]: Brady Gaster
+                - time [ref=e2393]: Yesterday 8:40 PM
+              - generic [ref=e2394]:
+                - generic [ref=e2397]:
+                  - img [ref=e2398]
+                  - img [ref=e2399]:
+                    - img [ref=e2401]
+                - group "Brady Gaster np mate, thanks for being thorough. Smile Yesterday at 8:40 PM." [ref=e2404]:
+                  - button "More message options" [ref=e2405]
+                  - generic "np mate, thanks for being thorough. Smile" [ref=e2406]:
+                    - paragraph [ref=e2407]:
+                      - text: np mate, thanks for being thorough.
+                      - generic "Smile" [ref=e2408]:
+                        - img "🙂" [ref=e2409]
+          - generic [ref=e2413]:
+            - heading "Hey Jon Gallant , thanks for the thorough ... by Tamir Dresher" [level=4] [ref=e2414]
+            - generic [ref=e2416]:
+              - generic [ref=e2417]:
+                - time [ref=e2418]: Yesterday 8:51 PM
+                - generic [ref=e2422]: Tamir Dresher
+              - group [ref=e2425]:
+                - button "More message options" [ref=e2426]
+                - generic [ref=e2427]:
+                  - paragraph [ref=e2428]:
+                    - text: Hey
+                    - button "Mentioned Jon Gallant" [ref=e2429]: Jon Gallant
+                    - text: ", thanks for the thorough security hardening 79 findings across 9 cycles is impressive work"
+                    - generic "Smile" [ref=e2430]:
+                      - img "🙂" [ref=e2431]
+                  - paragraph [ref=e2432]: "I reviewed it and cherry-picked the redaction improvements into PR #15 — the ANSI bypass protection, Unicode invisible char stripping, NFKC normalization, and 9 new token patterns (27 total now)."
+                  - paragraph [ref=e2433]: These are safe, no breaking changes, and directly improve our secret redaction.
+                  - paragraph [ref=e2434]: "The rest of the PR I'm holding off on for now:"
+                  - list [ref=e2435]:
+                    - listitem [ref=e2436]: "Cookie-based auth: It breaks the QR code flow that lets users scan and connect from their phone. The token-in-URL approach is deliberate for cross-device UX. DevTunnel already provides the outer auth layer (private tunnels, MS identity)."
+                    - listitem [ref=e2437]: "E2E WebSocket encryption: DevTunnel provides TLS between the phone and the relay. Adding E2E on top adds latency and complexity for marginal gain on a dev tool. The 5 known gaps (plaintext downgrade, unauthenticated ECDH, grid bypass) also need design review before shipping."
+                    - listitem [ref=e2438]: "CSRF, token encryption at rest, self-hosted xterm: Over-engineering for our use case. File permissions (0o600) protect tokens. CDN + SRI hashes protect xterm.js."
+                - toolbar "Reaction summary" [ref=e2439]:
+                  - button "1 Like reaction with light skin tone." [ref=e2441]:
+                    - generic [ref=e2442]:
+                      - img "👍🏻" [ref=e2444]
+                      - generic [ref=e2445]: 1 Like reaction with light skin tone.
+                  - button "More reactions" [ref=e2447]:
+                    - img [ref=e2449]
+          - generic [ref=e2455]:
+            - heading "Brady Gaster i'm sync the security changes ... by Tamir Dresher" [level=4] [ref=e2456]
+            - generic [ref=e2458]:
+              - generic [ref=e2459]:
+                - time [ref=e2460]: Yesterday 9:04 PM
+                - generic [ref=e2464]: Tamir Dresher
+              - group "Tamir Dresher Brady Gaster i'm sync the security changes to squad-pr. will let you know when it's done and tested 1 Like reaction with medium light skin tone. Yesterday at 9:04 PM." [ref=e2467]:
+                - button "More message options" [ref=e2468]
+                - generic "Brady Gaster i'm sync the security changes to squad-pr. will let you know when it's done and tested" [ref=e2469]:
+                  - paragraph [ref=e2470]:
+                    - button "Mentioned Brady Gaster" [ref=e2471]: Brady Gaster
+                  - paragraph [ref=e2472]: i'm sync the security changes to squad-pr. will let you know when it's done and tested
+                - toolbar "Reaction summary" [ref=e2473]:
+                  - button "1 Like reaction with medium light skin tone." [ref=e2475]:
+                    - generic [ref=e2476]:
+                      - img "👍🏼" [ref=e2478]
+                      - generic [ref=e2479]: 1 Like reaction with medium light skin tone.
+                  - button "More reactions" [ref=e2481]:
+                    - img [ref=e2483]
+          - generic [ref=e2489]:
+            - heading "Brady Gaster we should be good to go now by Tamir Dresher" [level=4] [ref=e2490]
+            - generic [ref=e2492]:
+              - generic [ref=e2493]:
+                - time [ref=e2494]: Yesterday 11:24 PM
+                - generic [ref=e2498]: Tamir Dresher
+              - generic [ref=e2499]:
+                - group "Tamir Dresher Seen by everyone Brady Gaster we should be good to go now Yesterday at 11:24 PM." [ref=e2501]:
+                  - button "More message options" [ref=e2502]
+                  - generic "Brady Gaster we should be good to go now" [ref=e2503]:
+                    - paragraph [ref=e2504]:
+                      - button "Mentioned Brady Gaster" [ref=e2505]: Brady Gaster
+                    - paragraph [ref=e2506]: we should be good to go now
+                - img "Seen by everyone" [ref=e2508]:
+                  - img [ref=e2509]
+          - heading "Last read" [level=3] [ref=e2513]:
+            - generic [ref=e2514]: Last read
+          - heading "Today" [level=3] [ref=e2517]:
+            - generic [ref=e2518]: Today
+          - generic [ref=e2521]:
+            - heading "let me know when you're ready for a merge (... by Brady Gaster" [level=4] [ref=e2522]
+            - generic [ref=e2524]:
+              - generic [ref=e2525]:
+                - generic [ref=e2529]: Brady Gaster
+                - time [ref=e2530]: 12:05 AM
+              - generic [ref=e2531]:
+                - generic [ref=e2534]:
+                  - img [ref=e2535]
+                  - img [ref=e2536]:
+                    - img [ref=e2538]
+                - group "Brady Gaster let me know when you're ready for a merge (would appreciate others to thumbs-up the message too for a paper trail) Today at 12:05 AM." [ref=e2541]:
+                  - button "More message options" [ref=e2542]
+                  - generic "let me know when you're ready for a merge (would appreciate others to thumbs-up the message too for a paper trail)" [ref=e2543]:
+                    - paragraph [ref=e2544]: let me know when you're ready for a merge (would appreciate others to thumbs-up the message too for a paper trail)
+          - generic [ref=e2548]:
+            - heading "Jon Gallant - I'm ready for updated securi... by Ami Schreiber" [level=4] [ref=e2549]
+            - generic [ref=e2551]:
+              - generic [ref=e2552]:
+                - generic [ref=e2556]: Ami Schreiber
+                - time [ref=e2557]: 8:06 AM
+              - generic [ref=e2558]:
+                - generic [ref=e2561]:
+                  - img [ref=e2562]
+                  - img [ref=e2563]:
+                    - img [ref=e2565]
+                - group "Ami Schreiber Jon Gallant - I'm ready for updated security scan whenever you are. Today at 8:06 AM." [ref=e2568]:
+                  - button "More message options" [ref=e2569]
+                  - generic "Jon Gallant - I'm ready for updated security scan whenever you are." [ref=e2570]:
+                    - paragraph [ref=e2571]:
+                      - button "Mentioned Jon Gallant" [ref=e2572]: Jon Gallant
+                      - text: "- I'm ready for updated security scan whenever you are."
+          - generic [ref=e2576]:
+            - heading "Running, I'll also do a pr and each issue w... by Jon Gallant" [level=4] [ref=e2577]
+            - generic [ref=e2579]:
+              - generic [ref=e2580]:
+                - generic [ref=e2584]: Jon Gallant
+                - time [ref=e2585]: 3:50 PM
+                - generic "Edited Today at 3:50 PM" [ref=e2588]: Edited
+              - generic [ref=e2589]:
+                - generic [ref=e2592]:
+                  - img [ref=e2593]
+                  - img [ref=e2594]:
+                    - img [ref=e2596]
+                - group "Jon Gallant Running, I'll also do a pr and each issue with be resolved in an isolated commit so you can cherry pick. 1 Like reaction. Today at 3:50 PM. Edited" [ref=e2599]:
+                  - button "More message options" [ref=e2600]
+                  - generic "Running, I'll also do a pr and each issue with be resolved in an isolated commit so you can cherry pick." [ref=e2601]:
+                    - paragraph [ref=e2602]: Running, I'll also do a pr and each issue with be resolved in an isolated commit so you can cherry pick.
+                  - toolbar "Reaction summary" [ref=e2603]:
+                    - button "1 Like reaction." [ref=e2605]:
+                      - generic [ref=e2606]:
+                        - img "👍" [ref=e2608]
+                        - generic [ref=e2609]: 1 Like reaction.
+                    - button "More reactions" [ref=e2611]:
+                      - img [ref=e2613]
+          - generic [ref=e2619]:
+            - heading "Link https://github.com/tamirdresher/cli-tu... by Jon Gallant" [level=4] [ref=e2620]
+            - generic [ref=e2622]:
+              - generic [ref=e2623]:
+                - generic [ref=e2627]: Jon Gallant
+                - time [ref=e2628]: 4:20 PM
+              - generic [ref=e2629]:
+                - generic [ref=e2632]:
+                  - img [ref=e2633]
+                  - img [ref=e2634]:
+                    - img [ref=e2636]
+                - group "Jon Gallant Link https://github.com/tamirdresher/cli-tunnel-pr/issues/16 Link https://github.com/tamirdresher/cli-tunnel-pr/pull/17 Today at 4:20 PM." [ref=e2639]:
+                  - button "More message options" [ref=e2640]
+                  - generic "Link https://github.com/tamirdresher/cli-tunnel-pr/issues/16 Link https://github.com/tamirdresher/cli-tunnel-pr/pull/17" [ref=e2641]:
+                    - paragraph [ref=e2642]:
+                      - link "Link https://github.com/tamirdresher/cli-tunnel-pr/issues/16" [ref=e2643] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher/cli-tunnel-pr/issues/16
+                        - text: https://github.com/tamirdresher/cli-tunnel-pr/issues/16
+                    - paragraph [ref=e2644]:
+                      - link "Link https://github.com/tamirdresher/cli-tunnel-pr/pull/17" [ref=e2645] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher/cli-tunnel-pr/pull/17
+                        - text: https://github.com/tamirdresher/cli-tunnel-pr/pull/17
+        - generic [ref=e2648]: has context menu
+      - generic [ref=e2657]:
+        - generic [ref=e2658]:
+          - textbox "Type a message" [ref=e2659]:
+            - paragraph [ref=e2660]: Type a message
+          - generic:
+            - log
+            - log
+        - generic [ref=e2661]:
+          - toolbar [ref=e2662]:
+            - button "Show Formatting options (Ctrl+Shift+X)" [ref=e2663] [cursor=pointer]:
+              - img [ref=e2665]
+            - button "Emoji, GIFs and Stickers" [ref=e2668] [cursor=pointer]:
+              - img [ref=e2670]
+            - button "Rewrite with Copilot (Alt+A)" [ref=e2672] [cursor=pointer]:
+              - img [ref=e2675]
+            - button "Loop components (Ctrl+Alt+L)" [ref=e2677] [cursor=pointer]:
+              - img [ref=e2679]
+            - button "Actions and apps" [ref=e2682] [cursor=pointer]:
+              - img [ref=e2684]
+          - toolbar "Actions for new message" [ref=e2686]:
+            - generic [ref=e2688]:
+              - button "Send (Ctrl+Enter)" [ref=e2689] [cursor=pointer]:
+                - img [ref=e2691]
+              - generic [ref=e2694]: has context menu

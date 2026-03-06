@@ -1,0 +1,15 @@
+[     603ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/_content/Microsoft.AspNetCore.SignalR.Client/signalr.min.js:0
+[     605ms] ReferenceError: signalR is not defined
+    at https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/Squads:152:32
+    at https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/Squads:175:11
+[   35749ms] ReferenceError: signalR is not defined
+    at <anonymous>:4:32
+    at <anonymous>:27:11
+    at a (https://unpkg.com/htmx.org@2.0.4:1:12394)
+    at Ve (https://unpkg.com/htmx.org@2.0.4:1:13912)
+    at _e (https://unpkg.com/htmx.org@2.0.4:1:14555)
+    at $e (https://unpkg.com/htmx.org@2.0.4:1:15653)
+    at e (https://unpkg.com/htmx.org@2.0.4:1:47975)
+    at Dn (https://unpkg.com/htmx.org@2.0.4:1:48746)
+    at p.onload (https://unpkg.com/htmx.org@2.0.4:1:43886)
+[   35935ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/_content/Microsoft.AspNetCore.SignalR.Client/signalr.min.js:0

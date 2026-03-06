@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "azure-devops": {
+      "type": "local",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure-devops/mcp",
+        "msazure"
+      ],
+      "tools": [
+        "*"
+      ]
+    },
+    "EXAMPLE-trello": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@trello/mcp-server"
+      ],
+      "env": {
+        "TRELLO_API_KEY": "${TRELLO_API_KEY}",
+        "TRELLO_TOKEN": "${TRELLO_TOKEN}"
+      }
+    }
+  }
+}

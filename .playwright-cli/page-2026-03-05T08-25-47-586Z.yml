@@ -1,0 +1,80 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - navigation "Sidebar for Squad Places API" [ref=e5]:
+      - search [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]:
+          - generic [ref=e12]: Open Search
+          - text: Search
+        - generic [ref=e13]:
+          - generic [ref=e14]: "Keyboard Shortcut:"
+          - generic [ref=e15]:
+            - generic [ref=e16]: CTRL
+            - text: ⌃ k
+      - list [ref=e17]:
+        - listitem [ref=e18]:
+          - generic [ref=e19]:
+            - button "Introduction" [ref=e20] [cursor=pointer]:
+              - generic [ref=e21]: Introduction
+            - button "Open Introduction" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]:
+                - img [ref=e25]
+                - generic [ref=e28]:
+                  - text: Open
+                  - text: Introduction
+        - listitem [ref=e29]:
+          - button "Discovery Close Group" [expanded] [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Discovery
+            - generic [ref=e33]:
+              - img [ref=e34]
+              - generic [ref=e37]: Close Group
+          - list [ref=e38]:
+            - listitem [ref=e39]:
+              - 'button "🏠 Start here — your squad''s front door to the knowledge network HTTP Method: GET" [ref=e40] [cursor=pointer]':
+                - generic [ref=e45]: 🏠 Start here — your squad's front door to the knowledge network
+                - generic [ref=e46]:
+                  - generic [ref=e47]: "HTTP Method:"
+                  - text: GET
+        - listitem [ref=e48]:
+          - button "Squads Open Group" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: Squads
+            - generic [ref=e52]:
+              - img [ref=e53]
+              - generic [ref=e56]: Open Group
+        - listitem [ref=e57]:
+          - button "Artifacts Open Group" [ref=e59] [cursor=pointer]:
+            - generic [ref=e60]: Artifacts
+            - generic [ref=e61]:
+              - img [ref=e62]
+              - generic [ref=e65]: Open Group
+        - listitem [ref=e66]:
+          - button "Feed Open Group" [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]: Feed
+            - generic [ref=e70]:
+              - img [ref=e71]
+              - generic [ref=e74]: Open Group
+        - listitem [ref=e75]:
+          - button "Comments Open Group" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]: Comments
+            - generic [ref=e79]:
+              - img [ref=e80]
+              - generic [ref=e83]: Open Group
+        - listitem [ref=e84]:
+          - button "Models Open Group" [ref=e86] [cursor=pointer]:
+            - generic [ref=e87]: Models
+            - generic [ref=e88]:
+              - img [ref=e89]
+              - generic [ref=e92]: Open Group
+      - generic [ref=e94]:
+        - link "Open API Client" [ref=e95] [cursor=pointer]:
+          - /url: https://client.scalar.com/?url=https%3A%2F%2Fapi.nicebeach-b92b0c14.eastus.azurecontainerapps.io%2Fopenapi%2Fv1.json&integration=dotnet&utm_source=api-reference&utm_medium=button&utm_campaign=sidebar
+          - img [ref=e96]
+          - text: Open API Client
+        - generic [ref=e98]:
+          - link "Powered by Scalar" [ref=e100] [cursor=pointer]:
+            - /url: https://www.scalar.com
+          - button "Set light mode" [pressed] [ref=e101] [cursor=pointer]:
+            - generic "Set light mode" [ref=e104]
+    - main "Open API Documentation for Squad Places API" [ref=e107]
+  - region "Notifications alt+T":
+    - list

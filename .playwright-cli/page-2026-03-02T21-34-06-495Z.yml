@@ -1,0 +1,1384 @@
+- application [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - button [ref=e4192]:
+            - img [ref=e15]
+          - img [ref=e17]
+        - generic [ref=e33]: MS
+      - search [ref=e40]:
+        - button [ref=e41]:
+          - img [ref=e42]
+        - combobox [ref=e4193]
+      - generic [ref=e50]:
+        - button [ref=e4194]:
+          - img [ref=e55]
+        - button [ref=e4195]:
+          - img [ref=e4196]:
+            - generic [ref=e61]: TD
+            - img [ref=e62]
+            - img [ref=e4197]:
+              - img [ref=e65]
+    - group [ref=e547]:
+      - img [ref=e549]
+      - generic [ref=e551]:
+        - text: "Teams has a new URL: teams.cloud.microsoft. Same app, better security."
+        - button [ref=e4198] [cursor=pointer]: Learn more
+      - button [ref=e4199]:
+        - img [ref=e556]
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - navigation [ref=e4200]:
+          - button [ref=e4202]:
+            - generic [ref=e78]:
+              - generic:
+                - generic:
+                  - img
+                - generic: Activity
+          - generic [ref=e4203]:
+            - button [pressed] [ref=e4204]:
+              - generic [ref=e82]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Chat
+            - generic: "39"
+            - generic [ref=e83]: 39 new notifications
+          - button [ref=e4206]:
+            - generic [ref=e87]:
+              - generic:
+                - generic:
+                  - img
+                - generic: Calendar
+          - button [ref=e4208]:
+            - generic [ref=e91]:
+              - generic:
+                - generic:
+                  - img
+                - generic: Calls
+          - button [ref=e4210]:
+            - generic [ref=e95]:
+              - generic:
+                - generic:
+                  - img
+                - generic: OneDrive
+          - button [ref=e4212]:
+            - generic [ref=e99]:
+              - generic:
+                - generic:
+                  - img
+                - generic: Copilot
+        - generic [ref=e100]:
+          - generic [ref=e4213]:
+            - button [ref=e4214]:
+              - generic [ref=e103]:
+                - generic:
+                  - generic:
+                    - img
+            - generic [ref=e558]: New activities
+          - button [ref=e4216]:
+            - generic [ref=e107]:
+              - generic:
+                - generic:
+                  - img
+                - generic: Apps
+      - generic [ref=e109]: Has context menu
+    - generic [ref=e112]:
+      - generic [ref=e559]:
+        - generic [ref=e560]:
+          - heading [level=1] [ref=e4217]: Chat
+          - toolbar [ref=e4218]:
+            - button [ref=e4219]:
+              - img [ref=e567]
+            - button [ref=e4220]:
+              - img [ref=e571]
+            - button [ref=e4221]:
+              - img [ref=e575]
+            - button [ref=e4222]:
+              - img [ref=e579]
+        - generic [ref=e583]:
+          - toolbar [ref=e4224]:
+            - generic [ref=e586]:
+              - button [ref=e4225]: Unread
+              - button [ref=e4226]: Channels
+              - button [ref=e4227]: Chats
+          - button [ref=e4228]:
+            - img [ref=e596]
+        - tree [ref=e598]:
+          - generic [ref=e599]:
+            - treeitem [level=1] [ref=e4229] [cursor=pointer]:
+              - generic [ref=e601]:
+                - img [ref=e604]
+                - generic [ref=e606]: Copilot
+            - treeitem [level=1] [ref=e4230] [cursor=pointer]:
+              - generic [ref=e608]:
+                - img [ref=e611]
+                - generic [ref=e613]: Discover
+            - treeitem [level=1] [ref=e4231] [cursor=pointer]:
+              - generic [ref=e615]:
+                - img [ref=e618]
+                - generic [ref=e620]: Mentions
+            - treeitem [level=1] [ref=e4232] [cursor=pointer]:
+              - generic [ref=e622]:
+                - img [ref=e625]
+                - generic [ref=e627]: Tag mentions
+            - treeitem [level=1] [ref=e4233] [cursor=pointer]:
+              - generic [ref=e629]:
+                - img [ref=e632]
+                - generic [ref=e634]: Followed threads
+            - treeitem [level=1] [ref=e4234] [cursor=pointer]:
+              - generic [ref=e636]:
+                - img [ref=e639]
+                - generic [ref=e641]: Drafts
+            - treeitem [level=1] [ref=e4235] [cursor=pointer]:
+              - generic [ref=e643]:
+                - img [ref=e646]
+                - generic [ref=e648]: Saved
+            - separator [ref=e649]
+          - treeitem [expanded] [level=1] [ref=e4236] [cursor=pointer]:
+            - generic [ref=e651]:
+              - img [ref=e653]
+              - generic [ref=e656]: Favorites
+            - group [ref=e657]:
+              - treeitem [level=2] [ref=e4237]:
+                - generic [ref=e659]:
+                  - generic [ref=e663]:
+                    - img [ref=e664]
+                    - img [ref=e665]:
+                      - img [ref=e667]
+                  - generic [ref=e670]: Tamir Dresher (You)
+              - treeitem [level=2] [ref=e4238]:
+                - generic [ref=e672]:
+                  - img [ref=e676]
+                  - generic [ref=e678]: DK8s Resource Provider
+              - treeitem [level=2] [ref=e4239]:
+                - generic [ref=e680]:
+                  - img [ref=e683]
+                  - generic [ref=e685]: RP Hub
+              - treeitem [level=2] [ref=e4240]:
+                - generic [ref=e687]:
+                  - img [ref=e691]
+                  - generic [ref=e693]: tamir-squads-notifications
+              - treeitem [level=2] [ref=e4241]:
+                - generic [ref=e695]:
+                  - img [ref=e699]
+                  - generic [ref=e701]: Welcome to the Squad squad
+          - treeitem [expanded] [level=1] [ref=e4242] [cursor=pointer]:
+            - generic [ref=e703]:
+              - img [ref=e705]
+              - generic [ref=e708]: Idp
+          - treeitem [expanded] [level=1] [ref=e4243] [cursor=pointer]:
+            - generic [ref=e710]:
+              - img [ref=e712]
+              - generic [ref=e715]: Chats
+            - group [ref=e716]:
+              - treeitem [level=2] [ref=e4244]:
+                - generic [ref=e718]:
+                  - img [ref=e721]
+                  - generic [ref=e723]: Ami, Brady, and Jon
+              - treeitem [level=2] [ref=e4245]:
+                - generic [ref=e725]:
+                  - img [ref=e728]
+                  - generic [ref=e730]: Andy, Brady, Helen, +5
+              - treeitem [level=2] [ref=e4246]:
+                - generic [ref=e732]:
+                  - img [ref=e735]:
+                    - img [ref=e737]
+                  - generic [ref=e740]: "AI Days: NASA Team"
+              - treeitem [level=2] [ref=e4247]:
+                - generic [ref=e742]:
+                  - generic [ref=e746]:
+                    - img [ref=e747]
+                    - img [ref=e748]:
+                      - img [ref=e750]
+                  - generic [ref=e753]: Sashwat Kondepudi
+              - treeitem [level=2] [ref=e4248]:
+                - generic [ref=e755]:
+                  - img [ref=e758]
+                  - generic [ref=e760]: Supercharge with AI
+              - treeitem [level=2] [ref=e4249]:
+                - generic [ref=e762]:
+                  - img [ref=e765]
+                  - generic [ref=e767]: Another AI group
+              - treeitem [level=2] [ref=e4250]:
+                - generic [ref=e769]:
+                  - generic [ref=e773]:
+                    - img [ref=e774]
+                    - img [ref=e775]:
+                      - img [ref=e777]
+                  - generic [ref=e780]: Anand Kumar
+              - treeitem [level=2] [ref=e4251]:
+                - generic [ref=e782]:
+                  - generic [ref=e786]:
+                    - img [ref=e787]
+                    - img [ref=e788]:
+                      - img [ref=e790]
+                  - generic [ref=e793]: Ofek Finkelstein
+              - treeitem [level=2] [ref=e4252]:
+                - generic [ref=e795]:
+                  - img [ref=e798]
+                  - generic [ref=e800]: .NET 10 + dotnet publish = 🔥
+              - treeitem [level=2] [ref=e4253]:
+                - generic [ref=e802]:
+                  - img [ref=e805]:
+                    - img [ref=e807]
+                  - generic [ref=e810]: Sync up for Hygene and time reduction
+              - treeitem [level=2] [ref=e4254]:
+                - generic [ref=e812]:
+                  - generic [ref=e816]:
+                    - img [ref=e817]
+                    - img [ref=e818]:
+                      - img [ref=e4054]
+                  - generic [ref=e823]: Ami Schreiber
+              - treeitem [level=2] [ref=e4255]:
+                - generic [ref=e825]:
+                  - img [ref=e828]
+                  - generic [ref=e830]: Michael and Ramaprakash
+              - treeitem [level=2] [ref=e4256]:
+                - generic [ref=e832]:
+                  - generic [ref=e836]:
+                    - img [ref=e837]
+                    - img [ref=e838]:
+                      - img [ref=e3636]
+                  - generic [ref=e843]: Craig Treasure
+              - treeitem [level=2] [ref=e4257]:
+                - generic [ref=e845]:
+                  - generic [ref=e849]:
+                    - img [ref=e850]
+                    - img [ref=e851]:
+                      - img [ref=e853]
+                  - generic [ref=e856]: Shir Levin (TALENT SOLUTIONS LTD)
+              - treeitem [level=2] [ref=e4258]:
+                - generic [ref=e858]:
+                  - img [ref=e861]
+                  - generic [ref=e863]: ArgoCD + Karpenter ILDC
+              - treeitem [level=2] [ref=e4259]:
+                - generic [ref=e865]:
+                  - img [ref=e868]
+                  - generic [ref=e870]: "[DK8s] new tartarus PPE cluster (with DK8s onboarding wizard)"
+              - treeitem [level=2] [ref=e4260]:
+                - generic [ref=e872]:
+                  - img [ref=e875]
+                  - generic [ref=e877]: Adir, Ashok, Brajesh, +7
+              - treeitem [level=2] [ref=e4261]:
+                - generic [ref=e879]:
+                  - img [ref=e882]
+                  - generic [ref=e884]: DK8S | Core [Chat]
+              - treeitem [level=2] [ref=e4262]:
+                - generic [ref=e886]:
+                  - img [ref=e889]
+                  - generic [ref=e891]: OneSoc Interviewers
+              - treeitem [level=2] [ref=e4263]:
+                - generic [ref=e893]:
+                  - img [ref=e896]
+                  - generic [ref=e898]: Efi and Saurabh
+              - treeitem [level=2] [ref=e4264]:
+                - generic [ref=e900]:
+                  - button [ref=e4265]:
+                    - img [ref=e904]
+                  - generic [ref=e906]: Thrive Global
+              - treeitem [level=2] [ref=e4266]:
+                - generic [ref=e908]:
+                  - button [ref=e4267]:
+                    - img [ref=e912]
+                  - generic [ref=e914]: IcM Assistant (Obi)
+              - treeitem [level=2] [ref=e4268]:
+                - generic [ref=e916]:
+                  - img [ref=e919]:
+                    - img [ref=e921]
+                  - generic [ref=e924]: מפגש היכרות עם פרויקט “מחבקים את החיילים"
+              - treeitem [level=2] [ref=e4269]:
+                - generic [ref=e926]:
+                  - img [ref=e929]
+                  - generic [ref=e931]: DK8S | Security & Network
+              - treeitem [level=2] [ref=e4270]:
+                - generic [ref=e933]:
+                  - img [ref=e936]:
+                    - img [ref=e938]
+                  - generic [ref=e941]: "[Weekly] ArgoCD Week Recap"
+              - treeitem [level=2] [ref=e4271]:
+                - generic [ref=e943]:
+                  - img [ref=e946]:
+                    - img [ref=e948]
+                  - generic [ref=e951]: Interview
+              - treeitem [level=2] [ref=e4272]:
+                - generic [ref=e953]:
+                  - img [ref=e956]:
+                    - img [ref=e958]
+                  - generic [ref=e961]: CoreDNS - Status and ArgoCD alignment - ARGO CD
+                  - img [ref=e964]
+              - treeitem [level=2] [ref=e4273]:
+                - generic [ref=e967]:
+                  - img [ref=e970]:
+                    - img [ref=e972]
+                  - generic [ref=e975]: Digital Escort session request in Blei
+              - treeitem [level=2] [ref=e4274]:
+                - generic [ref=e977]:
+                  - button [ref=e4275]:
+                    - img [ref=e981]
+                  - generic [ref=e983]: Stack Overflow for Teams
+              - treeitem [level=2] [ref=e4276]:
+                - generic [ref=e987]:
+                  - text: See more
+                  - img [ref=e988]
+          - treeitem [expanded] [level=1] [ref=e4277] [cursor=pointer]:
+            - generic [ref=e991]:
+              - img [ref=e993]
+              - generic [ref=e996]: Teams and channels
+            - group [ref=e997]:
+              - treeitem [expanded] [level=2] [ref=e4278]:
+                - generic [ref=e999]:
+                  - img [ref=e1001]
+                  - img [ref=e1005]
+                  - generic [ref=e1007]: OneBranch Release YAML Migration Community Forum
+                - group [ref=e1008]:
+                  - treeitem [level=3] [ref=e4279]:
+                    - generic [ref=e1013]: General
+              - treeitem [level=2] [ref=e4280]:
+                - generic [ref=e1015]:
+                  - img [ref=e1017]
+                  - img [ref=e1021]
+                  - generic [ref=e1023]: .NET Team website
+              - treeitem [expanded] [level=2] [ref=e4281]:
+                - generic [ref=e1025]:
+                  - img [ref=e1027]
+                  - img [ref=e1031]
+                  - generic [ref=e1033]: .NET First Party Outreach
+                - group [ref=e1034]:
+                  - treeitem [level=3] [ref=e4282]:
+                    - generic [ref=e1039]: General
+                  - treeitem [level=3] [ref=e4283]:
+                    - generic [ref=e1044]: ASP.NET Core Discussion
+                  - treeitem [level=3] [ref=e4284]:
+                    - generic [ref=e1049]: Aspire Discussion
+                  - treeitem [level=3] [ref=e4285]:
+                    - generic [ref=e1054]: Dotnet on Azure Linux Discussion
+                  - treeitem [level=3] [ref=e4286]:
+                    - generic [ref=e1059]: dotNET Upgrade Agent
+                  - treeitem [level=3] [ref=e4287]:
+                    - generic [ref=e1064]: First Party Forum
+                  - treeitem [level=3] [ref=e4288]:
+                    - generic [ref=e1067]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4289]:
+                - generic [ref=e1069]:
+                  - img [ref=e1071]
+                  - img [ref=e1075]
+                  - generic [ref=e1077]: RP-as-a-Service Partners
+                - group [ref=e1078]:
+                  - treeitem [level=3] [ref=e4290]:
+                    - generic [ref=e1083]: General
+                  - treeitem [level=3] [ref=e4291]:
+                    - generic [ref=e1088]: MOBO (MRG) Preview
+                  - treeitem [level=3] [ref=e4292]:
+                    - generic [ref=e1093]: Private RP Partners
+                  - treeitem [level=3] [ref=e4293]:
+                    - generic [ref=e1096]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4294]:
+                - generic [ref=e1098]:
+                  - img [ref=e1100]
+                  - img [ref=e1104]
+                  - generic [ref=e1106]: MSC Sovereign Automation [IDC]
+                - group [ref=e1107]:
+                  - treeitem [level=3] [ref=e4295]:
+                    - generic [ref=e1112]: Ev2ArtifactsValidator - Support Hub
+                  - treeitem [level=3] [ref=e4296]:
+                    - generic [ref=e1115]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4297]:
+                - generic [ref=e1117]:
+                  - img [ref=e1119]
+                  - img [ref=e1123]
+                  - generic [ref=e1125]: DK8s Champions
+                - group [ref=e1126]:
+                  - treeitem [level=3] [ref=e4298]:
+                    - generic [ref=e1131]: DK8s Champions - Discussions
+              - treeitem [expanded] [level=2] [ref=e4299]:
+                - generic [ref=e1133]:
+                  - img [ref=e1135]
+                  - img [ref=e1139]
+                  - generic [ref=e1141]: Aspire
+                - group [ref=e1142]:
+                  - treeitem [level=3] [ref=e4300]:
+                    - generic [ref=e1147]: General
+                  - treeitem [level=3] [ref=e4301]:
+                    - generic [ref=e1152]: 🖼️ Aspire memes
+                  - treeitem [level=3] [ref=e4302]:
+                    - generic [ref=e1157]: 🥰😢 Feedback
+                  - treeitem [level=3] [ref=e4303]:
+                    - generic [ref=e1162]: 🫶🏻 Friends of Aspire
+                  - treeitem [level=3] [ref=e4304]:
+                    - generic [ref=e1167]: Aspire for 1P
+                  - treeitem [level=3] [ref=e4305]:
+                    - generic [ref=e1172]: CI Notifications
+                  - treeitem [level=3] [ref=e4306]:
+                    - generic [ref=e1177]: Tactics And Shiproom
+                  - treeitem [level=3] [ref=e4307]:
+                    - generic [ref=e1180]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4308]:
+                - generic [ref=e1182]:
+                  - img [ref=e1184]
+                  - img [ref=e1188]
+                  - generic [ref=e1190]: GitHub Copilot at Microsoft
+                - group [ref=e1191]:
+                  - treeitem [level=3] [ref=e4309]:
+                    - generic [ref=e1196]: General
+                  - treeitem [level=3] [ref=e4310]:
+                    - generic [ref=e1201]: Copilot CLI
+                  - treeitem [level=3] [ref=e4311]:
+                    - generic [ref=e1206]: Copilot in Visual Studio 2026
+                  - treeitem [level=3] [ref=e4312]:
+                    - generic [ref=e1209]: See all channels
+              - treeitem [level=2] [ref=e4313]:
+                - generic [ref=e1211]:
+                  - img [ref=e1213]
+                  - img [ref=e1217]
+                  - generic [ref=e1219]: Kubernetes Shared Tools and Techniques
+                  - img [ref=e1222]
+              - treeitem [expanded] [level=2] [ref=e4314]:
+                - generic [ref=e1225]:
+                  - img [ref=e1227]
+                  - img [ref=e1231]
+                  - generic [ref=e1233]: squads
+                - group [ref=e1234]:
+                  - treeitem [level=3] [ref=e4315]:
+                    - generic [ref=e1239]: tamir-squads-notifications
+                  - treeitem [level=3] [ref=e4316]:
+                    - generic [ref=e1242]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4317]:
+                - generic [ref=e1244]:
+                  - img [ref=e1246]
+                  - img [ref=e1250]
+                  - generic [ref=e1252]: GitHub inside Microsoft (GiM)
+                - group [ref=e1253]:
+                  - treeitem [level=3] [ref=e4318]:
+                    - generic [ref=e1255]:
+                      - generic [ref=e1258]: General
+                      - img [ref=e1261]
+                  - treeitem [level=3] [ref=e4319]:
+                    - generic [ref=e1267]: Proxima
+                  - treeitem [level=3] [ref=e4320]:
+                    - generic [ref=e1270]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4321]:
+                - generic [ref=e1272]:
+                  - img [ref=e1274]
+                  - img [ref=e1278]
+                  - generic [ref=e1280]: Infra and Developer Platform Community
+                - group [ref=e1281]:
+                  - treeitem [level=3] [ref=e4322]:
+                    - generic [ref=e1286]: ConfigGen SDK - Support
+                  - treeitem [level=3] [ref=e4323]:
+                    - generic [ref=e1288]:
+                      - generic [ref=e1291]: Defender Build and Release - Support
+                      - generic [ref=e1293]:
+                        - img [ref=e1294]
+                        - img [ref=e1296]
+                  - treeitem [level=3] [ref=e4324]:
+                    - generic [ref=e1302]: DK8S Clusters (Kubernetes) - Announcements
+                  - treeitem [level=3] [ref=e4325]:
+                    - generic [ref=e1304]:
+                      - generic [ref=e1307]: DK8S Clusters (Kubernetes) - Support
+                      - img [ref=e1310]
+                  - treeitem [level=3] [ref=e4326]:
+                    - generic [ref=e1314]: See all channels
+              - treeitem [level=2] [ref=e4327]:
+                - generic [ref=e1316]:
+                  - img [ref=e1318]
+                  - img [ref=e1322]
+                  - generic [ref=e1324]: GitOps
+                  - generic [ref=e1326]:
+                    - img [ref=e1327]
+                    - img [ref=e1329]
+              - treeitem [expanded] [level=2] [ref=e4328]:
+                - generic [ref=e1332]:
+                  - img [ref=e1334]
+                  - img [ref=e1338]
+                  - generic [ref=e1340]: Infra and Developer Platform Org
+                - group [ref=e1341]:
+                  - treeitem [level=3] [ref=e4329]:
+                    - generic [ref=e1346]: Dk8sWizard
+                  - treeitem [level=3] [ref=e4330]:
+                    - generic [ref=e1351]: IDP ADR Notifications
+                  - treeitem [level=3] [ref=e4331]:
+                    - generic [ref=e1356]: IDP AI [Chat]
+                  - treeitem [level=3] [ref=e4332]:
+                    - generic [ref=e1361]: IDP Annoucements
+                  - treeitem [level=3] [ref=e4333]:
+                    - generic [ref=e1364]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4334]:
+                - generic [ref=e1366]:
+                  - img [ref=e1368]
+                  - img [ref=e1372]
+                  - generic [ref=e1374]: C# AI
+                - group [ref=e1375]:
+                  - treeitem [level=3] [ref=e4335]:
+                    - generic [ref=e1380]: CSharp AI Team Chat
+                  - treeitem [level=3] [ref=e4336]:
+                    - generic [ref=e1383]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4337]:
+                - generic [ref=e1385]:
+                  - img [ref=e1387]
+                  - img [ref=e1391]
+                  - generic [ref=e1393]: ILDC Official Trainers 2025-2026
+                - group [ref=e1394]:
+                  - treeitem [level=3] [ref=e4338]:
+                    - generic [ref=e1399]: Trainers Discussion
+              - treeitem [expanded] [level=2] [ref=e4339]:
+                - generic [ref=e1401]:
+                  - img [ref=e1403]
+                  - img [ref=e1407]
+                  - generic [ref=e1409]: One Defender Base
+                - group [ref=e1410]:
+                  - treeitem [level=3] [ref=e4340]:
+                    - generic [ref=e1415]: General
+                  - treeitem [level=3] [ref=e4341]:
+                    - generic [ref=e1418]: See all channels
+              - treeitem [level=2] [ref=e4342]:
+                - generic [ref=e1420]:
+                  - img [ref=e1422]
+                  - img [ref=e1426]
+                  - generic [ref=e1428]: Ibiza Fx Partners
+              - treeitem [expanded] [level=2] [ref=e4343]:
+                - generic [ref=e1430]:
+                  - img [ref=e1432]
+                  - img [ref=e1436]
+                  - generic [ref=e1438]: Work IQ Feedback
+                - group [ref=e1439]:
+                  - treeitem [level=3] [ref=e4344]:
+                    - generic [ref=e1444]: Please Use FEEDBACK Channel
+                  - treeitem [level=3] [ref=e4345]:
+                    - generic [ref=e1447]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4346]:
+                - generic [ref=e1449]:
+                  - img [ref=e1451]
+                  - img [ref=e1455]
+                  - generic [ref=e1457]: MSEC + Anthropic + Claude Code
+                - group [ref=e1458]:
+                  - treeitem [level=3] [ref=e4347]:
+                    - generic [ref=e1463]: Anthropic.DEV
+              - treeitem [expanded] [level=2] [ref=e4348]:
+                - generic [ref=e1465]:
+                  - img [ref=e1467]
+                  - img [ref=e1471]
+                  - generic [ref=e1473]: Agent Framework/AutoGen/Semantic Kernel - MSFT Support
+                - group [ref=e1474]:
+                  - treeitem [level=3] [ref=e4349]:
+                    - generic [ref=e1479]: General
+                  - treeitem [level=3] [ref=e4350]:
+                    - generic [ref=e1484]: Ask Us!
+                  - treeitem [level=3] [ref=e4351]:
+                    - generic [ref=e1487]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4352]:
+                - generic [ref=e1489]:
+                  - img [ref=e1491]
+                  - img [ref=e1495]
+                  - generic [ref=e1497]: Runtime Platform (DK8S)
+                - group [ref=e1498]:
+                  - treeitem [level=3] [ref=e4353]:
+                    - generic [ref=e1503]: Dev
+                  - treeitem [level=3] [ref=e4354]:
+                    - generic [ref=e1508]: DK8S General 🗣️
+                  - treeitem [level=3] [ref=e4355]:
+                    - generic [ref=e1513]: DK8S OnCall; Sev2 💥
+                  - treeitem [level=3] [ref=e4356]:
+                    - generic [ref=e1518]: Dk8s Provisioning
+                  - treeitem [level=3] [ref=e4357]:
+                    - generic [ref=e1521]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4358]:
+                - generic [ref=e1523]:
+                  - img [ref=e1525]
+                  - img [ref=e1529]
+                  - generic [ref=e1531]: Productivity with AI ILDC
+                - group [ref=e1532]:
+                  - treeitem [level=3] [ref=e4359]:
+                    - generic [ref=e1534]:
+                      - generic [ref=e1537]: ❔QnA
+                      - img [ref=e1540]
+                  - treeitem [level=3] [ref=e4360]:
+                    - generic [ref=e1546]: 💡Tips and Tricks
+                  - treeitem [level=3] [ref=e4361]:
+                    - generic [ref=e1551]: 💬 General Chat
+                  - treeitem [level=3] [ref=e4362]:
+                    - generic [ref=e1554]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4363]:
+                - generic [ref=e1556]:
+                  - img [ref=e1558]
+                  - img [ref=e1562]
+                  - generic [ref=e1564]: MPD Experience
+                - group [ref=e1565]:
+                  - treeitem [level=3] [ref=e4364]:
+                    - generic [ref=e1567]:
+                      - generic [ref=e1570]: General Questions
+                      - generic [ref=e1572]:
+                        - img [ref=e1573]
+                        - img [ref=e1575]
+                  - treeitem [level=3] [ref=e4365]:
+                    - generic [ref=e1579]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4366]:
+                - generic [ref=e1581]:
+                  - img [ref=e1583]
+                  - img [ref=e1587]
+                  - generic [ref=e1589]: DK8s Resource Provider
+                - group [ref=e1590]:
+                  - treeitem [level=3] [ref=e4367]:
+                    - generic [ref=e1595]: General
+              - treeitem [level=2] [ref=e4368]:
+                - generic [ref=e1597]:
+                  - img [ref=e1599]
+                  - img [ref=e1603]
+                  - generic [ref=e1605]: ARM Partners
+              - treeitem [expanded] [level=2] [ref=e4369]:
+                - generic [ref=e1607]:
+                  - img [ref=e1609]
+                  - img [ref=e1613]
+                  - generic [ref=e1615]: MTP ILDC team
+                - group [ref=e1616]:
+                  - treeitem [level=3] [ref=e4370]:
+                    - generic [ref=e1621]: General
+                  - treeitem [level=3] [ref=e4371]:
+                    - generic [ref=e1626]: Architecture
+                  - treeitem [level=3] [ref=e4372]:
+                    - generic [ref=e1629]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4373]:
+                - generic [ref=e1631]:
+                  - img [ref=e1633]
+                  - img [ref=e1637]
+                  - generic [ref=e1639]: IL Military Community
+                - group [ref=e1640]:
+                  - treeitem [level=3] [ref=e4374]:
+                    - generic [ref=e1645]: General
+                  - treeitem [level=3] [ref=e4375]:
+                    - generic [ref=e1648]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4376]:
+                - generic [ref=e1650]:
+                  - img [ref=e1652]
+                  - img [ref=e1656]
+                  - generic [ref=e1658]: MVP Program
+                - group [ref=e1659]:
+                  - treeitem [level=3] [ref=e4377]:
+                    - generic [ref=e1661]:
+                      - generic [ref=e1664]: General
+                      - img [ref=e1667]
+                  - treeitem [level=3] [ref=e4378]:
+                    - generic [ref=e1673]: 💻 Product Group Interaction
+                  - treeitem [level=3] [ref=e4379]:
+                    - generic [ref=e1675]:
+                      - generic [ref=e1678]: 🗻 MVP Summit
+                      - img [ref=e1681]
+                  - treeitem [level=3] [ref=e4380]:
+                    - generic [ref=e1687]: Development
+                  - treeitem [level=3] [ref=e4381]:
+                    - generic [ref=e1689]:
+                      - generic [ref=e1692]: Microsoft Foundry
+                      - img [ref=e1695]
+                  - treeitem [level=3] [ref=e4382]:
+                    - generic [ref=e1699]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4383]:
+                - generic [ref=e1701]:
+                  - img [ref=e1703]
+                  - img [ref=e1707]
+                  - generic [ref=e1709]: The Garage Intelligence Lab
+                - group [ref=e1710]:
+                  - treeitem [level=3] [ref=e4384]:
+                    - generic [ref=e1712]:
+                      - generic [ref=e1715]: News
+                      - img [ref=e1718]
+                  - treeitem [level=3] [ref=e4385]:
+                    - generic [ref=e1722]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4386]:
+                - generic [ref=e1724]:
+                  - img [ref=e1726]
+                  - img [ref=e1730]
+                  - generic [ref=e1732]: Posture AI Tools
+                - group [ref=e1733]:
+                  - treeitem [level=3] [ref=e4387]:
+                    - generic [ref=e1738]: InspectorX
+              - treeitem [expanded] [level=2] [ref=e4388]:
+                - generic [ref=e1740]:
+                  - img [ref=e1742]
+                  - img [ref=e1746]
+                  - generic [ref=e1748]: Squad
+                - group [ref=e1749]:
+                  - treeitem [level=3] [ref=e4389]:
+                    - generic [ref=e1754]: Welcome to the Squad squad
+              - treeitem [expanded] [level=2] [ref=e4390]:
+                - generic [ref=e1756]:
+                  - img [ref=e1758]
+                  - img [ref=e1762]
+                  - generic [ref=e1764]: .NET IL Bond
+                - group [ref=e1765]:
+                  - treeitem [level=3] [ref=e4391]:
+                    - generic [ref=e1770]: General
+                  - treeitem [level=3] [ref=e4392]:
+                    - generic [ref=e1772]:
+                      - generic [ref=e1775]: Leaders
+                      - img [ref=e1777]
+                  - treeitem [level=3] [ref=e4393]:
+                    - generic [ref=e1780]:
+                      - generic [ref=e1783]: Questions
+                      - img [ref=e1785]
+                  - treeitem [level=3] [ref=e4394]:
+                    - generic [ref=e1789]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4395]:
+                - generic [ref=e1791]:
+                  - img [ref=e1793]
+                  - img [ref=e1797]
+                  - generic [ref=e1799]: Bonds Leaders ILDC
+                - group [ref=e1800]:
+                  - treeitem [level=3] [ref=e4396]:
+                    - generic [ref=e1805]: General-
+              - treeitem [expanded] [level=2] [ref=e4397]:
+                - generic [ref=e1807]:
+                  - img [ref=e1809]
+                  - img [ref=e1813]
+                  - generic [ref=e1815]: Work-Claw
+                - group [ref=e1816]:
+                  - treeitem [level=3] [ref=e4398]:
+                    - generic [ref=e1821]: General
+                  - treeitem [level=3] [ref=e4399]:
+                    - generic [ref=e1824]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4400]:
+                - generic [ref=e1826]:
+                  - img [ref=e1828]
+                  - img [ref=e1832]
+                  - generic [ref=e1834]: MCP @ Microsoft
+                - group [ref=e1835]:
+                  - treeitem [level=3] [ref=e4401]:
+                    - generic [ref=e1840]: 📰 MCP News
+                  - treeitem [level=3] [ref=e4402]:
+                    - generic [ref=e1845]: MCP .NET SDK
+                  - treeitem [level=3] [ref=e4403]:
+                    - generic [ref=e1850]: MCP 1p Publishing
+                  - treeitem [level=3] [ref=e4404]:
+                    - generic [ref=e1855]: MCP Agentic Protocol
+                  - treeitem [level=3] [ref=e4405]:
+                    - generic [ref=e1860]: MCP Collaboration
+                  - treeitem [level=3] [ref=e4406]:
+                    - generic [ref=e1865]: MCP Demo Videos
+                  - treeitem [level=3] [ref=e4407]:
+                    - generic [ref=e1870]: MCP in Windows
+                  - treeitem [level=3] [ref=e4408]:
+                    - generic [ref=e1875]: MCP Security
+                  - treeitem [level=3] [ref=e4409]:
+                    - generic [ref=e1878]: See all channels
+              - treeitem [expanded] [level=2] [ref=e4410]:
+                - generic [ref=e1880]:
+                  - img [ref=e1882]
+                  - img [ref=e1886]
+                  - generic [ref=e1888]: IDP Leadership
+                - group [ref=e1889]:
+                  - treeitem [level=3] [ref=e4411]:
+                    - generic [ref=e1894]: IDP LT [Chat]
+                  - treeitem [level=3] [ref=e4412]:
+                    - generic [ref=e1897]: See all channels
+              - treeitem [level=2] [ref=e4413]:
+                - generic [ref=e1900]: See all your teams
+          - treeitem [expanded] [level=1] [ref=e4414] [cursor=pointer]:
+            - generic [ref=e1902]:
+              - img [ref=e1904]
+              - generic [ref=e1907]: Communities
+            - group [ref=e1908]:
+              - treeitem [level=2] [ref=e4415]:
+                - generic [ref=e1910]:
+                  - img [ref=e1913]
+                  - generic [ref=e1915]: Agency
+              - treeitem [level=2] [ref=e4416]:
+                - generic [ref=e1917]:
+                  - img [ref=e1920]
+                  - generic [ref=e1922]: Agents at Microsoft | Builders' Lounge
+              - treeitem [level=2] [ref=e4417]:
+                - generic [ref=e1924]:
+                  - img [ref=e1927]
+                  - generic [ref=e1929]: All Network
+              - treeitem [level=2] [ref=e4418]:
+                - generic [ref=e1931]:
+                  - img [ref=e1934]
+                  - generic [ref=e1936]: Microsoft Digital Europe South
+              - treeitem [level=2] [ref=e4419]:
+                - generic [ref=e1938]:
+                  - img [ref=e1941]
+                  - generic [ref=e1943]: Employee News & Events
+              - treeitem [level=2] [ref=e4420]:
+                - generic [ref=e1945]:
+                  - img [ref=e1948]
+                  - generic [ref=e1950]: The Garage Intelligence Lab - Israel
+              - treeitem [level=2] [ref=e4421]:
+                - generic [ref=e1952]:
+                  - img [ref=e1955]
+                  - generic [ref=e1957]: CEMA GEO Manager Excellence Community
+              - treeitem [level=2] [ref=e4422]:
+                - generic [ref=e1960]: See all your communities
+        - status [ref=e1961]
+        - generic [ref=e1962]: Unread message
+        - generic [ref=e1963]: Last message
+        - generic [ref=e1964]: Group chat
+        - generic [ref=e1965]: Meeting chat
+        - generic [ref=e1966]: Chat
+        - generic [ref=e1967]: Personal at mention
+        - generic [ref=e1968]: Everyone at mention
+        - generic [ref=e1969]: Important
+        - generic [ref=e1970]: Urgent
+        - generic [ref=e1971]: Draft
+        - generic [ref=e1972]: Draft
+        - generic [ref=e1973]: Muted
+        - generic [ref=e1974]: Meeting in progress
+        - generic [ref=e1975]: Meet now in progress
+        - generic [ref=e1976]: You can't send messages because you are not a member of the chat.
+        - generic [ref=e1977]: Private
+        - generic [ref=e1978]: Shared
+        - generic [ref=e1979]: Has context menu
+        - generic [ref=e1980]: Channel at mention
+        - generic [ref=e1981]: Team at mention
+        - generic [ref=e1982]: Personal at mention
+        - generic [ref=e1983]: Unread
+        - generic [ref=e1984]: Unread
+        - generic [ref=e1985]: Meeting in progress
+        - generic [ref=e1986]: Unread
+        - generic [ref=e1987]: Channel
+        - generic [ref=e1988]: Team
+        - generic [ref=e1989]: Has pinned messages
+        - generic [ref=e1990]: See more
+        - generic [ref=e1991]: Community
+        - generic [ref=e1992]: Temporarily shown
+        - generic [ref=e1993]: Has context menu
+        - generic [ref=e1994]: Has context menu
+        - toolbar [ref=e4423]:
+          - separator [ref=e1997]
+          - button [ref=e4424]:
+            - generic [ref=e2000]: Teams and channels
+            - generic [ref=e2001]:
+              - img [ref=e2002]
+              - img [ref=e2004]
+      - slider [ref=e4425]
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - button [ref=e4426]:
+          - generic [ref=e126]:
+            - img [ref=e128]
+            - img [ref=e130]
+        - generic [ref=e135]:
+          - heading [level=2] [ref=e4427]:
+            - list [ref=e4428]:
+              - generic [ref=e2007]:
+                - listitem [ref=e4429] [cursor=pointer]:
+                  - generic [ref=e2009]:
+                    - img [ref=e4430]:
+                      - img [ref=e4064]
+                    - generic [ref=e2014]: Ami
+                - text: ","
+              - listitem [ref=e4431] [cursor=pointer]:
+                - generic [ref=e2017]:
+                  - img [ref=e4432]:
+                    - img [ref=e2020]
+                  - generic [ref=e2022]: Brady
+              - text: ", +2"
+          - button [ref=e4433]:
+            - img [ref=e147]
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - tablist [ref=e151]:
+            - tab [selected] [ref=e4434] [cursor=pointer]:
+              - generic [ref=e156]: Chat
+            - tab [ref=e4435] [cursor=pointer]:
+              - generic [ref=e160]: Shared
+            - tab [ref=e4436]:
+              - img [ref=e163]
+          - generic [ref=e166]: Has context menu
+        - status [ref=e167]
+      - toolbar [ref=e4437]:
+        - generic [ref=e170]:
+          - button [ref=e4438]:
+            - img [ref=e173]
+            - generic [ref=e175]: Meet now
+          - button [ref=e4439]:
+            - img [ref=e178]
+        - button [ref=e4440]:
+          - img [ref=e182]
+          - text: "4"
+        - separator [ref=e184]
+        - generic [ref=e4441]:
+          - button [ref=e4442]:
+            - img [ref=e2025]
+          - button [ref=e4443]:
+            - img [ref=e189]
+          - button [ref=e4444]:
+            - img [ref=e193]
+        - button [ref=e4445]:
+          - img [ref=e202]
+    - generic [ref=e209]:
+      - generic [ref=e212]:
+        - generic [ref=e218]:
+          - generic [ref=e2028]:
+            - heading [level=6] [ref=e4446]: Jon Gallant added Tamir Dresher and 2 others to the chat.
+            - group [ref=e4447]:
+              - generic [ref=e2033]:
+                - img [ref=e2034]
+                - img [ref=e2036]
+                - group [ref=e4448]:
+                  - generic [ref=e2039]:
+                    - button [ref=e4449]:
+                      - button [ref=e4450]: Jon Gallant
+                    - text: added
+                    - button [ref=e4451]:
+                      - button [ref=e4452]: Tamir Dresher
+                    - text: and 2 others to the chat.
+          - generic [ref=e2047]:
+            - heading [level=4] [ref=e4453]: I'm helping you both secure your tunnel imp... by Jon Gallant
+            - generic [ref=e2050]:
+              - generic [ref=e2051]:
+                - generic [ref=e2055]: Jon Gallant
+                - time [ref=e2056]: 6:50 AM
+              - generic [ref=e2057]:
+                - generic [ref=e2060]:
+                  - img [ref=e2061]
+                  - img [ref=e2062]:
+                    - img [ref=e2064]
+                - group [ref=e4454]:
+                  - button [ref=e4455]
+                  - paragraph [ref=e2070]: I'm helping you both secure your tunnel implementations. Might be a good idea to merge them or one use the other...
+                  - toolbar [ref=e4457]:
+                    - button [ref=e4458]:
+                      - generic [ref=e2074]:
+                        - img [ref=e4459]
+                        - generic [ref=e2077]: 2 Green heart reactions.
+                        - generic [ref=e2078]: "2"
+                    - button [ref=e4460]:
+                      - img [ref=e2082]
+          - generic [ref=e2088]:
+            - heading [level=4] [ref=e4461]: Thank you, Jon by Brady Gaster
+            - generic [ref=e2091]:
+              - generic [ref=e2092]:
+                - generic [ref=e2096]: Brady Gaster
+                - time [ref=e2097]: 6:51 AM
+              - generic [ref=e2098]:
+                - generic [ref=e2101]:
+                  - img [ref=e2102]
+                  - img [ref=e2103]:
+                    - img [ref=e2105]
+                - group [ref=e4462]:
+                  - button [ref=e4463]
+                  - paragraph [ref=e2111]:
+                    - text: Thank you,
+                    - button [ref=e4465]: Jon
+          - generic [ref=e2116]:
+            - heading [level=4] [ref=e4466]: For reference, here’s what I’ve put togethe... by Ami Schreiber
+            - generic [ref=e2119]:
+              - generic [ref=e2120]:
+                - generic [ref=e2124]: Ami Schreiber
+                - time [ref=e2125]: 6:53 AM
+              - generic [ref=e2126]:
+                - generic [ref=e2129]:
+                  - img [ref=e2130]
+                  - img [ref=e2131]:
+                    - img [ref=e4066]
+                - group [ref=e4467]:
+                  - button [ref=e4468]
+                  - paragraph [ref=e2139]:
+                    - text: For reference, here’s what I’ve put together. It comes with a companion iOS app. I’ll add everyone to TestFlight so you can kick the tires.
+                    - link [ref=e4470] [cursor=pointer]:
+                      - /url: https://github.com/shribr/agent-dashboard
+                      - text: https://github.com/shribr/agent-dashboard
+          - generic [ref=e2144]:
+            - heading [level=4] [ref=e4471]: Also added everyone as collaborators for th... by Ami Schreiber
+            - generic [ref=e2147]:
+              - generic [ref=e2148]:
+                - generic [ref=e2152]: Ami Schreiber
+                - time [ref=e2153]: 6:58 AM
+                - generic [ref=e4472]: Edited
+              - generic [ref=e2157]:
+                - generic [ref=e2160]:
+                  - img [ref=e2161]
+                  - img [ref=e2162]:
+                    - img [ref=e4068]
+                - group [ref=e4473]:
+                  - button [ref=e4474]
+                  - generic [ref=e2170]: Also added everyone as collaborators for the repo.
+                  - toolbar [ref=e4476]:
+                    - button [ref=e4477]:
+                      - generic [ref=e2174]:
+                        - img [ref=e4478]
+                        - generic [ref=e2177]: 1 Like reaction with medium light skin tone.
+                    - button [ref=e4479]:
+                      - img [ref=e2181]
+          - generic [ref=e2187]:
+            - heading [level=4] [ref=e4480]: Link https://github.com/shribr/agent-dashbo... by Jon Gallant
+            - generic [ref=e2190]:
+              - generic [ref=e2191]:
+                - generic [ref=e2195]: Jon Gallant
+                - time [ref=e2196]: 8:31 AM
+              - generic [ref=e2197]:
+                - generic [ref=e2200]:
+                  - img [ref=e2201]
+                  - img [ref=e2202]:
+                    - img [ref=e2204]
+                - group [ref=e4481]:
+                  - button [ref=e4482]
+                  - paragraph [ref=e2210]:
+                    - link [ref=e4484] [cursor=pointer]:
+                      - /url: https://github.com/shribr/agent-dashboard-pr/issues/5
+                      - text: https://github.com/shribr/agent-dashboard-pr/issues/5
+          - generic [ref=e2215]:
+            - heading [level=4] [ref=e4485]: Link https://github.com/tamirdresher/cli-tu... by Jon Gallant
+            - generic [ref=e2218]:
+              - generic [ref=e2222]: Jon Gallant
+              - time [ref=e2223]: 8:32 AM
+              - group [ref=e4486]:
+                - button [ref=e4487]
+                - paragraph [ref=e2229]:
+                  - link [ref=e4489] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher/cli-tunnel-pr/issues/12
+                    - text: https://github.com/tamirdresher/cli-tunnel-pr/issues/12
+          - generic [ref=e2234]:
+            - heading [level=4] [ref=e4490]: keep in mind that copilot team is building ... by Jon Gallant
+            - generic [ref=e2237]:
+              - generic [ref=e2241]: Jon Gallant
+              - time [ref=e2242]: 8:32 AM
+              - group [ref=e4491]:
+                - button [ref=e4492]
+                - paragraph [ref=e2248]: keep in mind that copilot team is building the official version, so all of this will likely be moot as soon as they do
+          - generic [ref=e2252]:
+            - heading [level=4] [ref=e4494]: Ok. Either way, it’s a cool exercise. Any c... by Ami Schreiber
+            - generic [ref=e2255]:
+              - generic [ref=e2256]:
+                - generic [ref=e2260]: Ami Schreiber
+                - time [ref=e2261]: 8:49 AM
+              - generic [ref=e2262]:
+                - generic [ref=e2265]:
+                  - img [ref=e2266]
+                  - img [ref=e2267]:
+                    - img [ref=e4070]
+                - group [ref=e4495]:
+                  - button [ref=e4496]
+                  - generic [ref=e2275]: Ok. Either way, it’s a cool exercise. Any chance we can help with that?
+          - generic [ref=e2279]:
+            - heading [level=4] [ref=e4498]: Also, for the security assessment, were the... by Ami Schreiber
+            - generic [ref=e2282]:
+              - generic [ref=e2286]: Ami Schreiber
+              - time [ref=e2287]: 8:51 AM
+              - group [ref=e4499]:
+                - button [ref=e4500]
+                - generic [ref=e2293]: Also, for the security assessment, were the 11 critical issues not based on the original scan? Did the rescan still find the same issues?
+          - generic [ref=e2297]:
+            - heading [level=4] [ref=e4502]: Also, I removed Cloudflare as an option to ... by Ami Schreiber
+            - generic [ref=e2300]:
+              - generic [ref=e2304]: Ami Schreiber
+              - time [ref=e2305]: 8:55 AM
+              - group [ref=e4503]:
+                - button [ref=e4504]
+                - generic [ref=e2311]: Also, I removed Cloudflare as an option to simplify things a bit so I’m not sure why the security scanner still thinks it’s in the codebase.
+          - generic [ref=e2315]:
+            - heading [level=4] [ref=e4506]: Hi Ami Schreiber I'll add you as contribu... by Tamir Dresher
+            - generic [ref=e2318]:
+              - generic [ref=e2319]:
+                - time [ref=e2320]: 9:20 AM
+                - generic [ref=e2324]: Tamir Dresher
+              - group [ref=e4507]:
+                - button [ref=e4508]
+                - paragraph [ref=e2330]:
+                  - text: Hi
+                  - button [ref=e4510]: Ami Schreiber
+                  - text: I'll add you as contributor in a sec
+                - toolbar [ref=e4511]:
+                  - button [ref=e4512]:
+                    - generic [ref=e2335]:
+                      - img [ref=e4513]
+                      - generic [ref=e2338]: 1 Like reaction.
+                  - button [ref=e4514]:
+                    - img [ref=e2342]
+          - generic [ref=e2348]:
+            - heading [level=4] [ref=e4515]: Begin Reference, https://github.com/tamirdr... by Tamir Dresher
+            - generic [ref=e2351]:
+              - generic [ref=e2352]:
+                - time [ref=e2353]: 9:53 AM
+                - generic [ref=e2357]: Tamir Dresher
+              - group [ref=e4516]:
+                - button [ref=e4517]
+                - generic [ref=e4518]:
+                  - group [ref=e4519] [cursor=pointer]:
+                    - generic [ref=e2366]:
+                      - generic [ref=e2367]:
+                        - generic [ref=e2368]: Jon Gallant
+                        - generic [ref=e2369]: 3/2/2026 8:32 AM
+                      - generic [ref=e2370]: https://github.com/tamirdresher/cli-tunnel-pr/issues/12
+                  - paragraph [ref=e2371]:
+                    - button [ref=e4520]: Jon Gallant
+                    - text: i commented in the issue, can you take a look please?
+          - generic [ref=e2376]:
+            - heading [level=4] [ref=e4521]: Here's the PR that copilot says solves almo... by Jon Gallant
+            - generic [ref=e2379]:
+              - generic [ref=e2380]:
+                - generic [ref=e2384]: Jon Gallant
+                - time [ref=e2385]: 7:44 PM
+              - generic [ref=e2386]:
+                - generic [ref=e2389]:
+                  - img [ref=e2390]
+                  - img [ref=e2391]:
+                    - img [ref=e2393]
+                - group [ref=e4522]:
+                  - button [ref=e4523]
+                  - paragraph [ref=e2399]:
+                    - text: Here's the PR that copilot says solves almost all the issues.
+                    - link [ref=e4525] [cursor=pointer]:
+                      - /url: https://github.com/tamirdresher/cli-tunnel-pr/pull/11
+                      - text: https://github.com/tamirdresher/cli-tunnel-pr/pull/11
+                    - text: I haven't test it.
+                  - toolbar [ref=e4526]:
+                    - button [pressed] [ref=e4527]:
+                      - generic [ref=e2404]:
+                        - img [ref=e4528]
+                        - generic [ref=e2407]: 1 Heart reaction.
+                    - button [ref=e4529]:
+                      - generic [ref=e2409]:
+                        - img [ref=e4530]
+                        - generic [ref=e2412]: 1 Party popper reaction.
+                    - button [ref=e4531]:
+                      - img [ref=e2416]
+          - generic [ref=e2422]:
+            - heading [level=4] [ref=e4532]: Jon Gallant Can you please run another sec... by Ami Schreiber
+            - generic [ref=e2425]:
+              - generic [ref=e2426]:
+                - generic [ref=e2430]: Ami Schreiber
+                - time [ref=e2431]: 8:37 PM
+              - generic [ref=e2432]:
+                - generic [ref=e2435]:
+                  - img [ref=e2436]
+                  - img [ref=e2437]:
+                    - img [ref=e4072]
+                - group [ref=e4533]:
+                  - button [ref=e4534]
+                  - paragraph [ref=e2445]:
+                    - button [ref=e4536]: Jon Gallant
+                    - text: Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration.
+          - generic [ref=e2450]:
+            - heading [level=4] [ref=e4537]: also - i made a lot of changes to the code ... by Brady Gaster
+            - generic [ref=e2453]:
+              - generic [ref=e2454]:
+                - generic [ref=e2458]: Brady Gaster
+                - time [ref=e2459]: 8:38 PM
+              - generic [ref=e2460]:
+                - generic [ref=e2463]:
+                  - img [ref=e2464]
+                  - img [ref=e2465]:
+                    - img [ref=e2467]
+                - group [ref=e4538]:
+                  - button [ref=e4539]
+                  - paragraph [ref=e2473]: also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated.
+          - generic [ref=e2477]:
+            - heading [level=4] [ref=e4541]: Begin Reference, also - i made a lot of cha... by Ami Schreiber
+            - generic [ref=e2480]:
+              - generic [ref=e2481]:
+                - generic [ref=e2485]: Ami Schreiber
+                - time [ref=e2486]: 8:39 PM
+              - generic [ref=e2487]:
+                - generic [ref=e2490]:
+                  - img [ref=e2491]
+                  - img [ref=e2492]:
+                    - img [ref=e4074]
+                - group [ref=e4542]:
+                  - button [ref=e4543]
+                  - generic [ref=e4544]:
+                    - group [ref=e4545] [cursor=pointer]:
+                      - generic [ref=e2503]:
+                        - generic [ref=e2504]:
+                          - generic [ref=e2505]: Brady Gaster
+                          - generic [ref=e2506]: 3/2/2026 8:38 PM
+                        - generic [ref=e2507]: also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated.
+                    - paragraph [ref=e2508]: Are you talking about my repo or Tamir's?
+          - generic [ref=e2512]:
+            - heading [level=4] [ref=e4546]: Squad-PR by Brady Gaster
+            - generic [ref=e2515]:
+              - generic [ref=e2516]:
+                - generic [ref=e2520]: Brady Gaster
+                - time [ref=e2521]: 8:40 PM
+              - generic [ref=e2522]:
+                - generic [ref=e2525]:
+                  - img [ref=e2526]
+                  - img [ref=e2527]:
+                    - img [ref=e2529]
+                - group [ref=e4547]:
+                  - button [ref=e4548]
+                  - paragraph [ref=e2535]: Squad-PR
+          - generic [ref=e2539]:
+            - heading [level=4] [ref=e4550]: Begin Reference, Squad-PR, Brady Gaster, 3/... by Ami Schreiber
+            - generic [ref=e2542]:
+              - generic [ref=e2543]:
+                - generic [ref=e2547]: Ami Schreiber
+                - time [ref=e2548]: 8:40 PM
+              - generic [ref=e2549]:
+                - generic [ref=e2552]:
+                  - img [ref=e2553]
+                  - img [ref=e2554]:
+                    - img [ref=e4076]
+                - group [ref=e4551]:
+                  - button [ref=e4552]
+                  - generic [ref=e4553]:
+                    - group [ref=e4554] [cursor=pointer]:
+                      - generic [ref=e2565]:
+                        - generic [ref=e2566]:
+                          - generic [ref=e2567]: Brady Gaster
+                          - generic [ref=e2568]: 3/2/2026 8:40 PM
+                        - generic [ref=e2569]: Squad-PR
+                    - paragraph [ref=e2570]:
+                      - text: Just making sure.
+                      - img [ref=e4556]
+                  - toolbar [ref=e4557]:
+                    - button [ref=e4558]:
+                      - generic [ref=e2576]:
+                        - img [ref=e4559]
+                        - generic [ref=e2579]: 1 Like reaction with medium light skin tone.
+                    - button [ref=e4560]:
+                      - img [ref=e2583]
+          - generic [ref=e2589]:
+            - heading [level=4] [ref=e4561]: np mate, thanks for being thorough. Smile by Brady Gaster
+            - generic [ref=e2592]:
+              - generic [ref=e2593]:
+                - generic [ref=e2597]: Brady Gaster
+                - time [ref=e2598]: 8:40 PM
+              - generic [ref=e2599]:
+                - generic [ref=e2602]:
+                  - img [ref=e2603]
+                  - img [ref=e2604]:
+                    - img [ref=e2606]
+                - group [ref=e4562]:
+                  - button [ref=e4563]
+                  - paragraph [ref=e2612]:
+                    - text: np mate, thanks for being thorough.
+                    - img [ref=e4566]
+          - generic [ref=e410]:
+            - heading [level=4] [ref=e4567]: Hey Jon Gallant , thanks for the thorough ... by Tamir Dresher
+            - generic [ref=e413]:
+              - generic [ref=e414]:
+                - time [ref=e415]: 8:51 PM
+                - generic [ref=e419]: Tamir Dresher
+              - group [ref=e4568]:
+                - button [ref=e4569]
+                - generic [ref=e4570]:
+                  - paragraph [ref=e425]:
+                    - text: Hey
+                    - button [ref=e4571]: Jon Gallant
+                    - text: ", thanks for the thorough security hardening 79 findings across 9 cycles is impressive work"
+                    - img [ref=e4573]
+                  - paragraph [ref=e428]: "I reviewed it and cherry-picked the redaction improvements into PR #15 — the ANSI bypass protection, Unicode invisible char stripping, NFKC normalization, and 9 new token patterns (27 total now)."
+                  - paragraph [ref=e429]: These are safe, no breaking changes, and directly improve our secret redaction.
+                  - paragraph [ref=e430]: "The rest of the PR I'm holding off on for now:"
+                  - list [ref=e431]:
+                    - listitem [ref=e432]: "Cookie-based auth: It breaks the QR code flow that lets users scan and connect from their phone. The token-in-URL approach is deliberate for cross-device UX. DevTunnel already provides the outer auth layer (private tunnels, MS identity)."
+                    - listitem [ref=e433]: "E2E WebSocket encryption: DevTunnel provides TLS between the phone and the relay. Adding E2E on top adds latency and complexity for marginal gain on a dev tool. The 5 known gaps (plaintext downgrade, unauthenticated ECDH, grid bypass) also need design review before shipping."
+                    - listitem [ref=e434]: "CSRF, token encryption at rest, self-hosted xterm: Over-engineering for our use case. File permissions (0o600) protect tokens. CDN + SRI hashes protect xterm.js."
+                - toolbar [ref=e4574]:
+                  - button [ref=e4575]:
+                    - generic [ref=e438]:
+                      - img [ref=e4576]
+                      - generic [ref=e441]: 1 Like reaction with light skin tone.
+                  - button [ref=e4577]:
+                    - img [ref=e445]
+          - generic [ref=e451]:
+            - heading [level=4] [ref=e4578]: Brady Gaster i'm sync the security changes ... by Tamir Dresher
+            - generic [ref=e454]:
+              - generic [ref=e455]:
+                - time [ref=e456]: 9:04 PM
+                - generic [ref=e460]: Tamir Dresher
+              - generic [ref=e461]:
+                - group [ref=e4579]:
+                  - button [ref=e4580]
+                  - generic [ref=e4581]:
+                    - paragraph [ref=e466]:
+                      - button [ref=e4582]: Brady Gaster
+                    - paragraph [ref=e467]: i'm sync the security changes to squad-pr. will let you know when it's done and tested
+                - img [ref=e4583]:
+                  - img [ref=e470]
+          - generic [ref=e474]:
+            - heading [level=4] [ref=e4584]: Brady Gaster we should be good to go now by Tamir Dresher
+            - generic [ref=e477]:
+              - generic [ref=e478]:
+                - time [ref=e479]: 11:24 PM
+                - generic [ref=e483]: Tamir Dresher
+              - group [ref=e4585]:
+                - button [ref=e4586]
+                - generic [ref=e4587]:
+                  - paragraph [ref=e489]:
+                    - button [ref=e4588]: Brady Gaster
+                  - paragraph [ref=e490]: we should be good to go now
+          - generic [ref=e4081]:
+            - heading [level=4] [ref=e4589]: "Cross-repo analysis: idk8s-infrastructure v... by Tamir Dresher, has an attachment."
+            - generic [ref=e4084]:
+              - generic [ref=e4085]:
+                - time [ref=e4086]: 11:32 PM
+                - generic [ref=e4090]: Tamir Dresher
+              - generic [ref=e4091]:
+                - group [ref=e4590]:
+                  - button [ref=e4591]
+                  - paragraph [ref=e4096]: "Cross-repo analysis: idk8s-infrastructure vs BasePlatformRP - reuse opportunities (from the Squad team analysis)"
+                  - group [ref=e4594]:
+                    - generic [ref=e4105]:
+                      - toolbar [ref=e4595]:
+                        - generic [ref=e4109]:
+                          - img [ref=e4112]
+                          - generic [ref=e4120]: cross-repo-analysis-idk8s-to-baseplatformrp.md
+                      - toolbar [ref=e4597]:
+                        - generic [ref=e4126]:
+                          - button [ref=e4598]:
+                            - img [ref=e4130]
+                          - button [ref=e4599]:
+                            - img [ref=e4134]
+                - img [ref=e4600]:
+                  - img [ref=e4141]
+        - generic [ref=e496]: has context menu
+      - generic [ref=e504]:
+        - textbox [ref=e4601]:
+          - /placeholder: Type a message
+          - paragraph [ref=e507]: Type a message
+        - generic [ref=e4143]:
+          - toolbar [ref=e4144]:
+            - button [ref=e4602] [cursor=pointer]:
+              - img [ref=e4147]
+            - button [ref=e4603] [cursor=pointer]:
+              - img [ref=e4152]
+            - button [ref=e4604] [cursor=pointer]:
+              - img [ref=e4157]
+            - button [ref=e4605] [cursor=pointer]:
+              - img [ref=e4161]
+            - button [ref=e4606] [cursor=pointer]:
+              - img [ref=e4166]
+          - toolbar [ref=e4608]:
+            - generic [ref=e4170]:
+              - button [ref=e4609] [cursor=pointer]:
+                - img [ref=e4173]
+              - generic [ref=e4176]: has context menu
+  - dialog [ref=e4610]:
+    - menu [ref=e5023]:
+      - menuitem "[HLD] Above-ARM RP Canary Testing.docx Opened 17 hours ago" [active] [ref=e5024] [cursor=pointer]:
+        - img [ref=e5026]
+        - generic [ref=e5037]:
+          - generic [ref=e5039]: "[HLD] Above-ARM RP Canary Testing.docx"
+          - generic [ref=e5041]: Opened 17 hours ago
+      - menuitem "Installing Work.iq on Mac Guide.docx Opened 17 hours ago" [ref=e5042] [cursor=pointer]:
+        - img [ref=e5044]
+        - generic [ref=e5055]:
+          - generic [ref=e5057]: Installing Work.iq on Mac Guide.docx
+          - generic [ref=e5059]: Opened 17 hours ago
+      - menuitem "AFD Implementation Plan.docx Opened 1 day ago" [ref=e5060] [cursor=pointer]:
+        - img [ref=e5062]
+        - generic [ref=e5073]:
+          - generic [ref=e5075]: AFD Implementation Plan.docx
+          - generic [ref=e5077]: Opened 1 day ago
+      - menuitem "Thrive University Schedule.pptx Opened 1 day ago" [ref=e5078] [cursor=pointer]:
+        - img [ref=e5080]
+        - generic [ref=e5090]:
+          - generic [ref=e5092]: Thrive University Schedule.pptx
+          - generic [ref=e5094]: Opened 1 day ago
+      - menuitem "zero-to-implementation-with-squad.pdf Opened 5 days ago" [ref=e5095] [cursor=pointer]:
+        - img [ref=e5097]
+        - generic [ref=e5104]:
+          - generic [ref=e5106]: zero-to-implementation-with-squad.pdf
+          - generic [ref=e5108]: Opened 5 days ago
+      - menuitem "Squad_llms_txt_Adoption.docx Opened 13 days ago" [ref=e5109] [cursor=pointer]:
+        - img [ref=e5111]
+        - generic [ref=e5122]:
+          - generic [ref=e5124]: Squad_llms_txt_Adoption.docx
+          - generic [ref=e5126]: Opened 13 days ago
+      - menuitem "Attach cloud files" [ref=e5127] [cursor=pointer]:
+        - img [ref=e5129]
+        - generic [ref=e5134]: Attach cloud files
+      - menuitem "Upload from this device" [ref=e5135] [cursor=pointer]:
+        - img [ref=e5137]
+        - generic [ref=e5139]: Upload from this device

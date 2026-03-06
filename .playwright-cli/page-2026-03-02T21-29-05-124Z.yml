@@ -1,0 +1,332 @@
+- application [active] [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - button "Open office app launcher" [ref=e13]:
+            - img [ref=e15]
+          - img [ref=e17]
+        - generic [ref=e33]: MS
+      - search [ref=e40]:
+        - button [ref=e41]:
+          - img [ref=e42]
+        - combobox "Search (Ctrl+Alt+E)" [ref=e48]
+      - generic [ref=e50]:
+        - button "Settings and more" [ref=e52]:
+          - img [ref=e55]
+        - button "Your profile, status Available" [ref=e59]:
+          - img "Profile picture of Tamir Dresher." [ref=e60]:
+            - generic [ref=e61]: TD
+            - img [ref=e62]
+            - img "available" [ref=e63]:
+              - img [ref=e65]
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - navigation "Apps" [ref=e74]:
+          - generic "Activity (Ctrl+Shift+1)" [ref=e76]:
+            - button "Activity (Ctrl+Shift+1)" [ref=e77]:
+              - generic [ref=e78]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Activity
+          - generic "Chat (Ctrl+Shift+2)" [ref=e80]:
+            - button "Chat (Ctrl+Shift+2)" [pressed] [ref=e81]:
+              - generic [ref=e82]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Chat
+            - generic: "38"
+            - generic [ref=e83]: 38 new notifications
+          - generic "Calendar (Ctrl+Shift+3)" [ref=e85]:
+            - button "Calendar (Ctrl+Shift+3)" [ref=e86]:
+              - generic [ref=e87]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calendar
+          - generic "Calls (Ctrl+Shift+4)" [ref=e89]:
+            - button "Calls (Ctrl+Shift+4)" [ref=e90]:
+              - generic [ref=e91]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calls
+          - generic "OneDrive (Ctrl+Shift+5)" [ref=e93]:
+            - button "OneDrive (Ctrl+Shift+5)" [ref=e94]:
+              - generic [ref=e95]:
+                - generic:
+                  - generic:
+                    - img "OneDrive"
+                    - img
+                  - generic: OneDrive
+          - generic "Copilot (Ctrl+Shift+6)" [ref=e97]:
+            - button "Copilot (Ctrl+Shift+6)" [ref=e98]:
+              - generic [ref=e99]:
+                - generic:
+                  - generic:
+                    - img "Copilot"
+                    - img
+                  - generic: Copilot
+        - generic [ref=e100]:
+          - generic "View more apps" [ref=e101]:
+            - button "View more apps" [ref=e102]:
+              - generic [ref=e103]:
+                - generic:
+                  - generic:
+                    - img
+          - generic "Apps" [ref=e105]:
+            - button "Apps" [ref=e106]:
+              - generic [ref=e107]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Apps
+      - generic [ref=e109]: Has context menu
+    - slider "Resize left panel" [ref=e115]
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - button "Change the group profile picture" [ref=e125]:
+          - generic [ref=e126]:
+            - img [ref=e128]
+            - img [ref=e130]
+        - generic [ref=e135]:
+          - heading "Chat participants" [level=2] [ref=e137]:
+            - list "Chat participants" [ref=e138]:
+              - listitem "Ami Available" [ref=e139] [cursor=pointer]:
+                - generic [ref=e141]: Ami
+                - text: ","
+              - listitem "Brady In a call" [ref=e142] [cursor=pointer]:
+                - generic [ref=e144]: Brady
+                - text: ","
+              - text: ", +2"
+          - button "Name group chat" [ref=e145]:
+            - img [ref=e147]
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - tablist [ref=e151]:
+            - tab "Chat" [selected] [ref=e153] [cursor=pointer]:
+              - generic [ref=e156]: Chat
+            - tab "Shared" [ref=e157] [cursor=pointer]:
+              - generic [ref=e160]: Shared
+            - tab "Add a tab" [ref=e161]:
+              - img [ref=e163]
+          - generic [ref=e166]: Has context menu
+        - status [ref=e167]
+      - toolbar "Chat actions" [ref=e168]:
+        - generic [ref=e170]:
+          - button "Meet now" [ref=e171]:
+            - img [ref=e173]
+            - generic [ref=e175]: Meet now
+          - button "More call options" [ref=e176]:
+            - img [ref=e178]
+        - button "Add people, agents, and bots, 4 participants" [ref=e180]:
+          - img [ref=e182]
+          - text: "4"
+        - separator [ref=e184]
+        - generic "Sidepane Features" [ref=e185]:
+          - button "Open notes" [ref=e187]:
+            - img [ref=e189]
+          - button "Open Agents and bots" [ref=e191]:
+            - img [ref=e193]
+          - button "Find in chat (Ctrl+F)" [ref=e195]:
+            - img [ref=e197]
+        - button "More chat options" [ref=e200]:
+          - img [ref=e202]
+    - generic [ref=e209]:
+      - generic [ref=e212]:
+        - generic [ref=e218]:
+          - generic [ref=e221]:
+            - heading "Jon Gallant Can you please run another sec... by Ami Schreiber" [level=4] [ref=e222]
+            - generic [ref=e224]:
+              - generic [ref=e225]:
+                - generic [ref=e229]: Ami Schreiber
+                - time [ref=e230]: 8:37 PM
+              - generic [ref=e231]:
+                - generic [ref=e233]:
+                  - img [ref=e234]
+                  - img [ref=e235]:
+                    - img [ref=e237]
+                - group "Ami Schreiber Jon Gallant Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration. Today at 8:37 PM." [ref=e240]:
+                  - button "More message options" [ref=e241]
+                  - generic "Jon Gallant Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration." [ref=e242]:
+                    - paragraph [ref=e243]: Jon Gallant Can you please run another security scan for my repo? I want to make sure I've gotten most of the issues taken care of before I start working with Tamir on integration.
+          - generic [ref=e247]:
+            - heading "also - i made a lot of changes to the code ... by Brady Gaster" [level=4] [ref=e248]
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - generic [ref=e255]: Brady Gaster
+                - time [ref=e256]: 8:38 PM
+              - generic [ref=e257]:
+                - generic [ref=e259]:
+                  - img [ref=e260]
+                  - img [ref=e261]:
+                    - img [ref=e263]
+                - group "Brady Gaster also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated. Today at 8:38 PM." [ref=e266]:
+                  - button "More message options" [ref=e267]
+                  - generic "also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated." [ref=e268]:
+                    - paragraph [ref=e269]: also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated.
+          - generic [ref=e273]:
+            - heading "Begin Reference, also - i made a lot of cha... by Ami Schreiber" [level=4] [ref=e274]
+            - generic [ref=e276]:
+              - generic [ref=e277]:
+                - generic [ref=e281]: Ami Schreiber
+                - time [ref=e282]: 8:39 PM
+              - generic [ref=e283]:
+                - generic [ref=e285]:
+                  - img [ref=e286]
+                  - img [ref=e287]:
+                    - img [ref=e289]
+                - group "Ami Schreiber Begin Reference, also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated., Brady Gaster, 3/2/2026 8:38 PM, End reference Are you talking about my repo or Tamir's? Today at 8:39 PM." [ref=e292]:
+                  - button "More message options" [ref=e293]
+                  - generic "Begin Reference, also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated., Brady Gaster, 3/2/2026 8:38 PM, End reference Are you talking about my repo or Tamir's?" [ref=e294]:
+                    - group "Begin Reference, also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated., Brady Gaster, 3/2/2026 8:38 PM, End reference" [ref=e295] [cursor=pointer]:
+                      - generic [ref=e298]:
+                        - generic [ref=e299]:
+                          - generic [ref=e300]: Brady Gaster
+                          - generic [ref=e301]: 3/2/2026 8:38 PM
+                        - generic [ref=e302]: also - i made a lot of changes to the code over the weekend so i want to make sure we're rebasing against the new changes and that, if that forces changes and that forces new scans, that we're doing that. sorry if i made life complicated.
+                    - paragraph [ref=e303]: Are you talking about my repo or Tamir's?
+          - generic [ref=e307]:
+            - heading "Squad-PR by Brady Gaster" [level=4] [ref=e308]
+            - generic [ref=e310]:
+              - generic [ref=e311]:
+                - generic [ref=e315]: Brady Gaster
+                - time [ref=e316]: 8:40 PM
+              - generic [ref=e317]:
+                - generic [ref=e319]:
+                  - img [ref=e320]
+                  - img [ref=e321]:
+                    - img [ref=e323]
+                - group "Brady Gaster Squad-PR Today at 8:40 PM." [ref=e326]:
+                  - button "More message options" [ref=e327]
+                  - generic "Squad-PR" [ref=e328]:
+                    - paragraph [ref=e329]: Squad-PR
+          - generic [ref=e333]:
+            - heading "Begin Reference, Squad-PR, Brady Gaster, 3/... by Ami Schreiber" [level=4] [ref=e334]
+            - generic [ref=e336]:
+              - generic [ref=e337]:
+                - generic [ref=e341]: Ami Schreiber
+                - time [ref=e342]: 8:40 PM
+              - generic [ref=e343]:
+                - generic [ref=e345]:
+                  - img [ref=e346]
+                  - img [ref=e347]:
+                    - img [ref=e349]
+                - group "Ami Schreiber Begin Reference, Squad-PR, Brady Gaster, 3/2/2026 8:40 PM, End reference Just making sure. Smile 1 Like reaction with medium light skin tone. Today at 8:40 PM." [ref=e352]:
+                  - button "More message options" [ref=e353]
+                  - generic "Begin Reference, Squad-PR, Brady Gaster, 3/2/2026 8:40 PM, End reference Just making sure. Smile" [ref=e354]:
+                    - group "Begin Reference, Squad-PR, Brady Gaster, 3/2/2026 8:40 PM, End reference" [ref=e355] [cursor=pointer]:
+                      - generic [ref=e358]:
+                        - generic [ref=e359]:
+                          - generic [ref=e360]: Brady Gaster
+                          - generic [ref=e361]: 3/2/2026 8:40 PM
+                        - generic [ref=e362]: Squad-PR
+                    - paragraph [ref=e363]:
+                      - text: Just making sure.
+                      - generic "Smile" [ref=e364]:
+                        - img "🙂" [ref=e365]
+                  - toolbar "Reaction summary" [ref=e366]:
+                    - button "1 Like reaction with medium light skin tone." [ref=e368]:
+                      - generic [ref=e369]:
+                        - img "👍🏼" [ref=e371]
+                        - generic [ref=e372]: 1 Like reaction with medium light skin tone.
+                    - button "More reactions" [ref=e374]:
+                      - img [ref=e376]
+          - generic [ref=e382]:
+            - heading "np mate, thanks for being thorough. Smile by Brady Gaster" [level=4] [ref=e383]
+            - generic [ref=e385]:
+              - generic [ref=e386]:
+                - generic [ref=e390]: Brady Gaster
+                - time [ref=e391]: 8:40 PM
+              - generic [ref=e392]:
+                - generic [ref=e394]:
+                  - img [ref=e395]
+                  - img [ref=e396]:
+                    - img [ref=e398]
+                - group "Brady Gaster np mate, thanks for being thorough. Smile Today at 8:40 PM." [ref=e401]:
+                  - button "More message options" [ref=e402]
+                  - generic "np mate, thanks for being thorough. Smile" [ref=e403]:
+                    - paragraph [ref=e404]:
+                      - text: np mate, thanks for being thorough.
+                      - generic "Smile" [ref=e405]:
+                        - img "🙂" [ref=e406]
+          - generic [ref=e410]:
+            - heading "Hey Jon Gallant , thanks for the thorough ... by Tamir Dresher" [level=4] [ref=e411]
+            - generic [ref=e413]:
+              - generic [ref=e414]:
+                - time [ref=e415]: 8:51 PM
+                - generic [ref=e419]: Tamir Dresher
+              - group [ref=e422]:
+                - button "More message options" [ref=e423]
+                - generic [ref=e424]:
+                  - paragraph [ref=e425]:
+                    - text: Hey Jon Gallant, thanks for the thorough security hardening 79 findings across 9 cycles is impressive work
+                    - generic "Smile" [ref=e426]:
+                      - img "🙂" [ref=e427]
+                  - paragraph [ref=e428]: "I reviewed it and cherry-picked the redaction improvements into PR #15 — the ANSI bypass protection, Unicode invisible char stripping, NFKC normalization, and 9 new token patterns (27 total now)."
+                  - paragraph [ref=e429]: These are safe, no breaking changes, and directly improve our secret redaction.
+                  - paragraph [ref=e430]: "The rest of the PR I'm holding off on for now:"
+                  - list [ref=e431]:
+                    - listitem [ref=e432]: "Cookie-based auth: It breaks the QR code flow that lets users scan and connect from their phone. The token-in-URL approach is deliberate for cross-device UX. DevTunnel already provides the outer auth layer (private tunnels, MS identity)."
+                    - listitem [ref=e433]: "E2E WebSocket encryption: DevTunnel provides TLS between the phone and the relay. Adding E2E on top adds latency and complexity for marginal gain on a dev tool. The 5 known gaps (plaintext downgrade, unauthenticated ECDH, grid bypass) also need design review before shipping."
+                    - listitem [ref=e434]: "CSRF, token encryption at rest, self-hosted xterm: Over-engineering for our use case. File permissions (0o600) protect tokens. CDN + SRI hashes protect xterm.js."
+                - toolbar "Reaction summary" [ref=e435]:
+                  - button "1 Like reaction with light skin tone." [ref=e437]:
+                    - generic [ref=e438]:
+                      - img "👍🏻" [ref=e440]
+                      - generic [ref=e441]: 1 Like reaction with light skin tone.
+                  - button "More reactions" [ref=e443]:
+                    - img [ref=e445]
+          - generic [ref=e451]:
+            - heading "Brady Gaster i'm sync the security changes ... by Tamir Dresher" [level=4] [ref=e452]
+            - generic [ref=e454]:
+              - generic [ref=e455]:
+                - time [ref=e456]: 9:04 PM
+                - generic [ref=e460]: Tamir Dresher
+              - generic [ref=e461]:
+                - group "Tamir Dresher Seen by everyone Brady Gaster i'm sync the security changes to squad-pr. will let you know when it's done and tested Today at 9:04 PM." [ref=e463]:
+                  - button "More message options" [ref=e464]
+                  - generic "Brady Gaster i'm sync the security changes to squad-pr. will let you know when it's done and tested" [ref=e465]:
+                    - paragraph [ref=e466]: Brady Gaster
+                    - paragraph [ref=e467]: i'm sync the security changes to squad-pr. will let you know when it's done and tested
+                - img "Seen by everyone" [ref=e469]:
+                  - img [ref=e470]
+          - generic [ref=e474]:
+            - heading "Brady Gaster we should be good to go now by Tamir Dresher" [level=4] [ref=e475]
+            - generic [ref=e477]:
+              - generic [ref=e478]:
+                - time [ref=e479]: 11:24 PM
+                - generic [ref=e483]: Tamir Dresher
+              - generic [ref=e484]:
+                - group "Tamir Dresher Sent Brady Gaster we should be good to go now Today at 11:24 PM." [ref=e486]:
+                  - button "More message options" [ref=e487]
+                  - generic "Brady Gaster we should be good to go now" [ref=e488]:
+                    - paragraph [ref=e489]: Brady Gaster
+                    - paragraph [ref=e490]: we should be good to go now
+                - img "Sent" [ref=e492]:
+                  - img [ref=e493]
+        - generic [ref=e496]: has context menu
+      - generic [ref=e504]:
+        - textbox [ref=e506]:
+          - /placeholder: Type a message
+          - paragraph [ref=e507]: Type a message
+        - generic [ref=e508]:
+          - toolbar [ref=e509]:
+            - button "Show Formatting options (Ctrl+Shift+X)" [ref=e510] [cursor=pointer]:
+              - img [ref=e512]
+            - button "Emoji, GIFs and Stickers" [ref=e515] [cursor=pointer]:
+              - img [ref=e517]
+            - button "Rewrite with Copilot (Alt+A)" [ref=e519] [cursor=pointer]:
+              - img [ref=e522]
+          - toolbar "Actions for new message" [ref=e524]:
+            - generic [ref=e526]:
+              - button "Send (Ctrl+Enter)" [ref=e527] [cursor=pointer]:
+                - img [ref=e529]
+              - generic [ref=e532]: has context menu
+  - progressbar [ref=e534]:
+    - generic [ref=e535]:
+      - generic:
+        - generic [ref=e537]: We're setting things up for you…
+        - generic [ref=e538]: Just another minute…

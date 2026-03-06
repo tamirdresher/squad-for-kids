@@ -232,3 +232,41 @@ The most valuable insight for infrastructure work: **Build infrastructure for ag
 - NAT Gateway is zonal but DK8S alerting is region-scoped — creates false Sev2 escalations
 - Self-hosted VPA needed at >1k pods (AKS add-on hits scale limits)
 - D8 minimum node size prevents daemonset overhead from starving workloads
+
+---
+
+### 2026-03-07: Aurora Cluster Provisioning Experiment Design (Issue #4)
+
+**Task:** Design a controlled experiment to evaluate Aurora E2E validation for DK8S cluster provisioning, answering whether it would slow down component changes and rollouts.
+
+**Research Conducted:**
+- WorkIQ: 4 queries — DK8S cluster provisioning process, pipeline SLA/timing, Aurora Bridge integration, Aurora + DK8S discussions
+- EngineeringHub: Access denied (permissions issue); relied on WorkIQ-sourced Aurora docs
+- Web search: Aurora validation pipeline integration patterns
+- Prior analysis: dk8s-stability-analysis.md, dk8s-infrastructure-inventory.md, dk8s-platform-knowledge.md
+
+**Key Findings:**
+
+1. **DK8S cluster provisioning is a 6-stage pipeline** — Inventory → ConfigGen → Pipeline Creation → EV2/AKS → Platform Bring-Up → Validation. End-to-end ~45–90 minutes excluding inventory delay. No formal SLA exists.
+
+2. **Aurora Bridge integrates without pipeline changes** — Manifest-based onboarding via `ADO_Dev.json`. Aurora Workload App (service principal) observes pipeline externally. No YAML modifications. No added latency in monitoring mode.
+
+3. **Monitoring-only mode is explicitly supported** — `WorkloadCreateIcM = false` disables incident creation. Recommended for dev/test environments. This is the Phase 1 approach.
+
+4. **No one has proposed Aurora for DK8S cluster provisioning before** — WorkIQ confirms Aurora is positioned as workload/service validation, not infrastructure provisioning. DK8S has its own Cluster Health Validator. This would be a new integration discussion.
+
+5. **9 documented failure modes** in cluster provisioning (from stability analysis) — none are systematically tracked or auto-categorized today. Aurora could fill this gap.
+
+6. **Zero impact on component rollouts** — Experiment is scoped to provisioning pipeline only. Component Helm charts deploy via ArgoCD, which is not in scope.
+
+**Deliverables:**
+- `aurora-cluster-provisioning-experiment.md` — Full 4-part experiment design (current pipeline, experiment design, rollout impact, implementation checklist)
+- `.squad/decisions/inbox/belanna-aurora-experiment.md` — Decision proposal for team review
+- Issue #4 comment with experiment summary
+
+**Infrastructure Patterns Learned:**
+- Aurora Bridge is manifest-driven, not task-driven — no ADO Marketplace extension, config-as-code onboarding via PR
+- DK8S provisioning pipelines are auto-generated per cluster via Product Catalog API (not static)
+- "Provisioned but unhealthy" is a real failure state — cluster exists in AKS but platform components are broken
+- No provisioning regression baseline exists today — no way to detect if provisioning quality is degrading over time
+- Aurora results support multi-subscription, multi-region, multi-resource-group reporting via structured JSON schema

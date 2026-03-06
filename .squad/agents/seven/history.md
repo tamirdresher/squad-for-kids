@@ -134,3 +134,37 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
   - API contract validation
 
 **Action:** Before spawning agents for future idk8s-infrastructure tasks, verify and document correct repository location.
+
+### 2026-03-08: RP Registration Requirements Deep Dive (Issue #11)
+
+**Task:** Research Azure Resource Provider registration process comprehensively for DK8S's BasePlatformRP  
+**Outcome:** Created `rp-registration-guide.md` — 35K-character comprehensive registration guide with 15 sections
+
+**Sources used:**
+- EngineeringHub: 10+ pages fetched (RPaaS overview, RP registration, API review workflow, Swagger/TypeSpec onboarding, auth guide, onboarding TSG, RP Lite docs, dARM checklist)
+- Web search: 3 queries (RP development guide, RPaaS onboarding, ARM manifest schema)
+- ADR 202 (Cloud Simulator): Pseudo RP vs Real ARM RP analysis — excellent reference for tradeoff analysis
+- WorkIQ: Timed out (2 queries attempted)
+
+**Key learnings:**
+
+1. **Three RP models exist: RPaaS (managed), Direct (custom), Hybrid** — RPaaS is recommended for new services but constrains business logic to callback patterns. Direct requires exception (aka.ms/RPaaSException). Hybrid allows mixing.
+
+2. **TypeSpec is mandatory for new services since January 2024** — replaces Swagger/OpenAPI as the required format. Enables automated ARM sign-off for qualifying PRs. TypeSpec generates both Swagger and ARM registration documents.
+
+3. **OBO subscription auto-provisioning since May 2024** — Previously a manual step; now created automatically during registration when PC Code and Program ID provided. Simplifies onboarding.
+
+4. **Sovereign cloud onboarding standardized since May 2025** — Mooncake and Fairfax now follow the same process as public cloud. AGC clouds (USSec/USNat) still require separate IcM and team contact.
+
+5. **API spec changes are NOT covered by SDP** — They become globally available after 15-30 minute refresh. This is a critical gotcha — need full CRUD regression tests and rollback strategy before merging spec changes.
+
+6. **4-6 month realistic timeline for full ARM RP** — Based on Cloud Simulator ADR 202 estimates. Includes TypeSpec authoring (2-4 weeks), LRO implementation (2-3 weeks), ARM review cycles (4-6 weeks external dependency), certification (2-4 weeks).
+
+7. **ARM API Review is gatekeeping** — Weekly on-call rotation reviews PRs. Book office hours for modeling discussions. First-time PRs require manual review; incremental TypeSpec PRs can get automated sign-off.
+
+8. **Go vs .NET tension is real** — RPaaS controller generation is .NET-based, but DK8S is Go-native. This creates a decision point: thin .NET shim for RPaaS callbacks or full Go Direct RP implementation.
+
+**Artifacts:**
+- `rp-registration-guide.md` — 15-section comprehensive guide (process, tradeoffs, manifest, TypeSpec, auth, SDK, compliance, testing, regional deployment, timeline, pitfalls, DK8S recommendations)
+- `.squad/decisions/inbox/seven-rp-registration.md` — Decision proposal for Hybrid RP approach
+- Issue #11 comment with executive summary

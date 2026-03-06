@@ -222,3 +222,32 @@ Platform provides:
 
 **Engagement Summary:**
 Reviewed 8+ high-value architectural artifacts focusing on resilience, multi-agent coordination, testing strategies, and offline-first design. Identified cross-cutting themes: determinism requirements, file-based patterns for resumability, and contract-based testing for LLM systems. The Squad Places community is publishing production-grade patterns at scale.
+
+---
+
+### 2026-03-07: Aurora Adoption Plan & Scenario Definition Framework (Issue #4)
+
+**Context:** Tamir asked whether we could run an Aurora experiment on a DK8S component — specifically cluster provisioning — and whether Aurora would make rollouts slower. Built comprehensive adoption plan synthesizing Seven's Aurora research, B'Elanna's stability analysis, and deep WorkIQ intelligence.
+
+**Key Learnings:**
+
+1. **Aurora scenario structure:** Workload → Scenario → Steps → Assertions. Scenarios require: workload definition (onboarding manifest), success criteria (quantitative thresholds), and matrix parameters (regions, SKUs, versions). Authentication uses two service principals via Key Vault certs.
+
+2. **Aurora Bridge is the lowest-friction entry:** Connects existing ADO pipelines without test rewrites. Provides monitoring, alerting, and historical trending immediately. This is the right Phase 1 move.
+
+3. **DIV runs during bake time, not blocking deployments:** DK8S already has mandatory bake periods between EV2 rings. Aurora validation can execute during these windows, adding zero net latency. This is the critical insight that answers "will it slow us down?" — no, if structured correctly.
+
+4. **Cluster provisioning is ideal first candidate:** Clear success criteria, high blast radius, no cross-team dependencies, addresses known provisioning validation gaps surfaced in Runtime Platform reviews and cluster automation brainstorms (confirmed via WorkIQ).
+
+5. **Other teams' approach — Databricks model:** Deep nightly validation (full matrix, 1-2 hours) + lightweight per-deployment checks (3-5 smoke scenarios, 10-15 min). This separation minimizes rollout impact while maximizing coverage.
+
+6. **No existing DK8S-Aurora connection in org:** WorkIQ confirmed Aurora and DK8S discussions are "adjacent rather than unified." We would be establishing a new integration, not joining existing work.
+
+7. **EngineeringHub access denied:** Could not fetch Aurora onboarding docs via enghub-search or enghub-fetch. Relied on Seven's prior research URLs and WorkIQ intelligence instead.
+
+**Decision:** Proceed with 4-phase adoption plan. Phase 0 (experiment design) starts immediately. Monitoring-only through Phase 1-2. Gating mode only in Phase 4, only for critical scenarios, only after 30-day burn-in.
+
+**Artifacts produced:**
+- `aurora-adoption-plan.md` — comprehensive plan with scenario definition framework, templates, phased rollout, experiment design, and impact analysis
+- Decision inbox entry: `.squad/decisions/inbox/picard-aurora-adoption-plan.md`
+- Issue #4 comment summarizing plan

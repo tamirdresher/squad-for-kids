@@ -1,0 +1,225 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - text: GitHub Enterprise
+        - generic "Users managed by Microsoft EMU" [ref=e14]:
+          - text: Users managed by
+          - link "Microsoft EMU" [ref=e15] [cursor=pointer]:
+            - /url: /enterprises/microsoft
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - button "Open menu" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+          - link "Homepage Enterprise (g then d)" [ref=e22] [cursor=pointer]:
+            - /url: /
+            - img [ref=e23]
+        - generic [ref=e25]:
+          - navigation "Breadcrumbs" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "mtp-microsoft" [ref=e29] [cursor=pointer]:
+                  - /url: /mtp-microsoft
+                  - generic [ref=e30]: mtp-microsoft
+          - button "Search or jump to…" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]:
+              - generic:
+                - img
+              - generic [ref=e35]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e39]:
+              - link "Chat with Copilot" [ref=e41] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e42]
+              - button "Open agents panel" [ref=e46] [cursor=pointer]:
+                - generic [ref=e47]:
+                  - generic:
+                    - img
+                  - generic:
+                    - img
+            - button "Create new..." [ref=e49] [cursor=pointer]:
+              - generic [ref=e50]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues (g then i)" [ref=e51] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e52]
+            - link "Pull requests (g then p)" [ref=e55] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e56]
+            - link "Repositories" [ref=e58] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e59]
+          - link "You have unread notifications (g then n)" [ref=e61] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e62]
+          - button "Open user navigation menu" [ref=e65] [cursor=pointer]:
+            - img "Tamir Dresher" [ref=e66]
+      - heading "Organization navigation" [level=2] [ref=e67]
+      - navigation "Organization" [ref=e68]:
+        - list [ref=e69]:
+          - listitem [ref=e70]:
+            - link "Overview" [ref=e71] [cursor=pointer]:
+              - /url: /mtp-microsoft
+              - img [ref=e73]
+              - generic [ref=e75]: Overview
+          - listitem [ref=e76]:
+            - link "Repositories (27)" [ref=e77] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/repositories
+              - img [ref=e79]
+              - generic [ref=e81]: Repositories
+              - generic [ref=e82]:
+                - generic [ref=e83]: "27"
+                - generic [ref=e84]: (27)
+          - listitem [ref=e85]:
+            - link "Projects (1)" [ref=e86] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/projects
+              - img [ref=e88]
+              - generic [ref=e90]: Projects
+              - generic [ref=e91]:
+                - generic [ref=e92]: "1"
+                - generic [ref=e93]: (1)
+          - listitem [ref=e94]:
+            - link "Packages" [ref=e95] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/packages
+              - img [ref=e97]
+              - generic [ref=e99]: Packages
+          - listitem [ref=e100]:
+            - link "Teams (147)" [ref=e101] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/teams
+              - img [ref=e103]
+              - generic [ref=e105]: Teams
+              - generic [ref=e106]:
+                - generic [ref=e107]: "147"
+                - generic [ref=e108]: (147)
+          - listitem [ref=e109]:
+            - link "People (1.4k)" [ref=e110] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/people
+              - img [ref=e112]
+              - generic [ref=e114]: People
+              - generic [ref=e115]:
+                - generic [ref=e116]: 1.4k
+                - generic [ref=e117]: (1.4k)
+          - listitem [ref=e118]:
+            - link "Security" [ref=e119] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/security/overview
+              - img [ref=e121]
+              - generic [ref=e123]: Security
+          - listitem [ref=e124]:
+            - link "Insights" [ref=e125] [cursor=pointer]:
+              - /url: /orgs/mtp-microsoft/insights
+              - img [ref=e127]
+              - generic [ref=e129]: Insights
+  - main [ref=e132]:
+    - generic [ref=e135]:
+      - generic [ref=e136]:
+        - heading "Create a new repository" [level=1] [ref=e139]
+        - generic [ref=e141]:
+          - text: Repositories contain a project's files and version history.
+          - generic [ref=e142]:
+            - text: Have a project elsewhere?
+            - link "Import a repository" [ref=e143] [cursor=pointer]:
+              - /url: /new/import
+            - text: .
+      - generic [ref=e144]: Required fields are marked with an asterisk (*).
+      - generic [ref=e146]:
+        - generic [ref=e148]: "1"
+        - generic [ref=e149]:
+          - heading "General" [level=2] [ref=e150]
+          - group "Repository owner and name" [ref=e153]:
+            - generic [ref=e154]: Repository owner and name
+            - generic [ref=e156]:
+              - generic [ref=e158] [cursor=pointer]:
+                - generic [ref=e159]:
+                  - text: Owner
+                  - generic [ref=e160]: (required)
+                - generic [ref=e161]: "*"
+              - button "mtp-microsoft, Owner (Required)" [ref=e162] [cursor=pointer]:
+                - generic [ref=e164]: mtp-microsoft
+                - generic:
+                  - img
+              - generic [ref=e167]:
+                - img [ref=e169]
+                - generic [ref=e171]: You don’t appear to have permission to create repositories for this organization. Sorry about that.
+  - contentinfo [ref=e172]:
+    - heading "Footer" [level=2] [ref=e173]
+    - generic [ref=e174]: Microsoft EMU
+    - generic [ref=e175]:
+      - generic [ref=e176]:
+        - link "Microsoft EMU Home page" [ref=e177] [cursor=pointer]:
+          - /url: https://github.com/enterprises/microsoft
+          - img "Microsoft EMU Home page" [ref=e178]
+        - link "Microsoft EMU" [ref=e179] [cursor=pointer]:
+          - /url: https://github.com/enterprises/microsoft
+      - list [ref=e180]:
+        - link [ref=e181] [cursor=pointer]:
+          - /url: https://go.microsoft.com/fwlink/?LinkId=518021
+          - text: Data Protection Notice
+        - link [ref=e182] [cursor=pointer]:
+          - /url: https://github.com/orgs/gim-home/discussions
+          - text: Feedback
+        - link [ref=e183] [cursor=pointer]:
+          - /url: https://aka.ms/gim/docs
+          - text: GitHub inside Microsoft
+        - link [ref=e184] [cursor=pointer]:
+          - /url: https://microsoftedge.microsoft.com/addons/detail/gim-refined/lmklppompohjlekmgnbjdbjgaggclpoe
+          - text: Install Browser Extension
+      - list [ref=e185]:
+        - listitem [ref=e186]:
+          - link "Data Protection Notice" [ref=e187] [cursor=pointer]:
+            - /url: https://go.microsoft.com/fwlink/?LinkId=518021
+        - listitem [ref=e188]:
+          - link "Feedback" [ref=e189] [cursor=pointer]:
+            - /url: https://github.com/orgs/gim-home/discussions
+        - listitem [ref=e190]:
+          - link "GitHub inside Microsoft" [ref=e191] [cursor=pointer]:
+            - /url: https://aka.ms/gim/docs
+        - listitem [ref=e192]:
+          - link "Install Browser Extension" [ref=e193] [cursor=pointer]:
+            - /url: https://microsoftedge.microsoft.com/addons/detail/gim-refined/lmklppompohjlekmgnbjdbjgaggclpoe
+    - generic [ref=e194]:
+      - generic [ref=e195]:
+        - link "GitHub Homepage" [ref=e196] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e197]
+        - generic [ref=e199]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e200]:
+        - heading "Footer navigation" [level=3] [ref=e201]
+        - list "Footer navigation" [ref=e202]:
+          - listitem [ref=e203]:
+            - link "Terms" [ref=e204] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e205]:
+            - link "Privacy" [ref=e206] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e207]:
+            - link "Security" [ref=e208] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e209]:
+            - link "Status" [ref=e210] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e211]:
+            - link "Community" [ref=e212] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e213]:
+            - link "Docs" [ref=e214] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e215]:
+            - link "Contact" [ref=e216] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e217]:
+            - button "Manage cookies" [ref=e219] [cursor=pointer]
+          - listitem [ref=e220]:
+            - button "Do not share my personal information" [ref=e222] [cursor=pointer]

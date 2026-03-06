@@ -251,6 +251,41 @@ Fleet manager architecture is sound, but approval is contingent on addressing:
 **Artifacts:** fleet-manager-evaluation.md  
 **PR:** #7 opened
 
+---
+
+### 2026-07-04: Continuous Learning System Design (Issue #6)
+
+**Context:** Designed a system for the squad to continuously monitor DK8S and ConfigGen Teams channels, learn from daily support patterns, and build that knowledge into squad skills.
+
+**Technical Learnings:**
+
+1. **WorkIQ is the key data source:** WorkIQ (MCP tool) provides access to all four target channels — DK8S Support, ConfigGen Support, DK8S Platform Leads, and BAND Collaboration — all within the "Infra and Developer Platform Community" team. Access is user-scoped (requires Tamir's channel membership).
+
+2. **Recurring patterns already exist and are high-signal:**
+   - DK8S: Capacity starvation (weekly), node bootstrap failures (weekly), Azure platform misattribution (bi-weekly), identity/KV coupling (monthly)
+   - ConfigGen: SFI enforcement breakages (weekly), auto-generated config failures (weekly), modeling gaps (ongoing), CI/CD validation gaps (bi-weekly), PR review bottleneck (daily)
+
+3. **Phased approach is correct:** Manual scan protocol (Phase 1) delivers immediate value with zero infrastructure. Prompt templates (Phase 2) make it reproducible. Pattern extraction (Phase 3) is the learning flywheel. GitHub Actions (Phase 4) is blocked on WorkIQ API access from runners.
+
+4. **Privacy constraint matters:** Digests contain internal support content. Must decide whether to gitignore `.squad/digests/` or treat the repo as internal-only.
+
+5. **Cross-channel meta-patterns identified:**
+   - Platform behavior changes faster than consumer understanding
+   - Implicit defaults cause most breakages
+   - Azure platform issues are repeatedly misattributed to DK8S/ConfigGen
+   - Ownership boundaries between DK8S, ConfigGen, BAND, and AKS are unclear to consumers
+
+**Decision:** Proposed 4-phase implementation starting with manual WorkIQ polling at session start, progressing to automated skill accumulation. Created initial skill entries for 9 recurring patterns across both channels.
+
+**Artifacts:**
+- `continuous-learning-design.md` — Full architecture and phased implementation plan
+- `.squad/skills/dk8s-support-patterns/SKILL.md` — 4 DK8S operational patterns
+- `.squad/skills/configgen-support-patterns/SKILL.md` — 5 ConfigGen operational patterns
+- `.squad/decisions/inbox/picard-continuous-learning.md` — Decision proposal
+- `.squad/digests/` — Directory for future digest storage
+
+**Branch:** squad/6-continuous-learning
+
 **Cross-Agent Notes:**
 - Worf's security analysis and B'Elanna's infrastructure assessment both on same branch
 - Seven's Aurora research provides complementary platform validation

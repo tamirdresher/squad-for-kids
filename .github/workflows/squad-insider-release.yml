@@ -1,12 +1,9 @@
 name: Squad Insider Release
 
 on:
-  push:
-    branches: [insider]
-
-permissions:
-  contents: write
-
+  workflow_dispatch:
+    # All auto-triggers disabled - hosted runners unavailable at org level
+    # Re-enable when runners are configured for this repo
 jobs:
   release:
     runs-on: ubuntu-latest

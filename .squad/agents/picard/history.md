@@ -251,3 +251,40 @@ Reviewed 8+ high-value architectural artifacts focusing on resilience, multi-age
 - `aurora-adoption-plan.md` — comprehensive plan with scenario definition framework, templates, phased rollout, experiment design, and impact analysis
 - Decision inbox entry: `.squad/decisions/inbox/picard-aurora-adoption-plan.md`
 - Issue #4 comment summarizing plan
+
+---
+
+### 2026-03-08: RP Registration Status — IcM 757549503 Analysis (Issue #11)
+
+**Context:** Tamir reported receiving a response on IcM 757549503 related to RP registration for Private.BasePlatform. Tasked with reviewing the IcM, researching RP registration requirements, and creating an action plan.
+
+**Key Findings:**
+
+1. **IcM 757549503 is a Sev 3 incident:** "[Private.BasePlatform] Cosmos DB role assignment failure blocking RP manifest rollout"
+   - Root cause: `NullReferenceException` in `CosmosDbRoleAssignmentJob` due to missing `jobMetadata` parameter
+   - Created 2026-03-06 by Andrew Gao
+   - State: **New** (unresolved) — no fix or workaround provided
+   - Area: MSAzure\One\Azure-ARM\Azure-ARM-Extensibility\Livesite
+
+2. **Related IcM 754149871:** Cosmos DB deployments failing during role assignment creation with `InternalServerError` from `CreateRoleAssignmentInServerPartitionsAsync` — may indicate platform-wide issue
+
+3. **This is a platform-side bug, not our misconfiguration:** The `NullReferenceException` is in RPaaS infrastructure code, not in our RP registration payload
+
+4. **RP registration pipeline is completely blocked:** Cannot proceed past the Cosmos DB role assignment step, which blocks manifest rollout, resource type registration, and all downstream steps
+
+5. **RPaaS onboarding process well-documented:** Synthesized comprehensive requirements from 6+ EngineeringHub docs covering Hybrid RP registration, Operations RT, manifest checkin, AFEC, and lifecycle stages
+
+**Technical Learnings:**
+
+1. **RPaaS Hybrid RP registration flow:** File onboarding IcM → RPaaS DRI creates mapping → PUT RP registration with PC Code + Profit Center → Register Operations RT → Manifest checkin → Rollout
+2. **Cosmos DB provisioning is automatic:** Since May 2024, OBO subscription is created automatically during RP registration when PC Code and Program ID are provided
+3. **RP Lite vs Hybrid vs Direct:** BasePlatformRP is correctly using Hybrid RP (mix of managed and direct resource types)
+4. **TypeSpec is mandatory since Jan 2024:** All new RPs must use TypeSpec for API specs
+5. **WorkIQ limitations:** Detailed IcM response content not accessible via WorkIQ — incident metadata and email thread subjects visible but not full email bodies
+
+**Decision:** Escalate through RPaaS IST Office Hours. Request manual Cosmos DB role assignment workaround. If unblocked within 2 weeks, proceed with registration PUT; otherwise escalate to Sev 2.
+
+**Artifacts produced:**
+- `rp-registration-status.md` — comprehensive status report with IcM analysis, checklist, blockers, and action plan
+- Decision inbox entry: `.squad/decisions/inbox/picard-rp-registration.md`
+- Issue #11 comment with findings and next steps

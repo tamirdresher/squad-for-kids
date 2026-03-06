@@ -134,3 +134,24 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
   - API contract validation
 
 **Action:** Before spawning agents for future idk8s-infrastructure tasks, verify and document correct repository location.
+
+### 2025-07: DK8S Knowledge Consolidation (Issue #2)
+
+**Task:** Consolidate all DK8S platform knowledge from multiple sources into single reference document  
+**Outcome:** Created `dk8s-platform-knowledge.md` — 620-line comprehensive knowledge base
+
+**Sources synthesized:**
+- 10 existing analysis files in tamresearch1 repo
+- `C:\Users\tamirdresher\source\repos\Dk8sCodingAI-1` (DK8S AI tooling repo, ADO — repo architecture, coding guidelines, platform instructions)
+- `C:\Users\tamirdresher\source\repos\Dk8sCodingAIgithub` (GitHub version — squad config with 16 agents, 15 skills)
+- `dk8s-all-repos.code-workspace` — complete 48-repo inventory across 10 categories
+
+**Key learnings:**
+1. **Two distinct platforms documented**: idk8s-infrastructure (Celestial/Entra Identity) and Defender K8S (DK8S/WDATP) — related but separate ownership and architecture
+2. **48 repos in DK8S workspace** spanning documentation, core infrastructure, configuration, deployment, security, observability, automation, node management, testing, and 14 shared libraries
+3. **DK8S has two repo types**: Component repos (Helm/operator → ACR artifacts) and Cluster Provisioning repos (inventory, ConfigGen, templates, tooling) — understanding this distinction is critical
+4. **ConfigGen is the expansion engine**: Takes generic manifests and produces cluster-specific configurations using cluster inventory
+5. **idk8s has 19 tenants, 27 clusters, 7 sovereign clouds, 12 ADRs, 45 projects, 24+ pipelines** — extremely mature platform
+6. **BasePlatformRP sits above both platforms** as an ARM RP abstraction layer — early stage, 22 issues identified
+7. **Deleted content recovery**: Dk8sCodingAIgithub had significant content consolidated into plugin structure (commit c5bc68d) — the squad config, agent definitions, and skill files were refactored, not lost
+8. **Cross-team AI tooling**: Both platforms have sophisticated AI agent configurations — Dk8sCodingAI has 15 specialized skills for platform operations including on-call triage

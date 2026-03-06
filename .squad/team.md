@@ -14,3 +14,11 @@
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 
+## Issue Source
+
+| Field | Value |
+|-------|-------|
+| Repository | `tamirdresher_microsoft/tamresearch1` |
+| Connected | 2026-03-06 |
+| Filters | All open issues |
+

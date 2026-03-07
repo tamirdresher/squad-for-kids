@@ -1,4 +1,4 @@
-# Ralph Watch v5 - Runs agency copilot with Squad agent every interval
+# Ralph Watch v6 - Runs agency copilot with Squad agent every interval
 # Launches a full Copilot session that can do actual work
 # To stop: Ctrl+C
 
@@ -15,6 +15,44 @@ while ($true) {
     Write-Host "[$timestamp] Ralph Round $round - launching agency" -ForegroundColor Cyan
     Write-Host "============================================" -ForegroundColor Cyan
     
+    # Step 1: Update the repo to ensure we have the latest code
+    Write-Host "[$timestamp] Pulling latest changes..." -ForegroundColor Yellow
+    try {
+        # Fetch latest changes
+        git fetch 2>&1 | Out-Null
+        
+        # Check if there are uncommitted changes
+        $status = git status --porcelain
+        if ($status) {
+            Write-Host "[$timestamp] Local changes detected, stashing..." -ForegroundColor Yellow
+            git stash save "ralph-watch-auto-stash-$timestamp" 2>&1 | Out-Null
+            $stashed = $true
+        } else {
+            $stashed = $false
+        }
+        
+        # Pull latest changes
+        $pullResult = git pull 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[$timestamp] Repository updated successfully" -ForegroundColor Green
+        } else {
+            Write-Host "[$timestamp] Warning: git pull failed: $pullResult" -ForegroundColor Yellow
+        }
+        
+        # Restore stashed changes if any
+        if ($stashed) {
+            Write-Host "[$timestamp] Restoring local changes..." -ForegroundColor Yellow
+            $popResult = git stash pop 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "[$timestamp] Warning: Could not restore stashed changes. Use 'git stash list' to recover." -ForegroundColor Yellow
+            }
+        }
+    } catch {
+        Write-Host "[$timestamp] Warning: Failed to update repository: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "[$timestamp] Continuing with existing code..." -ForegroundColor Yellow
+    }
+    
+    # Step 2: Run the agency copilot
     try {
         agency copilot --yolo --autopilot --agent squad -p $prompt
         Write-Host "[$timestamp] Round $round completed" -ForegroundColor Green

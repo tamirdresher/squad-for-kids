@@ -956,3 +956,41 @@ WDATP project restrictions caused 3 blocked tests (expected — custom locked-do
 
 ### Summary
 All three issues have clear status and next steps. ADO integration is tested, Ralph loop is monitoring with new telemetry, Teams integration has working polling solution ready to deploy.
+
+---
+
+## 2026-03-07T17:55:00Z: Squad Activity Monitor Implementation
+
+### Issue #40: Build Squad Activity Monitor
+
+**Implemented:** C# console application at .squad/tools/squad-monitor/
+
+**Technical Decisions:**
+- **Platform:** .NET 10 with C# 13 (single-file, top-level statements)
+- **UI Framework:** Spectre.Console 0.49.1 for terminal tables and colors
+- **Architecture:** Simple, focused tool - parses markdown logs and displays formatted output
+- **Parsing Strategy:** Regex-based extraction from orchestration log filenames and content
+  - Filename pattern: YYYY-MM-DDTHH-MM-SSZ-agentname.md
+  - Content sections: Status, Assignment, Outcome
+- **Features:**
+  - Auto-refresh with configurable interval (default 5s)
+  - --once flag for single-run mode
+  - Color-coded status indicators (green/yellow/red)
+  - Activity age tracking with smart formatting (just now, Xm/h/d/w ago)
+  - Summary statistics (total agents, 24h activity count)
+
+**Key Files:**
+- .squad/tools/squad-monitor/Program.cs - Main application (single file, ~270 lines)
+- .squad/tools/squad-monitor/squad-monitor.csproj - Project configuration
+- .squad/tools/squad-monitor/README.md - Usage documentation
+
+**Learnings:**
+- Timestamp parsing from filename format requires careful regex grouping
+- Spectre.Console's Markup.Escape() is essential for user content
+- .NET 10 single-file publish creates self-contained executables
+- Top-level statements + records make console apps very clean
+
+**User Preference:** Tamir prefers C# over PowerShell for tooling (more portable, better type safety)
+
+**Status:** ✅ Implemented, tested, PR #47 created
+

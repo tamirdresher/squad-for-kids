@@ -1,0 +1,88 @@
+# NetworkPolicy: Sovereign/Gov Cloud Ingress Controller Policy
+# FedRAMP Compensating Control — Issue #54
+# Stricter policy for Fairfax/Mooncake: restricts source CIDRs to known ranges
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-controller-sovereign
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/part-of: dk8s-ingress-security
+    fedramp.dk8s.io/control: "SC-7"
+    dk8s.io/cloud-type: sovereign
+  annotations:
+    argocd.argoproj.io/sync-wave: "-9"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Azure Government Front Door ranges only (no open 0.0.0.0/0)
+    - ports:
+        - protocol: TCP
+          port: 443
+      from:
+        - ipBlock:
+            # Azure Government Front Door service tag range (placeholder — replace with actual)
+            cidr: 23.97.0.0/16
+        - ipBlock:
+            # Azure Gov Application Gateway subnet
+            cidr: 10.1.0.0/24
+    # Healthcheck from kubelet
+    - ports:
+        - protocol: TCP
+          port: 10254
+      from:
+        - ipBlock:
+            cidr: 10.0.0.0/8
+    # Admission webhook from API server
+    - ports:
+        - protocol: TCP
+          port: 8443
+      from:
+        - namespaceSelector: {}
+          podSelector: {}
+  egress:
+    # Backend services — sovereign clusters typically use 443 only
+    - ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 8443
+      to:
+        - namespaceSelector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: NotIn
+                values:
+                  - kube-system
+                  - ingress-nginx
+    # DNS
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+    # Kubernetes API server
+    - ports:
+        - protocol: TCP
+          port: 443
+      to:
+        - ipBlock:
+            cidr: 10.0.0.0/8
+    # dSTS authentication endpoint (sovereign auth)
+    - ports:
+        - protocol: TCP
+          port: 443
+      to:
+        - ipBlock:
+            # dSTS endpoint range (placeholder — replace with actual sovereign IdP range)
+            cidr: 20.140.0.0/15

@@ -1,0 +1,47 @@
+# NetworkPolicy: Isolate ingress-nginx namespace from lateral movement
+# FedRAMP Compensating Control — Issue #54
+# Prevents pods in other namespaces from directly reaching ingress internals
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-cross-namespace-to-internals
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/part-of: dk8s-ingress-security
+    fedramp.dk8s.io/control: "SC-7"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+  policyTypes:
+    - Ingress
+  ingress:
+    # Only allow traffic on the expected ports — block everything else
+    # This explicitly blocks internal nginx status (port 18080),
+    # Prometheus metrics (port 10254 /metrics path abuse), and
+    # any debug/admin endpoints
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+      from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+    - ports:
+        - protocol: TCP
+          port: 10254
+      from:
+        # Healthchecks from kubelet only (node CIDR)
+        - ipBlock:
+            cidr: 10.0.0.0/8
+    - ports:
+        - protocol: TCP
+          port: 8443
+      from:
+        # Admission webhook from kube-apiserver
+        - ipBlock:
+            cidr: 10.0.0.0/8

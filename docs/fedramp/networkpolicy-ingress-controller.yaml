@@ -1,0 +1,81 @@
+# NetworkPolicy: Allow required traffic to/from ingress-nginx controller
+# FedRAMP Compensating Control — Issue #54
+# Permits only HTTP(S) ingress, healthcheck, and required egress paths
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/part-of: dk8s-ingress-security
+    fedramp.dk8s.io/control: "SC-7"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-9"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow HTTP traffic from Azure Load Balancer / Front Door
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+      from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+    # Allow healthcheck probes from kubelet (node-local)
+    - ports:
+        - protocol: TCP
+          port: 10254
+      from:
+        - ipBlock:
+            cidr: 10.0.0.0/8
+    # Allow admission webhook traffic from API server
+    - ports:
+        - protocol: TCP
+          port: 8443
+      from:
+        - namespaceSelector: {}
+          podSelector: {}
+  egress:
+    # Allow traffic to backend services (workload namespaces)
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
+      to:
+        - namespaceSelector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: NotIn
+                values:
+                  - kube-system
+                  - ingress-nginx
+    # Allow DNS resolution
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+    # Allow communication with Kubernetes API server
+    - ports:
+        - protocol: TCP
+          port: 443
+      to:
+        - ipBlock:
+            cidr: 10.0.0.0/8

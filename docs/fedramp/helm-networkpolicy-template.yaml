@@ -1,0 +1,121 @@
+{{- if .Values.networkPolicy.enabled }}
+# Default-Deny: Zero-trust baseline for ingress-nginx namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "ingress-nginx.fullname" . }}-default-deny
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ingress-nginx.labels" . | nindent 4 }}
+    fedramp.dk8s.io/control: "SC-7"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Allow-list: Ingress controller required traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "ingress-nginx.fullname" . }}-controller-allow
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ingress-nginx.labels" . | nindent 4 }}
+    fedramp.dk8s.io/control: "SC-7"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-9"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    {{- if .Values.networkPolicy.sovereign.enabled }}
+    # Sovereign: Restrict to known Front Door / AppGW ranges
+    {{- range .Values.networkPolicy.sovereign.allowedIngressCIDRs }}
+    - ports:
+        - protocol: TCP
+          port: 443
+      from:
+        - ipBlock:
+            cidr: {{ . }}
+    {{- end }}
+    {{- else }}
+    # Public cloud: Allow HTTP/HTTPS from any source (WAF handles filtering)
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+      from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+    {{- end }}
+    # Healthcheck probes (kubelet)
+    - ports:
+        - protocol: TCP
+          port: {{ .Values.networkPolicy.healthcheckPort | default 10254 }}
+      from:
+        {{- range .Values.networkPolicy.nodeCIDRs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+    # Admission webhook (API server)
+    - ports:
+        - protocol: TCP
+          port: 8443
+      from:
+        - namespaceSelector: {}
+          podSelector: {}
+  egress:
+    # Backend workloads
+    - ports:
+        {{- range .Values.networkPolicy.allowedBackendPorts }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+      to:
+        - namespaceSelector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: NotIn
+                values:
+                  - kube-system
+                  - {{ .Release.Namespace }}
+    # DNS
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+    # Kubernetes API
+    - ports:
+        - protocol: TCP
+          port: 443
+      to:
+        {{- range .Values.networkPolicy.nodeCIDRs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+    {{- if .Values.networkPolicy.sovereign.enabled }}
+    # Sovereign auth endpoint (dSTS)
+    {{- range .Values.networkPolicy.sovereign.authEndpointCIDRs }}
+    - ports:
+        - protocol: TCP
+          port: 443
+      to:
+        - ipBlock:
+            cidr: {{ . }}
+    {{- end }}
+    {{- end }}
+{{- end }}

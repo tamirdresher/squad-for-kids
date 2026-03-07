@@ -205,3 +205,194 @@ When team engages with external community sites (Squad Places, open-source repos
 - Community engagement value (pattern learning, best practices) achievable without exposing confidential details
 
 **Related:** Applied during Squad Places reconnaissance (Picard, B'Elanna, Worf, Data, Seven) where 38 artifacts reviewed across 7 squads without disclosing Microsoft-specific infrastructure, security findings, or internal decision-making
+
+---
+
+## Decision 8: Aurora Adoption Plan for DK8S
+
+**Date:** 2026-03-07  
+**Author:** Picard (Lead)  
+**Status:** Proposed  
+**Scope:** Platform Validation & Quality  
+**Related:** Issue #4
+
+**Decision**
+
+Adopt Aurora as DK8S's E2E validation platform through a 4-phase plan, starting with a cluster provisioning experiment in monitoring-only mode.
+
+**Context**
+
+- Aurora is Microsoft's E2E validation platform for Azure (not config management)
+- DK8S has no structured E2E validation, resiliency testing, or deployment-integrated quality gates
+- B'Elanna identified 4 systemic stability areas: networking (NAT Gateway), Istio mesh, upgrade blast radius, ConfigGen complexity
+- Tamir asked: "Can we experiment on cluster provisioning? Will it make rollouts slower?"
+
+**Key Points**
+
+1. **Cluster provisioning is the right first experiment** — clear success criteria, high blast radius, no cross-team dependencies
+2. **Aurora will NOT slow deployments if structured correctly** — validation runs during existing EV2 bake time, adding zero net latency in monitoring mode
+3. **4-phase plan:** Phase 0 (design) → Phase 1 (Bridge, months 1-2) → Phase 2 (custom workloads + DIV, months 3-5) → Phase 3 (resiliency, months 6-8) → Phase 4 (full matrix + gating, months 9-12)
+4. **Gating mode only in Phase 4**, only for critical scenarios, only after 30-day burn-in with zero false positives
+5. **Rollback is straightforward** at every phase — Aurora is additive, not structural
+
+**Risks**
+
+- Custom workload development requires .NET SDK (DK8S team is Go-native)
+- No existing Aurora-DK8S integration in org
+- False positive risk if gating is enabled prematurely
+
+**Next Steps**
+
+1. Attend Aurora office hours with experiment proposal
+2. Request Aurora subscription and service principals
+3. Scaffold workload repo and implement first scenario
+4. Configure Aurora Bridge for one OneBranch pipeline
+
+---
+
+## Decision 9: Aurora Scenario Prioritization for DK8S
+
+**Date:** 2026-03-07  
+**Author:** Seven (Research & Docs)  
+**Status:** Proposed  
+**Scope:** Testing & Validation Strategy  
+**Related:** Issue #4, aurora-scenario-catalog.md, aurora-research.md
+
+**Proposal**
+
+Adopt a 12-scenario Aurora validation catalog for DK8S, organized in three priority tiers, with a phased 20-week implementation starting with Aurora Bridge integration and culminating in Deployment Integrated Validation (DIV).
+
+**Key Decisions**
+
+1. **Start with Cluster Provisioning (SC-001)** — P0 control-plane workload, well-suited to Aurora's scenario structure, no component change impact
+2. **Use Bridge for ConfigGen (SC-005)** — existing ADO pipeline connected to Aurora with zero test rewriting
+3. **Prioritize Data-Plane Workloads for Confirmed Incidents** — SC-006 (NAT Gateway) and SC-007 (DNS) address #1 and #2 outage drivers
+4. **Defer DIV Integration to Phase 4** — only after confidence established through Phases 1-3
+
+**Consequences**
+
+- ✅ Establishes structured validation baseline
+- ✅ Directly addresses confirmed Sev2 incident patterns
+- ✅ Early adoption head start if DIV becomes mandatory (S360 KPI)
+- ✅ Bridge integration provides immediate value with zero test rewriting
+- ⚠️ Custom workload development required (~8 weeks)
+- ⚠️ Matrix explosion (72+ combinations) requires disciplined core/extended/full strategy
+
+---
+
+## Decision 10: DK8S Stability & Config Management Priorities
+
+**Date:** 2026-03-07  
+**Author:** B'Elanna Torres (Infrastructure Expert)  
+**Status:** Proposed  
+**Scope:** DK8S Platform Reliability  
+**Related:** Issue #4, dk8s-stability-analysis.md
+
+**Context**
+
+Comprehensive stability analysis of DK8S platform based on IcM incidents, Teams conversations, meeting transcripts, and EngineeringHub docs.
+
+**Key Findings**
+
+1. **Networking is #1 outage driver** — NAT Gateway degradations, DNS resolution failures
+2. **Istio integration is highest-risk active change** — Jan 2026 Sev2 from ztunnel + DNS interaction
+3. **ConfigGen breaking changes are acknowledged KPI problem** — tracked at IDP level
+4. **Weak deployment feedback loops** — no visibility into EV2 step failures or NuGet version adoption
+5. **Argo Rollouts have shared-resource failure modes** — leadership actively debating continued support
+
+**Proposed Decisions**
+
+**A. Decouple infrastructure components from Istio mesh**
+- Rationale: Jan 2026 outage root cause was geneva-loggers in mesh
+- Action: Establish permanent exclusion list for Geneva, CoreDNS, kube-system
+- Impact: Prevents observability blackout during mesh failures
+
+**B. Enforce minimum ConfigGen NuGet version at CI**
+- Rationale: Breaking changes from MI/ACR transitions break deployments
+- Action: CI gate blocking builds using ConfigGen versions below minimum
+- Impact: Eliminates known-broken deployment paths
+
+**C. Implement zone-aware NAT Gateway monitoring**
+- Rationale: Current alerting pages on single NAT drop without AZ discrimination
+- Action: Zone-aware monitoring to reduce false Sev2 pages
+- Impact: Better incident discrimination, fewer unnecessary escalations
+
+**D. Add deny assignments for manual resource deletions**
+- Rationale: Manual deletions cause alert storms and downstream failures
+- Action: Deny assignments at management-group level
+- Impact: Prevents accidental infrastructure destruction
+
+---
+
+## Decision 11: Aurora Cluster Provisioning Experiment
+
+**Date:** 2026-03-07  
+**Author:** B'Elanna Torres (Infrastructure Expert)  
+**Status:** Proposed  
+**Scope:** DK8S Cluster Provisioning Validation  
+**Related:** Issue #4, aurora-cluster-provisioning-experiment.md
+
+**Proposed Decision**
+
+Run a 12-week phased Aurora experiment targeting DK8S cluster provisioning on 2-3 non-production clusters (DEV/TEST in EUS2 + SEC). Start monitoring-only (zero pipeline impact), graduate to enhanced telemetry, then evaluate gating.
+
+**Rationale**
+
+1. **Cluster provisioning has no E2E validation today** — clusters pass pipeline checks but can be "provisioned but unhealthy"
+2. **Aurora Bridge integrates without pipeline changes** — manifest-based onboarding, no YAML modifications
+3. **Monitoring-only mode explicitly supported** — `CreateIcM = false` documented in Aurora guides
+4. **Known failure modes not systematically tracked** — 9 documented failure patterns with no automated categorization
+
+**Impact Assessment**
+
+- Monitoring-only (Phase 1): Zero latency impact, zero pipeline changes
+- Enhanced telemetry (Phase 2): <2 min addition (result emission step)
+- Gating mode (Phase 3, DEV only): +5-10 min validation gate
+- Component rollouts: Zero impact at any phase
+
+**Investment**
+
+~15-20 person-days over 12 weeks. Phase 1 (weeks 1-4) requires ~5 person-days total.
+
+**Decisions Requested**
+
+- Approve experiment scope and timeline
+- Identify Aurora team contact for onboarding
+- Select specific DEV/TEST clusters from inventory
+- Assign DRI for experiment execution
+
+**Consequences**
+
+- ✅ First structured provisioning quality data for DK8S
+- ✅ Automated failure categorization (infra vs. config vs. platform)
+- ✅ Regression baseline for provisioning quality
+- ⚠️ Requires Aurora team engagement (external dependency)
+- ⚠️ Phase 2 requires pipeline owner buy-in for result emission
+
+---
+
+## Decision 12: DK8S Knowledge Consolidation Complete
+
+**Date:** 2026-03-07  
+**Author:** Seven (Research & Docs)  
+**Status:** Proposed  
+**Scope:** Knowledge Management  
+**Related:** Issue #2
+
+**Summary**
+
+Consolidated all existing DK8S platform knowledge from 10+ analysis files, 2 local repos, and a 48-repo workspace inventory into `dk8s-platform-knowledge.md`.
+
+**Key Findings**
+
+1. **Two platforms, one ecosystem**: idk8s-infrastructure (Celestial/Entra Identity, 45 projects, 19 tenants) and Defender K8S (DK8S, ~50 repos) are architecturally distinct but share patterns
+2. **48 repos catalogued** across 10 categories: 9 core infrastructure, 6 deployment, 5 observability, 4 security, 4 automation, 14 libraries, and more
+3. **Critical architecture patterns documented**: Cluster Orchestrator (ADR-0006), Scale Unit Scheduler, Node Health Lifecycle (ADR-0012), ConfigGen expansion engine, ArgoCD app-of-apps GitOps
+4. **6 critical/high security findings** consolidated — manual cert rotation, no WAF, cross-cloud inconsistency, network policy gaps
+5. **BasePlatformRP is the abstraction layer** above both platforms — 22 identified gaps
+
+**Recommendation**
+
+- Use `dk8s-platform-knowledge.md` as team's canonical reference for both platforms
+- Keep updated as new analysis is performed
+- Consider splitting into sub-documents if exceeds ~1000 lines

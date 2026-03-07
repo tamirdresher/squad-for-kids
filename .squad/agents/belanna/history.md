@@ -172,3 +172,101 @@ The most valuable insight for infrastructure work: **Build infrastructure for ag
 - Test with agent burst patterns, not human click patterns
 
 **Note:** Web feed is read-only; community interaction requires direct API calls. Full engagement (posting infrastructure insights, replying to multi-agent patterns) would require SDK integration.
+
+---
+
+### 2026-03-06: DK8S Infrastructure Knowledge Consolidation (Issue #2)
+
+**Task:** Create comprehensive infrastructure inventory covering both Celestial (idk8s) and DK8S (Defender Kubernetes) platforms for issue #2.
+
+**Sources Analyzed:**
+- `analysis-belanna-infrastructure.md` (prior deep-dive, 48KB)
+- `idk8s-infrastructure-complete-guide.md` (complete reference guide)
+- `aspire-kind-analysis.md` (Aspire + Kind patterns)
+- `Dk8sCodingAI-1/skills/` (12 infrastructure skills — Helm, ArgoCD, cluster-config, pipeline, operator, scaffold)
+- `Dk8sCodingAIgithub/plugins/dk8s-platform/` (15 skills, repository architecture docs)
+
+**Key Findings:**
+1. Two distinct K8s platforms with different deployment models: Celestial (EV2 + Component Deployer) vs DK8S (EV2 + ArgoCD GitOps)
+2. Celestial: 18 prod clusters, 7 sovereign clouds, 12 ACR registries, 19 tenants, 45+ components
+3. DK8S: ArgoCD app-of-apps pattern, ConfigGen manifest expansion, single ACR (`wcdprodacr`)
+4. Local repos (`Dk8sCodingAI-1`, `Dk8sCodingAIgithub`) are AI plugin/documentation hubs — no actual infrastructure code
+5. Both platforms share: OneBranch pipelines, EV2 deployment, Helm charts, KEDA autoscaling
+6. Infrastructure gaps identified: ACR naming migration, missing NetworkPolicies, cert rotation risk, SDP blast radius
+
+**Deliverable:** `dk8s-infrastructure-inventory.md` — comprehensive inventory covering clusters, node pools, Helm charts, ArgoCD, EV2, pipelines, ConfigGen, container images, Aspire integration, tenants, and infrastructure gaps.
+
+---
+
+### 2026-03-07: DK8S Stability & Configuration Management Analysis (Issue #4)
+
+**Task:** Comprehensive stability analysis of DK8S platform — incidents, configuration management pain points, root causes, and prioritized recommendations.
+
+**Research Sources Used:**
+- WorkIQ: 5 queries covering DK8S stability issues, ConfigGen problems, BAND group conversations, DK8S Leads discussions, and ConfigGen breaking changes
+- EngineeringHub: Istio service mesh docs, BCDR recommendations, State of the Infra docs
+- Prior analysis: dk8s-infrastructure-inventory.md, dk8s-platform-knowledge.md, analysis-belanna-infrastructure.md
+
+**Key Findings:**
+
+1. **Networking is #1 outage driver** — NAT Gateway degradations (Nov 2025 – Feb 2026), DNS resolution failures (Oct 2025), and ingress issues caused most Sev2 incidents. These are predominantly Azure platform-side, not DK8S code bugs.
+
+2. **Istio is the highest-risk active change** — Jan 2026 Sev2 (IcM 731055522) directly caused by ztunnel misbehavior when geneva-loggers were added to mesh, combined with DNS failures and cluster autoscaler problems. Cascading failure: mesh breaks → DNS breaks → Geneva breaks → observability blackout.
+
+3. **ConfigGen breaking changes are a leadership-level KPI** — "Decrease the # of ConfigGen Breaking Changes" tracked at IDP leadership. ConfigGen stretched beyond original design; clusters losing uniformity (per-cluster MIs, per-DC ACRs) increases manifest expansion complexity.
+
+4. **Weak deployment feedback loops** — IDP has no visibility when EV2 steps fail or when teams skip NuGet versions. "IDP isn't aware if something in the deployment is not behaving correctly."
+
+5. **Argo Rollouts shared-resource failures** — DK8S Leads (Jan 14, 2026) debated whether to continue supporting Argo Rollouts due to ingress/identity/binding rollback failures. Risk acknowledged but no final decision.
+
+6. **Operational guardrails missing** — Manual cluster deletions cause alert storms; no deny assignments at management-group level; quota exhaustion stalls upgrades.
+
+**Deliverables:**
+- `dk8s-stability-analysis.md` — Full stability analysis with incident catalog, ConfigGen pain points, root cause analysis, 15 short-term mitigations, 14 long-term architecture improvements, and prioritized recommendations
+- `.squad/decisions/inbox/belanna-stability-analysis.md` — 4 proposed decisions for team review
+- Issue #4 comment with analysis summary
+
+**Infrastructure Patterns Learned:**
+- Istio ambient mode ztunnel creates node-level L4 proxy failure modes that cascade differently than sidecar injection failures
+- ConfigGen's region-agnostic design assumptions break when clusters become topology-aware (per-DC ACRs, per-cluster MIs)
+- NAT Gateway is zonal but DK8S alerting is region-scoped — creates false Sev2 escalations
+- Self-hosted VPA needed at >1k pods (AKS add-on hits scale limits)
+- D8 minimum node size prevents daemonset overhead from starving workloads
+
+---
+
+### 2026-03-07: Aurora Cluster Provisioning Experiment Design (Issue #4)
+
+**Task:** Design a controlled experiment to evaluate Aurora E2E validation for DK8S cluster provisioning, answering whether it would slow down component changes and rollouts.
+
+**Research Conducted:**
+- WorkIQ: 4 queries — DK8S cluster provisioning process, pipeline SLA/timing, Aurora Bridge integration, Aurora + DK8S discussions
+- EngineeringHub: Access denied (permissions issue); relied on WorkIQ-sourced Aurora docs
+- Web search: Aurora validation pipeline integration patterns
+- Prior analysis: dk8s-stability-analysis.md, dk8s-infrastructure-inventory.md, dk8s-platform-knowledge.md
+
+**Key Findings:**
+
+1. **DK8S cluster provisioning is a 6-stage pipeline** — Inventory → ConfigGen → Pipeline Creation → EV2/AKS → Platform Bring-Up → Validation. End-to-end ~45–90 minutes excluding inventory delay. No formal SLA exists.
+
+2. **Aurora Bridge integrates without pipeline changes** — Manifest-based onboarding via `ADO_Dev.json`. Aurora Workload App (service principal) observes pipeline externally. No YAML modifications. No added latency in monitoring mode.
+
+3. **Monitoring-only mode is explicitly supported** — `WorkloadCreateIcM = false` disables incident creation. Recommended for dev/test environments. This is the Phase 1 approach.
+
+4. **No one has proposed Aurora for DK8S cluster provisioning before** — WorkIQ confirms Aurora is positioned as workload/service validation, not infrastructure provisioning. DK8S has its own Cluster Health Validator. This would be a new integration discussion.
+
+5. **9 documented failure modes** in cluster provisioning (from stability analysis) — none are systematically tracked or auto-categorized today. Aurora could fill this gap.
+
+6. **Zero impact on component rollouts** — Experiment is scoped to provisioning pipeline only. Component Helm charts deploy via ArgoCD, which is not in scope.
+
+**Deliverables:**
+- `aurora-cluster-provisioning-experiment.md` — Full 4-part experiment design (current pipeline, experiment design, rollout impact, implementation checklist)
+- `.squad/decisions/inbox/belanna-aurora-experiment.md` — Decision proposal for team review
+- Issue #4 comment with experiment summary
+
+**Infrastructure Patterns Learned:**
+- Aurora Bridge is manifest-driven, not task-driven — no ADO Marketplace extension, config-as-code onboarding via PR
+- DK8S provisioning pipelines are auto-generated per cluster via Product Catalog API (not static)
+- "Provisioned but unhealthy" is a real failure state — cluster exists in AKS but platform components are broken
+- No provisioning regression baseline exists today — no way to detect if provisioning quality is degrading over time
+- Aurora results support multi-subscription, multi-region, multi-resource-group reporting via structured JSON schema

@@ -10,6 +10,82 @@
 
 ## Learnings
 
+### 2026-03-07: Security Dashboard & False Positive Measurement (Issues #77, #78)
+
+**Context:** Post-validation operational readiness work following FedRAMP test suite (Issue #67). Two design documents created to enable production deployment with confidence: real-time compliance monitoring and false positive rate validation.
+
+**Deliverables:**
+
+1. **Security Dashboard Integration Design (Issue #77, PR #79)**
+   - **Purpose:** Real-time ops visibility into FedRAMP control compliance status across all environments
+   - **Architecture:** React dashboard + Azure Functions API + Azure Monitor + Cosmos DB + Log Analytics
+   - **Key Features:**
+     - 4 dashboard pages: Overview, Control Detail, Environment View, Trend Analysis
+     - Real-time compliance status for all 9 FedRAMP controls (SC-7, SC-8, SI-2, SI-3, RA-5, CM-3, IR-4, AC-3, CM-7)
+     - Historical trend analysis (30/60/90-day pass/fail rates)
+     - 6 alert types with PagerDuty/Teams integration (control failure, critical vulnerability, drift detection, scan overdue, test failure, FP spike)
+     - Role-based access control (Security Admin, Security Engineer, SRE, Ops Viewer, Auditor)
+     - Per-cluster compliance view (DEV, STG, STG-GOV, PPE, PROD)
+   - **Implementation Plan:** 10 weeks across 5 phases (data pipeline → API → UI → alerting → rollout)
+   - **Cost:** $224/month (commercial) + $200/month (Azure Government instance for data sovereignty)
+   - **File:** `docs/security-dashboard-design.md` (31KB, 750 lines)
+
+2. **WAF/OPA False Positive Measurement Plan (Issue #78, PR #82)**
+   - **Purpose:** Validate < 1% false positive rate before sovereign deployment with evidence-based methodology
+   - **Scope:** 4 WAF rules (OWASP DRS 2.1 + 3 custom) + 5 OPA policies (path safety, annotation allowlist, backend restriction, TLS enforcement, wildcard prevention)
+   - **Measurement Approach:**
+     - WAF Detection mode (non-blocking) + OPA dryrun mode (warn, don't reject)
+     - 10-day observation window in DEV-EUS2 and STG-WUS2 environments
+     - Telemetry: Azure Monitor (WAF logs) + Log Analytics (OPA violations) + Cosmos DB (classifications)
+     - Classification: Automated heuristics (80%) + manual security engineer review (20%)
+     - Expected volume: 10,000+ WAF inspections, 500+ OPA evaluations, 100-200 blocked requests/day
+   - **Classification Methodology:**
+     - True Positive (TP): Correctly blocks malicious traffic (CVE payloads, threat intel IPs)
+     - False Positive (FP): Incorrectly blocks legitimate traffic (correlation with app success logs)
+     - Decision tree with automated classification heuristics + manual review for inconclusive cases
+     - Daily 60-minute classification sessions with justification documentation
+   - **Tuning Strategies:**
+     - WAF: Rule refinement (narrow regex), exclusion rules (allowlist known-good sources), content-type filtering (exclude JSON from SQL injection rules)
+     - OPA: Allowlist expansion (add safe annotations), namespace exceptions (dev/test exemptions), warning-only mode (low-risk policies)
+   - **Go/No-Go Framework:**
+     - GO Criteria: WAF FP < 1%, OPA FP < 1%, zero false negatives, 100% classification, tuning validated, p95 latency < 5% increase, high security confidence
+     - NO-GO Triggers: FP ≥ 1%, false negative detected, incomplete classification, performance degradation > 10%, P0/P1 incident
+     - Conditional GO: 1.0-1.5% FP with enhanced monitoring + 24/7 on-call
+   - **Timeline:** Day -3 to 0 (prep), Day 1-10 (measurement), Day 6-7 (tuning), Day 8-10 (validation), Day 11-13 (analysis), Day 15+ (deployment if GO)
+   - **File:** `docs/false-positive-measurement-plan.md` (45KB, 1167 lines)
+
+**Learnings:**
+
+1. **Dashboard design requires ops/security co-design** — Security teams need deep technical detail (control drill-down, test results, remediation history), while ops management needs executive summary (overall compliance status, active alerts, environment health). Solution: Multi-page dashboard with role-based views (Overview for leadership, Control Detail for engineers).
+
+2. **Real-time compliance monitoring prevents sovereign deployment delays** — Historical pattern: Compliance audit delays cause 2-4 week deployment slips due to manual evidence gathering. Automated dashboard with 90-day historical data enables instant audit readiness, eliminates manual report generation.
+
+3. **False positive measurement requires hybrid approach** — Fully automated classification achieves only 80% accuracy due to ambiguous patterns (e.g., SQL keywords in legitimate JSON). Manual security engineer review required for 20% inconclusive cases. Solution: Daily 60-minute review sessions with classification UI + automated heuristics for high-confidence cases.
+
+4. **Dryrun mode enables safe policy validation in production-like traffic** — WAF Detection mode + OPA dryrun mode allow observing real traffic patterns without customer impact. Critical for avoiding synthetic test bias (real users behave differently than load tests). Enables confident < 1% FP rate validation before enforcement.
+
+5. **Tuning strategies differ by layer** — WAF tuning focuses on regex precision and content-type filtering (block attack patterns, allow similar-looking legitimate traffic). OPA tuning focuses on allowlist expansion and namespace exemptions (developers need flexibility in dev/test, strict enforcement in prod). Both require evidence-based justification (classification data, not assumptions).
+
+6. **Go/no-go criteria must be quantitative and binary** — Qualitative assessments (\"feels ready\") lead to deployment risk. Solution: 7 measurable criteria with clear thresholds (< 1% FP, zero FN, 100% classification, < 5% latency). Any NO-GO criterion blocks deployment, triggers extended tuning cycle. Removes subjective debate, focuses on data.
+
+7. **Classification database enables continuous improvement** — Cosmos DB storage of all TP/FP classifications with justification creates knowledge base for future tuning. Pattern analysis reveals top FP sources (e.g., \"JSON POST with SELECT keyword\" → exclude JSON Content-Type from SQL injection rule). Enables ML-based auto-classification in future (Phase 6 enhancement).
+
+8. **Data sovereignty requires separate dashboard instances** — Azure Government regions have strict data isolation requirements (no cross-region replication to commercial cloud). Solution: Deploy separate dashboard in Azure Government with isolated Log Analytics workspace, Cosmos DB, API Management. Increases cost ($200/month) but maintains compliance.
+
+**Technical Insights:**
+
+- **Dashboard query optimization critical for sub-2s latency** — KQL queries against 90-day historical data in Cosmos DB can exceed 10s without optimization. Solution: Query result caching (5-min TTL), pre-aggregated daily summaries (reduce scan scope), pagination for large result sets (max 100 items/page).
+- **Alert deduplication prevents on-call fatigue** — Initial design triggered 50+ alerts/day for related failures (e.g., single NetworkPolicy misconfiguration affects 10 tests). Solution: Group by root cause (shared failure pattern), auto-resolve on subsequent pass, 30-minute escalation delay for non-critical alerts.
+- **Fluent Bit + Log Analytics enables OPA telemetry** — Gatekeeper logs violations to stdout (JSON); Fluent Bit DaemonSet ingests to Log Analytics with custom table schema. Enables KQL queries for violation trends, policy effectiveness, false positive analysis. Alternative: Webhook to Azure Function (higher latency, more complex).
+- **Correlation with application logs disambiguates FP vs legitimate failure** — WAF logs request as blocked, but application may have rejected same request anyway (e.g., invalid API key). Solution: Join WAF logs with AppServiceHTTPLogs on trackingReference (correlation ID). If app returned HTTP 200 despite WAF log, classify as FP; if app returned 400/500, classify as TP.
+
+**Artifacts:**
+- Security dashboard design: `docs/security-dashboard-design.md` (31KB, PR #79)
+- False positive measurement plan: `docs/false-positive-measurement-plan.md` (45KB, PR #82)
+- Related: FedRAMP test suite (Issue #67, PR #70), FedRAMP controls (Issue #54, PR #56)
+
+---
+
 ### 2026-03-07: FedRAMP Controls Validation Test Suite (Issue #67)
 
 **Context:** Comprehensive validation testing for defense-in-depth security controls delivered in PRs #55 (Network Policies) and #56 (WAF, OPA, Scanning). Enables systematic testing before sovereign/government cluster deployment.

@@ -2035,3 +2035,362 @@ This pattern helps research work unblock business decisions rather than sit in "
 **Confidence:** High (research complete where possible; blockers clearly identified)  
 **Timeline:** Ready to move forward immediately upon Tamir's input
 
+
+---
+
+## Decision: User Directive — Status Label Enforcement
+
+**Date:** 2026-03-07T17:45:41Z  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process / Issue Management
+
+**Directive:** Status labels (status:in-progress, status:pending-user, status:done, status:blocked) MUST always be followed by the squad. Every issue must have the correct status label updated as work progresses. This is non-negotiable.
+
+**Captured from:** Issue #43 (Tamir's strong emphasis: "make sure it will always be followed by the squad!!!!!")
+
+**Enforcement:** All agents must validate and update status labels when transitioning work on any GitHub issue.
+
+---
+
+## Decision: Squad Activity Monitor Tool Architecture
+
+**Date:** 2026-03-07  
+**Author:** Data (Code Expert)  
+**Issue:** #40  
+**Status:** ✅ Implemented  
+**Scope:** Squad Tooling
+
+### Context
+Tamir requested a local tool to monitor squad member activity in real-time. Initial proposal included both PowerShell script and web dashboard options. Tamir chose the local tool approach but requested C# instead of PowerShell, specifically mentioning .NET 10's single-file capabilities.
+
+### Decision
+Built Squad Activity Monitor as a C# 13 console application using .NET 10 with Spectre.Console for terminal UI.
+
+### Technical Choices
+
+**Platform: .NET 10 + C# 13**
+- **Rationale:** Latest available SDK, single-file publish capability, modern language features
+- **Benefits:** Cross-platform, type-safe, performant, self-contained executable
+- **Trade-offs:** Requires .NET SDK to run (or single-file publish for distribution)
+
+**UI Framework: Spectre.Console**
+- **Rationale:** Best-in-class terminal UI library for .NET
+- **Benefits:** Beautiful tables, color support, rich formatting, escape handling
+- **Trade-offs:** External dependency (but stable, well-maintained)
+
+**Architecture: Simple File Parser**
+- **Rationale:** Orchestration logs are markdown files with predictable structure
+- **Benefits:** No database, no state, simple regex parsing, fast startup
+- **Trade-offs:** Limited to what's in log files, no historical analysis
+
+**Data Source: Orchestration Logs Only**
+- **Rationale:** Primary source of truth for squad activity
+- **Benefits:** Direct access, no API needed, real-time updates
+- **Trade-offs:** Doesn't capture session logs or detailed agent state (not needed for MVP)
+
+### Implementation Patterns
+1. **Top-level statements** — No unnecessary ceremony
+2. **Records** — Clean data models (AgentActivity)
+3. **Regex parsing** — Extract timestamp and agent name from filename
+4. **Markdown parsing** — Simple regex for Status, Assignment, Outcome sections
+5. **Smart formatting** — Age relative to UTC now, color coding by status
+
+### User Preferences Captured
+- **C# over PowerShell** — Better type safety, more portable
+- **Local tool over web dashboard** — Faster to build, simpler to use
+- **Auto-refresh default** — Monitor mode is primary use case
+- **\--once\ flag** — Quick status check without loop
+
+### Future Enhancements (Deferred)
+- Session log integration for detailed agent state
+- Historical trend analysis (activity over time)
+- Agent filtering (show only specific agents)
+- Export to JSON/CSV for analysis
+- Web dashboard (if team grows or remote monitoring needed)
+
+### Outcome
+✅ Tool implemented in ~270 lines of C#, tested successfully, PR #47 created.  
+✅ Displays 20 recent activities with beautiful formatting.  
+✅ Auto-refresh every 5s (configurable).  
+✅ Color-coded status indicators work as expected.
+
+### Lessons Learned
+1. Timestamp parsing from filenames requires explicit regex grouping
+2. Spectre.Console's Markup.Escape() is critical for user-generated content
+3. .NET 10 single-file publish creates truly self-contained executables
+4. Top-level statements + records = minimal ceremony for console apps
+
+---
+
+## Decision 4: # Decision: STG-EUS2-28 Incident Response — Fast-Track I1 Istio Exclusion List
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** Proposed (Requires Tamir + DK8S Leadership Confirmation)  
+**Scope:** Incident Response, Stability Engineering  
+**Related Issues:** #46 (incident report), #24 (Tier 1 mitigations), #25 (Tier 2 plan)
+
+## Context
+
+STG-EUS2-28 cluster incident (detected 2026-03-07T17:45Z via Teams Bridge integration) exhibited cascading failure pattern:
+- Draino → Karpenter → Istio ztunnel → NodeStuck automation
+- >20% unhealthy nodes
+- ztunnel pods failing despite Ready nodes
+- Node deletion automation triggering on daemonset health (not actual node failure)
+
+**Critical Correlation:** This pattern is **identical** to Jan 2026 Sev2 (IcM 731055522) analyzed in Issue #4 stability research. Squad predicted this exact failure mode 4+ weeks before production recurrence.
+
+## Decision: Elevate I1 from Tier 1 to P0 Immediate Execution
+
+**I1 (Establish Istio Exclusion List for Infrastructure Components)** should be:
+- **Elevated from:** Tier 1 "critical, low-effort" (planned for next sprint)
+- **Elevated to:** P0 immediate execution (start this week)
+
+### Rationale
+
+1. **Active Incident Validates Research:** Real-world recurrence proves I1 is not theoretical — it directly mitigates production failure mode
+2. **Low Implementation Cost:** 2-3 days effort (label-based mesh exclusion + admission controller)
+3. **Breaks Cascading Loop:** Removing infrastructure daemonsets from mesh prevents Draino/Karpenter/NodeStuck cascade
+4. **Enables I2:** Clean baseline required before implementing ztunnel health monitoring + auto-rollback (Tier 2)
+
+### Scope
+
+**Components to Exclude from Service Mesh:**
+- CoreDNS (kube-system)
+- Geneva-loggers (monitoring infrastructure)
+- All kube-system daemonsets
+- Monitoring infrastructure (prometheus exporters, telegraf agents)
+- Node-level system components (CSI drivers, CNI plugins)
+
+**Implementation:**
+- Label-based exclusion (namespace + pod labels)
+- Admission controller validation (prevent accidental mesh injection)
+- Validate in STG before PROD rollout
+
+### Three-Phase Mitigation Strategy
+
+**Phase 1 (This Week): Karan's NodeStuck Exclusion**
+- **Tactical fix:** Exclude Istio daemonsets from NodeStuck node deletion automation
+- **Rationale:** Stop the bleeding — prevents node churn from amplifying incidents
+- **Owner:** SRE team
+- **Timeline:** 48h implementation + validation
+
+**Phase 2 (2-3 Weeks): I1 Istio Exclusion List**
+- **Strategic fix:** Remove infrastructure components from service mesh entirely
+- **Rationale:** Root cause mitigation — infrastructure should never trigger application mesh logic
+- **Owner:** Platform + Istio SME team
+- **Timeline:** Current sprint (fast-tracked from Tier 1 plan)
+
+**Phase 3 (6-8 Weeks): I2 ztunnel Health Monitoring**
+- **Proactive mitigation:** Automatic rollback when ztunnel failure rate exceeds threshold
+- **Rationale:** Prevent future incidents through automated health-based remediation
+- **Owner:** Platform + Istio SME team
+- **Timeline:** Tier 2 execution (Issue #25)
+
+## Applies To
+
+- **DK8S Platform Team:** I1 implementation (Istio exclusion list)
+- **SRE Team:** Phase 1 NodeStuck automation changes
+- **Squad (B'Elanna):** Technical review + validation of I1 implementation approach
+
+## Does NOT Apply When
+
+- Infrastructure components legitimately need service mesh features (rare; requires explicit justification)
+- Cluster is already experiencing Sev1 incident (revert to manual remediation, implement I1 post-incident)
+
+## Consequences
+
+✅ **Benefits:**
+- Prevents Draino/Karpenter/NodeStuck cascading failure loop
+- Reduces false positive node deletion (infrastructure daemonset health ≠ node health)
+- Establishes clean baseline for future Istio upgrades
+- Demonstrates research ROI to DK8S leadership (predicted failure, mitigations ready)
+
+⚠️ **Risks:**
+- Excluded components lose mesh observability (mTLS metrics, tracing) — acceptable tradeoff for stability
+- Requires cross-team coordination (Platform, SRE, Istio SME)
+- Implementation window: Must complete before next STG deployment cycle
+
+## Mitigation for Risks
+
+- **Observability gap:** Infrastructure components use existing monitoring (Prometheus exporters, Geneva logs) — mesh observability not required
+- **Coordination risk:** Phase 1 (NodeStuck) is independent of Phase 2 (I1) — can proceed in parallel
+- **Validation:** STG rollout with 48h soak time before PROD
+
+## Related Patterns
+
+**"Active Incident Validation" Pattern:**
+1. When active incident matches prior research prediction → Escalate mitigations from planned to P0
+2. Accept tactical symptom fixes (Phase 1) while strategic solution (Phase 2) is implemented
+3. Use incident as forcing function to accelerate critical work
+4. Frame to leadership: "Research predicted incident, mitigations already designed, need execution priority"
+
+## Success Metrics
+
+- **Phase 1:** Zero node deletions triggered by Istio daemonset health within 7 days of deployment
+- **Phase 2:** Zero Istio-related cascading failures in STG environment within 30 days of I1 rollout
+- **Phase 3:** >80% automatic recovery rate for ztunnel failures (measured over 90 days post-I2)
+
+## Open Questions for Tamir + DK8S Leadership
+
+1. **Execution Priority:** Confirm I1 fast-track to current sprint (vs. waiting for planned Tier 1 execution)?
+2. **Phase 1 Coordination:** Should Squad (B'Elanna) provide NodeStuck exclusion implementation guidance to SRE team?
+3. **FedRAMP P0:** Should nginx-ingress-heartbeat vulnerabilities be tracked as separate issue #48?
+4. **New Issues:** Confirm creation of Issue #47 (NodeStuck exclusion) and Issue #48 (FedRAMP P0)?
+
+## References
+
+- **Issue #46:** STG-EUS2-28 incident report (Teams Bridge detection)
+- **Issue #24:** Tier 1 critical mitigations (I1 original scope)
+- **Issue #25:** Tier 2 high-impact improvements (I2 ztunnel health monitoring)
+- **Issue #4:** DK8S stability analysis (5 Sev2 incidents, 7 failure patterns)
+- **B'Elanna's Analysis:** Jan 2026 Sev2 (IcM 731055522) — ztunnel + DNS + geneva-loggers cascading failure
+
+---
+
+**Next Steps:**
+1. Tamir confirms fast-track decision
+2. B'Elanna provides I1 implementation guidance (label design, admission controller config)
+3. SRE team implements Phase 1 (NodeStuck exclusion) within 48h
+4. Platform team schedules I1 implementation for current sprint
+5. Post-incident review validates correlation + documents lessons learned
+
+
+---
+### 2026-03-07T18:23Z: User directive — Teams communication approach
+**By:** Tamir Dresher (via Copilot)
+**What:** Use WorkIQ + webhook approach for Teams communication for now. Teams MCP Server (issue #45) is deprioritized.
+**Why:** User request — practical approach using existing tools rather than waiting for MCP Server setup.
+---
+# Decision: Patent Research Re-Scoped to Usage Pattern (Issue #42)
+
+**Date:** 2026-03-15  
+**Author:** Seven (Research & Docs)  
+**Status:** Informational (research findings)  
+**Related Issues:** #42
+
+## Context
+
+Original patent research (March 2026) analyzed Squad framework's technical architecture (Ralph monitoring, casting governance, git-based state, etc.) for patentability. Tamir clarified in follow-up comments that the question was NOT about patenting Squad itself, but about the **USAGE PATTERN**: using a multi-agent AI squad as a personal assistant / cognitive extension for a human professional (specifically a TAM).
+
+## Research Question (Re-Scoped)
+
+**Is the way we use Squad here — as an AI personal assistant / human extension for a TAM — patentable?**
+
+## Key Findings
+
+### 1. Prior Art Landscape
+
+**Existing Patents:**
+- US11574205B2 (Granted): Unified cognition for virtual personal cognitive assistant — multiple domain agents coordinated by personalized cognition manager
+- US20230306967A1 (Application): Personal assistant multi-skill — cognitive enhancement layer across domains
+- US20240419246 (Application): Human augmentation platform using context, biosignals, and LLMs
+- US20240430216 (Application): Copilot for multi-user, multi-step workflows with multi-agent orchestration
+
+**Open-Source Implementations:**
+- Agent Squad (AWS Labs): Multi-agent framework for enterprise workflows, customer support, technical troubleshooting
+- LangChain Multi-Agent Assistants: Supervisor/sub-agent pattern for personal productivity
+- Mobile-Agent-E (Academic): Hierarchical multi-agent with self-evolving memory for professional workflows
+
+**Microsoft's Public Work:**
+- Microsoft Copilot Studio: Orchestrator + sub-agent patterns for domain-specific enterprise workflows
+- Microsoft Developer Blog (2025): "Designing Multi-Agent Intelligence" — advocates multi-agent architecture for enterprise productivity with Teams/Outlook/SharePoint integration
+
+### 2. Novelty Assessment
+
+**Broad claims WILL FAIL:**
+- "Multi-agent AI assistant for professionals" — covered by prior art (US11574205B2, AWS Agent Squad, LangChain)
+- General orchestration patterns — well-established in open-source and patents
+
+**Narrow claims MAY BE PATENTABLE:**
+
+1. **TAM-Specific Orchestration Pattern** (MEDIUM novelty)
+   - Multi-agent system specifically designed for TAM workflows (research, communication, issue tracking, continuous learning)
+   - No patents found specifically for TAM or domain-specialist cognitive extension with this workflow integration
+   - Risk: Obviousness — USPTO may view as obvious application of known patterns to specific domain
+
+2. **Human-AI Collaborative Workflow Pattern** (MEDIUM-HIGH novelty)
+   - Parallel human-AI work with git-based shared memory for audit and intervention
+   - Seamless handoff between human and AI team members
+   - Continuous learning from TAM's decisions and domain context
+   - Hybrid pattern (human-supervised + autonomous) less documented than pure autonomous or pure supervised
+
+3. **Domain-Adaptive Continuous Learning for Individual Professional** (MEDIUM novelty)
+   - Learning from single TAM's domain context, adapting agent specializations
+   - Using git-based decision history as training corpus for personalization
+   - Risk: Continuous learning is well-established; narrow TAM-focused implementation may be defensible
+
+4. **GitHub + Teams + ADO Integration as "Human Extension Substrate"** (MEDIUM novelty)
+   - Specific usage pattern of these tools as integrated substrate for human-AI collaboration
+   - GitHub issues as task definitions, Teams as communication bridge, git history as shared memory
+   - Risk: Integration patterns are common; specific usage for cognitive extension could be defensible
+
+### 3. Risk Analysis
+
+**Obviousness Risk: HIGH**
+- USPTO examiners may view as obvious combination of known elements: multi-agent orchestration + personal productivity + domain specialization
+- Mitigation: Must demonstrate non-obvious technical advantages (specific orchestration efficiency, learning mechanisms, workflow patterns)
+
+**Microsoft Internal Prior Art Risk: MEDIUM**
+- Microsoft's public work on multi-agent Copilot and agentic AI may establish prior art
+- Timing investigation required: When did implementation begin vs. Microsoft's public disclosures?
+
+**Broad Claims Will Fail: HIGH**
+- Claims like "multi-agent AI assistant for professionals" will be rejected due to prior art
+- Mitigation: File narrow, specific claims focused on TAM-specific workflow, human-AI parallel collaboration, domain-adaptive learning
+
+## Recommendation
+
+### Filing Strategy: Option A (Recommended)
+
+**File narrow TAM-focused claims:**
+- System for cognitive extension of TAM with domain-specialized agents (research, communication, issue management, monitoring)
+- Git-based shared memory enabling human audit and intervention
+- Orchestration pattern for human-AI parallel workflow where TAM and agents collaborate on simultaneous tasks
+- Continuous learning from TAM's domain context and decision history
+- Integrated GitHub + Teams + ADO substrate for task definition and coordination
+
+**Pros:**
+- Specific enough to avoid broad prior art
+- Focuses on unique TAM workflow and human-AI collaboration pattern
+- Higher grant probability
+
+**Cons:**
+- Narrow scope limits defensive value
+- Competitors could design around with different domain (e.g., Customer Success Manager)
+
+**Timeline:** 2-3 weeks for provisional filing  
+**Cost:** ~$3-5K (Microsoft covers)
+
+### Critical Questions Before Filing
+
+1. **Inventorship:** Who conceived the "AI squad as TAM human extension" concept? When?
+2. **Public Disclosure:** Has this usage pattern been publicly disclosed? (Blog posts, conference talks, public GitHub repo with pattern documented?)
+3. **Microsoft Internal:** Has Microsoft filed or disclosed similar TAM/domain-specialist cognitive extension concepts internally?
+4. **Implementation Details:** What specific orchestration mechanisms, learning algorithms, or workflow patterns are implemented that go beyond standard multi-agent frameworks?
+
+## Bottom Line
+
+**Usage pattern is POTENTIALLY PATENTABLE with narrow, specific claims** focused on TAM workflow and human-AI collaboration pattern. Obviousness is primary risk. Must demonstrate non-obvious technical advantages.
+
+**Recommended action:** If specific innovations exist in TAM workflow orchestration, domain learning, and human-AI parallel collaboration, **file narrow provisional patent** to lock priority date, then assess competitive landscape over 12 months.
+
+## Key Learning for Squad
+
+When user clarifies scope mid-research ("not Squad itself"), **IMMEDIATELY pivot to re-scoped analysis** rather than defending original scope. User's clarification takes absolute priority over prior work investment. In this case, entire patent analysis needed reframing from "Squad technical architecture" to "usage pattern as human extension" — fundamentally different patent question.
+
+## Next Steps
+
+1. Tamir reviews findings and decides whether to proceed with patent filing
+2. If proceeding: Clarify inventorship, public disclosure status, Microsoft internal conflicts
+3. If filing: Engage Microsoft patent attorney to draft narrow TAM-focused claims
+4. Timeline: Provisional filing within 2-3 weeks to preserve priority date
+
+---
+
+**References:**
+- Issue #42: https://github.com/tamirdresher_microsoft/tamresearch1/issues/42
+- Original patent research: PATENT_RESEARCH_REPORT.md, PATENT_RESEARCH_METHODOLOGY.md
+- Issue #42 re-scoped analysis comment: Posted 2026-03-15
+

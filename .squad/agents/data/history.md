@@ -994,3 +994,32 @@ All three issues have clear status and next steps. ADO integration is tested, Ra
 
 **Status:** ✅ Implemented, tested, PR #47 created
 
+---
+
+### 2026-03-02: Issue #48 - Enhanced .gitignore for squad-monitor
+
+**Task**: Clean up build artifacts and add comprehensive .gitignore for squad-monitor tool.
+
+**Context**: Build artifacts (bin/obj) were already removed from tracking in commit a197120, but .gitignore was minimal (only 6 lines).
+
+**Actions Taken**:
+1. Enhanced `.squad/tools/squad-monitor/.gitignore` with comprehensive .NET patterns:
+   - Build outputs (Debug/Release/x64/x86/ARM variants)
+   - Visual Studio cache and user settings (*.suo, *.user, .vs/)
+   - NuGet packages (*.nupkg, packages/)
+   - Test results (TestResults/, *.trx, *.coverage)
+   - IDE configurations (.vscode/, .idea/)
+2. Created branch `squad/48-gitignore-cleanup`
+3. Committed and pushed changes
+4. Created PR #49 referencing issue #48
+
+**Key Files:**
+- `.squad/tools/squad-monitor/.gitignore` - Enhanced from 6 to 46 lines
+
+**Learnings:**
+- Always check git history before assuming artifacts need removal
+- Comprehensive .gitignore patterns prevent future tracking issues
+- Standard .NET ignore patterns include platform variants (x86/x64/ARM)
+
+**Status:** ✅ Complete, PR #49 created and ready for review
+

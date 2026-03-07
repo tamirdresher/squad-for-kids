@@ -10,6 +10,81 @@
 
 ## Learnings
 
+### 2026-03-09: Continuous Learning Phase 1 — Manual Channel Scan & Skill Promotion Design
+
+**Task:** Design and document Phase 1 of continuous learning system for Issue #21: Manual channel scanning, insight extraction, and skill promotion workflow
+
+**Outcome:** Delivered comprehensive Phase 1 guide (`CONTINUOUS_LEARNING_PHASE_1.md`) with actionable workflow, templates, and real examples. Guide is immediately usable by agents; committed to repo.
+
+**Key findings:**
+
+1. **Existing Phase 1 Skill (dk8s-support-patterns) Validates Approach**
+   - Already exists in `.squad/skills/dk8s-support-patterns/SKILL.md`
+   - High confidence; battle-tested patterns from support channel
+   - Proves framework works: Teams channel → human extraction → skill → agent use
+   - Sets template for future Phase 1 extractions
+
+2. **Phase 1 Must Be Manual, Not Automated**
+   - Automated scraping risks noise and false positives
+   - Human review ensures signal quality before scaling to Phase 2
+   - Manual process trains the system's confidence calibration
+   - Team feedback loop improves future extractions
+
+3. **Three-Layer Quality Gate Required**
+   - Layer 1: Evidence threshold (3+ examples minimum)
+   - Layer 2: Confidence calibration (High/Medium/Low explicit, not inflated)
+   - Layer 3: Utility validation ("Will agents actually use this?")
+   - Decision 15 (OpenCLAW patterns) already proposed similar gates
+
+4. **Skill Structure Is Clear but Underutilized**
+   - `.squad/skill.md` template exists and is sound
+   - Four existing skills: `squad-conventions`, `teams-monitor`, `dk8s-support-patterns`, `configgen-support-patterns`
+   - Framework is battle-tested; ready for expansion
+   - Agents should query skills but no systematic process existed until Phase 1 design
+
+5. **Decision Loop-Back is Critical for Institutional Learning**
+   - Patterns extracted from channels often reveal systemic insights
+   - Example: "Pod scheduling failures → capacity checking should be first diagnostic step"
+   - These insights must feed back to `decisions.md` so broader team benefits
+   - Closes loop: Teams channel → skill → team decision → org learning
+
+6. **Validation Workflow Must Be Lightweight**
+   - GitHub issue + team feedback (2-3 days max) sufficient
+   - Avoid heavyweight review that kills momentum
+   - Confidence levels explicit; imperfect data is acceptable if labeled honestly
+   - Anti-pattern: over-reviewing kills Phase 1; launch with 2+ examples, iterate based on use
+
+**Phase 1 Implementation Roadmap:**
+
+| Week | Target | Expected Output |
+|------|--------|-----------------|
+| 1 | DK8S channels | 2-3 committed skills |
+| 2 | ConfigGen + other domains | 1-2 additional skills |
+| 3 | Feedback loop + iteration | Updated existing skills, 1 decision |
+| 4 | Normalize workflow | Quarterly scan plan |
+
+**Artifacts Created:**
+- `CONTINUOUS_LEARNING_PHASE_1.md` — 600-line comprehensive guide (workflow, templates, examples, FAQ, anti-patterns)
+- Design validated against existing decision infrastructure (Decision 15: OpenCLAW patterns + QMD extraction)
+- References all four existing skills and validates they follow framework
+- Ready for immediate team adoption
+
+**Critical Success Factors:**
+1. Start with high-confidence patterns (3+ examples, team consensus)
+2. Confidence levels must be honest (not inflated)
+3. Loop insights back to decisions.md for org learning
+4. Weekly cadence in Phase 1; automate in Phase 2
+5. Agents must actually query and apply skills (measure adoption)
+
+**Next Steps:**
+- Tamir confirms approach
+- Begin Week 1 DK8S channel scans
+- Extract 2-3 high-confidence Phase 1 skills
+- Iterate based on team feedback
+- Establish quarterly refresh cadence before Phase 2
+
+---
+
 ### 2026-03-07: Full Blog Draft — Engineering Narrative for Personal Productivity
 
 **Task:** Write complete blog post draft (2,000-2,500 words) about how AI Squad changed Tamir's productivity, with personal narrative, real examples, and image placeholders  

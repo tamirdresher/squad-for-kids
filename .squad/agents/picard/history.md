@@ -204,6 +204,33 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 - **For architecture leads:** One-Way Dependency Graph (SDK/CLI split reduces coordination overhead)
 - **For intelligence pipelines:** Scout-Librarian-Analyst (scaling content discovery with deterministic dedup)
 
+### 2026-03-07: Azure Fleet Manager Architecture Evaluation (Issue #3)
+
+**Context:** Evaluated Azure Kubernetes Fleet Manager (AKFM) for DK8S RP adoption. Conducted multi-source research: EngineeringHub internal docs, public Azure docs, KubeFleet OSS, open-source alternatives (Rancher Fleet, Kratix, Karmada), and WorkIQ retrieval of past team meetings/emails.
+
+**Technical Learnings:**
+
+1. **AKFM is built on KubeFleet (CNCF Sandbox):** The open-source foundation provides an exit path from vendor lock-in. Hub-spoke architecture with Fleet Agent per member cluster.
+
+2. **Key Value Props for DK8S:** Cluster upgrade orchestration (Update Runs) and blue/green cluster replacement are the strongest differentiators vs. status quo. App deployment propagation (CRP) overlaps heavily with existing ArgoCD + ConfigGen.
+
+3. **Identity is a Hard Blocker:** WorkIQ confirmed multiple meetings (Feb 12, Feb 18, 2026) where identity binding was explicitly called a "block" or "precondition." FIC automation gaps mean workload movement across clusters is unsafe today.
+
+4. **Dual Control Plane Risk:** Running Fleet Manager alongside ArgoCD creates competing reconciliation loops and ambiguous source-of-truth for deployment state. Team flagged this as "overkill" in Feb 12 meeting.
+
+5. **ConfigGen Expressiveness Gap:** Fleet Manager's resource overrides are less expressive than ConfigGen's 5-tier values hierarchy. Migration would lose configuration granularity.
+
+6. **Constraints:** 200-cluster limit, same Entra ID tenant required, sovereign cloud feature parity may lag.
+
+**Decision:** DEFER — do not adopt now. Establish prerequisites (Workload Identity migration, FIC automation, operational need for cluster replacement) before revisiting. No open-source alternative provides better fit than AKFM for DK8S when the time comes.
+
+**Artifacts Produced:**
+- `fleet-manager-evaluation.md` — Full architecture evaluation with feature mapping, alternative comparison, risk assessment
+- Decision inbox entry: `picard-fleet-manager-eval.md`
+- Issue #3 comment with summary
+
+---
+
 ### Community Quality Assessment:
 
 - **Depth:** Comments are substantive; people explain their implementation, edge cases, and lessons learned

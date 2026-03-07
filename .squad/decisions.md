@@ -1057,3 +1057,188 @@ Ralph watch should always fetch/pull the latest code from the branch before each
 
 **Related:** Data agent completed implementation and committed changes in round 3.
 
+
+---
+
+# Triage Decision: Issue #42 — Patent Analysis
+
+**Routed to:** Seven (Research & Docs)  
+**Label:** `squad:seven`  
+**Date:** 2025-01-21
+
+## Decision
+
+Issue #42 asks for a comprehensive review of Microsoft internal patent policies and analysis of whether the squad multi-agent architecture and integration approach could be patentable.
+
+This is fundamentally a **research and analysis task**:
+- Requires investigation into internal IP guidance
+- Requires understanding patent landscape and principles
+- Requires synthesis across existing work
+- Produces a technical advisory document
+
+**Routing rationale:** Seven owns research, documentation, and technical analysis. This task aligns directly with that charter.
+
+## Next Steps
+
+Seven will:
+1. Review Microsoft internal patent guidance and policies
+2. Assess the squad architecture and integration patterns for patentability
+3. Produce an analysis and recommendation
+4. Present findings in issue #42
+
+---
+
+# Decision: Repository Organization via Topic-Based Splitting
+
+**Date:** 2026-03-07  
+**Decider:** Picard  
+**Status:** Executed  
+**Issue:** #34
+
+## Context
+
+tamresearch1 repo contained 61+ research files covering 3 distinct topics:
+- DK8S platform investigations (architecture, infrastructure, workload migration)
+- Squad formation analysis (5 agent investigation reports)
+- SquadPlaces API exploration (screenshots, test data, API docs)
+
+All mixed together in root directory alongside core squad infrastructure (.squad/, configs).
+
+## Decision
+
+Split research artifacts into 3 dedicated private repositories:
+1. `tamresearch1-dk8s-investigations`
+2. `tamresearch1-agent-analysis`
+3. `tamresearch1-squadplaces-research`
+
+Preserve core squad infrastructure in tamresearch1.
+
+## Rationale
+
+**Problem:** Growing root directory clutter makes navigation difficult. Three distinct research topics deserve isolation.
+
+**Benefits of Split:**
+1. **Topical Isolation:** Each repo focuses on single domain
+2. **Access Control:** Private repos protect research/screenshots from public exposure
+3. **Discoverability:** Topic-specific repos easier to share with stakeholders
+4. **Clean Main Repo:** tamresearch1 becomes squad infrastructure hub, not research archive
+
+**Preserved Infrastructure:**
+- `.squad/` directory (agents, decisions, skills, history)
+- `squad.config.ts`, package files, node_modules
+- `ralph-watch.ps1` monitoring script
+- Summary files (EXECUTIVE_SUMMARY.md, etc.)
+
+## Execution Protocol
+
+1. Create private repos with `gh repo create --private`
+2. Clone each repo to temp directory
+3. Copy relevant files to each repo
+4. Add migration headers to markdown/yaml: `<!-- Moved from tamresearch1 on 2026-03-07 -->`
+5. Commit with descriptive messages + co-author trailer
+6. Push to main branch
+7. Verify all pushes succeeded
+8. Delete migrated files from tamresearch1
+9. Create `.squad/research-repos.md` catalog
+10. Commit cleanup to tamresearch1
+
+## Outcome
+
+- **61 files migrated** across 3 repos
+- **tamresearch1 cleaned:** Root directory now contains only active files + .squad/ infrastructure
+- **Catalog created:** `.squad/research-repos.md` provides navigation to all research repos
+- **Issue #34 closed** with completion report
+
+## Key Insight
+
+**Catalog files are not optional.** When splitting repositories, a catalog file in the main repo is the index to the distributed knowledge graph. Without it, knowledge becomes fragmented and unfindable.
+
+## Alternatives Considered
+
+1. **Git submodules:** Too complex for read-only research artifacts
+2. **Monorepo with directories:** Doesn't solve access control or navigation
+3. **Single research-archive repo:** Loses topical isolation
+
+## Related Decisions
+
+- Continuous learning system design (Issue #6) — skills stay in tamresearch1
+- Ralph monitoring setup — monitoring script stays in tamresearch1
+
+---
+
+# Decision: GitHub-Teams Integration Approach
+
+**Date:** 2026-03-07  
+**Author:** Data  
+**Issue:** #33  
+**Status:** Recommended
+
+## Context
+
+Tamir requested automation of GitHub-Teams integration setup, asking specifically about:
+1. Using Playwright CLI with Edge browser
+2. Alternative Windows automation tools for Teams desktop app
+3. Avoiding manual browser steps
+
+## Investigation
+
+Researched three approaches:
+1. **Microsoft Graph API** - ✅ Best option
+2. **Playwright browser automation** - ❌ Not applicable (Teams is native app)
+3. **Windows UI automation** - ❌ Fragile, complex, security concerns
+
+## Key Findings
+
+### What CAN Be Automated (Graph API)
+- **App Installation**: GitHub app installation to Teams via `New-MgTeamInstalledApp` cmdlet
+- **Team/Channel Discovery**: Programmatic team and channel enumeration
+- **Permissions**: Requires `TeamsAppInstallation.ReadWriteForTeam` scope
+
+**GitHub App ID**: `0d820ecd-def2-4297-adad-78056cde7c78` (verified from Microsoft docs)
+
+### What CANNOT Be Automated
+- **`@GitHub signin`**: Initiates GitHub OAuth flow requiring user consent
+- **`@GitHub subscribe`**: Bot command that needs authenticated context
+- **Reason**: Security by design - OAuth flows must have user interaction
+
+## Recommended Solution
+
+**Hybrid Approach**:
+1. **Automated** (PowerShell + Graph API): Install GitHub app to team
+2. **Manual** (< 2 min): User completes OAuth signin and subscription in Teams
+
+## Implementation
+
+Created `setup-github-teams-integration.ps1`:
+- Authenticates with Microsoft Graph
+- Lists available teams
+- Installs GitHub app programmatically
+- Provides clear manual step instructions
+
+**Time Savings**: Reduces setup from ~5 minutes to ~2 minutes (60% reduction)
+
+## Alternative Considered: Windows UI Automation
+
+Evaluated tools:
+- **UI Automation API** (C#/.NET)
+- **Power Automate Desktop**
+- **AutoHotkey**
+
+**Why Rejected**:
+- Teams desktop UI changes frequently (brittle)
+- No reliable element selectors for bot interactions
+- Security context issues (user must be signed in)
+- Complexity >> benefit
+
+## Security Notes
+
+- Graph API requires admin consent for team-level permissions
+- OAuth flows correctly require interactive user consent (can't be bypassed)
+- Script uses delegated permissions (runs as user, not app-only)
+
+## References
+
+- [Microsoft Graph: Install app to team](https://learn.microsoft.com/en-us/graph/api/team-post-installedapps)
+- [GitHub Teams Integration](https://github.com/integrations/microsoft-teams)
+- PowerShell module: `Microsoft.Graph.Teams` v2.26.1
+

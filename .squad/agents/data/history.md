@@ -610,3 +610,71 @@ When testing forks with build steps:
 
 **Technical Insight**:
 The ADO adapter design is sound: `PlatformAdapter` interface provides clean abstraction, allowing GitHub and ADO to coexist. The split between repo operations (git remote org/project) and work item operations (ado.org/project config) elegantly handles enterprise separation-of-concerns. Using az CLI instead of REST APIs + PATs reduces auth complexity and aligns with enterprise auth patterns (AAD via az login).
+
+---
+
+### 2026-03-07: GitHub-Teams Integration Automation Research (Issue #33)
+
+**Task**: Research automation options for GitHub-Teams integration setup per Tamir's request. Explore Playwright, Windows UI automation, and API-based approaches.
+
+**Investigation Results**:
+
+**Microsoft Graph API Approach (Implemented)**:
+- Microsoft.Graph.Teams PowerShell module v2.26.1 already available on system
+- New-MgTeamInstalledApp installs apps to teams programmatically
+- GitHub app Teams catalog ID: 0d820ecd-def2-4297-adad-78056cde7c78 (verified from Microsoft docs)
+- Requires TeamsAppInstallation.ReadWriteForTeam delegated permission
+- Automation boundary: App installation only - OAuth flows require user interaction
+
+**Playwright Approach (Rejected)**:
+- Teams is a native Windows application, not a web app
+- Playwright only controls browsers (Edge, Chrome, Firefox)
+- Not applicable to desktop app automation
+
+**Windows UI Automation (Evaluated and Rejected)**:
+- Tools considered: UI Automation API, Power Automate Desktop, AutoHotkey
+- Problems: Teams UI changes frequently, bot chat interactions have no reliable automation hooks, security context challenges, complexity far exceeds benefit
+
+**OAuth Security Boundary**:
+- @GitHub signin initiates GitHub OAuth flow
+- @GitHub subscribe requires authenticated bot context
+- These cannot be automated by design (security requirement for user consent)
+
+**Deliverable**:
+1. Script: setup-github-teams-integration.ps1 (4.8 KB)
+2. Documentation: .squad/decisions/inbox/data-teams-integration.md
+3. Issue Comment: Posted comprehensive findings to Issue #33
+
+**Time Savings**: Reduces setup from ~5 minutes to ~2 minutes (60% reduction)
+
+**Key Learning**:
+When evaluating automation approaches, distinguish between technical limitations (Playwright can't control native apps), security boundaries (OAuth requires user consent), and pragmatic tradeoffs (UI automation complexity vs. 2-min manual work). The best automation respects security boundaries while maximizing developer efficiency.
+
+### 2026-03-07: Ralph Round 1 — Teams Integration + Monitoring Proposals
+
+**Round 1 Assignments:**
+
+1. **Issue #33 — Teams Integration (Sonnet)**
+   - ✅ Investigated automation approaches for GitHub-Teams integration
+   - ✅ Evaluated 3 options: Microsoft Graph API (✅), Playwright (❌), Windows UI Automation (❌)
+   - ✅ Created hybrid solution: Graph API app install + 2-min manual OAuth
+   - ✅ Wrote setup-github-teams-integration.ps1 (4.8 KB, ~60% time savings)
+   - ✅ Decision merged into decisions.md
+   - Orchestration log: 2026-03-07T17-03-00Z-data-r1-sonnet.md
+   - Key Learning: Best automation respects security boundaries
+
+2. **Issue #40 — Monitoring Utility (Haiku)**
+   - ✅ Proposed 2 monitoring solutions
+   - Options: PowerShell monitor (lightweight) + Web dashboard (rich UI)
+   - Status: Awaiting Tamir preference for Round 2 implementation
+   - Orchestration log: 2026-03-07T17-04-00Z-data-r1-haiku.md
+
+**Patterns Established:**
+- Microsoft Graph module as preferred automation bridge for Teams
+- Security boundaries cannot be automated (OAuth by design)
+- Hybrid solutions (automated + manual) maximize efficiency
+- Time savings quantification (60% in Teams case) justifies approach
+
+**Integration Readiness:**
+- setup-github-teams-integration.ps1 ready for deployment
+- Monitoring solution awaiting decision (Round 2)

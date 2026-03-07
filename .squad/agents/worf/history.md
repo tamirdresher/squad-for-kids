@@ -10,6 +10,30 @@
 
 ## Learnings
 
+### 2026-03-07: FedRAMP Compensating Controls Implementation (Issue #54)
+
+**Context:** Follow-up to Issue #51 P0 assessment. Implemented the four security layers identified as missing during CVE-2026-24512 incident.
+
+**Deliverables:**
+1. **WAF Implementation Guide** — Azure Front Door Premium (commercial) / Application Gateway WAF_v2 (sovereign) with OWASP DRS 2.1, bot protection, and 3 custom rules targeting nginx config injection, annotation abuse, and heartbeat DDoS.
+2. **OPA/Gatekeeper Policies (5 total):** DK8SIngressSafePath (path injection), DK8SIngressAnnotationAllowlist (snippet annotations), DK8SIngressBackendRestriction (infrastructure services), DK8SIngressTLSRequired (FedRAMP SC-8), DK8SIngressNoWildcardHost (subdomain takeover).
+3. **CI/CD Scanning Pipeline** — Trivy + Conftest in Azure DevOps pipeline with zero-tolerance gates for CRITICAL/HIGH findings.
+4. **Emergency Patching Runbook** — 4-phase progressive rollout (Test→PPE→Prod→Sovereign) with rollback triggers and sovereign air-gap procedures.
+
+**Learnings:**
+1. OPA dryrun-first strategy prevents breaking existing workloads during policy rollout
+2. Sovereign cloud WAF limited to Application Gateway WAF_v2 (Front Door feature parity varies)
+3. CI/CD scanning must use local tools (Trivy/Conftest) — no SaaS for FedRAMP/air-gapped compliance
+4. Annotation allowlisting is more secure than blocklisting for nginx-ingress (100+ annotations)
+5. Air-gapped sovereign image transfer adds 24-48h to emergency patching timelines
+
+**Artifacts:**
+- Security controls document: `docs/fedramp-compensating-controls-security.md`
+- Decision document: `.squad/decisions/inbox/worf-fedramp-controls.md`
+- Branch: `squad/54-fedramp-security`
+
+---
+
 ### 2026-03-06: FedRAMP P0 nginx-ingress-controller Vulnerability Assessment (Issue #51)
 
 **Context:** Emergency security assessment of nginx-ingress-heartbeat vulnerabilities in DK8S government cloud deployments following STG-EUS2-28 incident (Issue #46).

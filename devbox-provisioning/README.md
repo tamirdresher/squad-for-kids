@@ -106,6 +106,25 @@ The skill is located at `.squad/skills/devbox-provisioning/SKILL.md` and provide
 
 For technical details, see the [SKILL.md](../.squad/skills/devbox-provisioning/SKILL.md) documentation.
 
+### MCP Server Interface (Phase 3)
+
+The MCP server provides a standard Model Context Protocol interface for DevBox operations. Any MCP client can call DevBox tools:
+
+```json
+{
+  "mcpServers": {
+    "devbox": {
+      "command": "npx",
+      "args": ["-y", "@microsoft/devbox-mcp-server"]
+    }
+  }
+}
+```
+
+Available tools: `devbox_list`, `devbox_create`, `devbox_clone`, `devbox_show`, `devbox_status`, `devbox_delete`, `devbox_bulk_create`.
+
+For full MCP server documentation, see [mcp-server/README.md](mcp-server/README.md).
+
 ### Quick Start: Clone Your Dev Box
 
 The fastest way to create a new Dev Box with the same configuration as your current one:
@@ -250,11 +269,17 @@ If you cannot connect to a provisioned Dev Box:
 - ✅ Natural language pattern matching and interpretation
 - ✅ Error handling and validation patterns
 
-### Phase 3 (Planned)
-- 🔲 MCP Server integration (`@microsoft/devbox-mcp`)
+### Phase 3 (Complete) ✅
+- ✅ MCP Server integration (`@microsoft/devbox-mcp-server`)
+- ✅ Standard MCP stdio transport with 7 core tools
+- ✅ Universal MCP client support (Teams, GitHub, VS Code, etc.)
+- ✅ Full integration test suite with MCP Inspector
+
+### Phase 4 (Planned)
 - 🔲 Advanced templating: custom images, network configs
 - 🔲 Cost optimization: auto-hibernation schedules
 - 🔲 CI/CD integration: ephemeral DevBoxes for PRs
+- 🔲 Resource monitoring and cost tracking
 
 ## Contributing
 
@@ -274,5 +299,5 @@ To add features or fix issues:
 ---
 
 **Maintained by:** B'Elanna (Infrastructure Expert)  
-**Issues:** #35 (Phase 1), #63 (Phase 2)  
-**Status:** Phase 2 Complete
+**Issues:** #35 (Phase 1), #63 (Phase 2), #65 (Phase 3)  
+**Status:** Phase 3 Complete

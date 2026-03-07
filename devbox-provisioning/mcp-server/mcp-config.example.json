@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "devbox": {
+      "command": "npx",
+      "args": ["-y", "@microsoft/devbox-mcp-server"],
+      "env": {}
+    }
+  }
+}

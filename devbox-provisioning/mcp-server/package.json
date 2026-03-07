@@ -1,0 +1,36 @@
+{
+  "name": "@microsoft/devbox-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Microsoft DevBox provisioning operations",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "devbox-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "devbox",
+    "microsoft",
+    "azure",
+    "development-environment",
+    "infrastructure"
+  ],
+  "author": "B'Elanna (Infrastructure Expert)",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

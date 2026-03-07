@@ -1,0 +1,33 @@
+# Squad Memory Separation — Tier 1 (Transaction) Exclusions
+# Reference: .squad/.gitignore-rules.md, Issue #66: OpenCLAW Adoption
+#
+# POLICY: Raw operational data (Tier 1) is never committed.
+# Only curated digests (Tier 2) and permanent skills (Tier 3) are tracked.
+
+# Tier 1 — Transaction Layer (Raw, Temporary)
+# High-volume transactional data with no long-term value
+
+# Daily digests (raw, merged from channel scans)
+digests/*.md
+digests/*-*.md
+!digests/archive/
+!digests/dream/
+!digests/triage/TRIAGE-*.jsonl
+
+# Per-channel raw scans
+digests/**/*-*.md
+
+# Triage JSONL (raw incident classifications)
+digests/triage/*.jsonl
+!digests/triage/.gitkeep
+
+# Log outputs (orchestration, execution)
+log/**/*
+!log/.gitkeep
+
+# Session transcripts
+sessions/**/*
+!sessions/.gitkeep
+
+# Playwright generated files
+.playwright-cli/

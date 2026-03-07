@@ -47,7 +47,7 @@ var cosmosDbAccountName = 'fedramp-cosmos-${nameSuffix}'
 var storageAccountName = 'fedrampstore${replace(nameSuffix, '-', '')}'
 var functionAppName = 'fedramp-pipeline-func-${nameSuffix}'
 var appServicePlanName = 'fedramp-plan-${nameSuffix}'
-var keyVaultName = 'fedramp-kv-${take(nameSuffix, 18)}'
+var keyVaultName = 'fedramp-kv-${uniqueString(resourceGroup().id, environment)}'
 var appInsightsName = 'fedramp-insights-${nameSuffix}'
 
 // Log Analytics Workspace
@@ -117,11 +117,11 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     enableMultipleWriteLocations: false
     publicNetworkAccess: 'Enabled'  // TODO: Disable in PROD with Private Endpoint
     networkAclBypass: 'AzureServices'
-    capabilities: [
+    capabilities: environment != 'prod' ? [
       {
         name: 'EnableServerless'  // Use serverless for dev/stg, provisioned for prod
       }
-    ]
+    ] : []
   }
 }
 
@@ -299,8 +299,12 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
       linuxFxVersion: 'DOTNET-ISOLATED|8.0'
       appSettings: [
         {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=${az.environment().suffixes.storage}'
+          name: 'AzureWebJobsStorage__accountName'
+          value: storageAccount.name
+        }
+        {
+          name: 'AzureWebJobsStorage__credential'
+          value: 'managedidentity'
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
@@ -346,6 +350,10 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
           name: 'ArchiveContainerName'
           value: 'validation-archive'
         }
+        {
+          name: 'KeyVaultUri'
+          value: keyVault.properties.vaultUri
+        }
       ]
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
@@ -366,12 +374,23 @@ resource cosmosDbRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAs
   }
 }
 
-// RBAC: Function App → Storage (Blob Data Contributor)
+// RBAC: Function App → Storage (Blob Data Owner for Archive tier operations)
 resource storageBlobRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: storageAccount
-  name: guid(storageAccount.id, functionApp.id, 'StorageBlobDataContributor')
+  name: guid(storageAccount.id, functionApp.id, 'StorageBlobDataOwner')
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')  // Storage Blob Data Contributor
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b7e6dc6d-f1e8-4753-8933-f67e1f2be9a4')  // Storage Blob Data Owner
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// RBAC: Function App → Storage (Queue Data Contributor for AzureWebJobsStorage)
+resource storageQueueRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: storageAccount
+  name: guid(storageAccount.id, functionApp.id, 'StorageQueueDataContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '974c5e8b-45b9-4653-ba55-5f855dd0fb88')  // Storage Queue Data Contributor
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -396,6 +415,39 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')  // Key Vault Secrets User
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
+  }
+}
+
+// Key Vault Secrets (populate with function configuration)
+resource cosmosDbEndpointSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'CosmosDbEndpoint'
+  properties: {
+    value: cosmosDbAccount.properties.documentEndpoint
+  }
+}
+
+resource logAnalyticsWorkspaceIdSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'LogAnalyticsWorkspaceId'
+  properties: {
+    value: logAnalyticsWorkspace.properties.customerId
+  }
+}
+
+resource storageAccountNameSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'StorageAccountName'
+  properties: {
+    value: storageAccount.name
+  }
+}
+
+resource appInsightsConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  parent: keyVault
+  name: 'AppInsightsConnectionString'
+  properties: {
+    value: appInsights.properties.ConnectionString
   }
 }
 

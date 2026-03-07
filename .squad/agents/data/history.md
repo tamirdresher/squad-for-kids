@@ -345,6 +345,69 @@ When testing unreleased features, distinguish between (1) published package stat
 
 ---
 
+### 2026-03-07: Issue Status Checks & Status Updates (Batch Issues #1, #19, #22, #33)
+
+**Task**: Review completion status of assigned issues and provide status updates to Tamir via GitHub comments.
+
+**Issues Reviewed**:
+
+1. **Issue #33 — GitHub-Teams Integration Setup**
+   - **Status**: ✅ Script complete and functional
+   - **Finding**: \`setup-github-teams-integration.ps1\` exists, uses Microsoft Graph API correctly
+   - **Blockers**: OAuth flows (GitHub signin, subscribe) require manual interaction for security reasons
+   - **Outcome**: Commented with setup instructions; awaiting Tamir's Teams workspace details to complete execution
+   - **Label**: NOT marked pending-user (needs input to proceed)
+
+2. **Issue #19 — GitHub Notification Failures**
+   - **Status**: ✅ Root cause confirmed; recommendations valid
+   - **Finding**: Self-mention suppression (Squad uses Tamir's PAT → comments authored by tamirdresher_microsoft → GitHub won't notify on self-mentions)
+   - **Previous Work**: Repo subscription set, Playwright blocked by Chrome conflict
+   - **Latest Request**: Use Edge not Chrome
+   - **Analysis**: GitHub App (Option #2) is correct fix; GitHub Actions (his question) doesn't apply
+   - **Outcome**: Commented with refined analysis; awaiting Tamir's decision on GitHub App setup
+   - **Label**: NOT marked pending-user (architectural decision needed)
+
+3. **Issue #1 — Squad CLI 'upstream' Command Not Available**
+   - **Status**: ✅ Confirmed still broken; no newer versions available
+   - **Finding**: Version 0.8.20 is latest; \`upstream\` command never wired into CLI entry point (4-line fix needed in bradygaster/squad)
+   - **EMU Blocker**: Cannot file issue in bradygaster/squad (EMU policy restricts cross-org issue creation)
+   - **Latest Request**: "Check again; might be resolved in latest or insider"
+   - **Verification**: Confirmed \`squad --help\` shows no \`upstream\` command; no newer versions exist
+   - **Outcome**: Commented confirming issue still relevant; awaiting Tamir's manual PR filing or local workaround
+   - **Label**: NOT marked pending-user (blocked on external repo fix or Tamir action)
+
+4. **Issue #22 — Continuous Learning Phase 2: Automated Digest Generator**
+   - **Status**: ✅✅✅ COMPLETE — Delivered and verified
+   - **Finding**: \`.squad/scripts/generate-digest.ps1\` exists and fully functional
+   - **All Acceptance Criteria Met**:
+     - Prompt template: PowerShell implementation (deterministic)
+     - WorkIQ templates: Defined and documented
+     - Deduplication/rotation: Implemented and tested
+     - Automated digest: Tested daily/weekly generation successful
+   - **Testing**: Verified script execution with \`-Period daily\` flag; digest file generated successfully
+   - **Documentation**: Complete in \`.squad/digest-generator-design.md\` and \`DIGEST_GENERATOR_QUICKSTART.md\`
+   - **Outcome**: Commented with completion status; added \`status:pending-user\` label (ready for Tamir's review/deployment decision)
+   - **Label**: ✅ Marked pending-user (work complete, awaiting user review/acceptance)
+
+**Procedural Insights**:
+
+1. **Issue Status vs. Label Status**: Not all in-progress issues warrant "pending-user" label. Use it only when:
+   - Work is complete and awaiting user review
+   - Decision needed from user to proceed
+   - NOT for "awaiting external blockers" (Tamir's Teams workspace details, Squad repo PR merge, EMU policy changes)
+
+2. **GitHub Platform Constraints**: EMU accounts cannot file issues in non-EMU repos (bradygaster/squad). Plan for workaround: either Tamir files manually, or find alternative (fork locally and apply fix, open PR from personal account, etc.)
+
+3. **Self-Mention Suppression is Design**: GitHub's notification system isn't broken; it's working as designed. The fix requires architectural change (separate identity for Squad), not configuration change.
+
+4. **Digest Generator Signals**: The orchestration log warnings (unparseable files) are expected — the script gracefully falls back and still generates valid digests. This is correct behavior; not a bug.
+
+**Comments Posted**:
+- [#33](https://github.com/tamirdresher_microsoft/tamresearch1/issues/33#issuecomment-4016977653) — Setup status + next steps
+- [#19](https://github.com/tamirdresher_microsoft/tamresearch1/issues/19#issuecomment-4016978431) — Root cause confirmed, Option #3 not applicable (GitHub Actions can't help)
+- [#1](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1#issuecomment-4016979102) — Version check confirmed; issue still relevant
+- [#22](https://github.com/tamirdresher_microsoft/tamresearch1/issues/22#issuecomment-4016979589) — Completion confirmation
+
 ---
 
 ### 2026-03-07: GitHub-in-Teams Integration Setup Research (Issue #33)

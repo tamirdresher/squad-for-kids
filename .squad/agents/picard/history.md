@@ -627,3 +627,26 @@ Keep in tamresearch1: .squad/*, squad.config.ts, package.json, alph-watch.ps1, 
 **Decisions Made:**
 - Repo split execution (approved by Tamir)
 - Triage routing finalized for 3 issues
+
+---
+
+### 2026-03-XX: Issue #43 — Status Label System for Visibility
+
+**Context:** Tamir raised issue #43: "I need a way to know which items are currently in work by you, and which are pending me." He referenced a prior suggestion but noted it wasn't being used. Request: Enable filtering/sorting in GitHub issues page.
+
+**Solution Deployed:**
+- **Four status labels:** \status:in-progress\, \status:pending-user\, \status:done\, \status:blocked\
+- **GitHub-native filtering:** User can now query \label:status:pending-user\ to see issues awaiting their input
+- **Initial labeling:** Applied retroactively to open issues based on deliverable presence and work state
+
+**Triage Assignment:**
+- \squad:picard\ (decision/architecture)
+- \squad:data\ (implementation/maintenance)
+
+**Key Pattern:**
+User visibility drives discoverability. Simple label system allows GitHub-native filtering without external tooling. Status follows deliverable lifecycle: no-output → in-progress → pending-user → done.
+
+**Files & Decisions:**
+- Decision staged: \.squad/decisions/inbox/picard-status-labels.md\
+- Implementation: 4 labels created, 6 issues labeled (42, 41, 39, 35, 33, 43)
+- Process: New issues get status as work begins; updated as issues transition

@@ -5,6 +5,9 @@
 
 set -euo pipefail
 
+# Start timing
+START_TIME=$(date +%s)
+
 # Color output
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -41,10 +44,10 @@ BASE_BRANCH="${BASE_BRANCH:-origin/main}"
 
 # Function to validate security fields in rendered manifests
 validate_security_fields() {
-    local manifest_file=$1
+    local manifest_file="$1"
     local validation_errors=0
     
-    echo "  Validating security fields in $(basename $manifest_file)..."
+    echo "  Validating security fields in $(basename "$manifest_file")..."
     
     # Check for critical security misconfigurations
     if grep -q "allowPrivilegeEscalation: true" "$manifest_file" 2>/dev/null; then
@@ -62,17 +65,50 @@ validate_security_fields() {
         validation_errors=$((validation_errors + 1))
     fi
     
+    if grep -q "hostPID: true" "$manifest_file" 2>/dev/null; then
+        echo -e "    ${RED}✗ CRITICAL: Host PID namespace access enabled${NC}"
+        validation_errors=$((validation_errors + 1))
+    fi
+    
+    if grep -q "hostIPC: true" "$manifest_file" 2>/dev/null; then
+        echo -e "    ${RED}✗ CRITICAL: Host IPC namespace access enabled${NC}"
+        validation_errors=$((validation_errors + 1))
+    fi
+    
+    if grep -q "privileged: true" "$manifest_file" 2>/dev/null; then
+        echo -e "    ${RED}✗ CRITICAL: Privileged container detected${NC}"
+        validation_errors=$((validation_errors + 1))
+    fi
+    
+    # Check for dangerous capabilities
+    if grep -A 5 "capabilities:" "$manifest_file" 2>/dev/null | grep -E "add:.*\[(.*SYS_ADMIN.*|.*NET_ADMIN.*|.*ALL.*)\]" 2>/dev/null; then
+        echo -e "    ${RED}✗ CRITICAL: Dangerous capabilities granted (SYS_ADMIN/NET_ADMIN/ALL)${NC}"
+        validation_errors=$((validation_errors + 1))
+    fi
+    
     # Check for security best practices
     if ! grep -q "readOnlyRootFilesystem: true" "$manifest_file" 2>/dev/null && grep -q "kind: Deployment" "$manifest_file" 2>/dev/null; then
         echo -e "    ${YELLOW}⚠ WARNING: Read-only root filesystem not enforced${NC}"
     fi
     
     if grep -q "kind: NetworkPolicy" "$manifest_file" 2>/dev/null; then
-        echo -e "    ${GREEN}✓ NetworkPolicy defined${NC}"
+        # Validate NetworkPolicy has actual rules, not just empty spec
+        if grep -A 20 "kind: NetworkPolicy" "$manifest_file" 2>/dev/null | grep -qE "(ingress:|egress:)" 2>/dev/null; then
+            echo -e "    ${GREEN}✓ NetworkPolicy defined with rules${NC}"
+        else
+            echo -e "    ${YELLOW}⚠ WARNING: NetworkPolicy defined but has no ingress/egress rules${NC}"
+        fi
     fi
     
-    if grep -q "tls:" "$manifest_file" 2>/dev/null && grep -q "kind: Ingress" "$manifest_file" 2>/dev/null; then
-        echo -e "    ${GREEN}✓ TLS configured on Ingress${NC}"
+    # Validate TLS is actually enabled, not just present
+    if grep -q "kind: Ingress" "$manifest_file" 2>/dev/null; then
+        if grep -A 10 "tls:" "$manifest_file" 2>/dev/null | grep -E "^\s+- hosts:" 2>/dev/null; then
+            echo -e "    ${GREEN}✓ TLS properly configured on Ingress${NC}"
+        elif grep -qE "tls:\s*(true|enabled)" "$manifest_file" 2>/dev/null; then
+            echo -e "    ${GREEN}✓ TLS enabled on Ingress${NC}"
+        elif grep -q "tls:" "$manifest_file" 2>/dev/null; then
+            echo -e "    ${YELLOW}⚠ WARNING: TLS key present but may not be enabled (check for 'tls: false')${NC}"
+        fi
     fi
     
     return $validation_errors
@@ -87,7 +123,7 @@ if [[ "$HELM_DRIFT" == "true" ]]; then
     HELM_FILES=$(echo "$HELM_CHANGES" | tr '|' '\n' | grep -v '^$')
     
     # Find all Chart.yaml files in changed directories
-    CHART_DIRS=$(echo "$HELM_FILES" | xargs -I {} dirname {} | sort -u | while read dir; do
+    CHART_DIRS=$(echo "$HELM_FILES" | xargs -I {} dirname {} | sort -u | while read -r dir; do
         # Walk up to find Chart.yaml
         current_dir="$dir"
         while [[ "$current_dir" != "." && "$current_dir" != "/" ]]; do
@@ -100,22 +136,25 @@ if [[ "$HELM_DRIFT" == "true" ]]; then
     done | sort -u)
     
     if [[ -n "$CHART_DIRS" ]]; then
-        for chart_dir in $CHART_DIRS; do
+        while IFS= read -r chart_dir; do
             if [[ -f "$chart_dir/Chart.yaml" ]]; then
                 chart_name=$(basename "$chart_dir")
                 echo "Processing Helm chart: $chart_dir"
                 
-                # Render baseline (from main branch)
+                # Render baseline (from main branch) - use unique temp file
+                TEMP_VALUES=$(mktemp /tmp/values-baseline-$$.XXXXXX.yaml)
                 echo "  Rendering baseline from $BASE_BRANCH..."
-                git show ${BASE_BRANCH}:${chart_dir}/values.yaml > /tmp/values-baseline.yaml 2>/dev/null || {
+                git show "${BASE_BRANCH}:${chart_dir}/values.yaml" > "$TEMP_VALUES" 2>/dev/null || {
                     echo -e "  ${YELLOW}⚠ No baseline values.yaml found, skipping baseline comparison${NC}"
+                    rm -f "$TEMP_VALUES"
                     continue
                 }
                 
                 if command -v helm &> /dev/null; then
-                    helm template "$chart_name" "$chart_dir" -f /tmp/values-baseline.yaml --output-dir "$BASELINE_DIR/${chart_name}-baseline" 2>/dev/null || {
+                    helm template "$chart_name" "$chart_dir" -f "$TEMP_VALUES" --output-dir "$BASELINE_DIR/${chart_name}-baseline" 2>/dev/null || {
                         echo -e "  ${YELLOW}⚠ Failed to render baseline chart${NC}"
                     }
+                    rm -f "$TEMP_VALUES"
                     
                     # Render current version
                     echo "  Rendering current version..."
@@ -156,7 +195,7 @@ if [[ "$HELM_DRIFT" == "true" ]]; then
                 
                 echo ""
             fi
-        done
+        done <<< "$CHART_DIRS"
     else
         echo -e "${YELLOW}⚠ No Helm charts found in changed files${NC}"
         echo ""
@@ -175,7 +214,7 @@ if [[ "$KUSTOMIZE_DRIFT" == "true" ]]; then
     KUSTOMIZE_DIRS=$(echo "$KUSTOMIZE_FILES" | xargs -I {} dirname {} | sort -u)
     
     if [[ -n "$KUSTOMIZE_DIRS" ]]; then
-        for kustomize_dir in $KUSTOMIZE_DIRS; do
+        while IFS= read -r kustomize_dir; do
             if [[ -f "$kustomize_dir/kustomization.yaml" ]]; then
                 overlay_name=$(echo "$kustomize_dir" | tr '/' '_')
                 echo "Processing Kustomize overlay: $kustomize_dir"
@@ -210,7 +249,7 @@ if [[ "$KUSTOMIZE_DRIFT" == "true" ]]; then
                 
                 echo ""
             fi
-        done
+        done <<< "$KUSTOMIZE_DIRS"
     else
         echo -e "${YELLOW}⚠ No Kustomize overlays found in changed files${NC}"
         echo ""
@@ -223,6 +262,13 @@ VALIDATION_FAILED=${VALIDATION_FAILED}
 EOF
 
 echo "=================================================="
+
+# Calculate and save timing
+END_TIME=$(date +%s)
+ELAPSED_TIME=$((END_TIME - START_TIME))
+echo "$ELAPSED_TIME" > /tmp/drift-detection/timing.txt
+echo "Execution time: ${ELAPSED_TIME}s (target: 15s)"
+
 if [[ "$VALIDATION_FAILED" == "true" ]]; then
     echo -e "${RED}✗ Validation FAILED — security issues detected${NC}"
     echo "=================================================="

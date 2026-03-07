@@ -21,7 +21,7 @@ BASE_BRANCH="${BASE_BRANCH:-origin/main}"
 
 # Get changed files
 echo "Analyzing changes against ${BASE_BRANCH}..."
-CHANGED_FILES=$(git diff --name-only ${BASE_BRANCH}...HEAD 2>/dev/null || echo "")
+CHANGED_FILES=$(git diff --name-only "${BASE_BRANCH}...HEAD" 2>/dev/null || echo "")
 
 if [[ -z "$CHANGED_FILES" ]]; then
     echo -e "${YELLOW}⚠ Warning: No changes detected or not in a git repository${NC}"
@@ -66,7 +66,7 @@ fi
 echo "Analyzing security-relevant changes..."
 SECURITY_PATTERNS="networkPolicy|securityContext|tls\.enabled|runAsNonRoot|allowPrivilegeEscalation|podSecurityContext|image\.tag|appVersion"
 
-SECURITY_CHANGES=$(git diff ${BASE_BRANCH}...HEAD -- ${HELM_CHANGES} ${KUSTOMIZE_CHANGES} 2>/dev/null | grep -E "^\+.*($SECURITY_PATTERNS)" || true)
+SECURITY_CHANGES=$(git diff "${BASE_BRANCH}...HEAD" -- ${HELM_CHANGES} ${KUSTOMIZE_CHANGES} 2>/dev/null | grep -E "^\+.*($SECURITY_PATTERNS)" || true)
 
 if [[ -n "$SECURITY_CHANGES" ]]; then
     echo -e "${RED}⚠ SECURITY-RELEVANT changes detected:${NC}"

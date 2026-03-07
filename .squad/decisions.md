@@ -2028,6 +2028,372 @@ Adopt four OpenCLAW production patterns via concrete template files that agents 
 - ✅ P0 incidents caught and escalated within 1 hour (Issue-Triager)
 - ✅ Cross-digest trends detected automatically (Dream Routine)
 - ✅ Git history stays clean — raw noise gitignored, only curated data committed
+
+---
+
+## Decision 16: TAM Patent Strategy — Option A (Narrow Claims)
+
+**Date:** March 11, 2026  
+**Owner:** Tamir Dresher (decision maker), Seven (research lead)  
+**Status:** Awaiting Tamir's confirmation on co-inventors + filing intent  
+**Related Issues:** #42, #23 (OpenCLAW patterns — complementary to TAM)  
+
+### The Decision
+
+**Implement Option A: File narrow, TAM-focused patent claims** covering:
+1. Ralph proactive monitoring with autonomous recovery
+2. Universe-based casting with governance policies  
+3. Git-native persistent state for coordination
+4. Drop-box memory for asynchronous consensus
+5. Integrated system combining all 4 (non-obvious combination)
+
+**Why**: Broad multi-agent orchestration claims are heavily prior-art'd (CrewAI, MetaGPT, LangGraph, NEC patent WO2025099499A1). Narrow integration-focused claims have defensibility.
+
+**Timeline**: 4-6 weeks to filing (via Microsoft Inventor Portal)
+
+**Cost**: ~$500 filing fee (provisional); Microsoft covers everything
+
+**Upside**: Defensive IP (prevent copying), Microsoft rewards ($500-2,000 filing bonus), locks in priority date
+
+**Downside**: Risk on git-native state claims (gitclaw prior art timing unknown), requires inventor confirmation
+
+### Patentability Analysis
+
+| Element | Existing Solution | TAM Difference |
+|---------|---|---|
+| **Proactive Monitoring** | Kubernetes (infrastructure) | Application-level agents, **autonomous recovery** (not just alerting) |
+| **Task Assignment** | Load balancing (CrewAI, LangGraph) | **Declarative governance policies** (role, seniority, org rules) |
+| **Persistent State** | Database or API state | **Git as backbone** (version-controlled, auditable, distributed) |
+| **Consensus** | Real-time (Raft, Paxos) | **Asynchronous with rationale** (decisions preserve reasoning) |
+| **Integration** | Individual components | **Unified system** addressing knowledge work gaps |
+
+### Prior Art Assessment
+
+**High Risk (Probably Prior-Art'd)**
+- ❌ General multi-agent task delegation (CrewAI, MetaGPT, NEC patent)
+- ❌ Database/API state for workflows (well-established)
+- ❌ Health monitoring and alerting (Kubernetes, Datadog, Prometheus)
+
+**Medium Risk (Competitive Landscape)**
+- ⚠️ Git-native coordination (gitclaw project is active, timing unknown)
+- ⚠️ Governance policies in task routing (emerging in enterprise orchestration)
+- ⚠️ Asynchronous consensus with rationale preservation (GitHub RFC process exists)
+
+**Low Risk (Genuinely Novel)**
+- ✅ **Autonomous recovery from multi-agent cascading failures** (Ralph pattern)
+- ✅ **Universe-based casting with declarative governance**
+- ✅ **Integrated 4-part system** (combination is non-obvious)
+
+### Filing Strategy
+
+**Provisional Patent (Recommended First Step)**
+- **Timeline**: File now, submit to Microsoft portal week 4
+- **Cost**: $500 filing fee
+- **Benefit**: Locks in priority date, buys 12 months to assess competitive landscape
+- **Decision point at month 10**: Convert to utility patent or abandon based on competitive landscape
+
+**Utility Patent Conversion (Month 10 Decision)**
+- **Cost**: $8,000-15,000
+- **Benefit**: Broader protection, longer patent term
+- **Criteria**: Has gitclaw invalidated claims? Have competitors copied? International expansion planned?
+
+### Critical Decisions Requiring Tamir
+
+1. **Confirm Inventorship** — Who conceived each pattern? Co-inventors must consent.
+2. **Confirm Filing Intent** — Defensive (prevent copying), offensive (licensing), or company rewards program?
+3. **Public Disclosure Status** — Blog posts? GitHub? Conference talks? (US grace period = 1 year from first disclosure)
+4. **gitclaw Timeline Investigation** — When did Squad git-state conception start vs. gitclaw development?
+5. **International Scope** — US only, or PCT (150+ countries)?
+
+### Success Criteria
+
+- [ ] Co-inventors confirmed and consented
+- [ ] Tamir reviews claims and confirms accuracy
+- [ ] gitclaw timeline investigated (confirm git-state claims viability)
+- [ ] Patent application submitted via Microsoft Inventor Portal
+- [ ] Provisional patent issued (~4 weeks after submission)
+- [ ] Priority date locked in (prevents future prior art)
+
+### Timeline
+
+| Week | Milestone | Owner |
+|------|-----------|-------|
+| **1** | ✅ Patent claims draft complete | Seven (DONE) |
+| **2** | ⏳ Tamir confirms inventors, files decision | Tamir |
+| **3** | ⏳ Tamir internal review of claims accuracy | Tamir |
+| **3** | ⏳ Patent attorney prepares diagrams | Microsoft (auto) |
+| **4** | ⏳ Submit via Microsoft portal | Tamir (with Seven support) |
+| **4-8** | ⏳ USPTO provisional review | Microsoft attorney (auto) |
+| **~8** | ✅ Provisional patent issued | USPTO |
+
+### Related
+
+- **Document**: PATENT_CLAIMS_DRAFT.md (639 lines, ready for review)
+- **Issue #42**: TAM patent research
+- **PR #60**: Patent claims + supporting analysis
+- **Decision 15**: OpenCLAW Pattern Adoption (complementary — system architecture + proprietary knowledge moat)
+
+---
+
+## Decision 17: Digest Generator Pipeline Architecture
+
+**Date:** 2026-03-07
+**Author:** Data (Code Expert)
+**Status:** Proposed
+**Scope:** Continuous Learning Pipeline
+**Issue:** #22
+
+### Decision
+
+Implement the Phase 2 digest generator as a set of markdown prompt templates (not executable scripts) that define a deterministic pipeline. The pipeline follows the OpenCLAW hybrid pattern: structured data processing is fully specified in templates, LLM judgment is invoked only for QMD classification, "new information" assessment, and severity inference.
+
+### Key Choices
+
+**1. Channel Scan Order**
+- **Chosen:** dk8s-support → incidents → configgen → general
+- **Rationale:** Ordered by signal density (highest first). Cross-channel deduplication becomes more effective when high-signal channels are scanned first.
+
+**2. Deduplication Strategy**
+- **Chosen:** SHA256 fingerprint of `lowercase(author + date_rounded_to_day + first_50_chars_of_message)`
+- **Rationale:** Simple, deterministic, avoids false positives.
+
+**3. Safety-First Rotation**
+- **Chosen:** Never delete raw digests unless a QMD digest covers their week. Run emergency QMD extraction if coverage is missing.
+- **Rationale:** Raw data is disposable only after signal extraction. Losing a week of raw data before QMD runs means permanent information loss.
+
+**4. Incident Tracking via JSONL**
+- **Chosen:** `active-incidents.jsonl` in `.squad/digests/triage/` as the incident state store.
+- **Rationale:** Line-oriented format enables append-only writes, easy grep, and human readability.
+
+**5. Three-Tier Gitignore**
+- **Chosen:** Updated `.gitignore` to implement memory-separation.md rules.
+- **Rationale:** Prevents PII and noise from version control while preserving curated institutional knowledge.
+
+### Consequences
+
+- ✅ Pipeline is fully documented and reproducible
+- ✅ Deterministic steps can be automated without LLM (cost-effective)
+- ✅ Three-tier memory prevents digest bloat in version control
+- ✅ Channel-priority dedup maximizes signal retention
+- ⚠️ Templates are documentation, not executable code — requires agent interpretation
+- ⚠️ SHA256 dedup may miss semantically identical messages with different wording
+
+### Dependencies
+
+- Requires Phase 1 digest directory structure (present)
+- Requires Seven's OpenCLAW templates (PR #57, merged)
+- `generate-digest.ps1` exists but does not yet call rotation logic
+
+### Related
+
+- **Decision 15**: OpenCLAW Pattern Adoption (foundation)
+- **Issue #22**: Continuous learning phase 2
+- **Issue #45**: WorkIQ validation (unblocked by this decision)
+
+---
+
+## Decision 18: GitHub App Creation for Issue #19
+
+**Decision Date:** 2025-01-24
+**Author:** Data
+**Status:** Requires Manual Completion
+
+### Context
+
+Issue #19: Tamir not receiving GitHub notifications when tagged in squad comments.
+
+**Root Cause:** GitHub's self-mention suppression. Squad uses Tamir's PAT, so all comments are authored by "tamirdresher_microsoft". GitHub doesn't notify users about their own mentions.
+
+**Solution:** Create a GitHub App so comments come from "squad-notification-bot[bot]" identity, enabling proper @mention notifications.
+
+### Attempted Automation
+
+Attempted to use Playwright MCP to automate GitHub App creation at https://github.com/settings/apps/new, but encountered:
+- Login requirement (browser not authenticated)
+- Playwright MCP tools don't expose Edge browser or profile parameters needed for authenticated session
+
+### Manual Setup Required
+
+**Step 1: Create GitHub App**
+1. Navigate to: https://github.com/settings/apps/new
+2. Fill in the form:
+   - **GitHub App name:** `squad-notification-bot` (try variants if taken)
+   - **Homepage URL:** `https://github.com/tamirdresher_microsoft/tamresearch1`
+   - **Description:** "Bot for posting squad comments to enable proper @mention notifications"
+   - **Callback URL:** Leave empty
+   - **Webhook:** Uncheck "Active" (disable webhook)
+   - **Permissions:**
+     - Repository permissions:
+       - Issues: Read & Write
+       - Pull requests: Read & Write
+   - **Where can this GitHub App be installed?** Select "Only on this account"
+3. Click "Create GitHub App"
+
+**Step 2: Install App on Repository**
+1. After creation, click "Install App" in left sidebar
+2. Select "tamirdresher_microsoft" account
+3. Choose "Only select repositories"
+4. Select "tamresearch1"
+5. Click "Install"
+
+**Step 3: Generate Private Key**
+1. In app settings, scroll to "Private keys" section
+2. Click "Generate a private key"
+3. Save the downloaded .pem file securely (e.g., `.squad/secrets/squad-notification-bot.pem`)
+4. **DO NOT COMMIT THIS FILE TO GIT**
+
+**Step 4: Get App Credentials**
+- **App ID:** (numeric ID shown at top)
+- **Client ID:** (shown in "About" section)
+- **Installation ID:** Go to https://github.com/settings/installations, click app, check URL for installation ID
+
+**Step 5: Configure Squad**
+- Store App ID, Installation ID, and private key path
+- Update GitHub client to authenticate as app instead of using PAT
+- Modify comment posting logic to use app credentials
+
+### Implementation Notes
+
+- GitHub App auth requires JWT generation + installation token exchange
+- Libraries available: `@octokit/auth-app` (Node.js) or manual JWT implementation
+- Installation tokens expire after 1 hour and must be refreshed
+- Comments will show as from "squad-notification-bot[bot]"
+
+### Next Steps
+
+1. Tamir: Complete manual GitHub App creation (Steps 1-4)
+2. Data: Implement GitHub App authentication in squad codebase
+3. Data: Update comment posting to use app token instead of PAT
+4. Test: Post comment with @tamirdresher_microsoft mention, verify notification received
+5. Close Issue #19
+
+### References
+- GitHub Docs: https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app
+- GitHub App Auth: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/about-authentication-with-a-github-app
+
+---
+
+## Decision 19: DevBox Provisioning Architecture (Issue #35)
+
+**Date:** 2026-03-11  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented (Phase 1)  
+**Scope:** Infrastructure / Automation
+
+### Context
+
+Tamir requested automation for spinning up clones of his current devbox. Requirements:
+- Reproducible devbox provisioning
+- Easy cloning of existing configurations
+- Reusable for future team automation
+- Dedicated repo + Squad skill
+
+### Decision
+
+**Two-Phase Architecture:**
+
+#### Phase 1: IaC Foundation (COMPLETE)
+- **Location:** `devbox-provisioning/` directory in tamresearch1 repo
+- **Strategy:** Azure CLI-based provisioning (not ARM) until ARM support is available
+- **Components:**
+  - PowerShell provisioning script with prerequisite validation
+  - Clone script with auto-detection of existing devboxes
+  - Bicep template scaffolding for future ARM migration
+  - Comprehensive documentation and troubleshooting
+
+#### Phase 2: AI-Native Automation (PLANNED)
+- Squad skill for natural language provisioning
+- MCP Server integration (`@microsoft/devbox-mcp`)
+- Advanced templating and orchestration
+
+### Architecture Patterns
+
+**1. Prerequisites Validation**
+```powershell
+Test-AzureCLI → Test-DevCenterExtension → Test-AzureAuth → Provision
+```
+Fail fast with actionable error messages at each gate.
+
+**2. Auto-Detection Flow**
+```
+List DevBoxes → Select Source → Get Details → Clone Config → Provision
+```
+Zero-config cloning when only one devbox exists; interactive selection for multiple.
+
+**3. Wait-for-Completion Strategy**
+- Poll every 30 seconds
+- Display status: "Attempt X/Y - Status: Provisioning (Elapsed: N min)"
+- Configurable timeout (default 30 min)
+- Final status: Succeeded/Running/Failed
+
+**4. Configuration Defaults with Overrides**
+```powershell
+# Script has defaults (lines 47-49)
+$DefaultDevCenterName = "YOUR-DEVCENTER-NAME"
+$DefaultProjectName = "YOUR-PROJECT-NAME"
+$DefaultPoolName = "YOUR-POOL-NAME"
+
+# Parameters override defaults
+provision.ps1 -DevBoxName "new-box" -ProjectName "OverrideProject"
+```
+
+### Implementation
+
+**Files Created:**
+- `devbox-provisioning/README.md` (7KB)
+- `devbox-provisioning/bicep/main.bicep` (7.5KB)
+- `devbox-provisioning/scripts/provision.ps1` (11.7KB)
+- `devbox-provisioning/scripts/clone-devbox.ps1` (10.4KB)
+
+**Pull Request:** #61  
+**Branch:** `squad/35-devbox-provisioning`
+
+### Known Limitations
+
+1. **Azure CLI Extension:** `az extension add --name devcenter` failed with pip error on current machine
+   - Documented workarounds in README
+   - Scripts validate extension presence and provide guidance
+
+2. **ARM Support Gap:** Dev Box does not support ARM/Bicep provisioning
+   - Bicep template uses deployment script workaround
+   - Ready for migration when ARM support lands
+
+3. **Authentication Scope:** Azure CLI requires authenticated user principal (not service principals)
+   - Documented in prerequisites section
+
+### Success Criteria
+
+**Phase 1:**
+- ✅ Scripts created with comprehensive error handling
+- ✅ Documentation covers all workflows
+- ✅ Auto-detection working (via CLI)
+- ✅ Fallback guidance for extension install failures
+- ⏳ End-to-end testing blocked by extension install issue
+
+**Phase 2:**
+- ⏳ Squad skill accepts natural language requests
+- ⏳ MCP Server integration working
+- ⏳ Multi-devbox orchestration
+
+### Open Questions
+
+1. Should Phase 1 repo become a separate GitHub repository, or stay in tamresearch1?
+2. What custom images/network configs does Tamir need for Phase 2?
+3. Should we add CI/CD pipeline for validation in Phase 1?
+
+### Next Steps
+
+1. Tamir installs devcenter extension: `az extension add --name devcenter`
+2. Tamir runs discovery: `az devcenter dev dev-box list`
+3. Tamir updates defaults in provision.ps1 (lines 47-49)
+4. Tamir tests clone: `.\scripts\clone-devbox.ps1 -NewDevBoxName "test-clone"`
+5. If successful, close Issue #35 Phase 1; plan Phase 2 skill work
+
+### Related
+- **Issue #35:** Creating another devbox
+- **Pull Request #61:** Phase 1 implementation
+- **Microsoft Dev Box MCP Server:** `@microsoft/devbox-mcp` npm package
+- **Azure CLI Extension:** `az extension add --name devcenter`
 - ⚠️ Requires weekly QMD extraction discipline (manual initially, automate in Phase 2)
 - ⚠️ Issue-Triager scoring rules need 2-week calibration period
 

@@ -461,6 +461,30 @@ The most valuable insight for infrastructure work: **Build infrastructure for ag
 **Stability Findings:**
 - **5 Sev2 Incidents:** Historical instability patterns documented (cluster scheduling, node lifecycle, workload eviction)
 - **7 Architectural Patterns:** Identified sustainable approaches (Cluster Orchestrator, Scale Unit Scheduler, Node Health Lifecycle, Multi-Cloud Abstraction)
+
+### 2026-03-12: Issue #54 — FedRAMP Compensating Controls (Network Policies)
+
+**Task:** Implement NetworkPolicy manifests, Helm chart integration, and CI/CD pipeline validation for ingress-nginx defense-in-depth after CVE-2026-24512.
+
+**Deliverables:**
+- 4 NetworkPolicy manifests: default-deny, controller allow-list (public), sovereign variant, namespace isolation
+- Helm template with `networkPolicy.enabled` and `networkPolicy.sovereign.enabled` toggles
+- ArgoCD sync wave ordering: policies at wave -10/-9, before ingress resources at wave 0
+- CI/CD pipeline with kubeval + conftest validation
+- Conftest OPA rules: reject unrestricted egress, enforce FedRAMP labels, block HTTP on sovereign
+- Progressive rollout: Test → PPE → Prod → Sovereign with soak periods
+
+**Key Design Decisions:**
+- Default-deny deploys at sync-wave -10 to guarantee zero-trust before any workload starts
+- Sovereign policies restrict inbound to known Azure Gov Front Door CIDRs (no 0.0.0.0/0)
+- Sovereign egress includes dSTS auth endpoint CIDRs for authentication
+- Helm values use per-environment overrides via ArgoCD ApplicationSet valueFiles pattern
+- Port 80 blocked on sovereign clusters (TLS-only per FedRAMP)
+
+**FedRAMP Controls Mapped:** SC-7, SC-7(5), AC-4, CM-7, SI-4, CA-2
+
+**Branch:** `squad/54-fedramp-infra`  
+**Files:** `docs/fedramp-compensating-controls-infrastructure.md`, `docs/fedramp/*.yaml`
 - **6 ConfigGen Pain Points:** NuGet versioning coordination, cross-component dependencies, package distribution model limitations
 
 **ConfigGen Impact:**

@@ -1,0 +1,19 @@
+# NetworkPolicy: Default-Deny All Traffic in ingress-nginx namespace
+# FedRAMP Compensating Control — Issue #54
+# Deploy FIRST (ArgoCD sync-wave: -10) to ensure zero-trust baseline
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/part-of: dk8s-ingress-security
+    fedramp.dk8s.io/control: "SC-7"
+    fedramp.dk8s.io/priority: "P0"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

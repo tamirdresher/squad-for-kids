@@ -1,0 +1,52 @@
+# values.yaml — NetworkPolicy configuration for ingress-nginx
+# FedRAMP Compensating Controls — Issue #54
+#
+# Override per environment in ArgoCD ApplicationSet:
+#   values-test.yaml, values-ppe.yaml, values-prod.yaml, values-sovereign.yaml
+
+networkPolicy:
+  # Master switch — enable in all environments
+  enabled: true
+
+  # Healthcheck port (ingress-nginx default)
+  healthcheckPort: 10254
+
+  # Node/cluster CIDRs for kubelet and API server access
+  nodeCIDRs:
+    - "10.0.0.0/8"
+
+  # Ports allowed for egress to backend workloads
+  allowedBackendPorts:
+    - 80
+    - 443
+    - 8080
+    - 8443
+
+  # Sovereign cloud overrides
+  sovereign:
+    enabled: false
+    # Azure Government Front Door / Application Gateway CIDRs
+    # Replace with actual Azure Gov service tag ranges for your region
+    allowedIngressCIDRs: []
+    # dSTS / sovereign IdP endpoint CIDRs
+    authEndpointCIDRs: []
+
+# --- Environment-specific overrides ---
+
+# values-sovereign.yaml example:
+# networkPolicy:
+#   sovereign:
+#     enabled: true
+#     allowedIngressCIDRs:
+#       - "23.97.0.0/16"       # Azure Gov Front Door
+#       - "10.1.0.0/24"        # AppGW subnet
+#     authEndpointCIDRs:
+#       - "20.140.0.0/15"      # dSTS endpoints
+
+# values-prod.yaml example:
+# networkPolicy:
+#   nodeCIDRs:
+#     - "10.224.0.0/12"        # AKS node CIDR for prod
+#   allowedBackendPorts:
+#     - 443
+#     - 8443

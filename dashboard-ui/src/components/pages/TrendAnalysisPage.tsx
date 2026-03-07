@@ -71,6 +71,7 @@ export const TrendAnalysisPage: React.FC = () => {
       setDriftData(drift);
     } catch (err) {
       console.error('Error fetching drift data:', err);
+      setError(err as Error);
     }
   };
 

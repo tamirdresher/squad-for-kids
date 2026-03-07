@@ -71,9 +71,11 @@ export const parseJwtRole = (token: string): UserRole | null => {
 };
 
 export const mockGetCurrentUserRole = (): UserRole => {
-  const mockRole = localStorage.getItem('mock_user_role');
-  if (mockRole && isValidRole(mockRole)) {
-    return mockRole as UserRole;
+  if (process.env.NODE_ENV === 'development') {
+    const mockRole = localStorage.getItem('mock_user_role');
+    if (mockRole && isValidRole(mockRole)) {
+      return mockRole as UserRole;
+    }
   }
   return 'SRE';
 };

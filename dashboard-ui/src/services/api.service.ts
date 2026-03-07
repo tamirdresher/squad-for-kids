@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import axiosRetry from 'axios-retry';
 import type {
   ComplianceStatus,
   ComplianceTrend,
@@ -18,15 +19,27 @@ class FedRAMPApiClient {
   constructor(baseURL: string = '/api/v1') {
     this.client = axios.create({
       baseURL,
+      timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
+    axiosRetry(this.client, {
+      retries: 3,
+      retryDelay: axiosRetry.exponentialDelay,
+      retryCondition: (error) => {
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.response?.status === 429;
+      },
+    });
+
     this.client.interceptors.request.use((config) => {
+      // SECURITY WARNING: localStorage is vulnerable to XSS attacks
+      // TODO: Migrate to httpOnly cookies for enhanced security
       const token = localStorage.getItem('azure_ad_token');
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        const sanitizedToken = token.replace(/[^\w\-\.]/g, '');
+        config.headers.Authorization = `Bearer ${sanitizedToken}`;
       }
       return config;
     });

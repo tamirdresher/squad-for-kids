@@ -56,7 +56,7 @@ export const ControlDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchControlData();
-  }, []);
+  }, [controlId, environment, status]);
 
   const handleEnvironmentChange = (event: SelectChangeEvent) => {
     setEnvironment(event.target.value as Environment);

@@ -78,6 +78,28 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
   - SAST security scanning
   - API contract validation
 
+---
+
+### 2026-03-07: Automated Digest Generator — Phase 2 (Issue #22)
+
+**Task**: Implement automated digest pipeline with WorkIQ query templates, deduplication, and three-tier memory rotation.
+
+**Delivered**:
+- `.squad/scripts/channel-scan.md` — Prompt template for deterministic channel scanning via WorkIQ. Covers query construction, file naming conventions (`{date}-{channel}.md`), SHA256-based deduplication, and QMD 5-category classification.
+- `.squad/scripts/workiq-queries/` — Four per-channel query templates (dk8s-support, incidents, configgen, general) with signal patterns, noise filters, and dedup notes per channel.
+- `.squad/scripts/digest-processor.md` — Cross-day merging pipeline with incident tracking (JSONL), severity inference, conflict resolution rules (channel priority ordering), and resolved-incident marking.
+- `.squad/scripts/digest-rotation.md` — Retention policy implementation: 30-day raw, 7-day QMD extraction trigger, 90-day triage rotation. Includes safety rule preventing raw deletion without QMD coverage.
+- `.gitignore` updated to implement three-tier memory architecture from `memory-separation.md`. Tier 1 (raw) is gitignored, Tier 2/3 (curated/skills) stays committed.
+- Directory structure created: `digests/archive/`, `digests/dream/`, `digests/triage/` with `.gitkeep` files.
+
+**Design Decisions**:
+1. **OpenCLAW hybrid split**: Deterministic steps (query construction, dedup fingerprinting, file naming, rotation rules) are in scripts. LLM steps (QMD classification, "new information" judgment, severity inference) are clearly marked as LLM-assisted.
+2. **Channel scan order**: dk8s-support → incidents → configgen → general. Ordered by signal density so cross-channel dedup is most effective.
+3. **Dedup via SHA256 fingerprint**: `SHA256(lowercase(author + date + first_50_chars))` — simple, deterministic, avoids false positives.
+4. **Safety-first rotation**: Raw digests never deleted unless a QMD digest covers their week. Emergency extraction runs if QMD is missing.
+
+**Dependencies used**: QMD 5-category framework from `qmd-extraction.md`, three-tier architecture from `memory-separation.md` (both from Seven's PR #57).
+
 **Action:** Before spawning agents for future idk8s-infrastructure tasks, verify and document correct repository location.
 
 ---
@@ -1050,3 +1072,31 @@ All three issues have clear status and next steps. ADO integration is tested, Ra
 - All tools work against microsoft.visualstudio.com organization
 
 **Outcome**: Posted comprehensive test results to GitHub issue #14. Integration ready for Squad use.
+
+---
+
+### 2026-03-08: Copilot CLI in GitHub Actions Evaluation (Issue #39)
+
+**Task**: Evaluate whether GitHub Copilot CLI integration with GitHub Actions can improve squad workflows.
+
+**Documentation**: https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-with-actions
+
+**What the feature does**: GitHub Copilot CLI (`@github/copilot`) can be installed on Actions runners and invoked programmatically via `copilot -p "PROMPT"`. Authenticated via fine-grained PAT with `Copilot Requests` permission. Designed for CI/CD automation — daily summaries, report generation, scaffolding.
+
+**Verdict**: YES — useful for squad. Four specific improvements identified:
+
+1. **P0 — Replace keyword triage in `squad-triage.yml`**: Current 200+ lines of JavaScript keyword matching is brittle. A single `copilot -p` call with team.md and routing.md context would understand issue semantics, not just keywords. Eliminates maintenance burden when roles change.
+
+2. **P1 — Daily digest workflow**: New capability — generate automated squad briefings from git log, issues, and PRs. Feed into `.squad/digests/` or Teams.
+
+3. **P2 — Migrate `ralph-watch.ps1` to scheduled Actions**: Eliminates local machine dependency. Trade-off: Copilot CLI lacks MCP tools and agent state, so it's not a full replacement for `agency copilot --agent squad`.
+
+4. **P3 — PR review step in `squad-ci.yml`**: Low value — native Copilot code review already exists in PRs.
+
+**Blocker**: All squad workflows currently have auto-triggers disabled (hosted runners unavailable at org level). Must fix runner availability before any of these improvements can take effect.
+
+**Prerequisites**: Fine-grained PAT with `Copilot Requests` permission, stored as repo secret.
+
+**Comment**: Posted on [#39](https://github.com/tamirdresher_microsoft/tamresearch1/issues/39#issuecomment-4017124032)
+
+**Decision file**: `.squad/decisions/inbox/data-copilot-actions.md`

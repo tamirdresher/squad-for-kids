@@ -2120,3 +2120,139 @@ Built Squad Activity Monitor as a C# 13 console application using .NET 10 with S
 2. Spectre.Console's Markup.Escape() is critical for user-generated content
 3. .NET 10 single-file publish creates truly self-contained executables
 4. Top-level statements + records = minimal ceremony for console apps
+
+---
+
+## Decision 4: # Decision: STG-EUS2-28 Incident Response — Fast-Track I1 Istio Exclusion List
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** Proposed (Requires Tamir + DK8S Leadership Confirmation)  
+**Scope:** Incident Response, Stability Engineering  
+**Related Issues:** #46 (incident report), #24 (Tier 1 mitigations), #25 (Tier 2 plan)
+
+## Context
+
+STG-EUS2-28 cluster incident (detected 2026-03-07T17:45Z via Teams Bridge integration) exhibited cascading failure pattern:
+- Draino → Karpenter → Istio ztunnel → NodeStuck automation
+- >20% unhealthy nodes
+- ztunnel pods failing despite Ready nodes
+- Node deletion automation triggering on daemonset health (not actual node failure)
+
+**Critical Correlation:** This pattern is **identical** to Jan 2026 Sev2 (IcM 731055522) analyzed in Issue #4 stability research. Squad predicted this exact failure mode 4+ weeks before production recurrence.
+
+## Decision: Elevate I1 from Tier 1 to P0 Immediate Execution
+
+**I1 (Establish Istio Exclusion List for Infrastructure Components)** should be:
+- **Elevated from:** Tier 1 "critical, low-effort" (planned for next sprint)
+- **Elevated to:** P0 immediate execution (start this week)
+
+### Rationale
+
+1. **Active Incident Validates Research:** Real-world recurrence proves I1 is not theoretical — it directly mitigates production failure mode
+2. **Low Implementation Cost:** 2-3 days effort (label-based mesh exclusion + admission controller)
+3. **Breaks Cascading Loop:** Removing infrastructure daemonsets from mesh prevents Draino/Karpenter/NodeStuck cascade
+4. **Enables I2:** Clean baseline required before implementing ztunnel health monitoring + auto-rollback (Tier 2)
+
+### Scope
+
+**Components to Exclude from Service Mesh:**
+- CoreDNS (kube-system)
+- Geneva-loggers (monitoring infrastructure)
+- All kube-system daemonsets
+- Monitoring infrastructure (prometheus exporters, telegraf agents)
+- Node-level system components (CSI drivers, CNI plugins)
+
+**Implementation:**
+- Label-based exclusion (namespace + pod labels)
+- Admission controller validation (prevent accidental mesh injection)
+- Validate in STG before PROD rollout
+
+### Three-Phase Mitigation Strategy
+
+**Phase 1 (This Week): Karan's NodeStuck Exclusion**
+- **Tactical fix:** Exclude Istio daemonsets from NodeStuck node deletion automation
+- **Rationale:** Stop the bleeding — prevents node churn from amplifying incidents
+- **Owner:** SRE team
+- **Timeline:** 48h implementation + validation
+
+**Phase 2 (2-3 Weeks): I1 Istio Exclusion List**
+- **Strategic fix:** Remove infrastructure components from service mesh entirely
+- **Rationale:** Root cause mitigation — infrastructure should never trigger application mesh logic
+- **Owner:** Platform + Istio SME team
+- **Timeline:** Current sprint (fast-tracked from Tier 1 plan)
+
+**Phase 3 (6-8 Weeks): I2 ztunnel Health Monitoring**
+- **Proactive mitigation:** Automatic rollback when ztunnel failure rate exceeds threshold
+- **Rationale:** Prevent future incidents through automated health-based remediation
+- **Owner:** Platform + Istio SME team
+- **Timeline:** Tier 2 execution (Issue #25)
+
+## Applies To
+
+- **DK8S Platform Team:** I1 implementation (Istio exclusion list)
+- **SRE Team:** Phase 1 NodeStuck automation changes
+- **Squad (B'Elanna):** Technical review + validation of I1 implementation approach
+
+## Does NOT Apply When
+
+- Infrastructure components legitimately need service mesh features (rare; requires explicit justification)
+- Cluster is already experiencing Sev1 incident (revert to manual remediation, implement I1 post-incident)
+
+## Consequences
+
+✅ **Benefits:**
+- Prevents Draino/Karpenter/NodeStuck cascading failure loop
+- Reduces false positive node deletion (infrastructure daemonset health ≠ node health)
+- Establishes clean baseline for future Istio upgrades
+- Demonstrates research ROI to DK8S leadership (predicted failure, mitigations ready)
+
+⚠️ **Risks:**
+- Excluded components lose mesh observability (mTLS metrics, tracing) — acceptable tradeoff for stability
+- Requires cross-team coordination (Platform, SRE, Istio SME)
+- Implementation window: Must complete before next STG deployment cycle
+
+## Mitigation for Risks
+
+- **Observability gap:** Infrastructure components use existing monitoring (Prometheus exporters, Geneva logs) — mesh observability not required
+- **Coordination risk:** Phase 1 (NodeStuck) is independent of Phase 2 (I1) — can proceed in parallel
+- **Validation:** STG rollout with 48h soak time before PROD
+
+## Related Patterns
+
+**"Active Incident Validation" Pattern:**
+1. When active incident matches prior research prediction → Escalate mitigations from planned to P0
+2. Accept tactical symptom fixes (Phase 1) while strategic solution (Phase 2) is implemented
+3. Use incident as forcing function to accelerate critical work
+4. Frame to leadership: "Research predicted incident, mitigations already designed, need execution priority"
+
+## Success Metrics
+
+- **Phase 1:** Zero node deletions triggered by Istio daemonset health within 7 days of deployment
+- **Phase 2:** Zero Istio-related cascading failures in STG environment within 30 days of I1 rollout
+- **Phase 3:** >80% automatic recovery rate for ztunnel failures (measured over 90 days post-I2)
+
+## Open Questions for Tamir + DK8S Leadership
+
+1. **Execution Priority:** Confirm I1 fast-track to current sprint (vs. waiting for planned Tier 1 execution)?
+2. **Phase 1 Coordination:** Should Squad (B'Elanna) provide NodeStuck exclusion implementation guidance to SRE team?
+3. **FedRAMP P0:** Should nginx-ingress-heartbeat vulnerabilities be tracked as separate issue #48?
+4. **New Issues:** Confirm creation of Issue #47 (NodeStuck exclusion) and Issue #48 (FedRAMP P0)?
+
+## References
+
+- **Issue #46:** STG-EUS2-28 incident report (Teams Bridge detection)
+- **Issue #24:** Tier 1 critical mitigations (I1 original scope)
+- **Issue #25:** Tier 2 high-impact improvements (I2 ztunnel health monitoring)
+- **Issue #4:** DK8S stability analysis (5 Sev2 incidents, 7 failure patterns)
+- **B'Elanna's Analysis:** Jan 2026 Sev2 (IcM 731055522) — ztunnel + DNS + geneva-loggers cascading failure
+
+---
+
+**Next Steps:**
+1. Tamir confirms fast-track decision
+2. B'Elanna provides I1 implementation guidance (label design, admission controller config)
+3. SRE team implements Phase 1 (NodeStuck exclusion) within 48h
+4. Platform team schedules I1 implementation for current sprint
+5. Post-incident review validates correlation + documents lessons learned
+

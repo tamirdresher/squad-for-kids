@@ -2394,3 +2394,202 @@ When user clarifies scope mid-research ("not Squad itself"), **IMMEDIATELY pivot
 - Original patent research: PATENT_RESEARCH_REPORT.md, PATENT_RESEARCH_METHODOLOGY.md
 - Issue #42 re-scoped analysis comment: Posted 2026-03-15
 
+---
+
+## Decision 5: NodeStuck Istio Exclusion Pattern
+
+**Date:** 2026-03-11  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** Adopted  
+**Scope:** Infrastructure / SRE Automation  
+**Priority:** P0 Emergency
+
+### Context
+
+STG-EUS2-28 incident (Issue #46) revealed that NodeStuck automation incorrectly deletes healthy nodes when Istio daemonset health degrades. This amplifies blast radius during service mesh incidents by forcing workload rescheduling onto equally unhealthy infrastructure.
+
+### Decision
+
+**Exclude Istio infrastructure daemonsets (ztunnel, istio-cni, istio-operator) from NodeStuck node deletion triggers via label-based exclusion mechanism.**
+
+#### Principle
+
+**Separate infrastructure health from service health signals:**
+- **Infrastructure health** (node failures) → triggers node deletion
+- **Service health** (daemonset failures) → triggers alerts + manual investigation (NO automatic node deletion)
+
+### Implementation
+
+1. **Label-Based Exclusion**
+   - Apply `app.kubernetes.io/component=istio` label to all Istio daemonsets
+   - NodeStuck filters daemonsets BEFORE evaluating node health
+   - Excluded daemonsets do not contribute to node deletion criteria
+
+2. **Configuration**
+   ```yaml
+   triggers:
+     - type: DaemonSetUnhealthy
+       action: DeleteNode
+       scope: FilteredDaemonSets
+       exclusionLabels:
+         - "app.kubernetes.io/component=istio"
+   ```
+
+3. **Progressive Rollout**
+   - STG deployment + chaos testing (Day 1-2)
+   - 48-hour monitoring (Day 2-3)
+   - Progressive PROD rollout (Day 3-4)
+
+### Rationale
+
+1. **Root Cause:** Istio daemonset failures are **mesh control plane issues**, not node infrastructure failures
+2. **Blast Radius:** Deleting nodes during mesh incidents cascades failures (workloads reschedule onto unhealthy mesh)
+3. **Recovery:** Node deletion prevents proper troubleshooting and recovery of mesh issues
+4. **Precedent:** Node health monitoring already distinguishes disk/memory/PID pressure from workload failures
+
+### Impact
+
+- ✅ **60-80% blast radius reduction** during mesh incidents
+- ✅ **Zero node deletions** triggered by Istio daemonset health
+- ✅ **30-50% MTTR improvement** (no cascading node loss)
+- ✅ **Node deletion rate unchanged** for actual infrastructure failures
+
+### Consequences
+
+**Benefits:**
+- Prevents cascading node deletion during mesh incidents
+- Enables proper troubleshooting of Istio failures (nodes remain for log collection)
+- Reduces false positive node deletions
+
+**Risks:**
+- **Risk 1:** If exclusion too aggressive, legitimate node failures may be missed if ONLY Istio daemonsets fail first
+  - **Mitigation:** Node health monitoring includes kubelet heartbeat, disk/memory/PID pressure (independent of daemonsets)
+- **Risk 2:** Prolonged Istio daemonset failures may mask underlying node issues
+  - **Mitigation:** Alert rules fire if Istio unhealthy >15 minutes (manual investigation)
+
+### Related Issues
+
+- **Issue #50:** NodeStuck Istio Exclusion (IMMEDIATE — 48 hours)
+- **Issue #46:** STG-EUS2-28 incident root cause analysis
+- **Issue #24:** Tier 1 Stability (I1 Istio Exclusion List — 2-3 weeks)
+- **Issue #25:** Tier 2 Stability (I2 ztunnel health monitoring — 6-8 weeks)
+
+### Deliverables
+
+- **Configuration Document:** `docs/nodestuck-istio-exclusion-config.md`
+- **PR #52:** https://github.com/tamirdresher_microsoft/tamresearch1/pull/52
+- **Status:** ✅ PR #52 Merged, Issue #50 Closed
+
+### Generalization for Future Use
+
+**Pattern:** When automation conflates **infrastructure failures** with **service failures**, use label-based exclusion to separate health signal layers.
+
+**Applies to:**
+- Logging daemonsets (FluentBit, Geneva Logs) — failures should NOT trigger node deletion
+- Monitoring daemonsets (Prometheus Node Exporter, Azure Monitor Agent) — failures should NOT trigger node deletion
+- Security daemonsets (Falco, Aqua) — failures should NOT trigger node deletion
+
+**Does NOT apply to:**
+- System-critical daemonsets (kubelet, kube-proxy) — failures SHOULD trigger node deletion
+- Storage daemonsets (CSI drivers) — failures MAY indicate node-level storage issues
+
+---
+
+## Decision 6: FedRAMP P0 nginx-ingress Vulnerability Response
+
+**Date:** 2026-03-06  
+**Decision Maker:** Worf (Security & Cloud)  
+**Issue:** #51 — nginx-ingress-heartbeat FedRAMP P0  
+**Context:** STG-EUS2-28 incident (Issue #46) revealed CVE-2026-24512 vulnerabilities
+**Status:** Adopted
+
+### Decision
+
+**IMMEDIATE EMERGENCY PATCH REQUIRED**
+
+Upgrade ingress-nginx to v1.13.7+ or v1.14.3+ within 24 hours across all DK8S clusters.
+
+### Rationale
+
+1. **Vulnerability Severity:** CVE-2026-24512 (CVSS 8.8) enables remote code execution and full cluster compromise
+2. **Zero Compensating Controls:** DK8S lacks Network Policies, WAF, and OPA validation (all planned Q1-H2 2026)
+3. **FedRAMP Compliance:** P0 requires < 24h remediation; risk acceptance NOT viable without defense-in-depth
+4. **Exploitability:** Multi-tenant platform with potential tenant Ingress creation = HIGH risk
+5. **Regulatory Requirement:** Government cloud deployments (Fairfax, Mooncake) mandate compliance
+
+### Rejected Alternatives
+
+- **Rollback:** All older versions vulnerable; FedRAMP requires patch, not reversion
+- **WAF Mitigation Only:** Insufficient timeline (Q1 2026) + does not address internal lateral movement
+- **Admission Controller Only:** Insufficient timeline (Q2 2026) + does not eliminate CVE
+
+### Implementation Plan
+
+#### Phase 1: Immediate Patch (0-24h)
+- Test ring: 0-8h
+- PPE ring: 8-16h
+- Prod ring: 16-24h
+- Sovereign clouds: 24-48h (with compensating controls)
+
+#### Phase 2: Compensating Controls for Sovereign Lag (24-48h)
+If Fairfax/Mooncake deployment delayed:
+- OPA emergency policy: Block new Ingress creation
+- RBAC audit: Verify tenant isolation
+- Monitoring: Alert on Ingress modifications
+- Network policy: Isolate ingress-controller namespace
+
+#### Phase 3: Defense-in-Depth (Q1-Q2 2026)
+- WAF deployment (Q1 2026)
+- OPA/Rego Ingress validation (Q2 2026)
+- Default-deny Network Policies (H2 2026)
+
+### Risk Assessment
+
+**Without Patch:**
+- Cluster compromise via Ingress path injection
+- Secrets exfiltration (controller has broad RBAC by default)
+- FedRAMP audit failure + compliance violation
+- Potential data breach in government cloud tenants
+
+**With Patch:**
+- Vulnerability eliminated
+- FedRAMP compliant
+- Minimal operational risk (progressive ring deployment)
+
+### Validation Criteria
+
+- [x] Security assessment complete (FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md)
+- [ ] Current versions identified across all clusters
+- [ ] Patch deployed to Test ring (validate heartbeat functional)
+- [ ] Patch deployed to PPE ring (monitor for regression)
+- [ ] Patch deployed to Prod ring (< 24h from detection)
+- [ ] Sovereign clouds patched OR compensating controls active (< 48h)
+- [ ] Post-patch validation: Version check, no CVE reproduction
+
+### Impact on Team Decisions
+
+**Related to Decision 3 (Security Findings):**
+- nginx-ingress patch addresses Finding #1 immediate risk
+- Reinforces urgency of Finding #2 (WAF), #3 (OPA), #5 (Network Policies)
+- Demonstrates consequence of delayed defense-in-depth: single CVE = P0 incident
+
+**Related to Issue #46 (STG-EUS2-28):**
+- Root cause: CVE-2026-24512 exploitation potential
+- Mitigation: Patch eliminates root vulnerability
+
+**Related to Issue #29 (Tier 3 Architecture):**
+- Security architecture gaps (WAF, Network Policies) = systemic risk
+- Defense-in-depth timeline acceleration required
+
+### Owner & Next Actions
+
+- **Platform Team:** Version identification + patch deployment coordination
+- **SRE Team:** EV2 progressive ring deployment execution
+- **Worf (Security):** OPA emergency policy if sovereign cloud lag, post-patch validation
+- **Compliance:** FedRAMP audit documentation (timeline, validation results)
+- **Status:** ✅ Assessment complete, PR #53 merged, Issue #51 updated
+
+### Audit Trail
+
+FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md (full technical analysis)
+

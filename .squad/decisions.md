@@ -2256,3 +2256,141 @@ STG-EUS2-28 cluster incident (detected 2026-03-07T17:45Z via Teams Bridge integr
 4. Platform team schedules I1 implementation for current sprint
 5. Post-incident review validates correlation + documents lessons learned
 
+
+---
+### 2026-03-07T18:23Z: User directive — Teams communication approach
+**By:** Tamir Dresher (via Copilot)
+**What:** Use WorkIQ + webhook approach for Teams communication for now. Teams MCP Server (issue #45) is deprioritized.
+**Why:** User request — practical approach using existing tools rather than waiting for MCP Server setup.
+---
+# Decision: Patent Research Re-Scoped to Usage Pattern (Issue #42)
+
+**Date:** 2026-03-15  
+**Author:** Seven (Research & Docs)  
+**Status:** Informational (research findings)  
+**Related Issues:** #42
+
+## Context
+
+Original patent research (March 2026) analyzed Squad framework's technical architecture (Ralph monitoring, casting governance, git-based state, etc.) for patentability. Tamir clarified in follow-up comments that the question was NOT about patenting Squad itself, but about the **USAGE PATTERN**: using a multi-agent AI squad as a personal assistant / cognitive extension for a human professional (specifically a TAM).
+
+## Research Question (Re-Scoped)
+
+**Is the way we use Squad here — as an AI personal assistant / human extension for a TAM — patentable?**
+
+## Key Findings
+
+### 1. Prior Art Landscape
+
+**Existing Patents:**
+- US11574205B2 (Granted): Unified cognition for virtual personal cognitive assistant — multiple domain agents coordinated by personalized cognition manager
+- US20230306967A1 (Application): Personal assistant multi-skill — cognitive enhancement layer across domains
+- US20240419246 (Application): Human augmentation platform using context, biosignals, and LLMs
+- US20240430216 (Application): Copilot for multi-user, multi-step workflows with multi-agent orchestration
+
+**Open-Source Implementations:**
+- Agent Squad (AWS Labs): Multi-agent framework for enterprise workflows, customer support, technical troubleshooting
+- LangChain Multi-Agent Assistants: Supervisor/sub-agent pattern for personal productivity
+- Mobile-Agent-E (Academic): Hierarchical multi-agent with self-evolving memory for professional workflows
+
+**Microsoft's Public Work:**
+- Microsoft Copilot Studio: Orchestrator + sub-agent patterns for domain-specific enterprise workflows
+- Microsoft Developer Blog (2025): "Designing Multi-Agent Intelligence" — advocates multi-agent architecture for enterprise productivity with Teams/Outlook/SharePoint integration
+
+### 2. Novelty Assessment
+
+**Broad claims WILL FAIL:**
+- "Multi-agent AI assistant for professionals" — covered by prior art (US11574205B2, AWS Agent Squad, LangChain)
+- General orchestration patterns — well-established in open-source and patents
+
+**Narrow claims MAY BE PATENTABLE:**
+
+1. **TAM-Specific Orchestration Pattern** (MEDIUM novelty)
+   - Multi-agent system specifically designed for TAM workflows (research, communication, issue tracking, continuous learning)
+   - No patents found specifically for TAM or domain-specialist cognitive extension with this workflow integration
+   - Risk: Obviousness — USPTO may view as obvious application of known patterns to specific domain
+
+2. **Human-AI Collaborative Workflow Pattern** (MEDIUM-HIGH novelty)
+   - Parallel human-AI work with git-based shared memory for audit and intervention
+   - Seamless handoff between human and AI team members
+   - Continuous learning from TAM's decisions and domain context
+   - Hybrid pattern (human-supervised + autonomous) less documented than pure autonomous or pure supervised
+
+3. **Domain-Adaptive Continuous Learning for Individual Professional** (MEDIUM novelty)
+   - Learning from single TAM's domain context, adapting agent specializations
+   - Using git-based decision history as training corpus for personalization
+   - Risk: Continuous learning is well-established; narrow TAM-focused implementation may be defensible
+
+4. **GitHub + Teams + ADO Integration as "Human Extension Substrate"** (MEDIUM novelty)
+   - Specific usage pattern of these tools as integrated substrate for human-AI collaboration
+   - GitHub issues as task definitions, Teams as communication bridge, git history as shared memory
+   - Risk: Integration patterns are common; specific usage for cognitive extension could be defensible
+
+### 3. Risk Analysis
+
+**Obviousness Risk: HIGH**
+- USPTO examiners may view as obvious combination of known elements: multi-agent orchestration + personal productivity + domain specialization
+- Mitigation: Must demonstrate non-obvious technical advantages (specific orchestration efficiency, learning mechanisms, workflow patterns)
+
+**Microsoft Internal Prior Art Risk: MEDIUM**
+- Microsoft's public work on multi-agent Copilot and agentic AI may establish prior art
+- Timing investigation required: When did implementation begin vs. Microsoft's public disclosures?
+
+**Broad Claims Will Fail: HIGH**
+- Claims like "multi-agent AI assistant for professionals" will be rejected due to prior art
+- Mitigation: File narrow, specific claims focused on TAM-specific workflow, human-AI parallel collaboration, domain-adaptive learning
+
+## Recommendation
+
+### Filing Strategy: Option A (Recommended)
+
+**File narrow TAM-focused claims:**
+- System for cognitive extension of TAM with domain-specialized agents (research, communication, issue management, monitoring)
+- Git-based shared memory enabling human audit and intervention
+- Orchestration pattern for human-AI parallel workflow where TAM and agents collaborate on simultaneous tasks
+- Continuous learning from TAM's domain context and decision history
+- Integrated GitHub + Teams + ADO substrate for task definition and coordination
+
+**Pros:**
+- Specific enough to avoid broad prior art
+- Focuses on unique TAM workflow and human-AI collaboration pattern
+- Higher grant probability
+
+**Cons:**
+- Narrow scope limits defensive value
+- Competitors could design around with different domain (e.g., Customer Success Manager)
+
+**Timeline:** 2-3 weeks for provisional filing  
+**Cost:** ~$3-5K (Microsoft covers)
+
+### Critical Questions Before Filing
+
+1. **Inventorship:** Who conceived the "AI squad as TAM human extension" concept? When?
+2. **Public Disclosure:** Has this usage pattern been publicly disclosed? (Blog posts, conference talks, public GitHub repo with pattern documented?)
+3. **Microsoft Internal:** Has Microsoft filed or disclosed similar TAM/domain-specialist cognitive extension concepts internally?
+4. **Implementation Details:** What specific orchestration mechanisms, learning algorithms, or workflow patterns are implemented that go beyond standard multi-agent frameworks?
+
+## Bottom Line
+
+**Usage pattern is POTENTIALLY PATENTABLE with narrow, specific claims** focused on TAM workflow and human-AI collaboration pattern. Obviousness is primary risk. Must demonstrate non-obvious technical advantages.
+
+**Recommended action:** If specific innovations exist in TAM workflow orchestration, domain learning, and human-AI parallel collaboration, **file narrow provisional patent** to lock priority date, then assess competitive landscape over 12 months.
+
+## Key Learning for Squad
+
+When user clarifies scope mid-research ("not Squad itself"), **IMMEDIATELY pivot to re-scoped analysis** rather than defending original scope. User's clarification takes absolute priority over prior work investment. In this case, entire patent analysis needed reframing from "Squad technical architecture" to "usage pattern as human extension" — fundamentally different patent question.
+
+## Next Steps
+
+1. Tamir reviews findings and decides whether to proceed with patent filing
+2. If proceeding: Clarify inventorship, public disclosure status, Microsoft internal conflicts
+3. If filing: Engage Microsoft patent attorney to draft narrow TAM-focused claims
+4. Timeline: Provisional filing within 2-3 weeks to preserve priority date
+
+---
+
+**References:**
+- Issue #42: https://github.com/tamirdresher_microsoft/tamresearch1/issues/42
+- Original patent research: PATENT_RESEARCH_REPORT.md, PATENT_RESEARCH_METHODOLOGY.md
+- Issue #42 re-scoped analysis comment: Posted 2026-03-15
+

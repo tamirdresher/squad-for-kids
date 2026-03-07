@@ -10,6 +10,22 @@
 
 ## Learnings
 
+### 2026-03-07: GitHub Teams Integration Guidance — Issue #44
+
+**Context:** Tamir installed the GitHub for Microsoft Teams app, signed in, and asked how to connect it to this repo (tamirdresher_microsoft/tamresearch1).
+
+**Guidance Provided:** Posted comment on issue #44 with actionable steps:
+1. In Teams channel: `@GitHub subscribe tamirdresher_microsoft/tamresearch1`
+2. Customize with: `@GitHub subscribe tamirdresher_microsoft/tamresearch1 issues pulls reviews comments`
+3. Check subscriptions: `@GitHub subscribe list`
+4. Linked official docs: https://github.com/integrations/microsoft-teams
+
+**Key Insight:** The Teams app setup follows a predictable pattern—subscribe in channel, customize filters, verify. Tamir can execute this immediately and start seeing notifications within seconds.
+
+**Decision Pattern Applied:** Direct actionable guidance with reference docs for deeper exploration; unblocked Tamir to proceed.
+
+---
+
 ### 2026-03-07: Ralph Watch v5 Assessment — Observability Gap Analysis
 
 **Context:** Tamir asked for assessment of ralph-watch.ps1 (hourly polling script for monitoring GitHub issues/PRs). Existing implementation runs the squad agent in a 5-minute loop with basic comment tracking via `.ralph-state.json`. Request: "Can you make it working ok? Any suggestions for improvement?"

@@ -1,0 +1,22 @@
+// WAF Daily Summary Query
+// Purpose: Aggregate WAF activity for past 24 hours
+// Owner: Worf (Security & Cloud)
+
+FrontdoorWebApplicationFirewallLog
+| where TimeGenerated >= ago(24h)
+| summarize 
+    TotalRequests = count(),
+    BlockedRequests = countif(action_s == "Log" or action_s == "Block"),
+    UniqueIPs = dcount(clientIP_s),
+    UniqueRules = dcount(ruleId_s),
+    AvgLatency = avg(processingTime_d)
+    by bin(TimeGenerated, 1h)
+| project 
+    Hour = TimeGenerated,
+    TotalRequests,
+    BlockedRequests,
+    BlockRate = round((todouble(BlockedRequests) / todouble(TotalRequests)) * 100, 2),
+    UniqueIPs,
+    UniqueRules,
+    AvgLatencyMs = round(AvgLatency, 2)
+| order by Hour desc

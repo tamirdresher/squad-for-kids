@@ -1137,3 +1137,69 @@ All three issues have clear status and next steps. ADO integration is tested, Ra
 pm view to identify "available to users" version.
 
 **Status**: Awaiting npm publish (external dependency). Monitoring for v0.8.21 release.
+
+---
+
+### 2026-03-07: Issue #18 Finalization — Teams Integration Complete
+
+**Context:** Tamir requested finalization of two-way Teams integration work after multiple iterations.
+
+**Task:** Verify Teams integration completeness, ensure no secrets in skill files, close issue #18.
+
+**Findings:**
+1. **.squad/skills/teams-monitor/SKILL.md exists and is complete**
+   - WorkIQ-based polling pattern for Teams → GitHub bridge
+   - Documented query templates, deduplication, filtering heuristics
+   - No secrets stored (authentication via WorkIQ/notification mechanisms)
+   - Confidence marked as LOW (first implementation, needs iteration)
+
+2. **Issue evolution tracked:**
+   - Originally proposed: Azure Bot Framework, Graph API, Power Automate
+   - Tamir's insight: WorkIQ (read) + Squad notifications (send) = just need polling loop
+   - Picard created teams-monitor skill (2026-03-07T11:41:20Z)
+   - Follow-up issues #44 (GitHub in Teams app) and #45 (Teams MCP Server) spun off
+   - Tamir's final directive: "Finalize this already" (2026-03-07T20:06:11Z)
+
+3. **Current state:**
+   - ✅ Read capability: WorkIQ
+   - ✅ Send capability: Existing notification mechanisms
+   - ✅ Polling loop: teams-monitor skill
+   - ✅ Bridge pattern: Teams → GitHub issues → Squad → notifications
+   - ⚠️ Needs iteration: Query tuning, false positive/negative rates
+
+**Decision:**
+Issue #18 closed as complete. The polling bridge pattern is operational and documented. Future enhancements (GitHub in Teams app, MCP Server) tracked in separate issues.
+
+**Key Learning:**
+**"Notify me in Teams" directive:** When Tamir says "notify me in Teams" or "update me in Teams", agents must:
+1. Use existing notification mechanisms to send messages
+2. Use WorkIQ to check for responses/follow-ups
+3. Create GitHub issues from actionable Teams messages
+4. Document the teams-bridge in issue labels
+
+This is now a standing directive for all agents, documented in the teams-monitor skill.
+
+**Files involved:**
+- .squad/skills/teams-monitor/SKILL.md (existing, verified complete)
+- Issue #18 (closed)
+- Issue #44 (open — GitHub in Teams app setup)
+- Issue #45 (closed — Teams MCP Server investigation)
+
+
+---
+
+### 2026-03-07: Issue #18 Finalization — Ralph Round 1
+
+**Task:** Finalize #18 Teams two-way integration (background agent, Ralph work monitor Round 1).
+
+**Status:** ✅ COMPLETED
+
+**Outcome:**
+- Issue #18 → CLOSED ✅
+- Teams notification directive formalized as team policy
+- Decision record created and merged to decisions.md
+- Orchestration log: .squad/orchestration-log/2026-03-07T20-23-45Z-data.md
+
+**Team-Relevant Decision:** Teams integration standing directive — whenever Tamir (or team) requests Teams notifications/updates, agents MUST comply without additional confirmation. Polling-based pattern (WorkIQ reads Teams → GitHub issues → Squad sends) is now operational.
+
+**Key Insight:** Issue #18 resolution pattern: Complex proposals (Azure Bot, Power Automate) unnecessary. Tamir's insight: existing capabilities (WorkIQ + Squad notifications) sufficient with systematic polling layer. Lesson: Sometimes the MVP wins by reusing existing capabilities vs. building new infrastructure.

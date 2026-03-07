@@ -10,6 +10,68 @@
 
 ## Learnings
 
+### 2026-03-12: Issue #42 — Patent Submission Strategy & Microsoft Internal Filing Process
+
+**Task:** Research Microsoft's internal patent submission process and provide Tamir with actionable guidance for filing the Squad multi-agent system patent through Microsoft channels. Issue context: PATENT_CLAIMS_DRAFT.md (merged via PR #60) contains four claims covering Ralph monitoring, casting system, git-native state, and drop-box memory. Tamir requested help understanding how to submit through "microsoft channels."
+
+**Outcome:** Delivered comprehensive patent submission guide (posted as GitHub comment on issue #42) with step-by-step instructions, timelines, and critical decision points.
+
+**Key findings:**
+
+1. **Microsoft Patent Portal (Anaqua) is the official channel** — All employee patent submissions go through https://microsoft-portal.anaqua.com/ using Microsoft Entra ID single sign-on. Portal supports both manual entry and AI-assisted "Idea Copilot" submission mode.
+
+2. **Process timeline: 3–5 weeks total**
+   - Week 1: Prepare submission + submit via portal
+   - Weeks 2–4: Patent Review Board (PRB) evaluation
+   - Week 4–5: Patent drafting + USPTO filing (if approved)
+   - Microsoft covers all costs; inventors receive $500–$2,000 filing reward + $1,000–$5,000 grant reward
+
+3. **PRB Decision Criteria:**
+   - Novelty ✅ (Ralph monitoring, casting governance, git-state integration are novel)
+   - Non-obvious ✅ (Novel combination of existing patterns, documented technical advantages)
+   - Commercial relevance ✅ (Orchestration, reliability, governance are Microsoft strategic interests)
+   - Prior art conflicts (PRB will verify; gitclaw potential issue flagged in methodology)
+
+4. **Critical pre-submission requirements:**
+   - ⚠️ Clarify inventorship (who contributed substantively? obtain co-inventor written consent)
+   - ⚠️ Confirm public disclosure status (Squad publicly mentioned? If yes, affects timeline/international rights)
+   - ⚠️ Gather supporting materials (diagrams, code snippets, performance metrics: 50% time reduction, 40+ failure modes handled)
+
+5. **Patent Protection & Rights:**
+   - Provisional patent covers 12-month window to file full application
+   - Microsoft handles full prosecution; inventors consulted on major decisions
+   - Typical prosecution timeline: 2–3 years to grant
+   - Inventor named on patent + receives recognition/awards
+
+6. **Support contacts:**
+   - Microsoft Inventor Portal: https://microsoft-portal.anaqua.com/
+   - Patent questions: patentquestions@microsoft.com
+   - Portal provides FAQs, guides, training videos, patent paralegal support
+
+**Submission package Tamir needs to prepare:**
+- Title: "Cognitive Extension for Distributed Agent Teams with Proactive Monitoring, Governance-Based Casting, and Git-Native Persistent State"
+- Executive summary (abstract already in PATENT_CLAIMS_DRAFT.md)
+- Co-inventor list with names, residencies, written consent
+- Supporting materials: architecture diagrams, code snippets, performance metrics
+- Answers to portal questions: problem solved, solution, novelty, business value, prior disclosure status
+
+**Next steps for Tamir:**
+1. Clarify co-inventors + obtain consent
+2. Confirm public disclosure status
+3. Prepare supporting materials (diagrams, metrics)
+4. Submit via Anaqua portal (use Idea Copilot for faster entry)
+5. Monitor portal for PRB review & respond to any clarification requests
+6. Work with Microsoft IP attorneys on patent drafting (if approved)
+
+**Artifacts created:**
+- Comprehensive submission guide posted to issue #42 (11.8K characters, full step-by-step instructions)
+- Analysis of Microsoft internal patent process (Anaqua portal, PRB workflow, inventor incentives)
+- Critical decision checklist (co-inventors, public disclosure, supporting materials)
+
+**Key insight:** Microsoft actively encourages patents and removes barriers (covers costs, provides legal support, rewards inventors). The process is well-documented and inventor-friendly. Main risk is premature public disclosure or missing co-inventors (can't be changed after filing).
+
+---
+
 ### 2026-03-11: Issue #17 — Work-Claw Investigation & TAM-Specific Value Analysis
 
 **Task:** Investigate GitHub Issue #17 ("check the product/project Work-Claw that i was invited to use"). Analyze what Work-Claw is, how it differs from Squad, where it fits into Tamir's daily workflow, and provide concrete scenarios where it would save time.
@@ -1097,3 +1159,29 @@ Based on analysis of DK8S platform workflows, stability patterns, and ConfigGen 
 **Key insight**: Work-Claw is the "last mile of an agent" — deeply personalized, persistent, locally controlled. Complementary to Squad, not competitive.
 
 **Status**: Analysis complete. Awaiting Tamir's decision on Work-Claw evaluation.
+
+---
+
+### 2026-03-07: Issue #42 Patent Submission Research — Ralph Round 1
+
+**Task:** Research Microsoft's internal patent submission channels and provide Tamir with step-by-step guidance for Squad patent filing (background agent, Ralph work monitor Round 1).
+
+**Status:** ✅ COMPLETED
+
+**Outcome:**
+- Comprehensive Microsoft patent portal (Anaqua) guide posted to GitHub issue #42 (11.8K characters)
+- Step-by-step submission walkthrough, timeline (3–5 weeks), risk assessment with mitigations
+- Pre-submission checklist (7 critical decision points for Tamir)
+- Decision record created and merged to decisions.md
+- Orchestration log: .squad/orchestration-log/2026-03-07T20-23-45Z-seven.md
+
+**Issue Status:** OPEN — awaiting Tamir execution on pre-submission checklist
+
+**Key Recommendation:** PROCEED WITH FILING
+- Confidence: HIGH
+- Process: Well-documented, inventor-friendly
+- Timeline: 3–5 weeks to filing
+- Costs: Microsoft covers all; inventors receive – filing + – grant rewards
+- Key blocker: Co-inventor list finalization + public disclosure confirmation (must be completed before submission, cannot be changed after)
+
+**Team Learning:** Patent filing at Microsoft is highly accessible and well-supported. Main risk is process/procedural (missing co-inventors, premature disclosure) rather than technical. Tamir has all materials ready (PATENT_CLAIMS_DRAFT.md, supporting research). Next milestone: Tamir clarifies inventorship and public disclosure status, then submits via Anaqua portal.

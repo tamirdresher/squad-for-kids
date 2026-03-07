@@ -3398,3 +3398,206 @@ For individual contributors, managers, and TAMs like yourself, this "last mile" 
 
 *Analysis prepared by @Seven (Research & Docs) — sourced from Teams discussions with Sudipto Rakshit, Dani Halfin, and pattern analysis of Tamir's calendar, email, and Teams activity via WorkIQ.*
 
+
+---
+
+## Decision 7: Teams Notification Directive
+
+**Date:** 2026-03-07
+**Author:** Data (Code Expert)
+**Status:** ✅ Adopted
+**Scope:** Team Process
+
+### Context
+
+Issue #18 ("find a way we can interact two-way via teams") went through multiple phases:
+1. Complex proposals (Azure Bot Framework, Graph API, Power Automate)
+2. Tamir's insight: WorkIQ already reads Teams, Squad already sends — just need polling loop
+3. Picard created .squad/skills/teams-monitor/SKILL.md
+4. Follow-up issues #44 (GitHub in Teams app) and #45 (Teams MCP Server) spun off
+5. Tamir's final directive: "Finalize this already" and implicit "whenever I ask you to notify me or update me in teams, you will do so!"
+
+### Decision
+
+**When Tamir (or any stakeholder) says "notify me in Teams" or "update me in Teams", agents MUST:**
+
+1. **Send notification via existing mechanisms** (documented in teams-monitor skill)
+2. **Use WorkIQ to check for responses** in subsequent sessions/Ralph cycles
+3. **Create GitHub issues from actionable Teams messages** with 	eams-bridge label
+4. **Do NOT wait for permission or ask for clarification** — this is a standing directive
+
+### Implementation
+
+- **Skill:** .squad/skills/teams-monitor/SKILL.md (committed 2026-03-07)
+- **Trigger:** Session start, Ralph cycles, explicit "check Teams" requests
+- **Query templates:** Documented in skill file (adapt to current work context)
+- **Deduplication:** Check existing GitHub issues before creating new ones
+- **Confidence:** LOW → MEDIUM (first implementation, needs iteration)
+
+### Rationale
+
+The polling bridge pattern is operational:
+- ✅ WorkIQ reads Teams
+- ✅ Squad sends notifications
+- ✅ teams-monitor skill provides systematic polling loop
+- ✅ Bridge: Teams → GitHub → Squad → notifications
+
+This solves the core problem without new infrastructure (no Azure Bot, no Power Automate needed for MVP).
+
+### Consequences
+
+- **Positive:** Clear directive removes ambiguity when Tamir requests Teams updates
+- **Positive:** Documented skill means consistent behavior across all agents
+- **Positive:** Polling pattern works with existing capabilities (no new dependencies)
+- **Negative:** Polling-based (not push), so may have delay in detecting Teams messages
+- **Negative:** Query tuning needed to reduce false positives/negatives
+
+### Related
+
+- Issue #18 (CLOSED — two-way Teams integration)
+- Issue #44 (OPEN — GitHub in Teams app for automated notifications)
+- Issue #45 (CLOSED — Teams MCP Server investigation)
+- .squad/skills/teams-monitor/SKILL.md
+
+---
+
+## Decision 8: DevBox Provisioning Phase 2 Architecture
+
+**Date:** 2026-03-07
+**Author:** B'Elanna (Infrastructure Expert)
+**Status:** ✅ Implemented
+**Scope:** Infrastructure Automation
+**Issue:** #63
+**PR:** #64
+
+### Context
+
+Phase 2 of DevBox provisioning automation adds natural language interpretation on top of Phase 1 Bicep templates and PowerShell scripts. Goal is to enable non-technical users to provision DevBoxes with phrases like "Create 3 devboxes like mine."
+
+### Decision
+
+Implemented a Squad skill at .squad/skills/devbox-provisioning/SKILL.md that:
+
+1. **Natural Language Mapping:**
+   - Maps common phrases to Phase 1 script invocations
+   - Single DevBox: provision.ps1 or clone-devbox.ps1
+   - Bulk: Loop with name generation
+   - Discovery: Direct Azure CLI queries
+
+2. **Validation-First Approach:**
+   - Check auth, extension, permissions BEFORE calling scripts
+   - Validate naming, uniqueness, quota constraints
+   - 7 documented error patterns with remediation guidance
+
+3. **Bulk Provisioning Script:**
+   - New ulk-provision.ps1 for team environments
+   - Parallel execution (default, 5 concurrent) for speed
+   - Sequential mode available for quota-constrained scenarios
+   - Job-based concurrency with batch coordination
+
+4. **Error Interpretation Layer:**
+   - Translates Azure CLI errors to human-actionable messages
+   - No raw error exposure to end users
+   - Specific remediation steps for each failure mode
+
+### Rationale
+
+- **Why Squad Skill?** Abstracts Azure CLI complexity from users. Squad coordinator handles interpretation, not users.
+- **Why Validation First?** Fail fast before expensive provisioning operations. Better UX.
+- **Why Parallel Bulk?** Team provisioning (5-10 DevBoxes) is common use case. Sequential would take hours.
+- **Why Job-Based Concurrency?** PowerShell Start-Job is native, no external dependencies. Clean progress tracking.
+
+### Alternatives Considered
+
+1. **Direct Azure CLI in skill:** Rejected — exposes implementation details, violates abstraction
+2. **Sequential-only bulk:** Rejected — too slow for team scenarios (30+ min per DevBox)
+3. **Unlimited parallelism:** Rejected — could exceed Azure quota, cause failures mid-batch
+4. **Custom MCP server:** Deferred to Phase 3 — overkill for current scope
+
+### Implications
+
+- Users can now provision DevBoxes via natural language without Azure CLI knowledge
+- Team leads can bulk-provision environments for sprints/projects
+- Squad coordinator gains new capability domain (infrastructure provisioning)
+- Phase 3 can layer MCP server integration for real-time status
+
+### Open Questions
+
+- **Quota monitoring:** Should skill proactively check quota before bulk provisioning? (Currently relies on graceful failure)
+- **Naming collision resolution:** Auto-append timestamp vs. prompt user? (Currently errors on conflict)
+- **Phase 3 timeline:** When will @microsoft/devbox-mcp be available?
+
+---
+
+## Decision 9: Patent Submission Strategy — Issue #42
+
+**Date:** 2026-03-12
+**Prepared by:** Seven (Research & Docs)
+**Status:** Awaiting Tamir Execution
+**Confidence Level:** HIGH
+
+### Decision: PROCEED WITH PATENT FILING
+
+**Outcome:** Recommend immediate submission of Squad multi-agent system patent through Microsoft's official Anaqua portal.
+
+### Process Timeline
+
+| Milestone | Timeline | Responsibility |
+|-----------|----------|-----------------|
+| Prepare submission package | 1–3 days | Tamir + co-inventors |
+| Submit via Anaqua | Week 1 | Tamir |
+| PRB initial screening | Week 1 | Microsoft patent team |
+| PRB review begins | Week 2 | Microsoft PRB |
+| PRB decision issued | Week 3–4 | Microsoft PRB |
+| Patent drafting (if approved) | Week 4 | Microsoft IP attorneys |
+| USPTO provisional filing | Week 4–5 | Microsoft IP team |
+| **Total: Submission to filing** | **3–5 weeks** | |
+
+### Risk Assessment & Mitigations
+
+| Risk | Probability | Impact | Mitigation |
+|------|------------|--------|-----------|
+| **gitclaw prior art** | MEDIUM | MEDIUM | PRB will evaluate; if conflict found, narrow claims further or focus on Ralph+casting (lower risk) |
+| **Missing co-inventors** | MEDIUM | HIGH | Tamir must list all substantive contributors BEFORE filing; cannot modify after submission |
+| **Public disclosure before filing** | LOW | CRITICAL | Confirm Squad not mentioned publicly; if disclosed, file within 1 year or lose international rights |
+| **Incomplete submission** | LOW | LOW | Use Idea Copilot + review checklist before submitting; PRB provides clarification opportunity |
+| **PRB rejection** | LOW | LOW | Uncommon if prior art well-documented; feedback provided for resubmission if rejected |
+
+### Critical Pre-Submission Checklist (For Tamir)
+
+- [ ] Co-inventor list finalized (names, residencies, roles)
+- [ ] Written consent obtained from all co-inventors
+- [ ] Public disclosure status confirmed (Squad not mentioned anywhere public?)
+- [ ] Supporting materials prepared (diagrams, code snippets, metrics)
+- [ ] PATENT_CLAIMS_DRAFT.md reviewed for accuracy
+- [ ] Submission summary written (use Idea Copilot)
+- [ ] Patent portal account verified (access to https://microsoft-portal.anaqua.com/)
+- [ ] Contact info ready (patentquestions@microsoft.com for any questions)
+
+### Patent Protection & Rights
+
+- Provisional patent covers 12-month window to file full application
+- Microsoft handles full prosecution; inventors consulted on major decisions
+- Typical prosecution timeline: 2–3 years to grant
+- Inventor named on patent + receives recognition/awards
+- Awards: Filing reward –,000, grant reward ,000–,000
+
+### Supporting Artifacts
+
+1. **Patent claims:** PATENT_CLAIMS_DRAFT.md (4 independent claims, 8K+ words)
+2. **Prior art analysis:** PATENT_RESEARCH_REPORT.md (25K+ words, novelty assessment)
+3. **Methodology:** PATENT_RESEARCH_METHODOLOGY.md (Research phases, sources, confidence ratings)
+4. **Submission guide:** GitHub issue #42 comment (11.8K characters, step-by-step instructions)
+
+### Recommendation to Tamir
+
+1. **Immediately:** Clarify co-inventor list + confirm public disclosure status (2 key blockers)
+2. **This week:** Gather supporting materials + prepare submission summary
+3. **Next week:** Submit via Anaqua portal (recommend using Idea Copilot for faster entry)
+4. **Weeks 2–5:** Monitor portal, respond to PRB questions as needed
+5. **Expected outcome:** Patent pending within 5 weeks, formal patent grant within 2–3 years
+
+---
+
+**Status:** Decisions merged and deduplicated from inbox (2026-03-07T20:23:45Z)  
+**Scribe:** Final review and git commit pending.

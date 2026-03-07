@@ -302,3 +302,90 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
   - API contract validation
 
 **Action:** Before spawning agents for future idk8s-infrastructure tasks, verify and document correct repository location.
+
+### 2026-03-07: Fleet Manager FIC Blocker — Multi-Team Coordination Intelligence
+
+**Context:** Issue #26 — Research Workload Identity / FIC automation as Fleet Manager adoption prerequisite. Tamir requested outreach to AKS, Entra, and Fleet Manager teams to explain blocker.
+
+**Mission:** Used WorkIQ to identify stakeholders, existing discussions, and draft escalation communication for Fleet Manager adoption blocker.
+
+**Key Intelligence Gathered:**
+
+1. **Stakeholder Mapping (3 Teams, 10+ Contacts)**
+   - **AKS Fleet Manager:** Jim Minter (core team), Yadin Ben Kessous (internal lead), Simon Waight (PM)
+   - **AKS Workload Identity/Identity Bindings:** Shashank Barsin (primary PM — controls preview access), Ben Petersen (co-PM, PRD author)
+   - **Entra ID FIC Policy:** EIAM_FIC@microsoft.com (authoritative for 20-FIC limit), Tianyu Wang (core infra engineer)
+   - **Customer Impact Validation:** Lou Godmer (Azure Cosmic — documented real migration blockers)
+
+2. **Critical Design Gap Discovered**
+   - **Quote from Shashank Barsin:** "Fleet and identity binding are unaware of each other by design"
+   - **Implication:** No automatic FIC provisioning when Fleet adds cluster to fleet or migrates workload
+   - **Security Risk (R-SEC-05 CRITICAL):** Workload loses Azure access immediately if target cluster FIC doesn't exist
+   - **Current State:** Manual pre-provisioning required; not safe at scale
+
+3. **Existing Recognition at Leadership Level**
+   - Joshua Johnson (IDP Leadership) explicitly called out: "Identity Binding / FIC — affecting Karpenter adoption"
+   - Noted organizational ownership ambiguity between teams
+   - **Learning:** This blocker affects multiple adoption scenarios, not just DK8S — use for escalation leverage
+
+4. **Recent Discussions Involving Tamir/DK8S**
+   - Feb 12, 2026 meeting: Tamir questioned whether team was starting from implementation vs. aligning on value proposition
+   - ADR in progress: "Overcoming FIC Limits for Workload Identity Migration"
+   - Saurabh Agrawal working with Tamir on threat modeling for workload identity adoption
+   - Production/Fairfax clusters breaking due to components still on NMI (AAD Pod Identity deprecated but dependencies remain)
+
+5. **Sovereign Cloud Confirmation**
+   - **User-assigned managed identity NOT SUPPORTED** in Fleet Manager for US Gov regions (USDOD Central, USDOD East, USGov Iowa)
+   - Per official Azure docs — feature gaps documented as service constraints
+   - Ownership: Same AKS Fleet Manager team, not separate sovereign owner
+
+6. **Automation Brittleness Evidence**
+   - Cross-tenant FIC automation failures in PPE/Dogfood environments
+   - Graph API errors: "Property is not currently supported"
+   - No CRUD APIs for virtual issuers
+   - Cannot pre-create FICs before clusters exist
+   - **Learning:** This is a platform gap, not just DK8S tooling issue
+
+**Escalation Strategy Delivered:**
+
+1. **Joint Coordination Meeting** — Propose single meeting with Fleet PMs, Identity Bindings PMs, Entra FIC team, DK8S stakeholders
+2. **Framing for Impact** — Emphasize cross-team blocker (Fleet, Karpenter, customer migrations), not DK8S-only
+3. **Draft Communication** — Full email template provided with technical context, evidence, and specific asks
+4. **Immediate Mitigations** — 5 security controls (M6, M7, M15, M16, M17) to implement while awaiting platform solution
+
+**Security Assessment:**
+
+- **R-SEC-04 (CRITICAL):** FIC scaling ceiling — 20 per UAMI insufficient for 50+ clusters
+- **R-SEC-05 (CRITICAL):** FIC pre-provisioning failure → immediate service outage during migration
+- **R-SEC-06 (HIGH):** Stale FIC accumulation → identity sprawl, unnecessary trust relationships
+- **R-SEC-07 (HIGH):** Sovereign cloud FIC mismatch → compliance violation
+
+**Worf's Position:** This is a **first-order security concern**. DK8S is explicitly described as a nation-state target. Identity continuity failures during Fleet-orchestrated migration create attack surface. **Do not proceed with Fleet Manager adoption until resolved at platform level.**
+
+**Artifacts Created:**
+
+- Posted comprehensive stakeholder mapping + escalation strategy to Issue #26
+- Draft email ready for Tamir to send to AKS/Entra teams
+- Documented 5 immediate security mitigations (M6, M7, M15, M16, M17)
+
+**WorkIQ Effectiveness:**
+
+- ✅ Identified 10+ specific contacts with roles/ownership evidence
+- ✅ Found existing meeting transcripts (Tamir attended Feb 12 Fleet meeting)
+- ✅ Discovered leadership acknowledgment (Joshua Johnson IDP Leadership chat)
+- ✅ Confirmed sovereign cloud gaps with official doc citations
+- ✅ Revealed critical design gap: Fleet/Identity Bindings "unaware by design"
+
+**Key Learning:** WorkIQ is exceptionally effective for stakeholder mapping and evidence gathering in multi-team coordination scenarios. Direct quotes from internal discussions (Shashank Barsin on design separation, Jim Minter on integration openness) provide strong escalation ammunition.
+
+**Pattern for Future Escalations:**
+1. Use WorkIQ to map ownership across multiple teams
+2. Find existing recognition at leadership level (leverage for urgency)
+3. Document customer/business impact (not just DK8S-specific)
+4. Provide ready-to-send communication with evidence citations
+5. Frame as coordination opportunity, not blame assignment
+
+**References:**
+- Issue #26 comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/26
+- fleet-manager-security-analysis.md (20+ page security assessment)
+- fleet-manager-evaluation.md (architecture & feature-fit)

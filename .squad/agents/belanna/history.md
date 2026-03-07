@@ -1036,3 +1036,144 @@ Kubernetes-inspired patterns (reconciliation, desired-state, scheduler) are powe
 **Key Learning:** MCP servers should be thin protocol adapters wrapping existing automation, NOT reimplementing business logic. This enables code reuse across CLI, natural language, and MCP interfaces.
 
 **PR:** #69 | **Commit:** eaa9875
+
+### 2026-03-06: Issues #75 & #76 — FedRAMP Drift Detection & Performance Baseline
+
+**Tasks:** Two follow-up issues from Worf's security review on PR #73:
+- Issue #75: Extend drift detection to Helm charts and Kustomize overlays
+- Issue #76: Establish performance baseline measurement for sovereign production deployment
+
+**Issue #75: Drift Detection for Helm/Kustomize**
+
+**Problem:** Current drift detection (PR #73) monitors 
+etwork*, opa*, waf*, policy* patterns but misses Helm values and Kustomize overlays that can silently degrade FedRAMP controls (e.g., disabling NetworkPolicy via alues.yaml change or weakening TLS via Kustomize patch).
+
+**Solution Delivered:**
+
+**Document:** docs/fedramp/drift-detection-helm-kustomize.md (14.6 KB, 400+ lines)
+
+**Key Components:**
+
+1. **Monitored File Patterns:**
+   - Helm: alues.yaml, alues-*.yaml, Chart.yaml (appVersion/version fields)
+   - Kustomize: kustomization.yaml, overlays/**, patches/**
+
+2. **Security-Relevant Fields:**
+   - 
+etworkPolicy.enabled (SC-7 Boundary Protection)
+   - ingress.tls.enabled (SC-8 Transmission Confidentiality)
+   - securityContext.* (CM-7 Least Functionality)
+   - image.tag (SI-2 Flaw Remediation — version tracking)
+   - eplicaCount (CP-9 Availability)
+
+3. **Implementation Scripts:**
+   - 	ests/fedramp-validation/detect-helm-kustomize-changes.sh — File pattern detection
+   - 	ests/fedramp-validation/render-and-validate.sh — Manifest rendering & security field validation
+   - 	ests/fedramp-validation/compliance-delta-report.sh — Generates PR comment with control impact analysis
+
+4. **Alert Thresholds:**
+   - **CRITICAL (Block):** NetworkPolicy disabled, TLS disabled, privileged containers enabled
+   - **WARNING (Manual Review):** Chart version bumps, replica reduction (<2), namespace changes
+   - **INFO (Log):** Non-security field updates
+
+5. **Integration:** Extends .github/workflows/fedramp-validation.yml check-control-drift job with Helm/Kustomize pattern detection
+
+6. **Performance:** Estimated 5-15 seconds overhead per PR (Helm template ~1-3s, Kustomize build ~0.5-2s, OPA validation ~2-5s)
+
+7. **Rollout Plan:**
+   - Phase 1 (Week 1-2): Detection only, INFO alerts, shadow mode
+   - Phase 2 (Week 3-4): Full validation, WARNING alerts
+   - Phase 3 (Week 5+): Enforcement with merge blocking
+
+**PR:** #80 — squad/75-drift-detection-helm-kustomize-fixed
+
+---
+
+**Issue #76: Performance Baseline Measurement**
+
+**Problem:** Before deploying FedRAMP validation workflow (PR #73) to sovereign production (PROD-USGOV), must measure performance overhead and ensure CI/CD pipeline doesn't degrade. Need go/no-go criteria.
+
+**Solution Delivered:**
+
+**Document:** docs/fedramp/performance-baseline-measurement.md (17 KB, 557 lines)
+
+**Key Components:**
+
+1. **Test Environments:**
+   - DEV → STG (commercial cloud)
+   - STG-USGOV-01 (sovereign staging)
+   - PROD → PROD-USGOV (production)
+
+2. **6 Measurement Categories:**
+   - Pipeline execution time (baseline vs. with FedRAMP validation)
+   - Trivy scan duration (small/medium/large images)
+   - WAF rule evaluation latency (P50/P95/P99)
+   - Control drift detection performance (small/medium/large PRs)
+   - OPA policy evaluation (single manifest, full suite)
+
+3. **Go/No-Go Thresholds:**
+
+   | Metric | Commercial | Sovereign |
+   |--------|-----------|-----------|
+   | Pipeline Overhead | <20% | <30% |
+   | Trivy Scan | <120s | <180s |
+   | WAF Latency (P95) | <25ms | <40ms |
+   | Drift Detection | <15s per PR | <20s per PR |
+   | OPA Evaluation | <10s | <15s |
+   | Total Validation Time | <3 min | <5 min |
+
+4. **Sovereign-Specific Adjustments:**
+   - Network latency mitigation: pre-cache Trivy databases, local Helm repositories, registry mirrors
+   - Threshold adjustments: +10% pipeline overhead, +60s Trivy scan, +15ms WAF latency
+
+5. **Master Benchmark Script:** edramp-performance-baseline.sh — orchestrates all 6 measurement categories with timestamped output
+
+6. **5-Week Rollout Schedule:**
+   - Week 1: DEV baseline measurement
+   - Week 2: DEV + STG with FedRAMP validation
+   - Week 3: STG-USGOV-01 sovereign measurement
+   - Week 4: PROD commercial validation
+   - Week 5+: PROD-USGOV progressive rollout (10% → 25% → 50% → 100%)
+
+7. **Monitoring Strategy:**
+   - Prometheus metrics: edramp_validation_duration_seconds, edramp_trivy_scan_duration_seconds, etc.
+   - AlertManager rules: FedRAMPValidationSlow (>5 min), FedRAMPPipelineOverhead (>30%)
+
+8. **Optimization Strategies (if thresholds exceeded):**
+   - Parallel execution (independent checks run simultaneously)
+   - Conditional execution (only on security-related changes)
+   - Caching (Trivy databases, Helm charts)
+   - Incremental validation (only changed resources)
+   - Larger GitHub Actions runners (8-core)
+
+**PR:** #81 — squad/76-performance-baseline
+
+---
+
+**Patterns Used:**
+
+1. **Documentation-First Infrastructure:** Comprehensive design docs before implementation (drift detection architecture, measurement methodology)
+2. **Defense-in-Depth Performance:** Multiple optimization strategies documented upfront (parallel, conditional, caching, incremental)
+3. **Sovereign-Aware Design:** Explicit adjustments for sovereign cloud constraints (network latency, registry access, pre-caching)
+4. **Progressive Rollout:** Phased deployment with validation gates (DEV → STG → STG-USGOV-01 → PROD → PROD-USGOV)
+5. **Observable Systems:** Prometheus metrics + AlertManager rules for continuous performance monitoring
+6. **Go/No-Go Criteria:** Clear thresholds for deployment decisions (quantitative, not subjective)
+
+**Key Learnings:**
+
+- **Drift detection must cover indirect configuration:** Helm values and Kustomize overlays can silently weaken controls even when direct policy files unchanged
+- **Sovereign performance requires explicit planning:** Network latency, registry access, and caching strategies must be addressed upfront, not as afterthoughts
+- **Performance thresholds are control requirements:** If validation takes >5 min, it becomes deployment blocker → impacts IR-4 (Incident Handling) SLA
+- **Alert granularity matters:** CRITICAL (block), WARNING (review), INFO (log) — too many false positives erode trust
+- **Phase 1 shadow mode is critical:** Must collect false positive metrics before enforcement
+
+**File Paths:**
+- docs/fedramp/drift-detection-helm-kustomize.md
+- docs/fedramp/performance-baseline-measurement.md
+- 	ests/fedramp-validation/detect-helm-kustomize-changes.sh
+- 	ests/fedramp-validation/render-and-validate.sh
+- 	ests/fedramp-validation/compliance-delta-report.sh
+
+**PRs:**
+- #80 (Issue #75) — Drift Detection for Helm/Kustomize
+- #81 (Issue #76) — Performance Baseline Measurement

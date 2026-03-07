@@ -1,0 +1,762 @@
+openapi: 3.0.3
+info:
+  title: FedRAMP Security Dashboard API
+  description: |
+    REST API for the FedRAMP Security Dashboard - Phase 2 of 5
+    
+    Provides real-time compliance status, historical trends, and control validation data
+    with role-based access control (RBAC) for security teams.
+    
+    **Data Sources:**
+    - Azure Monitor (real-time metrics)
+    - Cosmos DB (90-day hot storage)
+    - Log Analytics (KQL queries)
+    
+    **Authentication:** Azure AD / Microsoft Entra ID
+    
+    **RBAC Roles:**
+    - Security Admin (full access)
+    - Security Engineer (read/write validation data)
+    - SRE (operational dashboards)
+    - Ops Viewer (read-only dashboards)
+    - Auditor (compliance reports only)
+  version: 2.0.0
+  contact:
+    name: Platform Security Team
+    email: platform-security@contoso.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://fedramp-dashboard-api-prod.azurewebsites.net/api/v1
+    description: Production
+  - url: https://fedramp-dashboard-api-stg.azurewebsites.net/api/v1
+    description: Staging
+  - url: https://localhost:5001/api/v1
+    description: Local development
+
+security:
+  - AzureAD: []
+
+tags:
+  - name: Compliance
+    description: Real-time compliance status and trends
+  - name: Controls
+    description: FedRAMP control validation results
+  - name: Environments
+    description: Environment-level compliance summaries
+  - name: History
+    description: Historical validation data and trends
+  - name: Reports
+    description: Compliance reports and exports
+  - name: Admin
+    description: Administrative operations (audit logs, health checks)
+
+paths:
+  /compliance/status:
+    get:
+      summary: Get real-time compliance status
+      description: |
+        Returns the current compliance status across all environments.
+        Aggregates validation results from the last 24 hours.
+        
+        **Permission:** `Dashboard.Read` (all roles except Auditor)
+      operationId: getComplianceStatus
+      tags:
+        - Compliance
+      parameters:
+        - name: environment
+          in: query
+          description: Filter by environment (DEV, STG, PROD, ALL)
+          required: false
+          schema:
+            type: string
+            enum: [DEV, STG, PROD, ALL]
+            default: ALL
+        - name: controlCategory
+          in: query
+          description: Filter by control category
+          required: false
+          schema:
+            type: string
+            enum: 
+              - "Access Control"
+              - "System and Communications Protection"
+              - "System and Information Integrity"
+              - "Incident Response"
+              - "Configuration Management"
+      responses:
+        '200':
+          description: Compliance status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - AzureAD:
+            - Dashboard.Read
+
+  /compliance/trend:
+    get:
+      summary: Get compliance trend over time
+      description: |
+        Returns compliance rate trends for specified time period.
+        Aggregates pass/fail rates by day.
+        
+        **Permission:** `Dashboard.Read` (all roles except Auditor)
+      operationId: getComplianceTrend
+      tags:
+        - Compliance
+      parameters:
+        - name: environment
+          in: query
+          description: Environment filter
+          required: true
+          schema:
+            type: string
+            enum: [DEV, STG, PROD]
+        - name: startDate
+          in: query
+          description: Start date (ISO 8601 format)
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: End date (ISO 8601 format)
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: granularity
+          in: query
+          description: Time granularity for aggregation
+          required: false
+          schema:
+            type: string
+            enum: [hourly, daily, weekly]
+            default: daily
+      responses:
+        '200':
+          description: Compliance trend retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceTrend'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - AzureAD:
+            - Dashboard.Read
+
+  /controls/{controlId}/validation-results:
+    get:
+      summary: Get validation results for a specific control
+      description: |
+        Returns all validation test results for a FedRAMP control.
+        Includes historical data for the specified time period.
+        
+        **Permission:** `Controls.Read` (Security Admin, Security Engineer, SRE)
+      operationId: getControlValidationResults
+      tags:
+        - Controls
+      parameters:
+        - name: controlId
+          in: path
+          description: FedRAMP control ID (e.g., SC-7, SI-2)
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}-[0-9]{1,2}$'
+        - name: environment
+          in: query
+          description: Environment filter
+          required: false
+          schema:
+            type: string
+            enum: [DEV, STG, PROD, ALL]
+            default: ALL
+        - name: status
+          in: query
+          description: Filter by test status
+          required: false
+          schema:
+            type: string
+            enum: [PASS, FAIL, ALL]
+            default: ALL
+        - name: startDate
+          in: query
+          description: Start date for historical results
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: End date for historical results
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          description: Maximum number of results
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+      responses:
+        '200':
+          description: Control validation results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlValidationResultList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - AzureAD:
+            - Controls.Read
+
+  /environments/{environment}/summary:
+    get:
+      summary: Get compliance summary for an environment
+      description: |
+        Returns aggregated compliance metrics for a specific environment.
+        Includes pass/fail counts, control status breakdown, and recent failures.
+        
+        **Permission:** `Dashboard.Read` (all roles)
+      operationId: getEnvironmentSummary
+      tags:
+        - Environments
+      parameters:
+        - name: environment
+          in: path
+          description: Environment identifier
+          required: true
+          schema:
+            type: string
+            enum: [DEV, STG, PROD]
+        - name: timeRange
+          in: query
+          description: Time range for summary calculation
+          required: false
+          schema:
+            type: string
+            enum: [24h, 7d, 30d, 90d]
+            default: 24h
+      responses:
+        '200':
+          description: Environment summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - AzureAD:
+            - Dashboard.Read
+
+  /history/control-drift:
+    get:
+      summary: Get control drift detection results
+      description: |
+        Identifies controls with significant changes in failure rates.
+        Compares current period vs. prior period to detect compliance drift.
+        
+        **Permission:** `Analytics.Read` (Security Admin, Security Engineer, SRE)
+      operationId: getControlDrift
+      tags:
+        - History
+      parameters:
+        - name: environment
+          in: query
+          description: Environment filter
+          required: false
+          schema:
+            type: string
+            enum: [DEV, STG, PROD, ALL]
+            default: ALL
+        - name: currentPeriodDays
+          in: query
+          description: Number of days for current period
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 30
+            default: 7
+        - name: driftThreshold
+          in: query
+          description: Minimum drift percentage to include (e.g., 10 = 10% increase)
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Control drift results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlDriftList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - AzureAD:
+            - Analytics.Read
+
+  /reports/compliance-export:
+    get:
+      summary: Export compliance report
+      description: |
+        Generates a compliance report in CSV or JSON format.
+        Suitable for audit documentation and external reporting.
+        
+        **Permission:** `Reports.Export` (Security Admin, Security Engineer, Auditor)
+      operationId: exportComplianceReport
+      tags:
+        - Reports
+      parameters:
+        - name: format
+          in: query
+          description: Export format
+          required: false
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+        - name: environment
+          in: query
+          description: Environment filter
+          required: false
+          schema:
+            type: string
+            enum: [DEV, STG, PROD, ALL]
+            default: ALL
+        - name: startDate
+          in: query
+          description: Report start date
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Report end date
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: includeDetails
+          in: query
+          description: Include detailed test results
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Compliance report generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceReport'
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - AzureAD:
+            - Reports.Export
+
+components:
+  securitySchemes:
+    AzureAD:
+      type: oauth2
+      description: Azure Active Directory / Microsoft Entra ID authentication
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize
+          scopes:
+            Dashboard.Read: Read access to compliance dashboards
+            Controls.Read: Read access to control validation data
+            Analytics.Read: Read access to analytics and drift detection
+            Reports.Export: Export compliance reports
+
+  schemas:
+    ComplianceStatus:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Status calculation timestamp
+        overall_compliance_rate:
+          type: number
+          format: float
+          description: Overall compliance rate (0-100)
+        environments:
+          type: array
+          items:
+            type: object
+            properties:
+              environment:
+                type: string
+                enum: [DEV, STG, PROD]
+              compliance_rate:
+                type: number
+                format: float
+              total_controls:
+                type: integer
+              passing_controls:
+                type: integer
+              failing_controls:
+                type: integer
+              recent_failures:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    control_id:
+                      type: string
+                    control_name:
+                      type: string
+                    failure_time:
+                      type: string
+                      format: date-time
+        control_categories:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              compliance_rate:
+                type: number
+                format: float
+              control_count:
+                type: integer
+
+    ComplianceTrend:
+      type: object
+      properties:
+        environment:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        granularity:
+          type: string
+          enum: [hourly, daily, weekly]
+        data_points:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              compliance_rate:
+                type: number
+                format: float
+              total_tests:
+                type: integer
+              passed_tests:
+                type: integer
+              failed_tests:
+                type: integer
+
+    ControlValidationResultList:
+      type: object
+      properties:
+        control_id:
+          type: string
+        control_name:
+          type: string
+        total_results:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationResult'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ValidationResult:
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        environment:
+          type: string
+        cluster:
+          type: string
+        control_id:
+          type: string
+        control_name:
+          type: string
+        test_category:
+          type: string
+        test_name:
+          type: string
+        status:
+          type: string
+          enum: [PASS, FAIL]
+        execution_time_ms:
+          type: integer
+        details:
+          type: object
+          additionalProperties: true
+        metadata:
+          type: object
+          properties:
+            pipeline_id:
+              type: string
+            pipeline_url:
+              type: string
+            commit_sha:
+              type: string
+            branch:
+              type: string
+
+    EnvironmentSummary:
+      type: object
+      properties:
+        environment:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        time_range:
+          type: string
+        compliance_rate:
+          type: number
+          format: float
+        total_controls:
+          type: integer
+        passing_controls:
+          type: integer
+        failing_controls:
+          type: integer
+        control_breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              control_id:
+                type: string
+              control_name:
+                type: string
+              status:
+                type: string
+                enum: [PASS, FAIL, UNKNOWN]
+              last_test_time:
+                type: string
+                format: date-time
+        recent_failures:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationResult'
+
+    ControlDriftList:
+      type: object
+      properties:
+        analysis_timestamp:
+          type: string
+          format: date-time
+        current_period_days:
+          type: integer
+        drift_threshold:
+          type: number
+          format: float
+        drifting_controls:
+          type: array
+          items:
+            type: object
+            properties:
+              control_id:
+                type: string
+              control_name:
+                type: string
+              environment:
+                type: string
+              current_failure_rate:
+                type: number
+                format: float
+              prior_failure_rate:
+                type: number
+                format: float
+              drift_percentage:
+                type: number
+                format: float
+              severity:
+                type: string
+                enum: [LOW, MEDIUM, HIGH, CRITICAL]
+
+    ComplianceReport:
+      type: object
+      properties:
+        report_id:
+          type: string
+        generated_at:
+          type: string
+          format: date-time
+        report_period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date-time
+            end_date:
+              type: string
+              format: date-time
+        environments:
+          type: array
+          items:
+            type: string
+        summary:
+          type: object
+          properties:
+            total_tests:
+              type: integer
+            passed_tests:
+              type: integer
+            failed_tests:
+              type: integer
+            overall_compliance_rate:
+              type: number
+              format: float
+        control_results:
+          type: array
+          items:
+            type: object
+            properties:
+              control_id:
+                type: string
+              control_name:
+                type: string
+              pass_count:
+                type: integer
+              fail_count:
+                type: integer
+              compliance_rate:
+                type: number
+                format: float
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        has_more:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        trace_id:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: Insufficient permissions for this operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

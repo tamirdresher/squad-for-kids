@@ -542,6 +542,75 @@ choco install -y git nodejs-lts github-cli
 - Covers: both options (local machine + devbox), setup steps, security considerations, workflow requirements, persistence tradeoffs
 - Includes: PowerShell commands, workflow YAML updates, tool installation (Chocolatey), recommended enablement order
 
+---
+
+### 2026-03-07T21:30:00Z: Copilot CLI + GitHub Actions Integration Evaluation (Issue #39)
+
+**Task**: Evaluate GitHub Copilot CLI + GitHub Actions integration (https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-with-actions) to determine if it can help improve Squad automation.
+
+**Approach**:
+1. Fetched and analyzed official GitHub documentation on Copilot CLI + Actions integration
+2. Reviewed Squad project context from history.md (ralph-watch.ps1, Issue #28 runner setup, Teams integration)
+3. Assessed feature capabilities, prerequisites, limitations, and enterprise applicability
+4. Mapped strategic opportunities for Squad workflows
+5. Compared with self-hosted runner approach from Issue #28
+6. Developed 3-phase integration roadmap
+
+**Key Findings**:
+
+**Feature Capabilities**:
+- Copilot CLI installs via npm in workflows (`npm install -g @github/copilot`)
+- Runs in programmatic mode (`copilot -p "prompt"`) — non-interactive, suitable for CI/CD
+- Requires fine-grained PAT with "Copilot Requests" permission
+- Can access repository context (git log, files) from workflow workspace
+- Output can be captured and posted to issues, PRs, or Teams channels
+
+**Strategic Opportunities for Squad**:
+1. **Replace/Supplement ralph-watch.ps1**: Move polling from local script → scheduled GitHub Actions workflow (always online, no devbox dependency)
+2. **Event-Driven Squad Sessions**: Trigger automation on GitHub events (PR opened, issue labeled) with Copilot-generated context
+3. **AI-Enhanced Operations**: Use Copilot CLI for issue triage (analysis → Squad CLI execution), PR review summarization, changelog generation
+4. **Complementary to Self-Hosted Runner**: Copilot CLI runs on GitHub-hosted runners (always available); Squad CLI executes on self-hosted runner based on AI context
+
+**Complementary Architecture**:
+```
+GitHub Event (PR opened)
+  ↓
+[GitHub-hosted runner] Copilot CLI generates context + analysis
+  ↓
+[Self-hosted runner] Squad CLI executes triage/branch/PR based on AI context
+```
+
+**Enterprise Applicability**:
+- ✅ Prerequisites: Copilot subscription, fine-grained PAT, GitHub Actions (all present)
+- ⚠️ EMU Requirement: Copilot CLI policy must be enabled in org settings (action item: verify with admin)
+- ✅ Authentication: Fine-grained PAT only; no org-seat passthrough but covered by Copilot plan
+- ✅ Limitations manageable: Non-deterministic output (mitigated with structured prompts), scope limited to repo content (can prefetch via API)
+
+**Recommended 3-Phase Approach**:
+1. **Phase 1 (PoC, this week)**: Test Copilot CLI in workflow (30 min effort, low risk)
+2. **Phase 2 (Integration, 1-2 days)**: Replace ralph-watch.ps1 polling with scheduled Copilot CLI context generation
+3. **Phase 3 (Scaling, 2-3 days)**: Event-driven automation for PR/issue analysis, changelog generation
+
+**Not a Blocker**: Existing self-hosted runner (Issue #28) and ralph-watch.ps1 can continue operating; Copilot CLI is an enhancement layer, not a mandatory replacement.
+
+**Deliverable**: Comprehensive evaluation posted to [Issue #39](https://github.com/tamirdresher_microsoft/tamresearch1/issues/39#issuecomment-4016947391) with:
+- Feature breakdown and use cases
+- 4 strategic opportunities mapped to Squad workflows
+- Comparison matrix: Copilot CLI vs. self-hosted runner
+- Enterprise applicability assessment (EMU policy verification required)
+- 5 identified limitations with mitigation strategies
+- 3-phase integration roadmap with effort/risk estimates
+- Blockers and dependencies
+- Recommended immediate action items
+
+**Procedural Insight**:
+Copilot CLI and self-hosted runners are complementary tools, not alternatives. The former provides intelligence/analysis (always-available GitHub-hosted runners), the latter provides trusted execution (private devbox). Combined, they enable distributed Squad automation: AI context generation decoupled from workflow execution. This reduces polling dependencies and enables real-time GitHub event integration.
+
+**Next Steps**: 
+- Await Tamir's decision on proceeding with Phase 1 PoC
+- EMU policy verification required before implementation
+- No blocking impact on existing Squad workflows or Issue #28 runner
+
 **Key Learning**:
 Self-hosted runners are the pragmatic unblocking path for org-level runner restrictions. For private repositories with trusted code, local machine (testing) + devbox (production) is a solid incremental adoption strategy. Security risks are manageable with proper scoping (private repos only), network isolation, and regular updates. The 15-minute setup time is far less than the time spent waiting for org-level runner policy changes.
 

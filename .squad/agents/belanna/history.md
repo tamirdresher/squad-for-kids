@@ -735,3 +735,87 @@ Kubernetes-inspired patterns (reconciliation, desired-state, scheduler) are powe
 - Monitor #29 for Tamir feedback and refine mitigations if needed
 
 ---
+
+### 2026-03-07: Issue #63 — DevBox Provisioning Phase 2 (Squad Skill)
+
+**Task:** Build Squad skill for natural language DevBox provisioning, enabling requests like "Create 3 devboxes like mine" to trigger automated provisioning using Phase 1 infrastructure.
+
+**Background:** Phase 1 (Issue #35, PR #61) delivered Bicep templates and PowerShell scripts for DevBox provisioning. Phase 2 adds natural language interpretation layer to abstract Azure CLI complexity from end users.
+
+**Deliverables:**
+
+1. **Squad Skill** (.squad/skills/devbox-provisioning/SKILL.md):
+   - Natural language pattern matching for common provisioning requests
+   - Configuration auto-detection workflow (Azure CLI queries)
+   - Validation patterns: auth, extension, naming, uniqueness, quota
+   - Error handling for 7 common failure modes
+   - Integration guidance for Squad coordinator
+
+2. **Bulk Provisioning Script** (devbox-provisioning/scripts/bulk-provision.ps1):
+   - Team environment provisioning (1-20 DevBoxes)
+   - Parallel execution (up to 5 concurrent) or sequential mode
+   - Auto-generated naming with prefix patterns
+   - Job-based concurrency management with batch coordination
+   - Progress tracking and per-DevBox status reporting
+
+3. **Documentation Updates** (devbox-provisioning/README.md):
+   - Phase 2 usage section with natural language examples
+   - Script reference for bulk-provision.ps1
+   - Roadmap updated to show Phase 2 complete
+
+**Architecture Decisions:**
+
+1. **Natural Language Patterns:**
+   - Single DevBox: "Create devbox X" → provision.ps1 -DevBoxName "X"
+   - Clone: "Clone my devbox as X" → clone-devbox.ps1 -NewDevBoxName "X"
+   - Bulk: "Create N devboxes like mine" → Loop clone-devbox.ps1 with name generation
+   - Discovery: "What's my devbox config?" → Azure CLI queries
+
+2. **Configuration Capture:**
+   - Auto-detect existing DevBox: z devcenter dev dev-box list --output json
+   - Extract: devCenterName, projectName, poolName, hardware/image metadata
+   - Validate before provisioning: auth, extension, permissions, naming, quota
+
+3. **Bulk Provisioning Strategy:**
+   - Default: Parallel execution (5 concurrent) for speed
+   - Sequential mode: Available for quota-constrained environments
+   - Name generation: {prefix}-001, {prefix}-002, etc. (zero-padded 3 digits)
+   - Job-based concurrency: PowerShell Start-Job with batch coordination
+   - Per-DevBox tracking: Success/failure status with error details
+
+4. **Error Handling Patterns:**
+   - Authentication failure → Prompt z login
+   - Extension missing → Auto-install z extension add --name devcenter
+   - Invalid name → Suggest valid pattern, prompt correction
+   - Name conflict → Suggest alternative (timestamp/counter)
+   - Quota exceeded → List existing, suggest cleanup
+   - Pool unavailable → List available pools
+   - Provisioning timeout → Provide status check command
+
+5. **Integration Model:**
+   - Skill bridges natural language (user) and technical automation (Phase 1 scripts)
+   - Squad coordinator identifies provisioning intent → invokes skill agent
+   - Skill agent parses request → validates → executes Phase 1 scripts
+   - Results reported in human terms (no Azure CLI output exposure)
+
+**Key Files:**
+- .squad/skills/devbox-provisioning/SKILL.md — 11KB, natural language patterns + validation/error handling
+- devbox-provisioning/scripts/bulk-provision.ps1 — 12KB, team provisioning orchestration
+- devbox-provisioning/README.md — Updated with Phase 2 usage section
+
+**PR #64:** https://github.com/tamirdresher_microsoft/tamresearch1/pull/64
+
+**Pattern Learned:** Phase 2 skills abstract technical complexity:
+1. **Natural language layer:** Map common user phrases to script invocations
+2. **Validation before execution:** Check all preconditions (auth, extension, quota) before calling backend
+3. **Error interpretation:** Translate Azure CLI errors to human-actionable guidance
+4. **Bulk orchestration:** Job-based concurrency for scale (parallel) vs. safety (sequential)
+5. **Backend reuse:** Phase 2 builds on Phase 1 scripts — no duplication, pure orchestration
+
+**Technical Insight:** Squad skills are "orchestration blueprints" — they don't execute directly, they guide the Squad coordinator on how to interpret requests and sequence existing automation. The skill is the contract between user intent and infrastructure execution.
+
+**Phase 3 Roadmap:**
+- MCP Server integration (@microsoft/devbox-mcp) for real-time DevBox status
+- Advanced templating: custom images, network configs, security policies
+- Cost optimization: auto-hibernation schedules based on usage patterns
+- CI/CD integration: ephemeral DevBoxes triggered by PR creation

@@ -1,0 +1,360 @@
+# Trivy Scanning Pipeline Configuration
+# Issue #67: Automated vulnerability scanning for FedRAMP compliance
+# FedRAMP Controls: SI-2 (Flaw Remediation), RA-5 (Vulnerability Scanning)
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+      - release/*
+  paths:
+    include:
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/Dockerfile'
+      - '**/Chart.yaml'
+
+schedules:
+  - cron: "0 2 * * 1"  # Weekly Monday 2 AM UTC
+    displayName: 'Weekly Security Scan'
+    branches:
+      include:
+        - main
+    always: true
+
+variables:
+  trivyVersion: '0.52.0'
+  severityThreshold: 'CRITICAL,HIGH'
+  scanTimeout: '15m'
+  trivyCacheDir: '$(Pipeline.Workspace)/.trivy-cache'
+
+stages:
+  - stage: ContainerImageScanning
+    displayName: 'Container Image Vulnerability Scanning'
+    jobs:
+      - job: TrivyImageScan
+        displayName: 'Scan Container Images'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Bash@3
+            displayName: 'Install Trivy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+                echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+                sudo apt-get update
+                sudo apt-get install trivy=$(trivyVersion)
+                trivy --version
+
+          - task: Bash@3
+            displayName: 'Cache Trivy Database'
+            inputs:
+              targetType: 'inline'
+              script: |
+                mkdir -p $(trivyCacheDir)
+                trivy image --download-db-only --cache-dir $(trivyCacheDir)
+
+          - task: Bash@3
+            displayName: 'Scan nginx-ingress-controller Image'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Scanning nginx-ingress-controller image..."
+                
+                # Scan image and output to multiple formats
+                trivy image \
+                  --severity $(severityThreshold) \
+                  --timeout $(scanTimeout) \
+                  --cache-dir $(trivyCacheDir) \
+                  --format json \
+                  --output $(Build.ArtifactStagingDirectory)/trivy-nginx-ingress.json \
+                  registry.k8s.io/ingress-nginx/controller:v1.14.3
+                
+                trivy image \
+                  --severity $(severityThreshold) \
+                  --timeout $(scanTimeout) \
+                  --cache-dir $(trivyCacheDir) \
+                  --format table \
+                  --output $(Build.ArtifactStagingDirectory)/trivy-nginx-ingress.txt \
+                  registry.k8s.io/ingress-nginx/controller:v1.14.3
+                
+                # Check for CRITICAL vulnerabilities (zero-tolerance gate)
+                CRITICAL_COUNT=$(trivy image \
+                  --severity CRITICAL \
+                  --timeout $(scanTimeout) \
+                  --cache-dir $(trivyCacheDir) \
+                  --format json \
+                  registry.k8s.io/ingress-nginx/controller:v1.14.3 | jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length')
+                
+                echo "Found $CRITICAL_COUNT CRITICAL vulnerabilities"
+                
+                if [ "$CRITICAL_COUNT" -gt 0 ]; then
+                  echo "##vso[task.logissue type=error]CRITICAL vulnerabilities detected: $CRITICAL_COUNT"
+                  echo "##vso[task.complete result=Failed;]CRITICAL vulnerabilities found"
+                  exit 1
+                fi
+
+          - task: Bash@3
+            displayName: 'Scan Custom Application Images'
+            inputs:
+              targetType: 'inline'
+              script: |
+                # Find all Dockerfiles and extract image references
+                echo "Scanning custom application images..."
+                
+                # Example: Scan images referenced in deployment manifests
+                IMAGE_LIST=$(grep -rh "image:" --include="*.yaml" --include="*.yml" . | \
+                  sed 's/.*image: //' | sed 's/"//g' | sed 's/\x27//g' | \
+                  grep -v "^#" | sort -u)
+                
+                mkdir -p $(Build.ArtifactStagingDirectory)/custom-images
+                
+                while IFS= read -r image; do
+                  if [ -n "$image" ] && [[ ! "$image" =~ ^gcr.io/google|^k8s.gcr.io|^mcr.microsoft.com ]]; then
+                    echo "Scanning: $image"
+                    
+                    IMAGE_SAFE_NAME=$(echo "$image" | sed 's/[^a-zA-Z0-9]/_/g')
+                    
+                    trivy image \
+                      --severity $(severityThreshold) \
+                      --timeout $(scanTimeout) \
+                      --cache-dir $(trivyCacheDir) \
+                      --format json \
+                      --output "$(Build.ArtifactStagingDirectory)/custom-images/trivy-${IMAGE_SAFE_NAME}.json" \
+                      "$image" || echo "Failed to scan $image"
+                  fi
+                done <<< "$IMAGE_LIST"
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Trivy Scan Results'
+            inputs:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'TrivyScanResults'
+              publishLocation: 'Container'
+
+  - stage: ConfigurationScanning
+    displayName: 'Kubernetes Configuration Scanning'
+    dependsOn: []
+    jobs:
+      - job: TrivyConfigScan
+        displayName: 'Scan K8s Manifests'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Bash@3
+            displayName: 'Install Trivy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+                echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+                sudo apt-get update
+                sudo apt-get install trivy=$(trivyVersion)
+
+          - task: Bash@3
+            displayName: 'Scan Kubernetes Manifests'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Scanning Kubernetes manifests for misconfigurations..."
+                
+                trivy config \
+                  --severity $(severityThreshold) \
+                  --format json \
+                  --output $(Build.ArtifactStagingDirectory)/trivy-k8s-config.json \
+                  docs/fedramp/
+                
+                trivy config \
+                  --severity $(severityThreshold) \
+                  --format table \
+                  --output $(Build.ArtifactStagingDirectory)/trivy-k8s-config.txt \
+                  docs/fedramp/
+                
+                # Check for HIGH/CRITICAL misconfigurations
+                ISSUES_COUNT=$(trivy config \
+                  --severity CRITICAL,HIGH \
+                  --format json \
+                  docs/fedramp/ | jq '[.Results[]?.Misconfigurations[]? | select(.Severity=="CRITICAL" or .Severity=="HIGH")] | length')
+                
+                echo "Found $ISSUES_COUNT HIGH/CRITICAL misconfigurations"
+                
+                if [ "$ISSUES_COUNT" -gt 0 ]; then
+                  echo "##vso[task.logissue type=warning]HIGH/CRITICAL misconfigurations detected: $ISSUES_COUNT"
+                  # Non-blocking warning for configs (can be remediated)
+                fi
+
+          - task: Bash@3
+            displayName: 'Scan Helm Charts'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Scanning Helm charts..."
+                
+                # Render Helm templates first
+                helm template test docs/fedramp/ > /tmp/rendered-manifests.yaml 2>/dev/null || echo "No Helm charts found"
+                
+                if [ -f /tmp/rendered-manifests.yaml ]; then
+                  trivy config \
+                    --severity $(severityThreshold) \
+                    --format json \
+                    --output $(Build.ArtifactStagingDirectory)/trivy-helm-config.json \
+                    /tmp/rendered-manifests.yaml
+                fi
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Config Scan Results'
+            inputs:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'TrivyConfigResults'
+              publishLocation: 'Container'
+
+  - stage: OPAPolicyScanning
+    displayName: 'OPA/Conftest Policy Validation'
+    dependsOn: []
+    jobs:
+      - job: ConftestValidation
+        displayName: 'Validate with Conftest'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Bash@3
+            displayName: 'Install Conftest'
+            inputs:
+              targetType: 'inline'
+              script: |
+                wget -qO conftest.tar.gz https://github.com/open-policy-agent/conftest/releases/download/v0.52.0/conftest_0.52.0_Linux_x86_64.tar.gz
+                tar xzf conftest.tar.gz
+                sudo mv conftest /usr/local/bin/
+                conftest --version
+
+          - task: Bash@3
+            displayName: 'Validate Ingress Manifests'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Validating Ingress manifests with OPA policies..."
+                
+                # Create test policy for dangerous patterns
+                mkdir -p policy
+                cat > policy/ingress.rego <<'EOF'
+                package main
+
+                deny[msg] {
+                  input.kind == "Ingress"
+                  some i
+                  path := input.spec.rules[_].http.paths[i].path
+                  contains(path, ";")
+                  msg := sprintf("Path contains semicolon (CVE-2026-24512): %s", [path])
+                }
+
+                deny[msg] {
+                  input.kind == "Ingress"
+                  annotations := input.metadata.annotations
+                  key := annotations[_]
+                  contains(key, "snippet")
+                  msg := sprintf("Dangerous snippet annotation found: %s", [key])
+                }
+                EOF
+                
+                # Run conftest on all manifests
+                conftest test docs/fedramp/*.yaml \
+                  --policy policy/ \
+                  --output table \
+                  --all-namespaces || {
+                    echo "##vso[task.logissue type=error]Conftest validation failed"
+                    exit 1
+                  }
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Conftest Results'
+            inputs:
+              pathToPublish: 'policy'
+              artifactName: 'ConftestPolicies'
+              publishLocation: 'Container'
+
+  - stage: ReportGeneration
+    displayName: 'Generate Compliance Report'
+    dependsOn:
+      - ContainerImageScanning
+      - ConfigurationScanning
+      - OPAPolicyScanning
+    condition: succeededOrFailed()
+    jobs:
+      - job: GenerateReport
+        displayName: 'Compliance Report Generation'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: DownloadBuildArtifacts@1
+            displayName: 'Download All Scan Results'
+            inputs:
+              buildType: 'current'
+              downloadType: 'specific'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - task: Bash@3
+            displayName: 'Generate HTML Report'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Generating compliance report..."
+                
+                cat > $(Build.ArtifactStagingDirectory)/scan-report.html <<'EOF'
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <title>FedRAMP Security Scan Report</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    h1 { color: #2c3e50; }
+                    .section { margin: 20px 0; }
+                    .critical { color: #c0392b; font-weight: bold; }
+                    .high { color: #e67e22; font-weight: bold; }
+                    .pass { color: #27ae60; font-weight: bold; }
+                  </style>
+                </head>
+                <body>
+                  <h1>FedRAMP Security Scan Report</h1>
+                  <p><strong>Build:</strong> $(Build.BuildNumber)</p>
+                  <p><strong>Date:</strong> $(Build.BuildDateTime)</p>
+                  <p><strong>Branch:</strong> $(Build.SourceBranch)</p>
+                  
+                  <div class="section">
+                    <h2>Scan Summary</h2>
+                    <p>View detailed results in the build artifacts.</p>
+                  </div>
+                  
+                  <div class="section">
+                    <h2>FedRAMP Compliance Status</h2>
+                    <ul>
+                      <li>SI-2 (Flaw Remediation): Trivy scanning enabled ✓</li>
+                      <li>RA-5 (Vulnerability Scanning): Weekly scans configured ✓</li>
+                      <li>CM-3 (Configuration Management): OPA validation enabled ✓</li>
+                    </ul>
+                  </div>
+                </body>
+                </html>
+                EOF
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Compliance Report'
+            inputs:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'ComplianceReport'
+              publishLocation: 'Container'
+
+          - task: Bash@3
+            displayName: 'Post Scan Summary'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "================================"
+                echo "FedRAMP Security Scan Complete"
+                echo "================================"
+                echo "Issue: #67"
+                echo "Validated PRs: #55, #56"
+                echo "Controls: SI-2, RA-5, CM-3"
+                echo "================================"

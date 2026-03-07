@@ -3601,3 +3601,157 @@ Implemented a Squad skill at .squad/skills/devbox-provisioning/SKILL.md that:
 
 **Status:** Decisions merged and deduplicated from inbox (2026-03-07T20:23:45Z)  
 **Scribe:** Final review and git commit pending.
+
+---
+# Decision: Follow-Up Triage for Merged PRs (March 7, 2026)
+
+**Date:** 2026-03-07  
+**Owner:** Picard (Lead)  
+**Context:** Work-check cycle — all 10 open PRs merged today. Analysis for follow-up issues requested.
+
+---
+
+## Decision
+
+**Create 3 follow-up issues** to drive next phases of work on DevBox automation, OpenCLAW adoption, and FedRAMP validation testing.
+
+---
+
+## Analysis
+
+### Merged PRs Summary (10 PRs closing 8 issues)
+
+| PR | Issue | Title | Status |
+|----|-------|-------|--------|
+| #64 | #63 | DevBox Provisioning Phase 2 | ✅ CLOSED |
+| #61 | #35 | DevBox Phase 1 infrastructure | ✅ CLOSED |
+| #60 | #42 | Patent claims draft | ⏳ OPEN (not closed by PR) |
+| #59 | #22 | Automated Digest Generator Phase 2 | ✅ CLOSED |
+| #57 | #23 | OpenCLAW Patterns (4 templates) | ✅ CLOSED |
+| #55 | #54 | FedRAMP Compensating Controls — Infrastructure | ✅ CLOSED |
+| #56 | #54 | FedRAMP Compensating Controls — Security | ✅ CLOSED |
+| #53 | #51 | nginx-ingress Security Assessment | ✅ CLOSED |
+| #52 | #50 | NodeStuck Istio Exclusion | ✅ CLOSED |
+| #49 | #48 | Remove build artifacts + .gitignore | ✅ CLOSED |
+
+### Follow-Ups Identified
+
+#### 1. DevBox Phase 3: MCP Server Integration (Issue #65)
+
+**Trigger:** PR #64 explicitly states "Phase 3 will add MCP server integration and advanced templating."
+
+**Current State:** Phase 2 Squad Skill + PowerShell scripts operational.
+
+**Follow-Up Work:** Design + implement MCP server interface wrapping Phase 1/2 scripts. Enable integration with broader MCP ecosystem.
+
+**Owner:** B'Elanna (Infrastructure Expert)
+
+**Why:** Natural progression. Squad Skill is CLI-bound; MCP lifts it to protocol level, enabling integration with Teams, GitHub, other tools.
+
+**Actionability:** Clear deliverables (MCP interface, handlers, API docs, integration tests). Effort ~1-2 sprints.
+
+---
+
+#### 2. OpenCLAW Adoption: Integrate Templates into Workflows (Issue #66)
+
+**Trigger:** PR #57 delivered 4 production templates (QMD, Dream Routine, Issue-Triager, Memory Separation) but they are **inert without deployment into daily processes**.
+
+**Current State:** Templates exist in `.squad/scripts/`, but not yet automated into workflows.
+
+**Follow-Up Work:**
+- Weekly QMD digest extraction automation
+- Monday morning Dream Routine cross-digest analysis
+- Issue-Triager classification in channel-scan pipeline
+- Validation of memory-separation gitignore rules
+- Monitoring dashboard for extraction metrics
+
+**Owner:** Seven (Research & Learning)
+
+**Why:** High-effort infrastructure (Phase 2) deserves high-effort adoption. Patterns are proven but deployment requires systematic integration. Worth 2-3 sprints for long-term learning system value.
+
+**Actionability:** Phased rollout plan included (QMD → Issue-Triager → Dream Routine). Success criteria defined.
+
+---
+
+#### 3. FedRAMP Controls Validation Testing (Issue #67)
+
+**Trigger:** PR #55 + PR #56 delivered defense-in-depth controls (Network Policies, WAF, OPA, CI/CD scanning) but explicit validation needed before production deployment.
+
+**Current State:** Code merged; no cluster testing conducted yet. Runbook drafted but not executed.
+
+**Follow-Up Work:**
+- Network Policy testing on STG (routing, isolation, SLA impact)
+- WAF rule validation (attack simulation, false positive rates)
+- OPA/Gatekeeper policy testing (violations caught, audit logging)
+- Runbook dry-run on STG (4-phase emergency patching)
+- Load testing for performance regression
+
+**Owner:** Worf (Security & Cloud) + B'Elanna (Infrastructure)
+
+**Why:** P1 compliance requirement. Before sovereign/gov cluster rollout, validation mandatory. Failure here cascades to broader DK8S FedRAMP posture.
+
+**Actionability:** Explicit test plan included. Success metrics defined (zero regressions, all controls validated, runbook verified).
+
+---
+
+## Non-Follow-Ups
+
+- **Issue #48 (gitignore):** Complete; no follow-up needed.
+- **Issue #22, #51, #50, #35, #63:** Completed successfully; no natural follow-ups.
+- **Issue #42 (patent):** Still open; separate from merge cycle.
+- **NodeStuck Istio Exclusion (#50):** Deployment target was 48 hours; validation plan embedded in PR. Monitoring by ops, not a new issue.
+
+---
+
+## Decision Rationale
+
+1. **Phase Gates:** Look for Phase 2→3 transitions. DevBox and Digest both have explicit phase roadmaps; follow-ups represent designed-in next steps.
+
+2. **Template → Deployment Gap:** OpenCLAW templates are high-effort research output. Worth systematic adoption planning rather than ad-hoc integration.
+
+3. **Code → Validation Gap:** FedRAMP is compliance-critical. Merged code without cluster validation is liability. Validation issue captures that gate clearly.
+
+4. **No Duplication:** Verified against existing open issues (#62, #46, #44, #42, #41, #29, #26, #25, #19, #17). No overlap.
+
+5. **Reasonable Volume:** 3 follow-ups = progress acknowledgment + forward momentum. Not overwhelming; each is 1-3 sprints.
+
+---
+
+## Execution
+
+**Issues Created (auto):**
+- #65: DevBox Phase 3 (Owner: B'Elanna)
+- #66: OpenCLAW Adoption (Owner: Seven)
+- #67: FedRAMP Validation (Owner: Worf + B'Elanna)
+
+**Next Steps:**
+- Monitor issue reactions from agents
+- Ensure no blocker cascades from these being open (they're *additions*, not blockages)
+- Review progress on issues #65, #66, #67 in next work-check
+
+---
+
+## Alternatives Considered
+
+1. **Zero follow-ups:** "Everything is done; nothing needs to happen." Rejected. Phase 2→3 transitions are real work. Learning system adoption needs systematization. Compliance validation can't be skipped.
+
+2. **Five follow-ups:** Add "Digest Generator Phase 3" (integration with workflows) and "NodeStuck Monitoring" (track exclusion effectiveness). Rejected. Digest is already covered by OpenCLAW adoption. NodeStuck monitoring belongs in ops runbook, not a new issue.
+
+3. **Document-only follow-ups:** Create decision docs without GitHub issues. Rejected. Issues in GitHub create visibility, assign ownership, surface blockers, enable progress tracking. Decisions docs alone are inert.
+
+---
+
+## Related Decisions
+
+- Decision 19: DevBox Provisioning Architecture (Issue #35) — sets foundation
+- Decision 8: Adopt OpenCLAW Production Patterns (Issue #23) — templates exist, now adoption
+- Decision 6: FedRAMP Compensating Controls (Issue #54) — code exists, now validation
+
+---
+
+## Metrics
+
+- **Cycle Time:** Follow-ups created same day as PR merge (hours, not days)
+- **Quality:** Each issue has clear owner, acceptance criteria, effort estimate, success metrics
+- **Coverage:** 3 follow-ups × 3 large PRs = reasonable signal-to-noise
+

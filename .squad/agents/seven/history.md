@@ -1185,3 +1185,44 @@ Based on analysis of DK8S platform workflows, stability patterns, and ConfigGen 
 - Key blocker: Co-inventor list finalization + public disclosure confirmation (must be completed before submission, cannot be changed after)
 
 **Team Learning:** Patent filing at Microsoft is highly accessible and well-supported. Main risk is process/procedural (missing co-inventors, premature disclosure) rather than technical. Tamir has all materials ready (PATENT_CLAIMS_DRAFT.md, supporting research). Next milestone: Tamir clarifies inventorship and public disclosure status, then submits via Anaqua portal.
+
+---
+
+### 2026-03-11: Issue #66 — OpenCLAW Adoption: Implementation Planning & Documentation
+
+**Task:** Create implementation plan for integrating four production-ready OpenCLAW templates (QMD, Dream Routine, Issue-Triager, Memory Separation) from PR #57 into Squad's operational workflows.
+
+**Outcome:** Delivered comprehensive implementation documentation with three-phase roadmap, memory tier enforcement, and monitoring baseline.
+
+**Artifacts:**
+- .squad/implementations/66-openclaw-adoption.md (16.1K) — Full three-phase roadmap, tasks, acceptance criteria
+- .squad/.gitignore-rules.md (10.6K) — Three-tier architecture, verification scripts, audit procedures
+- .squad/.gitignore — Enforces Tier 1 raw files not committed
+- .squad/monitoring/66-metrics.jsonl — Baseline for metrics collection
+- GitHub PR #68: OpenCLAW Adoption implementation plan
+
+**Key Design Decisions:**
+1. Three-tier memory architecture: Tier 1 (Transaction/Gitignored), Tier 2 (Operational/Committed), Tier 3 (Permanent/Committed)
+2. QMD extraction: Weekly Sundays 22:00 UTC with 5-category KEEP/DROP
+3. Dream Routine: Weekly Mondays 08:00 UTC analyzing last 4 QMD digests
+4. Issue-Triager: 3-dimension priority scoring (blast radius, time sensitivity, reversibility) reducing false positives
+5. Acceptance criteria: At least 2 weeks of QMD digests collected (implies 2 successful runs)
+
+**Key Learnings:**
+- Three-tier enforcement is organizational (process discipline) not just technical (.gitignore)
+- LLM classification needs guardrails: 3-dimension scoring beats keyword-only priority
+- Dream Routine requires minimum 2 QMD digests; marks "Low confidence" if <3
+- Memory separation is enabling infrastructure for reliable pattern analysis
+- Infrastructure (tiers) must precede automation; automation can be added incrementally
+
+**Status:**
+- ✅ Implementation plan created and committed (PR #68)
+- 🚧 Phase 1 (Memory separation, QMD baseline) — ready to execute
+- 🚧 Phase 2 (Dream Routine, Issue-Triager) — blocked on Phase 1 completion
+- 🚧 Phase 3 (Monitoring) — blocked on Phase 2 completion
+
+**Next Steps:**
+- Implement QMD extraction script (.squad/scripts/qmd-extract.ps1)
+- Create GitHub Actions workflows (qmd-weekly.yml, dream-routine.yml)
+- Integrate Issue-Triager into channel-scan workflow
+- Collect first 2 weeks of QMD digests to meet Issue #66 acceptance criteria

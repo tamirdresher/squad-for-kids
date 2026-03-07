@@ -10,6 +10,58 @@
 
 ## Learnings
 
+### 2026-03-06: FedRAMP P0 nginx-ingress-controller Vulnerability Assessment (Issue #51)
+
+**Context:** Emergency security assessment of nginx-ingress-heartbeat vulnerabilities in DK8S government cloud deployments following STG-EUS2-28 incident (Issue #46).
+
+**Vulnerability:** CVE-2026-24512 (CVSS 8.8, HIGH)
+- **Attack Vector:** Arbitrary nginx configuration injection via Ingress `rules.http.paths.path` field
+- **Impact:** Remote code execution in controller pod → cluster-wide secrets exfiltration → full cluster compromise
+- **Affected Versions:** ingress-nginx < v1.13.7, < v1.14.3
+- **Additional Threats:** CVE-2025-1974 (RCE), CVE-2026-24514 (DoS), unauthenticated heartbeat endpoint exposure
+
+**DK8S Security Posture Analysis:**
+- **CRITICAL FINDING:** Zero effective compensating controls exist
+  - Network Policies: NOT IMPLEMENTED (Finding #5, planned H2 2026)
+  - WAF Protection: NOT DEPLOYED (Finding #2, planned Q1 2026)
+  - OPA/Rego Validation: NOT IMPLEMENTED (Finding #3, planned Q2 2026)
+  - Admission Controller: Istio label validation only, does NOT validate Ingress security
+- **Risk Assessment:** UNACCEPTABLE — Multi-tenant platform (19 tenants) with potential for tenant Ingress creation = immediate exploitation path if RBAC misconfigured
+- **Exploitability:** HIGH — Without Network Policies, any compromised pod can reach ingress-controller; without OPA validation, malicious Ingress resources are possible
+
+**Decision:** IMMEDIATE EMERGENCY PATCH REQUIRED
+- **Action:** Upgrade ingress-nginx to v1.13.7+ or v1.14.3+ within 24h
+- **Rationale:** FedRAMP P0 compliance requires < 24h remediation; risk acceptance NOT viable without defense-in-depth layers
+- **Rejected Alternatives:**
+  - Rollback: All older versions vulnerable; non-compliant
+  - WAF mitigation only: Insufficient timeline + does not address internal lateral movement
+  - Admission controller only: Insufficient timeline + does not eliminate CVE
+
+**Implementation Plan:**
+1. **Phase 1 (0-24h):** Progressive ring deployment (Test → PPE → Prod → Sovereign)
+2. **Phase 2 (24-48h):** Compensating controls for sovereign cloud lag (OPA emergency policy, RBAC audit, monitoring)
+3. **Phase 3 (Q1-Q2 2026):** Defense-in-depth layers (WAF, OPA/Rego, Network Policies)
+
+**Security Principles Applied:**
+- **Paranoid by Design:** Assume vulnerability exists until proven otherwise (version not documented)
+- **Zero Trust:** No single control failure should enable breach; patch eliminates root cause
+- **Defense-in-Depth Urgency:** Single CVE becomes P0 incident when compensating controls absent
+- **Compliance First:** FedRAMP timeline non-negotiable; risk acceptance requires compensating controls
+
+**Learnings:**
+1. **Consequence of delayed security controls:** Findings #2 (WAF), #3 (OPA), #5 (Network Policies) all planned Q1-H2 2026; consequence = single CVE becomes critical incident with no mitigation options except emergency patch
+2. **Multi-tenancy amplifies risk:** Tenant Ingress creation capability transforms infrastructure CVE into tenant-exploitable vulnerability
+3. **FedRAMP compliance is forcing function:** < 24h remediation timeline eliminates "monitor and defer" options; must patch or implement compensating controls immediately
+4. **Admission controllers must validate security, not just functionality:** Current Istio admission controller validates mesh injection labels but ignores Ingress path injection vectors
+5. **Documentation gaps are security gaps:** Unknown nginx-ingress version = cannot assess exposure; infrastructure component versioning must be tracked and auditable
+
+**Artifacts:**
+- Full assessment: `FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md`
+- Decision document: `.squad/decisions/inbox/worf-fedramp-nginx.md`
+- GitHub issue comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/51#issuecomment-4017088682
+
+---
+
 ### 2026-03-05: Squad Places Community Intelligence — Multi-Agent Architecture & Security Patterns
 
 **Context:** Engaged with Squad Places (AI squad social network) community across 7 squads discussing production-grade multi-agent system patterns. Platform hosts 38 artifacts from 7 squads discussing patterns, decisions, and lessons learned.

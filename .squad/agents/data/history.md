@@ -647,6 +647,65 @@ GitHub Event (PR opened)
 - ✅ Prerequisites: Copilot subscription, fine-grained PAT, GitHub Actions (all present)
 - ⚠️ EMU Requirement: Copilot CLI policy must be enabled in org settings (action item: verify with admin)
 - ✅ Authentication: Fine-grained PAT only; no org-seat passthrough but covered by Copilot plan
+
+---
+
+### 2026-03-07T19:30:00Z: Copilot CLI + Actions Integration Review (Issue #39) & Squad Visibility Tools (Issue #40)
+
+**Task**: Evaluate two architectural decisions for squad automation:
+1. GitHub Copilot CLI + Actions integration for AI-assisted automation
+2. Squad visibility/monitoring tool selection
+
+**Issue #39 — Copilot CLI + GitHub Actions Integration**
+
+**What I Found**:
+- Tamir had already completed a comprehensive evaluation with detailed recommendations
+- The analysis covered: core capabilities, squad benefits, integration approach, blockers, prerequisites
+- Recommendation: proceed with three-phase rollout (PoC → integration → event-driven)
+- User approval: "cool let's do it"
+
+**Key Strategic Insight**: Copilot CLI + Actions is **complementary** (not competing) with the self-hosted runner:
+- Self-hosted runner = execution environment (runs Squad workflows, CI/CD tests)
+- Copilot CLI = intelligence layer (generates context, makes AI-assisted decisions)
+- Architecture: `GitHub Event → Copilot CLI (context generation) → Self-Hosted Runner (Squad execution)`
+
+**My Role**: 
+- Consolidated findings into actionable status update
+- Confirmed prerequisites (policy check, fine-grained PAT, PoC validation)
+- Prepared implementation roadmap for squad team approval
+- Status: Moved from "pending-user" to ready-for-implementation
+
+**Issue #40 — Squad Activity Visibility Tool**
+
+**What I Found**:
+- Existing tools: EditLess (VS Code extension), SquadUI (VS Code + Aspire), Squad CLI commands
+- Gap: No terminal-based, real-time activity viewer
+- Three solutions proposed:
+  1. PowerShell script (2-3 hours, terminal-based, zero dependencies)
+  2. Node.js web dashboard (4-6 hours, browser UI, higher maintenance)
+  3. Squad CLI extension (upstream proposal to Brady Gaster)
+
+**User Feedback**: "Use C# with dotnet 10 single-file app instead of PowerShell"
+
+**My Approach**:
+- Redesigned Solution 1 to use C# 13 (single-file console app)
+- Tech stack: Spectre.Console (beautiful tables), System.Text.Json (parsing), dotnet run
+- Usage: `dotnet run -- --interval 5 --refresh` from `.squad/tools/squad-monitor/`
+- Confirmed requirements before implementation (orchestration log format, filtering, archival)
+
+**Key Pattern Learned**:
+- User preferences drive tool selection: "C# over PowerShell" signals enterprise readiness, type safety, and familiarity
+- Single-file apps (.NET 10+) eliminate project setup friction
+- Spectre.Console is the modern replacement for Console.WriteLine in .NET
+
+**Deliverables**:
+- [Issue #39](https://github.com/tamirdresher_microsoft/tamresearch1/issues/39#issuecomment-4016985429): Status update + prerequisites checklist
+- [Issue #40](https://github.com/tamirdresher_microsoft/tamresearch1/issues/40#issuecomment-4016985697): C# implementation plan + scope confirmation
+- Updated issue labels: #39 removed "status:pending-user"; #40 marked "status:in-progress"
+
+**Next Steps**:
+- #39: Await org-level Copilot CLI policy verification, then begin PoC workflow
+- #40: Await scope confirmation on orchestration log format + filtering options, then build C# tool
 - ✅ Limitations manageable: Non-deterministic output (mitigated with structured prompts), scope limited to repo content (can prefetch via API)
 
 **Recommended 3-Phase Approach**:
@@ -847,3 +906,53 @@ When evaluating automation approaches, distinguish between technical limitations
 
 **Technical Note**: The runner is configured for the specific repo (not org-level), so it only picks up jobs from 	amirdresher_microsoft/tamresearch1. This is the correct setup for a devbox runner.
 
+
+---
+
+## 2026-03-07T23:45:00Z: Status Update — Issues #14, #15, #18
+
+### Issue #14: ADO Integration Test ✅ COMPLETE
+**Finding:** ADO integration core functionality is solid. 10/13 tests passed. 3 bugs identified (not blockers):
+1. Squad init generates GitHub workflows in ADO repos (should skip or generate Azure Pipelines YAML)
+2. No ADO platform indicator in generated config (platform detection exists in SDK, init just doesn't use it)
+3. MCP template references Trello (stale, should be ADO/generic)
+
+WDATP project restrictions caused 3 blocked tests (expected — custom locked-down work item types, not Squad bugs).
+
+**Assessment:** Production-ready for core workflows (repo, branch, PR, commit ops). Recommend fixing init/config issues before GA.
+
+### Issue #15: Ralph Persistent Loop ✅ OPERATIONAL  
+**Status:** ralph-watch.ps1 v6 is running hourly with state tracking and team notifications.
+
+**Recent Improvements (Picard Review):**
+- Added structured JSON logging (.ralph-log.jsonl) with audit trail
+- Added metrics tracking (.ralph-metrics.json) with uptime %, round duration, last success time
+- Captured round output to both console and log file
+
+**Gaps Identified (Medium-effort, next sprint):**
+- Doesn't detect PR comments yet (only issue comments)
+- Missing state change detection (open/closed, labels, assignments)
+- No exponential backoff for transient failures
+- No external health check endpoint
+
+**Assessment:** Core hourly loop is solid. Logging now provides visibility. Recommend 1-2 weeks monitoring with new telemetry, then assess if additional coverage (PR comments, state changes) is needed.
+
+### Issue #18: Two-Way Teams Integration ✅ SOLUTION DESIGNED
+**Finding:** Core two-way communication achievable today via WorkIQ polling — no new infrastructure required.
+
+**Implemented:** .squad/skills/teams-monitor/SKILL.md
+- Teaches agents to poll WorkIQ for Teams messages
+- Filters for actionable items
+- Creates GitHub issues from Teams requests (tagged #teams-bridge)
+- Deduplicates
+- Integrates into Ralph hourly loop
+
+**Phase 2 Enhancement Options (deferred):**
+- Power Automate Flow (2-3 hours) — Teams msg → GitHub with Adaptive Cards
+- Teams Incoming Webhooks (1-2 hours) — Rich formatting
+- Teams Bot Framework (2-4 weeks) — Full conversational bot
+
+**Assessment:** Polling-based two-way bridge is ready. No blocker. Push notifications can be added if polling latency becomes issue. Recommend 2-week trial before investing in Phase 2.
+
+### Summary
+All three issues have clear status and next steps. ADO integration is tested, Ralph loop is monitoring with new telemetry, Teams integration has working polling solution ready to deploy.

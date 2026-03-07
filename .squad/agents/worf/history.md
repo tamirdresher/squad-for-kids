@@ -389,3 +389,85 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 - Issue #26 comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/26
 - fleet-manager-security-analysis.md (20+ page security assessment)
 - fleet-manager-evaluation.md (architecture & feature-fit)
+
+---
+
+## 2026-03-07: Issue #26 Technical Deep Dive — FIC Automation Gaps & Fleet Manager Blocker
+
+**Context:** Tamir requested comprehensive technical analysis of Workload Identity / FIC automation as Fleet Manager prerequisite. Previous comment provided stakeholder mapping; this analysis adds technical depth.
+
+**Deliverable:** Posted comprehensive comment (11KB) to Issue #26 covering:
+
+### Technical Analysis Delivered:
+
+1. **What is Workload Identity / FIC?**
+   - Eliminated NMI (AAD Pod Identity DaemonSet)
+   - OIDC issuer (cluster-specific virtual identity) → Entra ID trust
+   - FIC = trust relationship configuration (issuer + subject + audience + managed identity)
+   - Pod exchanges Kubernetes token for Azure token via FIC
+
+2. **Scaling Ceiling: 20 FIC per UAMI Hard Limit**
+   - Entra ID policy: Each UAMI can contain max 20 FICs
+   - DK8S with 50+ clusters + multi-tenant = rapid ceiling collision
+   - Current workaround: Identity Bindings (Private Preview) removes ceiling but is cluster-specific
+   - Pain point: Teams create duplicate UAMIs with identical permissions (identity sprawl)
+
+3. **Four Automation Options + Gaps:**
+   - **Azure SDK/Graph API**: Cannot pre-create FICs before cluster OIDC issuer exists; mutable issuer risk; no rollback on batch failures
+   - **Terraform**: State drift if issuer URL changes; ordering hazard if FIC created before issuer is live; no multi-cluster orchestration
+   - **Bicep**: Still requires cluster to exist first; no validation of issuer URLs
+   - **ConfigGen**: Cannot safely automate FIC creation because OIDC issuer is mutable; identity sprawl if cluster replaced
+
+4. **Fleet Manager as Blocker:**
+   - Fleet orchestrates workload migration across clusters
+   - Each cluster has different OIDC issuer URL
+   - When workload moves A→B, needs FIC for B's issuer or loses Azure access (R-SEC-05 CRITICAL)
+   - Fleet & Identity Bindings "unaware of each other by design" (Shashank Barsin quote)
+   - Manual coordination required = not safe at scale
+
+5. **Design Gap Identified:**
+   - Fleet adds cluster to fleet → No automatic FIC/binding provisioning
+   - Workload migrates → No pre-check that target FIC exists
+   - Cluster removed → No cleanup of stale identity relationships
+   - **Implication:** All four automation options fail without explicit orchestration
+
+6. **Five Immediate Security Mitigations:**
+   - M6: Pre-provision FICs for all target clusters
+   - M7: Automated FIC lifecycle tracking
+   - M15: Pre-flight validation (verify FIC + test token before migration)
+   - M16: Rollback strategy (never delete source FIC until target validated)
+   - M17: Zero-trust FIC scope (exact namespace + SA, no wildcards)
+
+7. **Recommended Path Forward:**
+   - **Short term (2-3 weeks):** Pre-flight tool + bulk provisioning script + audit logging
+   - **Medium term:** Joint design meeting (Fleet PMs + Identity Bindings PMs + Entra ID FIC team)
+   - **Long term (3-6 months):** Platform solution with Fleet-aware identity binding
+
+### Key Findings:
+
+- ✅ **Solvable at scale** but requires platform-level coordination
+- ⚠️ **Immediate mitigations possible** but manual + requires discipline
+- 🔴 **First-order security concern** — DK8S is nation-state target; identity continuity failure = attack surface
+- 🔴 **Fleet adoption blocked** until one of: (1) mitigations implemented + operationalized, (2) platform solution ships
+
+### Strategic Insight:
+
+This blocker affects multiple adoption scenarios:
+- Fleet Manager (DK8S)
+- Karpenter (noted by IDP Leadership)
+- Customer workload migration (Lou Godmer validation)
+- Cross-cloud identity federation
+
+Using this cross-team impact in escalation helps get AKS/Entra buy-in for coordination meeting.
+
+### Issue Status:
+
+Applied `status:in-progress` — stakeholder mapping complete; technical analysis documented; immediate mitigations identified; awaiting platform team coordination.
+
+**Next Steps:**
+1. Tamir sends coordination email to AKS Fleet, Identity Bindings, Entra ID FIC teams (template provided in prior comment)
+2. DK8S implements M6, M7, M15 mitigations this sprint
+3. Schedule joint design discussion by end of sprint
+4. Monitor Identity Bindings GA roadmap for Fleet integration
+
+**Worf Assessment:** This is a well-defined problem with clear blockers and mitigations. The gap is not technology — it's explicit design separation between Fleet and Identity Bindings. Solving this requires one coordination meeting to align on "who owns identity provisioning during fleet operations."

@@ -12,6 +12,52 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-11: Infrastructure Issues Status Update — Issues #24, #25, #29, #35
+
+**Task:** Check status and provide updates on 4 assigned DK8S/infrastructure issues. Review current work, comment on progress, apply status labels.
+
+**Issues Processed:**
+
+1. **Issue #24 (Tier 1 Mitigations)**
+   - Status: Plan complete, ready for DK8S team execution
+   - Work found: Comprehensive implementation plan already posted with 4 mitigations scoped (N3, C1, O1, I1)
+   - Action: Posted status update noting readiness + asking for DK8S team owner assignments
+   - Label applied: `status:in-progress` (awaiting DK8S execution)
+   - Note: Tamir's comment "close this for now" suggests issue may be closing soon; recommend confirming after DK8S team confirms execution roadmap
+
+2. **Issue #25 (Tier 2 Planning)**
+   - Status: Comprehensive plan delivered
+   - Work found: Full Tier 2 improvement plan already posted with 4 items (N1, N2, C2, I2), effort estimates, timeline, dependencies
+   - Action: Posted follow-up status update confirming readiness + highlighting Tier 1 dependency
+   - Label applied: `status:in-progress` (awaiting refinement session scheduling)
+   - Coordination: Highlighted that C2 (Deployment Feedback Webhook) integrates with Issue #29 tactical recommendations
+
+3. **Issue #29 (Strategic Change Risk Mitigation)**
+   - Status: Tactical approach delivered; awaiting Tamir's prioritization
+   - Work found: Comprehensive 5-point automation strategy already posted (blast-radius analyzer, dependency tracking, sovereign canary, webhook, dependency CI check)
+   - Action: Posted concise status update highlighting engineer-friendly tooling + asking which tactic (sovereign canary vs. blast-radius analyzer) unlocks the most value first
+   - Label applied: `status:pending-user` (awaiting Tamir's tactical prioritization)
+   - Insight: This tactical layer bridges Tier 1-2 improvements + addresses Tamir's core concern (shift failures left)
+
+4. **Issue #35 (Devbox Provisioning)**
+   - Status: Investigation complete; ready for Phase 1 repo creation
+   - Work found: Previous investigation documented (DevBox MCP Server, Azure CLI devcenter extension, Bicep/ARM options)
+   - Action: Posted status update with two-phase approach (Phase 1: dedicated provisioning repo; Phase 2: Squad skill)
+   - Label applied: `status:pending-user` (awaiting Tamir's devbox specs: project name, pool name, image, custom config)
+   - Note: Tamir's earlier comment "any update? send me in teams" suggests he's ready to move forward; need specs to scaffold Phase 1 repo
+
+**Coordination Notes:**
+- Issue #24 → Issue #25: Tier 1 is blocker for Tier 2 (C1, O1, I1 must land first)
+- Issue #25 → Issue #29: C2 (Deployment Feedback Webhook) appears in both; suggest unified RFC
+- Issue #35: Independent; blocking on specs; ~2-3 days to deliver Phase 1 repo once specs confirmed
+
+**Recommendations:**
+1. Follow up with Tamir on Issue #29 prioritization (sovereign canary vs. blast-radius) — this tactical work should likely start *during* Tier 1 execution to maximize value
+2. Get Issue #35 devbox specs from Tamir; scaffold Phase 1 repo (quick win, unblocks Phase 2 skill work)
+3. Once Tier 1 DK8S owner assignments confirmed (Issue #24), update Tier 2 refinement session planning
+
+---
+
 ### 2026-03-09: Issue #25 — DK8S Stability Tier 2 High-Impact Improvements Plan
 
 **Task:** Plan Tier 2 (medium-effort, high-impact) DK8S stability improvements building on Tier 1 critical mitigations from Issue #24. Create a prioritized, actionable plan with effort estimates, timeline, and success criteria.

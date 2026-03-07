@@ -1838,3 +1838,200 @@ Phase 3: Skill Promotion (with Dream Routine + audit trail input)
 **Seven (Research & Docs Expert)**  
 **Ready to support implementation of any/all patterns.**
 
+
+---
+
+## Decision: Status Labels for Issue Visibility
+
+**Date:** 2026-03-07  
+**Decision Owner:** Picard  
+**Status:** Implemented
+
+
+
+**Date:** 2025-01-XX  
+**Decision Owner:** Picard  
+**Status:** Proposed
+
+## Problem
+Issue #43: User (Tamir) needs visibility into which issues the squad is actively working on vs. which are waiting for his input. Current approach lacks GitHub-native filtering/sorting.
+
+## Solution
+Implement four status labels to enable user-side filtering in GitHub issues interface:
+
+| Label | Color | Meaning |
+|-------|-------|---------|
+| `status:in-progress` | Yellow (#FBCA04) | Squad actively working |
+| `status:pending-user` | Purple (#7057FF) | Blocked waiting for user input/decision |
+| `status:done` | Green (#0E8A16) | Work complete, ready to close |
+| `status:blocked` | Red (#B60205) | Blocked on external dependency |
+
+## How It Works
+1. **Discoverability:** User can now filter in GitHub issues UI with `label:status:pending-user` or similar
+2. **Maintenance:** Squad updates labels as work progresses through stages
+3. **Mapping:** Applied retroactively based on deliverable presence:
+   - Issues with output files in repo → `status:pending-user` (waiting for feedback)
+   - Issues actively in progress → `status:in-progress`
+   - Issues with completed work → `status:done`
+   - Issues with blockers → `status:blocked`
+
+## Initial Application
+- **#42** (Patent Research) → `status:pending-user`
+- **#41** (Blog Draft) → `status:in-progress`
+- **#39** (Continuous Learning) → `status:pending-user`
+- **#35** (Research Report) → `status:pending-user`
+- **#33** (Teams Integration) → `status:done`
+- **#43** (This triage) → `status:in-progress`
+- Others without deliverables: No status (backlog)
+
+## Benefits
+- **User Control:** Tamir can see at a glance which issues need his action
+- **Squad Clarity:** Clear handoff points between squad work and user decisions
+- **GitHub Native:** No external tools required, works in standard GitHub issues interface
+- **Queryable:** Enables dashboards, automation, and reporting via label filters
+
+## Implementation Notes
+Labels created via `gh label create` with `--force` to allow updates.
+Squad responsible for maintaining accuracy as work progresses.
+
+
+---
+
+## Decision: Issue Status & Team-Relevant Findings
+
+**Date:** 2026-03-07  
+**Decision Owner:** Seven (Research & Docs)  
+**Status:** Needs Team Input
+
+
+
+**Date:** 2026-03-13  
+**Author:** Seven (Research & Docs)  
+**Status:** Needs Team Input  
+**Scope:** Team Priorities  
+
+---
+
+## Summary
+
+Completed status check on 4 assigned issues. Two require Tamir's decision; one needs clarification; one is blocked waiting for next action.
+
+---
+
+## Findings
+
+### Issue #42 — Patent Research (DECISION GATE)
+**Status:** Research Complete ✅ | Decision Required  
+
+**What's Ready for Tamir:**
+- Comprehensive prior art analysis (Squad vs NEC patent WO2025099499A1, CrewAI, MetaGPT, LangGraph, gitclaw)
+- Patent strategy recommendation: File narrow, defensible claims (Ralph monitoring + casting governance)
+- Risk assessment: Skip broad multi-agent claims (heavily prior-art'd)
+- Microsoft patent process documented with costs ($3-5K, all covered by Microsoft)
+
+**Decision Gate (Tamir Must Answer):**
+1. Inventorship: Who conceived Ralph monitoring, casting, git-state, drop-box patterns?
+2. Public disclosure: Has Squad already been mentioned in blog, GitHub, or presentations?
+3. gitclaw timeline: When did gitclaw development start vs Squad?
+4. Filing scope: US only or international?
+5. Strategic intent: Defensive (prevent copying) or offensive (monetization)?
+
+**Timing:** CRITICAL. If Squad disclosed publicly, 60-day grace period clock is running. File provisional patent BEFORE any public announcement.
+
+**Recommendation:** File this week if Tamir decides yes; then publish blog and announcements freely.
+
+---
+
+### Issue #41 — Blog Draft (REVIEW GATE)
+**Status:** Content Complete ✅ | Review Required  
+
+**What's Ready for Tamir:**
+- Full 2,500-word blog draft with 9 image placeholder descriptions
+- Narrative: Personal (I'm not organized) → Problem (tools fail) → Solution (AI Squad) → How It Works (examples) → Lessons → Try It Yourself
+- Includes real code (ralph-watch.ps1), real issues (#23, decision from Worf), real team structure
+- Engineer-appropriate tone: Systems thinking, not marketing speak
+
+**Decision Gate (Tamir Must Answer):**
+1. Content edits or revisions needed?
+2. Which sections resonate most with intended audience?
+3. Publication venue: Blog, Medium, dev.to, internal Microsoft channel?
+4. Timeline: Publish before or after patent filing?
+
+**Next Action:** Tamir reviews, provides feedback, decides publication timing.
+
+---
+
+### Issue #32 — OpenCLAW vs Squad (RESEARCH COMPLETE)
+**Status:** Finding Delivered ✅ | No Action Needed  
+
+**What We Learned:**
+- Squad is NOT reinventing the wheel; solving a different problem than OpenCLAW ecosystem
+- gitclaw is closest comparison (both git-native)
+- Squad's genuine differentiation: GitHub as work queue, persistent agent memory, decision ledger, casting/identity system, work monitor (Ralph)
+- Market positioning: Squad fills gap in "stateful team coordination with persistent memory"
+- No direct competitors; competes indirectly with CrewAI, AutoGPT, MetaGPT
+- Confidence: High (researched via web_search + framework site visits)
+
+**Use Case:** This finding directly supports patent filing strategy (narrow claims around unique elements like Ralph) and positioning for any future funding or partnerships.
+
+---
+
+### Issue #17 — Work-Claw Research (BLOCKED, NEEDS CONTEXT)
+**Status:** Waiting for Tamir  
+
+**What's Needed:**
+1. What is Work-Claw? (Microsoft-internal? External project? GitHub?)
+2. URL or access details?
+3. What specific aspects to research? (Capabilities vs Squad? Integration opportunities? Architecture comparison?)
+
+**Once Tamir provides context, I can deliver:**
+- Feature comparison vs Squad
+- Integration points and opportunities
+- Architectural alignment assessment
+- Recommendations for Squad enhancement
+
+---
+
+## Pattern Observation: Decision Gates as Team Health Signal
+
+The four issues follow a pattern:
+- **#42 (Patent)**: Research complete, waiting for strategic decision owner (Tamir)
+- **#41 (Blog)**: Content complete, waiting for editorial/publishing decision (Tamir)
+- **#32 (Framework)**: Question answered, findings available for architecture decisions
+- **#17 (Work-Claw)**: Stalled waiting for context and decision owner clarity
+
+**Insight:** Research/Docs work succeeds when decision ownership is explicit. When issues lack clear "decision owner" or "success criteria," work stalls.
+
+**Recommendation for Team:** Every GitHub issue should include:
+- [ ] Decision owner (who decides if work is done?)
+- [ ] Success criteria (what does done look like?)
+- [ ] Decision deadline (when is decision needed?)
+
+This pattern helps research work unblock business decisions rather than sit in "complete but unused" status.
+
+---
+
+## Next Steps
+
+**For Tamir:**
+1. Review #42 patent findings; answer the 5 clarification questions
+2. Review #41 blog draft; provide feedback
+3. Clarify what Work-Claw research is needed for #17
+4. Decide: Patent first, then publish? Or consult patent attorney first?
+
+**For Seven:**
+- Waiting on Tamir for all four issues
+- Can execute any follow-up research or writing based on Tamir's decisions
+- Will track issue progress in next status checkpoint
+
+**For Team:**
+- Patent research findings available for architectural/strategic decisions
+- Blog draft available for engineering culture messaging
+- OpenCLAW/Squad positioning available for competitive analysis
+
+---
+
+**Status:** Awaiting Tamir input on all four issues  
+**Confidence:** High (research complete where possible; blockers clearly identified)  
+**Timeline:** Ready to move forward immediately upon Tamir's input
+

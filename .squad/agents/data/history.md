@@ -345,6 +345,69 @@ When testing unreleased features, distinguish between (1) published package stat
 
 ---
 
+### 2026-03-07: Issue Status Checks & Status Updates (Batch Issues #1, #19, #22, #33)
+
+**Task**: Review completion status of assigned issues and provide status updates to Tamir via GitHub comments.
+
+**Issues Reviewed**:
+
+1. **Issue #33 — GitHub-Teams Integration Setup**
+   - **Status**: ✅ Script complete and functional
+   - **Finding**: \`setup-github-teams-integration.ps1\` exists, uses Microsoft Graph API correctly
+   - **Blockers**: OAuth flows (GitHub signin, subscribe) require manual interaction for security reasons
+   - **Outcome**: Commented with setup instructions; awaiting Tamir's Teams workspace details to complete execution
+   - **Label**: NOT marked pending-user (needs input to proceed)
+
+2. **Issue #19 — GitHub Notification Failures**
+   - **Status**: ✅ Root cause confirmed; recommendations valid
+   - **Finding**: Self-mention suppression (Squad uses Tamir's PAT → comments authored by tamirdresher_microsoft → GitHub won't notify on self-mentions)
+   - **Previous Work**: Repo subscription set, Playwright blocked by Chrome conflict
+   - **Latest Request**: Use Edge not Chrome
+   - **Analysis**: GitHub App (Option #2) is correct fix; GitHub Actions (his question) doesn't apply
+   - **Outcome**: Commented with refined analysis; awaiting Tamir's decision on GitHub App setup
+   - **Label**: NOT marked pending-user (architectural decision needed)
+
+3. **Issue #1 — Squad CLI 'upstream' Command Not Available**
+   - **Status**: ✅ Confirmed still broken; no newer versions available
+   - **Finding**: Version 0.8.20 is latest; \`upstream\` command never wired into CLI entry point (4-line fix needed in bradygaster/squad)
+   - **EMU Blocker**: Cannot file issue in bradygaster/squad (EMU policy restricts cross-org issue creation)
+   - **Latest Request**: "Check again; might be resolved in latest or insider"
+   - **Verification**: Confirmed \`squad --help\` shows no \`upstream\` command; no newer versions exist
+   - **Outcome**: Commented confirming issue still relevant; awaiting Tamir's manual PR filing or local workaround
+   - **Label**: NOT marked pending-user (blocked on external repo fix or Tamir action)
+
+4. **Issue #22 — Continuous Learning Phase 2: Automated Digest Generator**
+   - **Status**: ✅✅✅ COMPLETE — Delivered and verified
+   - **Finding**: \`.squad/scripts/generate-digest.ps1\` exists and fully functional
+   - **All Acceptance Criteria Met**:
+     - Prompt template: PowerShell implementation (deterministic)
+     - WorkIQ templates: Defined and documented
+     - Deduplication/rotation: Implemented and tested
+     - Automated digest: Tested daily/weekly generation successful
+   - **Testing**: Verified script execution with \`-Period daily\` flag; digest file generated successfully
+   - **Documentation**: Complete in \`.squad/digest-generator-design.md\` and \`DIGEST_GENERATOR_QUICKSTART.md\`
+   - **Outcome**: Commented with completion status; added \`status:pending-user\` label (ready for Tamir's review/deployment decision)
+   - **Label**: ✅ Marked pending-user (work complete, awaiting user review/acceptance)
+
+**Procedural Insights**:
+
+1. **Issue Status vs. Label Status**: Not all in-progress issues warrant "pending-user" label. Use it only when:
+   - Work is complete and awaiting user review
+   - Decision needed from user to proceed
+   - NOT for "awaiting external blockers" (Tamir's Teams workspace details, Squad repo PR merge, EMU policy changes)
+
+2. **GitHub Platform Constraints**: EMU accounts cannot file issues in non-EMU repos (bradygaster/squad). Plan for workaround: either Tamir files manually, or find alternative (fork locally and apply fix, open PR from personal account, etc.)
+
+3. **Self-Mention Suppression is Design**: GitHub's notification system isn't broken; it's working as designed. The fix requires architectural change (separate identity for Squad), not configuration change.
+
+4. **Digest Generator Signals**: The orchestration log warnings (unparseable files) are expected — the script gracefully falls back and still generates valid digests. This is correct behavior; not a bug.
+
+**Comments Posted**:
+- [#33](https://github.com/tamirdresher_microsoft/tamresearch1/issues/33#issuecomment-4016977653) — Setup status + next steps
+- [#19](https://github.com/tamirdresher_microsoft/tamresearch1/issues/19#issuecomment-4016978431) — Root cause confirmed, Option #3 not applicable (GitHub Actions can't help)
+- [#1](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1#issuecomment-4016979102) — Version check confirmed; issue still relevant
+- [#22](https://github.com/tamirdresher_microsoft/tamresearch1/issues/22#issuecomment-4016979589) — Completion confirmation
+
 ---
 
 ### 2026-03-07: GitHub-in-Teams Integration Setup Research (Issue #33)
@@ -584,6 +647,65 @@ GitHub Event (PR opened)
 - ✅ Prerequisites: Copilot subscription, fine-grained PAT, GitHub Actions (all present)
 - ⚠️ EMU Requirement: Copilot CLI policy must be enabled in org settings (action item: verify with admin)
 - ✅ Authentication: Fine-grained PAT only; no org-seat passthrough but covered by Copilot plan
+
+---
+
+### 2026-03-07T19:30:00Z: Copilot CLI + Actions Integration Review (Issue #39) & Squad Visibility Tools (Issue #40)
+
+**Task**: Evaluate two architectural decisions for squad automation:
+1. GitHub Copilot CLI + Actions integration for AI-assisted automation
+2. Squad visibility/monitoring tool selection
+
+**Issue #39 — Copilot CLI + GitHub Actions Integration**
+
+**What I Found**:
+- Tamir had already completed a comprehensive evaluation with detailed recommendations
+- The analysis covered: core capabilities, squad benefits, integration approach, blockers, prerequisites
+- Recommendation: proceed with three-phase rollout (PoC → integration → event-driven)
+- User approval: "cool let's do it"
+
+**Key Strategic Insight**: Copilot CLI + Actions is **complementary** (not competing) with the self-hosted runner:
+- Self-hosted runner = execution environment (runs Squad workflows, CI/CD tests)
+- Copilot CLI = intelligence layer (generates context, makes AI-assisted decisions)
+- Architecture: `GitHub Event → Copilot CLI (context generation) → Self-Hosted Runner (Squad execution)`
+
+**My Role**: 
+- Consolidated findings into actionable status update
+- Confirmed prerequisites (policy check, fine-grained PAT, PoC validation)
+- Prepared implementation roadmap for squad team approval
+- Status: Moved from "pending-user" to ready-for-implementation
+
+**Issue #40 — Squad Activity Visibility Tool**
+
+**What I Found**:
+- Existing tools: EditLess (VS Code extension), SquadUI (VS Code + Aspire), Squad CLI commands
+- Gap: No terminal-based, real-time activity viewer
+- Three solutions proposed:
+  1. PowerShell script (2-3 hours, terminal-based, zero dependencies)
+  2. Node.js web dashboard (4-6 hours, browser UI, higher maintenance)
+  3. Squad CLI extension (upstream proposal to Brady Gaster)
+
+**User Feedback**: "Use C# with dotnet 10 single-file app instead of PowerShell"
+
+**My Approach**:
+- Redesigned Solution 1 to use C# 13 (single-file console app)
+- Tech stack: Spectre.Console (beautiful tables), System.Text.Json (parsing), dotnet run
+- Usage: `dotnet run -- --interval 5 --refresh` from `.squad/tools/squad-monitor/`
+- Confirmed requirements before implementation (orchestration log format, filtering, archival)
+
+**Key Pattern Learned**:
+- User preferences drive tool selection: "C# over PowerShell" signals enterprise readiness, type safety, and familiarity
+- Single-file apps (.NET 10+) eliminate project setup friction
+- Spectre.Console is the modern replacement for Console.WriteLine in .NET
+
+**Deliverables**:
+- [Issue #39](https://github.com/tamirdresher_microsoft/tamresearch1/issues/39#issuecomment-4016985429): Status update + prerequisites checklist
+- [Issue #40](https://github.com/tamirdresher_microsoft/tamresearch1/issues/40#issuecomment-4016985697): C# implementation plan + scope confirmation
+- Updated issue labels: #39 removed "status:pending-user"; #40 marked "status:in-progress"
+
+**Next Steps**:
+- #39: Await org-level Copilot CLI policy verification, then begin PoC workflow
+- #40: Await scope confirmation on orchestration log format + filtering options, then build C# tool
 - ✅ Limitations manageable: Non-deterministic output (mitigated with structured prompts), scope limited to repo content (can prefetch via API)
 
 **Recommended 3-Phase Approach**:
@@ -783,4 +905,92 @@ When evaluating automation approaches, distinguish between technical limitations
 **Deliverable**: Posted comprehensive setup guide and management instructions to [Issue #28](https://github.com/tamirdresher_microsoft/tamresearch1/issues/28#issuecomment-4016927931).
 
 **Technical Note**: The runner is configured for the specific repo (not org-level), so it only picks up jobs from 	amirdresher_microsoft/tamresearch1. This is the correct setup for a devbox runner.
+
+
+---
+
+## 2026-03-07T23:45:00Z: Status Update — Issues #14, #15, #18
+
+### Issue #14: ADO Integration Test ✅ COMPLETE
+**Finding:** ADO integration core functionality is solid. 10/13 tests passed. 3 bugs identified (not blockers):
+1. Squad init generates GitHub workflows in ADO repos (should skip or generate Azure Pipelines YAML)
+2. No ADO platform indicator in generated config (platform detection exists in SDK, init just doesn't use it)
+3. MCP template references Trello (stale, should be ADO/generic)
+
+WDATP project restrictions caused 3 blocked tests (expected — custom locked-down work item types, not Squad bugs).
+
+**Assessment:** Production-ready for core workflows (repo, branch, PR, commit ops). Recommend fixing init/config issues before GA.
+
+### Issue #15: Ralph Persistent Loop ✅ OPERATIONAL  
+**Status:** ralph-watch.ps1 v6 is running hourly with state tracking and team notifications.
+
+**Recent Improvements (Picard Review):**
+- Added structured JSON logging (.ralph-log.jsonl) with audit trail
+- Added metrics tracking (.ralph-metrics.json) with uptime %, round duration, last success time
+- Captured round output to both console and log file
+
+**Gaps Identified (Medium-effort, next sprint):**
+- Doesn't detect PR comments yet (only issue comments)
+- Missing state change detection (open/closed, labels, assignments)
+- No exponential backoff for transient failures
+- No external health check endpoint
+
+**Assessment:** Core hourly loop is solid. Logging now provides visibility. Recommend 1-2 weeks monitoring with new telemetry, then assess if additional coverage (PR comments, state changes) is needed.
+
+### Issue #18: Two-Way Teams Integration ✅ SOLUTION DESIGNED
+**Finding:** Core two-way communication achievable today via WorkIQ polling — no new infrastructure required.
+
+**Implemented:** .squad/skills/teams-monitor/SKILL.md
+- Teaches agents to poll WorkIQ for Teams messages
+- Filters for actionable items
+- Creates GitHub issues from Teams requests (tagged #teams-bridge)
+- Deduplicates
+- Integrates into Ralph hourly loop
+
+**Phase 2 Enhancement Options (deferred):**
+- Power Automate Flow (2-3 hours) — Teams msg → GitHub with Adaptive Cards
+- Teams Incoming Webhooks (1-2 hours) — Rich formatting
+- Teams Bot Framework (2-4 weeks) — Full conversational bot
+
+**Assessment:** Polling-based two-way bridge is ready. No blocker. Push notifications can be added if polling latency becomes issue. Recommend 2-week trial before investing in Phase 2.
+
+### Summary
+All three issues have clear status and next steps. ADO integration is tested, Ralph loop is monitoring with new telemetry, Teams integration has working polling solution ready to deploy.
+
+---
+
+## 2026-03-07T17:55:00Z: Squad Activity Monitor Implementation
+
+### Issue #40: Build Squad Activity Monitor
+
+**Implemented:** C# console application at .squad/tools/squad-monitor/
+
+**Technical Decisions:**
+- **Platform:** .NET 10 with C# 13 (single-file, top-level statements)
+- **UI Framework:** Spectre.Console 0.49.1 for terminal tables and colors
+- **Architecture:** Simple, focused tool - parses markdown logs and displays formatted output
+- **Parsing Strategy:** Regex-based extraction from orchestration log filenames and content
+  - Filename pattern: YYYY-MM-DDTHH-MM-SSZ-agentname.md
+  - Content sections: Status, Assignment, Outcome
+- **Features:**
+  - Auto-refresh with configurable interval (default 5s)
+  - --once flag for single-run mode
+  - Color-coded status indicators (green/yellow/red)
+  - Activity age tracking with smart formatting (just now, Xm/h/d/w ago)
+  - Summary statistics (total agents, 24h activity count)
+
+**Key Files:**
+- .squad/tools/squad-monitor/Program.cs - Main application (single file, ~270 lines)
+- .squad/tools/squad-monitor/squad-monitor.csproj - Project configuration
+- .squad/tools/squad-monitor/README.md - Usage documentation
+
+**Learnings:**
+- Timestamp parsing from filename format requires careful regex grouping
+- Spectre.Console's Markup.Escape() is essential for user content
+- .NET 10 single-file publish creates self-contained executables
+- Top-level statements + records make console apps very clean
+
+**User Preference:** Tamir prefers C# over PowerShell for tooling (more portable, better type safety)
+
+**Status:** ✅ Implemented, tested, PR #47 created
 

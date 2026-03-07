@@ -1,0 +1,334 @@
+# FedRAMP Dashboard Phase 1: Azure DevOps Pipeline
+# Runs validation tests and ingests results into Azure Monitor + Cosmos DB
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - tests/fedramp-validation/**
+      - infrastructure/**
+      - scripts/**
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - tests/fedramp-validation/**
+      - infrastructure/**
+      - scripts/**
+
+schedules:
+  - cron: "0 6 * * *"  # Daily at 6 AM UTC
+    displayName: Daily FedRAMP validation
+    branches:
+      include:
+        - main
+    always: true  # Run even if no code changes
+
+variables:
+  - group: fedramp-dashboard-credentials  # Variable group with Azure service connection
+  - name: ENVIRONMENT
+    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+      value: 'prod'
+    ${{ else }}:
+      value: 'dev'
+
+stages:
+  - stage: ValidateInfrastructure
+    displayName: Validate Infrastructure (DEV only)
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: ValidateBicep
+        displayName: Validate Bicep Templates
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: AzureCLI@2
+            displayName: Validate Bicep template
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az deployment group validate \
+                  --resource-group fedramp-dashboard-phase1-dev-rg \
+                  --template-file infrastructure/phase1-data-pipeline.bicep \
+                  --parameters environment=dev location=eastus2
+                echo "✓ Bicep template validation passed"
+
+  - stage: RunValidationTests
+    displayName: Run FedRAMP Validation Tests
+    dependsOn: []
+    jobs:
+      - job: NetworkPolicyTests
+        displayName: Network Policy Validation
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: AzureCLI@2
+            displayName: Authenticate to Azure
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Get access token for Azure Monitor
+                export AZURE_MONITOR_TOKEN=$(az account get-access-token \
+                  --resource https://monitoring.azure.com \
+                  --query accessToken -o tsv)
+                echo "##vso[task.setvariable variable=AZURE_MONITOR_TOKEN;issecret=true]$AZURE_MONITOR_TOKEN"
+                
+                # Get subscription ID
+                export AZURE_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+                echo "##vso[task.setvariable variable=AZURE_SUBSCRIPTION_ID]$AZURE_SUBSCRIPTION_ID"
+
+          - task: Kubernetes@1
+            displayName: Set kubeconfig
+            inputs:
+              connectionType: 'Azure Resource Manager'
+              azureSubscriptionEndpoint: 'fedramp-dashboard-service-connection'
+              azureResourceGroup: 'dk8s-$(ENVIRONMENT)-rg'
+              kubernetesCluster: 'dk8s-$(ENVIRONMENT)-cluster'
+
+          - bash: |
+              set -e
+              cd tests/fedramp-validation
+              
+              # Export environment variables for test scripts
+              export ENVIRONMENT="$(ENVIRONMENT)"
+              export CLUSTER_NAME="$(kubectl config current-context)"
+              export BUILD_BUILDID="$(Build.BuildId)"
+              export SYSTEM_TEAMFOUNDATIONCOLLECTIONURI="$(System.TeamFoundationCollectionUri)"
+              export SYSTEM_TEAMPROJECT="$(System.TeamProject)"
+              export BUILD_SOURCEVERSION="$(Build.SourceVersion)"
+              export BUILD_SOURCEVERSIONMESSAGE="$(Build.SourceVersionMessage)"
+              export BUILD_SOURCEBRANCHNAME="$(Build.SourceBranchName)"
+              export BUILD_REASON="$(Build.Reason)"
+              export AZURE_RESOURCE_GROUP="fedramp-dashboard-phase1-$(ENVIRONMENT)-rg"
+              
+              # Test Azure Monitor connectivity
+              source ../../scripts/azure-monitor-helper.sh
+              test_azure_monitor_connectivity
+              
+              # Run network policy tests
+              echo "Running network policy validation tests..."
+              ./network-policy-tests.sh
+            displayName: Run Network Policy Tests
+            env:
+              AZURE_MONITOR_TOKEN: $(AZURE_MONITOR_TOKEN)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+
+      - job: WafRuleTests
+        displayName: WAF Rule Validation
+        dependsOn: []  # Run in parallel
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: AzureCLI@2
+            displayName: Authenticate to Azure
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                export AZURE_MONITOR_TOKEN=$(az account get-access-token \
+                  --resource https://monitoring.azure.com \
+                  --query accessToken -o tsv)
+                echo "##vso[task.setvariable variable=AZURE_MONITOR_TOKEN;issecret=true]$AZURE_MONITOR_TOKEN"
+                
+                export AZURE_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+                echo "##vso[task.setvariable variable=AZURE_SUBSCRIPTION_ID]$AZURE_SUBSCRIPTION_ID"
+
+          - bash: |
+              set -e
+              cd tests/fedramp-validation
+              
+              export ENVIRONMENT="$(ENVIRONMENT)"
+              export BUILD_BUILDID="$(Build.BuildId)"
+              export SYSTEM_TEAMFOUNDATIONCOLLECTIONURI="$(System.TeamFoundationCollectionUri)"
+              export SYSTEM_TEAMPROJECT="$(System.TeamProject)"
+              export BUILD_SOURCEVERSION="$(Build.SourceVersion)"
+              export BUILD_SOURCEVERSIONMESSAGE="$(Build.SourceVersionMessage)"
+              export BUILD_SOURCEBRANCHNAME="$(Build.SourceBranchName)"
+              export BUILD_REASON="$(Build.Reason)"
+              export AZURE_RESOURCE_GROUP="fedramp-dashboard-phase1-$(ENVIRONMENT)-rg"
+              
+              echo "Running WAF rule validation tests..."
+              ./waf-rule-tests.sh
+            displayName: Run WAF Rule Tests
+            env:
+              AZURE_MONITOR_TOKEN: $(AZURE_MONITOR_TOKEN)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+
+      - job: OpaPolicyTests
+        displayName: OPA Policy Validation
+        dependsOn: []  # Run in parallel
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: AzureCLI@2
+            displayName: Authenticate to Azure
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                export AZURE_MONITOR_TOKEN=$(az account get-access-token \
+                  --resource https://monitoring.azure.com \
+                  --query accessToken -o tsv)
+                echo "##vso[task.setvariable variable=AZURE_MONITOR_TOKEN;issecret=true]$AZURE_MONITOR_TOKEN"
+                
+                export AZURE_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+                echo "##vso[task.setvariable variable=AZURE_SUBSCRIPTION_ID]$AZURE_SUBSCRIPTION_ID"
+
+          - bash: |
+              set -e
+              cd tests/fedramp-validation
+              
+              export ENVIRONMENT="$(ENVIRONMENT)"
+              export BUILD_BUILDID="$(Build.BuildId)"
+              export SYSTEM_TEAMFOUNDATIONCOLLECTIONURI="$(System.TeamFoundationCollectionUri)"
+              export SYSTEM_TEAMPROJECT="$(System.TeamProject)"
+              export BUILD_SOURCEVERSION="$(Build.SourceVersion)"
+              export BUILD_SOURCEVERSIONMESSAGE="$(Build.SourceVersionMessage)"
+              export BUILD_SOURCEBRANCHNAME="$(Build.SourceBranchName)"
+              export BUILD_REASON="$(Build.Reason)"
+              export AZURE_RESOURCE_GROUP="fedramp-dashboard-phase1-$(ENVIRONMENT)-rg"
+              
+              echo "Running OPA policy validation tests..."
+              ./opa-policy-tests.sh
+            displayName: Run OPA Policy Tests
+            env:
+              AZURE_MONITOR_TOKEN: $(AZURE_MONITOR_TOKEN)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+
+  - stage: ValidateIngestion
+    displayName: Validate Data Ingestion
+    dependsOn: RunValidationTests
+    jobs:
+      - job: VerifyData
+        displayName: Verify Data in Azure Monitor & Cosmos DB
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: AzureCLI@2
+            displayName: Query Log Analytics
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -e
+                
+                echo "Waiting 60 seconds for data ingestion..."
+                sleep 60
+                
+                # Get Log Analytics workspace ID
+                WORKSPACE_ID=$(az monitor log-analytics workspace show \
+                  --resource-group fedramp-dashboard-phase1-$(ENVIRONMENT)-rg \
+                  --workspace-name fedramp-logs-$(ENVIRONMENT)* \
+                  --query customerId -o tsv | head -n1)
+                
+                echo "Log Analytics Workspace ID: $WORKSPACE_ID"
+                
+                # Query for recent results from this pipeline
+                echo "Querying for results from pipeline $(Build.BuildId)..."
+                RESULT_COUNT=$(az monitor log-analytics query \
+                  --workspace "$WORKSPACE_ID" \
+                  --analytics-query "ControlValidationResults_CL | where PipelineId_s == '$(Build.BuildId)' | count" \
+                  --output tsv --query 'tables[0].rows[0][0]')
+                
+                echo "Found $RESULT_COUNT validation results from this pipeline"
+                
+                if [ "$RESULT_COUNT" -gt 0 ]; then
+                  echo "✓ Data ingestion validated successfully"
+                  
+                  # Display sample results
+                  az monitor log-analytics query \
+                    --workspace "$WORKSPACE_ID" \
+                    --analytics-query "ControlValidationResults_CL | where PipelineId_s == '$(Build.BuildId)' | project TimeGenerated, ControlId_s, TestName_s, Status_s | limit 10" \
+                    --output table
+                else
+                  echo "⚠ WARNING: No validation results found in Log Analytics"
+                  echo "This might indicate an ingestion delay or configuration issue"
+                fi
+
+          - task: AzureCLI@2
+            displayName: Query Cosmos DB
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -e
+                
+                # Get Cosmos DB account name
+                COSMOS_ACCOUNT=$(az cosmosdb list \
+                  --resource-group fedramp-dashboard-phase1-$(ENVIRONMENT)-rg \
+                  --query "[0].name" -o tsv)
+                
+                echo "Cosmos DB Account: $COSMOS_ACCOUNT"
+                
+                # Query Cosmos DB for recent results
+                QUERY="SELECT VALUE COUNT(1) FROM c WHERE c.metadata.pipeline_id = '$(Build.BuildId)'"
+                
+                RESULT_COUNT=$(az cosmosdb sql query \
+                  --account-name "$COSMOS_ACCOUNT" \
+                  --database-name SecurityDashboard \
+                  --container-name ControlValidationResults \
+                  --query-text "$QUERY" \
+                  --output tsv)
+                
+                echo "Found $RESULT_COUNT validation results in Cosmos DB"
+                
+                if [ "$RESULT_COUNT" -gt 0 ]; then
+                  echo "✓ Cosmos DB ingestion validated successfully"
+                else
+                  echo "⚠ WARNING: No validation results found in Cosmos DB"
+                fi
+
+  - stage: PublishMetrics
+    displayName: Publish Pipeline Metrics
+    dependsOn: ValidateIngestion
+    condition: always()
+    jobs:
+      - job: PublishMetrics
+        displayName: Publish Test Summary
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: AzureCLI@2
+            displayName: Generate summary report
+            inputs:
+              azureSubscription: 'fedramp-dashboard-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "## FedRAMP Validation Pipeline Summary" > summary.md
+                echo "" >> summary.md
+                echo "**Build:** $(Build.BuildNumber)" >> summary.md
+                echo "**Environment:** $(ENVIRONMENT)" >> summary.md
+                echo "**Trigger:** $(Build.Reason)" >> summary.md
+                echo "**Commit:** $(Build.SourceVersion)" >> summary.md
+                echo "" >> summary.md
+                echo "### Test Results" >> summary.md
+                echo "View detailed results in Azure Monitor Log Analytics" >> summary.md
+                echo "" >> summary.md
+                echo "[View Dashboard](https://portal.azure.com/#@microsoft.onmicrosoft.com/resource/subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/fedramp-dashboard-phase1-$(ENVIRONMENT)-rg/overview)" >> summary.md
+                
+                cat summary.md
+                
+                # Upload as pipeline artifact
+                mkdir -p $(Build.ArtifactStagingDirectory)/reports
+                cp summary.md $(Build.ArtifactStagingDirectory)/reports/
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish summary report
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/reports'
+              artifact: 'fedramp-validation-summary'
+              publishLocation: 'pipeline'

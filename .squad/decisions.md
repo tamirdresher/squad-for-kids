@@ -1015,3 +1015,22 @@ Aligns with Picard's architectural DEFER recommendation. Security gates are the 
 - Partner FIC Document — UAMI exposure in shared fleets, zero-trust gaps
 - EngineeringHub — FalconFleet FIC guide, Fleet Workload Identity Setup
 - Public docs — Azure Fleet Manager MI, AKS Identity Bindings (preview)
+
+---
+
+## Decision 5: Ralph Auto-Pull Directive
+
+**Date:** 2026-03-07  
+**Author:** Tamir Dresher (via Copilot)  
+**Issue:** #37  
+**Status:** ✅ Adopted  
+**Scope:** Ralph Watch Behavior
+
+Ralph watch should always fetch/pull the latest code from the branch before each cycle. First thing Ralph does in the loop is git fetch && git pull.
+
+**Rationale:** Prevent stale code issues where squad members have made changes but Ralph isn't picking them up.
+
+**Implementation:** Updated ralph-watch.ps1 to execute git fetch and pull at the start of each watch cycle before processing issues.
+
+**Related:** Data agent completed implementation and committed changes in round 3.
+

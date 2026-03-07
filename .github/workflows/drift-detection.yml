@@ -1,0 +1,200 @@
+name: Helm/Kustomize Drift Detection
+
+on:
+  pull_request:
+    paths:
+      - '**/values*.yaml'
+      - '**/Chart.yaml'
+      - '**/kustomization.yaml'
+      - '**/overlays/**'
+      - '**/patches/**'
+      - 'scripts/drift-detection/**'
+  workflow_dispatch:
+
+env:
+  BASE_BRANCH: origin/${{ github.base_ref }}
+
+jobs:
+  detect-drift:
+    name: Detect Configuration Drift
+    runs-on: ubuntu-latest
+    outputs:
+      helm_drift: ${{ steps.detect.outputs.helm_drift }}
+      kustomize_drift: ${{ steps.detect.outputs.kustomize_drift }}
+      security_drift: ${{ steps.detect.outputs.security_drift }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Detect Helm/Kustomize changes
+        id: detect
+        run: |
+          chmod +x scripts/drift-detection/detect-helm-kustomize-changes.sh
+          bash scripts/drift-detection/detect-helm-kustomize-changes.sh
+          
+          # Load results
+          source /tmp/drift-detection/changes.env
+          echo "helm_drift=$HELM_DRIFT" >> $GITHUB_OUTPUT
+          echo "kustomize_drift=$KUSTOMIZE_DRIFT" >> $GITHUB_OUTPUT
+          echo "security_drift=$SECURITY_DRIFT" >> $GITHUB_OUTPUT
+      
+      - name: Upload drift detection results
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-detection-results
+          path: /tmp/drift-detection/
+          retention-days: 7
+
+  validate-manifests:
+    name: Validate Manifests
+    runs-on: ubuntu-latest
+    needs: detect-drift
+    if: needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Download drift detection results
+        uses: actions/download-artifact@v4
+        with:
+          name: drift-detection-results
+          path: /tmp/drift-detection/
+      
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.13.0'
+      
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.28.0'
+      
+      - name: Install conftest (OPA policy testing)
+        run: |
+          wget https://github.com/open-policy-agent/conftest/releases/download/v0.49.1/conftest_0.49.1_Linux_x86_64.tar.gz
+          tar xzf conftest_0.49.1_Linux_x86_64.tar.gz
+          sudo mv conftest /usr/local/bin/
+          conftest --version
+      
+      - name: Render and validate manifests
+        id: validate
+        run: |
+          chmod +x scripts/drift-detection/render-and-validate.sh
+          bash scripts/drift-detection/render-and-validate.sh
+        continue-on-error: true
+      
+      - name: Upload rendered manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-manifests
+          path: /tmp/drift-detection/rendered/
+          retention-days: 7
+      
+      - name: Check validation result
+        if: steps.validate.outcome == 'failure'
+        run: |
+          echo "::error::Manifest validation failed - security issues detected"
+          exit 1
+
+  generate-report:
+    name: Generate Compliance Report
+    runs-on: ubuntu-latest
+    needs: [detect-drift, validate-manifests]
+    if: always() && (needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Download drift detection results
+        uses: actions/download-artifact@v4
+        with:
+          name: drift-detection-results
+          path: /tmp/drift-detection/
+      
+      - name: Download rendered manifests
+        uses: actions/download-artifact@v4
+        with:
+          name: rendered-manifests
+          path: /tmp/drift-detection/rendered/
+        continue-on-error: true
+      
+      - name: Generate compliance delta report
+        id: report
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          chmod +x scripts/drift-detection/compliance-delta-report.sh
+          bash scripts/drift-detection/compliance-delta-report.sh
+        continue-on-error: true
+      
+      - name: Upload compliance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-delta-report
+          path: /tmp/drift-detection/compliance-delta-report.md
+          retention-days: 30
+      
+      - name: Comment PR with compliance report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = '/tmp/drift-detection/compliance-delta-report.md';
+            
+            if (!fs.existsSync(reportPath)) {
+              console.log('Report file not found, skipping PR comment');
+              return;
+            }
+            
+            const report = fs.readFileSync(reportPath, 'utf8');
+            
+            // Find existing drift detection comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const driftComment = comments.find(comment => 
+              comment.body.includes('FedRAMP Compliance Delta Report')
+            );
+            
+            const commentBody = report;
+            
+            if (driftComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: driftComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+      
+      - name: Fail if validation failed
+        if: needs.validate-manifests.result == 'failure'
+        run: |
+          echo "::error::Drift validation failed - see compliance report for details"
+          exit 1

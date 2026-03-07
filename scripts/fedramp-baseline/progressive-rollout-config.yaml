@@ -407,9 +407,52 @@ spec:
 # kubectl apply -f progressive-rollout-stage-4.yaml
 # argocd app sync fedramp-validation-prod-usgov
 
-# To rollback to previous stage:
-# kubectl rollout undo deployment/fedramp-validation -n fedramp-validation
-# argocd app rollback fedramp-validation-prod-usgov
+# ============================================================================
+# Rollback Procedures
+# ============================================================================
+
+# ROLLBACK MECHANISM SELECTION:
+# Choose the appropriate rollback method based on failure type:
+#
+# 1. kubectl argo rollouts (PRIMARY for Rollout failures)
+#    Use when: Rollout is stuck, pods failing, or canary analysis fails
+#    - Abort current rollout: kubectl argo rollouts abort fedramp-validation-rollout -n fedramp-validation
+#    - Undo to previous ReplicaSet: kubectl argo rollouts undo fedramp-validation-rollout -n fedramp-validation
+#    This controls the Rollout resource and its managed ReplicaSets
+#
+# 2. argocd app rollback (for application-wide state issues)
+#    Use when: Need to revert entire ArgoCD application to previous synced revision
+#    - First, identify previous revision: argocd app history fedramp-validation-prod-usgov
+#    - Rollback to specific revision: argocd app rollback fedramp-validation-prod-usgov <revision-number>
+#    This reverts all manifests (Rollout, VirtualService, ConfigMaps, etc.) to previous git state
+#
+# ROLLBACK VERIFICATION (CRITICAL):
+# After executing rollback, verify completion within 5 minutes:
+#
+# 1. Check Rollout status:
+#    kubectl get rollout fedramp-validation-rollout -n fedramp-validation
+#    Expected: status shows "Healthy" and "Paused" or "Running"
+#
+# 2. Verify traffic routing post-rollback:
+#    kubectl get virtualservice fedramp-validation-traffic-split-* -n fedramp-validation -o yaml
+#    Confirm weight distribution matches expected rollback stage
+#
+# 3. Monitor rollback completion (timeout: 5 minutes):
+#    kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
+#    ESCALATION: If rollback does not complete within 5 minutes, escalate to on-call SRE
+#
+# REVISION IDENTIFICATION:
+# To find the <revision-number> for argocd rollback:
+#   argocd app history fedramp-validation-prod-usgov
+# This shows deployment history with revision IDs and timestamps
+# Select the last known-good revision (typically revision N-1 if current is N)
+#
+# SUCCESS CRITERIA:
+# Rollback is successful when:
+# - Rollout status returns to "Healthy" within 5 minutes
+# - VirtualService weights match previous stable configuration
+# - Error rate drops below 1% within 10 minutes post-rollback
+# - No pod CrashLoopBackOff or ImagePullBackOff states
 
 # To monitor rollout progress:
 # kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch

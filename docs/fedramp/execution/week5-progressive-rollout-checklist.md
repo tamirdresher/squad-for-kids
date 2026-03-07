@@ -254,18 +254,97 @@
 - [ ] Performance degradation > 50%
 - [ ] Resource exhaustion (CPU/Memory > 95%)
 
-### Rollback Execution
-1. [ ] Execute: `argocd app sync <app-name> --revision <previous-stable>`
-2. [ ] Verify rollback to previous traffic split
-3. [ ] Monitor for stabilization
-4. [ ] Notify stakeholders of rollback
-5. [ ] Investigate root cause
+### Rollback Mechanism Selection
 
-### Post-Rollback
-- [ ] Document rollback reason
-- [ ] Analyze root cause
-- [ ] Develop remediation plan
-- [ ] Schedule re-attempt
+**Choose the appropriate rollback method based on failure type:**
+
+#### Method 1: kubectl argo rollouts (PRIMARY for Rollout failures)
+**Use when:** Rollout stuck, pods failing, canary analysis fails
+
+```powershell
+# Abort current rollout
+kubectl argo rollouts abort fedramp-validation-rollout -n fedramp-validation
+
+# Undo to previous stable ReplicaSet
+kubectl argo rollouts undo fedramp-validation-rollout -n fedramp-validation
+```
+
+#### Method 2: argocd app rollback (for application-wide state issues)
+**Use when:** Need to revert entire application state (VirtualService, Rollout, ConfigMaps)
+
+```powershell
+# Step 1: Identify previous stable revision
+argocd app history fedramp-validation-prod-usgov
+# Output shows revision IDs - select last known-good (typically N-1)
+
+# Step 2: Rollback to specific revision
+argocd app rollback fedramp-validation-prod-usgov <revision-number>
+```
+
+### Rollback Verification (CRITICAL - 5 MINUTE TIMEOUT)
+
+**Must complete within 5 minutes. ESCALATE if not complete.**
+
+1. [ ] **Check Rollout status:**
+   ```powershell
+   kubectl get rollout fedramp-validation-rollout -n fedramp-validation
+   # Expected: STATUS = Healthy, Paused/Running
+   ```
+
+2. [ ] **Verify traffic routing post-rollback:**
+   ```powershell
+   kubectl get virtualservice -n fedramp-validation -o yaml
+   # Confirm weights match expected rollback stage
+   ```
+
+3. [ ] **Monitor rollback completion:**
+   ```powershell
+   kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
+   # Watch for "Healthy" status - TIMEOUT: 5 minutes
+   ```
+
+4. [ ] **Verify pod health:**
+   ```powershell
+   kubectl get pods -n fedramp-validation
+   # No CrashLoopBackOff or ImagePullBackOff
+   ```
+
+### Rollback Success Criteria
+- ✅ Rollout status "Healthy" within 5 minutes
+- ✅ VirtualService weights match previous stable config
+- ✅ Error rate < 1% within 10 minutes post-rollback
+- ✅ No pod failures
+- ✅ All health checks passing
+
+### Post-Rollback Actions
+
+1. [ ] **Document rollback**
+   - Rollback trigger: __________________
+   - Method used: kubectl / argocd (circle one)
+   - Rollback start time: __________
+   - Rollback completion time: __________
+   - Time to stabilize: __________ minutes
+
+2. [ ] **Immediate monitoring** (30 minutes post-rollback)
+   - Error rate: __________%
+   - Traffic distribution verified: ✅ / ❌
+   - Resource utilization: CPU ___% / Memory ___%
+
+3. [ ] **Root cause analysis**
+   - Review logs from failure period
+   - Identify configuration/code issues
+   - Determine environment-specific factors
+
+4. [ ] **Notify stakeholders**
+   - Send rollback notification
+   - Provide impact summary
+   - Communicate next steps
+
+5. [ ] **Remediation planning**
+   - Document issues found: ____________________________________
+   - Develop fix plan: ________________________________________
+   - Test in lower environment: ✅ / ❌
+   - Schedule re-attempt: __________
 
 ## Issues & Blockers
 

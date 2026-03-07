@@ -669,31 +669,129 @@ docker pull registry.sovereign.example.gov/nginx:1.25.3
 - Performance degradation > 50%
 - Resource exhaustion (CPU/Memory > 95%)
 
-### Rollback Execution
+### Rollback Mechanism Selection
+
+**Choose the appropriate method based on failure type:**
+
+#### Option 1: kubectl argo rollouts (PRIMARY for Rollout failures)
+
+**Use when:** Rollout is stuck, pods failing, or canary analysis fails
 
 ```powershell
-# Immediate rollback to previous stage
+# Abort current rollout progression
 kubectl argo rollouts abort fedramp-validation-rollout -n fedramp-validation
+
+# Undo to previous ReplicaSet (stable version)
 kubectl argo rollouts undo fedramp-validation-rollout -n fedramp-validation
-
-# Or rollback via ArgoCD
-argocd app rollback fedramp-validation-prod-usgov <previous-revision>
-
-# Verify rollback
-kubectl get pods -n fedramp-validation
-argocd app get fedramp-validation-prod-usgov
-
-# Monitor for stabilization (30 minutes)
-kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
 ```
 
-### Post-Rollback
+**What this does:** Controls the Rollout resource and its managed ReplicaSets. Reverts pod templates and replica distribution to previous stable state.
 
-1. Document rollback reason
-2. Analyze root cause
-3. Develop remediation plan
-4. Update runbook with learnings
-5. Schedule re-attempt
+#### Option 2: argocd app rollback (for application-wide state issues)
+
+**Use when:** Need to revert entire ArgoCD application to previous synced revision (includes VirtualService, ConfigMaps, Rollout, etc.)
+
+```powershell
+# Step 1: Identify previous stable revision
+argocd app history fedramp-validation-prod-usgov
+
+# Output shows:
+# ID    DATE                REVISION
+# 10    2024-03-15 14:23    abc123def    # Current (problematic)
+# 9     2024-03-14 10:15    xyz789ghi    # Previous stable <- USE THIS
+# 8     2024-03-13 09:00    lmn456opq
+
+# Step 2: Rollback to previous stable revision (e.g., revision 9)
+argocd app rollback fedramp-validation-prod-usgov 9
+```
+
+**What this does:** Reverts ALL application manifests (Rollout, VirtualService, ConfigMaps, etc.) to the previous git commit state.
+
+### Rollback Verification (CRITICAL)
+
+**Execute immediately after rollback. Timeout: 5 minutes. Escalate if not complete.**
+
+```powershell
+# Step 1: Check Rollout status (must show "Healthy" within 5 minutes)
+kubectl get rollout fedramp-validation-rollout -n fedramp-validation
+# Expected output: STATUS = Healthy, Paused or Running
+
+# Step 2: Verify traffic routing post-rollback
+kubectl get virtualservice -n fedramp-validation -o yaml
+# Confirm weight distribution matches expected rollback stage
+# Example: If rolling back from 50% to 25%, weights should be 25/75
+
+# Step 3: Verify rollout details and watch for completion
+kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
+# Watch for "Healthy" status and stable replica counts
+
+# Step 4: Check pod health
+kubectl get pods -n fedramp-validation
+# Ensure no CrashLoopBackOff or ImagePullBackOff states
+
+# Step 5: Verify ArgoCD application sync status
+argocd app get fedramp-validation-prod-usgov
+# Should show "Synced" and "Healthy"
+```
+
+### Rollback Success Criteria & Timeouts
+
+**Rollback must complete within 5 minutes. If not, ESCALATE to on-call SRE.**
+
+Success criteria:
+- ✅ Rollout status returns to "Healthy" (timeout: 5 minutes)
+- ✅ VirtualService weights match previous stable configuration (immediate)
+- ✅ Error rate drops below 1% (within 10 minutes post-rollback)
+- ✅ No pod failures (CrashLoopBackOff, ImagePullBackOff)
+- ✅ All health checks passing
+
+### Post-Rollback Investigation
+
+```powershell
+# Monitor stabilization for 30 minutes
+kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
+
+# Check recent logs for error patterns
+kubectl logs -n fedramp-validation -l app=fedramp-validation --tail=100 --since=30m
+
+# Query error rate metrics
+$prometheusUrl = "http://prometheus-prod-usgov.monitoring.svc:9090"
+$errorQuery = @"
+sum(rate(http_requests_total{environment="prod-usgov",status=~"5.."}[5m]))
+/
+sum(rate(http_requests_total{environment="prod-usgov"}[5m]))
+* 100
+"@
+# Execute query and verify < 1%
+```
+
+### Post-Rollback Actions
+
+1. **Document rollback details**
+   - Trigger condition that initiated rollback
+   - Rollback method used (kubectl vs argocd)
+   - Time to complete rollback
+   - Impact duration and affected users
+
+2. **Root cause analysis**
+   - Review logs and metrics from failure period
+   - Identify configuration or code issues
+   - Determine if issue was environment-specific
+
+3. **Develop remediation plan**
+   - Fix identified issues
+   - Add additional monitoring/alerts
+   - Update deployment procedures
+
+4. **Update runbook**
+   - Document new failure patterns
+   - Add prevention measures
+   - Update rollback procedures if gaps found
+
+5. **Schedule re-attempt**
+   - Define criteria for retry
+   - Plan testing in lower environment first
+   - Schedule deployment window
 
 ---
 

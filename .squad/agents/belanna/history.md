@@ -12,6 +12,59 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-09: Issue #25 — DK8S Stability Tier 2 High-Impact Improvements Plan
+
+**Task:** Plan Tier 2 (medium-effort, high-impact) DK8S stability improvements building on Tier 1 critical mitigations from Issue #24. Create a prioritized, actionable plan with effort estimates, timeline, and success criteria.
+
+**Background:** Issue #4 delivered comprehensive stability analysis (dk8s-stability-analysis.md) identifying 5 Sev2 incidents, 7 recurring patterns, and recommending improvements in 3 tiers. Tier 1 (critical, low-effort) planned in Issue #24. Tier 2 requires 4–8 weeks of engineering effort across 2 teams.
+
+**Tier 2 Improvements Identified & Planned:**
+
+1. **N1: Zone-Aware NAT Gateway Monitoring** (1.5 sprints)
+   - Problem: Monthly NAT failures page false Sev2 alerts; ops can't discriminate single-AZ vs. regional
+   - Solution: Per-zone metrics + zone-aware alerting (only page Sev2 if 2+ zones affected)
+   - Impact: 30–40% reduction in false Sev2 pages
+   - Owner: SRE / Monitoring team
+
+2. **N2: DNS Health in Node Readiness Gates** (1.5 sprints)
+   - Problem: Pods schedule on DNS-broken nodes; CoreDNS failures cascade with Istio
+   - Solution: Kubelet DNS probe at readiness check; auto-tag broken nodes
+   - Impact: 20–30% reduction in DNS-related incidents
+   - Owner: Platform / CoreDNS team
+
+3. **C2: Deployment Feedback Webhook** (1.5 sprints)
+   - Problem: IDP team blind to EV2 failures; ConfigGen breaking changes surface in sovereign clouds (4-week latency)
+   - Solution: Webhook on EV2 step failure → Auto-file issues in ConfigGen repo with context
+   - Impact: 50% faster issue detection; 3–4 week earlier feedback loop
+   - Owner: EV2 / IDP Platform team
+
+4. **I2: ztunnel Health Monitoring with Automatic Rollback** (2 sprints)
+   - Problem: Istio ztunnel failures (mTLS loops, circuit breaker issues) cascade; no auto-recovery
+   - Solution: Ztunnel sidecar health exporter + automatic remediation (restart sidecars / drain nodes / rollback version)
+   - Impact: 60% faster recovery; automatic mitigation for 80% of mesh failures
+   - Owner: Platform / Istio SME
+
+**Plan Characteristics:**
+- **Timeline:** Q2 2026 (4–8 weeks of parallel execution; 2 teams)
+- **Total effort:** ~5–6 sprints (SRE + Platform working in parallel)
+- **Success metrics:** <1 false Sev2/month, 0 DNS pod scheduling failures, <3 day issue feedback latency, >80% auto-recovery rate
+- **Dependencies:** All items depend on Tier 1 completion (C1, O1, I1, N3)
+
+**Deliverable:** Comprehensive Tier 2 plan posted as comment on Issue #25 with:
+- Detailed problem statement + solution for each item
+- Implementation timeline (8-week staged rollout: planning → core implementation → testing → production)
+- Effort estimates + ownership assignments
+- Risk mitigation table (Zone API unavailability, DNS false positives, webhook noise, etc.)
+- Open questions for Tamir + DK8S Leads (parallel execution, zone thresholds, ztunnel risk appetite)
+- Success criteria + metrics dashboard
+- Next steps + sprint planning recommendations
+
+**GitHub Comment:** https://github.com/tamirdresher_microsoft/tamresearch1/issues/25#issuecomment-4016949771
+
+**Pattern Learned:** Tier 2 planning = Medium-effort improvements discovered through analysis phase. Each item (N1, N2, C2, I2) tackles one recurring incident pattern + identifies cross-team dependencies. Risk assessment + staged rollout approach mitigates blast radius of automation (e.g., webhook accuracy, ztunnel auto-remediation aggression).
+
+---
+
 ### 2026-03-09: Issue #35 Investigation — Devbox Provisioning Strategy
 
 **Task:** Investigate tools and approach for reproducible devbox provisioning. Tamir wants to automate spinning up clones of his current devbox and create a dedicated repo + Squad skill for future reuse.

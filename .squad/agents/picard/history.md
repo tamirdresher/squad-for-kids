@@ -10,6 +10,76 @@
 
 ## Learnings
 
+### 2026-03-07: FedRAMP CI/CD Integration — Issue #72
+
+**Context:** Picked up Issue #72 (FedRAMP Controls: Continuous Validation in CI/CD Pipeline). Prior work completed: PRs #55/#56 (compensating controls), PR #70 (test suite). Task: Design and implement GitHub Actions workflow to automate FedRAMP validation on every PR/push without manual effort.
+
+**Design Approach — "Layered Validation":**
+
+Rather than running expensive cluster tests in GitHub Actions, designed a **lightweight, progressive validation** strategy:
+
+1. **Layer 1 (Pre-flight)** — Verify test suite structure (file presence, executability, YAML syntax). Fails fast if infrastructure incomplete.
+2. **Layer 2 (Documentation)** — Lint markdown, verify required sections. Ensures compliance docs stay maintainable.
+3. **Layer 3 (Reporting)** — Generate machine-readable (JSON) + human-readable (markdown) compliance matrices for audit trail and dashboarding.
+4. **Layer 4 (Drift Detection)** — Git diff analysis to catch security control changes and alert maintainers to verify test coverage.
+
+**Key Decision:** Lightweight validation in GH Actions + separate Azure DevOps pipeline for actual cluster testing. Rationale: GH Actions gives immediate PR feedback (~2 min); cluster tests are environment-specific and run separately.
+
+**Implementation Outcome:**
+- ✓ Created `.github/workflows/fedramp-validation.yml` (6 jobs, 380 lines)
+- ✓ Generates FedRAMP controls matrix (9 controls, 3 CVEs, defense-in-depth mapping)
+- ✓ Detects control drift on file changes
+- ✓ Outputs JSON (dashboarding) + markdown (human review) artifacts
+- ✓ Uploaded design rationale to `.squad/decisions/inbox/picard-fedramp-cicd.md`
+- ✓ Created PR #73 + commented on issue #72
+
+**Technical Insights:**
+
+1. **Conditional Workflow Triggers:** Use `paths:` filter to prevent CI spam. Only runs when FedRAMP files change. Saves ~100s CI runs/month.
+
+2. **Separation of Concerns:** Each job has single responsibility (validation, documentation, reporting, drift detection, alerts). Makes workflow maintainable and testable.
+
+3. **Artifact Retention for Compliance:** 30-day retention of compliance reports provides audit trail for FedRAMP compliance audits. JSON format enables future dashboard integration.
+
+4. **Control Drift as "Soft Fail":** Warnings (not blockers) encourage early conversation about control changes. Can escalate to hard blocker if control violations detected in future.
+
+5. **GitHub Actions Limitations:** Read-only GitHub API for PR creation/commenting. Used GitHub CLI (`gh`) for scripting instead.
+
+**Decision Rationale:**
+- **GitHub Actions vs. Azure DevOps:** GH Actions provides immediate PR feedback in developer context. Azure DevOps remains source of truth for cluster testing.
+- **Lightweight vs. Full Testing:** GH Actions workflow is environment-agnostic and fast. Actual cluster tests (NetworkPolicy, WAF, OPA) run separately in DEV/STG/PPE.
+- **Machine + Human Reporting:** JSON enables future automation/dashboards; markdown enables stakeholder communication. Both outputs generated together.
+- **Control Drift Detection:** Git-based change detection catches silent control modifications that tests might miss.
+
+**Deployment Pattern Established:**
+```
+Developer creates PR with FedRAMP changes
+  ↓
+GH Actions: Lightweight validation (2 min)
+  ├─ Pre-flight: Structure check
+  ├─ Documentation: Quality check
+  ├─ Compliance: Report generation
+  ├─ Drift: Change detection
+  └─ Artifacts: JSON + markdown saved
+  ↓
+PR author reviews compliance report + design decisions
+  ↓
+Merge to main
+  ↓
+Azure DevOps: Full cluster testing (separate pipeline)
+```
+
+**Key Learning:** For compliance-critical systems, layered validation with fast feedback + detailed auditing > single comprehensive test. Developers get quick signal in PR; security/compliance teams get detailed artifacts for review.
+
+**Pattern for Future Work:**
+- Pre-flight validation (structure, syntax)
+- Documentation quality (maintainability)
+- Reporting (machine + human readable)
+- Change detection (drift monitoring)
+- This pattern applies beyond FedRAMP to any compliance/security workflow.
+
+---
+
 ### 2026-03-07: GitHub Teams Integration Guidance — Issue #44
 
 **Context:** Tamir installed the GitHub for Microsoft Teams app, signed in, and asked how to connect it to this repo (tamirdresher_microsoft/tamresearch1).

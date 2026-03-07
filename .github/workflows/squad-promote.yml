@@ -2,17 +2,8 @@ name: Squad Promote
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Dry run — show what would happen without pushing'
-        required: false
-        default: 'false'
-        type: choice
-        options: ['false', 'true']
-
-permissions:
-  contents: write
-
+    # All auto-triggers disabled - hosted runners unavailable at org level
+    # Re-enable when runners are configured for this repo
 jobs:
   dev-to-preview:
     name: Promote dev → preview

@@ -112,6 +112,36 @@
 
 **Deliverable:** Engaged with active Squad Places community, analyzed 4 major discussion threads (10-15 comments each), identified security principles applicable to cloud/multi-agent architecture, documented cross-squad patterns and learnings.
 
+### 2026-03-07: Fleet Manager FIC/Identity Security Analysis — Issue #3
+
+**Context:** Conducted comprehensive security analysis of Azure Fleet Manager adoption for DK8S RP, focusing on Federated Identity Credentials (FIC), identity movement risks, and sovereign cloud compliance.
+
+**Research Sources:**
+- EngineeringHub: FIC with Pod Identity in FalconFleet, Fleet Workload Identity Setup Guide, Cloud Simulator Fleet Threat Model
+- WorkIQ: Feb 18 2026 Defender/AKS meeting (identity blast radius, sovereign cloud constraints, nation-state threat model), Partner FIC Document (UAMI exposure, zero-trust gaps), DK8S AAD Pod Identity deprecation emails
+- Web research: Azure Fleet Manager managed identity docs, AKS Workload Identity, Identity Bindings preview, Flexible FICs preview
+
+**Key Security Findings:**
+
+1. **FIC 20-per-UAMI Scaling Ceiling** (CRITICAL): DK8S has 50+ clusters across sovereign clouds. Each cluster has unique OIDC issuer. Cannot federate all to single UAMI. Identity Bindings (AKS preview) is emerging solution but not GA.
+
+2. **UAMI Node-Level Exposure in Shared Fleet** (CRITICAL): Falcon team confirmed UAMI is not secure in shared fleet systems — anyone on the node can access the identity. Only Workload Identity provides true pod-scoped isolation.
+
+3. **Sovereign Cloud Feature Lag** (CRITICAL): Fleet Manager features lag AKS in US NAT, US SEC, Blue, Delos. Feb 18 meeting confirmed this is a hard constraint, not a preference. DK8S cannot adopt features unavailable in sovereign clouds.
+
+4. **Identity Continuity Gap During Migration** (HIGH): When pods move between clusters, FICs referencing old OIDC issuer won't work on new cluster. Pre-provisioning and rollback plans required.
+
+5. **Past Identity Mistake Documented** (HIGH): DK8S previously allowed kubelet MI as app identity, creating "giant security group" flagged by EV2 as violating least-privilege. Fleet Manager could repeat this pattern if not designed correctly.
+
+**Recommendation:** CONDITIONAL NO-GO — four security gates must pass before adoption (Workload Identity complete, sovereign cloud GA, FIC scaling GA, threat model documented). Proposed 4-phase adoption path from PoC to sovereign clouds.
+
+**Deliverables:**
+- `fleet-manager-security-analysis.md` — 12-risk matrix, 17 mitigations, 4-phase adoption path
+- Issue #3 comment with security analysis summary
+- Decision inbox entry: `worf-fleet-manager-security.md`
+
+**Cross-Reference:** Aligns with Picard's DEFER recommendation from architectural perspective. Security analysis provides the identity-specific evidence supporting that recommendation.
+
 <!-- Append learnings below -->
 
 ### 2026-03-06: FIC/Identity Security Analysis for Fleet Manager (Issue #3)

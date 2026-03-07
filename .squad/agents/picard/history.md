@@ -204,6 +204,33 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 - **For architecture leads:** One-Way Dependency Graph (SDK/CLI split reduces coordination overhead)
 - **For intelligence pipelines:** Scout-Librarian-Analyst (scaling content discovery with deterministic dedup)
 
+### 2026-03-07: Azure Fleet Manager Architecture Evaluation (Issue #3)
+
+**Context:** Evaluated Azure Kubernetes Fleet Manager (AKFM) for DK8S RP adoption. Conducted multi-source research: EngineeringHub internal docs, public Azure docs, KubeFleet OSS, open-source alternatives (Rancher Fleet, Kratix, Karmada), and WorkIQ retrieval of past team meetings/emails.
+
+**Technical Learnings:**
+
+1. **AKFM is built on KubeFleet (CNCF Sandbox):** The open-source foundation provides an exit path from vendor lock-in. Hub-spoke architecture with Fleet Agent per member cluster.
+
+2. **Key Value Props for DK8S:** Cluster upgrade orchestration (Update Runs) and blue/green cluster replacement are the strongest differentiators vs. status quo. App deployment propagation (CRP) overlaps heavily with existing ArgoCD + ConfigGen.
+
+3. **Identity is a Hard Blocker:** WorkIQ confirmed multiple meetings (Feb 12, Feb 18, 2026) where identity binding was explicitly called a "block" or "precondition." FIC automation gaps mean workload movement across clusters is unsafe today.
+
+4. **Dual Control Plane Risk:** Running Fleet Manager alongside ArgoCD creates competing reconciliation loops and ambiguous source-of-truth for deployment state. Team flagged this as "overkill" in Feb 12 meeting.
+
+5. **ConfigGen Expressiveness Gap:** Fleet Manager's resource overrides are less expressive than ConfigGen's 5-tier values hierarchy. Migration would lose configuration granularity.
+
+6. **Constraints:** 200-cluster limit, same Entra ID tenant required, sovereign cloud feature parity may lag.
+
+**Decision:** DEFER — do not adopt now. Establish prerequisites (Workload Identity migration, FIC automation, operational need for cluster replacement) before revisiting. No open-source alternative provides better fit than AKFM for DK8S when the time comes.
+
+**Artifacts Produced:**
+- `fleet-manager-evaluation.md` — Full architecture evaluation with feature mapping, alternative comparison, risk assessment
+- Decision inbox entry: `picard-fleet-manager-eval.md`
+- Issue #3 comment with summary
+
+---
+
 ### Community Quality Assessment:
 
 - **Depth:** Comments are substantive; people explain their implementation, edge cases, and lessons learned
@@ -293,3 +320,66 @@ Fleet manager architecture is sound, but approval is contingent on addressing:
 
 **Decision Pattern:**
 When blocking conditions are addressable (not architectural failures), DEFER with explicit mitigation path and timeline. This enables parallel work on prerequisites while maintaining clear go/no-go criteria.
+### 2026-03-07: Aurora Adoption Plan & Scenario Definition Framework (Issue #4)
+
+**Context:** Tamir asked whether we could run an Aurora experiment on a DK8S component — specifically cluster provisioning — and whether Aurora would make rollouts slower. Built comprehensive adoption plan synthesizing Seven's Aurora research, B'Elanna's stability analysis, and deep WorkIQ intelligence.
+
+**Key Learnings:**
+
+1. **Aurora scenario structure:** Workload → Scenario → Steps → Assertions. Scenarios require: workload definition (onboarding manifest), success criteria (quantitative thresholds), and matrix parameters (regions, SKUs, versions). Authentication uses two service principals via Key Vault certs.
+
+2. **Aurora Bridge is the lowest-friction entry:** Connects existing ADO pipelines without test rewrites. Provides monitoring, alerting, and historical trending immediately. This is the right Phase 1 move.
+
+3. **DIV runs during bake time, not blocking deployments:** DK8S already has mandatory bake periods between EV2 rings. Aurora validation can execute during these windows, adding zero net latency. This is the critical insight that answers "will it slow us down?" — no, if structured correctly.
+
+4. **Cluster provisioning is ideal first candidate:** Clear success criteria, high blast radius, no cross-team dependencies, addresses known provisioning validation gaps surfaced in Runtime Platform reviews and cluster automation brainstorms (confirmed via WorkIQ).
+
+5. **Other teams' approach — Databricks model:** Deep nightly validation (full matrix, 1-2 hours) + lightweight per-deployment checks (3-5 smoke scenarios, 10-15 min). This separation minimizes rollout impact while maximizing coverage.
+
+6. **No existing DK8S-Aurora connection in org:** WorkIQ confirmed Aurora and DK8S discussions are "adjacent rather than unified." We would be establishing a new integration, not joining existing work.
+
+7. **EngineeringHub access denied:** Could not fetch Aurora onboarding docs via enghub-search or enghub-fetch. Relied on Seven's prior research URLs and WorkIQ intelligence instead.
+
+**Decision:** Proceed with 4-phase adoption plan. Phase 0 (experiment design) starts immediately. Monitoring-only through Phase 1-2. Gating mode only in Phase 4, only for critical scenarios, only after 30-day burn-in.
+
+**Artifacts produced:**
+- `aurora-adoption-plan.md` — comprehensive plan with scenario definition framework, templates, phased rollout, experiment design, and impact analysis
+- Decision inbox entry: `.squad/decisions/inbox/picard-aurora-adoption-plan.md`
+- Issue #4 comment summarizing plan
+
+---
+
+### 2026-03-08: RP Registration Status — IcM 757549503 Analysis (Issue #11)
+
+**Context:** Tamir reported receiving a response on IcM 757549503 related to RP registration for Private.BasePlatform. Tasked with reviewing the IcM, researching RP registration requirements, and creating an action plan.
+
+**Key Findings:**
+
+1. **IcM 757549503 is a Sev 3 incident:** "[Private.BasePlatform] Cosmos DB role assignment failure blocking RP manifest rollout"
+   - Root cause: `NullReferenceException` in `CosmosDbRoleAssignmentJob` due to missing `jobMetadata` parameter
+   - Created 2026-03-06 by Andrew Gao
+   - State: **New** (unresolved) — no fix or workaround provided
+   - Area: MSAzure\One\Azure-ARM\Azure-ARM-Extensibility\Livesite
+
+2. **Related IcM 754149871:** Cosmos DB deployments failing during role assignment creation with `InternalServerError` from `CreateRoleAssignmentInServerPartitionsAsync` — may indicate platform-wide issue
+
+3. **This is a platform-side bug, not our misconfiguration:** The `NullReferenceException` is in RPaaS infrastructure code, not in our RP registration payload
+
+4. **RP registration pipeline is completely blocked:** Cannot proceed past the Cosmos DB role assignment step, which blocks manifest rollout, resource type registration, and all downstream steps
+
+5. **RPaaS onboarding process well-documented:** Synthesized comprehensive requirements from 6+ EngineeringHub docs covering Hybrid RP registration, Operations RT, manifest checkin, AFEC, and lifecycle stages
+
+**Technical Learnings:**
+
+1. **RPaaS Hybrid RP registration flow:** File onboarding IcM → RPaaS DRI creates mapping → PUT RP registration with PC Code + Profit Center → Register Operations RT → Manifest checkin → Rollout
+2. **Cosmos DB provisioning is automatic:** Since May 2024, OBO subscription is created automatically during RP registration when PC Code and Program ID are provided
+3. **RP Lite vs Hybrid vs Direct:** BasePlatformRP is correctly using Hybrid RP (mix of managed and direct resource types)
+4. **TypeSpec is mandatory since Jan 2024:** All new RPs must use TypeSpec for API specs
+5. **WorkIQ limitations:** Detailed IcM response content not accessible via WorkIQ — incident metadata and email thread subjects visible but not full email bodies
+
+**Decision:** Escalate through RPaaS IST Office Hours. Request manual Cosmos DB role assignment workaround. If unblocked within 2 weeks, proceed with registration PUT; otherwise escalate to Sev 2.
+
+**Artifacts produced:**
+- `rp-registration-status.md` — comprehensive status report with IcM analysis, checklist, blockers, and action plan
+- Decision inbox entry: `.squad/decisions/inbox/picard-rp-registration.md`
+- Issue #11 comment with findings and next steps

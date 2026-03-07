@@ -1,12 +1,9 @@
 name: Squad Preview Validation
 
 on:
-  push:
-    branches: [preview]
-
-permissions:
-  contents: read
-
+  workflow_dispatch:
+    # All auto-triggers disabled - hosted runners unavailable at org level
+    # Re-enable when runners are configured for this repo
 jobs:
   validate:
     runs-on: ubuntu-latest

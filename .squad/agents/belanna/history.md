@@ -12,6 +12,98 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-11: Issue #50 — NodeStuck Istio Exclusion Configuration (P0 Emergency)
+
+**Task:** Draft comprehensive Istio exclusion configuration to prevent NodeStuck automation from deleting nodes during Istio daemonset health degradation. Implements Karan's proposal from STG-EUS2-28 incident (Issue #46).
+
+**Background:** NodeStuck automation incorrectly treats Istio daemonset health failures as node infrastructure failures, triggering cascading node deletion during mesh incidents. This amplifies blast radius by forcing workload rescheduling onto equally unhealthy mesh infrastructure.
+
+**Configuration Delivered:**
+
+**Document:** `docs/nodestuck-istio-exclusion-config.md` (348 lines, 13KB)
+
+**Key Architectural Components:**
+
+1. **Istio Daemonsets to Exclude**
+   - **ztunnel** (HIGH risk): Node-level L4 proxy (Ambient mode) — failures cascade to entire mesh
+   - **istio-cni** (MEDIUM risk): CNI plugin for traffic interception — failures affect pod networking but NOT node viability
+   - **istio-operator** (LOW risk): Control plane operator — failures are mesh control issues, not node issues
+
+2. **Label-Based Exclusion Mechanism**
+   - Standardized exclusion labels: `app.kubernetes.io/component=istio`, `app=ztunnel`, `app=istio-cni`, `app=istio-operator`
+   - NodeStuck filters daemonsets BEFORE evaluating node health
+   - Pseudocode logic: `filteredDaemonsets = daemonsets.filter(ds => !hasExclusionLabel(ds))`
+
+3. **Health Signal Separation**
+   - **Node Infrastructure Health** (triggers deletion): Kubelet unreachable, disk/memory/PID pressure
+   - **Node Networking Health** (drain + investigate): CNI/DNS failures, routing issues
+   - **Daemonset Service Health** (alerts only, NO deletion): Istio, monitoring, logging daemonsets unhealthy
+   - **Key Insight:** Daemonset failures are service layer issues requiring pod restarts/version rollbacks, NOT node deletion
+
+4. **STG Validation Plan (4-Day Progressive Rollout)**
+   - **Day 1:** Deploy config to STG, apply exclusion labels to Istio daemonsets
+   - **Day 1-2:** Chaos engineering test (crash ztunnel pods on 2-3 nodes, verify NodeStuck does NOT delete nodes)
+   - **Day 2-3:** 48-hour monitoring (track false positive rate, ensure zero Istio-triggered deletions)
+   - **Day 3-4:** Progressive PROD rollout (1 region → all regions with 24-hour monitoring between)
+
+5. **Monitoring & Alerting Strategy**
+   - New metrics: `nodestuck_exclusion_applied_total`, `nodestuck_node_deletion_rate`, `istio_daemonset_unhealthy_duration_seconds`
+   - Alert rules: Istio unhealthy >15 min (manual investigation), node deletion rate drops to zero (exclusion too aggressive)
+   - Rollback plan: Remove exclusion labels + revert NodeStuck ConfigMap
+
+**Configuration Changes:**
+
+**Before (Problematic):**
+```yaml
+triggers:
+  - type: DaemonSetUnhealthy
+    action: DeleteNode
+    scope: AllDaemonSets  # ❌ Includes Istio
+```
+
+**After (Safe):**
+```yaml
+triggers:
+  - type: DaemonSetUnhealthy
+    action: DeleteNode
+    scope: FilteredDaemonSets  # ✅ Excludes Istio
+    exclusionLabels:
+      - "app.kubernetes.io/component=istio"
+```
+
+**Expected Impact:**
+- ✅ Zero node deletions triggered by Istio daemonset health (7-day measurement post-PROD)
+- ✅ 60-80% blast radius reduction during mesh incidents
+- ✅ 30-50% MTTR improvement (no cascading node loss)
+- ✅ Node deletion rate for actual infrastructure failures unchanged (<5% variance)
+
+**Coordination:**
+- **PR #52:** https://github.com/tamirdresher_microsoft/tamresearch1/pull/52
+- **Issue #50 Comment:** https://github.com/tamirdresher_microsoft/tamresearch1/issues/50#issuecomment-4017084648
+- **Reviewers:** SRE Lead (NodeStuck owner), Platform Lead (Istio owner), Karan (proposal author), Picard (incident #46 owner)
+
+**Related Issues & Roadmap:**
+- **Issue #50 (This Work):** IMMEDIATE — Istio exclusion (48 hours)
+- **Issue #46:** STG-EUS2-28 incident root cause analysis
+- **Issue #24:** Tier 1 Stability (I1 Istio Exclusion List — 2-3 weeks)
+- **Issue #25:** Tier 2 Stability (I2 ztunnel health monitoring with auto-rollback — 6-8 weeks)
+
+**Pattern Learned:** P0 emergency mitigations require:
+1. **Root cause clarity:** Distinguish infrastructure failures from service layer failures
+2. **Surgical exclusion:** Use label-based filtering to exclude specific components without disabling entire automation
+3. **Progressive validation:** STG chaos tests → 48-hour monitoring → progressive PROD rollout
+4. **Monitoring discipline:** Track both false positives (exclusion working) AND false negatives (exclusion too aggressive)
+5. **Phased roadmap:** IMMEDIATE exclusion (48h) → Tier 1 permanent fixes (2-3w) → Tier 2 auto-recovery (6-8w)
+
+**Technical Insight:** NodeStuck automation conflates "pod unhealthy" with "node unhealthy" when both are true, but causality is reversed: Istio daemonset failures make pods unhealthy, not vice versa. Excluding Istio daemonsets breaks the cascade: mesh failures stay mesh failures, don't propagate to node deletion layer.
+
+**Open Questions for Reviewers:**
+1. Are there additional Istio components (istio-ingress, istio-egress) deployed as DaemonSets that should be excluded?
+2. Does NodeStuck automation have existing label-based filtering logic, or does this require new feature development?
+3. Should exclusion apply cluster-wide or be configurable per-environment (STG more aggressive, PROD more conservative)?
+
+---
+
 ### 2026-03-11: Infrastructure Issues Status Update — Issues #24, #25, #29, #35
 
 **Task:** Check status and provide updates on 4 assigned DK8S/infrastructure issues. Review current work, comment on progress, apply status labels.

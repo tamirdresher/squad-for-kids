@@ -1,0 +1,20 @@
+// OPA Daily Summary Query
+// Purpose: Aggregate OPA violations for past 24 hours
+// Owner: Worf (Security & Cloud)
+
+GatekeeperViolations_CL
+| where TimeGenerated >= ago(24h)
+| where event_type_s == "violation"
+| summarize 
+    TotalViolations = count(),
+    UniqueNamespaces = dcount(namespace_s),
+    UniqueUsers = dcount(user_s),
+    UniqueConstraints = dcount(constraint_kind_s)
+    by bin(TimeGenerated, 1h)
+| project 
+    Hour = TimeGenerated,
+    TotalViolations,
+    UniqueNamespaces,
+    UniqueUsers,
+    UniqueConstraints
+| order by Hour desc

@@ -16,7 +16,7 @@ while ($true) {
     Write-Host "============================================" -ForegroundColor Cyan
     
     try {
-        agency copilot --yolo --agent squad -p $prompt
+        agency copilot --yolo --autopilot --agent squad -p $prompt
         Write-Host "[$timestamp] Round $round completed" -ForegroundColor Green
     } catch {
         Write-Host "[$timestamp] Error: $($_.Exception.Message)" -ForegroundColor Red

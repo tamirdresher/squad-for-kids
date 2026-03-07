@@ -87,6 +87,25 @@ $PoolName = "your-pool-name"
 
 ## Usage
 
+### Natural Language Provisioning (Phase 2)
+
+The Squad skill enables natural language DevBox provisioning. Use phrases like:
+
+```
+"Create 3 new devboxes like mine"
+"Clone my devbox as feature-auth"
+"Create a devbox named test-env in project research-lab using pool high-memory"
+"What's my current devbox configuration?"
+```
+
+The skill is located at `.squad/skills/devbox-provisioning/SKILL.md` and provides:
+- Pattern matching for common provisioning requests
+- Auto-detection of current DevBox configuration
+- Validation and error handling
+- Bulk provisioning orchestration
+
+For technical details, see the [SKILL.md](../.squad/skills/devbox-provisioning/SKILL.md) documentation.
+
 ### Quick Start: Clone Your Dev Box
 
 The fastest way to create a new Dev Box with the same configuration as your current one:
@@ -157,6 +176,24 @@ az deployment group create `
 .\scripts\clone-devbox.ps1 -NewDevBoxName "hotfix-env"
 ```
 
+### `bulk-provision.ps1` (Phase 2)
+**Purpose:** Create multiple Dev Boxes for team environments  
+**Parameters:**
+- `-Count` (optional): Number of Dev Boxes to create (default: 3)
+- `-NamePrefix` (optional): Prefix for generated names (default: "devbox")
+- `-Names` (optional): Explicit array of names
+- `-Sequential` (optional): Create one at a time (default: parallel)
+- `-MaxConcurrent` (optional): Max parallel operations (default: 5)
+
+**Example:**
+```powershell
+# Create 5 Dev Boxes with auto-generated names
+.\scripts\bulk-provision.ps1 -Count 5 -NamePrefix "sprint-42"
+
+# Create Dev Boxes with explicit names
+.\scripts\bulk-provision.ps1 -Names @("alice-dev", "bob-dev", "charlie-dev")
+```
+
 ## Troubleshooting
 
 ### Extension Installation Fails
@@ -201,17 +238,23 @@ If you cannot connect to a provisioned Dev Box:
 
 ## Roadmap
 
-### Phase 1 (Current)
+### Phase 1 (Complete) ✅
 - ✅ Bicep template scaffolding
 - ✅ PowerShell provisioning scripts
 - ✅ Auto-detection and cloning capabilities
 - ✅ Documentation and troubleshooting guides
 
-### Phase 2 (Planned)
-- 🔲 Squad Skill: Natural language Dev Box provisioning
+### Phase 2 (Complete) ✅
+- ✅ Squad Skill: Natural language Dev Box provisioning
+- ✅ Bulk provisioning script for team environments
+- ✅ Natural language pattern matching and interpretation
+- ✅ Error handling and validation patterns
+
+### Phase 3 (Planned)
 - 🔲 MCP Server integration (`@microsoft/devbox-mcp`)
 - 🔲 Advanced templating: custom images, network configs
-- 🔲 Multi-Dev Box orchestration (teams, ephemeral envs)
+- 🔲 Cost optimization: auto-hibernation schedules
+- 🔲 CI/CD integration: ephemeral DevBoxes for PRs
 
 ## Contributing
 
@@ -231,5 +274,5 @@ To add features or fix issues:
 ---
 
 **Maintained by:** B'Elanna (Infrastructure Expert)  
-**Issue:** #35  
-**Status:** Phase 1 Complete
+**Issues:** #35 (Phase 1), #63 (Phase 2)  
+**Status:** Phase 2 Complete

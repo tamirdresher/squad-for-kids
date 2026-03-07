@@ -394,6 +394,68 @@ When blocking conditions are addressable (not architectural failures), DEFER wit
 
 3. **This is a platform-side bug, not our misconfiguration:** The `NullReferenceException` is in RPaaS infrastructure code, not in our RP registration payload
 
+---
+
+### 2026-03-07: Repository Split Execution (Issue #34)
+
+**Context:** Tamir approved proposal to split tamresearch1 into dedicated private repositories. Executed the plan: created 3 new repos, migrated 61 files, preserved core infrastructure, created catalog.
+
+**Technical Execution:**
+
+1. **Created 3 Private Repos (tamirdresher_microsoft org):**
+   - `tamresearch1-dk8s-investigations` — 20 files (DK8S platform research)
+   - `tamresearch1-agent-analysis` — 5 files (squad formation reports)
+   - `tamresearch1-squadplaces-research` — 36 files (API exploration, screenshots, test data)
+
+2. **Migration Protocol:**
+   - Cloned empty repos to temp directory
+   - Copied files from tamresearch1 to respective repos
+   - Added migration header to all markdown/yaml files: `<!-- Moved from tamresearch1 on 2026-03-07 -->`
+   - Committed with descriptive messages including co-author trailer
+   - Pushed to main branch
+   - Deleted migrated files from tamresearch1
+   - Created `.squad/research-repos.md` catalog with links to all three repos
+   - Committed cleanup to tamresearch1
+
+3. **Preserved in tamresearch1:**
+   - `.squad/` directory (agent configurations, history, decisions, skills)
+   - `squad.config.ts`, `package.json`, `package-lock.json`, `node_modules/`
+   - `ralph-watch.ps1` (monitoring script)
+   - Summary files: `EXECUTIVE_SUMMARY.md`, `QUICK_REFERENCE.txt`, `RESEARCH_REPORT.md`
+
+**Key Learnings:**
+
+1. **Git Automation at Scale:** Batch operations (61 files) across 3 repos require PowerShell loops with error handling. Using `Test-Path` validation before copying prevents pipeline failures.
+
+2. **Migration Headers as Provenance:** Adding `<!-- Moved from tamresearch1 on YYYY-MM-DD -->` to markdown/yaml files creates audit trail for future reference. Critical for understanding artifact origins in private research repos.
+
+3. **Catalog Files are Essential:** Creating `.squad/research-repos.md` with links, descriptions, and file inventories provides single source of truth. Prevents "where did that file go?" questions.
+
+4. **Private Repos by Default:** All research repos created with `--private` flag. Research artifacts, internal APIs, and screenshots should never be public.
+
+5. **Preserve Core Infrastructure:** `.squad/` directory and configuration files (squad.config.ts, package files) must stay in main repo. Splitting knowledge without splitting infrastructure.
+
+6. **Git Workflow Discipline:**
+   - Multi-repo operations complete before touching source repo
+   - Verify all pushes succeeded before deleting source files
+   - Use descriptive commit messages with context
+   - Always include co-author trailer for GitHub Copilot CLI commits
+
+**Decision Pattern Applied:**
+- **Execute approved plans completely:** No incremental "let's test one repo first" — execute the full plan as proposed
+- **Verify before delete:** Ensure all remote pushes succeeded before removing source files
+- **Document the split:** Catalog file is not optional; it's the index to the distributed knowledge graph
+- **Atomic cleanup:** Single commit removes all migrated files and adds catalog
+
+**Outcome:** Clean repository split. Core team infrastructure (agents, decisions, skills, monitoring) stays in tamresearch1. Research artifacts distributed to topic-specific private repos. Catalog provides navigation.
+
+**Artifacts:**
+- `.squad/research-repos.md` — Catalog with links and content inventory
+- 3 new private repos populated with 61 migrated files
+- Issue #34 closed with completion report
+
+---
+
 4. **RP registration pipeline is completely blocked:** Cannot proceed past the Cosmos DB role assignment step, which blocks manifest rollout, resource type registration, and all downstream steps
 
 5. **RPaaS onboarding process well-documented:** Synthesized comprehensive requirements from 6+ EngineeringHub docs covering Hybrid RP registration, Operations RT, manifest checkin, AFEC, and lifecycle stages

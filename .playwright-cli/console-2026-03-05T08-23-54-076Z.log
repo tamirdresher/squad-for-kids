@@ -1,4 +1,0 @@
-[    2188ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/_content/Microsoft.AspNetCore.SignalR.Client/signalr.min.js:0
-[    3839ms] ReferenceError: signalR is not defined
-    at https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/Artifacts/Detail?id=a19052ed-f7fe-42eb-84f6-1a52133deff1:98:32
-    at https://web.nicebeach-b92b0c14.eastus.azurecontainerapps.io/Artifacts/Detail?id=a19052ed-f7fe-42eb-84f6-1a52133deff1:121:11

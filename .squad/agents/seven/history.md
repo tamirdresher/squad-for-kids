@@ -100,6 +100,66 @@ Squad Places demonstrates that *effective knowledge transfer between AI agents i
 
 ---
 
+### 2026-03-08: Squad vs OpenCLAW & Multi-Agent Frameworks — Differentiation Analysis
+
+**Task:** Research OpenCLAW, CrewAI, MetaGPT, ChatDev, and related projects; determine if Squad is reinventing the wheel; answer Issue #32  
+**Outcome:** Comprehensive comparison posted to GitHub Issue #32; clear differentiation established
+
+**Key learnings:**
+
+1. **Squad is NOT Reinventing — It's Solving a Different Problem**
+   - OpenCLAW: Single-agent personal automation daemon (WhatsApp/Slack messages → tasks → actions)
+   - CrewAI: Python library for role-based multi-agent workflows (business processes, repeatable operations)
+   - MetaGPT: Simulates software engineering company (PM → Architect → Coder → QA)
+   - **Squad:** Persistent AI agent team with stateful memory across sessions, GitHub issues as work queue, decision ledgers
+
+2. **Squad's Genuine Differentiation Points**
+   - **GitHub as Work Queue** — Tasks enter as issues, not chat messages; enables public visibility, audit trails, approval loops
+   - **Persistent Agent Memory** — Each agent logs learnings to history.md (not conversation history; institutional knowledge)
+   - **Decision Ledger** — `.squad/decisions.md` makes team choices explicit and traceable (other frameworks have implicit decisions)
+   - **Casting + Identity System** — Agents drawn from Star Trek universe; distinct voices + personas aid memory and specialization
+   - **Work Monitor (Ralph)** — Active queue triage; not passive chat-waiting like OpenCLAW
+   - **No Chat Dependency** — Works through CLI/VS Code; no Slack/WhatsApp/Discord required
+
+3. **Market Positioning**
+   - **OpenCLAW is best for:** "I'm tired of repetitive manual tasks" (clear email, manage calendar from chat)
+   - **Squad is best for:** "I need a team that gets smarter as we work on this complex project together"
+   - **Both solve real problems; no direct competition.** The market is underserved for *stateful team coordination with persistent memory*.
+
+4. **Competitive Analysis Against All Frameworks**
+   - **AutoGPT:** Single-agent autonomous loop; Squad has specialized multi-agent coordination
+   - **CrewAI:** Python-library first with role-based tasks; Squad is GitHub-issue first with persistent memory traces
+   - **MetaGPT:** Domain-specific (software engineering); Squad is domain-agnostic (infrastructure, research, security, code)
+   - **ChatDev:** Conversational task decomposition; Squad is decision-trace-based coordination
+   - **AWS Agent Squad:** Closest in spirit (orchestrator + specialized agents); key diff is CLI/GitHub integration + memory persistence
+
+5. **Why Stateful Agent Teams Are Underserved**
+   - Most frameworks optimize for single-interaction loops (OpenCLAW) or per-session role assignment (CrewAI)
+   - Squad's bet on *persistent team memory through GitHub issues and .squad/ artifacts* is genuinely novel
+   - This is valuable when: domain knowledge accumulates, security findings must persist, architectural decisions need traces, team learnings compound
+
+6. **Key Insight: Narrative-Based Knowledge is Squad's Strength**
+   - From prior Squad Places research: AI agents prefer *reasoning traces* over *compressed facts*
+   - Squad's decision.md + history.md + agent charters embody this principle
+   - This is why Squad agents can "remember" context across sessions in ways other frameworks cannot
+
+**Technical Findings:**
+- OpenCLAW: 6+ messaging platform integrations, model-agnostic (Claude, GPT, local), skill plugin system
+- CrewAI: ~3 years of market adoption, Python-first, large open-source community, production use cases
+- MetaGPT: Strong for code generation; ~2 years in market
+- AWS Agent Squad: ~1 year old, gaining adoption in AWS ecosystem
+- Squad: Unique positioning at intersection of GitHub-native workflows + persistent agent memory
+
+**Market Intelligence:**
+- No existing framework combines: GitHub integration + stateful memory + multi-agent specialization + decision ledger
+- OpenCLAW growing fastest (personal productivity space)
+- CrewAI most adopted for enterprise workflows
+- Squad has **zero direct competitors** but competes indirectly with: CrewAI (multi-agent), AutoGPT (autonomy), MetaGPT (role simulation)
+
+**Confidence Level:** High. Researched via web_search (5+ credible sources), visited frameworks' official sites, analyzed architecture and positioning.
+
+---
+
 ## Cross-Session Learning: Azure DevOps Access Limitations
 
 **Important for all future sessions with this team:**
@@ -344,3 +404,49 @@ Aurora represents paradigm shift from "test before deploy" → "validate during 
 - PR #10 comment: 6-pattern analysis with specific recommendations for each design phase
 - Issue #13 comment: Broader analysis of how patterns apply to squad-wide improvement
 - `.squad/decisions/inbox/seven-openclaw-patterns.md` — Decision proposal for adopting OpenCLAW patterns
+
+### 2026-03-09: Work-Claw / CLAW Investigation & Sandbox Experiment (Issue #17)
+
+**Task:** Investigate Work-Claw product for sandbox feasibility and identify use cases for Tamir's DK8S workflows  
+**Outcome:** 2-part research delivered to Issue #17
+
+**Part 1: Initial Research — What Work-Claw Is**
+
+1. **Work-Claw ≠ OpenClaw** — Work-Claw is an internal Microsoft initiative called **CLAW (Copilot-Linked Assistant Workspace)**, led by Sudipto Rakshit
+2. **What it is** — Personal AI assistant that runs locally, has persistent memory, learns user preferences/projects/team context, extensible via skills
+3. **How Tamir got invited** — Sudipto added him to the "Work-Claw" Microsoft Teams team; confirmed via WorkIQ email search
+4. **Resources found** — Teams channel (Work-Claw/General), GitHub repo (suraks_microsoft/work-claw), SharePoint site
+5. **OpenClaw connection** — CLAW is inspired by OpenClaw concepts but adapted for Microsoft internal use. Vanilla OpenClaw has critical security warnings from Microsoft's own security blog (CVE-2026-25253, credential exposure, untrusted code execution)
+
+**Part 2: Sandbox Experiment Design — How to Run It Safely**
+
+**Key learnings on sandbox feasibility:**
+1. **Microsoft's own OpenClaw security guidance provides clear model** — Feb 2026 blog post + OpenClaw docs specify exact isolation requirements: dedicated VMs, non-privileged credentials, read-only access initially, audit logging
+2. **CLAW inside Microsoft's security boundary is safer than vanilla OpenClaw** — Internal adaptation means some compliance work already done, but still early-stage with no formal SLA
+3. **2-phase approach is practical** — Phase 1 (Week 1): isolated pilot with Teams/OneDrive/Calendar read-only, no code execution, weekly audit export; Phase 2 (Weeks 2-4): expand to ADO/GitHub read, monitor each skill
+4. **Stopping point is clear** — any suspicious activity triggers immediate rollback; CLAW is additive, not structural
+5. **Skills system is the attack surface** — only enable recommended skills; review code before enabling
+
+**Part 3: Seven Use Cases Tailored to Tamir's DK8S World (High Specificity)**
+
+Based on analysis of DK8S platform workflows, stability patterns, and ConfigGen challenges:
+
+1. **ConfigGen Breaking Change Early Warning** — CLAW learns cluster topology, monitors SDK support channel + release notes, alerts before CI hits breaking changes. **Impact: 2-3 hours per incident prevented.**
+2. **IcM Incident Context Assembly** — Sev2 fires; CLAW summarizes past 6 months of DNS+networking incidents with cluster, AZ, resolution. **Impact: 15-30 min triage acceleration.**
+3. **Pre-Deployment Health Checks** — Before EV2 rollouts, CLAW assembles zone-aware NAT status, Istio enrollment %, node churn, open incidents. **Impact: 20 min per deployment.**
+4. **Meeting Prep: Cross-Team Context** — Before AKS/Aurora/ConfigGen meetings, CLAW prepares 1-page brief of recent decisions, blockers, waiting PRs. **Impact: 30-45 min per cross-team meeting.**
+5. **ConfigGen PR Review Assistant** — CLAW analyzes PR against known cluster patterns, flags edge cases, suggests review questions. **Impact: 10-15 min per review.**
+6. **Deployment Blast Radius Analysis** — CLAW traces dependency graph: if I deploy to [cluster list], what services are affected? **Impact: 15-20 min per major rollout.**
+7. **Living Documentation: Architectural Decisions** — CLAW becomes knowledge assistant synthesizing quarterly decisions, trade-offs, reconsidered items. **Impact: 30+ min per knowledge question.**
+
+**Key insight:** CLAW is **always-on persistent context** for ConfigGen complexity, incident triage, deployment risk, cross-team coordination. Different from squad agents (session-based, analytical reasoning) — complementary, not replacement.
+
+**Sources used:**
+- WorkIQ: Teams messages from Sudipto Rakshit, email invitation, SharePoint site
+- Web search: Microsoft's OpenClaw security guidance (Feb 2026), OpenClaw docs, sandbox best practices, Copilot workspace security architecture
+- Domain knowledge: DK8S platform analysis (stability, ConfigGen patterns), Tamir's operational workflows, recurring incident patterns
+- Cross-reference with Issue #13 OpenCLAW research and continuous learning system design
+
+**Artifacts:**
+- Issue #17 comment part 1: Comprehensive sandbox experiment design with 2-phase approach and security guardrails
+- work-claw-response-part1.md: Full detailed response with rationale

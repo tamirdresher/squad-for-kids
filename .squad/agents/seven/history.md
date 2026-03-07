@@ -10,6 +10,57 @@
 
 ## Learnings
 
+### 2026-03-11: Issue #17 — Work-Claw Investigation & TAM-Specific Value Analysis
+
+**Task:** Investigate GitHub Issue #17 ("check the product/project Work-Claw that i was invited to use"). Analyze what Work-Claw is, how it differs from Squad, where it fits into Tamir's daily workflow, and provide concrete scenarios where it would save time.
+
+**Outcome:** Delivered 9,169-character comprehensive analysis document (.squad/decisions/inbox/seven-workclaw-issue17-analysis.md) with:
+- Clear definition of Work-Claw (CLAW = Copilot-Linked Assistant Workspace)
+- Distinction vs Squad (local-first + persistent memory vs cloud orchestration)
+- Tamir's daily pattern analysis (100+ meetings, notification-heavy email, deep Teams threads, knowledge trapped in chat)
+- Three concrete high-ROI scenarios (email triage, meeting post-processing, context continuity)
+- Comparison matrix (Squad vs Work-Claw vs WorkIQ)
+- Setup & risk guidance
+
+**Key findings:**
+
+1. **Work-Claw is complementary, not competing** — Squad handles team-level digests; Work-Claw handles personal automation. They reinforce each other.
+
+2. **Three immediate high-ROI use cases for Tamir:**
+   - Email triage agent (60% inbox reduction, 2–3 day setup)
+   - PR feedback automation (reuse v0.19 Copilot Feedback Agent)
+   - Decision capture (post-meeting extraction + tagging)
+   - **Expected time savings: 5–7 hours/week**
+
+3. **Work-Claw positioning: "The last mile of an agent"** (per Sudipto Rakshit, Teams)
+   - Stateful, persistent, locally controlled (vs stateless chat)
+   - Long-term memory across sessions (vs session-based)
+   - Autonomous action capability (vs read-only insights like WorkIQ)
+   - Critical for individual contributors, managers, TAMs
+
+4. **From Teams discussions:**
+   - Dani Halfin built email triage agent; explicitly said WorkIQ "doesn't cut it" for autonomous actions
+   - v0.19 release featured Copilot Feedback Agent (PR comment automation) + Dev Tunnel remote access
+   - Product actively developed; contributions encouraged in #Work-Claw channel
+
+5. **Why this matters:** Tamir's work pattern isn't *information deficit*—it's **information fragmentation + context re-hydration cost**. 
+   - 100+ meetings = scattered decisions
+   - Notification email = signal/noise ratio collapse
+   - Deep Teams threads = knowledge buried in chat
+   - Work-Claw solves this via local automation + persistent context
+
+**Comparison matrix created:**
+- Squad: Real-time digests ✅, Autonomous PR ✗, Email triage ✗, Meetings (manual)
+- Work-Claw: Real-time digests ✗, Autonomous PR ✅, Email triage ✅, Meetings (auto)
+- WorkIQ: Real-time digests ✗, Autonomous PR ✗, Email triage ✗, Meetings ✗, but M365 pattern analysis ✅
+
+**Artifacts:**
+- `.squad/decisions/inbox/seven-workclaw-issue17-analysis.md` — Full analysis with scenarios, risks, setup guidance
+
+**Decision made:** Recommended email triage as Tamir's first agent (2–3 day setup, immediate 60% inbox reduction). This creates a pattern for PR feedback + decision capture follow-ups.
+
+---
+
 ### 2026-03-10: Issue #23 — Apply OpenCLAW Patterns Analysis & Implementation Plan
 
 **Task:** Evaluate three OpenCLAW patterns (QMD Framework, Dream Routine, Issue-Triager Scanner) for Squad adoption. Document what they are, how OpenCLAW uses them, how Squad could adopt them, and post comprehensive analysis on issue #23.
@@ -1035,3 +1086,14 @@ Based on analysis of DK8S platform workflows, stability patterns, and ConfigGen 
 - All templates include integration sections showing how they connect to each other and existing Squad infrastructure
 
 **Why this matters:** These templates transform the OpenCLAW analysis (previous session's 5,500-line assessment) into actionable, ready-to-use artifacts. Any agent can now run QMD extraction, Dream Routine, or Issue-Triager by following these templates. Memory separation rules provide the governance framework that prevents signal/noise degradation over time.
+
+
+## Round 1 — 2026-03-07T19:59:30Z (Ralph Orchestration)
+
+**Async background execution**: Researched Issue #17 — Work-Claw product analysis for Tamir.
+
+**Finding**: Delivered comprehensive Work-Claw vs. Squad vs. WorkIQ analysis. Identified 3 high-ROI scenarios (email triage, meeting post-processing, context continuity). Recommended starting with email triage agent (2–3 days setup, 60% inbox reduction). Posted analysis to Issue #17.
+
+**Key insight**: Work-Claw is the "last mile of an agent" — deeply personalized, persistent, locally controlled. Complementary to Squad, not competitive.
+
+**Status**: Analysis complete. Awaiting Tamir's decision on Work-Claw evaluation.

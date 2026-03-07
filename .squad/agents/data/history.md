@@ -1100,3 +1100,40 @@ All three issues have clear status and next steps. ADO integration is tested, Ra
 **Comment**: Posted on [#39](https://github.com/tamirdresher_microsoft/tamresearch1/issues/39#issuecomment-4017124032)
 
 **Decision file**: `.squad/decisions/inbox/data-copilot-actions.md`
+
+
+---
+
+### 2026-03-08: Squad CLI upstream Command — Issue #1 Investigation
+
+**Task**: Investigate GitHub Issue #1 — "Squad CLI: upstream command not available in latest version". Tamir question: "Look at the squad repo, it was fixed there, was any version pushed that we can use?"
+
+**Findings**:
+- **Fix exists**: Merged March 6, 2026 via PR #225 (commit 2c6079d)
+- **Root cause**: upstream command (add/remove/list/sync) was fully implemented in upstream.ts but never wired into cli-entry.ts. Running squad upstream returned "Unknown command".
+- **Author**: Tamir Dresher himself (closed bradygaster/squad#224)
+- **GitHub release**: v0.8.21 tagged ~11 minutes before investigation
+- **npm status**: NOT YET PUBLISHED — Latest on npm is 0.8.20 (March 4, 2026)
+
+**Methodology**:
+1. Used gh release list to identify recent releases (v0.8.21 latest)
+2. Used gh search commits to find upstream-related commits
+3. Used npm view to check published versions vs GitHub tags
+4. Identified timing gap: GitHub release exists, npm publish pending
+
+**Outcome**: Posted comprehensive findings to Issue #1. User should wait for npm publish, then update via npm update @bradygaster/squad-cli.
+
+**Learning**: GitHub releases and npm publishes are decoupled. Always check both gh release list AND npm view to identify the "available to users" version vs "tagged on GitHub" version.
+
+
+
+## Round 1 — 2026-03-07T19:59:30Z (Ralph Orchestration)
+
+**Async background execution**: Investigated Issue #1 — Squad CLI upstream command availability.
+
+**Finding**: Fix merged in bradygaster/squad (PR #225, March 6) but not published to npm yet. v0.8.21 on GitHub, v0.8.20 on npm. Posted decision to Issue #1.
+
+**Key insight**: GitHub releases and npm publishes are decoupled. Always check both gh release list AND 
+pm view to identify "available to users" version.
+
+**Status**: Awaiting npm publish (external dependency). Monitoring for v0.8.21 release.

@@ -806,3 +806,39 @@ When reviewing infrastructure automation (IaC, provisioning scripts):
 5. **Configuration externalization**: Are environment-specific values parameterized rather than hardcoded?
 
 B'Elanna's DevBox provisioning scripts meet all five criteria, making them production-ready for Phase 1.
+
+
+---
+
+**Issue #44 - GitHub Teams Integration (Setup Guidance):**
+
+**Problem identified:** Tamir attempted to subscribe Teams to the tamresearch1 repo but received error: "GitHub Connector for Teams GitHub App isn't installed for that repository". The missing step was installing the GitHub App on the repository side (not just signing into GitHub from Teams).
+
+**Root cause:** The GitHub Teams integration requires TWO installations:
+1. **Teams side:** Install "GitHub for Microsoft Teams" app from Teams App Store (Tamir completed this)
+2. **GitHub side:** Install "GitHub Connector for Teams" GitHub App on the repository at https://github.com/apps/github-connector-for-teams (this was missing)
+
+**Resolution:** Created comprehensive step-by-step guide as comment on Issue #44, emphasizing the GitHub App installation as the critical missing step. Labeled issue as \status:pending-user\ since this requires Tamir's manual authorization (OAuth flows cannot be automated by AI agents).
+
+**Existing automation:** Repo already contains \setup-github-teams-integration.ps1\ which uses Microsoft Graph API to automate the Teams app installation, but correctly documents that OAuth signin and repository subscription still require manual interaction.
+
+**Key insight — OAuth Integration Pattern:**
+When guiding users through OAuth-based integrations (GitHub ↔️ Teams, GitHub ↔️ Slack, etc.):
+1. **Identify both sides:** Most integrations require app installation on BOTH platforms (source and destination)
+2. **OAuth boundaries:** AI agents cannot complete OAuth flows (requires interactive browser authentication)
+3. **Error message interpretation:** When users report subscription failures, check if the corresponding GitHub App is installed on the repository
+4. **Guide structure:** Provide numbered steps with clear success indicators, troubleshooting links, and ETA estimates
+5. **Label appropriately:** Use \status:pending-user\ for tasks that are blocked on user authentication/authorization
+
+For Issue #44, the blocker was the missing GitHub App installation. Once Tamir installs the app (< 1 minute), the subscription command will succeed immediately.
+
+
+## Round 1 — 2026-03-07T19:59:30Z (Ralph Orchestration)
+
+**Async background execution**: Troubleshooting Issue #44 — GitHub in Teams setup failure.
+
+**Finding**: Root cause identified: requires TWO installations (Teams app + GitHub Connector app on repo). Missing GitHub App installation on repo side was the blocker. Posted step-by-step setup guide to Issue #44. Labeled status:pending-user (requires manual OAuth).
+
+**Key insight**: OAuth integrations require installations on BOTH platforms. Error messages often point to missing installation on destination side. Agents cannot complete OAuth flows; that's always user responsibility.
+
+**Status**: Documentation complete. Awaiting user to install GitHub App and authorize OAuth flow.

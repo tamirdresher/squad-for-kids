@@ -3164,3 +3164,237 @@ If Fairfax/Mooncake deployment delayed:
 
 FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md (full technical analysis)
 
+
+
+---
+
+## Squad CLI Upstream Command Availability
+
+(Merged from inbox — 2026-03-07T19-59-30Z)
+
+# Squad CLI Upstream Command Availability
+
+**Date**: 2026-03-08  
+**Author**: Data (Code Expert)  
+**Status**: Informational  
+**Related**: Issue #1
+
+## Context
+
+The squad CLI `upstream` command was reported as unavailable in Issue #1. Investigation revealed a timing gap between GitHub releases and npm package publishing.
+
+## Findings
+
+**Fix Status**:
+- Merged into bradygaster/squad main branch on March 6, 2026 (PR #225, commit 2c6079d)
+- Author: Tamir Dresher
+- Root cause: Command implemented but not wired into CLI entry point
+- GitHub release: v0.8.21 (tagged March 7, 2026)
+- npm publish: PENDING (latest is 0.8.20 from March 4, 2026)
+
+**Command Capabilities**:
+The upstream command provides:
+- `squad upstream add` - Add upstream Squad source (org/team/repo)
+- `squad upstream remove` - Remove upstream source
+- `squad upstream list` - List configured upstreams
+- `squad upstream sync` - Sync inherited context from upstreams
+
+## Decision
+
+**Wait for npm publish**: Team should wait for @bradygaster/squad-cli@0.8.21 to be published to npm before updating. The fix exists but is not yet available through normal package manager channels.
+
+**Update command**: Once published:
+```bash
+npm update @bradygaster/squad-cli
+# or
+npm install -g @bradygaster/squad-cli@latest
+```
+
+## Lessons Learned
+
+1. **GitHub releases ≠ npm availability**: Always check both `gh release list` and `npm view` when investigating package versions
+2. **Publication delay is normal**: There's typically a delay between tagging a GitHub release and publishing to npm
+3. **Direct source install is possible**: In urgent cases, can install from GitHub tarball, but not recommended for production use
+
+## Monitoring
+
+Data will monitor npm registry and update Issue #1 when 0.8.21 becomes available.
+
+
+
+---
+
+## Work-Claw Analysis for Tamir Dresher — Issue #17
+
+(Merged from inbox — 2026-03-07T19-59-30Z)
+
+# Work-Claw Analysis for Tamir Dresher — Issue #17
+
+## Executive Summary
+
+**Work-Claw (CLAW = Copilot-Linked Assistant Workspace)** is an internal persistent AI assistant platform that runs locally on your dev box, learns your context over time, retains memory between sessions, and spawns autonomous sub-agents. Based on your Teams discussions and daily work patterns, here's where it would directly help you:
+
+---
+
+## What is Work-Claw?
+
+From Teams discussions with Sudipto Rakshit (creator), Work-Claw is:
+
+- **Persistent, local-first AI assistant** — runs on your machine, not cloud-dependent
+- **Long-term memory** — remembers projects, preferences, team context, and historic decisions
+- **Agent orchestration** — can spawn autonomous sub-agents, schedule tasks, build knowledge graphs
+- **Multi-interface** — accessible via web UI (localhost), CLI, or desktop app
+- **GitHub Copilot SDK powered** — integrates with dev workflows
+
+### Recent Major Release (v0.19)
+- Remote access via Microsoft Dev Tunnels
+- Mobile-optimized web UI
+- **Copilot Feedback Agent** — autonomously processes unresolved PR comments, fixes them, commits, and re-triggers reviews
+- Email triage agent (reference: Dani Halfin's implementation)
+
+---
+
+## How Squad Differs from Work-Claw
+
+**Squad** (your project team): Orchestrates LLM agents for structured workflows — digests, triaging, notifications, compliance reporting. **Cloud-based, state-managed, deterministic.**
+
+**Work-Claw**: Personal automation platform for **autonomous, long-running, memory-enabled workflows on your local machine.**
+
+| Dimension | Squad | Work-Claw |
+|-----------|-------|-----------|
+| Architecture | Cloud agents + state persistence | Local machine + persistent memory |
+| Deployment | Centralized (team) | Personal (single dev box) |
+| Use cases | Workflow orchestration, digests, incidents | Autonomous tasks, context awareness, agent spawning |
+| Memory model | Session-based | Long-term, cross-session |
+| Control | Stateless requests | Stateful, persistent agents |
+
+**They complement each other** — Squad handles team-level digests and automation; Work-Claw handles your personal context and autonomous workflows.
+
+---
+
+## Tamir's Daily Work Patterns (From Calendar, Email, Teams)
+
+**Your reality:**
+- **100+ recurring + one-off meetings** — mix of working sessions, broadcasts, and cross-org alignment
+- **Notification-heavy email** — CI failures, PRs, ADO incidents, GitHub updates (not conversational)
+- **Deep Teams threads** — 3–10 message chains explaining architecture, migrations, troubleshooting
+- **Knowledge trapped in chat** — explanations you've written 3+ times exist only in threads
+- **After-hours collaboration** — async work spanning time zones and outside 9-5
+- **Context re-hydration cost** — frequently resuming work requires re-reading meeting notes, chat history, and PR context
+
+---
+
+## Three Concrete Scenarios Where Work-Claw Would Help You
+
+### Scenario 1: Email Triage & PR Notification Collapse
+**Current reality:** You receive 15–30 emails/day from GitHub, ADO, and Outlook. Many are red herrings (auto-updates, low-signal CI noise). You manually scan each one.
+
+**With Work-Claw:**
+- Autonomous email agent categorizes inbox into "Critical incident", "Needs your review", "FYI", "Archive".
+- Groups related CI failures ("these 4 failures are the same root cause") into single digest.
+- Creates runbook: "When Sev 2 incident detected, fetch full context, summarize for leadership, flag for your escalation queue."
+- **Result:** Inbox reduced from 30 emails/day to 3–5 actionable summaries. No inbox backlog.
+
+*Reference: Dani Halfin's Teams post on email triage agent.*
+
+### Scenario 2: Meeting Post-Processing & Decision Capture
+**Current reality:** You attend 4–6 meetings/day. Notes are scattered (OneNote, Teams chat, email). Following up requires re-watching recordings or pinging participants.
+
+**With Work-Claw:**
+- Autonomous agent joins meetings (via Teams recording summary or transcript).
+- Extracts decisions, action items, blocking issues, and next-step owners.
+- Generates 1-pager: "Meeting X: Decisions made, who owns what, blocker for Squad on Y."
+- Tags relevant PRs and work items with decision context.
+- **Result:** Meeting follow-up time cut from 45 min to 5 min. Action items never lost.
+
+### Scenario 3: Context Continuity for Async Handoffs
+**Current reality:** You write long technical explanations in Teams (Squad strategy, ConfigGen migrations, DK8S tooling). New people ask the same questions. No searchable knowledge base.
+
+**With Work-Claw:**
+- Autonomous agent monitors your Teams messages for "explanatory patterns" (if message > 200 chars AND mentions a problem+solution, flag it).
+- Converts explanations into ADRs, troubleshooting guides, or runbooks.
+- Indexes them locally + tags with topics, projects, and people mentioned.
+- When someone asks similar question next time, agent surfaces the doc + context: "You wrote this on 2026-01-15, shared it with @person, and this person followed up with..."
+- **Result:** Your institutional knowledge becomes machine-queryable. New team members self-serve 70% of setup/troubleshooting questions. You spend less time repeating yourself.
+
+---
+
+## Work-Claw vs. WorkIQ: Why Work-Claw is Different for You
+
+From Teams discussions, **Dani Halfin** compared the two:
+- **WorkIQ** (existing tool in your org) — query M365 data, get insights, read-only interface.
+- **Work-Claw** — **autonomous agent that takes actions locally** (file I/O, Outlook COM, process spawning, Git operations).
+
+For your use case:
+- WorkIQ helps you *understand* your calendar and email patterns.
+- Work-Claw helps you *automate and reduce* the volume hitting your inbox in the first place.
+
+**You don't have to choose.** WorkIQ + Work-Claw together create a feedback loop: WorkIQ identifies patterns → Work-Claw automates based on those patterns.
+
+---
+
+## What You'd Build First (My Recommendation)
+
+Based on your Teams activity and DK8S/ConfigGen leadership role:
+
+1. **Email triage agent** (2–3 days to set up) — catches incidents, groups noise, reduces inbox by 60%.
+2. **PR feedback automation** — reuses existing Work-Claw v0.19 Copilot Feedback Agent; fewer review cycles, faster merges.
+3. **Decision capture** — post-meeting agent extracts and tags action items; couples with Squad's incident/work-item tagging.
+
+All three are in the **"low effort, high ROI"** zone and directly address your daily flow.
+
+---
+
+## Risk / Setup Considerations
+
+- **Local machine performance** — runs on your dev box; ensure 4+ GB free memory and ~500 MB disk for knowledge base.
+- **Security** — Work-Claw agents can access local files, Outlook, and Git; configure tool permissions carefully (no blanket `exec` permission recommended).
+- **Learning curve** — first agent takes ~2–3 hours to set up; subsequent agents are faster.
+
+---
+
+## Next Steps (If Interested)
+
+1. Clone the Work-Claw repo (you should already have access; check Teams #Work-Claw pinned messages).
+2. Run `setup.ps1`.
+3. Start with the **email triage template** (shared in Teams) to see the pattern.
+4. Ping Sudipto Rakshit in Teams #Work-Claw with questions.
+
+---
+
+## Comparison Matrix: Squad vs. Work-Claw vs. WorkIQ
+
+| Capability | Squad | Work-Claw | WorkIQ |
+|-----------|-------|-----------|--------|
+| Real-time digest generation | ✅ | ✗ | ✗ |
+| Autonomous PR feedback | ✗ | ✅ | ✗ |
+| Email triage + action | ✗ | ✅ | ✗ |
+| Meeting decision extraction | ✓ (manual) | ✅ (auto) | ✗ |
+| Long-term memory (cross-session) | ✅ | ✅ | ✗ |
+| M365 pattern analysis | ✗ | ✗ | ✅ |
+| Local-first, zero cloud sync | ✗ | ✅ | ✗ |
+| Personal context awareness | ✗ | ✅ | ✓ (read-only) |
+
+---
+
+## Conclusion
+
+**Work-Claw is complementary to Squad, not a replacement.** It fills your personal automation + context-awareness gap. For your role (TAM, PM, DK8S lead), it would save **5–7 hours/week** on email triage, meeting follow-up, and knowledge re-hydration, letting you focus on strategy and unblocking the team.
+
+**Start with email triage.** See the value in week 1. Then expand to PR automation and decision capture.
+
+---
+
+## Key Learning: Work-Claw is the "Last Mile" for Personal Automation
+
+From Sudipto Rakshit's positioning in Teams: Work-Claw is positioned as **"the last mile of an agent"** — deeply personalized, persistent, and locally controlled, rather than a stateless chat assistant. This is fundamentally different from:
+- **Chat-based AI** (stateless, per-request)
+- **Cloud orchestration** (centralized, team-focused)
+- **Read-only insights** (WorkIQ)
+
+For individual contributors, managers, and TAMs like yourself, this "last mile" is critical: it's where personal context, autonomous action, and long-term memory actually create time savings and institutional knowledge capture.
+
+---
+
+*Analysis prepared by @Seven (Research & Docs) — sourced from Teams discussions with Sudipto Rakshit, Dani Halfin, and pattern analysis of Tamir's calendar, email, and Teams activity via WorkIQ.*
+

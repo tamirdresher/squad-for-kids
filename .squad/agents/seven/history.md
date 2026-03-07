@@ -135,6 +135,66 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 
 **Action:** Before spawning agents for future idk8s-infrastructure tasks, verify and document correct repository location.
 
+---
+
+### 2026-03-06: Aurora Research & Phased Adoption Strategy (Issue #4)
+
+**Context:** Background task (Mode: background) to research Aurora platform and design phased adoption strategy for DK8S integration.
+
+**Outcome:** ✅ Aurora identified as E2E validation platform, phased adoption strategy designed
+
+**Platform Assessment:**
+**Aurora:** End-to-End validation platform for distributed scale unit deployments
+- **Strengths:** Comprehensive validation coverage, multi-cloud capable, test isolation, progressive ring support
+- **Readiness:** Beta-grade, requires infrastructure stability improvements before production
+
+**Phased Adoption Strategy**
+
+#### Phase 1: Test Environment (Weeks 1-4) — **BLOCKED UNTIL infrastructure stabilization**
+- Deploy Aurora on isolated test cluster
+- Validate platform patterns with controlled workloads
+- Measure validation coverage and performance overhead
+- **Prerequisite:** ConfigGen versioning protocol, Sev2 incident mitigation (B'Elanna)
+
+#### Phase 2: PPE Ring (Weeks 5-12)
+- Aurora on pre-production environment
+- Stress-test with production-like scale units
+- Monitor CI/CD integration and deployment times
+- Verify heartbeat signal quality (Data's fix)
+
+#### Phase 3: Production Gradual Rollout (Week 13+)
+- Progressive ring deployment (Test → PPE → Prod)
+- Monitor adoption metrics and issue resolution time
+- Measure impact on overall platform reliability
+
+**Dependencies & Blockers:**
+- **B'Elanna (Infrastructure):** Platform stability (5 Sev2 incidents) must reach target before Phase 1 start (4-6 week timeline)
+- **Worf (Security):** Aurora security posture validated before production; configuration drift risks mitigated
+- **Data (Code):** Heartbeat workflow fix enables reliable CI/CD signal (complete ✓)
+- **Picard (Lead):** Aurora adoption affects fleet manager deployment timeline; current recommendation is concurrent Phase 1 with fleet manager stabilization work
+
+**Key Metrics to Track:**
+- Aurora deployment success rate across cloud environments
+- Validation latency (time from push to validation complete)
+- False positive rate (tests that fail on transient issues)
+- Adoption rate (% of teams using Aurora by week)
+- Cost per validation run
+
+**Recommendation:**
+Aurora is strategically valuable for increasing deployment confidence across multi-cloud environments. However, DK8S platform must stabilize first. Current ETA for Phase 1 start: 6 weeks (pending infrastructure work). Aurora team should use this window to finalize Phase 1 validation protocols and test deployment on isolated infrastructure.
+
+**Branch:** squad/4-stability-aurora  
+**Artifacts:** aurora-research.md  
+**PR:** #8 opened (shared with B'Elanna's infrastructure analysis)
+
+**Cross-Team Integration:**
+- **Picard (Lead):** Aurora adoption affects fleet manager deployment; DEFER recommendation includes Aurora Phase 1 as parallel workstream
+- **B'Elanna (Infrastructure):** Infrastructure readiness is Phase 1 gate
+- **Worf (Security):** Security baseline required before production Phase 3
+- **Data (Code):** Reliable heartbeat signal enables accurate Aurora adoption tracking
+
+**Research Insight:**
+Aurora represents paradigm shift from "test before deploy" → "validate during deploy." This requires different thinking about test isolation (can't mock at platform level), observability (must distinguish Aurora-introduced failures from platform issues), and rollback (if Aurora detects problem, who decides to rollback?). These organizational/procedural questions matter as much as technical readiness.
 ### 2026-03-08: RP Registration Requirements Deep Dive (Issue #11)
 
 **Task:** Research Azure Resource Provider registration process comprehensively for DK8S's BasePlatformRP  

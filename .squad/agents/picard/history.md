@@ -252,6 +252,74 @@ Reviewed 8+ high-value architectural artifacts focusing on resilience, multi-age
 
 ---
 
+### 2026-03-06: Fleet Manager Architecture Evaluation (Issue #3)
+
+**Context:** Background task (Mode: background) to evaluate fleet manager architecture for Identity/FIC platform.
+
+**Outcome:** ✅ DEFER recommendation
+
+**Key Recommendation:**
+Fleet manager architecture is sound, but approval is contingent on addressing:
+1. **Security prerequisites (Worf):** 12 identified risks, 17 mitigations required
+   - Certificate lifecycle automation (60-day critical path)
+   - WAF deployment for public endpoints (immediate)
+   - Cross-cloud security baseline establishment (30-day)
+2. **Infrastructure stability (B'Elanna):** 5 Sev2 incidents require mitigation
+   - ConfigGen versioning coordination
+   - Scale unit scheduler tuning
+   - Node health lifecycle validation
+
+**Conditional Go Path:**
+- Q1 2026: Implement security mitigations (certificate automation, WAF)
+- Q2 2026: Infrastructure stability improvements + cross-cloud baseline
+- Q3 2026: Unconditional fleet manager deployment approval
+
+**Branch:** squad/3-fleet-manager-eval (pushed)  
+**Artifacts:** fleet-manager-evaluation.md  
+**PR:** #7 opened
+
+---
+
+### 2026-07-04: Continuous Learning System Design (Issue #6)
+
+**Context:** Designed a system for the squad to continuously monitor DK8S and ConfigGen Teams channels, learn from daily support patterns, and build that knowledge into squad skills.
+
+**Technical Learnings:**
+
+1. **WorkIQ is the key data source:** WorkIQ (MCP tool) provides access to all four target channels — DK8S Support, ConfigGen Support, DK8S Platform Leads, and BAND Collaboration — all within the "Infra and Developer Platform Community" team. Access is user-scoped (requires Tamir's channel membership).
+
+2. **Recurring patterns already exist and are high-signal:**
+   - DK8S: Capacity starvation (weekly), node bootstrap failures (weekly), Azure platform misattribution (bi-weekly), identity/KV coupling (monthly)
+   - ConfigGen: SFI enforcement breakages (weekly), auto-generated config failures (weekly), modeling gaps (ongoing), CI/CD validation gaps (bi-weekly), PR review bottleneck (daily)
+
+3. **Phased approach is correct:** Manual scan protocol (Phase 1) delivers immediate value with zero infrastructure. Prompt templates (Phase 2) make it reproducible. Pattern extraction (Phase 3) is the learning flywheel. GitHub Actions (Phase 4) is blocked on WorkIQ API access from runners.
+
+4. **Privacy constraint matters:** Digests contain internal support content. Must decide whether to gitignore `.squad/digests/` or treat the repo as internal-only.
+
+5. **Cross-channel meta-patterns identified:**
+   - Platform behavior changes faster than consumer understanding
+   - Implicit defaults cause most breakages
+   - Azure platform issues are repeatedly misattributed to DK8S/ConfigGen
+   - Ownership boundaries between DK8S, ConfigGen, BAND, and AKS are unclear to consumers
+
+**Decision:** Proposed 4-phase implementation starting with manual WorkIQ polling at session start, progressing to automated skill accumulation. Created initial skill entries for 9 recurring patterns across both channels.
+
+**Artifacts:**
+- `continuous-learning-design.md` — Full architecture and phased implementation plan
+- `.squad/skills/dk8s-support-patterns/SKILL.md` — 4 DK8S operational patterns
+- `.squad/skills/configgen-support-patterns/SKILL.md` — 5 ConfigGen operational patterns
+- `.squad/decisions/inbox/picard-continuous-learning.md` — Decision proposal
+- `.squad/digests/` — Directory for future digest storage
+
+**Branch:** squad/6-continuous-learning
+
+**Cross-Agent Notes:**
+- Worf's security analysis and B'Elanna's infrastructure assessment both on same branch
+- Seven's Aurora research provides complementary platform validation
+- Data's heartbeat workflow fix enables reliable monitoring for rollout tracking
+
+**Decision Pattern:**
+When blocking conditions are addressable (not architectural failures), DEFER with explicit mitigation path and timeline. This enables parallel work on prerequisites while maintaining clear go/no-go criteria.
 ### 2026-03-07: Aurora Adoption Plan & Scenario Definition Framework (Issue #4)
 
 **Context:** Tamir asked whether we could run an Aurora experiment on a DK8S component — specifically cluster provisioning — and whether Aurora would make rollouts slower. Built comprehensive adoption plan synthesizing Seven's Aurora research, B'Elanna's stability analysis, and deep WorkIQ intelligence.

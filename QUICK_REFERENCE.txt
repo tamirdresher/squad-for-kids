@@ -1,0 +1,246 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    QUICK REFERENCE: SQUAD ENHANCEMENTS                     ║
+║                         Research Summary (Mar 2026)                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📋 SECTION 1: OPENCLAW & CLAW FRAMEWORKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+What: Open-source AI agent framework ecosystem
+Status: Production-ready (multiple implementations)
+Best Match: gitclaw (TypeScript, git-native like Squad)
+Alternatives: NagaAgent (Python, 1,458 stars), AgentStack (TS, enterprise)
+
+🎯 Action: Study gitclaw for agent architecture alignment
+
+────────────────────────────────────────────────────────────────────────────
+
+📧 SECTION 2: CALENDAR & EMAIL (WRITE CAPABILITY)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+API: Microsoft Graph (Office 365)
+Status: Production-ready ✅
+MCP Servers Available: YES ✅
+
+⭐ RECOMMENDED: outlook-mcp (XenoXilus/outlook-mcp)
+   - JavaScript
+   - 14 GitHub stars
+   - Features: Email, Calendar, SharePoint, Office docs
+   - Setup: Azure App Registration (no client secret needed)
+   - Auth: PKCE OAuth with automatic token refresh
+   - Status: Updated Mar 2026
+
+Alternative: office-365-mcp-server (hvkshetry)
+   - More comprehensive (24 tools)
+   - Includes Teams, Planner, Groups
+
+Python Wrapper: python-o365 (if not using MCP)
+   - 1,883 GitHub stars
+   - \pip install O365\
+
+🎯 Action: Install outlook-mcp immediately (Phase 1)
+
+────────────────────────────────────────────────────────────────────────────
+
+📊 SECTION 3: POWERPOINT GENERATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ RECOMMENDED: python-pptx (scanny/python-pptx)
+   - Status: Production-ready ✅
+   - GitHub: 2,800+ stars
+   - Maturity: Industry standard
+   - Install: \pip install python-pptx\
+   - Capabilities: Create, modify, read .pptx files
+   - Limitations: No animations, basic chart support
+
+MCP Server: DOES NOT EXIST (opportunity for custom wrapper)
+
+Alternatives: officegen (Node.js, older), Apache POI (Java)
+
+🎯 Action: Use python-pptx directly in agents (Phase 2)
+          Or create custom MCP wrapper for reuse (Phase 3)
+
+────────────────────────────────────────────────────────────────────────────
+
+📄 SECTION 4: WORD DOCUMENT GENERATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ RECOMMENDED: python-docx (python-openxml/python-docx)
+   - Status: Production-ready ✅
+   - GitHub: 4,000+ stars
+   - Maturity: Industry standard
+   - Install: \pip install python-docx\
+   - Capabilities: Create, modify .docx files
+   - Features: Paragraphs, tables, images, styles
+
+Related: python-docx-template (mail-merge style)
+         pandoc (Markdown → .docx conversion)
+
+MCP Server: DOES NOT EXIST (opportunity for custom wrapper)
+
+🎯 Action: Use python-docx directly in agents (Phase 2)
+          Or create custom MCP wrapper for reuse (Phase 3)
+
+────────────────────────────────────────────────────────────────────────────
+
+🎥 SECTION 5: REMOTION (REACT VIDEO FRAMEWORK)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+What: Programmatic video generation in React (NOT presentations)
+Repository: remotion-dev/remotion
+GitHub Stars: 38,800+ (very popular)
+Status: Production-ready ✅
+Language: TypeScript/React
+Last Update: Mar 2026
+
+Capabilities: MP4, WebM, GIFs, animations, Canvas, SVG, WebGL
+
+✅ USE FOR:
+   - Animated marketing videos
+   - Data visualization videos
+   - Synchronized AI narration + visuals
+   - Social media content
+
+❌ DON'T USE FOR:
+   - Presentations (use PowerPoint)
+   - Documents (use Word)
+   - Presentation skills coaching
+   - Live presentations
+
+🎯 Action: Evaluate if video content is needed (Phase 4, optional)
+
+────────────────────────────────────────────────────────────────────────────
+
+🔌 SECTION 6: MCP SERVERS (MODEL CONTEXT PROTOCOL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+What: Standardized interface for AI to access tools
+Creator: Anthropic
+Status: Industry standard ✅
+
+EXISTING MCP SERVERS (FOR OFFICE 365):
+   ✅ outlook-mcp (ready to use)
+   ✅ office-365-mcp-server (ready to use)
+   ✅ calendar-mcp (multi-tenant)
+
+MISSING MCP SERVERS (OPPORTUNITY):
+   ❌ PowerPoint generation
+   ❌ Word generation
+   (Requires custom MCP wrappers)
+
+TEMPLATES (for creating new servers):
+   - mcp-ts-template (TypeScript, 118 stars) ⭐
+   - boilerplate-mcp-server (TypeScript, 69 stars)
+   - MCP-Server-Starter (TypeScript, 32 stars)
+   - mcp-server-python-template (Python, 15 stars)
+
+🎯 Action: Create custom MCP servers if multiple agents need them
+
+════════════════════════════════════════════════════════════════════════════
+
+🚀 IMPLEMENTATION ROADMAP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHASE 1: EMAIL/CALENDAR (IMMEDIATE - 1-2 days)
+├─ Install: outlook-mcp or office-365-mcp-server
+├─ Setup: Azure App Registration
+├─ Config: Add to .copilot/mcp-config.json
+├─ Value: Send emails, create calendar events
+└─ Effort: LOW
+
+PHASE 2: DOCUMENT GENERATION (1-2 weeks)
+├─ Install: pip install python-pptx python-docx
+├─ Integrate: Direct library calls in agent code
+├─ Value: Generate PowerPoint & Word documents
+└─ Effort: MEDIUM
+
+PHASE 3: ADVANCED MCP SERVERS (Optional, 2-4 weeks)
+├─ Create: Custom PowerPoint/Word MCP servers
+├─ Template: Use mcp-ts-template
+├─ Benefit: Reusable across agents
+└─ Effort: MEDIUM-HIGH
+
+PHASE 4: VIDEO CONTENT (Advanced/Optional, 3-6 weeks)
+├─ Evaluate: Remotion for video needs
+├─ Wrap: Remotion in MCP server if needed
+├─ Value: Animated presentations, demos
+└─ Effort: HIGH
+
+PHASE 5: OPENCLAW ALIGNMENT (Strategic, ongoing)
+├─ Study: gitclaw architecture
+├─ Align: Squad memory with git-native patterns
+├─ Benefit: Long-term scalability
+└─ Effort: ONGOING
+
+════════════════════════════════════════════════════════════════════════════
+
+📊 PRODUCTION READINESS MATRIX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Technology               | Maturity      | Ready | Maintained | Priority
+─────────────────────────┼───────────────┼───────┼────────────┼──────────
+outlook-mcp             | Production    | ✅    | ✅ (Mar26)  | PHASE 1
+office-365-mcp-server   | Production    | ✅    | ✅ (Feb26)  | PHASE 1
+python-pptx             | Production    | ✅    | ✅          | PHASE 2
+python-docx             | Production    | ✅    | ✅          | PHASE 2
+Remotion                | Production    | ✅    | ✅ (Mar26)  | PHASE 4
+gitclaw                 | Production    | ✅    | ✅ (Mar26)  | PHASE 5
+MCP Protocol            | Standard      | ✅    | ✅          | FOUNDATION
+
+════════════════════════════════════════════════════════════════════════════
+
+🔗 KEY GITHUB REPOSITORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EMAIL/CALENDAR:
+  📌 https://github.com/XenoXilus/outlook-mcp (⭐ use this)
+  📌 https://github.com/hvkshetry/office-365-mcp-server
+  📌 https://github.com/O365/python-o365
+
+DOCUMENTS:
+  📌 https://github.com/scanny/python-pptx (⭐ PowerPoint)
+  📌 https://github.com/python-openxml/python-docx (⭐ Word)
+
+VIDEO:
+  📌 https://github.com/remotion-dev/remotion
+
+OPENCLAW:
+  📌 https://github.com/open-gitagent/gitclaw (⭐ git-native)
+  📌 https://github.com/RTGS2017/NagaAgent
+
+MCP TEMPLATES:
+  📌 https://github.com/cyanheads/mcp-ts-template (⭐ recommended)
+  📌 https://github.com/aashari/boilerplate-mcp-server
+
+════════════════════════════════════════════════════════════════════════════
+
+💡 KEY INSIGHTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Email/Calendar: Production MCP servers EXIST → use immediately
+2. PowerPoint/Word: Libraries exist BUT no MCP servers → use libraries directly
+3. Remotion: For VIDEO content, NOT presentations
+4. OpenCLAW: gitclaw aligns well with Squad's git-native approach
+5. MCP: Standard protocol → foundation for all integrations
+
+════════════════════════════════════════════════════════════════════════════
+
+✅ NEXT STEPS FOR SQUAD TEAM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. THIS WEEK:
+   • Review RESEARCH_REPORT.md (full report)
+   • Set up Azure App Registration for outlook-mcp
+   • Clone and test outlook-mcp
+
+2. NEXT WEEK:
+   • Integrate outlook-mcp into Squad MCP config
+   • Install python-pptx and python-docx
+   • Create sample agent that generates documents
+
+3. FOLLOWING WEEK:
+   • Evaluate custom MCP server needs
+   • Study gitclaw architecture
+   • Plan long-term enhancement roadmap
+
+════════════════════════════════════════════════════════════════════════════

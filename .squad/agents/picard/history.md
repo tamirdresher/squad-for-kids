@@ -383,3 +383,35 @@ When blocking conditions are addressable (not architectural failures), DEFER wit
 - `rp-registration-status.md` — comprehensive status report with IcM analysis, checklist, blockers, and action plan
 - Decision inbox entry: `.squad/decisions/inbox/picard-rp-registration.md`
 - Issue #11 comment with findings and next steps
+
+---
+
+### 2026-03-07: PR Recommendation Audit (Issue #20)
+
+**Context:** Tamir requested review of all closed PRs for unimplemented recommendations, plus evaluation of GitHub Actions workflow automation options.
+
+**Actions Taken:**
+1. Reviewed all 5 closed PRs (#7, #8, #9, #10, #12) — read bodies, comments, review comments, and file changes
+2. PR #10 had the richest recommendations: 4-phase continuous learning implementation + 6 OpenCLAW patterns from Tamir's linked article
+3. PR #8 had 20+ stability mitigations organized in 3 tiers (Critical/High/Strategic)
+4. PR #7 had Fleet Manager prerequisites (DEFER recommendation with adoption triggers)
+5. PR #12 had 5-phase RP registration roadmap with Phase 0 prerequisites
+
+**Issues Created (9 total):**
+- #21: Continuous Learning Phase 1 — Manual Channel Scan & Skill Promotion (High)
+- #22: Continuous Learning Phase 2 — Automated Digest Generator (Medium)
+- #23: Apply OpenCLAW Patterns — QMD, Dream Routine, Issue-Triager (High)
+- #24: DK8S Stability Tier 1 Critical Mitigations (Critical)
+- #25: DK8S Stability Tier 2 High-Impact Improvements (High)
+- #26: Workload Identity / FIC Automation — Fleet Manager Prerequisite (Medium)
+- #27: RP Registration Phase 0 Prerequisites (Medium)
+- #28: Enable GitHub Actions Workflows for Squad Automation (High)
+- #29: DK8S Stability Tier 3 Strategic Architecture Initiatives (Strategic)
+
+**Workflow Automation Assessment:**
+- All 12 workflows are workflow_dispatch only (no hosted runners at org level)
+- Four options identified: self-hosted runner, request hosted access, alternative automation (Azure Functions/Logic Apps), selective enablement
+- Highest-value workflows to enable first: squad-triage, squad-label-enforce
+- Created issue #28 to track
+
+**Decision Pattern:** When converting design docs to actionable work, organize by implementation tier (immediate/soon/strategic) rather than by source document. This matches how sprint planning actually works.

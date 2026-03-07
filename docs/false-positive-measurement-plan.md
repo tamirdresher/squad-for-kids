@@ -114,10 +114,12 @@ Following the FedRAMP compensating controls implementation (Issue #54) and valid
 
 **False Positive Rate (FPR):**
 ```
-FPR = FP / (FP + TN) * 100%
+FPR = FP / (FP + TP) * 100%
 
 Target: FPR < 1%
 ```
+
+**Operational Note:** This FPR is defined as the ratio of false positives to total blocked requests (FP + TP), which is the standard operational metric for WAF/IDS systems. The classical FPR formula `FP/(FP + TN)` requires counting allowed traffic (TN), which is impractical for inline security controls that only log denied/blocked events. Our operational FPR directly measures the precision of blocking decisions.
 
 **Precision (Positive Predictive Value):**
 ```
@@ -596,8 +598,8 @@ Content-Type: application/json
 
 | Criterion | Threshold | Measurement | Status Gate |
 |-----------|-----------|-------------|-------------|
-| **WAF False Positive Rate** | < 1.0% | (FP_waf / (FP_waf + TN_waf)) * 100% | ✅ PASS if < 1.0% |
-| **OPA False Positive Rate** | < 1.0% | (FP_opa / (FP_opa + TN_opa)) * 100% | ✅ PASS if < 1.0% |
+| **WAF False Positive Rate** | < 1.0% | (FP_waf / (FP_waf + TP_waf)) * 100% | ✅ PASS if < 1.0% |
+| **OPA False Positive Rate** | < 1.0% | (FP_opa / (FP_opa + TP_opa)) * 100% | ✅ PASS if < 1.0% |
 | **Zero False Negatives** | 0 | Count of security bypasses detected | ✅ PASS if = 0 |
 | **Measurement Completeness** | 100% | All blocked requests classified | ✅ PASS if 100% |
 | **Tuning Validation** | < 1.0% FP after tuning | Re-test FP rate post-tuning (Day 12-13) | ✅ PASS if < 1.0% |

@@ -12,7 +12,7 @@ on:
     # Re-enable when runners are configured for this repo
 jobs:
   heartbeat:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 

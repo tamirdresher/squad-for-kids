@@ -1892,6 +1892,211 @@ Implement four status labels to enable user-side filtering in GitHub issues inte
 
 ## Implementation Notes
 Labels created via `gh label create` with `--force` to allow updates.
+
+---
+
+## Decision 6: FedRAMP Compensating Controls — Security Layer Implementation
+
+**Date:** 2026-03-07  
+**Author:** Worf (Security & Cloud)  
+**Issue:** #54  
+**Status:** Proposed  
+**Impact:** Critical — Closes defense-in-depth gaps exposed by CVE-2026-24512
+
+### Decision
+
+Implement four compensating control layers for DK8S ingress security, using the following technology choices:
+
+#### 1. WAF: Azure Front Door Premium (commercial) + Application Gateway WAF_v2 (sovereign)
+
+**Rationale:** Front Door provides global distribution with built-in DDoS and bot protection. Sovereign clouds require regional Application Gateway due to feature parity gaps. Both are FedRAMP HIGH authorized.
+
+**Key choices:**
+- OWASP DRS 2.1 (not CRS 3.x) — Microsoft's default ruleset with better false-positive tuning
+- Prevention mode from day one — Detection mode is not acceptable for FedRAMP HIGH
+- 3 custom rules specifically targeting nginx config injection vectors
+
+#### 2. OPA/Gatekeeper: 5 Admission Policies
+
+**Rationale:** Admission-time validation prevents dangerous Ingress resources from ever being created. This is the most effective defense against CVE-2026-24512-class attacks.
+
+**Key choices:**
+- Annotation allowlisting (not blocklisting) — more secure default-deny posture
+- Deploy in dryrun first, enforce after 48h validation — prevents tenant disruption
+- Exclude kube-system and gatekeeper-system namespaces — platform components need flexibility
+
+#### 3. CI/CD: Trivy + Conftest (no SaaS dependency)
+
+**Rationale:** Open source tools that run locally. No external data transmission — critical for FedRAMP and sovereign/air-gapped environments. Snyk rejected due to data residency concerns for gov clouds.
+
+#### 4. Emergency Patching: 4-Phase Progressive Rollout
+
+**Rationale:** Follows existing EV2 ring deployment pattern (Test→PPE→Prod→Sovereign) with added sovereign-specific procedures for air-gapped image transfer.
+
+### Consequences
+
+- ✅ Closes all four compensating control gaps identified in Issue #51 assessment
+- ✅ FedRAMP SC-7, SI-3, CM-7(5), RA-5, IR-4 compliance
+- ✅ No single CVE can escalate to P0 incident when all layers deployed
+- ⚠️ OPA policies may initially block legitimate tenant Ingress — mitigated by dryrun period
+- ⚠️ WAF custom rules need tuning — may produce false positives on complex URL patterns
+- ⚠️ Sovereign cloud WAF deployment lags commercial by 2-4 weeks due to image transfer
+
+### Dependencies
+
+- B'Elanna's Network Policy implementation (parallel track on `squad/54-fedramp-infra`)
+- Gatekeeper must be deployed to all clusters (prerequisite for OPA policies)
+- Azure Front Door Premium must be provisioned (infrastructure team)
+
+### Timeline
+
+- **Week 1-2:** OPA policies (dryrun → enforce) + WAF custom rules
+- **Week 2-3:** CI/CD pipeline integration
+- **Week 3-4:** Emergency runbook drill + sovereign cloud deployment
+
+---
+
+## Decision 7: NetworkPolicy Architecture for Ingress Security
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #54  
+**Status:** Proposed  
+**Impact:** High
+
+### Decision
+
+Deploy default-deny + explicit allow-list NetworkPolicies in the `ingress-nginx` namespace as FedRAMP compensating controls, with separate policies for public and sovereign clouds.
+
+### Key Choices
+
+1. **Default-deny first, allow-list second.** ArgoCD sync-wave -10 ensures zero-trust baseline before any ingress workload starts. This is non-negotiable for FedRAMP SC-7 compliance.
+
+2. **Separate sovereign policy.** Gov clusters use restricted source CIDRs instead of `0.0.0.0/0`, block HTTP port 80 entirely, and include dSTS egress. This avoids complex conditional logic in a single policy.
+
+3. **Helm-driven configuration.** `networkPolicy.enabled` and `networkPolicy.sovereign.enabled` toggles allow per-environment control via ArgoCD ApplicationSet valueFiles. No manual kubectl operations.
+
+4. **CI/CD policy-as-code.** Conftest/OPA rules enforce that no NetworkPolicy in the ingress namespace allows unrestricted egress, and all policies carry FedRAMP control labels.
+
+### Risks
+
+- **False-positive blocks:** If node CIDRs change, healthcheck probes fail → ingress goes unhealthy. Mitigated by configurable `nodeCIDRs` in values.yaml.
+- **CNI dependency:** NetworkPolicies require a CNI that enforces them (Calico, Cilium). If DK8S uses Azure CNI without network policy support, these are no-ops. Must verify CNI configuration.
+- **Sync ordering:** If ArgoCD sync waves fail or are bypassed (manual sync), policies might not be in place before ingress. Mitigated by conftest CI/CD gate.
+
+### Depends On
+
+- Worf: WAF deployment (Front Door CIDRs needed for sovereign policy)
+- Worf: OPA/Gatekeeper ConstraintTemplates (admission-time validation)
+- Verification of DK8S CNI type and network policy enforcement capability
+
+---
+
+## Decision 8: Adopt OpenCLAW Pattern Templates for Squad
+
+**Date:** 2026-03-11
+**Author:** Seven (Research & Docs)
+**Status:** Proposed
+**Scope:** Continuous Learning System
+**Issue:** #23
+
+### Decision
+
+Adopt four OpenCLAW production patterns via concrete template files that agents can follow directly:
+
+1. **QMD 5-Category Extraction** — Weekly digest compaction using KEEP (decisions, commitments, pattern changes, blockers, contacts) vs DROP (routine ops, ephemeral context, repeats, simple Q&A, PR pings)
+2. **Dream Routine** — Weekly cross-digest analysis detecting trends, recurring blockers, decision drift, and skill promotion candidates
+3. **Issue-Triager** — Classification taxonomy (incident/decision/question/coordination) with P0-P3 priority scoring and JSONL audit trail
+4. **Memory Separation** — Three-tier architecture: Transaction (raw, gitignored, 30-day retention) → Operational (QMD curated, committed, forever) → Skills (permanent, committed)
+
+### Templates Created
+
+- `.squad/templates/qmd-extraction.md`
+- `.squad/templates/dream-routine.md`
+- `.squad/templates/issue-triager.md`
+- `.squad/templates/memory-separation.md`
+
+### Adoption Order
+
+1. **Week 1-2:** QMD Framework (foundation — all downstream patterns depend on it)
+2. **Week 2-4:** Issue-Triager (immediate value — P0 incident catch within 1h)
+3. **Week 5-8:** Dream Routine (requires 4+ weeks of QMD data to detect trends)
+
+### Consequences
+
+- ✅ Digest signal-to-noise ratio improves ~50% (QMD extracts only what matters)
+- ✅ P0 incidents caught and escalated within 1 hour (Issue-Triager)
+- ✅ Cross-digest trends detected automatically (Dream Routine)
+- ✅ Git history stays clean — raw noise gitignored, only curated data committed
+- ⚠️ Requires weekly QMD extraction discipline (manual initially, automate in Phase 2)
+- ⚠️ Issue-Triager scoring rules need 2-week calibration period
+
+### Mitigation
+
+- QMD quality checklist prevents extraction drift
+- Issue-Triager calibration process built into template (weeks 1-2 human review)
+- Dream Routine guardrails prevent false pattern claims (3+ data point minimum)
+
+---
+
+## Decision 9: Adopt Copilot CLI in GitHub Actions for Squad Workflows
+
+**Author:** Data (Code Expert)  
+**Date:** 2026-03-08  
+**Issue:** #39  
+**Status:** Proposed
+
+### Context
+
+GitHub now supports running Copilot CLI (`@github/copilot`) inside GitHub Actions workflows via programmatic mode (`copilot -p "PROMPT"`). This enables AI-powered automation steps in CI/CD pipelines.
+
+Documentation: https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-with-actions
+
+### Recommendation
+
+**Adopt for triage and digest workflows. Do not replace Ralph's full agent loop.**
+
+#### What to do
+
+1. **Replace keyword triage in `squad-triage.yml`** (P0)
+    - Current: 200+ lines of brittle JavaScript keyword matching
+    - Proposed: Single `copilot -p` call that reads `.squad/team.md` and `.squad/routing.md`, understands issue context semantically
+    - Effort: 2-3 hours
+    - Impact: Eliminates maintenance burden, handles ambiguous issues better
+
+2. **Create daily digest workflow** (P1)
+    - New `squad-digest.yml` on cron schedule
+    - Copilot CLI summarizes daily git activity, issues, PRs
+    - Output to `.squad/digests/` or Teams webhook
+    - Effort: 1 hour
+
+3. **Evaluate Ralph migration** (P2)
+    - `ralph-watch.ps1` currently requires a local machine running continuously
+    - Copilot CLI in Actions could handle lightweight Ralph rounds
+    - **Limitation**: No MCP tools, no agent state — not a full replacement for `agency copilot --agent squad`
+    - Effort: 4 hours for evaluation
+
+#### What NOT to do
+
+- Don't add Copilot CLI PR review to `squad-ci.yml` — native Copilot code review in PRs is already better
+- Don't fully replace Ralph with Copilot CLI — the `agency copilot` agent has richer context (MCP, squad personality, cross-tool orchestration)
+
+### Prerequisites
+
+1. Fine-grained PAT with `Copilot Requests` permission → store as `COPILOT_CLI_TOKEN` repo secret
+2. **Fix hosted runner availability** — all workflows currently have auto-triggers disabled
+
+### Risk
+
+- Low risk for triage replacement — keyword matching is already lossy
+- Medium risk for Ralph migration — reduced capability vs. full agent loop
+- PAT management adds a secret to maintain
+
+### Team Impact
+
+- **Picard (Lead)**: Better triage accuracy, less manual re-routing
+- **All agents**: Daily digest provides shared situational awareness
+- **Ralph**: Lightweight checks could run in Actions; heavy work stays local
 Squad responsible for maintaining accuracy as work progresses.
 
 

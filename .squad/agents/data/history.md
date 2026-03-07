@@ -678,3 +678,40 @@ When evaluating automation approaches, distinguish between technical limitations
 **Integration Readiness:**
 - setup-github-teams-integration.ps1 ready for deployment
 - Monitoring solution awaiting decision (Round 2)
+
+---
+
+### 2026-03-07T18:59:07Z: Self-Hosted GitHub Actions Runner Setup (Issue #28)
+
+**Task**: Set up a self-hosted GitHub Actions runner for tamresearch1 repository to enable squad automation workflows.
+
+**Reason**: Repository has 12 squad workflows (heartbeat, CI, docs, issue management) all on workflow_dispatch only because GitHub-hosted runners are unavailable at the org level.
+
+**What I Did**:
+1. Created runner directory at C:\temp\github-runner
+2. Downloaded GitHub Actions runner v2.332.0 for Windows x64
+3. Obtained registration token via GitHub API
+4. Configured runner with:
+   - Name: 	amresearch1-devbox
+   - Labels: self-hosted, Windows, X64
+   - Unattended mode for non-interactive setup
+5. Started runner in detached mode (persistent background process)
+6. Updated squad-heartbeat.yml to use uns-on: self-hosted
+7. Tested with workflow dispatch - runner successfully picked up and executed the job
+
+**Runner Status**:
+- ✅ Online and listening for jobs
+- ✅ Successfully processed test workflow (Run #22803182763)
+- ✅ Running as detached process (survives shell closure)
+- Location: C:\temp\github-runner
+- Logs: C:\Users\TAMIRD~1\AppData\Local\Temp\copilot-detached-139-1772902535018.log
+
+**Next Steps for Tamir**:
+- All 12 squad workflows can be updated to use uns-on: self-hosted
+- Consider installing as Windows service for automatic startup
+- Runner can be managed via gh api commands for status checks
+
+**Deliverable**: Posted comprehensive setup guide and management instructions to [Issue #28](https://github.com/tamirdresher_microsoft/tamresearch1/issues/28#issuecomment-4016927931).
+
+**Technical Note**: The runner is configured for the specific repo (not org-level), so it only picks up jobs from 	amirdresher_microsoft/tamresearch1. This is the correct setup for a devbox runner.
+

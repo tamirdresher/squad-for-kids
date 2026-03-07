@@ -12,6 +12,53 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-09: Issue #35 Investigation — Devbox Provisioning Strategy
+
+**Task:** Investigate tools and approach for reproducible devbox provisioning. Tamir wants to automate spinning up clones of his current devbox and create a dedicated repo + Squad skill for future reuse.
+
+**Key Findings:**
+
+1. **Microsoft Dev Box MCP Server (Official):**
+   - `@microsoft/devbox-mcp` npm package (production-ready)
+   - Provides standardized MCP endpoints for AI agents to manage Dev Boxes
+   - Supports: create, list, start/stop, query status
+   - Works with VS Code, Copilot Studio, and any MCP client
+   - Authentication via Azure CLI SSO
+
+2. **Azure CLI Dev Center Extension:**
+   - `az extension add --name devcenter`
+   - Core command: `az devcenter dev dev-box create --dev-center-name X --project-name Y --pool-name Z --name NEW-BOX`
+   - **Limitation:** Requires authenticated user principal (not service principals)
+
+3. **Infrastructure-as-Code Options:**
+   - Bicep/ARM: Azure-native, ideal for full Dev Center provisioning
+   - OpenTofu/Terraform: Multi-cloud alternative
+   - Ansible: Post-provisioning configuration
+   - Pulumi: Code-centric for complex logic
+
+**Recommended Two-Phase Approach:**
+
+- **Phase 1 (Dedicated Repo):** Contains Bicep templates, CLI wrapper scripts, config files, documentation
+  - Captures current devbox specs (project, pool, naming conventions)
+  - Provides step-by-step provisioning guide
+  - Optional: CI/CD pipeline for validation
+
+- **Phase 2 (Squad Skill):** Automated devbox provisioner skill
+  - Accepts natural language requests ("create 3 new boxes like mine")
+  - Reads config from Phase 1 repo
+  - Calls `az devcenter` CLI with proper parameters
+  - Reusable for team-wide automation
+
+**Information Needed from Tamir:**
+- Current devbox Dev Center name, project name, pool name
+- OS/image specs for current box
+- Naming conventions and post-provisioning requirements
+- Scope: Phase 2 only (box cloning) or Phase 1+2 (full infrastructure)?
+
+**Status:** Awaiting Tamir's input to proceed with repo and skill build (~1-2 days build time once details confirmed)
+
+---
+
 ### 2026-03-07: Issue #29 Response — Change Risk Mitigation for DK8S
 
 **Task:** Respond to Tamir's core concern: Every change is risky, cross-component impacts hidden, failures detected late in gov/sov clouds. Propose practical, engineer-friendly solutions without bureaucracy.

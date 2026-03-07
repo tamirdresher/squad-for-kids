@@ -371,7 +371,7 @@ aad_groups:
    
 3. Provision Cosmos DB
    - Collection: `ControlValidationResults` (partition key: `environment`)
-   - 90-day retention policy with automated archival
+   - 90-day hot storage with automatic archival to Azure Blob cold storage for 2-year compliance retention
    
 4. Implement data pipeline function (Azure Function)
    - Triggered by Azure Monitor custom metrics
@@ -578,7 +578,7 @@ aad_groups:
 |-----------|------------------|---------|-----------|
 | Real-time metrics | 30 days | Azure Monitor | Operational visibility |
 | Detailed logs | 90 days | Log Analytics | Troubleshooting, audit |
-| Historical trends | 2 years | Cosmos DB | Compliance reporting, trend analysis |
+| Historical trends | 2 years | Cosmos DB (90-day hot) + Azure Blob (cold archive) | Compliance reporting, trend analysis |
 | Audit logs | 7 years | Azure Blob (archive tier) | Regulatory requirement (FedRAMP) |
 
 ### 7.3 Performance Requirements

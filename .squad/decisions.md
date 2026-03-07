@@ -725,6 +725,29 @@ The question: Should investigation outputs live in separate dedicated repositori
 - ✅ Research repos can have own lifecycles (archive, share, fork)
 - ✅ Easier to grant granular access (e.g., share dk8s-investigations with Azure team)
 
+---
+
+## Decision 6: Ralph Watch — Always Fetch/Pull Latest Code
+
+**Date:** 2026-03-07  
+**Author:** Tamir Dresher (via Copilot directive)  
+**Status:** ✅ Adopted  
+**Scope:** Ralph Watch Process
+
+Ralph watch automation must fetch and pull latest code from the configured branch before each cycle begins. This is the first operation in Ralph's loop.
+
+**Rationale:**
+- Prevents stale code execution
+- Ensures each cycle operates on current state
+- Aligns squad work with latest repository changes
+
+**Implementation:**
+- Add `git fetch && git pull` as initial step in Ralph watch loop
+- Applies to all configured branches
+- Fail-safe: Log and skip pull if network/auth issues; proceed with local state
+
+**Related:** Ralph activation round 1 (2026-03-07T16:42:08Z)
+
 **Risks:**
 - ⚠️ Increased repo count (4 repos instead of 1)
 - ⚠️ Cross-repo linking requires discipline

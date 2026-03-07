@@ -1,0 +1,266 @@
+# AlertManager Rules for FedRAMP Performance Baseline Monitoring
+# Issue #89: Performance Baseline & Progressive Sovereign Rollout
+# Deploy to: Prometheus AlertManager
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: fedramp-baseline-alerts
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+    - name: fedramp_pipeline_performance
+      interval: 30s
+      rules:
+        - alert: FedRAMPValidationSlow
+          expr: |
+            avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="true"}[5m]) > 300
+          for: 10m
+          labels:
+            severity: warning
+            component: cicd
+            fedramp: "true"
+          annotations:
+            summary: "FedRAMP validation taking longer than 5 minutes"
+            description: "Pipeline {{ $labels.workflow_name }} averaged {{ $value }}s over last 5 minutes (threshold: 300s)"
+            runbook_url: "https://github.com/your-org/repo/blob/main/docs/fedramp/execution/runbook-week1-5.md#troubleshooting-slow-validation"
+
+        - alert: FedRAMPPipelineOverhead
+          expr: |
+            (
+              avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="true"}[1h])
+              -
+              avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="false"}[1h])
+            ) / avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="false"}[1h]) * 100 > 30
+          for: 15m
+          labels:
+            severity: warning
+            component: cicd
+            fedramp: "true"
+          annotations:
+            summary: "FedRAMP validation overhead exceeding 30%"
+            description: "Current overhead: {{ $value | humanizePercentage }}"
+            action: "Review parallelization and caching strategies"
+
+    - name: fedramp_trivy_performance
+      interval: 30s
+      rules:
+        - alert: TrivyScanSlow
+          expr: trivy_scan_duration_seconds{job="fedramp-validation"} > 180
+          for: 5m
+          labels:
+            severity: warning
+            component: vulnerability-scanning
+            fedramp: "true"
+          annotations:
+            summary: "Trivy scan exceeding 3 minutes"
+            description: "Image {{ $labels.image }} took {{ $value }}s to scan"
+            action: "Check database cache and network connectivity"
+
+        - alert: TrivyDatabaseUpdateFailed
+          expr: rate(trivy_database_update_failures_total[5m]) > 0
+          for: 5m
+          labels:
+            severity: critical
+            component: vulnerability-scanning
+            fedramp: "true"
+          annotations:
+            summary: "Trivy database update failures detected"
+            description: "Vulnerability database may be out of date"
+            action: "Check network access to Trivy database sources"
+
+        - alert: TrivyScanSuccessRateLow
+          expr: |
+            (
+              sum(rate(trivy_scan_success_total[5m]))
+              /
+              sum(rate(trivy_scan_attempts_total[5m]))
+            ) * 100 < 95
+          for: 10m
+          labels:
+            severity: warning
+            component: vulnerability-scanning
+            fedramp: "true"
+          annotations:
+            summary: "Trivy scan success rate below 95%"
+            description: "Current success rate: {{ $value | humanizePercentage }}"
+
+    - name: fedramp_waf_performance
+      interval: 15s
+      rules:
+        - alert: WAFLatencyHigh
+          expr: |
+            histogram_quantile(0.95,
+              rate(waf_request_duration_milliseconds_bucket{job="fedramp-waf"}[5m])
+            ) > 40
+          for: 5m
+          labels:
+            severity: warning
+            component: waf
+            fedramp: "true"
+          annotations:
+            summary: "WAF P95 latency exceeding 40ms"
+            description: "Current P95 latency: {{ $value }}ms"
+            action: "Review WAF rule complexity and optimize"
+
+        - alert: WAFOverheadExcessive
+          expr: |
+            avg_over_time(waf_request_duration_milliseconds[5m])
+            -
+            avg_over_time(baseline_request_duration_milliseconds[5m]) > 25
+          for: 10m
+          labels:
+            severity: warning
+            component: waf
+            fedramp: "true"
+          annotations:
+            summary: "WAF adding excessive latency"
+            description: "Current overhead: {{ $value }}ms (threshold: 25ms)"
+
+    - name: fedramp_drift_detection
+      interval: 30s
+      rules:
+        - alert: DriftDetectionSlow
+          expr: drift_detection_duration_seconds{job="fedramp-validation"} > 20
+          for: 5m
+          labels:
+            severity: warning
+            component: drift-detection
+            fedramp: "true"
+          annotations:
+            summary: "Drift detection taking longer than 20 seconds"
+            description: "PR size {{ $labels.pr_size }} took {{ $value }}s"
+            action: "Review changed files count and Helm/Kustomize complexity"
+
+    - name: fedramp_opa_performance
+      interval: 30s
+      rules:
+        - alert: OPAEvaluationSlow
+          expr: sum(opa_eval_duration_milliseconds{job="fedramp-validation"}) > 15000
+          for: 5m
+          labels:
+            severity: warning
+            component: opa
+            fedramp: "true"
+          annotations:
+            summary: "OPA policy evaluation exceeding 15 seconds"
+            description: "Full test suite took {{ $value | humanizeDuration }}"
+            action: "Review policy complexity and consider caching"
+
+    - name: fedramp_sovereign_network
+      interval: 60s
+      rules:
+        - alert: SovereignNetworkLatencyHigh
+          expr: |
+            avg_over_time(git_operation_duration_seconds{
+              operation=~"clone|fetch|pull",
+              environment="sovereign"
+            }[5m]) > 45
+          for: 10m
+          labels:
+            severity: warning
+            component: network
+            fedramp: "true"
+            environment: sovereign
+          annotations:
+            summary: "High network latency in sovereign environment"
+            description: "Git operations averaging {{ $value }}s (threshold: 30s)"
+            action: "Check VPN/private link connectivity"
+
+        - alert: SovereignRegistryPullSlow
+          expr: |
+            avg_over_time(container_registry_pull_duration_seconds{
+              environment="sovereign"
+            }[5m]) > 60
+          for: 10m
+          labels:
+            severity: warning
+            component: registry
+            fedramp: "true"
+            environment: sovereign
+          annotations:
+            summary: "Slow container image pulls from sovereign registry"
+            description: "Average pull time: {{ $value }}s"
+            action: "Check registry mirrors and network bandwidth"
+
+    - name: fedramp_progressive_rollout
+      interval: 30s
+      rules:
+        - alert: ProgressiveRolloutErrorRateIncreased
+          expr: |
+            (
+              sum(rate(http_requests_total{environment="prod-usgov",status=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{environment="prod-usgov"}[5m]))
+            ) * 100 > 1.0
+          for: 5m
+          labels:
+            severity: critical
+            component: rollout
+            fedramp: "true"
+            environment: prod-usgov
+          annotations:
+            summary: "Error rate increased during progressive rollout"
+            description: "Current error rate: {{ $value | humanizePercentage }} (threshold: 1%)"
+            action: "HALT ROLLOUT - Investigate errors before proceeding"
+            runbook_url: "https://github.com/your-org/repo/blob/main/docs/fedramp/execution/runbook-week1-5.md#rollout-halt-procedure"
+
+        - alert: ArgocdSyncDurationHigh
+          expr: argocd_app_sync_duration_seconds{dest_namespace=~"prod-usgov.*"} > 300
+          for: 5m
+          labels:
+            severity: warning
+            component: argocd
+            fedramp: "true"
+            environment: prod-usgov
+          annotations:
+            summary: "ArgoCD sync taking longer than 5 minutes"
+            description: "Application {{ $labels.name }} took {{ $value }}s to sync"
+            action: "Review resource count and cluster performance"
+
+    - name: fedramp_resource_utilization
+      interval: 30s
+      rules:
+        - alert: CIRunnerHighCPU
+          expr: |
+            avg_over_time(github_runner_cpu_percent{
+              workflow_name="build-and-test"
+            }[5m]) > 80
+          for: 10m
+          labels:
+            severity: warning
+            component: ci-runner
+            fedramp: "true"
+          annotations:
+            summary: "CI runner CPU usage above 80%"
+            description: "Current usage: {{ $value | humanizePercentage }}"
+            action: "Consider larger runner instance or workload optimization"
+
+        - alert: CIRunnerHighMemory
+          expr: |
+            avg_over_time(github_runner_memory_percent{
+              workflow_name="build-and-test"
+            }[5m]) > 85
+          for: 10m
+          labels:
+            severity: warning
+            component: ci-runner
+            fedramp: "true"
+          annotations:
+            summary: "CI runner memory usage above 85%"
+            description: "Current usage: {{ $value | humanizePercentage }}"
+            action: "Consider larger runner instance or memory optimization"
+
+# Deployment Instructions:
+# 
+# kubectl apply -f scripts/fedramp-baseline/prometheus/alertmanager-rules.yaml
+#
+# Verify deployment:
+# kubectl get prometheusrules -n monitoring
+#
+# Test alerts:
+# kubectl port-forward -n monitoring svc/prometheus 9090:9090
+# Open http://localhost:9090/alerts

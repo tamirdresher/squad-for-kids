@@ -12,6 +12,80 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-12: Issue #71 — DK8S Stability Runbook Tier 1 Consolidation (Operational Reference)
+
+**Task:** Consolidate three coordinated P0/FedRAMP stability mitigations (Issues #50, #51, #54) into a single operational reference runbook that serves as incident response guide, FedRAMP control evidence, and integration point for Tier 2/3 roadmap.
+
+**Background:** Three critical PRs merged simultaneously in early March 2026:
+- PR #52 (Issue #50): NodeStuck Istio exclusion configuration
+- PR #53 (Issue #51): FedRAMP P0 nginx-ingress assessment + emergency patch for CVE-2026-24512
+- PR #55 (Issue #54): NetworkPolicy compensating controls (infrastructure)
+- PR #56 (Issue #54): WAF + OPA admission control (security)
+
+These mitigations form a **four-layer defense-in-depth** approach but were scattered across separate documents. Operations teams needed a unified reference.
+
+**Consolidated Runbook Delivered:**
+
+**Document:** `docs/dk8s-stability-runbook-tier1-consolidated.md` (781 lines, 29 KB)
+
+**Key Sections:**
+
+1. **Executive Summary** — Cross-links all three issues, shows deployment status matrix
+2. **Part 1: NodeStuck Istio Exclusion** — Problem statement, solution architecture, validation & monitoring procedures, rollback
+3. **Part 2: FedRAMP P0 nginx-ingress** — CVE-2026-24512 overview, vulnerability assessment, remediation actions (patched ingress-nginx >= v1.13.7)
+4. **Part 3: FedRAMP Compensating Controls** — Four-layer defense architecture:
+   - Layer 1: WAF (Azure Front Door Premium / Application Gateway WAF_v2)
+   - Layer 2: NetworkPolicies (default-deny + allow-list, public vs. sovereign variants)
+   - Layer 3: OPA/Gatekeeper admission control (Ingress resource validation)
+   - Layer 4: CI/CD pre-deploy validation (kubeval + conftest)
+5. **Part 4: Incident Response Procedures** — Four operational workflows:
+   - Istio daemonset unhealthy (investigation + remediation)
+   - CVE detected (version check + emergency patching + rollback)
+   - NetworkPolicy too restrictive (connectivity debugging + policy updates)
+   - WAF false positives (request analysis + exception workflow)
+6. **Part 5: FedRAMP Control Mapping** — Evidence matrix linking implementation to NIST controls (SC-7, AC-4, SI-3, IR-4, CM-3, etc.)
+7. **Part 6: Tier 2 Roadmap Integration** — Links to Issue #25 automation improvements (N1, N2, C2, I2)
+8. **Part 7: Tier 3 Strategic Architecture Links** — Links to Issue #29 change risk mitigation recommendations
+9. **Part 8: Quick Reference** — Common operations (health check script, monitoring dashboard, escalation path)
+
+**Operational Impact:**
+
+- **Single Source of Truth:** Operations team no longer cross-references 3 separate PRs + 5 technical documents
+- **Incident Response:** Four templated procedures reduce MTTR by providing step-by-step investigation workflows
+- **FedRAMP Compliance:** All mitigations mapped to NIST controls with evidence artifacts; ready for audits
+- **Knowledge Continuity:** Runbook documents not only *what* was deployed but *why* (threat model, blast radius, dependencies)
+- **Roadmap Alignment:** Clear connection to Tier 2 (automation) and Tier 3 (architecture) initiatives; prevents siloed work
+
+**Key Architectural Decision: Four-Layer Defense-in-Depth**
+
+The runbook consolidates a critical insight: **No single layer stops CVE-2026-24512, but all four together prevent exploitation.**
+
+| Layer | Blocks | Limitation |
+|-------|--------|-----------|
+| WAF | Malicious requests from internet | Doesn't stop insider/CI/CD threats |
+| NetworkPolicies | Lateral movement, blast radius | Doesn't prevent pod compromise |
+| OPA | Dangerous Ingress resources | Only works at admission time |
+| CI/CD validation | Misconfigured policies | Only catches pre-deploy errors |
+
+**Together:** RCE attempt → WAF blocks, even if bypassed → OPA blocks Ingress, even if bypassed → NetworkPolicy limits blast radius to namespace, even if compromised → CI/CD validation catches misconfigurations before they reach prod.
+
+**Pattern Learned: Consolidation Serves Multiple Functions**
+
+1. **Operational**: Reduces cognitive load for on-call teams
+2. **Compliance**: Creates audit trail + control mapping for FedRAMP reviews
+3. **Strategic**: Reveals dependencies and gaps (e.g., Tier 2 automation sits *on top* of Tier 1 isolation)
+4. **Onboarding**: New team members can understand full mitigation context in one document
+
+**Next Steps:**
+
+1. Publish runbook to Wiki for team visibility (Issue #71 deliverable)
+2. Link from incident response runbooks / playbooks
+3. Reference in DK8S stability retrospective (quarterly review)
+4. Use as baseline for Tier 2 automation design (Issue #25)
+5. Feed Tier 3 strategic decisions (Issue #29) with real operational constraints
+
+---
+
 ### 2026-03-11: Issue #50 — NodeStuck Istio Exclusion Configuration (P0 Emergency)
 
 **Task:** Draft comprehensive Istio exclusion configuration to prevent NodeStuck automation from deleting nodes during Istio daemonset health degradation. Implements Karan's proposal from STG-EUS2-28 incident (Issue #46).

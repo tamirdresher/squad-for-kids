@@ -2694,10 +2694,181 @@ Built Squad Activity Monitor as a C# 13 console application using .NET 10 with S
 
 ---
 
-## Decision 4: # Decision: STG-EUS2-28 Incident Response — Fast-Track I1 Istio Exclusion List
+---
+
+## Decision 4: MCP Server as Thin Protocol Adapter Pattern
+
+**Context:** Issue #65 — DevBox MCP Server Phase 3
+
+### Decision
+
+MCP servers should be implemented as **thin protocol adapters** that translate MCP tool schemas to existing automation (scripts, CLIs, SDKs), NOT as business logic containers.
+
+### Rationale
+
+The DevBox MCP server wraps Phase 1 PowerShell scripts and Azure CLI commands instead of reimplementing provisioning logic in TypeScript. This creates a reusable pattern:
+
+1. **Code Reuse:** Phase 2 Squad Skill and Phase 3 MCP server execute same Phase 1 scripts
+2. **Single Source of Truth:** Provisioning logic maintained in one place (PowerShell scripts)
+3. **Independent Testing:** Test scripts independently of MCP protocol
+4. **Composability:** Same automation callable via CLI, natural language, or MCP
+5. **Maintenance:** Update provisioning logic once, all interfaces (CLI/Skill/MCP) benefit
+
+### Alternatives Considered
+
+- **Fat MCP Server (Azure SDK in TypeScript):** Rejected — creates duplicate business logic, harder to maintain and test
+- **Hybrid (Some Logic in MCP):** Rejected — unclear boundaries, still maintains logic in two places
+
+### Status
+
+✅ **Accepted**  
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #65  
+**PR:** #69
+
+**Tags:** `mcp`, `architecture`, `devbox`, `phase-3`, `pattern`
+
+---
+
+## Decision 5: OpenCLAW Adoption Three-Tier Memory Architecture
 
 **Date:** 2026-03-11  
-**Author:** Picard (Lead)  
+**Issue:** #66 — OpenCLAW Adoption: Integrate QMD, Dream Routine, Issue-Triager  
+**Decision Maker:** Seven (Research & Docs)
+
+### Decision: Three-Tier Memory Architecture with Git-Based Enforcement
+
+How to organize Squad's memory (digests, reports, decisions, skills) to support scalable pattern analysis without drowning signal in noise.
+
+**The Three Tiers:**
+
+| Tier | Purpose | Examples | Git | Retention | Access |
+|------|---------|----------|-----|-----------|--------|
+| **Tier 1: Transaction** | Ephemeral raw data | Daily raw digests, per-channel scans, triage logs, session transcripts | ❌ GITIGNORED | 30 days | Current week only |
+| **Tier 2: Operational** | Curated signal | QMD archives, Dream reports, decision records | ✅ COMMITTED | Forever | Dream Routine, search, trend analysis |
+| **Tier 3: Permanent** | Durable knowledge | Skills, playbooks, validated patterns | ✅ COMMITTED | Forever | All agents, every session |
+
+### Enforcement Mechanism
+
+1. **`.squad/.gitignore`** — Prevents Tier 1 raw files from being committed
+2. **`git check-ignore` verification scripts** — Monthly audit to verify tier boundaries
+3. **CI/CD rule** — Reject commits containing Tier 1 files
+4. **Human oversight** — Monthly audit identifies edge cases automation misses
+
+### Rationale
+
+**Problem:** Without explicit separation, all operational data has equal weight in git history. This makes Dream Routine analysis unreliable (signal-to-noise too high) and bloats the repository.
+
+**Solution:** Separate raw (temporary) from curated (permanent). Let QMD extraction compress Tier 1 → Tier 2 weekly. Only feed Tier 2 data to Dream Routine for pattern analysis.
+
+**Effect:** Pattern analysis becomes more accurate, git history remains searchable, raw data can be cleaned on 30-day rotation without losing institutional knowledge.
+
+### Implementation Status
+
+**Committed artifacts:**
+- ✅ `.squad/implementations/66-openclaw-adoption.md` — Full plan
+- ✅ `.squad/.gitignore-rules.md` — Architecture & verification procedures
+- ✅ `.squad/.gitignore` — Tier 1 enforcement rules
+- ✅ `.squad/monitoring/66-metrics.jsonl` — Baseline for metrics
+
+**Pending implementation:**
+- 🚧 `.squad/scripts/qmd-extract.ps1` — LLM-powered KEEP/DROP extraction
+- 🚧 `.squad/scripts/dream-routine.ps1` — Cross-digest analysis
+- 🚧 `.squad/scripts/issue-triager.ps1` — Priority classification
+- 🚧 `.github/workflows/qmd-weekly.yml` — Automation trigger
+- 🚧 `.github/workflows/dream-routine.yml` — Automation trigger
+
+### Status
+
+✅ **Accepted**  
+**PR:** #68  
+**Tags:** `openclaw`, `memory`, `architecture`, `phase-1`, `curation`
+
+---
+
+## Decision 6: FedRAMP Controls Validation Strategy
+
+**Date:** 2026-03-07  
+**Author:** Worf (Security & Cloud)  
+**Scope:** Security Testing & Validation  
+**Issue:** #67  
+**PR:** #70
+
+### Context
+
+CVE-2026-24512 incident (Issue #51) revealed DK8S had zero compensating controls for ingress-layer attacks. PRs #55 (Network Policies) and #56 (WAF, OPA, Scanning) delivered four security layers. Before sovereign/government cluster deployment, comprehensive validation testing is required.
+
+### Decision
+
+Adopt a **layered validation testing strategy** with realistic attack simulation, false positive detection, and environment-specific procedures.
+
+### Test Suite Components
+
+1. **Script-based validation tests** (Bash + kubectl + curl + jq)
+   - Network Policy enforcement tests
+   - WAF rule effectiveness tests (CVE attack simulation)
+   - OPA admission control tests
+   - Trivy scanning pipeline
+
+2. **Comprehensive test plan** (10-day, 4-environment progressive deployment)
+   - DEV → STG → STG-GOV → PPE
+   - 100+ test cases
+   - Success criteria: 0 policy violations, < 1% false positives, < 5% SLA impact
+
+3. **Incident response validation** (runbook checklist)
+   - Emergency patching < 24h (commercial), < 48h (sovereign)
+   - Emergency OPA policy < 12h
+   - Emergency WAF rule < 8h
+   - NetworkPolicy incident containment < 30min
+
+### Key Principles
+
+**Defense-in-Depth Validation:** Test ALL security layers independently AND in combination. Verify that no single layer failure enables exploitation.
+
+**Realistic Attack Simulation:** Use actual CVE payloads (not generic "bad input"). CVE-2026-24512 path injection must be blocked by WAF AND OPA AND NetworkPolicy.
+
+**False Positive Detection:** Test legitimate traffic patterns extensively. Target: < 1% false positive rate. Rollback trigger: > 5% false positives.
+
+**Environment-Specific Validation:** Commercial (HTTP redirect acceptable, global Front Door) vs. Sovereign (HTTP blocked TLS-only, Azure Gov CIDRs, air-gap).
+
+**Performance Impact Measurement:** Baseline before controls, measure after. Target: < 5% p95 latency increase, < 1s admission webhook latency. Rollback trigger: > 2x baseline latency.
+
+### Success Criteria
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Network Policy violations | 0 | kubectl get violations |
+| WAF false positives | < 1% | WAF logs analysis |
+| OPA policy violations | 0 | Gatekeeper audit logs |
+| CRITICAL vulnerabilities | 0 | Trivy scan results |
+| p95 latency increase | < 5% | Prometheus metrics |
+| Admission webhook latency | < 1s | Gatekeeper metrics |
+| Failed deployments | 0 | ArgoCD sync status |
+| FedRAMP controls validated | 6/6 | Manual checklist |
+
+### Rollback Triggers
+
+**Immediate rollback required:**
+- Service outage > 5 minutes
+- Error rate > 10%
+- p95 latency > 2x baseline
+- False positive rate > 5%
+
+**Rollback procedure:** ArgoCD revert, manual kubectl delete, verify recovery, root cause analysis, fix and redeploy.
+
+### Status
+
+✅ **Accepted**  
+**Date:** 2026-03-07  
+**Tags:** `fedramp`, `security`, `validation`, `testing`, `sovereign`
+
+---
+
+## Decision 7: # Decision: STG-EUS2-28 Incident Response — Fast-Track I1 Istio Exclusion List
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)
 **Status:** Proposed (Requires Tamir + DK8S Leadership Confirmation)  
 **Scope:** Incident Response, Stability Engineering  
 **Related Issues:** #46 (incident report), #24 (Tier 1 mitigations), #25 (Tier 2 plan)

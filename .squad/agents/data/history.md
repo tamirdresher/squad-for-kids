@@ -1203,3 +1203,36 @@ This is now a standing directive for all agents, documented in the teams-monitor
 **Team-Relevant Decision:** Teams integration standing directive — whenever Tamir (or team) requests Teams notifications/updates, agents MUST comply without additional confirmation. Polling-based pattern (WorkIQ reads Teams → GitHub issues → Squad sends) is now operational.
 
 **Key Insight:** Issue #18 resolution pattern: Complex proposals (Azure Bot, Power Automate) unnecessary. Tamir's insight: existing capabilities (WorkIQ + Squad notifications) sufficient with systematic polling layer. Lesson: Sometimes the MVP wins by reusing existing capabilities vs. building new infrastructure.
+
+---
+
+### 2026-03-07: Issue #1 Verification - Squad CLI 'upstream' Command
+
+**Task:** Verify that the `upstream` command is available in the latest Squad CLI version after PR #225 was merged upstream.
+
+**Status:** ❌ ISSUE NOT RESOLVED
+
+**Steps Taken:**
+1. Updated @bradygaster/squad-cli from v0.8.18 to v0.8.22 (latest available on npm)
+2. Tested `npx @bradygaster/squad-cli --help` - no upstream command listed
+3. Attempted `npx @bradygaster/squad-cli upstream --help` - returned 'Unknown command: upstream'
+4. Checked npm registry - v0.8.21 mentioned in PR was never published
+5. Discovered package dependency issue: CLI v0.8.22 depends on squad-sdk@0.6.0-alpha.0 causing module resolution errors
+
+**Findings:**
+- Latest published version: v0.8.22
+- Available versions: 0.8.18, 0.8.19, 0.8.20, 0.8.22 (no v0.8.21)
+- The `upstream` command is NOT present in v0.8.22
+- Package has dependency conflicts with squad-sdk alpha version
+
+**Outcome:**
+- Commented on GitHub issue #1 with detailed verification results
+- Issue remains OPEN - fix not yet available in published releases
+
+**Learning:** When verifying upstream fixes, always check:
+1. Published version numbers on npm (npm view <package> versions)
+2. Actual command availability (not just changelog/PR notes)
+3. Package dependency tree for version mismatches
+4. The version mentioned in a merged PR may not be the version published to npm
+
+**Next Steps:** Feature may be planned for future release or PR fix wasn't included in v0.8.22 build.

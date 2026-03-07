@@ -1,0 +1,350 @@
+# Prometheus Query Templates for FedRAMP Performance Baseline
+# Issue #89: Performance Baseline & Progressive Sovereign Rollout
+# Owner: B'Elanna (Infrastructure Expert)
+
+queries:
+  # ============================================================================
+  # CI/CD Pipeline Performance Metrics
+  # ============================================================================
+  
+  pipeline_baseline_duration:
+    description: "Total pipeline execution time without FedRAMP validation"
+    query: |
+      github_workflow_run_duration_seconds{
+        workflow_name="build-and-test",
+        fedramp_enabled="false"
+      }
+    unit: "seconds"
+    aggregation: "avg_over_time"
+    window: "1h"
+    threshold:
+      dev: 300
+      stg: 420
+      prod: 600
+
+  pipeline_fedramp_duration:
+    description: "Total pipeline execution time with FedRAMP validation"
+    query: |
+      github_workflow_run_duration_seconds{
+        workflow_name="build-and-test",
+        fedramp_enabled="true"
+      }
+    unit: "seconds"
+    aggregation: "avg_over_time"
+    window: "1h"
+    threshold:
+      dev: 360  # 20% overhead
+      stg: 546  # 30% overhead for sovereign
+      prod: 720
+
+  pipeline_overhead_percentage:
+    description: "FedRAMP validation overhead as percentage"
+    query: |
+      (
+        avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="true"}[1h])
+        -
+        avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="false"}[1h])
+      ) / avg_over_time(github_workflow_run_duration_seconds{fedramp_enabled="false"}[1h]) * 100
+    unit: "percent"
+    threshold:
+      commercial: 20
+      sovereign: 30
+    alert_on: "value > threshold"
+
+  # ============================================================================
+  # Trivy Vulnerability Scanning Metrics
+  # ============================================================================
+
+  trivy_scan_duration:
+    description: "Duration of Trivy vulnerability scans by image size"
+    query: |
+      trivy_scan_duration_seconds{
+        job="fedramp-validation",
+        image=~".*"
+      }
+    unit: "seconds"
+    labels: ["image", "image_size_category"]
+    threshold:
+      small_image: 30
+      medium_image: 90
+      large_image: 180
+    sovereign_adjustment: "+60"
+
+  trivy_database_update_duration:
+    description: "Time to download/update Trivy vulnerability database"
+    query: |
+      trivy_database_update_duration_seconds{
+        job="fedramp-validation"
+      }
+    unit: "seconds"
+    threshold:
+      commercial: 30
+      sovereign: 90
+
+  trivy_scan_success_rate:
+    description: "Percentage of successful Trivy scans"
+    query: |
+      (
+        sum(rate(trivy_scan_success_total[5m]))
+        /
+        sum(rate(trivy_scan_attempts_total[5m]))
+      ) * 100
+    unit: "percent"
+    threshold: 95
+    alert_on: "value < threshold"
+
+  # ============================================================================
+  # WAF (Web Application Firewall) Performance Metrics
+  # ============================================================================
+
+  waf_latency_p50:
+    description: "WAF request latency - 50th percentile"
+    query: |
+      histogram_quantile(0.50,
+        rate(waf_request_duration_milliseconds_bucket{
+          job="fedramp-waf"
+        }[5m])
+      )
+    unit: "milliseconds"
+    threshold:
+      commercial: 10
+      sovereign: 15
+
+  waf_latency_p95:
+    description: "WAF request latency - 95th percentile"
+    query: |
+      histogram_quantile(0.95,
+        rate(waf_request_duration_milliseconds_bucket{
+          job="fedramp-waf"
+        }[5m])
+      )
+    unit: "milliseconds"
+    threshold:
+      commercial: 25
+      sovereign: 40
+
+  waf_latency_p99:
+    description: "WAF request latency - 99th percentile"
+    query: |
+      histogram_quantile(0.99,
+        rate(waf_request_duration_milliseconds_bucket{
+          job="fedramp-waf"
+        }[5m])
+      )
+    unit: "milliseconds"
+    threshold:
+      commercial: 50
+      sovereign: 75
+
+  waf_overhead_ms:
+    description: "Average latency added by WAF rules"
+    query: |
+      avg_over_time(waf_request_duration_milliseconds[5m])
+      -
+      avg_over_time(baseline_request_duration_milliseconds[5m])
+    unit: "milliseconds"
+    threshold: 25
+
+  waf_blocked_requests_rate:
+    description: "Rate of requests blocked by WAF (attack patterns)"
+    query: |
+      sum(rate(waf_blocked_requests_total[5m]))
+    unit: "requests/second"
+    informational: true
+
+  # ============================================================================
+  # Drift Detection Performance Metrics
+  # ============================================================================
+
+  drift_detection_duration:
+    description: "Time to detect control drift in PR"
+    query: |
+      drift_detection_duration_seconds{
+        job="fedramp-validation"
+      }
+    unit: "seconds"
+    labels: ["pr_size"]
+    threshold:
+      small_pr: 5
+      medium_pr: 10
+      large_pr: 15
+
+  helm_template_render_duration:
+    description: "Duration of Helm template rendering during drift detection"
+    query: |
+      helm_template_render_duration_seconds{
+        job="fedramp-validation"
+      }
+    unit: "seconds"
+    threshold: 10
+
+  kustomize_build_duration:
+    description: "Duration of Kustomize builds during drift detection"
+    query: |
+      kustomize_build_duration_seconds{
+        job="fedramp-validation"
+      }
+    unit: "seconds"
+    threshold: 8
+
+  # ============================================================================
+  # OPA (Open Policy Agent) Performance Metrics
+  # ============================================================================
+
+  opa_evaluation_duration_single:
+    description: "OPA policy evaluation time for single manifest"
+    query: |
+      opa_eval_duration_milliseconds{
+        job="fedramp-validation",
+        manifest_type=~".*"
+      }
+    unit: "milliseconds"
+    threshold: 200
+
+  opa_evaluation_duration_suite:
+    description: "Total OPA policy evaluation time for full test suite"
+    query: |
+      sum(opa_eval_duration_milliseconds{
+        job="fedramp-validation"
+      })
+    unit: "seconds"
+    threshold:
+      commercial: 10
+      sovereign: 15
+
+  opa_policy_decisions_rate:
+    description: "Rate of OPA policy decisions (allow/deny)"
+    query: |
+      sum(rate(opa_policy_decisions_total[5m])) by (decision)
+    unit: "decisions/second"
+    labels: ["decision"]
+    informational: true
+
+  # ============================================================================
+  # Network Performance (Sovereign-Specific)
+  # ============================================================================
+
+  network_latency_git_operations:
+    description: "Network latency for Git operations in sovereign environment"
+    query: |
+      avg_over_time(git_operation_duration_seconds{
+        operation=~"clone|fetch|pull",
+        environment="sovereign"
+      }[5m])
+    unit: "seconds"
+    sovereign_only: true
+    threshold: 30
+
+  network_latency_registry_pull:
+    description: "Container image pull latency from sovereign registry"
+    query: |
+      avg_over_time(container_registry_pull_duration_seconds{
+        environment="sovereign"
+      }[5m])
+    unit: "seconds"
+    sovereign_only: true
+    threshold: 45
+
+  # ============================================================================
+  # Resource Utilization Metrics
+  # ============================================================================
+
+  ci_runner_cpu_usage:
+    description: "CPU usage of CI/CD runners during FedRAMP validation"
+    query: |
+      avg_over_time(github_runner_cpu_percent{
+        workflow_name="build-and-test"
+      }[5m])
+    unit: "percent"
+    threshold: 80
+    alert_on: "value > threshold"
+
+  ci_runner_memory_usage:
+    description: "Memory usage of CI/CD runners during FedRAMP validation"
+    query: |
+      avg_over_time(github_runner_memory_percent{
+        workflow_name="build-and-test"
+      }[5m])
+    unit: "percent"
+    threshold: 85
+    alert_on: "value > threshold"
+
+  # ============================================================================
+  # Progressive Rollout Metrics (Week 5+)
+  # ============================================================================
+
+  argocd_sync_duration:
+    description: "ArgoCD sync duration for sovereign environment deployments"
+    query: |
+      argocd_app_sync_duration_seconds{
+        dest_namespace=~"prod-usgov.*"
+      }
+    unit: "seconds"
+    threshold: 300
+
+  progressive_rollout_traffic_percentage:
+    description: "Current traffic percentage to sovereign production"
+    query: |
+      sum(rate(http_requests_total{environment="prod-usgov"}[5m]))
+      /
+      (
+        sum(rate(http_requests_total{environment="prod-usgov"}[5m]))
+        +
+        sum(rate(http_requests_total{environment="prod-commercial"}[5m]))
+      ) * 100
+    unit: "percent"
+    target_stages:
+      - stage: 1
+        percentage: 10
+      - stage: 2
+        percentage: 25
+      - stage: 3
+        percentage: 50
+      - stage: 4
+        percentage: 100
+
+  progressive_rollout_error_rate:
+    description: "Error rate during progressive rollout (should remain stable)"
+    query: |
+      (
+        sum(rate(http_requests_total{environment="prod-usgov",status=~"5.."}[5m]))
+        /
+        sum(rate(http_requests_total{environment="prod-usgov"}[5m]))
+      ) * 100
+    unit: "percent"
+    threshold: 1.0
+    alert_on: "value > threshold"
+
+# ============================================================================
+# Query Usage Instructions
+# ============================================================================
+#
+# To execute these queries:
+#
+# 1. Using Prometheus HTTP API:
+#    curl -G 'http://prometheus:9090/api/v1/query' \
+#      --data-urlencode 'query=<query_from_above>'
+#
+# 2. Using PowerShell (see measurement scripts):
+#    .\scripts\fedramp-baseline\measurement\execute-prometheus-queries.ps1
+#
+# 3. Using Grafana dashboards:
+#    Import the dashboard JSON from:
+#    scripts/fedramp-baseline/prometheus/grafana-dashboard.json
+#
+# 4. For baseline comparison:
+#    .\scripts\fedramp-baseline\measurement\compare-baselines.ps1 `
+#      -CommercialResults baseline-commercial.json `
+#      -SovereignResults baseline-sovereign.json
+#
+# ============================================================================
+# Alert Configuration
+# ============================================================================
+#
+# These queries are designed to work with Prometheus AlertManager.
+# Sample alert rules are provided in:
+# scripts/fedramp-baseline/prometheus/alertmanager-rules.yaml
+#
+# To deploy alerts:
+# kubectl apply -f scripts/fedramp-baseline/prometheus/alertmanager-rules.yaml
+#

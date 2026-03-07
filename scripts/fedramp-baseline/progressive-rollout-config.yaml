@@ -1,0 +1,461 @@
+# Progressive Rollout Configuration Templates
+# Issue #89: Performance Baseline & Progressive Sovereign Rollout
+
+# ============================================================================
+# ArgoCD Application Configuration for Progressive Rollout
+# ============================================================================
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fedramp-validation-prod-usgov
+  namespace: argocd
+  labels:
+    environment: prod-usgov
+    fedramp: "true"
+    rollout-stage: "canary"
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/your-org/your-repo.git
+    targetRevision: main
+    path: charts/fedramp-validation
+    helm:
+      values: |
+        environment: prod-usgov
+        
+        # Progressive rollout configuration
+        rollout:
+          enabled: true
+          strategy: canary
+          initialTrafficPercentage: 10
+          
+        # Sovereign-specific configuration
+        sovereign:
+          enabled: true
+          region: us-gov-west-1
+          
+        # Network configuration for sovereign
+        network:
+          vpcId: vpc-sovereign-01
+          privateLink: true
+          
+        # Container registry
+        image:
+          registry: registry.sovereign.example.gov
+          pullPolicy: IfNotPresent
+          
+        # Trivy configuration for sovereign
+        trivy:
+          enabled: true
+          databasePreCache: true
+          initContainer:
+            enabled: true
+            image: aquasec/trivy:latest
+            command:
+              - trivy
+              - image
+              - --download-db-only
+              
+        # OPA policy configuration
+        opa:
+          enabled: true
+          policies:
+            - network-policies
+            - security-controls
+            - fedramp-compliance
+            
+        # WAF configuration
+        waf:
+          enabled: true
+          mode: active
+          rules:
+            - owasp-top-10
+            - custom-fedramp-rules
+            
+        # Monitoring and alerting
+        monitoring:
+          prometheus:
+            enabled: true
+            scrapeInterval: 30s
+          alerts:
+            enabled: true
+            channels:
+              - slack
+              - pagerduty
+              
+        # Resource limits (production)
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+  
+  destination:
+    server: https://prod-usgov-cluster.example.gov
+    namespace: fedramp-validation
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+---
+# ============================================================================
+# Traffic Split Configuration (Istio VirtualService)
+# ============================================================================
+
+# Stage 1: 10% Traffic
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fedramp-validation-traffic-split-10
+  namespace: fedramp-validation
+  labels:
+    rollout-stage: "stage-1-10-percent"
+spec:
+  hosts:
+    - fedramp-validation.example.com
+  http:
+    - match:
+        - headers:
+            x-environment:
+              exact: prod-usgov
+      route:
+        - destination:
+            host: fedramp-validation-prod-usgov
+            port:
+              number: 8080
+          weight: 10
+        - destination:
+            host: fedramp-validation-prod-commercial
+            port:
+              number: 8080
+          weight: 90
+
+---
+# Stage 2: 25% Traffic
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fedramp-validation-traffic-split-25
+  namespace: fedramp-validation
+  labels:
+    rollout-stage: "stage-2-25-percent"
+spec:
+  hosts:
+    - fedramp-validation.example.com
+  http:
+    - match:
+        - headers:
+            x-environment:
+              exact: prod-usgov
+      route:
+        - destination:
+            host: fedramp-validation-prod-usgov
+            port:
+              number: 8080
+          weight: 25
+        - destination:
+            host: fedramp-validation-prod-commercial
+            port:
+              number: 8080
+          weight: 75
+
+---
+# Stage 3: 50% Traffic
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fedramp-validation-traffic-split-50
+  namespace: fedramp-validation
+  labels:
+    rollout-stage: "stage-3-50-percent"
+spec:
+  hosts:
+    - fedramp-validation.example.com
+  http:
+    - match:
+        - headers:
+            x-environment:
+              exact: prod-usgov
+      route:
+        - destination:
+            host: fedramp-validation-prod-usgov
+            port:
+              number: 8080
+          weight: 50
+        - destination:
+            host: fedramp-validation-prod-commercial
+            port:
+              number: 8080
+          weight: 50
+
+---
+# Stage 4: 100% Traffic
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fedramp-validation-traffic-split-100
+  namespace: fedramp-validation
+  labels:
+    rollout-stage: "stage-4-100-percent"
+spec:
+  hosts:
+    - fedramp-validation.example.com
+  http:
+    - match:
+        - headers:
+            x-environment:
+              exact: prod-usgov
+      route:
+        - destination:
+            host: fedramp-validation-prod-usgov
+            port:
+              number: 8080
+          weight: 100
+
+---
+# ============================================================================
+# Canary Deployment Configuration (Argo Rollouts)
+# ============================================================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: fedramp-validation-rollout
+  namespace: fedramp-validation
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      steps:
+        # Stage 1: 10% for 3 days
+        - setWeight: 10
+        - pause:
+            duration: 3d
+        
+        # Stage 2: 25% for 3 days
+        - setWeight: 25
+        - pause:
+            duration: 3d
+        
+        # Stage 3: 50% for 3 days
+        - setWeight: 50
+        - pause:
+            duration: 3d
+        
+        # Stage 4: 100% (full rollout)
+        - setWeight: 100
+      
+      # Canary analysis (automated go/no-go)
+      analysis:
+        templates:
+          - templateName: fedramp-rollout-analysis
+        args:
+          - name: service-name
+            value: fedramp-validation-prod-usgov
+      
+      # Automatic rollback on failure
+      autoPromotionEnabled: false
+      maxSurge: "25%"
+      maxUnavailable: 0
+  
+  selector:
+    matchLabels:
+      app: fedramp-validation
+      environment: prod-usgov
+  
+  template:
+    metadata:
+      labels:
+        app: fedramp-validation
+        environment: prod-usgov
+        fedramp: "true"
+    spec:
+      containers:
+        - name: fedramp-validation
+          image: registry.sovereign.example.gov/fedramp-validation:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ENVIRONMENT
+              value: "prod-usgov"
+            - name: FEDRAMP_ENABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+---
+# ============================================================================
+# Analysis Template for Automated Go/No-Go
+# ============================================================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: fedramp-rollout-analysis
+  namespace: fedramp-validation
+spec:
+  args:
+    - name: service-name
+  
+  metrics:
+    # Error rate metric
+    - name: error-rate
+      interval: 5m
+      successCondition: result < 0.01  # < 1% error rate
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc:9090
+          query: |
+            sum(rate(http_requests_total{
+              service="{{args.service-name}}",
+              status=~"5.."
+            }[5m]))
+            /
+            sum(rate(http_requests_total{
+              service="{{args.service-name}}"
+            }[5m]))
+    
+    # Pipeline overhead metric
+    - name: pipeline-overhead
+      interval: 10m
+      successCondition: result < 30  # < 30% overhead
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc:9090
+          query: |
+            (
+              avg_over_time(github_workflow_run_duration_seconds{
+                fedramp_enabled="true",
+                environment="prod-usgov"
+              }[10m])
+              -
+              avg_over_time(github_workflow_run_duration_seconds{
+                fedramp_enabled="false"
+              }[10m])
+            ) / avg_over_time(github_workflow_run_duration_seconds{
+              fedramp_enabled="false"
+            }[10m]) * 100
+    
+    # P95 latency metric
+    - name: p95-latency
+      interval: 5m
+      successCondition: result < 40  # < 40ms P95 latency
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc:9090
+          query: |
+            histogram_quantile(0.95,
+              rate(waf_request_duration_milliseconds_bucket{
+                service="{{args.service-name}}"
+              }[5m])
+            )
+
+---
+# ============================================================================
+# Deployment Instructions
+# ============================================================================
+
+# To deploy Stage 1 (10% traffic):
+# kubectl apply -f progressive-rollout-stage-1.yaml
+# argocd app sync fedramp-validation-prod-usgov
+
+# To progress to Stage 2 (25% traffic):
+# kubectl apply -f progressive-rollout-stage-2.yaml
+# argocd app sync fedramp-validation-prod-usgov
+
+# To progress to Stage 3 (50% traffic):
+# kubectl apply -f progressive-rollout-stage-3.yaml
+# argocd app sync fedramp-validation-prod-usgov
+
+# To complete rollout (100% traffic):
+# kubectl apply -f progressive-rollout-stage-4.yaml
+# argocd app sync fedramp-validation-prod-usgov
+
+# ============================================================================
+# Rollback Procedures
+# ============================================================================
+
+# ROLLBACK MECHANISM SELECTION:
+# Choose the appropriate rollback method based on failure type:
+#
+# 1. kubectl argo rollouts (PRIMARY for Rollout failures)
+#    Use when: Rollout is stuck, pods failing, or canary analysis fails
+#    - Abort current rollout: kubectl argo rollouts abort fedramp-validation-rollout -n fedramp-validation
+#    - Undo to previous ReplicaSet: kubectl argo rollouts undo fedramp-validation-rollout -n fedramp-validation
+#    This controls the Rollout resource and its managed ReplicaSets
+#
+# 2. argocd app rollback (for application-wide state issues)
+#    Use when: Need to revert entire ArgoCD application to previous synced revision
+#    - First, identify previous revision: argocd app history fedramp-validation-prod-usgov
+#    - Rollback to specific revision: argocd app rollback fedramp-validation-prod-usgov <revision-number>
+#    This reverts all manifests (Rollout, VirtualService, ConfigMaps, etc.) to previous git state
+#
+# ROLLBACK VERIFICATION (CRITICAL):
+# After executing rollback, verify completion within 5 minutes:
+#
+# 1. Check Rollout status:
+#    kubectl get rollout fedramp-validation-rollout -n fedramp-validation
+#    Expected: status shows "Healthy" and "Paused" or "Running"
+#
+# 2. Verify traffic routing post-rollback:
+#    kubectl get virtualservice fedramp-validation-traffic-split-* -n fedramp-validation -o yaml
+#    Confirm weight distribution matches expected rollback stage
+#
+# 3. Monitor rollback completion (timeout: 5 minutes):
+#    kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
+#    ESCALATION: If rollback does not complete within 5 minutes, escalate to on-call SRE
+#
+# REVISION IDENTIFICATION:
+# To find the <revision-number> for argocd rollback:
+#   argocd app history fedramp-validation-prod-usgov
+# This shows deployment history with revision IDs and timestamps
+# Select the last known-good revision (typically revision N-1 if current is N)
+#
+# SUCCESS CRITERIA:
+# Rollback is successful when:
+# - Rollout status returns to "Healthy" within 5 minutes
+# - VirtualService weights match previous stable configuration
+# - Error rate drops below 1% within 10 minutes post-rollback
+# - No pod CrashLoopBackOff or ImagePullBackOff states
+
+# To monitor rollout progress:
+# kubectl argo rollouts get rollout fedramp-validation-rollout -n fedramp-validation --watch
+
+# To verify traffic split:
+# kubectl get virtualservice fedramp-validation-traffic-split-<stage> -n fedramp-validation -o yaml

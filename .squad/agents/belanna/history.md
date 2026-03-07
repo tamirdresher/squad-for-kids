@@ -104,6 +104,98 @@ triggers:
 
 ---
 
+### 2026-03-11: Issue #35 — Dev Box Provisioning Phase 1 Complete
+
+**Task:** Create Phase 1 scaffolding for DevBox provisioning infrastructure — Bicep templates, PowerShell scripts, documentation. Issue context: Tamir approved proceeding with two-phase approach (Phase 1 = IaC repo, Phase 2 = Squad skill).
+
+**What Was Built:**
+
+**Directory:** `devbox-provisioning/` (4 files, 37KB total)
+
+1. **README.md** (7KB)
+   - Comprehensive usage guide and documentation
+   - Prerequisites: Azure CLI, devcenter extension, permissions, authentication
+   - Configuration discovery workflow (how to find Dev Center/project/pool names)
+   - Usage examples: quick clone, manual provisioning, Bicep deployment
+   - Scripts reference guide
+   - Troubleshooting section (extension install, quota, connection issues)
+   - Phase 2 roadmap
+
+2. **bicep/main.bicep** (7.5KB)
+   - Bicep template scaffolded for future ARM support
+   - **Current limitation:** Dev Box does not yet support direct ARM/Bicep provisioning (uses CLI)
+   - Deployment script workaround using Azure PowerShell
+   - Parameterized configuration (Dev Center, project, pool, location, tags)
+   - Auto-shutdown and hibernation options
+   - Comprehensive outputs: connection command, provisioning state, resource tags
+
+3. **scripts/provision.ps1** (11.7KB)
+   - PowerShell script for creating new Dev Boxes
+   - Prerequisites validation: Azure CLI, devcenter extension, authentication
+   - Configurable defaults with parameter overrides
+   - Wait-for-completion with polling (30-second intervals, configurable timeout)
+   - Detailed status reporting and error handling
+   - Connection instructions upon completion
+
+4. **scripts/clone-devbox.ps1** (10.4KB)
+   - Auto-detection of existing Dev Box configurations
+   - Interactive selection when multiple devboxes exist
+   - Replicates: Dev Center, project, pool, hardware profile, image reference
+   - Confirmation prompt before cloning
+   - Delegates to provision.ps1 for actual provisioning
+
+**Key Architectural Decisions:**
+
+1. **Azure CLI Strategy:** Use `az devcenter dev dev-box` commands (not ARM) until ARM support is available
+2. **Config Discovery:** Auto-detection via `az devcenter dev dev-box list` for zero-config cloning
+3. **Validation Pattern:** Check prerequisites upfront, fail fast with actionable error messages
+4. **Polling Strategy:** 30-second intervals with configurable timeout (default 30 min), display progress
+5. **Fallback Guidance:** Comprehensive troubleshooting for extension install failures
+
+**Known Limitations:**
+
+- **Azure CLI Extension Install:** `az extension add --name devcenter` failed with pip error (FileNotFoundError, exit code 1)
+  - Root cause: Azure CLI Python environment issue on Tamir's machine
+  - Mitigation: Documented manual extension download + REST API fallback in README
+  - Scripts include prerequisite validation and fail with actionable guidance
+  
+- **ARM Support Gap:** Dev Box does not support direct ARM/Bicep provisioning yet
+  - Bicep template uses deployment script workaround (calls Azure CLI)
+  - Template ready for migration when ARM support lands
+
+**Coordination:**
+
+- **Branch:** `squad/35-devbox-provisioning`
+- **Commit:** `c979a19` — feat: Dev Box provisioning Phase 1 infrastructure
+- **Pull Request:** #61 — https://github.com/tamirdresher_microsoft/tamresearch1/pull/61
+- **Issue Comment:** Posted Phase 1 completion status with usage instructions
+
+**What Tamir Needs to Do:**
+
+1. Install devcenter extension: `az extension add --name devcenter`
+   - If pip fails, see README troubleshooting (manual download or REST API)
+2. Run discovery: `az devcenter dev dev-box list --output table`
+3. Update default config in `scripts/provision.ps1` (lines 47-49)
+4. Test clone: `.\devbox-provisioning\scripts\clone-devbox.ps1 -NewDevBoxName "test-clone"`
+
+**Phase 2 Preview:**
+
+Next phase adds:
+- Squad skill for natural language provisioning ("create 3 devboxes like mine")
+- MCP Server integration (`@microsoft/devbox-mcp` npm package)
+- Advanced templating: custom images, network configs
+- Multi-Dev Box orchestration for teams
+
+**Pattern Learned:** Phase 1 = IaC scaffolding with comprehensive docs; Phase 2 = AI-native automation layer. Split ensures robust foundation (scripts work manually) before adding natural language abstraction. Always provide fallback guidance when tooling has environmental dependencies (Azure CLI extension install).
+
+**Files Changed:**
+- `devbox-provisioning/README.md` (new)
+- `devbox-provisioning/bicep/main.bicep` (new)
+- `devbox-provisioning/scripts/provision.ps1` (new)
+- `devbox-provisioning/scripts/clone-devbox.ps1` (new)
+
+---
+
 ### 2026-03-11: Infrastructure Issues Status Update — Issues #24, #25, #29, #35
 
 **Task:** Check status and provide updates on 4 assigned DK8S/infrastructure issues. Review current work, comment on progress, apply status labels.

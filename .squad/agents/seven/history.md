@@ -254,3 +254,33 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 - `aurora-scenario-catalog.md` — 12-scenario catalog with full manifest definitions, matrix parameters, implementation roadmap
 - Issue #4 comment with scenario catalog summary
 - `.squad/decisions/inbox/seven-aurora-scenarios.md` — decision proposal for Aurora scenario prioritization
+
+### 2026-03-09: OpenCLAW Production Patterns Analysis (PR #10 + Issue #13)
+
+**Task:** Analyze OpenCLAW article (trilogyai.substack.com) for patterns applicable to continuous learning system design and squad improvement  
+**Outcome:** Posted detailed analysis on PR #10 and Issue #13, identified 6 directly applicable patterns
+
+**Key learnings:**
+
+1. **QMD (Quality Memory Digest) is the missing filter for our digest pipeline** — OpenCLAW's 5-category extraction framework (decisions, commitments, contacts, pattern changes, blockers) provides the signal-vs-noise taxonomy our continuous learning design lacked. This directly addresses Section 6 "Signal-to-Noise" limitation.
+
+2. **Dream Routines fill our cross-digest analysis gap** — Our design scans channels per-session but never analyzes *across* digests to detect trends. Dream routines (scheduled cross-digest pattern detection) would bridge Phase 2 (individual digests) and Phase 3 (skill accumulation).
+
+3. **Issue-Triager sub-agent is a direct blueprint for Channel Scanner** — DevBot's Issue-Triager (daily cron → query API → classify → prioritize → escalate P0 → log decisions) maps almost 1:1 to what our Teams channel scanner should become. Key improvement: classification + priority assignment transforms scanning from note-taking to triage.
+
+4. **Transaction vs. Operational memory answers the digest privacy question** — Open Question #1 in the design doc (should digests be committed?) is answered by separation: raw WorkIQ responses are transaction memory (gitignore), curated summaries are operational memory (commit), promoted skills are institutional knowledge (commit forever).
+
+5. **Hybrid pipeline principle (scripts + LLM)** — Use deterministic scripts for query construction, deduplication, file naming, and retention rotation. Use LLM only for interpretation and judgment. This is cheaper, faster, and more consistent than running everything through the LLM.
+
+6. **Authority levels would clarify squad autonomy** — DevBot's L1 (research only), L2 (propose & execute after approval), L3 (full autonomy) model could benefit our squad agents who currently have undefined autonomy boundaries.
+
+**Sources used:**
+- Web fetch: Full OpenCLAW article (trilogyai.substack.com/p/openclaw-in-the-real-world)
+- PR #10: Continuous learning system design (continuous-learning-design.md, 267 lines)
+- Issue #13: Squad improvement analysis request
+- Team decisions and history files for context
+
+**Artifacts:**
+- PR #10 comment: 6-pattern analysis with specific recommendations for each design phase
+- Issue #13 comment: Broader analysis of how patterns apply to squad-wide improvement
+- `.squad/decisions/inbox/seven-openclaw-patterns.md` — Decision proposal for adopting OpenCLAW patterns

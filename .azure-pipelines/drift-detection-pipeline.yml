@@ -1,0 +1,199 @@
+# Azure DevOps Pipeline for Helm/Kustomize Drift Detection
+# Issue #87 - FedRAMP Compliance Drift Detection
+
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+  paths:
+    include:
+      - '**/values*.yaml'
+      - '**/Chart.yaml'
+      - '**/kustomization.yaml'
+      - '**/overlays/**'
+      - '**/patches/**'
+      - 'scripts/drift-detection/**'
+
+pr:
+  branches:
+    include:
+      - main
+      - release/*
+  paths:
+    include:
+      - '**/values*.yaml'
+      - '**/Chart.yaml'
+      - '**/kustomization.yaml'
+      - '**/overlays/**'
+      - '**/patches/**'
+      - 'scripts/drift-detection/**'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  BASE_BRANCH: 'origin/$(System.PullRequest.TargetBranch)'
+  
+stages:
+- stage: DetectDrift
+  displayName: 'Detect Configuration Drift'
+  jobs:
+  - job: DetectChanges
+    displayName: 'Detect Helm/Kustomize Changes'
+    steps:
+    - checkout: self
+      fetchDepth: 0
+      displayName: 'Checkout repository with full history'
+    
+    - bash: |
+        chmod +x scripts/drift-detection/detect-helm-kustomize-changes.sh
+        bash scripts/drift-detection/detect-helm-kustomize-changes.sh
+        
+        # Load results for output
+        source /tmp/drift-detection/changes.env
+        echo "##vso[task.setvariable variable=HELM_DRIFT;isOutput=true]$HELM_DRIFT"
+        echo "##vso[task.setvariable variable=KUSTOMIZE_DRIFT;isOutput=true]$KUSTOMIZE_DRIFT"
+        echo "##vso[task.setvariable variable=SECURITY_DRIFT;isOutput=true]$SECURITY_DRIFT"
+      displayName: 'Detect configuration drift'
+      name: detectStep
+    
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish drift detection results'
+      inputs:
+        targetPath: '/tmp/drift-detection'
+        artifactName: 'drift-detection-results'
+
+- stage: ValidateManifests
+  displayName: 'Validate Rendered Manifests'
+  dependsOn: DetectDrift
+  condition: or(eq(stageDependencies.DetectDrift.DetectChanges.outputs['detectStep.HELM_DRIFT'], 'true'), eq(stageDependencies.DetectDrift.DetectChanges.outputs['detectStep.KUSTOMIZE_DRIFT'], 'true'))
+  jobs:
+  - job: RenderAndValidate
+    displayName: 'Render and Validate Manifests'
+    steps:
+    - checkout: self
+      fetchDepth: 0
+      displayName: 'Checkout repository'
+    
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download drift detection results'
+      inputs:
+        artifactName: 'drift-detection-results'
+        targetPath: '/tmp/drift-detection'
+    
+    - task: HelmInstaller@1
+      displayName: 'Install Helm'
+      inputs:
+        helmVersionToInstall: '3.13.0'
+    
+    - task: KubectlInstaller@0
+      displayName: 'Install kubectl'
+      inputs:
+        kubectlVersion: '1.28.0'
+    
+    - bash: |
+        # Install conftest for OPA policy testing
+        wget https://github.com/open-policy-agent/conftest/releases/download/v0.49.1/conftest_0.49.1_Linux_x86_64.tar.gz
+        tar xzf conftest_0.49.1_Linux_x86_64.tar.gz
+        sudo mv conftest /usr/local/bin/
+        conftest --version
+      displayName: 'Install conftest (OPA)'
+    
+    - bash: |
+        chmod +x scripts/drift-detection/render-and-validate.sh
+        bash scripts/drift-detection/render-and-validate.sh
+      displayName: 'Render and validate manifests'
+      name: validateStep
+      continueOnError: true
+    
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish rendered manifests'
+      condition: always()
+      inputs:
+        targetPath: '/tmp/drift-detection/rendered'
+        artifactName: 'rendered-manifests'
+    
+    - bash: |
+        if [ "$(validateStep.exitCode)" != "0" ]; then
+          echo "##vso[task.logissue type=error]Manifest validation failed - security issues detected"
+          echo "##vso[task.setvariable variable=VALIDATION_FAILED;isOutput=true]true"
+          exit 1
+        else
+          echo "##vso[task.setvariable variable=VALIDATION_FAILED;isOutput=true]false"
+        fi
+      displayName: 'Check validation result'
+      name: validationCheck
+
+- stage: GenerateReport
+  displayName: 'Generate Compliance Report'
+  dependsOn: 
+    - DetectDrift
+    - ValidateManifests
+  condition: always()
+  jobs:
+  - job: ComplianceReport
+    displayName: 'Generate FedRAMP Compliance Delta Report'
+    steps:
+    - checkout: self
+      fetchDepth: 0
+      displayName: 'Checkout repository'
+    
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download drift detection results'
+      inputs:
+        artifactName: 'drift-detection-results'
+        targetPath: '/tmp/drift-detection'
+    
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download rendered manifests'
+      continueOnError: true
+      inputs:
+        artifactName: 'rendered-manifests'
+        targetPath: '/tmp/drift-detection/rendered'
+    
+    - bash: |
+        chmod +x scripts/drift-detection/compliance-delta-report.sh
+        
+        # Set environment variables for report generation
+        export PR_NUMBER="$(System.PullRequest.PullRequestNumber)"
+        export BRANCH_NAME="$(System.PullRequest.SourceBranch)"
+        export COMMIT_SHA="$(Build.SourceVersion)"
+        
+        bash scripts/drift-detection/compliance-delta-report.sh
+      displayName: 'Generate compliance delta report'
+      continueOnError: true
+    
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish compliance report'
+      inputs:
+        targetPath: '/tmp/drift-detection/compliance-delta-report.md'
+        artifactName: 'compliance-delta-report'
+    
+    - bash: |
+        # Read the report content
+        REPORT_CONTENT=$(cat /tmp/drift-detection/compliance-delta-report.md)
+        
+        # Post as PR comment (requires Azure DevOps API token)
+        if [ -n "$(System.PullRequest.PullRequestId)" ]; then
+          echo "PR ID: $(System.PullRequest.PullRequestId)"
+          echo "Report generated - would post to PR in production"
+          
+          # For Azure DevOps, you would use the REST API here:
+          # az repos pr comment create --pr-id $(System.PullRequest.PullRequestId) \
+          #   --content "$REPORT_CONTENT" --org $(System.CollectionUri) \
+          #   --project $(System.TeamProject) --repository $(Build.Repository.Name)
+        fi
+      displayName: 'Comment PR with report'
+      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+      env:
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+    
+    - bash: |
+        # Fail the build if validation failed
+        if [ "$(stageDependencies.ValidateManifests.RenderAndValidate.outputs['validationCheck.VALIDATION_FAILED'])" == "true" ]; then
+          echo "##vso[task.logissue type=error]Drift validation failed - see compliance report for details"
+          exit 1
+        fi
+      displayName: 'Enforce validation result'
+      condition: always()

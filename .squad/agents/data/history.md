@@ -297,3 +297,253 @@ When testing unreleased features, distinguish between (1) published package stat
 **Awaiting User Decision**: Clone fork and test now, or wait for PR merge.
 
 **Comment**: Posted on [#14](https://github.com/tamirdresher_microsoft/tamresearch1/issues/14#issuecomment-4016717662)
+
+---
+
+### 2026-03-07: Ralph Round 1 — Teams Integration Research (Background)
+
+**Context:** Ralph work-check cycle initiated. Data assigned to research Teams integration setup for #33.
+
+**Task:** Analyze Teams integration complexity and provide practical options for squad coordination.
+
+**Research Conducted:**
+- Teams bot registration mechanisms (Microsoft Bot Framework, OAuth, permissions)
+- Squad-cli Teams integration hooks
+- Webhook automation patterns
+- Azure app registration requirements
+
+**3 Integration Options Posted to #33:**
+
+1. **Teams Webhook (Simplest, 2 min)**
+   - Incoming webhook URL in Teams channel
+   - Squad-cli posts messages via HTTP POST
+   - No authentication layer; suitable for private team channels
+   - Limitation: No interactive elements
+
+2. **Teams Bot Registration (Configurable, 10 min)**
+   - Service principal + OAuth flow
+   - Bot Framework for richer interactions
+   - Message cards with actions
+   - Suitable for cross-team visibility
+
+3. **Azure App Registration (Scalable, 15 min)**
+   - Full Azure AD integration
+   - Graph API access for user context
+   - Persistent app identity
+   - Foundation for future Teams app published in catalog
+
+**Recommendation:** Manual 2-min webhook setup for immediate enablement. Scales to full bot registration later.
+
+**Outcome:** ✅ Complete
+- 3 options posted to #33
+- Recommended pragmatic manual setup approach
+- Provided step-by-step configuration guide
+
+**Next Steps:**
+- Await team decision on integration option
+- Data ready to implement chosen approach
+
+---
+
+---
+
+### 2026-03-07: GitHub-in-Teams Integration Setup Research (Issue #33)
+
+**Task**: Research practical ways to set up GitHub-in-Teams integration on Tamir's behalf. Explore automation options including browser automation (Playwright with Edge profile), Windows desktop app automation, Graph API, and Power Automate.
+
+**Request Context**: Tamir asked about controlling Teams app on Windows using accessibility/testing automation tools, specifically mentioning Playwright CLI with Edge and default profile.
+
+**Key Findings**:
+
+1. **Microsoft Graph API Limitations**:
+   - Can install Teams apps at team level (`POST /teams/{id}/installedApps`)
+   - Can add tabs to channels
+   - **Cannot automate**: OAuth authorization (user must sign in to GitHub through Teams UI)
+   - **Cannot automate**: Channel subscription commands (`@GitHub subscribe owner/repo`)
+   - GitHub app ID in Teams catalog: needs to be queried per tenant
+
+2. **Power Automate / Logic Apps**:
+   - Can create HTTP webhook endpoint for GitHub events
+   - Can post messages to Teams channels
+   - **Cannot avoid**: Manual flow creation in Power Automate UI
+   - **Cannot avoid**: GitHub webhook configuration in repository settings
+   - Alternative to deprecated Incoming Webhooks (being retired)
+
+3. **Browser Automation (Playwright) — Not Viable**:
+   - GitHub-in-Teams integration setup happens **inside Teams desktop app**, not browser
+   - Playwright with Edge profile cannot access Teams desktop app UI
+   - Teams web app has limited app installation capabilities
+
+4. **Windows Desktop Automation — WinAppDriver**:
+   - **Tool**: WinAppDriver (Microsoft's open-source Windows UI automation service)
+   - **Technology**: Exposes Windows UI Automation (UIA) API via Appium/Selenium protocol
+   - **Capabilities**: Can automate Teams desktop app by locating UI elements via accessibility identifiers
+   - **Setup Required**:
+     - Install WinAppDriver service (`winget install Microsoft.WinAppDriver`)
+     - Write automation scripts in C#/Python/JavaScript using Appium client libraries
+     - Use Inspect.exe (Windows SDK) to identify element locators (AutomationId, Name, ControlType)
+   - **Time Investment**: 2-4 hours for initial setup + script authoring
+   - **Maintenance**: Scripts require updates when Teams UI changes
+   - **Use Cases**: Valuable for repeated automation tasks (e.g., configuring multiple Teams/channels)
+
+5. **Microsoft Graph PowerShell Module**:
+   - **Available in environment**: Microsoft.Graph.Teams (95+ cmdlets for schedule, shifts, time-off)
+   - **Not Available**: Teams messaging/channels MCP server tools (no `mcp_graph_teams_*` tools found)
+   - **Limitation**: Graph Teams cmdlets focus on scheduling/workforce management, not app installation or messaging
+
+**Technical Architecture Analysis**:
+
+**GitHub-in-Teams Integration Layers** (from Issue #18):
+1. **GitHub → Teams**: Official GitHub app (requires manual setup, this issue)
+2. **Teams → Squad**: WorkIQ polling (already working)
+3. **Squad → Teams**: Teams MCP Server (needs verification — not found in current env)
+
+**Automation Decision Matrix**:
+
+| Approach | Automation Level | Setup Time | Maintenance | Viable? |
+|----------|-----------------|------------|-------------|---------|
+| Manual 2-min setup | 0% | 2 minutes | Zero | ✅ Best for one-time |
+| Graph API | 60% (app install only) | 30 minutes | Low | ⚠️ Incomplete (OAuth blocked) |
+| Power Automate | 70% (notifications only) | 1 hour | Medium | ⚠️ Requires manual flow setup |
+| WinAppDriver | 100% | 2-4 hours | Medium-High | ✅ Best for repeated tasks |
+| Playwright | 0% (wrong target) | N/A | N/A | ❌ Not viable |
+
+**Recommendation Provided**:
+
+**For Issue #33 (one-time setup):** Manual 2-minute setup in Teams desktop app is the pragmatic choice.
+
+**Steps**:
+1. Open Teams desktop app
+2. Search for GitHub app in Apps
+3. Install and authorize (`@GitHub signin`)
+4. Subscribe channel (`@GitHub subscribe tamirdresher_microsoft/tamresearch1`)
+
+**For Future (repeated automation):** Invest in WinAppDriver + test framework if frequent Teams app configuration needed.
+
+**Procedural Insights**:
+
+1. **Automation Boundaries**: Not all workflows can be fully automated. OAuth flows, security-sensitive operations, and UI-dependent setup often require human interaction by design.
+
+2. **Tool Selection**: Choose automation tools based on target environment:
+   - Browser apps → Playwright/Selenium
+   - Desktop apps → WinAppDriver/UI Automation API
+   - APIs → Graph API/REST clients
+   - Don't force browser tools onto desktop app problems
+
+3. **Cost-Benefit Analysis**: 2 minutes of manual work vs. 4 hours of automation infrastructure is a clear decision unless the task repeats frequently.
+
+4. **Windows UI Automation Stack**:
+   - **UIA (UI Automation)**: Windows accessibility framework, exposes all desktop app UI elements
+   - **WinAppDriver**: Service that bridges UIA to Appium/Selenium protocol
+   - **Inspect.exe**: Tool to discover UIA element properties (AutomationId, Name, patterns)
+   - **Accessibility Insights**: Advanced UIA inspection and validation tool
+
+5. **Teams Integration Architecture**: Official Microsoft integrations (GitHub app, Power Platform) are better maintained than custom solutions. Only automate when official tools don't exist or are insufficient.
+
+**Artifacts**:
+- Research summary posted to [Issue #33](https://github.com/tamirdresher_microsoft/tamresearch1/issues/33#issuecomment-4016751274)
+- Recommendations: (A) Graph API to check app status, (B) WinAppDriver guide, or (C) Manual setup documentation
+
+**Next Steps**: Awaiting Tamir's decision on approach (A, B, or C).
+
+---
+
+### 2026-03-07: GitHub Actions Self-Hosted Runner Research (Issue #28)
+
+**Task**: Research how to set up self-hosted GitHub Actions runners for Squad automation workflows, specifically on Tamir's devbox or local Windows machine.
+
+**Context**: 
+- All 12 Squad workflows currently disabled with `workflow_dispatch` only (no auto-triggers)
+- Comment in workflows: "All auto-triggers disabled - hosted runners unavailable at org level"
+- Tamir asked: "Can the runner be one of my devboxes? Or my local machine?"
+
+**Workflows Analyzed**:
+- **12 total workflows**: squad-ci.yml, squad-docs.yml, squad-heartbeat.yml, squad-insider-release.yml, squad-issue-assign.yml, squad-label-enforce.yml, squad-main-guard.yml, squad-preview.yml, squad-promote.yml, squad-release.yml, squad-triage.yml, sync-squad-labels.yml
+- **Key requirements**: Node.js 22, Git, GitHub CLI (gh)
+- **Workflow patterns**: GitHub Actions scripts (actions/github-script@v7), issue triage, label management, Ralph auto-assignment
+
+**Research Findings**:
+
+**Option 1: Local Windows Machine (Recommended for Testing)**
+- **Pros**: Full control, no cloud costs, easy start/stop, great for workflow testing
+- **Cons**: Must be online for workflows to run, not suitable for 24/7 automation
+- **Security**: Only use with private repositories (never public)
+- **Setup Time**: ~15 minutes
+- **Steps**:
+  1. Get runner token from GitHub (repo Settings → Actions → Runners → New self-hosted runner)
+  2. Install runner (download, extract, configure with repo URL + token)
+  3. Run as Windows Service (`svc.cmd install`) or interactively (`run.cmd`)
+  4. Update workflows: `runs-on: self-hosted` or `runs-on: [self-hosted, windows]`
+
+**Option 2: Microsoft Dev Box**
+- **Pros**: Cloud-based, can stay online 24/7, Microsoft-managed environment, team sharing
+- **Cons**: ~$20-40/month cost, may auto-hibernate after inactivity, needs runner service restart after hibernation
+- **Setup**: Same as local machine, but install as Windows Service for auto-start after hibernation
+- **Considerations**: Need "keep-alive" script or configure no-hibernation for 24/7 availability
+
+**Security Considerations (CRITICAL for Enterprise)**:
+1. **Only use with private repositories** — public repos allow external contributors to run arbitrary code on your runner
+2. **Network isolation** — runner has access to local network and credentials
+3. **Secrets exposure** — workflow secrets accessible to jobs on your runner
+4. **Regular updates** — keep runner application and OS patched
+5. **Minimal permissions** — grant GITHUB_TOKEN only minimum required permissions
+
+**Appropriate for this use case**: Private Microsoft repository with trusted Squad automation code (issue triage, label management, CI tests). No public contributors, no untrusted code execution.
+
+**Workflow Dependencies**:
+- Node.js 22 (for GitHub scripts and test execution)
+- Git (for actions/checkout)
+- GitHub CLI (gh) — optional but useful for Squad CLI integration
+
+**Installation**:
+```powershell
+# Using Chocolatey
+choco install -y git nodejs-lts github-cli
+```
+
+**Immediate Next Steps Recommended**:
+1. **Start with local machine** — test one workflow (squad-ci.yml)
+2. **Verify it works** — run manually via workflow_dispatch
+3. **Enable auto-triggers** — uncomment `on:` triggers in workflow files once confident
+4. **Consider devbox** — if 24/7 availability needed for heartbeat/triage workflows
+
+**Most Valuable Workflows to Enable First**:
+1. **squad-triage.yml** — auto-assigns new issues to squad members (reduces manual routing)
+2. **squad-label-enforce.yml** — maintains label consistency (mutual exclusivity, auto-applies release:backlog)
+3. **squad-heartbeat.yml** — periodic health checks + Ralph's smart triage (requires 24/7 runner)
+4. **sync-squad-labels.yml** — keeps label taxonomy in sync
+
+**Persistence & Uptime**:
+- **Local Machine**: Runner only works when machine is on → good for development/testing, not ideal for scheduled workflows
+- **Dev Box**: Can be configured for near-24/7 uptime → good for all automation including scheduled tasks
+- **Alternative**: Azure VM or wait for GitHub-hosted runners if Microsoft enables them for your org
+
+**Technical Details from Web Research**:
+- Latest runner version: v2.331.0 (as of 2024)
+- Runner application: PowerShell-based Windows service
+- Configuration: `config.cmd --url <repo> --token <token>`
+- Service management: `svc.cmd install/start/stop`
+- Runner labels: Can add custom labels for workflow targeting (e.g., `[self-hosted, windows, local]`)
+- Multiple runners: Can install multiple runners on same machine with different working directories
+
+**Architecture Patterns (from web research)**:
+1. **Ephemeral runners**: Spin up for job, tear down after (Azure Container Apps + KEDA autoscaling)
+2. **Persistent runners**: Single long-running machine (simpler but requires maintenance)
+3. **Runner groups**: Organize runners by team/project/environment (requires GitHub Enterprise)
+
+**Codespace Considerations**:
+- GitHub Codespaces can run self-hosted runners but:
+  - Codespaces hibernate after inactivity (disconnects runner)
+  - Requires custom `.devcontainer` setup with runner auto-registration on start
+  - Better suited for ephemeral/on-demand workflows, not 24/7 scheduled tasks
+
+**Deliverable**: 
+- Comprehensive guide posted to [Issue #28](https://github.com/tamirdresher_microsoft/tamresearch1/issues/28#issuecomment-4016788504)
+- Covers: both options (local machine + devbox), setup steps, security considerations, workflow requirements, persistence tradeoffs
+- Includes: PowerShell commands, workflow YAML updates, tool installation (Chocolatey), recommended enablement order
+
+**Key Learning**:
+Self-hosted runners are the pragmatic unblocking path for org-level runner restrictions. For private repositories with trusted code, local machine (testing) + devbox (production) is a solid incremental adoption strategy. Security risks are manageable with proper scoping (private repos only), network isolation, and regular updates. The 15-minute setup time is far less than the time spent waiting for org-level runner policy changes.
+
+**Procedural Insight**:
+When corporate policies block standard tooling (GitHub-hosted runners), evaluate self-hosted alternatives with clear security tradeoffs. Document the security boundaries (private repos only), provide concrete setup instructions, and recommend incremental adoption (test workflows on local machine first, move to devbox for 24/7 automation). The goal: unblock the team without compromising security posture.

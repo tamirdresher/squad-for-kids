@@ -12,6 +12,45 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-07: Issue #29 Response — Change Risk Mitigation for DK8S
+
+**Task:** Respond to Tamir's core concern: Every change is risky, cross-component impacts hidden, failures detected late in gov/sov clouds. Propose practical, engineer-friendly solutions without bureaucracy.
+
+**Key Insight:** The Tier 3 strategic initiatives from dk8s-stability-analysis.md are correct long-term, but they don't address the *immediate* tactical friction: engineers need instant visibility into blast radius at PR/commit time, not at sovereign deployment time.
+
+**Recommendations Posted to Issue #29:**
+
+1. **Automated Blast-Radius Analysis (CI gate)**
+   - Parse manifest dependencies + ConfigGen expansion; visualize impact across clusters/regions
+   - Engineer sees: "This NuGet bump affects 12 clusters + 3 sovereign regions" inline
+   - 2-3 days effort; reuses existing Component Deployer manifest parsing
+
+2. **Dependency Tracking & Impact Visualization**
+   - Lightweight `deps.json` in artifacts tracking ConfigGen → manifests → targets
+   - Query: "What components are affected by ConfigGen v1.2.3→v1.3.0?"
+   - 1 day effort; lives in EV2 artifact generation
+
+3. **Sovereign Cloud Pre-Staging (Canary Ring)**
+   - Deploy to single sovereign Test cluster after PPE passes; automatic rollback on failure
+   - Shifts gov/sov failure detection left by 2-4 weeks
+   - Aligns with existing L13 (Additional STG Ring) proposal; 1-2 sprints effort
+
+4. **Deployment Feedback Webhook**
+   - EV2 failures post back to artifact repo with context and suggested mitigation
+   - Closes visibility gap for ConfigGen/IDP teams; automatically files issues
+   - 1 day effort; extends existing EV2 wrapper scripts
+
+5. **Component Dependency CI Check**
+   - Manifest compile-and-link validation; fail PR if cross-component references unmet
+   - Enforce all dependencies point to existing, versioned artifacts
+   - 3-5 days effort; leverages existing conftest + OPA/Rego policies
+
+**Why This Works:** Automation gates, not approval chains. Inline feedback in PRs. No new bureaucracy — just smarter CI. Low-risk changes merge immediately; high-risk changes flagged automatically for review.
+
+**Philosophy:** Engineers gain instant visibility into cross-component impacts; unknown blast radius is caught by automation, not discovered in sovereign clouds.
+
+---
+
 ### 2026-03-02: idk8s-infrastructure Deep-Dive Analysis
 
 **Task:** Infrastructure layer analysis of Identity Kubernetes Platform (Celestial) fleet management system.
@@ -313,3 +352,32 @@ Kubernetes-inspired patterns (reconciliation, desired-state, scheduler) are powe
 - "Provisioned but unhealthy" is a real failure state — cluster exists in AKS but platform components are broken
 - No provisioning regression baseline exists today — no way to detect if provisioning quality is degrading over time
 - Aurora results support multi-subscription, multi-region, multi-resource-group reporting via structured JSON schema
+
+---
+
+### 2026-03-07: Ralph Round 1 — Change Risk Mitigation Response (Background)
+
+**Context:** Ralph work-check cycle initiated. B'Elanna assigned to respond to Tamir's #29 DK8S change risk clarification.
+
+**Task:** Analyze Tamir's core concern — Every change is risky, cross-component impacts hidden, failures detected late. Propose practical mitigations without bureaucracy.
+
+**Response Posted to #29:**
+
+**5 Practical Mitigations:**
+1. **Automated Blast-Radius Analysis (CI gate)** — Parse manifest dependencies + ConfigGen expansion; visualize impact across clusters/regions at PR time
+2. **Dependency Tracking & Impact Visualization** — Lightweight deps.json in artifacts; query: "What components affected by ConfigGen bump?"
+3. **Sovereign Cloud Pre-Staging (Canary Ring)** — Deploy to single sovereign Test cluster after PPE; auto-rollback on failure
+4. **Deployment Feedback Webhook** — EV2 failures post back to artifact repo with context; close visibility gap for ConfigGen teams
+5. **Component Dependency CI Check** — Manifest compile-and-link validation; fail PR if cross-component references unmet
+
+**Philosophy:** Automation gates, not approval chains. Inline feedback in PRs. No new bureaucracy — just smarter CI.
+
+**Outcome:** ✅ Complete
+- 5 practical mitigations posted to #29
+- Addressed configuration drift risks with concrete automation steps
+- Coordinated triage of #35 with Picard
+
+**Next Steps:**
+- Monitor #29 for Tamir feedback and refine mitigations if needed
+
+---

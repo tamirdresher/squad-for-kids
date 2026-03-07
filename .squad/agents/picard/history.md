@@ -10,6 +10,35 @@
 
 ## Learnings
 
+### 2026-03-07: Ralph Watch v5 Assessment — Observability Gap Analysis
+
+**Context:** Tamir asked for assessment of ralph-watch.ps1 (hourly polling script for monitoring GitHub issues/PRs). Existing implementation runs the squad agent in a 5-minute loop with basic comment tracking via `.ralph-state.json`. Request: "Can you make it working ok? Any suggestions for improvement?"
+
+**Assessment Delivered:**
+
+Ralph Watch v5 is **operationally functional** but **blind** — no telemetry, logging, or failure recovery. Identified 5 critical gaps:
+
+1. **No Execution Logs** — Running silently; no audit trail of what actually happened each round
+2. **No Error Recovery** — Single failure breaks the loop; no retry logic or exponential backoff
+3. **Incomplete Change Detection** — Only tracks issue comments, not PR comments or state changes
+4. **No Metrics** — Can't answer "Is Ralph alive?" or "How effective is this interval?"
+5. **No Failure Notification** — Silent failures; Tamir has no way to know when rounds fail
+
+**Improvement Plan Posted to Issue #15:**
+- **Quick Wins (1 hour):** Add structured JSON logging (`.ralph-log.jsonl`), capture round output, add metrics file (`.ralph-metrics.json`)
+- **Medium Effort (2-3 hours):** Implement PR comment detection, state change tracking, retry logic with exponential backoff
+- **Nice-to-Have:** Teams integration, threshold alerting, round duration tracking
+
+**Key Insight:** Before optimizing interval/coverage, instrument first. A week of data will reveal: "Are we missing actionable changes? Is 5 minutes too frequent/infrequent? Where are the blind spots?" Data-driven > guessing.
+
+**Decision Pattern Applied:**
+- Diagnosed root cause (lack of observability, not lack of functionality)
+- Prioritized quick wins for immediate visibility
+- Deferred optimization until metrics are available
+- Framed next steps as data collection + decision point
+
+---
+
 ### 2026-03-02: idk8s-infrastructure Deep Architecture Analysis
 
 **Context:** Tasked with deep-diving into the idk8s-infrastructure Azure DevOps repository (project "One", msazure org) to extend existing architecture report. Repository access via MCP tools failed - project "One" not found, searches for "idk8s-infrastructure" returned zero results.
@@ -415,3 +444,96 @@ When blocking conditions are addressable (not architectural failures), DEFER wit
 - Created issue #28 to track
 
 **Decision Pattern:** When converting design docs to actionable work, organize by implementation tier (immediate/soon/strategic) rather than by source document. This matches how sprint planning actually works.
+
+### 2026-03-07: Repository Organization Decision (Issue #34)
+
+**Context:** Tamir raised issue #34 questioning whether investigation reports and research artifacts should live in separate dedicated repos. The tamresearch1 repo currently contains both squad infrastructure (.squad/*, squad.config.ts) and research outputs (53 files, 620+ KB of analysis reports, guides, test data).
+
+**Technical Learnings:**
+
+1. **Architectural Boundary Principle:**
+   - "If this repo was deleted, would we lose the squad's ability to function?" → KEEP IT
+   - "If this repo was deleted, would we lose research outputs?" → MOVE IT
+   - Squad home base = infrastructure; Research outputs = deliverables with independent lifecycles
+
+2. **Research Output Categorization:**
+   - **Investigation Reports:** Deep-dives on target systems (idk8s-infrastructure, BaseplatformRP)
+   - **Agent Analysis Reports:** Cross-agent investigations from squad formation/onboarding
+   - **Test/Exploration Data:** SquadPlaces API artifacts, screenshots, test payloads
+   - Each category has different audience, lifecycle, and access control needs
+
+3. **Repository Anti-Patterns Identified:**
+   - Mixing squad infrastructure with deliverables creates confusion about repo purpose
+   - 620 KB research outputs cluttering a 15 KB squad home base (~40:1 signal-to-noise ratio)
+   - Research artifacts in squad repo prevent granular access control (can't share DK8S research without exposing squad internals)
+   - Git history fragmentation: single repo mixing coordination commits with research commits makes both harder to understand
+
+4. **File Count as Signal:**
+   - 66 files total; 13 squad infrastructure; 53 research outputs
+   - ~80% of files don't belong → architectural violation
+   - Clean architecture: 90%+ of files serve primary repo purpose
+
+5. **Repository Design Principles (for multi-agent teams):**
+   - **Squad home base contains:** Agent charters, history, decisions, coordination artifacts, tooling config
+   - **Research repos contain:** Investigation reports, analysis outputs, research data, deliverables
+   - **Test/exploration repos contain:** API test data, screenshots, experimental artifacts
+   - Each repo should answer one question: "What is this repo for?" If answer requires "and" → split it
+
+**Decision:**
+
+Create 3 new private repos:
+1. **tamresearch1-dk8s-investigations** — DK8S platform deep-dives (13 files)
+2. **tamresearch1-agent-analysis** — Squad formation analysis reports (5 files)
+3. **tamresearch1-squadplaces-research** — SquadPlaces API exploration (35 files)
+
+Keep in tamresearch1: .squad/*, squad.config.ts, package.json, alph-watch.ps1, git config files
+
+**Migration Strategy:**
+- Use manual copy + lineage header notes (simpler than git mv cross-repo)
+- Create .squad/research-repos.md catalog for discoverability
+- Preserve cross-references via GitHub issue/commit links
+- Tag research repos with semantic versions (e.g., 1.0-idk8s-analysis)
+
+**Impact:**
+- ✅ Clear separation of concerns
+- ✅ Squad home base stays lean (~13 files)
+- ✅ Research repos can be archived/shared independently
+- ✅ Easier granular access control
+- ⚠️ Increased repo count (4 repos instead of 1) → mitigated by catalog
+- ⚠️ Cross-repo linking requires discipline → mitigated by conventional commit messages
+
+**Artifacts:**
+- .squad/decisions/inbox/picard-repo-organization.md — Full decision document
+- Issue #34 comment — Posted analysis and awaiting approval
+
+**User Preferences Learned:**
+- Tamir prefers private repos unless explicitly requested otherwise
+- Tamir values clear architectural boundaries and organization
+- Routing through issues for structural decisions is correct pattern
+
+**Key File Paths:**
+- .squad/decisions/inbox/ — Decision proposals (staged by agents, merged by Scribe)
+- .squad/research-repos.md — Catalog for cross-repo references (to be created)
+- .squad/agents/{name}/history.md — Agent learning accumulation
+
+---
+
+### 2026-03-07: Ralph Round 1 — Triage + Repo Organization (Background)
+
+**Context:** Ralph work-check cycle initiated. Picard assigned to triage #35/#34 and deliver repo organization decision.
+
+**Triage Actions:**
+- Issue #35 (Squad places feeds): Classified as B'Elanna responsibility (infrastructure expert required); coordinated ownership routing
+- Issue #34 (Repo organization): Full analysis and decision proposal delivered
+
+**Outcome:** ✅ Complete
+- Analysis complete; 3 new repos proposed; decision posted to #34
+- Decision merged into .squad/decisions.md by Scribe
+- Awaiting Tamir approval before creating repos and executing migration
+
+**Next Steps:**
+- Monitor #34 for approval/feedback
+- Upon approval: Create 3 new private repos via gh CLI
+- Execute migration plan (file moves, cross-references, catalog creation)
+
+---

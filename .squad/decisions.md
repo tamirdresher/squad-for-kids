@@ -630,6 +630,121 @@ Transform the Channel Scanner from "query and store" to "query, classify, priori
 - **Classification:** incident / decision / question / coordination
 - **Priority:** P0 (production outage) → P3 (cleanup)
 - **Escalation:** P0 items trigger immediate squad action
+
+---
+
+## Decision 5: Repository Organization — Squad Home vs. Research Outputs
+
+**Date:** 2026-03-07  
+**Author:** Picard (Lead)  
+**Status:** ✅ Proposed  
+**Scope:** Repository Architecture
+
+### Context
+
+Issue #34 raised by Tamir: This repository (tamresearch1) contains both:
+1. Squad infrastructure (.squad/*, squad.config.ts, package.json)
+2. Investigation reports and research artifacts (analysis-*.md, *-guide.md, etc.)
+
+The question: Should investigation outputs live in separate dedicated repositories?
+
+### Analysis
+
+#### Current Repository Contents (66 files in root)
+
+**Squad Infrastructure (BELONGS HERE):**
+- .squad/* — agent charters, history, decisions, logs
+- squad.config.ts — squad configuration
+- package.json — squad-cli tooling
+- .gitignore, .gitattributes — repo metadata
+- ralph-watch.ps1 — squad automation
+
+**Investigation Reports (27 files, SHOULD MOVE):**
+- analysis-belanna-infrastructure.md (34 KB)
+- analysis-data-code.md (35 KB)
+- analysis-picard-architecture.md (40 KB)
+- analysis-seven-repohealth.md (36 KB)
+- analysis-worf-security.md (45 KB)
+- idk8s-architecture-report.md (31 KB)
+- idk8s-infrastructure-complete-guide.md (183 KB)
+- cross-repo-analysis-idk8s-to-baseplatformrp.md (37 KB)
+- workload-migration-deep-dive.md (33 KB)
+
+**Research Artifacts (SHOULD MOVE):**
+- aspire-kind-analysis.md, aurora-adoption-plan.md, aurora-cluster-provisioning-experiment.md, aurora-scenario-catalog.md, baseplatform-issues.md, continuous-learning-design.md, dk8s-infrastructure-inventory.md, dk8s-platform-knowledge.md, dk8s-stability-analysis.md, fleet-manager-evaluation.md, fleet-manager-security-analysis.md, rp-registration-guide.md, rp-registration-status.md
+
+**SquadPlaces Test Data (SHOULD MOVE):**
+- api-docs.yaml, artifact-detail.yaml, feed-*.yaml, squads-page.yaml, artifact*.json, comment*.json, squad-export.json, *.png screenshots, current-page.md, feed-*.md, squad-places-feed-*.md, artifact-with-comments.md
+
+**Total:** 53 files (620+ KB) that don't belong in the squad home base.
+
+### Decision
+
+**AGREE with Tamir.** This repository should be the squad's home base and finite knowledge base — NOT a dumping ground for research outputs.
+
+#### Architectural Principles
+
+1. **Squad Home Base Contains:**
+   - Agent definitions and history (.squad/agents/*)
+   - Team decisions (.squad/decisions.md, .squad/decisions/inbox/*)
+   - Squad configuration (squad.config.ts, package.json)
+   - Team coordination artifacts (.squad/ceremonies.md, roster.md, routing.md)
+   - Meta-documentation about HOW the squad works
+
+2. **Research Outputs Belong In:**
+   - Dedicated private repositories per investigation domain
+   - Organized by subject matter (infrastructure, security, platform, etc.)
+   - Versioned and tagged appropriately
+   - Cross-referenced from squad decisions when relevant
+
+3. **Boundary Test:**
+   - "If this repo was deleted, would we lose the squad's ability to function?" → KEEP IT
+   - "If this repo was deleted, would we lose research outputs?" → MOVE IT
+
+#### Proposed Repository Structure
+
+**Create 3 New Private Repos:**
+
+1. **tamresearch1-dk8s-investigations** (Private)
+   - Purpose: Deep-dive research on DK8S platform (idk8s-infrastructure, BaseplatformRP)
+   - Scope: 13 files (420 KB) covering infrastructure, platform knowledge, migrations
+
+2. **tamresearch1-agent-analysis** (Private)
+   - Purpose: Cross-agent investigation reports (initial squad deep-dives)
+   - Scope: 5 files (190 KB) of analysis reports from Picard, B'Elanna, Data, Seven, Worf
+
+3. **tamresearch1-squadplaces-research** (Private)
+   - Purpose: SquadPlaces API exploration, screenshots, test data
+   - Scope: 35 files (1.1 MB) of API artifacts, test data, screenshots, documentation
+
+### Impact
+
+**Benefits:**
+- ✅ Clear separation of concerns: squad infrastructure vs. research outputs
+- ✅ Squad home base stays lean and focused
+- ✅ Research repos can have own lifecycles (archive, share, fork)
+- ✅ Easier to grant granular access (e.g., share dk8s-investigations with Azure team)
+
+**Risks:**
+- ⚠️ Increased repo count (4 repos instead of 1)
+- ⚠️ Cross-repo linking requires discipline
+- ⚠️ Git history fragmentation (mitigated by lineage notes)
+
+**Mitigation:**
+- Maintain .squad/research-repos.md catalog with links and descriptions
+- Use conventional commit messages with cross-repo references
+- Tag research repos consistently (e.g., v1.0-idk8s-analysis)
+
+### Team Consensus
+
+**Required:** Tamir approval before creating repos and moving files.
+
+**Next Steps:**
+1. Tamir reviews this decision (posted to issue #34)
+2. If approved, Picard creates 3 new private repos
+3. Picard executes migration plan
+4. Scribe updates .squad/research-repos.md catalog
+5. Close issue #34
 - **Audit:** Log all triage decisions for pattern analysis
 
 **Impact:** Turns channel monitoring from passive note-taking into active intelligence gathering.

@@ -1,5 +1,19 @@
 node_modules/
 
-# Squad: ignore generated logs
+# Squad Tier 1: Transaction memory (raw, high-volume, may contain PII)
 .squad/orchestration-log/
 .squad/log/
+.squad/sessions/
+.squad/digests/[0-9]*.md
+.squad/digests/[0-9]*-*.md
+.squad/digests/triage/*.jsonl
+.squad/raw-agent-output.md
+.squad/run-output.md
+
+# Squad Tier 2 & 3: Always committed (do NOT ignore)
+# .squad/digests/archive/     — QMD digests
+# .squad/digests/dream/       — Dream reports
+# .squad/decisions/            — Team decisions
+# .squad/skills/               — Permanent skills
+# .squad/templates/            — Templates
+# .squad/agents/               — Agent config

@@ -1009,3 +1009,29 @@ Based on analysis of DK8S platform workflows, stability patterns, and ConfigGen 
 **Why this matters:** This re-scoped analysis directly addresses Tamir's clarified question about patenting the USAGE PATTERN (AI squad as human extension for TAM), not the Squad framework architecture. Analysis identifies where novelty could exist (TAM-specific orchestration, human-AI parallel workflow) and where prior art blocks broad claims (general multi-agent assistants). Provides actionable filing strategy with realistic risk assessment.
 
 **Key learning:** When user clarifies scope mid-research ("not Squad itself"), IMMEDIATELY pivot to re-scoped analysis rather than defending original scope. User's clarification takes absolute priority over prior work investment. In this case, entire patent analysis needed reframing from "Squad technical architecture" to "usage pattern as human extension" — fundamentally different patent question.
+---
+
+### 2026-03-11: Issue #23 — OpenCLAW Pattern Templates Implementation
+
+**Task:** Create concrete, production-ready template files implementing four OpenCLAW patterns for Squad adoption: QMD Framework, Dream Routine, Issue-Triager, and Memory Separation.
+
+**Outcome:** Delivered 4 template files (834 lines total) in `.squad/templates/`, committed on branch `squad/23-openclaw-patterns`.
+
+**Templates created:**
+
+1. **qmd-extraction.md** — Full 5-category KEEP/DROP taxonomy with signal words, templates, examples, quality checklist, and output format for weekly digest compaction.
+
+2. **dream-routine.md** — Complete prompt template for cross-digest analysis covering 6 analysis tasks (trending topics, recurring blockers, incident clusters, decision drift, skill promotion candidates, commitment tracking) with configurable parameters.
+
+3. **issue-triager.md** — Classification taxonomy (incident/decision/question/coordination), P0-P3 priority scoring with 3-dimension rubric, escalation criteria, JSONL audit trail schema with query examples, and sub-agent configuration.
+
+4. **memory-separation.md** — Three-tier architecture (Transaction/Operational/Skills) with directory structure, retention rules, .gitignore rules, data flow diagram, and migration plan.
+
+**Key design decisions:**
+- QMD uses 5 KEEP + 5 DROP categories (directly from OpenCLAW article) with Squad-specific examples
+- Dream Routine requires minimum 2 QMD digests (3+ for confident trends) — prevents false pattern detection
+- Issue-Triager uses 3-dimension scoring (blast radius, time sensitivity, reversibility) rather than keyword-only priority
+- Memory separation uses 3 tiers (not 2) to distinguish raw/curated/permanent, with gitignore rules per tier
+- All templates include integration sections showing how they connect to each other and existing Squad infrastructure
+
+**Why this matters:** These templates transform the OpenCLAW analysis (previous session's 5,500-line assessment) into actionable, ready-to-use artifacts. Any agent can now run QMD extraction, Dream Routine, or Issue-Triager by following these templates. Memory separation rules provide the governance framework that prevents signal/noise degradation over time.

@@ -4499,6 +4499,118 @@ Validation Tests → Azure Monitor REST API (HTTP POST)
 
 ---
 
+## Decision 14: FedRAMP Migration Plan Technical Sign-Off
+
+**Date:** 2026-03-08  
+**Decision Maker:** Data (Code Expert)  
+**Context:** PR #131 — FedRAMP Dashboard migration plan review  
+**Status:** Approved with minor recommendations  
+
+## Decision
+
+**APPROVED** the FedRAMP Dashboard migration plan with technical sign-off as Code Expert.
+
+## Technical Validation Summary
+
+### Inventory Accuracy: ✅ VERIFIED
+- Validated actual codebase against documented inventory
+- API: 39 files (5 controllers, 9 services, middleware, configuration)
+- Functions: 8 source files (data pipeline, alerting, archival)
+- Dashboard UI: 19 TypeScript files
+- Infrastructure: 13 files (Bicep templates, deployment scripts)
+- Tests: 137 FedRAMP-related test files
+- All key components correctly identified
+
+### Dependencies: ✅ ACCURATE
+- Cross-component dependencies validated:
+  - API ↔ Functions (CosmosDbService shared)
+  - API ↔ Infrastructure (CacheTelemetryMiddleware ↔ cache alert)
+  - Functions ↔ Alerting (AlertProcessor ↔ PagerDuty/Teams)
+  - UI ↔ API (5 controller endpoints)
+  - Tests validate all components
+
+### Migration Feasibility: ✅ SOUND
+- Git filter-repo approach correct (preserves 13 PRs, ~80 commits)
+- Blue-green deployment essential for continuous Functions
+- Directory structure changes are clean
+- Parallel pipeline strategy solid mitigation
+
+### Timeline: ⚠️ SLIGHTLY OPTIMISTIC
+- 6 weeks achievable but tight
+- Migration + validation phase (Weeks 2-3) may need 2.5 weeks
+- **Recommendation:** Add 1-week buffer → 7 weeks total
+
+### Ownership: ✅ LOGICAL
+- Assignments match actual expertise and implementation history
+- Data owns API/Functions (built PRs #100, #102, #106, #108, #117)
+- CODEOWNERS structure is sound
+
+## Minor Recommendations
+
+1. **Timeline Buffer:** Extend migration/validation phase by 0.5 weeks (7 weeks total)
+2. **Cache Alert Documentation:** Document expected cold-cache alert on first PROD deployment (hit rate <70% temporary)
+3. **Testing:** Validate all 5 controllers in DEV before STG promotion
+4. **OpenAPI Update:** Update base URL in openapi-fedramp-dashboard.yaml during migration
+
+## Critical Technical Considerations
+
+### Cache Implementation (PR #102)
+- IMemoryCache with 60s (status) / 300s (trend) TTL
+- CacheTelemetryMiddleware + CacheTelemetryOptions + ICacheTelemetryService must migrate as unit
+- Hit rate telemetry via <100ms response duration heuristic
+- phase4-cache-alert.bicep dependency validated
+
+### Security Hardening (PR #100)
+- Parameterized KQL queries (ComplianceService, ControlsService)
+- @ prefixed Cosmos DB parameters
+- Services must migrate together (ComplianceService, ControlsService use shared patterns)
+
+### Functions Pipeline
+- ProcessValidationResults: Log Analytics → Cosmos DB ingestion
+- AlertProcessor: Threshold evaluation → PagerDuty/Teams
+- ArchiveExpiredResults: Cold archival (retention compliance)
+- All three have structured telemetry with duration tracking
+- Application Insights workspace connection must be preserved
+
+## Risk Assessment
+
+**5 risks identified in plan are correct:**
+1. Deployment disruption → Blue-green + rollback ✅
+2. Git history loss → git filter-repo + backup ✅
+3. Broken cross-references → Search "tamresearch1" ✅
+4. Squad integration failure → Test Ralph Watch ✅
+5. CI/CD gaps → Parallel pipelines ✅
+
+**Additional risk identified:**
+- Cache warm-up after migration (cold cache → temporary alert expected)
+
+## Confidence Level
+
+**HIGH ✅** — This is production-quality migration planning. Inventory accurate, dependencies correct, ownership logical, risk mitigation comprehensive.
+
+## Related Work
+
+- PR #100: API Security & Resilience Hardening (Data)
+- PR #102: Response Caching Implementation (Data)
+- PR #106: Cache SLI & Monitoring Post-Merge (Data)
+- PR #108: Cache Monitoring PR (Data)
+- PR #117: Cache Telemetry Work (Data)
+- Issue #120: Cache Telemetry Consolidation (Data)
+- Issue #121: Config-Driven Endpoint Filtering (Data)
+
+## Follow-Up Actions
+
+1. Picard considers timeline adjustment (+1 week buffer)
+2. Document cache warm-up alert in phase4-cache-alert runbook
+3. Update OpenAPI spec base URL during migration
+4. Validate all 5 controllers in DEV before STG
+
+## Outcome
+
+**Technical sign-off posted to PR #131.** Migration plan validated from code expert perspective. Ready for Tamir's final approval.
+
+---
+
 ## Applies To
 
 - FedRAMP Security Dashboard (all phases)

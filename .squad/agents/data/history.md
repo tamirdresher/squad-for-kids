@@ -18,6 +18,21 @@
 
 ## Learnings
 
+### 2026-03-08: squad-monitor v2 — Multi-Panel Dashboard (PR #135)
+
+**Task:** Upgrade squad-monitor from orchestration-log-only to a multi-source dashboard.
+**Delivered:** 5-panel terminal dashboard (Ralph heartbeat, Ralph log, GitHub Issues, GitHub PRs, Orchestration log).
+**Key decisions:**
+- Used `gh` CLI for GitHub data instead of direct API — avoids token management, leverages user's auth
+- Ralph panels read from `~/.squad/` (user-profile) since watch loop is per-user, not per-repo
+- All panels degrade gracefully — monitor works even when some data sources are absent
+- Capped orchestration log to top 10 entries for readability
+- `gh` CLI calls use 10s timeout to prevent blocking the refresh loop
+
+**Branch:** `squad/128-monitor-observability` | **PR:** #135 | **Issues:** #128 (comment added), #129 (supports)
+
+---
+
 ### 2026-03-08: Ralph Round 1 Activation — Tech Debt Issues #120, #121
 
 **Activation:** Tamir initiated Ralph Round 1  

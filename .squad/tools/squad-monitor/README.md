@@ -1,14 +1,27 @@
-# Squad Activity Monitor
+# Squad Activity Monitor v2
 
-A real-time terminal dashboard for monitoring squad member activity.
+A multi-panel terminal dashboard for monitoring squad activity, GitHub work queue, and Ralph watch loop health.
 
 ## Features
 
 - 🎨 Beautiful terminal UI with Spectre.Console
 - 🔄 Auto-refresh every 5 seconds (configurable)
 - 📊 Color-coded status indicators (green/yellow/red)
-- 📈 Activity age tracking
-- 🎯 Parse orchestration logs automatically
+- 💚 **Ralph heartbeat panel** — shows watch loop status, round count, staleness
+- 📜 **Ralph log panel** — recent round summaries from `ralph-watch.log`
+- 📋 **GitHub Issues panel** — open issues with `squad` label, assignees, status
+- 🔀 **GitHub PRs panel** — open PRs with review status, CI rollup
+- 🎯 **Orchestration log panel** — agent activity from `.squad/orchestration-log/`
+
+## Data Sources
+
+| Panel | Source | Requirement |
+|-------|--------|-------------|
+| Ralph Heartbeat | `~/.squad/ralph-heartbeat.json` | ralph-watch.ps1 v7+ |
+| Ralph Log | `~/.squad/ralph-watch.log` | ralph-watch.ps1 v7+ |
+| GitHub Issues | `gh issue list --label squad` | `gh` CLI authenticated |
+| GitHub PRs | `gh pr list` | `gh` CLI authenticated |
+| Orchestration Log | `.squad/orchestration-log/*.md` | Squad orchestration |
 
 ## Usage
 
@@ -35,21 +48,29 @@ dotnet publish -c Release -r win-x64 --self-contained
 
 The published executable will be at: `bin\Release\net10.0\win-x64\publish\squad-monitor.exe`
 
-## How It Works
+## Panels
 
-1. Finds team root by looking for `.squad` directory
-2. Reads orchestration logs from `.squad/orchestration-log/`
-3. Parses agent name, status, task, and outcome from markdown files
-4. Displays in a formatted table with color coding and age indicators
+### Ralph Watch Loop
+Reads `~/.squad/ralph-heartbeat.json` (written by ralph-watch.ps1) to show:
+- Running/idle/crashed status
+- Current round number
+- Time since last run (green <10m, yellow <30m, red >30m)
+- Consecutive failure count
 
-## Status Color Coding
+### Ralph Recent Rounds
+Tails `~/.squad/ralph-watch.log` for the last 5 log lines, color-coded by severity (ERROR=red, WARN=yellow, SUCCESS=green).
 
-- 🟢 Green: Completed (✅)
-- 🟡 Yellow: In Progress (⏳)
-- 🔴 Red: Failed (❌)
-- 🔵 Blue: Other statuses
+### GitHub Issues
+Runs `gh issue list --state open --label squad --json ...` to show open squad issues with labels, assignees, and last-updated age.
+
+### GitHub Pull Requests
+Runs `gh pr list --state open --json ...` to show open PRs with review decision (approved/changes/pending) and CI check rollup.
+
+### Orchestration Log
+Parses `.squad/orchestration-log/*.md` files (top 10 most recent) showing agent, status, age, task, and outcome.
 
 ## Requirements
 
 - .NET 10.0 SDK
-- Windows, Linux, or macOS
+- `gh` CLI (GitHub CLI) — installed and authenticated for GitHub panels
+- ralph-watch.ps1 v7+ — for heartbeat/log panels (gracefully skipped if absent)

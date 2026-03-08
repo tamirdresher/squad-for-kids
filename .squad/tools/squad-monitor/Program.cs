@@ -38,8 +38,8 @@ AnsiConsole.WriteLine();
 if (runOnce)
 {
     // Run once mode: render directly without Live display
-    var now = DateTime.UtcNow;
-    var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss} UTC[/]")
+    var now = DateTime.Now;
+    var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss}[/]")
     {
         Justification = Justify.Left
     };
@@ -75,7 +75,7 @@ else
                     }
                 }
 
-                var now = DateTime.UtcNow;
+                var now = DateTime.Now;
                 var content = orchestrationOnlyMode 
                     ? BuildOrchestrationOnlyContent(now, userProfile, teamRoot)
                     : BuildDashboardContent(now, userProfile, teamRoot);
@@ -99,7 +99,7 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
     var sections = new List<IRenderable>();
 
     // Header
-    var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss} UTC[/]")
+    var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss}[/]")
     {
         Justification = Justify.Left
     };
@@ -137,7 +137,7 @@ static IRenderable BuildOrchestrationOnlyContent(DateTime now, string userProfil
     var sections = new List<IRenderable>();
 
     // Header
-    var header = new Rule($"[yellow bold]Squad Monitor v2 — Orchestration View[/] [dim]— {now:yyyy-MM-dd HH:mm:ss} UTC[/]")
+    var header = new Rule($"[yellow bold]Squad Monitor v2 — Orchestration View[/] [dim]— {now:yyyy-MM-dd HH:mm:ss}[/]")
     {
         Justification = Justify.Left
     };
@@ -231,7 +231,7 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
     try
     {
         var json = File.ReadAllText(heartbeatPath);
-        var heartbeatFileAge = DateTime.UtcNow - File.GetLastWriteTimeUtc(heartbeatPath);
+        var heartbeatFileAge = DateTime.Now - File.GetLastWriteTime(heartbeatPath);
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 
@@ -260,7 +260,7 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
         DateTime lastRunDt = DateTime.MinValue;
         if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out lastRunDt))
         {
-            var age = DateTime.UtcNow - lastRunDt;
+            var age = DateTime.Now - lastRunDt;
             staleness = FormatAge(age);
             stalenessColor = age.TotalMinutes < 10 ? "green" : age.TotalMinutes < 30 ? "yellow" : "red";
         }
@@ -279,7 +279,7 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
         if (lastRunDt != DateTime.MinValue && status == "idle")
         {
             var nextRoundTime = lastRunDt.AddMinutes(5);
-            var timeUntilNext = nextRoundTime - DateTime.UtcNow;
+            var timeUntilNext = nextRoundTime - DateTime.Now;
             
             if (timeUntilNext.TotalSeconds > 0)
             {
@@ -456,7 +456,7 @@ static IRenderable BuildGitHubIssuesSection(string teamRoot)
             var number = issue.TryGetProperty("number", out var n) ? n.GetInt32().ToString() : "?";
             var title = issue.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
             var author = issue.TryGetProperty("author", out var a) && a.TryGetProperty("login", out var login) ? login.GetString() ?? "" : "";
-            var createdAt = issue.TryGetProperty("createdAt", out var c) && DateTime.TryParse(c.GetString(), out var created) ? FormatAge(DateTime.UtcNow - created) : "?";
+            var createdAt = issue.TryGetProperty("createdAt", out var c) && DateTime.TryParse(c.GetString(), out var created) ? FormatAge(DateTime.Now - created.ToLocalTime()) : "?";
 
             var labelsList = new List<string>();
             if (issue.TryGetProperty("labels", out var labels))
@@ -556,7 +556,7 @@ static IRenderable BuildGitHubPRsSection(string teamRoot)
             var title = pr.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
             var author = pr.TryGetProperty("author", out var a) && a.TryGetProperty("login", out var login) ? login.GetString() ?? "" : "";
             var branch = pr.TryGetProperty("headRefName", out var b) ? b.GetString() ?? "" : "";
-            var createdAt = pr.TryGetProperty("createdAt", out var c) && DateTime.TryParse(c.GetString(), out var created) ? FormatAge(DateTime.UtcNow - created) : "?";
+            var createdAt = pr.TryGetProperty("createdAt", out var c) && DateTime.TryParse(c.GetString(), out var created) ? FormatAge(DateTime.Now - created.ToLocalTime()) : "?";
             var isDraft = pr.TryGetProperty("isDraft", out var d) && d.GetBoolean();
 
             var reviewDecision = pr.TryGetProperty("reviewDecision", out var rd) ? rd.GetString() ?? "" : "";
@@ -676,7 +676,7 @@ static IRenderable BuildRecentlyMergedPRsSection(string teamRoot)
             var title = pr.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
             var author = pr.TryGetProperty("author", out var a) && a.TryGetProperty("login", out var login) ? login.GetString() ?? "" : "";
             var branch = pr.TryGetProperty("headRefName", out var b) ? b.GetString() ?? "" : "";
-            var mergedAt = pr.TryGetProperty("mergedAt", out var m) && DateTime.TryParse(m.GetString(), out var merged) ? FormatAge(DateTime.UtcNow - merged) : "?";
+            var mergedAt = pr.TryGetProperty("mergedAt", out var m) && DateTime.TryParse(m.GetString(), out var merged) ? FormatAge(DateTime.Now - merged.ToLocalTime()) : "?";
 
             if (title.Length > 40)
                 title = title.Substring(0, 37) + "...";
@@ -817,7 +817,7 @@ static IRenderable BuildDetailedOrchestrationSection(List<AgentActivity> activit
         var grid = new Grid()
             .AddColumn(new GridColumn().Width(15))
             .AddColumn(new GridColumn().NoWrap())
-            .AddRow($"[cyan bold]{Markup.Escape(activity.Agent)}[/]", $"[{ageColor}]{Markup.Escape(ageStr)} — {Markup.Escape(activity.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"))} UTC[/]")
+            .AddRow($"[cyan bold]{Markup.Escape(activity.Agent)}[/]", $"[{ageColor}]{Markup.Escape(ageStr)} — {Markup.Escape(activity.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"))}[/]")
             .AddRow($"[dim]Status:[/]", $"[{statusColor} bold]{Markup.Escape(activity.Status)}[/]");
 
         if (!string.IsNullOrWhiteSpace(activity.Task))
@@ -895,7 +895,7 @@ static void DisplayRalphHeartbeat(string userProfile)
         var stalenessColor = "dim";
         if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var lastRunDt))
         {
-            var age = DateTime.UtcNow - lastRunDt;
+            var age = DateTime.Now - lastRunDt;
             staleness = FormatAge(age);
             stalenessColor = age.TotalMinutes < 10 ? "green" : age.TotalMinutes < 30 ? "yellow" : "red";
         }
@@ -1028,7 +1028,7 @@ static void DisplayGitHubIssues(string teamRoot)
             if (issue.TryGetProperty("updatedAt", out var updatedAt) &&
                 DateTime.TryParse(updatedAt.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var updatedDt))
             {
-                updatedStr = FormatAge(DateTime.UtcNow - updatedDt);
+                updatedStr = FormatAge(DateTime.Now - updatedDt.ToLocalTime());
             }
 
             // Status heuristic from labels
@@ -1141,7 +1141,7 @@ static void DisplayGitHubPRs(string teamRoot)
             if (pr.TryGetProperty("updatedAt", out var updatedAt) &&
                 DateTime.TryParse(updatedAt.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var updatedDt))
             {
-                updatedStr = FormatAge(DateTime.UtcNow - updatedDt);
+                updatedStr = FormatAge(DateTime.Now - updatedDt.ToLocalTime());
             }
 
             table.AddRow(
@@ -1213,7 +1213,7 @@ static void DisplayRecentlyMergedPRs(string teamRoot)
             if (pr.TryGetProperty("mergedAt", out var mergedAt) &&
                 DateTime.TryParse(mergedAt.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var mergedDt))
             {
-                mergedStr = FormatAge(DateTime.UtcNow - mergedDt);
+                mergedStr = FormatAge(DateTime.Now - mergedDt.ToLocalTime());
             }
 
             table.AddRow(
@@ -1342,7 +1342,7 @@ static AgentActivity? ParseOrchestrationLog(string filePath)
 
 static void DisplayOrchestrationLog(List<AgentActivity> activities)
 {
-    var now = DateTime.UtcNow;
+    var now = DateTime.Now;
 
     var section = new Rule("[cyan]Orchestration Log (Recent)[/]") { Justification = Justify.Left };
     AnsiConsole.Write(section);

@@ -126,7 +126,7 @@ function Update-HeartbeatTimestamp {
     
     try {
         $heartbeat = Get-Content -Path $heartbeatFile -Raw -Encoding utf8 | ConvertFrom-Json
-        $heartbeat.lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+        $heartbeat.lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')
         $heartbeat | ConvertTo-Json | Out-File -FilePath $heartbeatFile -Encoding utf8 -Force
     } catch {
         # Silently fail if file is locked or corrupted
@@ -145,8 +145,8 @@ function Update-Heartbeat {
     )
     
     $heartbeat = [ordered]@{
-        lastRun = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
-        lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+        lastRun = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')
+        lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')
         round = $Round
         status = $Status
         exitCode = $ExitCode
@@ -409,7 +409,7 @@ while ($true) {
             if (Test-Path $HeartbeatFile) {
                 try {
                     $hb = Get-Content -Path $HeartbeatFile -Raw -Encoding utf8 | ConvertFrom-Json
-                    $hb | Add-Member -NotePropertyName "lastHeartbeat" -NotePropertyValue (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ') -Force
+                    $hb | Add-Member -NotePropertyName "lastHeartbeat" -NotePropertyValue (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss') -Force
                     $hb | ConvertTo-Json | Out-File -FilePath $HeartbeatFile -Encoding utf8 -Force
                 } catch {}
             }

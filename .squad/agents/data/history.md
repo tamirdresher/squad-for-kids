@@ -18,6 +18,30 @@
 
 ## Learnings
 
+### 2026-03-08: Squad CLI upstream command investigation (Issue #1, bradygaster/squad)
+
+**Task:** Investigate why the `upstream` command is not available in published npm versions despite PR #225 being merged.
+
+**Root Cause:** Version mismatch between merge timing and release tag. PR #225 was merged on March 6, 2026 at 18:36 UTC, but v0.8.23 was tagged/published on March 7, 2026 at 22:09 UTC from a different commit that branched BEFORE the fix.
+
+**Evidence:**
+- PR #225 commit: `dae284c38f064189f8e14423dc1bdf0d938c40be`
+- v0.8.23 tag: `9a7e9a18bcc5323331f86222a370c4021cb696bf`
+- Git comparison shows v0.8.23 is 116 commits ahead of PR fix, confirming the fix is NOT in the published version
+- Current main branch has version 0.8.23.4 in package.json and DOES have the upstream command wired in cli-entry.ts
+- Published npm @bradygaster/squad-cli@0.8.23 does NOT have upstream
+
+**Recommendation:** Brady needs to publish a new version from current main branch to include the fix. The implementation is complete (commands/upstream.ts exists, docs exist), just not published.
+
+**Tools Used:** GitHub MCP tools (get_file_contents, list_commits, pull_request_read, get_commit), gh CLI for API queries, npm view for package inspection.
+
+**Key Learning:** When investigating npm package availability, always verify:
+1. The commit in the published version tag
+2. Whether the fix commit is in the tag's ancestry
+3. The current main branch version vs published version
+
+---
+
 ### 2026-03-08: Squad Monitor round timing enhancements (PR #158, Issue #157)
 
 **Task:** Add start/end times for rounds and next round countdown to squad-monitor dashboard.
@@ -2182,3 +2206,53 @@ This is now a standing directive for all agents, documented in the teams-monitor
 - Ready for deployment with next orchestration update
 
 **Coordination:** Presented to team as completed deliverable in Ralph Round 1 orchestration (2026-03-08)
+
+## Learnings
+
+### 2025-03-08: Squad CLI Investigation (Issue #1)
+- **Task:** Investigated GitHub issue #1 about missing 'upstream' command in @bradygaster/squad-cli
+- **Versions checked:** v0.8.22 (previous) → v0.8.23 (latest as of March 8, 2025)
+- **Finding:** The 'upstream' command does NOT exist in any published version, including the latest v0.8.23
+- **Available commands:** init, upgrade, migrate, status, triage, loop, hire, copilot, plugin, export, import, scrub-emails, start, nap, doctor, consult, extract, workstreams, link, build, aspire, rc, copilot-bridge, init-remote, rc-tunnel, help
+- **Possible alternatives:** Commands like 'link', 'init-remote', or 'workstreams' may provide similar functionality
+- **Action taken:** 
+  - Posted detailed comment on issue #1 with findings and recommendations
+  - Moved issue to "Pending User" status on project board (option ID: c48a6815)
+  - Added 'status:pending-user' label to issue
+- **Project board workflow:** Used gh CLI to get item ID and update status field (Project: PVT_kwHOC0L5c84BRG-P, Status field: PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc)
+- **PowerShell gotcha:** Backticks in multi-line strings cause parsing errors; used here-string with --body-file - instead
+
+### 2026-03-08: Issue #1 Response — Teams Message for Brady
+- **Task:** Respond to issue #1 with Teams message template for Tamir to send to Brady about the 'upstream' command fix
+- **Root cause:** PR #225 (upstream CLI wiring fix) merged to main, but v0.8.23 npm release was published from a commit 116 commits BEFORE the merge
+- **Finding:** Fix is in current codebase (main branch shows upstream command wired), just not released to npm
+- **Solution:** Brady needs to publish new npm version (0.8.24 or later) from current main
+- **Actions:**
+  - Posted friendly Teams message template as comment on issue #1
+  - Added 'status:pending-user' label
+  - Moved issue #1 to "Pending User" on project board
+- **Outcome:** Issue now awaiting Brady's npm publication
+
+### 2026-03-08: Issue #1 Final Resolution — v0.8.24 Published
+- **Task:** Confirm if v0.8.24 includes both upstream fix and recent PRs
+- **Findings:**
+  - ✅ v0.8.24 released TODAY (March 8, 2026) to npm
+  - ✅ PR #225 (upstream command fix) IS included in v0.8.24
+  - ✅ All recent PRs merged before the v0.8.24 tag are included
+  - Release includes: ADO adapter, CommunicationAdapter, SubSquads, security hardening
+- **Version history:** 0.8.23 → 0.8.24 (published March 8, 2026)
+- **Action taken:** Posted resolution comment on issue #1 confirming the fix is live
+- **Outcome:** Issue fully resolved — upstream command now available in published npm version
+- **Installation:** npm install -g @bradygaster/squad-cli@0.8.24
+
+
+## Issue #159: Local Time Everywhere (2026-03-08)
+
+Fixed inconsistent time display in Squad Monitor and ralph-watch.ps1:
+- Changed all DateTime.UtcNow to DateTime.Now in Program.cs
+- Removed UTC labels from monitor headers
+- Added .ToLocalTime() conversion for timestamps parsed from JSON (GitHub API returns UTC)
+- Removed 'Z' suffix from ralph-watch.ps1 timestamps (Get-Date format strings)
+- Key files: .squad\tools\squad-monitor\Program.cs, ralph-watch.ps1
+- All time displays now consistently show local time
+

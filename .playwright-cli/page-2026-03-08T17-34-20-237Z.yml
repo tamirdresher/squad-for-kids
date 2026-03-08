@@ -1,0 +1,54 @@
+- generic [ref=e6]:
+  - banner [ref=e9]:
+    - menubar [ref=e13]:
+      - generic [ref=e14]:
+        - img "Microsoft logo" [ref=e15]
+        - heading "Microsoft" [level=1] [ref=e16]
+  - generic [ref=e17]:
+    - main [ref=e18]:
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: MICROSOFT DEVELOPER PORTAL
+          - generic [ref=e23]: Create and manage dev boxes and deployment environments
+          - generic [ref=e24]: If your project administrator has already added to you to a team, sign in to begin.
+          - button "Sign in" [ref=e26]
+        - generic [ref=e29]:
+          - generic [ref=e30]: Develop and deploy in the cloud
+          - generic [ref=e31]: The developer portal provides project-based access to your development resources. Depending on how your project is configured, these can include dev boxes, deployment environments, or both.
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: Deployment environments on demand
+            - generic [ref=e38]: Azure Deployment Environments empowers you to create secure and environments for code deployment, when and where you need them. Pre-approved templates ensure every environment is fully compliant.
+          - generic [ref=e39]:
+            - generic [ref=e40]: Manage your own dev boxes
+            - generic [ref=e41]: Microsoft Dev Box puts the power to create, access, and manage powerful development environments in your hands.
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - generic [ref=e45]: Microsoft Dev Box
+            - generic [ref=e46]: For developers
+            - link "Dev Box quickstart" [ref=e48] [cursor=pointer]:
+              - /url: https://aka.ms/AAtfp8p
+            - link "Download Windows app" [ref=e50] [cursor=pointer]:
+              - /url: https://aka.ms/devcenter/devportal/install-windows-app
+            - generic [ref=e51]: For admins and project leads
+            - link "Configuring Microsoft Dev Box for your team" [ref=e53] [cursor=pointer]:
+              - /url: https://aka.ms/AAtf7va
+            - link "All documentation" [ref=e55] [cursor=pointer]:
+              - /url: https://aka.ms/devbox-documentation
+          - generic [ref=e56]:
+            - generic [ref=e57]: Azure Deployment Environments
+            - generic [ref=e58]: For developers
+            - link "Deployment Environments quickstart" [ref=e60] [cursor=pointer]:
+              - /url: https://aka.ms/AAtfp9v
+            - generic [ref=e61]: For admins and project leads
+            - link "Configuring Azure Deployment Environments for your team" [ref=e63] [cursor=pointer]:
+              - /url: https://aka.ms/ade/devcenter
+            - link "All documentation" [ref=e65] [cursor=pointer]:
+              - /url: https://aka.ms/ade/overview
+    - contentinfo [ref=e67]:
+      - generic [ref=e69]:
+        - link "Privacy" [ref=e71] [cursor=pointer]:
+          - /url: https://aka.ms/devbox-privacy
+        - link "Terms of use" [ref=e73] [cursor=pointer]:
+          - /url: https://aka.ms/devbox-productterms
+        - generic [ref=e74]: © Microsoft 2026

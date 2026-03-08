@@ -2390,3 +2390,85 @@ Infrastructure reviews should focus on **integration points** where systems conn
 
 **Learning:** DevBox provisioning is UI-first. CLI tooling (z devcenter) exists but extension installation is unreliable. Portal automation via Playwright is more reliable for one-off provisioning tasks.
 
+
+### 2026-03-08: Azure DevBox CLI Investigation (Issue #103)
+
+**Activation:** Tamir requested investigation of Azure DevBox CLI issues after DevBox IDPDev-2 creation
+**Task:** Find working solution for Azure DevBox CLI access or alternatives
+**Mode:** Immediate
+**Status:** COMPLETED
+
+**Investigation Results:**
+
+**Failed Approaches:**
+1. ❌ \z extension add --name devcenter\ - pip installation error
+2. ❌ Azure DevBox REST API - endpoints don't resolve (api.devcenter.azure.com)
+3. ❌ Management API via \z rest\ - requires correct resource URIs not in docs
+
+**Working Solutions:**
+1. ✅ **DevBox Web Portal** (https://devbox.microsoft.com)
+   - Full management capabilities
+   - Primary recommendation for immediate use
+   
+2. ✅ **@microsoft/devbox-mcp** NPM package
+   - Successfully installed v0.0.3-alpha.4
+   - MCP server for DevBox integration with GitHub Copilot
+   - Enables conversational DevBox management
+   - Discovered via EngHub search
+
+**Key Resources:**
+- EngHub DevBox management doc: https://eng.ms/docs/office-of-coo/commerce-ecosystems/commerce-internal/ai_productivity/00_references/projects/managingdevbox/readme
+- NPM package: \
+pm install -g @microsoft/devbox-mcp\
+- DevBox portal: https://devbox.microsoft.com
+
+**Recommendation:** 
+- Use web portal for immediate DevBox access
+- Configure MCP server for future Copilot-driven management
+- Azure CLI extension requires Azure team support to resolve pip installation issue
+
+**Deliverable:** Commented findings on Issue #103, updated board to pending-user
+
+---
+
+### 2026-03-08: DevBox Setup and Browser Connection (Issue #103)
+
+**Activation:** Tamir requested DevBox creation and setup with browser connection  
+**Task:** Install DevBox MCP server globally and establish browser-based connection to Microsoft DevBox  
+**Status:** COMPLETED
+
+**What I Did:**
+1. **DevBox MCP Server Installation**
+   - Discovered official `@microsoft/devbox-mcp` package (v0.0.3-alpha.4)
+   - Installed globally via npm (accessible in user .copilot context)
+   - Published by Microsoft (npmjs@microsoft.com)
+
+2. **DevBox Portal Access**
+   - Navigated to https://devbox.microsoft.com via Playwright browser automation
+   - User already authenticated as Tamir Dresher @ Microsoft org
+   - Found 2 running DevBoxes: IDPDev and IDPDev-2 (both in 1SOC project)
+
+3. **Browser Connection Established**
+   - Connection method: devbox.microsoft.com → dropdown next to "Connect via app" → "Open in browser"
+   - Connected to IDPDev (16 vCPU, 64GB RAM, 2TB SSD, West Europe)
+   - Configured session settings (printer, file transfer, microphone, clipboard, camera, location, keyboard shortcuts, enhanced graphics)
+   - Successfully loaded Windows login screen in browser
+
+**Key Learnings:**
+- **DevBox MCP Package**: `@microsoft/devbox-mcp` is the official Microsoft package for DevBox integration with MCP servers
+- **Browser Connection Path**: The "Connect via app" button has a dropdown with "Open in browser" option - not immediately visible
+- **DevBox Specs**: IDPDev is a powerful dev environment (16 vCPU, 64GB RAM, 2TB SSD) running 1es-office-enhancedtools-baseImage
+- **Session Settings**: Browser-based DevBox supports full feature set including clipboard, file transfer, microphone, camera, location services
+- **Playwright for Browser Automation**: Successfully used Playwright browser tools to navigate, interact, and establish DevBox connection without manual intervention
+
+**Infrastructure Patterns:**
+- DevBox portal uses Azure-hosted web client (windows.cloud.microsoft)
+- Connection URLs include PPE environment indicators (cpcEnv=ppe)
+- DevBox instances tied to Dev Center projects (1SOC in this case)
+- Multiple DevBoxes can exist per user/project
+- Browser-based connection is production-ready alternative to Windows App
+
+**Deliverable:** Comment on Issue #103 with complete setup details and screenshots
+
+---
+

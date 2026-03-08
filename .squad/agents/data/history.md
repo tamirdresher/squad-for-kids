@@ -10,6 +10,60 @@
 
 ## Learnings
 
+### 2026-03-08: Issue #106 - FedRAMP Dashboard Post-Merge Caching SLI & Monitoring
+
+**Task**: Implement production monitoring and documentation for PR #102 response caching (60s/300s TTL).
+
+**Delivered**:
+1. **Cache SLI Documentation** (`docs/fedramp-dashboard-cache-sli.md`, 14.4KB)
+   - Defined cache as production SLI: hit rate ≥ 70% (24h rolling window)
+   - Expected performance: 80-85% hit rate, 80-85% query reduction, 20-30% latency improvement
+   - Measurement methodology with Application Insights KQL queries
+   - 6-path remediation playbook (pod restart, request diversity, TTL adjustment, scaling, cache bugs)
+   - Future enhancements: event-driven invalidation, Redis, cache versioning
+
+2. **Application Insights Alert** (Bicep + PowerShell)
+   - `infrastructure/phase4-cache-alert.bicep`: Alert triggers when hit rate <70% for 15 min
+   - `infrastructure/deploy-cache-alert.ps1`: Automated deployment with validation
+   - Alert configuration: Severity 2, evaluates every 5 min, routes to PagerDuty
+   - Includes runbook link in alert properties for on-call SRE
+
+3. **30-Day Cache Review Process**
+   - `docs/fedramp/cache-reviews/template.md`: Monthly review template (6.1KB)
+   - Schedule: First Tuesday of each month, 10 AM PT
+   - Metrics tracking: hit rate trends, latency, query reduction, RU savings
+   - Action item tracking for cache optimization
+   - Historical archive process documented
+
+4. **Operational Runbook Integration**
+   - Added Section 9 to `docs/fedramp/phase5-rollout/deployment-runbook.md`
+   - Cache monitoring commands (Application Insights queries)
+   - Troubleshooting procedures and emergency cache clear
+   - Monthly review checklist integrated into deployment ops
+
+**Key Technical Decisions**:
+1. **SLO Target (70%)**: Conservative threshold allowing 30% miss rate for pod restarts, cache warming
+2. **Cache Hit Detection**: Use response duration <100ms as heuristic (cached responses are fast)
+3. **Alert Evaluation Window**: 15 minutes prevents false positives from transient cache clears
+4. **Review Cadence**: Monthly (not weekly) balances oversight with operational overhead
+5. **Cache Storage**: In-memory (IMemoryCache) for v1.0; Redis planned for v2.0 if hit rate drops <60%
+
+**Files Created**: 5
+- docs/fedramp-dashboard-cache-sli.md
+- infrastructure/phase4-cache-alert.bicep
+- infrastructure/deploy-cache-alert.ps1
+- docs/fedramp/cache-reviews/README.md
+- docs/fedramp/cache-reviews/template.md
+
+**Files Modified**: 1
+- docs/fedramp/phase5-rollout/deployment-runbook.md (added Section 9)
+
+**Branch**: squad/106-caching-sli
+**PR**: #108
+**Outcome**: Complete post-merge monitoring established. Alert deployable to all environments. Monthly review process institutionalized.
+
+---
+
 ### 2026-03-10: Issue #100 - FedRAMP Dashboard API Security & Resilience Hardening
 
 **Task**: Implement PR review follow-up improvements for security and API quality across C# Azure Functions and API services.

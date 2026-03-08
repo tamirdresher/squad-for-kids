@@ -10,6 +10,24 @@
 
 ## Learnings
 
+### 2026-03-08: Issue #109 Triage — GitHub Projects Visibility Decision
+
+**Context:** Tamir asked if GitHub Projects (or similar tools) makes sense for squad work visibility/visualization. Current system: GitHub Issues + squad labels, Ralph Watch monitoring, Azure Monitor telemetry. No centralized board.
+
+**Triage Decision:** Route to Seven (Research & Docs).
+
+**Rationale:**
+- This is a comparative research question, not an architectural decision yet
+- Seven specializes in evaluating tools and documenting approaches
+- Needed output: Decision document with pros/cons of GitHub Projects vs. alternatives (Jira, Azure Boards, custom dashboard) against our current label-based system
+- Context: Issue #43 already flagged filtering gaps; we have 100+ issues across multiple repos; squad agents operate async
+
+**Label Applied:** `squad:seven`
+
+**Key Insight:** Visibility questions require research before decision. Don't solve prematurely—characterize the gap first (Is it real-time status? Burndown? Blocker detection?), then evaluate options against that requirement.
+
+---
+
 ### 2026-03-07: GitHub Teams Integration Guidance — Issue #44
 
 **Context:** Tamir installed the GitHub for Microsoft Teams app, signed in, and asked how to connect it to this repo (tamirdresher_microsoft/tamresearch1).
@@ -1082,3 +1100,33 @@ Result: **Faster, more confident code review** because the "why" is already docu
 **Status:** PR #108 merged to main. Issue #106 closed. Cache monitoring now production-ready.
 
 ---
+
+---
+
+### 2026-03-11: Issue #105 Follow-up — Clarifying Issue Discovery Trail
+
+**Context:** Tamir asked two urgent follow-up questions about the issue trail (issues #50, #99, #46, #51, #40):
+1. "I still not following why #46 was even found..is it some automation we have? Did you do any changes in other repos or only here."
+2. "Where is #50 gonna be used and by who?"
+
+**Answer Provided (GitHub Comment):**
+
+**Q1: How was issue #46 discovered?**
+- **Via Teams Bridge integration** — automated incident detection, not external automation or other-repo changes
+- Ralph detected STG-EUS2-28 production incident (cascading failures: Draino → Karpenter → Istio → NodeStuck)
+- I recognized it matched our prior Tier 1/2 stability research predictions
+- Legitimate incident-driven discovery, not false-positive automation or research artifacts
+
+**Q2: Were changes made in other repos?**
+- No. All changes were **in this repo only**
+- Issue #50 (NodeStuck Istio Exclusion) → PR #52 contained DK8S platform NodeStuck automation config changes
+- No changes to idk8s-infrastructure, other Microsoft repositories, or external systems
+
+**Q3: Where is issue #50's output used and by whom?**
+- **What:** PR #52 prevents NodeStuck from terminating Istio daemonsets (ztunnel) when they fail health checks
+- **Who:** DK8S on-call team, platform operators, incident response engineers
+- **Where:** Deployed to DK8S staging/production clusters
+- **Impact:** Operational remediation — stops cascading node churn when mesh infrastructure fails
+
+**Key Learning — Transparency About Scope:**
+Squad's work is operationally driven: real incidents (#46 from Teams Bridge), immediate mitigations (#50/#51 within 48h), and research follow-ups (#99, #40) to prevent recurrence. The issue trail reflects **legitimate operational patterns**, not scattered external research or multi-repo changes. Being explicit about scope (single repo, operational focus, real incidents) builds confidence that our work is grounded and bounded. Tamir's questions indicate value in clarity — continue this transparency when explaining issue origins and deployment boundaries.

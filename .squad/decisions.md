@@ -3633,6 +3633,220 @@ For your use case:
 
 ---
 
+## Decision 21: Triage Issue #109 — GitHub Projects Visibility
+
+**Date:** 2026-03-08  
+**Author:** Picard (Lead)  
+**Status:** ✅ Routed to Seven  
+**Scope:** Team Process, Visibility Tooling  
+
+Route issue #109 ("does it make sense to use github project or something else to have visibility and visualization on the work we do here?") to Seven for comparative research and evaluation.
+
+**Why not Picard (Architecture):** This is not yet a decision; it's a research question. Premature to decide on tools before understanding the requirement gap.
+
+**Why Seven (Research & Docs):** Specializes in evaluating tools and documenting approaches. Can produce objective analysis of GitHub Projects vs. alternatives.
+
+**Research Scope:**
+1. Current State Analysis: GitHub Issues + squad labels, Ralph Watch, Azure Monitor, no centralized board
+2. Visibility Gap Characterization: What does Tamir need to see? What's missing?
+3. Tool Evaluation: GitHub Projects, Jira, Azure Boards, custom dashboard, vs. current label-based system
+4. Recommendation: Pros/cons matrix, implementation effort, go/no-go decision
+
+**Next Step:** Seven begins research on visibility tooling and produces decision document. Return to Picard for architectural sign-off when evaluation is complete.
+
+**Related:** Issue #43 (filtering active vs. waiting)
+
+---
+
+## Decision 22: DevBox Infrastructure Communication via Teams Webhook
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Executed  
+**Scope:** Infrastructure Documentation & Communication  
+**Issue:** #103
+
+User requested DevBox infrastructure details and specifically asked for notification via Teams webhook. DevBox provisioning infrastructure was already built in Phases 1-3 but user needed current status and access instructions.
+
+**Decision:** Deliver DevBox infrastructure status through **dual channels**: Teams webhook notification + GitHub issue comment, rather than attempting to provision new resources without proper Dev Center configuration.
+
+**Rationale:**
+1. Infrastructure Already Complete: DevBox provisioning automation exists but requires Azure Dev Center resources to be configured first
+2. Communication Over Provisioning: User needs to know what's available before provisioning, especially given missing Dev Center configuration
+3. Webhook Pattern: Teams webhook provides immediate, rich notification outside of GitHub workflow
+4. Documentation-First: Comprehensive status helps user understand prerequisites and next steps
+
+**Teams Webhook Pattern:**
+- Webhook Location: `$env:USERPROFILE\.squad\teams-webhook.url`
+- Adaptive Card Structure: Title, status facts, capabilities list, quick start code block, prerequisites, documentation links
+
+**Key Information Shared:**
+- Infrastructure status: Phase 3 Complete ✅
+- Available capabilities: Bicep, PowerShell, MCP Server, Squad Skill
+- Quick start commands
+- Prerequisites checklist
+- Current Azure authentication context
+
+**Communication Strategy:**
+- **When to Document vs. Provision:** Document when prerequisites unclear or incomplete; provision when resources ready
+- **Hierarchy:** Teams webhook (immediate) → GitHub comment (permanent record) → Code comments (technical) → Docs (comprehensive)
+
+**Next Steps for User:** Install extension, discover configuration, update script defaults, provision DevBox
+
+**Related:** Issue #35, #63, #65
+
+---
+
+## Decision 23: Corrected Patent Attribution for Issue #42
+
+**Date:** 2026-03-08  
+**Author:** Seven (Research & Docs)  
+**Status:** ✅ Documented  
+**Impact:** High — Legal correctness of patent filing strategy
+
+Original patent research mistakenly attributed Squad framework's technical components to Tamir. Tamir's correction clarified that Ralph, casting governance, and git-native state are open-source Brady Gaster's Squad framework features.
+
+**Decision:** CORRECT PATENT ATTRIBUTION: Squad framework features (Ralph, casting governance) belong to Brady Gaster's open-source project. Tamir's innovations are the INTEGRATION PATTERN and HUMAN EXTENSION METHODOLOGY.
+
+**What IS Tamir's Innovation:**
+
+1. **Integrated Deployment Pattern**
+   - Combining Squad + Ralph + casting + infrastructure-specific glue
+   - Production deployment with compliance/audit requirements
+   - DK8S/Azure/Kubernetes-specific application
+
+2. **"Human Extension" Methodology**
+   - Documented pattern for using multi-agent AI as cognitive extension of domain specialist
+   - Human-AI parallel workflow (not sequential replacement)
+   - Git-based shared memory for human audit/intervention
+   - Continuous learning from individual professional's context
+
+3. **TAM-Specific Application**
+   - Custom agent roles for TAM workflows (Seven=research, Worf=security, etc.)
+   - Integration with TAM toolchain (ADO, GitHub, Teams)
+   - FedRAMP compliance monitoring with Squad agents
+
+**Legal Implications:**
+- ✅ File narrow claims on integration pattern and methodology
+- ✅ Focus on what's genuinely novel: human extension deployment pattern
+- ✅ Proper attribution to Brady Gaster's Squad for framework features
+- ❌ Do NOT claim open-source Squad components (invalid prior art)
+
+**Key Learning:** When user corrects attribution mid-research, IMMEDIATELY research the actual source to understand component ownership. Correct patent strategy to focus on genuine innovations. Never recommend filing on someone else's IP.
+
+**References:** Brady Gaster's Squad (https://github.com/bradygaster/squad), Ralph documentation (https://bradygaster.github.io/squad/features/ralph.html)
+
+---
+
+## Decision 24: Transparency Protocol for Issue Discovery & Deployment Boundaries
+
+**Date:** 2026-03-08  
+**Author:** Picard (Lead)  
+**Status:** ✅ Implemented  
+**Scope:** Team Communication Pattern  
+**GitHub Reference:** Issue #105
+
+Tamir asked urgent follow-up questions after receiving explanation of issue trail: "I still not following why #46 was even found" and "Where is #50 gonna be used and by who?"
+
+**Decision:** When explaining issue trails to Tamir or stakeholders, always explicitly state:
+
+1. **Discovery Method**
+   - Real incident (Teams Bridge, customer report, IcM) ✅
+   - Code review finding ✅
+   - Research prediction validated ✅
+   - External automation/scanning ⚠️ (rare; disclose if true)
+
+2. **Scope of Changes**
+   - Single repository (this one) ✅ Always disclose if external repos were touched
+   - Multi-repo changes ⚠️ Explicitly call this out
+   - Research-only (no deployment) ✅ Clarify when applicable
+
+3. **Operational Impact**
+   - Deployed to production ✅ Name the system (DK8S, FedRAMP API, etc.)
+   - Staged/validation only ✅ Clear on deployment status
+   - Research/documentation ✅ Be explicit when not operational
+
+**Rationale:** Squad's credibility depends on clear boundaries and operational grounding. Boundary confusion creates perception that work is ad-hoc or scattered across teams. Explicit scoping builds confidence that work is bounded and legitimate.
+
+**Implementation:** Applied to GitHub comment on issue #105 with clear discovery path, scope of changes, and deployment status.
+
+---
+
+## Decision 25: Teams Integration Pattern — PR #107 Review
+
+**Date:** 2026-03-08  
+**Author:** Picard (Lead)  
+**Status:** ✅ Approved and Merged  
+**Context:** Issue #104 → PR #107 by Data  
+
+User (Tamir) had no visibility when issues were closed or work was completed by squad agents. Issue #104: "When you close issues and finalize my requests I am not aware of it."
+
+**Solution:** Data created two GitHub Actions workflows for Microsoft Teams integration:
+1. **squad-issue-notify.yml** — Real-time issue close notifications
+2. **squad-daily-digest.yml** — Daily 8 AM UTC activity digest
+
+**Pattern Established for Future Teams Integrations:**
+1. **Always** store webhook URL as repository secret
+2. **Always** add defensive check before posting (`if: env.TEAMS_WEBHOOK_URL != ''`)
+3. **Prefer** Adaptive Cards 1.4 for rich formatting
+4. **Use** read-only permissions unless write is essential
+5. **Include** direct links to GitHub resources
+6. **Handle** edge cases gracefully (missing data, empty lists, null fields)
+7. **Test** with manual workflow dispatch before production use
+
+**Setup Required:** User must add `TEAMS_WEBHOOK_URL` secret to repository settings (stored locally at `C:\Users\tamirdresher\.squad\teams-webhook.url`)
+
+**Lessons:**
+1. GHA Security Model: Check secret existence before use prevents workflow failures
+2. Agent Attribution: Parse last comment for squad agent names provides better attribution
+3. Defensive Card Design: Truncate summary at 500 chars prevents rendering issues
+4. Dual Notification Strategy: Real-time + daily digest balances urgency with noise reduction
+
+**Outcome:** ✅ PR #107 merged to main, Issue #104 auto-closed
+
+---
+
+## Decision 26: FedRAMP Dashboard Cache Monitoring — PR #108 Review
+
+**Date:** 2026-03-08  
+**Author:** Picard (Lead)  
+**Status:** ✅ Approved & Merged  
+**Context:** Issue #106 → PR #108 by Data  
+
+PR #102 introduced HTTP response caching (60s TTL for status, 300s for trend endpoints) to reduce backend load. Issue #106 required:
+1. Cache configuration documented as production SLI
+2. Application Insights alert for low cache hit rate (<70%)
+3. Remediation playbook for on-call engineers
+4. Monthly review process to track cache effectiveness
+
+**Solution Delivered (PR #108):**
+
+1. **SLI Documentation** (434 lines): Cache TTL by endpoint, SLO target (≥70%), expected performance (80-85% hit rate), measurement strategy, thresholds
+2. **Application Insights Alert**: Cache hit rate < 70% for 15 minutes → Severity 2 → PagerDuty via Action Group
+3. **Deployment Automation**: PowerShell script with environment validation and post-deployment verification
+4. **Remediation Playbook**: Clear decision tree with timelines (5 min immediate actions, 15 min investigation, varying resolution timelines)
+5. **Monthly Review Process**: Schedule, template, metrics tracking, historical archive
+6. **Operational Runbook Integration**: Section 2.4 of deployment-runbook.md added
+
+**Technical Quality:** 9.5/10
+- **Strengths:** Clear SLI definition, valid Bicep template, actionable playbook, operational integration
+- **Note:** Cache hit detection via latency (<100ms) is pragmatic but imprecise; future iteration should instrument explicit cache telemetry
+
+**Pattern Recognition:**
+
+1. **Monitoring Completeness Prevents Silent Degradation:** Without SLI/SLO and alerting, cache would silently degrade over time without visibility
+2. **Remediation Playbooks Enable Self-Service:** On-call engineers can resolve incidents without escalating to code experts
+3. **Monthly Reviews Create Accountability:** Scheduled reviews force retrospective analysis, not just reactive incident response
+
+**Team Standard:** When introducing caching in production APIs, apply this pattern:
+1. Document cache configuration as SLI
+2. Configure Application Insights alert for low hit rate
+3. Provide remediation playbook with clear decision tree
+4. Schedule monthly reviews
+5. Plan future enhancements
+
+---
+
 ## What You'd Build First (My Recommendation)
 
 Based on your Teams activity and DK8S/ConfigGen leadership role:

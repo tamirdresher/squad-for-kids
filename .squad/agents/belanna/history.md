@@ -1490,3 +1490,87 @@ etwork-policy-tests.sh, waf-rule-tests.sh, opa-policy-tests.sh
 **Teams Notification:** Sent comprehensive status card via webhook with infrastructure assessment, available scripts, blockers, and next steps.
 
 **Pattern:** When provisioning infrastructure that depends on external Azure resources, always check for resource existence first before attempting automation. REST API fallbacks are valuable when CLI extensions fail.
+
+---
+
+### 2026-03-09: Issue #103 — DevBox Infrastructure Documentation & Teams Webhook Integration
+
+**Task:** Share DevBox infrastructure details with Tamir via Teams webhook and GitHub issue comment.
+
+**Context:** User requested DevBox provisioning details and specifically asked for Teams webhook notification. Infrastructure already exists from Phase 1-3 work (Issues #35, #63, #65).
+
+**Deliverables:**
+
+1. **Teams Webhook Notification:**
+   - Located webhook URL at: `$env:USERPROFILE\.squad\teams-webhook.url`
+   - Sent Adaptive Card with comprehensive DevBox infrastructure status
+   - Included: capabilities, quick start commands, prerequisites, Azure context, documentation links
+
+2. **GitHub Issue Comment:**
+   - Posted detailed comment to Issue #103 with full DevBox infrastructure overview
+   - Documented all available scripts and their usage
+   - Listed prerequisites and current Azure authentication status
+   - Provided quick start commands for immediate use
+
+3. **Infrastructure Assessment:**
+   - Phase 3 Complete: Bicep templates, PowerShell scripts, MCP Server, Squad Skill
+   - Azure authenticated as: tamirdresher@microsoft.com
+   - Subscription: WCD_MicroServices_Staging_LBI (eastus2euap-cloud)
+   - DevCenter extension not installed yet (requires user confirmation)
+
+**Key Findings:**
+
+1. **Teams Webhook Location:** Standard squad webhook stored at `$env:USERPROFILE\.squad\teams-webhook.url` (not `.squad-teams-webhook` or other variations)
+
+2. **DevBox Infrastructure Complete:** All automation scripts and templates ready, awaiting Azure DevCenter resource configuration
+
+3. **Authentication Status:** User already authenticated to Azure CLI, but devcenter extension installation requires confirmation
+
+**Learnings:**
+
+- **Webhook File Patterns:** Squad team uses `.squad\` directory in user profile for webhook storage
+- **DevBox Provisioning Readiness:** While IaC and scripts are complete, actual provisioning requires Dev Center, Project, and Pool resources to exist in Azure first
+- **Extension Installation UX:** Azure CLI extension installation prompts for user confirmation, blocking automation in non-interactive scenarios
+- **Adaptive Card Design:** Teams webhooks accept rich Adaptive Cards with FactSets, TextBlocks, and Actions for professional notifications
+
+**Next Steps for User:**
+1. Install devcenter extension: `az extension add --name devcenter`
+2. Discover Dev Center configuration: `az devcenter dev dev-box list`
+3. Update script defaults with actual Dev Center/Project/Pool names
+4. Run clone or provision script to create DevBox
+
+**Technical Pattern:** When infrastructure automation exists but depends on cloud resources, prioritize documentation and communication over attempting provisioning that will fail. Teams webhook + GitHub issue comment provided comprehensive status without blocking on missing prerequisites.
+
+### 2026-03-08: Issue #103 — DevBox Portal vs Dev Center Clarification
+
+**Task:** Address Tamir's question about DevBox portal vs Dev Center infrastructure needs
+
+**Context:** Tamir asked "But when I created devbox so far I just went to devbox web site. Connect there and see how it was used maybe we dont need dev center?" — questioning whether the Dev Center infrastructure approach in the repo was necessary given his existing portal-based workflow.
+
+**Resolution:**
+
+Clarified the relationship between DevBox portal and Dev Center:
+- **Key insight:** The DevBox website (https://devbox.microsoft.com) IS the Azure Dev Center web portal — they're the same system
+- Portal is the UI front-end; Dev Center is the backend infrastructure
+- Tamir's existing portal workflow is perfectly valid and doesn't need to change
+- The scripts in `devbox-provisioning/` automate what the portal does manually
+
+**Practical Outcome:**
+
+Posted comment on Issue #103 explaining:
+1. Portal = Dev Center UI (not separate systems)
+2. Portal workflow remains valid
+3. Scripts add automation benefits (repeatability, bulk operations, CI/CD integration, natural language)
+4. Requested 3 values needed to provision: Project name, Pool name, DevBox name
+
+**Learnings:**
+
+1. **User Mental Model:** Users may perceive the portal as distinct from "Dev Center infrastructure" when they're actually the same system accessed different ways (UI vs API/CLI)
+
+2. **Automation Value Proposition:** When users have a working manual process, emphasize automation benefits (scale, repeatability, integration) rather than replacing their workflow
+
+3. **Practical Next Steps:** Always end infrastructure explanations with concrete asks — in this case, the 3 config values needed to actually provision the devbox
+
+4. **Documentation Gap:** The devbox-provisioning README should include a "Portal vs Scripts" section upfront to address this common confusion
+
+**Status:** Awaiting Tamir's response with Project/Pool/Name values to proceed with provisioning

@@ -68,10 +68,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            --title "${{ steps.version.outputs.tag }}" \
-            --generate-notes \
-            --latest
+          gh release create "${{ steps.version.outputs.tag }}" --title "${{ steps.version.outputs.tag }}" --generate-notes --latest
 
       - name: Verify release
         if: steps.check_tag.outputs.exists == 'false'
@@ -79,4 +76,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release view "${{ steps.version.outputs.tag }}"
-          echo "✅ Release ${{ steps.version.outputs.tag }} created and verified."
+          Write-Output "✅ Release ${{ steps.version.outputs.tag }} created and verified."

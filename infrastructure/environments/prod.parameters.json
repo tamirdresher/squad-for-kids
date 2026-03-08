@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "prod" },
+    "location": { "value": "eastus2" },
+    "failoverLocation": { "value": "westus2" },
+    "cosmosDbAccountName": { "value": "fedramp-dashboard-prod" },
+    "cosmosDbThroughput": { "value": 4000 },
+    "cosmosDbEnableAutoscale": { "value": true },
+    "cosmosDbEnableMultiRegion": { "value": true },
+    "functionAppName": { "value": "fedramp-functions-prod" },
+    "functionAppSku": { "value": "EP2" },
+    "appServiceName": { "value": "fedramp-api-prod" },
+    "appServiceSku": { "value": "P2v2" },
+    "storageAccountName": { "value": "fedrampstoprod" },
+    "storageAccountSku": { "value": "Standard_GZRS" },
+    "logAnalyticsWorkspaceName": { "value": "fedramp-logs-prod" },
+    "applicationInsightsName": { "value": "fedramp-appinsights-prod" },
+    "keyVaultName": { "value": "fedramp-kv-prod" },
+    "enableVNetIntegration": { "value": true },
+    "enablePrivateEndpoints": { "value": true },
+    "enableBackup": { "value": true },
+    "backupRetentionDays": { "value": 90 },
+    "enableGeoReplication": { "value": true },
+    "enableSlotDeployment": { "value": true },
+    "trafficManagerProfileName": { "value": "fedramp-dashboard-tm" },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "FedRAMP Dashboard",
+        "Owner": "infrastructure-team@contoso.com",
+        "CostCenter": "IT-Security",
+        "Compliance": "FedRAMP-High",
+        "SLA": "99.9%"
+      }
+    }
+  }
+}

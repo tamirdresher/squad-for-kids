@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "stg-gov" },
+    "location": { "value": "usgovvirginia" },
+    "cosmosDbAccountName": { "value": "fedramp-dashboard-stggov" },
+    "cosmosDbThroughput": { "value": 1000 },
+    "cosmosDbEnableAutoscale": { "value": true },
+    "functionAppName": { "value": "fedramp-functions-stggov" },
+    "functionAppSku": { "value": "Y1" },
+    "appServiceName": { "value": "fedramp-api-stggov" },
+    "appServiceSku": { "value": "S1" },
+    "storageAccountName": { "value": "fedrampstostggov" },
+    "storageAccountSku": { "value": "Standard_GRS" },
+    "logAnalyticsWorkspaceName": { "value": "fedramp-logs-stggov" },
+    "applicationInsightsName": { "value": "fedramp-appinsights-stggov" },
+    "keyVaultName": { "value": "fedramp-kv-stggov" },
+    "enableVNetIntegration": { "value": true },
+    "enablePrivateEndpoints": { "value": false },
+    "enableBackup": { "value": true },
+    "backupRetentionDays": { "value": 30 },
+    "azureCloud": { "value": "AzureUSGovernment" },
+    "tags": {
+      "value": {
+        "Environment": "Staging-Government",
+        "Project": "FedRAMP Dashboard",
+        "Owner": "infrastructure-team@contoso.com",
+        "CostCenter": "IT-Security",
+        "Compliance": "FedRAMP-High"
+      }
+    }
+  }
+}

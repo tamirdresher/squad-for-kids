@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "stg" },
+    "location": { "value": "eastus2" },
+    "cosmosDbAccountName": { "value": "fedramp-dashboard-stg" },
+    "cosmosDbThroughput": { "value": 1000 },
+    "cosmosDbEnableAutoscale": { "value": true },
+    "functionAppName": { "value": "fedramp-functions-stg" },
+    "functionAppSku": { "value": "Y1" },
+    "appServiceName": { "value": "fedramp-api-stg" },
+    "appServiceSku": { "value": "S1" },
+    "storageAccountName": { "value": "fedrampstostg" },
+    "storageAccountSku": { "value": "Standard_GRS" },
+    "logAnalyticsWorkspaceName": { "value": "fedramp-logs-stg" },
+    "applicationInsightsName": { "value": "fedramp-appinsights-stg" },
+    "keyVaultName": { "value": "fedramp-kv-stg" },
+    "enableVNetIntegration": { "value": false },
+    "enablePrivateEndpoints": { "value": false },
+    "enableBackup": { "value": true },
+    "backupRetentionDays": { "value": 7 },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "FedRAMP Dashboard",
+        "Owner": "infrastructure-team@contoso.com",
+        "CostCenter": "IT-Security"
+      }
+    }
+  }
+}

@@ -1444,6 +1444,67 @@ When user corrects attribution mid-research ("Ralph is not something I invented"
 - If approved, refine patent claims to focus exclusively on integration pattern and methodology
 - Consider provisional filing timeline (must file before public disclosure)
 
+### 2026-03-13: Issue #134 — Document Expected Cold-Cache Alert on First PROD Deployment
+
+**Task:** Document expected cold-cache behavior when FedRAMP Dashboard is first deployed to a new environment (especially migration to new repo). Address PR #131 review comment from Data. Create branch `squad/134-cold-cache-docs` and update runbook + migration plan.
+
+**Outcome:** Delivered comprehensive cold-cache documentation. Two key files updated with warnings, procedures, and monitoring guidance. Committed (6a07ee0) and opened PR #138 (merged).
+
+**Key findings:**
+
+1. **Cold-Cache Root Cause is Expected**
+   - In-memory cache starts empty on first deployment
+   - Normal traffic hits cause 100% miss rate initially
+   - Alert fires 15–30 minutes post-deployment (hit rate drops below 70% SLO)
+   - This is expected behavior, not a bug or infrastructure failure
+
+2. **Documentation Gap Existed**
+   - Bicep alert template had no cold-cache context
+   - Cache SLI runbook § 4.2 lacked first-deployment scenario
+   - Migration plan mentioned no expected alerts
+   - On-call team would receive alert with no documented guidance
+
+3. **Two Cache Warm-Up Implementation Paths**
+   - **Option A (Recommended):** Automated bash script runs post-API-deployment, primes cache with 18 standard queries (6 environments × 3 categories)
+   - **Option B:** Manual PowerShell script for operators to run after first deployment
+   - Both include monitoring script to track cache hit rate recovery every 60 seconds
+   - Timeline: ~5 minutes to warm cache; 15–30 minutes to return to 75%+ hit rate
+
+4. **Placement + Messaging Decisions**
+   - § 4.2 Remediation Playbook: Added prominent ⚠️ warning at top of symptom section
+   - § 6.2 (new section): Cache Warm-Up Procedure with automated + manual options + monitoring
+   - Migration plan Phase 3: Added "Expected Alerts During First Deployment" callout box with cross-references
+   - Clear messaging: "Do not panic or escalate; this is normal behavior"
+
+5. **Architecture Insight: Per-Instance In-Memory Cache**
+   - Cache provider: ASP.NET Core in-memory cache (no distributed cache in v1)
+   - TTL: 60s status endpoint, 300s trend endpoint
+   - Expected hit rate under normal load: 80–85%
+   - First deployment hit rate: 0% initially
+   - Alert threshold: < 70% for 15 minutes (evaluates every 5 min, fires after 3 consecutive misses)
+
+**Artifacts created:**
+- `docs/fedramp-dashboard-cache-sli.md` — § 4.2 (cold-cache warning) + § 6.2 (warm-up procedure with scripts)
+- `docs/fedramp-migration-plan.md` — Phase 3 (Expected Alerts callout with warm-up references)
+- Git commit: 6a07ee0 (message details all changes, refs #134)
+- PR #138 opened and merged
+
+**Pattern: Operational Documentation Prevents False Escalations**
+- Alert + runbook without context → team panics, escalates, pages SRE
+- Alert + runbook with context + warm-up option → team monitors, understands timeline, learns cache behavior
+- Difference is documentation + operational awareness, not infrastructure change
+
+**Key learning for documentation:**
+When infrastructure exhibits expected behavior on first deployment (cold cache, ephemeral pod restarts, etc.), document it prominently in the runbook with:
+1. Clear statement: "This is expected, not an error"
+2. Timeline: "It will take X minutes to resolve"
+3. Monitoring procedure: "Here's how to track progress"
+4. Action: "Here's what you can do to speed it up"
+
+This transforms an alert that generates false escalations into an operational learning moment for the on-call team.
+
+---
+
 ### 2026-03-08: Issue #109 — Visibility & Visualization Tools Research
 
 **Context:** Tamir asked (issue #109): "does it make sense to use github project or something else to have visibility and visualization on the work we do here?"

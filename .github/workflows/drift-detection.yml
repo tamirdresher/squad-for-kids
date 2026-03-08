@@ -14,10 +14,14 @@ on:
 env:
   BASE_BRANCH: origin/${{ github.base_ref }}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   detect-drift:
     name: Detect Configuration Drift
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       helm_drift: ${{ steps.detect.outputs.helm_drift }}
       kustomize_drift: ${{ steps.detect.outputs.kustomize_drift }}
@@ -50,7 +54,7 @@ jobs:
 
   validate-manifests:
     name: Validate Manifests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: detect-drift
     if: needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true'
     
@@ -106,7 +110,7 @@ jobs:
 
   generate-report:
     name: Generate Compliance Report
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [detect-drift, validate-manifests]
     if: always() && (needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true')
     permissions:

@@ -2,12 +2,15 @@ name: Squad Promote
 
 on:
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   dev-to-preview:
     name: Promote dev → preview
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,7 +63,7 @@ jobs:
   preview-to-main:
     name: Promote preview → main (release)
     needs: dev-to-preview
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:

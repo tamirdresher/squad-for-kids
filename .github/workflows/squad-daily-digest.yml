@@ -6,9 +6,13 @@ on:
     - cron: '0 8 * * *'
   workflow_dispatch: # Allow manual trigger
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   send-digest:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       issues: read
       pull-requests: read

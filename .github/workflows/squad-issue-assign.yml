@@ -1,14 +1,14 @@
 name: Squad Issue Assign
 
 on:
+  issues:
+    types: [labeled]
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
 jobs:
   assign-work:
     # Only trigger on squad:{member} labels (not the base "squad" label)
     if: startsWith(github.event.label.name, 'squad:')
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       issues: write
       pull-requests: write

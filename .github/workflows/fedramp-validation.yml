@@ -19,10 +19,14 @@ on:
         required: false
         default: 'true'
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   validate-test-suite:
     name: Validate Test Suite Structure
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       
@@ -50,7 +54,7 @@ jobs:
 
   lint-test-documentation:
     name: Lint Test Documentation
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       
@@ -83,7 +87,7 @@ jobs:
 
   generate-compliance-report:
     name: Generate Compliance Report
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [validate-test-suite, lint-test-documentation]
     steps:
       - uses: actions/checkout@v4
@@ -277,7 +281,7 @@ jobs:
 
   check-control-drift:
     name: Check Control Drift
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       
@@ -312,7 +316,7 @@ jobs:
 
   alert-on-validation-failure:
     name: Alert on Validation Failure
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: failure()
     permissions:
       issues: write
@@ -357,7 +361,7 @@ jobs:
 
   summary:
     name: FedRAMP Validation Summary
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [validate-test-suite, lint-test-documentation, generate-compliance-report]
     if: always()
     steps:

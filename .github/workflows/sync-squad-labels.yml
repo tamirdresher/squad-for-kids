@@ -1,12 +1,15 @@
 name: Sync Squad Labels
 
 on:
+  push:
+    paths:
+      - '.squad/team.md'
+      - '.ai-team/team.md'
+      - '.github/workflows/sync-squad-labels.yml'
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
 jobs:
   sync-labels:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       issues: write
       contents: read

@@ -4,9 +4,13 @@ on:
   issues:
     types: [closed]
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   notify-teams:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       issues: read
       contents: read

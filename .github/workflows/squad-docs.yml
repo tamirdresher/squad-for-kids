@@ -1,12 +1,15 @@
 name: Squad Docs — Build & Deploy
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/squad-docs.yml'
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -27,7 +30,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -1,12 +1,12 @@
 name: Squad Label Enforce
 
 on:
+  issues:
+    types: [labeled]
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
 jobs:
   enforce:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       issues: write
       pull-requests: write

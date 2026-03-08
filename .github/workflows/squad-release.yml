@@ -1,12 +1,17 @@
 name: Squad Release
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:

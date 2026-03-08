@@ -1,12 +1,14 @@
 name: Squad Protected Branch Guard
 
 on:
+  pull_request:
+    branches: [main, preview]
+  push:
+    branches: [main, preview]
   workflow_dispatch:
-    # All auto-triggers disabled - hosted runners unavailable at org level
-    # Re-enable when runners are configured for this repo
 jobs:
   guard:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 

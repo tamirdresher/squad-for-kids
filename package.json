@@ -1,4 +1,7 @@
 {
+  "name": "tamresearch1",
+  "version": "0.1.0",
+  "private": true,
   "devDependencies": {
     "@bradygaster/squad-cli": "^0.8.18"
   }

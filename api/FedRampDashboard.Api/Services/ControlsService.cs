@@ -32,18 +32,50 @@ public class ControlsService : IControlsService
         int limit, 
         int offset)
     {
+        var parameters = new Dictionary<string, object>
+        {
+            ["control_id"] = controlId,
+            ["limit_val"] = limit,
+            ["offset_val"] = offset
+        };
+        
+        var filters = new List<string> { "c.control.id = @control_id" };
+        
+        if (!string.IsNullOrEmpty(environment) && environment != "ALL")
+        {
+            filters.Add("c.environment = @environment_param");
+            parameters["environment_param"] = environment;
+        }
+        
+        if (!string.IsNullOrEmpty(status) && status != "ALL")
+        {
+            filters.Add("c.test.status = @status_param");
+            parameters["status_param"] = status;
+        }
+        
+        if (startDate.HasValue)
+        {
+            filters.Add("c.timestamp >= @start_date");
+            parameters["start_date"] = startDate.Value;
+        }
+        
+        if (endDate.HasValue)
+        {
+            filters.Add("c.timestamp <= @end_date");
+            parameters["end_date"] = endDate.Value;
+        }
+
+        var whereClause = string.Join(" AND ", filters);
         var query = $@"
             SELECT * FROM c 
-            WHERE c.control.id = '{controlId}'
-            {(string.IsNullOrEmpty(environment) || environment == "ALL" ? "" : $"AND c.environment = '{environment}'")}
-            {(string.IsNullOrEmpty(status) || status == "ALL" ? "" : $"AND c.test.status = '{status}'")}
-            {(startDate.HasValue ? $"AND c.timestamp >= '{startDate.Value:yyyy-MM-ddTHH:mm:ssZ}'" : "")}
-            {(endDate.HasValue ? $"AND c.timestamp <= '{endDate.Value:yyyy-MM-ddTHH:mm:ssZ}'" : "")}
+            WHERE {whereClause}
             ORDER BY c.timestamp DESC
-            OFFSET {offset} LIMIT {limit}
+            OFFSET @offset_val LIMIT @limit_val
         ";
 
-        // TODO: Execute actual Cosmos DB query
+        // TODO: Execute parameterized Cosmos DB query
+        // await _cosmosDbService.QueryAsync<T>(query, parameters);
+        
         return new ControlValidationResultList
         {
             ControlId = controlId,

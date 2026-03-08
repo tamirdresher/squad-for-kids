@@ -173,6 +173,66 @@ resource thresholdBreachAlert 'Microsoft.Insights/scheduledQueryRules@2021-08-01
   }
 }
 
+// Alert Rule 4: High Alert Deduplication Rate (Meta-Alert)
+resource highDedupRateAlert 'Microsoft.Insights/scheduledQueryRules@2021-08-01' = {
+  name: 'fedramp-high-dedup-rate-${environment}'
+  location: location
+  properties: {
+    displayName: 'FedRAMP High Alert Deduplication Rate'
+    description: 'Meta-alert: Triggered when dedup rate exceeds 50%, indicating noisy alert rules'
+    severity: 2
+    enabled: true
+    evaluationFrequency: 'PT1H'
+    windowSize: 'PT1H'
+    scopes: [
+      logAnalyticsWorkspaceId
+    ]
+    targetResourceTypes: [
+      'Microsoft.OperationalInsights/workspaces'
+    ]
+    criteria: {
+      allOf: [
+        {
+          query: '''
+            let lookback = 1h;
+            let dedup_threshold = 0.50;
+            // Query Application Insights for alert processing logs
+            AppTraces
+            | where TimeGenerated > ago(lookback)
+            | where Message contains "AlertProcessor"
+            | extend status = extract("status\":\"([^\"]+)", 1, Message)
+            | extend alert_type = extract("alert_type\":\"([^\"]+)", 1, Message)
+            | extend environment = extract("environment\":\"([^\"]+)", 1, Message)
+            | where isnotempty(alert_type) and isnotempty(environment)
+            | summarize 
+                total_alerts = count(),
+                duplicate_alerts = countif(status == "duplicate"),
+                processed_alerts = countif(status == "processed")
+              by alert_type, environment
+            | extend dedup_rate = todouble(duplicate_alerts) / total_alerts
+            | where dedup_rate > dedup_threshold
+            | project alert_type, environment, total_alerts, duplicate_alerts, dedup_rate
+            | order by dedup_rate desc
+          '''
+          timeAggregation: 'Count'
+          operator: 'GreaterThan'
+          threshold: 0
+          failingPeriods: {
+            numberOfEvaluationPeriods: 1
+            minFailingPeriodsToAlert: 1
+          }
+        }
+      ]
+    }
+    actions: {
+      actionGroups: [
+        actionGroupId
+      ]
+    }
+  }
+}
+
 output controlDriftAlertId string = controlDriftAlert.id
 output controlRegressionAlertId string = controlRegressionAlert.id
 output thresholdBreachAlertId string = thresholdBreachAlert.id
+output highDedupRateAlertId string = highDedupRateAlert.id

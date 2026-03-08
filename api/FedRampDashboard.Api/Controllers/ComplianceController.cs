@@ -24,6 +24,7 @@ public class ComplianceController : ControllerBase
     /// </summary>
     [HttpGet("status")]
     [Authorize(Policy = "Dashboard.Read")]
+    [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "environment", "controlCategory" })]
     [ProducesResponseType(typeof(ComplianceStatus), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status403Forbidden)]
@@ -31,14 +32,37 @@ public class ComplianceController : ControllerBase
         [FromQuery] string? environment = "ALL",
         [FromQuery] string? controlCategory = null)
     {
+        using var scope = _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["Environment"] = environment ?? "ALL",
+            ["ControlCategory"] = controlCategory ?? "none",
+            ["Endpoint"] = "GetComplianceStatus"
+        });
+        
+        var startTime = DateTime.UtcNow;
+        
         try
         {
+            _logger.LogInformation(
+                "Retrieving compliance status: Environment={Environment}, ControlCategory={ControlCategory}",
+                environment, controlCategory);
+            
             var status = await _complianceService.GetComplianceStatusAsync(environment, controlCategory);
+            
+            var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+            _logger.LogInformation(
+                "Compliance status retrieved successfully: OverallRate={OverallRate}%, Duration={Duration}ms",
+                status.OverallComplianceRate, duration);
+            
             return Ok(status);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving compliance status");
+            var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+            _logger.LogError(ex, 
+                "Error retrieving compliance status: Environment={Environment}, Duration={Duration}ms", 
+                environment, duration);
+            
             return StatusCode(500, new ApiError
             {
                 ErrorCode = "INTERNAL_ERROR",
@@ -54,6 +78,7 @@ public class ComplianceController : ControllerBase
     /// </summary>
     [HttpGet("trend")]
     [Authorize(Policy = "Dashboard.Read")]
+    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "environment", "startDate", "endDate", "granularity" })]
     [ProducesResponseType(typeof(ComplianceTrend), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetComplianceTrend(
@@ -62,8 +87,20 @@ public class ComplianceController : ControllerBase
         [FromQuery] DateTime endDate,
         [FromQuery] string granularity = "daily")
     {
+        using var scope = _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["Environment"] = environment,
+            ["StartDate"] = startDate,
+            ["EndDate"] = endDate,
+            ["Granularity"] = granularity,
+            ["Endpoint"] = "GetComplianceTrend"
+        });
+        
+        var startExecution = DateTime.UtcNow;
+        
         if (string.IsNullOrEmpty(environment))
         {
+            _logger.LogWarning("Invalid request: Environment parameter missing");
             return BadRequest(new ApiError
             {
                 ErrorCode = "INVALID_PARAMETER",
@@ -75,6 +112,10 @@ public class ComplianceController : ControllerBase
 
         if (endDate <= startDate)
         {
+            _logger.LogWarning(
+                "Invalid date range: StartDate={StartDate}, EndDate={EndDate}", 
+                startDate, endDate);
+            
             return BadRequest(new ApiError
             {
                 ErrorCode = "INVALID_DATE_RANGE",
@@ -86,12 +127,26 @@ public class ComplianceController : ControllerBase
 
         try
         {
+            _logger.LogInformation(
+                "Retrieving compliance trend: Environment={Environment}, DateRange={StartDate} to {EndDate}, Granularity={Granularity}",
+                environment, startDate, endDate, granularity);
+            
             var trend = await _complianceService.GetComplianceTrendAsync(environment, startDate, endDate, granularity);
+            
+            var duration = (DateTime.UtcNow - startExecution).TotalMilliseconds;
+            _logger.LogInformation(
+                "Compliance trend retrieved: DataPoints={DataPoints}, Duration={Duration}ms",
+                trend.DataPoints.Count, duration);
+            
             return Ok(trend);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving compliance trend");
+            var duration = (DateTime.UtcNow - startExecution).TotalMilliseconds;
+            _logger.LogError(ex, 
+                "Error retrieving compliance trend: Environment={Environment}, Duration={Duration}ms", 
+                environment, duration);
+            
             return StatusCode(500, new ApiError
             {
                 ErrorCode = "INTERNAL_ERROR",

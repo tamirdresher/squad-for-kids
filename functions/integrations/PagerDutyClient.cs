@@ -87,14 +87,7 @@ namespace FedRampDashboard.Functions
 
         private string MapSeverityToPagerDuty(string severity)
         {
-            return severity switch
-            {
-                "P0" => "critical",
-                "P1" => "error",
-                "P2" => "warning",
-                "P3" => "info",
-                _ => "warning"
-            };
+            return AlertHelper.SeverityMapping.ToPagerDuty(severity);
         }
 
         private List<object> GetAlertLinks(Alert alert)

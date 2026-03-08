@@ -36,8 +36,21 @@ public class ControlsController : ControllerBase
         [FromQuery] int limit = 100,
         [FromQuery] int offset = 0)
     {
+        using var scope = _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["ControlId"] = controlId,
+            ["Environment"] = environment ?? "ALL",
+            ["Status"] = status ?? "ALL",
+            ["Limit"] = limit,
+            ["Offset"] = offset,
+            ["Endpoint"] = "GetControlValidationResults"
+        });
+        
+        var startExecution = DateTime.UtcNow;
+        
         if (!IsValidControlId(controlId))
         {
+            _logger.LogWarning("Invalid control ID format: {ControlId}", controlId);
             return BadRequest(new ApiError
             {
                 ErrorCode = "INVALID_CONTROL_ID",
@@ -49,6 +62,7 @@ public class ControlsController : ControllerBase
 
         if (limit < 1 || limit > 1000)
         {
+            _logger.LogWarning("Invalid limit value: {Limit}", limit);
             return BadRequest(new ApiError
             {
                 ErrorCode = "INVALID_LIMIT",
@@ -60,11 +74,21 @@ public class ControlsController : ControllerBase
 
         try
         {
+            _logger.LogInformation(
+                "Retrieving control validation results: ControlId={ControlId}, Environment={Environment}, Status={Status}, Limit={Limit}, Offset={Offset}",
+                controlId, environment, status, limit, offset);
+            
             var results = await _controlsService.GetControlValidationResultsAsync(
                 controlId, environment, status, startDate, endDate, limit, offset);
             
+            var duration = (DateTime.UtcNow - startExecution).TotalMilliseconds;
+            
             if (results.TotalResults == 0)
             {
+                _logger.LogInformation(
+                    "No validation results found: ControlId={ControlId}, Duration={Duration}ms",
+                    controlId, duration);
+                
                 return NotFound(new ApiError
                 {
                     ErrorCode = "CONTROL_NOT_FOUND",
@@ -74,11 +98,19 @@ public class ControlsController : ControllerBase
                 });
             }
 
+            _logger.LogInformation(
+                "Control validation results retrieved: ControlId={ControlId}, TotalResults={Total}, Returned={Returned}, Duration={Duration}ms",
+                controlId, results.TotalResults, results.Results.Count, duration);
+
             return Ok(results);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving control validation results for {ControlId}", controlId);
+            var duration = (DateTime.UtcNow - startExecution).TotalMilliseconds;
+            _logger.LogError(ex, 
+                "Error retrieving control validation results: ControlId={ControlId}, Duration={Duration}ms", 
+                controlId, duration);
+            
             return StatusCode(500, new ApiError
             {
                 ErrorCode = "INTERNAL_ERROR",

@@ -21,19 +21,25 @@ public class ComplianceService : IComplianceService
 
     public async Task<ComplianceStatus> GetComplianceStatusAsync(string? environment, string? controlCategory)
     {
-        var envFilter = environment == "ALL" || string.IsNullOrEmpty(environment) 
-            ? "" 
-            : $"| where Environment_s == '{environment}'";
+        var parameters = new Dictionary<string, object>();
+        var filters = new List<string> { "TimeGenerated > ago(24h)" };
+        
+        if (!string.IsNullOrEmpty(environment) && environment != "ALL")
+        {
+            filters.Add("Environment_s == environment_param");
+            parameters["environment_param"] = environment;
+        }
+        
+        if (!string.IsNullOrEmpty(controlCategory))
+        {
+            filters.Add("ControlCategory_s == category_param");
+            parameters["category_param"] = controlCategory;
+        }
 
-        var categoryFilter = string.IsNullOrEmpty(controlCategory)
-            ? ""
-            : $"| where ControlCategory_s == '{controlCategory}'";
-
+        var whereClause = string.Join(" and ", filters);
         var kqlQuery = $@"
             ControlValidationResults_CL
-            | where TimeGenerated > ago(24h)
-            {envFilter}
-            {categoryFilter}
+            | where {whereClause}
             | summarize 
                 pass_count = countif(Status_s == 'PASS'),
                 fail_count = countif(Status_s == 'FAIL')
@@ -41,7 +47,9 @@ public class ComplianceService : IComplianceService
             | extend compliance_rate = todouble(pass_count) / (pass_count + fail_count) * 100
         ";
 
-        // TODO: Implement actual KQL query execution and result mapping
+        // TODO: Implement actual KQL query execution with parameters
+        // await _logAnalyticsService.QueryAsync<T>(kqlQuery, parameters);
+        
         return new ComplianceStatus
         {
             Timestamp = DateTime.UtcNow,
@@ -59,19 +67,29 @@ public class ComplianceService : IComplianceService
             _ => "1d"
         };
 
-        var kqlQuery = $@"
+        var parameters = new Dictionary<string, object>
+        {
+            ["start_date"] = startDate,
+            ["end_date"] = endDate,
+            ["environment_param"] = environment,
+            ["bin_size"] = binSize
+        };
+
+        var kqlQuery = @"
             ControlValidationResults_CL
-            | where TimeGenerated between (datetime('{startDate:yyyy-MM-ddTHH:mm:ssZ}') .. datetime('{endDate:yyyy-MM-ddTHH:mm:ssZ}'))
-            | where Environment_s == '{environment}'
+            | where TimeGenerated between (start_date .. end_date)
+            | where Environment_s == environment_param
             | summarize 
                 pass_count = countif(Status_s == 'PASS'),
                 fail_count = countif(Status_s == 'FAIL')
-              by bin(TimeGenerated, {binSize})
+              by bin(TimeGenerated, bin_size)
             | extend compliance_rate = todouble(pass_count) / (pass_count + fail_count) * 100
             | order by TimeGenerated asc
         ";
 
-        // TODO: Implement actual KQL query execution and result mapping
+        // TODO: Implement actual KQL query execution with parameters
+        // await _logAnalyticsService.QueryAsync<T>(kqlQuery, parameters);
+        
         return new ComplianceTrend
         {
             Environment = environment,

@@ -24,7 +24,8 @@ namespace FedRampDashboard.Functions
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("AlertProcessor triggered");
+            var startTime = DateTime.UtcNow;
+            log.LogInformation("AlertProcessor triggered at {Timestamp}", startTime);
 
             try
             {
@@ -33,6 +34,7 @@ namespace FedRampDashboard.Functions
                 {
                     var redisConnection = Environment.GetEnvironmentVariable("RedisConnectionString");
                     _redis = ConnectionMultiplexer.Connect(redisConnection);
+                    log.LogInformation("Redis connection established");
                 }
 
                 // Parse incoming alert
@@ -41,47 +43,71 @@ namespace FedRampDashboard.Functions
 
                 if (alert == null)
                 {
+                    log.LogWarning("Invalid alert payload received");
                     return new BadRequestObjectResult("Invalid alert payload");
                 }
 
-                log.LogInformation($"Processing alert: {alert.AlertId} ({alert.AlertType})");
-
-                // Step 1: Enrich alert with metadata
-                await EnrichAlertAsync(alert, log);
-
-                // Step 2: Check for duplicates (30-min window)
-                if (await IsDuplicateAsync(alert, log))
+                using (log.BeginScope(new Dictionary<string, object>
                 {
-                    log.LogInformation($"Alert {alert.AlertId} is duplicate. Skipping.");
-                    return new OkObjectResult(new { status = "duplicate", alert_id = alert.AlertId });
+                    ["AlertId"] = alert.AlertId,
+                    ["AlertType"] = alert.AlertType,
+                    ["Severity"] = alert.Severity,
+                    ["Environment"] = alert.Environment,
+                    ["ControlId"] = alert.Control?.Id ?? "none"
+                }))
+                {
+                    log.LogInformation(
+                        "Processing alert: AlertId={AlertId}, Type={AlertType}, Severity={Severity}, Environment={Environment}",
+                        alert.AlertId, alert.AlertType, alert.Severity, alert.Environment);
+
+                    // Step 1: Enrich alert with metadata
+                    var enrichStart = DateTime.UtcNow;
+                    await EnrichAlertAsync(alert, log);
+                    log.LogInformation("Alert enrichment completed in {Duration}ms", 
+                        (DateTime.UtcNow - enrichStart).TotalMilliseconds);
+
+                    // Step 2: Check for duplicates (30-min window)
+                    if (await IsDuplicateAsync(alert, log))
+                    {
+                        log.LogInformation("Alert {AlertId} is duplicate. Skipping.", alert.AlertId);
+                        return new OkObjectResult(new { status = "duplicate", alert_id = alert.AlertId });
+                    }
+
+                    // Step 3: Check suppression rules
+                    if (await IsSuppressedAsync(alert, log))
+                    {
+                        log.LogInformation("Alert {AlertId} is suppressed. Skipping.", alert.AlertId);
+                        return new OkObjectResult(new { status = "suppressed", alert_id = alert.AlertId });
+                    }
+
+                    // Step 4: Route alert based on severity
+                    var routingStart = DateTime.UtcNow;
+                    var routingResults = await RouteAlertAsync(alert, log);
+                    log.LogInformation("Alert routing completed in {Duration}ms", 
+                        (DateTime.UtcNow - routingStart).TotalMilliseconds);
+
+                    // Step 5: Store alert in cache for deduplication
+                    await StoreAlertInCacheAsync(alert, log);
+
+                    // Step 6: Log to Application Insights for audit trail
+                    var totalDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    log.LogInformation(
+                        "Alert processed successfully: AlertId={AlertId}, Routing={Routing}, TotalDuration={Duration}ms",
+                        alert.AlertId, JsonConvert.SerializeObject(routingResults), totalDuration);
+
+                    return new OkObjectResult(new
+                    {
+                        status = "processed",
+                        alert_id = alert.AlertId,
+                        routing = routingResults,
+                        processing_time_ms = totalDuration
+                    });
                 }
-
-                // Step 3: Check suppression rules
-                if (await IsSuppressedAsync(alert, log))
-                {
-                    log.LogInformation($"Alert {alert.AlertId} is suppressed. Skipping.");
-                    return new OkObjectResult(new { status = "suppressed", alert_id = alert.AlertId });
-                }
-
-                // Step 4: Route alert based on severity
-                var routingResults = await RouteAlertAsync(alert, log);
-
-                // Step 5: Store alert in cache for deduplication
-                await StoreAlertInCacheAsync(alert, log);
-
-                // Step 6: Log to Application Insights for audit trail
-                log.LogInformation($"Alert processed: {alert.AlertId}, Routing: {JsonConvert.SerializeObject(routingResults)}");
-
-                return new OkObjectResult(new
-                {
-                    status = "processed",
-                    alert_id = alert.AlertId,
-                    routing = routingResults
-                });
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error processing alert");
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                log.LogError(ex, "Error processing alert. Duration={Duration}ms", duration);
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
@@ -116,7 +142,7 @@ namespace FedRampDashboard.Functions
             try
             {
                 var db = _redis.GetDatabase();
-                var dedupKey = $"alert:dedup:{alert.AlertType}:{alert.Control?.Id ?? "global"}:{alert.Environment}";
+                var dedupKey = AlertHelper.GenerateDedupKey(alert.AlertType, alert.Control?.Id, alert.Environment);
                 
                 var exists = await db.KeyExistsAsync(dedupKey);
                 return exists;
@@ -134,7 +160,7 @@ namespace FedRampDashboard.Functions
             {
                 // Check acknowledged alerts in Redis
                 var db = _redis.GetDatabase();
-                var ackKey = $"alert:ack:{alert.AlertType}:{alert.Control?.Id ?? "global"}:{alert.Environment}";
+                var ackKey = AlertHelper.GenerateAckKey(alert.AlertType, alert.Control?.Id, alert.Environment);
                 var isAcknowledged = await db.KeyExistsAsync(ackKey);
                 
                 if (isAcknowledged)
@@ -198,7 +224,7 @@ namespace FedRampDashboard.Functions
             try
             {
                 var db = _redis.GetDatabase();
-                var dedupKey = $"alert:dedup:{alert.AlertType}:{alert.Control?.Id ?? "global"}:{alert.Environment}";
+                var dedupKey = AlertHelper.GenerateDedupKey(alert.AlertType, alert.Control?.Id, alert.Environment);
                 
                 // Store with 30-minute TTL
                 await db.StringSetAsync(dedupKey, alert.AlertId, TimeSpan.FromMinutes(30));

@@ -10,6 +10,92 @@
 
 ## Learnings
 
+### 2026-03-07: Alerting Code Quality & Load Testing (Issue #99, PR #101)
+
+**Context:** Post-PR #97 review follow-up to improve code quality and validate production readiness of the FedRAMP alerting pipeline.
+
+**Problem Statement:**
+- Dedup key generation logic was duplicated 3 times across AlertProcessor.cs (IsDuplicateAsync, IsSuppressedAsync, StoreAlertInCacheAsync)
+- Severity mapping logic duplicated across PagerDutyClient.cs and TeamsClient.cs
+- Missing report generation script (06-generate-report.sh) referenced in measurement plan
+- No load testing to validate 500+ alerts/hour Redis throughput capacity
+- No meta-alerting to detect noisy alert rules (high deduplication rate)
+
+**Deliverables:**
+
+1. **Code Quality Refactoring**
+   - Created `functions/AlertHelper.cs` shared module with:
+     - `GenerateDedupKey()`: Consistent dedup key generation for Redis cache
+     - `GenerateAckKey()`: Consistent acknowledgment key generation
+     - `SeverityMapping` class: Centralized P0-P3 severity mappings
+       - `ToPagerDuty()`: Maps to critical/error/warning/info
+       - `ToTeamsWebhookKey()`: Maps to critical/medium/low channels
+       - `ToTeamsCardStyle()`: Maps to Adaptive Card color styles
+   - Updated AlertProcessor.cs to use helper methods (3 locations)
+   - Updated PagerDutyClient.cs to use SeverityMapping.ToPagerDuty()
+   - Updated TeamsClient.cs to use SeverityMapping.ToTeamsWebhookKey() and ToTeamsCardStyle()
+   - **Impact:** Reduced code duplication by ~40 lines, improved maintainability, eliminated security bug surface area
+
+2. **Measurement Report Generation (`scripts/measurement/06-generate-report.sh`)**
+   - Generates comprehensive markdown daily reports with:
+     - Executive summary table (FP rate, total evaluations, TP/FP/inconclusive counts)
+     - Traffic volume context (total requests, unique IPs, block rate)
+     - WAF classification details with top rules triggered
+     - OPA classification details with top constraints triggered
+     - Notable incidents (high-confidence true positives)
+     - Recommendations based on FP rate thresholds
+     - Automated next steps for tuning or manual review
+   - Integrates with Azure Monitor Log Analytics for contextual metrics
+   - Updates measurement-state.json to track daily reports and increment day counter
+   - **File:** `scripts/measurement/06-generate-report.sh` (10.9KB, 350+ lines)
+
+3. **Load Testing Script (`scripts/load-test-alerting.sh`)**
+   - Validates alerting pipeline performance under production load
+   - Features:
+     - Configurable target rate (default 500 alerts/hour)
+     - Realistic alert payload generation (6 alert types, 9 controls, 3 environments, weighted severity distribution)
+     - Concurrent request execution with rate limiting
+     - Redis deduplication monitoring (background process tracking key count)
+     - Comprehensive metrics collection (success rate, P50/P95/P99 latency, duplicate rate, throughput)
+     - Pass/fail validation (>99% success rate, target throughput, <2s P95 latency)
+   - **File:** `scripts/load-test-alerting.sh` (9.4KB, 350+ lines)
+   - **Usage:** `FUNCTION_URL=https://... FUNCTION_KEY=... TARGET_RATE=500 TEST_DURATION=300 ./scripts/load-test-alerting.sh`
+
+4. **Meta-Alert Configuration (`infrastructure/phase4-alert-rules.bicep`)**
+   - Added `highDedupRateAlert` scheduled query rule
+   - Triggers when deduplication rate exceeds 50% (indicates noisy alert rules)
+   - Queries Application Insights for alert processing telemetry
+   - Groups by alert_type and environment to identify specific problem areas
+   - Severity P2 (warning) with 1-hour evaluation window
+   - **Impact:** Proactive detection of misconfigured alert rules before they impact on-call engineers
+
+**Key Design Decisions:**
+- Used shared helper module instead of base class to avoid inheritance complexity
+- Centralized severity mapping as static methods (no state, pure functions)
+- Load test script uses realistic alert distribution (40% drift, 20% regression, 15% threshold breach, etc.)
+- Meta-alert queries App Insights logs instead of Redis directly (better telemetry integration)
+- Report generation script uses bc for floating-point math (Bash limitation workaround)
+
+**File Paths:**
+- `functions/AlertHelper.cs` - Shared dedup key and severity mapping helper
+- `functions/AlertProcessor.cs` - Updated to use AlertHelper
+- `functions/integrations/PagerDutyClient.cs` - Updated to use SeverityMapping
+- `functions/integrations/TeamsClient.cs` - Updated to use SeverityMapping
+- `infrastructure/phase4-alert-rules.bicep` - Added highDedupRateAlert
+- `scripts/load-test-alerting.sh` - Load test script for alerting pipeline
+- `scripts/measurement/06-generate-report.sh` - Daily report generation
+
+**Testing:**
+- Load test validates 500+ alerts/hour throughput
+- Redis deduplication accuracy validated via duplicate detection rate
+- Success rate must exceed 99%, P95 latency must be <2s
+- Meta-alert tested via KQL query against sample Application Insights data
+
+**Related:**
+- Issue #99: FedRAMP Dashboard: Alerting Code Quality & Load Testing
+- PR #101: https://github.com/tamirdresher_microsoft/tamresearch1/pull/101
+- Follow-up to PR #97 review feedback
+
 ### 2026-03-07: Security Dashboard & False Positive Measurement (Issues #77, #78)
 
 **Context:** Post-validation operational readiness work following FedRAMP test suite (Issue #67). Two design documents created to enable production deployment with confidence: real-time compliance monitoring and false positive rate validation.

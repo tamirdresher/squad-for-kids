@@ -374,6 +374,46 @@ The Squad Places network has 8 enlisted squads sharing substantive knowledge on 
 
 ---
 
+### 2026-03-08: Squad Monitor Orchestration View — Issue #144 Enhancement & PR #153
+
+**Task**: Add orchestration-only view toggle to squad monitor per Tamir's request — "allow me also to hit a key to see the simplified view of only Orchestration Activity: Recent and current agent activities with status (in elaborated format)."
+
+**Delivered**:
+- Added keyboard input handling in live mode using `Console.KeyAvailable`
+- Press 'O' or 'o' to toggle between full dashboard and orchestration-only view
+- Created `BuildOrchestrationOnlyContent()` for orchestration-focused dashboard
+- Created `BuildDetailedOrchestrationSection()` with:
+  - **Statistics Panel**: Shows total activities, 24h activities, active agents, status breakdown (⏳ in progress | ✅ completed | ❌ failed)
+  - **Detailed Activity List**: Up to 25 most recent activities with full details
+  - **Elaborate Format**: Agent name, precise UTC timestamp, status, complete task description, outcome
+  - **Color Coding**: Green (completed), yellow (in progress), red (failed), blue (other)
+  - **Age Indicators**: Recent activities highlighted (green <1h, yellow <24h, dim >24h)
+- Updated README with keyboard controls documentation
+
+**Key Technical Decisions**:
+1. **Non-Blocking Keyboard Input**: Used `Console.KeyAvailable` to check for keypresses without blocking the refresh loop
+2. **View Mode Toggle**: Simple boolean flag (`orchestrationOnlyMode`) controls which content builder is called
+3. **Statistics Panel Design**: Spectre.Console Panel with Markup for structured statistics display
+4. **Activity Display**: Individual panels per activity using Grid layout for clean alignment
+5. **Display Count**: 25 activities in orchestration view vs 10 in full dashboard — more detail when focused
+6. **Graceful Degradation**: Empty state handling with helpful message if no activities found
+
+**Files Modified**: 2
+- `.squad/tools/squad-monitor/Program.cs` (added toggle logic and detailed orchestration builder)
+- `.squad/tools/squad-monitor/README.md` (documented keyboard controls)
+
+**Key Patterns Used**:
+- Spectre.Console Grid for structured two-column display (label + value)
+- Spectre.Console Panel with BoxBorder.Rounded for visual separation
+- Markup escape for all user content to prevent injection
+- StringComparison.OrdinalIgnoreCase for status matching
+
+**Branch**: `squad/144-monitor-orchestration-view` | **PR**: #153 | **Issue**: #144 (additional comment)
+
+**Impact**: Operators can now press 'O' to see dedicated view of all subagent and copilot background tasks with full details, addressing Tamir's request for orchestration-focused monitoring with elaborated format.
+
+---
+
 ### 2026-03-06: Heartbeat Workflow Fix for Reliable CI/CD Signals (Issue #5)
 
 **Context:** Background task (Mode: background) to fix heartbeat workflow generating false alerts.

@@ -7,11 +7,17 @@ A multi-panel terminal dashboard for monitoring squad activity, GitHub work queu
 - 🎨 Beautiful terminal UI with Spectre.Console
 - 🔄 Auto-refresh every 5 seconds (configurable)
 - 📊 Color-coded status indicators (green/yellow/red)
+- 🔀 **Orchestration-only view** — Press 'o' to toggle detailed orchestration activity view
 - 💚 **Ralph heartbeat panel** — shows watch loop status, round count, staleness
 - 📜 **Ralph log panel** — recent round summaries from `ralph-watch.log`
 - 📋 **GitHub Issues panel** — open issues with `squad` label, assignees, status
 - 🔀 **GitHub PRs panel** — open PRs with review status, CI rollup
 - 🎯 **Orchestration log panel** — agent activity from `.squad/orchestration-log/`
+
+## Keyboard Controls
+
+- **Press 'o' or 'O'** — Toggle between full dashboard and orchestration-only view
+- **Ctrl+C** — Exit the monitor
 
 ## Data Sources
 
@@ -68,6 +74,12 @@ Runs `gh pr list --state open --json ...` to show open PRs with review decision 
 
 ### Orchestration Log
 Parses `.squad/orchestration-log/*.md` files (top 10 most recent) showing agent, status, age, task, and outcome.
+
+**Press 'o' or 'O' to toggle orchestration-only view**, which displays:
+- Detailed statistics (active agents, activities in last 24h, status breakdown)
+- Up to 25 most recent activities with full details
+- Expanded task descriptions and outcomes
+- Agent name, timestamp, status, task, and outcome for each activity
 
 ## Requirements
 

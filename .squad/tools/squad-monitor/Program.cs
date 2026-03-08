@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 var interval = 5;
 var runOnce = false;
+var orchestrationOnlyMode = false;
 var teamRoot = FindTeamRoot();
 var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
@@ -31,6 +32,7 @@ if (teamRoot == null)
 
 AnsiConsole.MarkupLine($"[dim]Squad Monitor v2 - Refresh interval: {interval}s[/]");
 AnsiConsole.MarkupLine($"[dim]Team root: {teamRoot}[/]");
+AnsiConsole.MarkupLine($"[dim]Press 'o' or 'O' to toggle orchestration-only view[/]");
 AnsiConsole.WriteLine();
 
 if (runOnce)
@@ -63,12 +65,25 @@ else
         {
             do
             {
+                // Check for keyboard input to toggle view mode
+                if (Console.KeyAvailable)
+                {
+                    var key = Console.ReadKey(intercept: true);
+                    if (key.Key == ConsoleKey.O)
+                    {
+                        orchestrationOnlyMode = !orchestrationOnlyMode;
+                    }
+                }
+
                 var now = DateTime.UtcNow;
-                var content = BuildDashboardContent(now, userProfile, teamRoot);
+                var content = orchestrationOnlyMode 
+                    ? BuildOrchestrationOnlyContent(now, userProfile, teamRoot)
+                    : BuildDashboardContent(now, userProfile, teamRoot);
                 layout.Update(content);
                 ctx.Refresh();
 
-                AnsiConsole.MarkupLine($"\n[dim]Refreshing in {interval}s... (Ctrl+C to exit)[/]");
+                var viewMode = orchestrationOnlyMode ? "[yellow]Orchestration View[/]" : "[cyan]Full Dashboard[/]";
+                AnsiConsole.MarkupLine($"\n[dim]Mode: {viewMode} | Press 'o' to toggle | Refreshing in {interval}s... (Ctrl+C to exit)[/]");
                 await Task.Delay(TimeSpan.FromSeconds(interval));
 
             } while (true);
@@ -109,6 +124,29 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
     // Orchestration Log
     var activities = LoadActivities(teamRoot);
     sections.Add(BuildOrchestrationLogSection(activities));
+
+    // Combine all sections into a group
+    var rows = new Rows(sections);
+    return rows;
+}
+
+// ─── Orchestration-Only Dashboard Builder ──────────────────────────────────
+
+static IRenderable BuildOrchestrationOnlyContent(DateTime now, string userProfile, string teamRoot)
+{
+    var sections = new List<IRenderable>();
+
+    // Header
+    var header = new Rule($"[yellow bold]Squad Monitor v2 — Orchestration View[/] [dim]— {now:yyyy-MM-dd HH:mm:ss} UTC[/]")
+    {
+        Justification = Justify.Left
+    };
+    sections.Add(header);
+    sections.Add(Text.Empty);
+
+    // Load and display orchestration activities in detail
+    var activities = LoadActivities(teamRoot);
+    sections.Add(BuildDetailedOrchestrationSection(activities, now));
 
     // Combine all sections into a group
     var rows = new Rows(sections);
@@ -643,6 +681,102 @@ static IRenderable BuildOrchestrationLogSection(List<AgentActivity> activities)
     items.Add(new Markup($"[dim]  Agents: {totalAgents} | Activities (24h): {recentActivities} | Showing top 10 of {activities.Count}[/]"));
     items.Add(Text.Empty);
     
+    return new Rows(items);
+}
+
+static IRenderable BuildDetailedOrchestrationSection(List<AgentActivity> activities, DateTime now)
+{
+    var items = new List<IRenderable>();
+    
+    var section = new Rule("[yellow bold]Orchestration Activity — Detailed View[/]") { Justification = Justify.Left };
+    items.Add(section);
+    items.Add(Text.Empty);
+
+    if (activities.Count == 0)
+    {
+        items.Add(new Markup("[dim]  No activities found in orchestration logs.[/]"));
+        items.Add(Text.Empty);
+        return new Rows(items);
+    }
+
+    // Show statistics
+    var totalActivities = activities.Count;
+    var recentActivities = activities.Count(a => (now - a.Timestamp).TotalHours <= 24);
+    var uniqueAgents = activities.Select(a => a.Agent).Distinct().ToList();
+    var totalAgents = uniqueAgents.Count;
+    
+    var activeCount = activities.Count(a => a.Status.Contains("Progress", StringComparison.OrdinalIgnoreCase) || a.Status.Contains("⏳"));
+    var completedCount = activities.Count(a => a.Status.Contains("Completed", StringComparison.OrdinalIgnoreCase) || a.Status.Contains("✅"));
+    var failedCount = activities.Count(a => a.Status.Contains("Failed", StringComparison.OrdinalIgnoreCase) || a.Status.Contains("❌"));
+
+    var statsPanel = new Panel(new Markup(
+        $"[cyan]Total Activities:[/] {totalActivities}  |  " +
+        $"[yellow]Last 24h:[/] {recentActivities}  |  " +
+        $"[cyan]Active Agents:[/] {totalAgents}\n" +
+        $"[yellow]⏳ In Progress:[/] {activeCount}  |  " +
+        $"[green]✅ Completed:[/] {completedCount}  |  " +
+        $"[red]❌ Failed:[/] {failedCount}"))
+    {
+        Header = new PanelHeader("[bold]Statistics[/]"),
+        Border = BoxBorder.Rounded,
+        BorderStyle = new Style(Color.Grey)
+    };
+    items.Add(statsPanel);
+    items.Add(Text.Empty);
+
+    // Display detailed activity entries (up to 25)
+    var displayCount = Math.Min(25, activities.Count);
+    items.Add(new Markup($"[dim]Showing {displayCount} most recent activities:[/]"));
+    items.Add(Text.Empty);
+
+    foreach (var activity in activities.Take(displayCount))
+    {
+        var age = now - activity.Timestamp;
+        var ageStr = FormatAge(age);
+        
+        var statusColor = activity.Status.Contains("✅") || activity.Status.Contains("Completed", StringComparison.OrdinalIgnoreCase) ? "green" :
+                         activity.Status.Contains("⏳") || activity.Status.Contains("Progress", StringComparison.OrdinalIgnoreCase) ? "yellow" :
+                         activity.Status.Contains("❌") || activity.Status.Contains("Failed", StringComparison.OrdinalIgnoreCase) ? "red" :
+                         "blue";
+
+        var ageColor = age.TotalHours < 1 ? "green" :
+                       age.TotalDays < 1 ? "yellow" :
+                       "dim";
+
+        // Create detailed entry with grid layout
+        var grid = new Grid()
+            .AddColumn(new GridColumn().Width(15))
+            .AddColumn(new GridColumn().NoWrap())
+            .AddRow($"[cyan bold]{Markup.Escape(activity.Agent)}[/]", $"[{ageColor}]{Markup.Escape(ageStr)} — {Markup.Escape(activity.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"))} UTC[/]")
+            .AddRow($"[dim]Status:[/]", $"[{statusColor} bold]{Markup.Escape(activity.Status)}[/]");
+
+        if (!string.IsNullOrWhiteSpace(activity.Task))
+        {
+            grid.AddRow($"[dim]Task:[/]", $"[white]{Markup.Escape(activity.Task)}[/]");
+        }
+
+        if (!string.IsNullOrWhiteSpace(activity.Outcome))
+        {
+            grid.AddRow($"[dim]Outcome:[/]", $"[dim]{Markup.Escape(activity.Outcome)}[/]");
+        }
+
+        var panel = new Panel(grid)
+        {
+            Border = BoxBorder.Rounded,
+            BorderStyle = new Style(Color.Grey),
+            Padding = new Padding(1, 0, 1, 0)
+        };
+
+        items.Add(panel);
+        items.Add(Text.Empty);
+    }
+
+    if (activities.Count > displayCount)
+    {
+        items.Add(new Markup($"[dim]... and {activities.Count - displayCount} more activities[/]"));
+        items.Add(Text.Empty);
+    }
+
     return new Rows(items);
 }
 

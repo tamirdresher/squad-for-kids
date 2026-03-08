@@ -46,11 +46,13 @@ gh project item-edit --project-id PVT_kwHOC0L5c84BRG-P --id {ITEM_ID} --field-id
 ```
 
 **Column option IDs:**
-- `f75ad846` → Todo
-- `47fc9ee4` → In Progress
-- `98236657` → Done
-- `70667752` → Blocked
-- `e2dee831` → Pending User
+- `0de780a1` → Todo
+- `238ff87a` → In Progress
+- `1807f788` → Review
+- `4830e3e3` → Done
+- `c6316ca6` → Blocked
+- `c48a6815` → Pending User
+- `52659e74` → Waiting for user review
 
 ### Shortcut: Combined add + set status
 
@@ -64,11 +66,12 @@ gh project item-edit --project-id PVT_kwHOC0L5c84BRG-P --id $ITEM_ID --field-id 
 
 Agents MUST update the board in these situations:
 
-1. **Triage:** When Picard triages an issue → set to `Todo`
-2. **Starting work:** When creating a branch/PR → set to `In Progress`
-3. **Blocked:** When encountering a blocker → set to `Blocked` + comment explaining why
-4. **Needs user input:** When adding `status:pending-user` label → ALSO set to `Pending User`
-5. **Closing:** When closing an issue → set to `Done`
+1. **Triage:** When Picard triages an issue → set to `Todo` (0de780a1)
+2. **Starting work:** When creating a branch/PR → set to `In Progress` (238ff87a)
+3. **Blocked:** When encountering a blocker → set to `Blocked` (c6316ca6) + comment explaining why
+4. **Needs user input:** When adding `status:pending-user` label → ALSO set to `Pending User` (c48a6815)
+5. **Closing:** When closing an issue → set to `Done` (4830e3e3)
+6. **Review:** When PR is open and ready for review → set to `Review` (1807f788)
 
 ## Important
 

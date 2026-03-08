@@ -8,6 +8,11 @@
 # - Teams alerts on consecutive failures (>3)
 # - Exit code, duration, and round tracking
 
+# Fix UTF-8 rendering in Windows PowerShell console
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+chcp 65001 | Out-Null
+
 $intervalMinutes = 5
 $round = 0
 $consecutiveFailures = 0

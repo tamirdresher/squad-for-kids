@@ -18,6 +18,26 @@
 
 ## Learnings
 
+### 2026-03-09: Workflow Syntax Error — Issue #177
+
+**Finding:** The "Squad Issue Notification" workflow failed with `SyntaxError: Unexpected identifier 'squad'` when closing issues. Root cause: unescaped apostrophe in the agent name regex pattern.
+
+**The Bug:** Line 38 of `.github/workflows/squad-issue-notify.yml` contained:
+```javascript
+const agentMatch = lastComment.match(/(Picard|Data|B'Elanna|Seven|Worf)/i);
+```
+
+The apostrophe in `B'Elanna` inside a single-quoted JavaScript string broke the string literal, causing the parser to treat the closing quote as string termination and then fail on `'Elanna` as an unexpected identifier.
+
+**The Fix:** Escaped the apostrophe:
+```javascript
+const agentMatch = lastComment.match(/(Picard|Data|B\\'Elanna|Seven|Worf)/i);
+```
+
+**Resolution:** Fixed in commit 697632b, issue closed. This was a CI automation issue requiring a code fix—a Data-tier correction in the workflow layer. Demonstrates importance of testing inline JavaScript in GitHub Actions scripts.
+
+---
+
 ### 2026-03-09: FedRAMP Dashboard Migration Planning — Issue #127
 
 **Context:** Tamir requested migration plan for FedRAMP Dashboard to dedicated repository following his decision on Issue #123 that the project is valid but belongs in its own repo.
@@ -1811,3 +1831,116 @@ Data delivered solid implementation of Issue #128 requirements:
 - Pre-flight DCR validation enhancement recommended for PR2
 
 **Deliverable:** Full review in decisions.md — consolidated with B'Elanna + Worf assessments
+
+### [2026-03-08 23:11] DevTunnel Hub Mode Setup (Issue #168)
+
+Successfully restarted the cli-tunnel devtunnel in hub mode:
+- **Tunnel ID:** amusing-pond-qz9xq22.euw
+- **Port:** 54406
+- **Access URL:** https://8rndbr7k-54406.euw.devtunnels.ms/
+- **Command:** devtunnel host amusing-pond-qz9xq22.euw --allow-anonymous
+- **Process Management:** Stopped previous devtunnel processes (PIDs 57480, 67772) before restarting
+- **Output Capture:** Used Start-Process with RedirectStandardOutput to capture initialization output
+- **Communication:** Posted full output to issue #168 and sent Adaptive Card to Teams via webhook
+- **Expiration:** 24 hours
+
+**Key Learning:** When Tamir asks for "all output", he wants to see the startup messages including the tunnel URLs and ready status. The devtunnel host command provides clean output that can be captured and shared effectively.
+
+---
+
+### 2026-03-08: Issue #178 Follow-Up — Priority Issues Created
+
+**Context:** Seven completed comprehensive research on issue #178, analyzing Tamir's work patterns from emails, Teams messages, and repository activity over the past month. Research identified 8 priority recommendations for repository improvements.
+
+**Action Taken:** Created 4 new issues from top-priority recommendations:
+- **#181: ConfigGen Support Integration ⭐⭐⭐** — Squad skill for ConfigGen CLI, CI automation, pattern documentation. Critical gap: Tamir actively uses ConfigGen but squad lacks direct integration.
+- **#182: Upstream Inheritance Implementation ⭐⭐⭐** — Configure tracking of bradygaster/squad upstream, document inheritance patterns, integrate community skills. Enables code reuse and community contributions.
+- **#183: Office Automation (Email/Calendar/Teams) ⭐⭐** — Install office-365-mcp-server, enable email/calendar/Teams automation, implement meeting→issue workflow. Streamlines notifications and knowledge capture.
+- **#184: AI Days / Copilot Learning Artifacts ⭐⭐** — Create /training/ai-days/ structure, document Copilot SDK patterns, capture historical session learnings. Preserves knowledge from Tamir's AI Days attendance.
+
+**Project Board Updates:**
+- Issue #178: Moved to Done column (status: 4830e3e3)
+- Issues #181-184: Added to Todo column (status: 0de780a1)
+- Commands: \gh project item-add\ + \gh project item-edit\ with project-id PVT_kwHOC0L5c84BRG-P, field-id PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc
+
+**Deferred Items (Priority 5-8):**
+- Hackathon demo preservation
+- .NET 10 migration guide
+- Patent submission follow-through (covered by existing #42)
+- SFI compliance automation
+These can be revisited as capacity allows.
+
+**Key Learning:** When research produces multiple recommendations, prioritize by direct workflow impact. ConfigGen and Office Automation address immediate daily needs. Upstream inheritance enables long-term efficiency. Knowledge capture (AI Days) prevents learning loss.
+
+**Decision Filed:** .squad/decisions/inbox/picard-178-followup.md
+
+---
+
+
+---
+
+### 2026-03-08: Issue #182 — Upstream Inheritance from bradygaster/squad
+
+**Context:** Issue #178 research revealed that upstream bradygaster/squad has evolved with new features, skills, and patterns we're not leveraging. This represents missed opportunities for code reuse and community contributions.
+
+**Action Taken:**
+1. **Configured upstream remote**: Added https://github.com/bradygaster/squad.git as upstream remote
+2. **Fetched upstream state**: Retrieved v0.8.25 (latest), analyzed 20 recent commits
+3. **Analyzed structure differences**: Compared our fork vs upstream monorepo
+4. **Identified inheritance targets**: Documented high-value files for cherry-picking
+5. **Created comprehensive documentation**: docs/UPSTREAM_INHERITANCE.md (11KB)
+
+**Key Findings:**
+
+**Upstream Architecture:**
+- Monorepo structure: packages/squad-sdk/ (runtime) + packages/squad-cli/ (tools)
+- .squad-templates/ directory with scaffolding for agent/skill/workflow initialization
+- .changeset/ for versioned release management
+- 11+ GitHub Actions workflows for CI/CD, docs, heartbeat, label enforcement, releases
+- CLI commands we lack: squad doctor, squad upstream, squad streams, squad plugin, squad export/import, squad aspire
+
+**High-Value Inheritance Targets:**
+1. .squad-templates/skill.md — More structured than our current template
+2. .squad-templates/workflows/squad-ci.yml — Improved CI patterns
+3. .github/workflows/squad-heartbeat.yml — System health monitoring
+4. packages/squad-cli/src/cli/commands/doctor.ts — Health diagnostics
+5. Casting engine patterns — Dynamic agent assignment based on skills
+6. SDK architecture patterns — Adapter system, event bus, session pooling
+
+**Our Unique Assets (not in upstream):**
+- Azure DevOps integration (.azuredevops/, custom workflows)
+- FedRAMP validation workflows
+- Drift detection pipeline
+- Custom agent themes (Picard/Data/Geordi vs upstream's Apollo 13)
+- Squad daily digest, issue notifications, main-guard workflows
+
+**Version Gap:**
+- Our CLI: @bradygaster/squad-cli@^0.8.18
+- Upstream: v0.8.25
+- **Lag**: 7 patch versions behind
+
+**Inheritance Strategy:**
+- **Approach**: Selective cherry-picking, NOT wholesale merge
+- **Rationale**: We maintain custom enterprise implementations (Azure DevOps, FedRAMP, custom agents)
+- **Workflow**: Monthly upstream review + automated weekly checks for new commits
+- **Automation**: Proposed GitHub Action to detect new upstream commits and create tracking issues
+
+**Documentation Created:**
+- Full inheritance guide: docs/UPSTREAM_INHERITANCE.md
+- Includes: git remote setup, automated sync workflow template, manual sync process, file-by-file priorities, versioning tracking, contributing-back guidelines
+
+**Project Board:** Set issue #182 to "In Progress" (item ID: PVTI_lAHOC0L5c84BRG-Pzgm8IVc)
+
+**Next Steps:**
+1. Update @bradygaster/squad-cli from v0.8.18 → v0.8.25
+2. Cherry-pick .squad-templates/skill.md as first inheritance
+3. Set up automated upstream sync check (weekly GitHub Action)
+4. Add upstream review to monthly squad ceremonies
+
+**Key Architectural Learning:** When working with open-source forks, establish explicit inheritance strategy early. Selective cherry-picking > wholesale merging when maintaining custom implementations. Document what you inherit, what you diverge on, and why. Version lag visibility (we're 7 patches behind) triggers proactive updates.
+
+**Pattern Identified:** Upstream has squad upstream command for managing upstream relationships — meta-useful for this exact scenario. Consider adopting their CLI tooling for upstream management.
+
+**Decision Filed:** .squad/decisions/inbox/picard-upstream-inheritance.md
+
+**Commit:** 97586e3 — docs: establish upstream inheritance workflow from bradygaster/squad

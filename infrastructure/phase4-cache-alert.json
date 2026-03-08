@@ -1,0 +1,106 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.36.177.2456",
+      "templateHash": "17067266665338918029"
+    }
+  },
+  "parameters": {
+    "appInsightsName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing Application Insights resource"
+      }
+    },
+    "actionGroupId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the Action Group for alert notifications"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for the alert rule"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "metadata": {
+        "description": "Environment name (dev, stg, prod)"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "Environment": "[parameters('environment')]",
+        "Component": "Monitoring",
+        "ManagedBy": "Bicep",
+        "Owner": "FedRAMP-Dashboard-Team"
+      },
+      "metadata": {
+        "description": "Tags for resource organization"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "apiVersion": "2021-08-01",
+      "name": "[format('FedRAMP-Dashboard-Cache-Hit-Rate-Low-{0}', parameters('environment'))]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "displayName": "[format('FedRAMP Dashboard - Cache Hit Rate Below 70% ({0})', parameters('environment'))]",
+        "description": "Alert when API response cache hit rate falls below 70% for 15 minutes. Uses explicit cache telemetry (CacheHit/CacheMiss events) for precision. Indicates potential cache configuration issue or unexpected access patterns.",
+        "severity": 2,
+        "enabled": true,
+        "evaluationFrequency": "PT5M",
+        "windowSize": "PT15M",
+        "scopes": [
+          "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
+        ],
+        "criteria": {
+          "allOf": [
+            {
+              "query": "            // Updated query to use explicit cache telemetry (Issue #115)\r\n            // Uses custom events (CacheHit/CacheMiss) instead of duration inference\r\n            customEvents\r\n            | where timestamp > ago(15m)\r\n            | where name in (\"CacheHit\", \"CacheMiss\")\r\n            | where customDimensions.Endpoint has \"compliance\"\r\n            | extend IsCacheHit = iff(name == \"CacheHit\", 1, 0)\r\n            | summarize \r\n                CacheHits = sum(IsCacheHit),\r\n                TotalRequests = count()\r\n            | extend CacheHitRate = (CacheHits * 100.0) / TotalRequests\r\n            | where CacheHitRate < 70\r\n            | project CacheHitRate, CacheHits, TotalRequests\r\n          ",
+              "timeAggregation": "Count",
+              "operator": "GreaterThan",
+              "threshold": 0,
+              "failingPeriods": {
+                "numberOfEvaluationPeriods": 1,
+                "minFailingPeriodsToAlert": 1
+              }
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            "[parameters('actionGroupId')]"
+          ],
+          "customProperties": {
+            "Runbook": "https://github.com/tamirdresher_microsoft/tamresearch1/blob/main/docs/fedramp-dashboard-cache-sli.md#42-remediation-playbook",
+            "Severity": "Warning",
+            "Team": "FedRAMP-OnCall",
+            "SLO": "CacheHitRate >= 70%",
+            "IssueRef": "#106"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "alertId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Insights/scheduledQueryRules', format('FedRAMP-Dashboard-Cache-Hit-Rate-Low-{0}', parameters('environment')))]"
+    },
+    "alertName": {
+      "type": "string",
+      "value": "[format('FedRAMP-Dashboard-Cache-Hit-Rate-Low-{0}', parameters('environment'))]"
+    }
+  }
+}

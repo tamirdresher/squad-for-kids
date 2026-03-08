@@ -51,17 +51,20 @@ assignees: []
 
 ### 30-Day Cache Hit Rate
 ```kusto
-requests
+// Updated to use explicit cache telemetry (Issue #115)
+customEvents
 | where timestamp > ago(30d)
-| where name has "compliance"
-| extend IsCacheHit = iff(duration < 100, 1, 0)
+| where name in ("CacheHit", "CacheMiss")
+| where customDimensions.Endpoint has "compliance"
+| extend IsCacheHit = iff(name == "CacheHit", 1, 0)
+| extend Duration = todouble(customMeasurements["Duration"])
 | summarize 
     TotalRequests = count(),
     CacheHits = sum(IsCacheHit),
     CacheMisses = sum(1 - IsCacheHit),
-    AvgDuration = avg(duration),
-    P95Duration = percentile(duration, 95),
-    P99Duration = percentile(duration, 99)
+    AvgDuration = avg(Duration),
+    P95Duration = percentile(Duration, 95),
+    P99Duration = percentile(Duration, 99)
 | extend CacheHitRate = round((CacheHits * 100.0) / TotalRequests, 2)
 | project 
     TotalRequests,
@@ -75,9 +78,11 @@ requests
 
 ### Weekly Breakdown
 ```kusto
-requests
-| where timestamp > ago(30d) and name has "compliance"
-| extend IsCacheHit = iff(duration < 100, 1, 0)
+customEvents
+| where timestamp > ago(30d)
+| where name in ("CacheHit", "CacheMiss")
+| where customDimensions.Endpoint has "compliance"
+| extend IsCacheHit = iff(name == "CacheHit", 1, 0)
 | extend Week = startofweek(timestamp)
 | summarize 
     TotalRequests = count(),
@@ -89,12 +94,19 @@ requests
 
 ### Top Query Combinations
 ```kusto
-requests
-| where timestamp > ago(30d) and name has "compliance"
+customEvents
+| where timestamp > ago(30d)
+| where name in ("CacheHit", "CacheMiss")
+| where customDimensions.Endpoint has "compliance"
 | extend Environment = tostring(customDimensions["Environment"])
 | extend ControlCategory = tostring(customDimensions["ControlCategory"])
 | summarize RequestCount = count() by Environment, ControlCategory
-| extend PercentOfTotal = round((RequestCount * 100.0) / toscalar(requests | where timestamp > ago(30d) and name has "compliance" | count()), 2)
+| extend PercentOfTotal = round((RequestCount * 100.0) / toscalar(
+    customEvents 
+    | where timestamp > ago(30d) 
+    | where name in ("CacheHit", "CacheMiss")
+    | where customDimensions.Endpoint has "compliance" 
+    | count()), 2)
 | order by RequestCount desc
 | take 10
 ```

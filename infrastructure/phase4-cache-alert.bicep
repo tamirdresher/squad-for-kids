@@ -28,13 +28,14 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 }
 
 // Cache Hit Rate Alert: Triggers when hit rate < 70% for 15 minutes
+// Updated to use explicit cache telemetry (Issue #115)
 resource cacheHitRateAlert 'Microsoft.Insights/scheduledQueryRules@2021-08-01' = {
   name: 'FedRAMP-Dashboard-Cache-Hit-Rate-Low-${environment}'
   location: location
   tags: tags
   properties: {
     displayName: 'FedRAMP Dashboard - Cache Hit Rate Below 70% (${environment})'
-    description: 'Alert when API response cache hit rate falls below 70% for 15 minutes. Indicates potential cache configuration issue or unexpected access patterns.'
+    description: 'Alert when API response cache hit rate falls below 70% for 15 minutes. Uses explicit cache telemetry (CacheHit/CacheMiss events) for precision. Indicates potential cache configuration issue or unexpected access patterns.'
     severity: 2  // Warning
     enabled: true
     evaluationFrequency: 'PT5M'   // Evaluate every 5 minutes
@@ -46,10 +47,13 @@ resource cacheHitRateAlert 'Microsoft.Insights/scheduledQueryRules@2021-08-01' =
       allOf: [
         {
           query: '''
-            requests
+            // Updated query to use explicit cache telemetry (Issue #115)
+            // Uses custom events (CacheHit/CacheMiss) instead of duration inference
+            customEvents
             | where timestamp > ago(15m)
-            | where name has "compliance"
-            | extend IsCacheHit = iff(duration < 100, 1, 0)  // Cached responses typically < 100ms
+            | where name in ("CacheHit", "CacheMiss")
+            | where customDimensions.Endpoint has "compliance"
+            | extend IsCacheHit = iff(name == "CacheHit", 1, 0)
             | summarize 
                 CacheHits = sum(IsCacheHit),
                 TotalRequests = count()

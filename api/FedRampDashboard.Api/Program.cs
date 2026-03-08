@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using FedRampDashboard.Api.Services;
 using FedRampDashboard.Api.Authorization;
+using FedRampDashboard.Api.Middleware;
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 
@@ -60,6 +61,10 @@ builder.Services.AddScoped<IControlsService, ControlsService>();
 builder.Services.AddScoped<IEnvironmentsService, EnvironmentsService>();
 builder.Services.AddScoped<IHistoryService, HistoryService>();
 builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<ICacheTelemetryService, CacheTelemetryService>();
+
+// Application Insights
+builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -97,6 +102,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowDashboard");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCacheTelemetry();
 app.MapControllers();
 
 app.Run();

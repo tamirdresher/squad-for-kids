@@ -1,0 +1,118 @@
+name: Squad Issue Notification
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  notify-teams:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      contents: read
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get issue details
+        id: issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              per_page: 100
+            });
+            
+            let lastComment = '';
+            if (comments.data.length > 0) {
+              lastComment = comments.data[comments.data.length - 1].body.substring(0, 500);
+            }
+            
+            // Check for squad agent mentions
+            let agent = 'Unknown';
+            const agentMatch = lastComment.match(/(Picard|Data|Geordi|Troi|Worf)/i);
+            if (agentMatch) {
+              agent = agentMatch[1];
+            } else if (issue.closed_by) {
+              agent = issue.closed_by.login;
+            }
+            
+            core.setOutput('title', issue.title);
+            core.setOutput('number', issue.number);
+            core.setOutput('url', issue.html_url);
+            core.setOutput('agent', agent);
+            core.setOutput('summary', lastComment || 'No additional details provided');
+            core.setOutput('closed_by', issue.closed_by?.login || 'Unknown');
+
+      - name: Send Teams notification
+        if: env.TEAMS_WEBHOOK_URL != ''
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        run: |
+          cat << 'EOF' > payload.json
+          {
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "content": {
+                  "type": "AdaptiveCard",
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "version": "1.4",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "text": "Issue Closed",
+                      "weight": "Bolder",
+                      "size": "Large",
+                      "color": "Good"
+                    },
+                    {
+                      "type": "FactSet",
+                      "facts": [
+                        {
+                          "title": "Issue:",
+                          "value": "#${{ steps.issue.outputs.number }} - ${{ steps.issue.outputs.title }}"
+                        },
+                        {
+                          "title": "Closed by:",
+                          "value": "${{ steps.issue.outputs.closed_by }}"
+                        },
+                        {
+                          "title": "Agent:",
+                          "value": "${{ steps.issue.outputs.agent }}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "Summary",
+                      "weight": "Bolder",
+                      "spacing": "Medium"
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "${{ steps.issue.outputs.summary }}",
+                      "wrap": true,
+                      "maxLines": 5
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "Action.OpenUrl",
+                      "title": "View Issue",
+                      "url": "${{ steps.issue.outputs.url }}"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+          EOF
+          
+          curl -H "Content-Type: application/json" -d @payload.json "$TEAMS_WEBHOOK_URL"

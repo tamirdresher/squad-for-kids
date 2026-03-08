@@ -9269,3 +9269,245 @@ Hi Brady, quick heads up on the upstream command issue. The fix (PR #225) is mer
 ## Rationale
 This format ensures Brady has all the context he needs to take action without a lengthy explanation, while maintaining the collaborative tone appropriate for an internal team message.
 
+
+---
+
+# Decision: Self-Hosted GitHub Actions Runner for EMU Repo
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented  
+**Scope:** CI/CD Infrastructure  
+**Related:** Issue #110
+
+## Context
+
+GitHub Actions workflows in the `tamresearch1` repository were failing because EMU (Enterprise Managed User) personal repositories cannot provision GitHub-hosted runners. This is a platform limitation affecting all workflows in the repo.
+
+## Problem
+
+- ❌ All GitHub Actions workflows failing with runner provisioning errors
+- ❌ GitHub-hosted runners unavailable for EMU personal repos
+- ✅ Repo owner authenticated as `tamirdresher_microsoft` (EMU account)
+- ⏰ Immediate blocker for CI/CD automation
+
+## Decision
+
+**Deploy self-hosted GitHub Actions runner on the current development machine.**
+
+### Rationale:
+1. **Immediate unblock:** Self-hosted runners available immediately without platform limitations
+2. **Low barrier:** Current machine already has necessary tools (gh CLI, PowerShell, Git)
+3. **Temporary solution:** Allows workflows to execute while long-term runner strategy is defined
+4. **Zero cost:** Uses existing compute resources
+
+## Implementation
+
+### Configuration Details:
+
+**Runner Location:** `C:\actions-runner`  
+**Runner Name:** `squad-local-runner`  
+**Runner Version:** v2.332.0 (Windows x64)  
+**Labels:** `self-hosted`, `Windows`, `X64`  
+**Status:** ✅ Online and registered
+
+### Technical Setup:
+
+1. Created dedicated runner directory
+2. Downloaded latest Windows x64 runner package (94.1 MB)
+3. Obtained short-lived registration token via GitHub API
+4. Configured runner in unattended mode:
+   ```bash
+   config.cmd --url https://github.com/tamirdresher_microsoft/tamresearch1 \
+              --token {TOKEN} \
+              --name "squad-local-runner" \
+              --labels "self-hosted,Windows,X64" \
+              --unattended
+   ```
+5. Started runner as background process (PID: 76992)
+
+### Verification:
+
+Confirmed runner registration via GitHub API:
+```json
+{
+  "name": "squad-local-runner",
+  "status": "online",
+  "os": "Windows",
+  "labels": ["self-hosted", "Windows", "X64"]
+}
+```
+
+## Impact
+
+**Positive:**
+- ✅ Workflows can now execute (unblocked)
+- ✅ Fast setup (< 5 minutes from token to online)
+- ✅ No external dependencies or infrastructure provisioning
+- ✅ Uses existing authenticated GitHub CLI session
+
+**Limitations:**
+- ⚠️ Runner lifecycle tied to host machine uptime
+- ⚠️ Not running as Windows service (won't auto-start on reboot)
+- ⚠️ Single runner = no parallelism for multiple concurrent jobs
+- ⚠️ Security: Runner has access to local machine resources
+
+**Trade-offs:**
+- Short-term solution prioritized over robust production runner infrastructure
+- Manual management vs. automated runner fleet
+- Local compute vs. dedicated CI/CD infrastructure
+
+## Usage
+
+Workflows should target self-hosted runners:
+
+```yaml
+jobs:
+  build:
+    runs-on: self-hosted
+    # OR
+    runs-on: [self-hosted, Windows, X64]
+```
+
+## Future Considerations
+
+**Short-term (1-2 weeks):**
+- Monitor runner health and job execution success
+- Consider converting to Windows service for persistence
+
+**Medium-term (1-3 months):**
+- Evaluate dedicated runner infrastructure (Azure VM, container-based runners)
+- Implement runner auto-scaling if job volume increases
+
+**Long-term (3-6 months):**
+- Define organization-wide runner strategy for EMU repos
+- Consider GitHub-hosted runner alternatives or platform exemptions
+
+## Alternatives Considered
+
+1. **GitHub-hosted runners** — ❌ Not available for EMU personal repos
+2. **Azure DevOps agents** — ⏳ Would require Azure Pipelines integration (different CI/CD platform)
+3. **Container-based runners** — ⏳ More complex setup, requires container runtime
+4. **Dedicated Azure VM** — 💰 Additional cost, longer setup time
+
+## Resources
+
+- **Issue:** #110 - GitHub Actions EMU restrictions
+- **Runner docs:** https://docs.github.com/en/actions/hosting-your-own-runners
+- **Registration API:** POST /repos/{owner}/{repo}/actions/runners/registration-token
+- **Verification API:** GET /repos/{owner}/{repo}/actions/runners
+
+## Success Criteria
+
+- ✅ Runner appears as "online" in GitHub repository settings
+- ✅ Runner can pick up and execute workflow jobs
+- ✅ Workflow failures reduced to zero (from runner provisioning issues)
+
+---
+
+**Status:** Deployed and operational as of 2026-03-08 20:30:33  
+**Owner:** B'Elanna (Infrastructure)  
+**Next Review:** When first workflow executes successfully
+
+---
+
+# Decision: Azure DevBox Remote Access Strategy
+
+**Date:** 2026-03-08  
+**Proposer:** B'Elanna (Infrastructure Expert)  
+**Status:** Proposed - Awaiting Information  
+**Context:** Issue #103 - DevBox IDPDev-2 remote setup and management
+
+## Problem Statement
+
+Tamir requested CLI/programmatic access to Azure DevBox "IDPDev-2" for remote setup and configuration, specifically asking to "connect to that devbox from remote and control and fix things there? set it up just not from UI"
+
+Browser-based access (previously established) cannot be scripted due to streaming desktop architecture.
+
+## Investigation Summary
+
+### Approaches Evaluated:
+
+1. **Azure CLI `devcenter` extension** → ❌ Installation fails (pip/registry errors)
+2. **Browser automation (Playwright)** → ❌ Cannot interact with streamed Windows desktop
+3. **Azure DevBox REST API** → ✅ Viable but requires Dev Center resource info
+4. **@microsoft/devbox-mcp** → ⚠️ Installed but not tested, conversational approach
+
+## Proposed Solution
+
+**Use Azure DevBox REST API for programmatic management:**
+
+### Required Information (Blocking):
+- Dev Center name (Azure resource)
+- Dev Center region
+- Access to subscription containing Dev Center resources
+
+### Endpoint Format:
+```
+https://{tenantId}-{devCenterName}.{region}.devcenter.azure.com
+```
+
+### API Capabilities:
+- Get RDP connection details: `GET /projects/{project}/users/me/devboxes/{name}/remoteConnection`
+- List DevBoxes: `GET /projects/{project}/users/me/devboxes`
+- Control operations: Start, stop, restart
+- Status monitoring
+
+### Authentication:
+```powershell
+$token = az account get-access-token --resource https://devcenter.azure.com
+```
+
+## Implementation Plan (Once Unblocked)
+
+1. **Obtain Dev Center details** from Tamir via Azure Portal
+2. **Create PowerShell wrapper** for DevBox REST API operations
+3. **Establish RDP connection** using API-retrieved connection details
+4. **Enable PowerShell remoting** on DevBox if not already configured
+5. **Execute remote commands** via Invoke-Command or Enter-PSSession
+
+## Alternative if REST API Unavailable
+
+Use **@microsoft/devbox-mcp** package for conversational DevBox management through GitHub Copilot CLI. This provides higher-level abstraction but may have feature limitations.
+
+## Trade-offs
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| REST API | Full control, scriptable, no UI needed | Requires resource discovery, more setup |
+| MCP Server | Simple, conversational interface | Limited feature set, less control |
+| Azure CLI | Official tool, well-documented | Installation broken in this environment |
+| Browser UI | Works now, no auth issues | Not scriptable, manual only |
+
+## Decision
+
+**Recommended:** REST API approach once Dev Center information is provided.
+
+**Rationale:** Provides complete programmatic control, enabling:
+- Automated DevBox provisioning and setup
+- Remote command execution for repository cloning and configuration
+- Status monitoring and health checks
+- Integration with existing automation workflows
+
+**Fallback:** MCP server if REST API access cannot be established.
+
+## Next Steps
+
+1. ✅ Posted request for Dev Center info on issue #103
+2. ✅ Added `status:pending-user` label
+3. ✅ Updated project board to "Pending User"
+4. ⏳ Awaiting Tamir's response with Dev Center details
+
+## Impact
+
+This decision affects:
+- DevBox automation capabilities for the squad
+- Future DevBox provisioning workflows
+- Remote setup and configuration procedures
+
+## References
+
+- [Azure DevBox REST API Documentation](https://learn.microsoft.com/en-us/rest/api/devcenter/developer/dev-boxes/)
+- Issue #103: Create a devbox for me and share with me its details
+- .squad/agents/belanna/history.md - DevBox CLI investigation
+

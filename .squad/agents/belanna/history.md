@@ -2508,3 +2508,147 @@ pm install -g @microsoft/devbox-mcp\
 
 **Next Step:** Awaiting Tamir's decision on approach (MCP Server vs Manual)
 
+
+---
+
+### 2026-03-08: Azure DevBox CLI Remote Access Investigation (Issue #103)
+
+**Activation:** Tamir requested CLI/remote-based DevBox control - "can you connect to that devbox from remote and control and fix things there? set it up just not from UI?"
+
+**Task:** Investigate programmatic/CLI access to Azure DevBox "IDPDev-2" for remote management without browser UI
+
+**Status:** BLOCKED - Requires Dev Center resource information from Tamir
+
+#### What I Investigated:
+
+**1. Azure CLI DevCenter Extension:**
+- ❌ z devcenter extension installation fails (pip/Windows registry error)
+- This blocks native CLI commands like z devcenter dev dev-box list
+- Installation command: z extension add --name devcenter → Fails with FileNotFoundError
+
+**2. Azure DevBox REST API (✅ VIABLE PATH):**
+- Successfully obtained authentication token: z account get-access-token --resource https://devcenter.azure.com
+- DevBox has full REST API for programmatic access
+- **Endpoint format:** https://{tenantId}-{devCenterName}.{region}.devcenter.azure.com
+- **Key API:** GET /projects/{projectName}/users/me/devboxes/{devBoxName}/remoteConnection
+- Returns RDP connection details including webUrl for establishing remote sessions
+
+**3. Resource Discovery Attempts:**
+- ❌ Dev Center resources not found in current subscription (c5d1c552-a815-4fc8-b12d-ab444e3225b1)
+- Queried: Microsoft.DevCenter/devcenters → Empty
+- Queried: Microsoft.DevCenter/projects → Empty
+- DevBox portal shows project "1SOC" but cannot resolve to resource ID
+
+#### Critical Blockers:
+
+To use REST API for CLI-based access, I need:
+1. **Dev Center Name** - The actual Azure resource name (not just "1SOC" project)
+2. **Dev Center Region** - Azure region where Dev Center is deployed (likely West Europe based on DevBox location)
+3. **Correct Subscription** - Or access to subscription where Dev Center resources exist
+
+#### What's Possible With Correct Info:
+
+Once Dev Center endpoint is available, REST API enables:
+- ✅ Get DevBox status programmatically
+- ✅ Retrieve RDP connection details (webUrl, connection files)
+- ✅ List all DevBoxes in project
+- ✅ Start/stop/restart DevBox operations
+- ✅ Potentially establish PowerShell remoting if configured on DevBox
+
+#### Learnings:
+
+**Azure DevBox Architecture:**
+- DevBox resources are scoped to Dev Center → Project → DevBox
+- Dev Center name is required for all API calls (acts as namespace)
+- Endpoint format requires: TenantID + DevCenterName + Region
+- Authentication via Azure AD tokens (https://devcenter.azure.com resource)
+
+**CLI Limitations:**
+- Azure CLI devcenter extension has installation issues on this Windows environment
+- REST API via z rest or PowerShell Invoke-RestMethod is more reliable
+- Browser-based access (investigated previously) cannot be scripted due to streaming desktop
+
+**Alternative Approaches:**
+1. **REST API** (Recommended) - Full programmatic control once endpoint known
+2. **@microsoft/devbox-mcp** - MCP server for conversational DevBox management (installed, not tested)
+3. **Native Windows App + PowerShell remoting** - Traditional RDP + remote execution
+
+#### Actions Taken:
+
+- ✅ Posted detailed findings to issue #103
+- ✅ Added status:pending-user label
+- ✅ Updated GitHub Project board to "Pending User" status
+- ✅ Requested Dev Center details from Tamir
+
+**Recommendation:** Once Tamir provides Dev Center name/endpoint, I can create PowerShell scripts for full CLI-based DevBox management including remote command execution, status monitoring, and automated setup tasks.
+
+---
+
+### 2026-03-08: Self-Hosted GitHub Actions Runner Setup (Issue #110)
+
+**Activation:** Tamir requested local runner setup after GitHub Actions workflows failed due to EMU personal repo limitations  
+**Task:** Configure self-hosted GitHub Actions runner on current Windows machine for tamresearch1 repository  
+**Status:** ✅ COMPLETED
+
+#### Problem Context:
+- All GitHub Actions workflows failing — EMU personal repos cannot provision GitHub-hosted runners
+- Repository: tamirdresher_microsoft/tamresearch1
+- Tamir's directive: "For now, add a worker on the current machine where you (ralph) is running"
+
+#### Implementation:
+
+**1. Runner Installation:**
+- Created runner directory: `C:\actions-runner`
+- Downloaded GitHub Actions runner v2.332.0 (Windows x64, 94.1 MB)
+- Extracted runner package
+
+**2. Runner Configuration:**
+- Obtained registration token via GitHub API
+- Configured runner with:
+  - Name: `squad-local-runner`
+  - URL: https://github.com/tamirdresher_microsoft/tamresearch1
+  - Labels: `self-hosted`, `Windows`, `X64`
+  - Mode: `--unattended` (non-interactive)
+
+**3. Runner Deployment:**
+- Started runner as background process (PID: 76992)
+- Used `Start-Process -WindowStyle Hidden` for persistent execution
+- Verified online status via GitHub API
+
+#### Verification Results:
+
+```json
+{
+  "name": "squad-local-runner",
+  "status": "online",
+  "os": "Windows",
+  "labels": ["self-hosted", "Windows", "X64"]
+}
+```
+
+Runner successfully registered and available to pick up workflow jobs.
+
+#### Infrastructure Details:
+
+**Path:** `C:\actions-runner`
+**Process:** cmd.exe (PID: 76992) running `run.cmd`
+**Startup:** 2026-03-08 20:30:33
+**Persistence:** Background process (will terminate on system shutdown - not installed as service)
+
+**Key Learnings:**
+1. EMU restrictions prevent GitHub-hosted runner provisioning for personal repos
+2. Self-hosted runners require registration tokens (short-lived, obtained via GitHub API)
+3. Windows runner can be started as background process (not requiring service installation)
+4. Runner registers immediately and appears online within 5 seconds
+5. Multiple runners can coexist (also found existing `tamresearch1-devbox` runner)
+
+**Next Steps:**
+- Workflows will now target `runs-on: self-hosted` or `runs-on: [self-hosted, Windows, X64]`
+- Consider converting to Windows service for true persistence across reboots
+- Monitor runner health and job execution
+
+**References:**
+- Issue #110: GitHub Actions EMU restrictions
+- Runner version: v2.332.0
+- GitHub API: /repos/{owner}/{repo}/actions/runners
+

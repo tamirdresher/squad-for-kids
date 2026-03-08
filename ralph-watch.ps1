@@ -1,4 +1,4 @@
-# Ralph Watch v7 - Runs agency copilot with Squad agent every interval
+# Ralph Watch v8 - Runs agency copilot with Squad agent every interval
 # Launches a full Copilot session that can do actual work
 # To stop: Ctrl+C
 # 
@@ -301,9 +301,13 @@ while ($true) {
     }
     
     try {
-        # Capture output to parse for metrics
-        $agencyOutput = agency copilot --yolo --autopilot --agent squad -p $prompt 2>&1 | Out-String
-        Write-Host $agencyOutput
+        # Stream output live to console AND capture for metrics parsing
+        $outputLines = @()
+        agency copilot --yolo --autopilot --agent squad -p $prompt 2>$null | ForEach-Object {
+            Write-Host $_
+            $outputLines += $_
+        }
+        $agencyOutput = $outputLines -join "`n"
         
         $exitCode = $LASTEXITCODE
         if ($exitCode -eq 0) {

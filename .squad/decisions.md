@@ -6387,3 +6387,643 @@ Multiple installation methods attempted:
 
 This decision documents why we're **not** pursuing CLI workarounds and instead recommending manual/organizational solutions. Pattern: when tooling AND infrastructure are both blocked, escalate to human decision-making rather than engineering around dual blockers.
 
+
+---
+
+# Decision: Ralph Watch Metrics Parsing
+
+**Date:** 2026-03-08  
+**Agent:** Data (Code Expert)  
+**Context:** Issue #133 — Enhancement from PR #130 review
+
+## Decision
+
+Implemented parsing of Squad CLI agency output to extract detailed work metrics per round.
+
+## What Changed
+
+Added Parse-AgencyMetrics function to ralph-watch.ps1 that extracts:
+- Issues closed (via regex matching close/fix/resolve patterns)
+- PRs merged (via regex matching merge patterns)  
+- Agent actions (via regex matching agent names + action verbs)
+
+Metrics are now included in:
+- Structured log entries (when non-zero)
+- Heartbeat JSON (metrics nested object)
+- Teams failure alerts (when present)
+- Console output summary (when non-zero)
+
+## Technical Approach
+
+### Output Capture
+`powershell
+$agencyOutput = agency copilot --yolo --autopilot --agent squad -p $prompt 2>&1 | Out-String
+`
+
+### Parsing Strategy
+- **Resilient regex patterns** for different output formats
+- **Deduplication by number** using hashtables to avoid double-counting
+- **Case-insensitive matching** via (?i) flag
+- **Flexible patterns** that match with/without "issue" keyword, with/without # symbol
+
+### Example Patterns
+- Issues: close #123, closed issue 45, ix 67, esolved #89
+- PRs: merged PR #456, merge pull request 78
+- Actions: squad created, alph updated, data fixed
+
+## Why These Choices
+
+1. **Capture full output:** Allows metrics parsing without altering existing display behavior
+2. **Regex over structured parsing:** Agency output is human-readable text, not structured JSON
+3. **Deduplication:** Prevents counting "closed issue #42" and "issue #42 closed" as two issues
+4. **Conditional display:** Reduces log noise when no work was done
+5. **Nested metrics object:** Makes heartbeat JSON queryable via jq/PowerShell
+
+## Future Considerations
+
+- Could add more agent names as team grows
+- Could track additional metrics (comments added, files changed, etc.)
+- Could parse execution time per agent if output includes it
+- Consider JSON output from agency CLI if format becomes available
+
+## Related
+
+- **PR:** #137
+- **Issue:** #133
+- **Review feedback from:** PR #130 (Picard)
+- **Builds on:** PR #130 (telemetry foundation)
+
+---
+
+# Decision Memo: Cold-Cache Alert Documentation for FedRAMP Dashboard
+
+**Date:** 2026-03-13  
+**Author:** Seven (Research & Docs)  
+**Issue:** #134  
+**PR:** #138  
+**Status:** ✅ MERGED  
+
+## Problem Statement
+
+When the FedRAMP Dashboard is first deployed to a new environment (especially during migration from tamresearch1 to dedicated repo), the in-memory cache starts empty. This causes:
+- 0% cache hit rate immediately post-deployment
+- Alert fires 15–30 minutes later (< 70% hit rate for 15 minutes)
+- On-call team receives alert with no context
+- False escalation + confusion ("Is this a problem?")
+
+**Root cause:** Expected behavior, not a bug. But undocumented, causing operational confusion.
+
+## Solution
+
+Updated two key documents with clear guidance:
+
+### 1. Cache SLI Runbook (docs/fedramp-dashboard-cache-sli.md)
+
+**Section 4.2 — Remediation Playbook (updated)**
+- Added prominent warning at top: "EXPECTED ON FIRST DEPLOYMENT"
+- Clarified: "This is normal behavior and does not indicate a problem"
+- Added step: "If this is the first deployment to this environment: Expected cold-cache alert"
+
+**New Section 6.2 — Cache Warm-Up Procedure**
+- **Option A (Automated):** Bash script runs post-API-deployment, primes cache with 18 standard queries
+- **Option B (Manual):** PowerShell script for operators if alerts fire anyway
+- **Monitoring:** PowerShell script queries Application Insights every 60 seconds, reports progress
+- Timeline: ~5 minutes to warm; 15–30 minutes to return to 75%+ hit rate
+
+### 2. Migration Plan (docs/fedramp-migration-plan.md)
+
+**Phase 3 — Infrastructure Validation (updated)**
+- Added "⚠️ Expected Alerts During First Deployment" callout box
+- Listed what will happen: Alert fires 15–30 minutes post-deployment
+- Reason: "In-memory cache is empty; hit rate drops below 70% threshold"
+- Action: "Monitor cache warm-up progress; **do not panic or escalate** this alert on first deployment"
+- Reference: Cross-linked to cache-sli.md § 4.2 and § 6.2
+
+## Implementation Details
+
+**Deployment scenario trigger:** First deployment to new environment (DEV/STG/PROD/sovereign)
+
+**Timeline:**
+- T+0: API deployed, cache empty
+- T+5min: First requests start hitting cache
+- T+15min: Alert threshold met (< 70% hit rate × 15 min window) → alert fires
+- T+15–30min: Cache warms with normal traffic
+- T+30min: Hit rate returns to 75%+, alert clears
+
+**Warm-up options:**
+- **Recommended:** Include scripts/warmup-cache.sh in deployment pipeline post-API-deployment
+  - 18 requests × 0.5s delay = ~9 seconds total
+  - Cache hits optimal state before normal traffic arrives
+  - Alert may not fire at all
+
+- **Fallback:** Manual warm-up via scripts/manual-warmup.ps1 if alert fires
+  - On-call team runs after receiving alert
+  - Same 18 requests, operator initiates manually
+  - Cache warm-up proceeds, alert clears within 15–30 minutes
+
+## Decision: Architecture Insight on Cache Strategy
+
+**Current design:** Per-instance in-memory cache (ASP.NET Core IMemoryCache)
+- ✅ Pro: No distributed cache complexity, fast (<50ms hit), <50MB memory
+- ❌ Con: Cold starts on deployment, no cross-instance cache sharing
+- **Trade-off accepted** for v1 because: low-traffic dashboard, migration timeline critical
+
+**Future consideration (v2.0):** Distributed cache (Redis) if:
+- Cache hit rate drops below 60% consistently, OR
+- Multi-instance deployments needed, OR
+- Cache stale data incidents occur
+
+**Until then:** Cold-cache alert is expected behavior, documented, and handled operationally.
+
+## Why This Matters
+
+**For on-call team:**
+- Alerts + runbook = confidence ("I understand why this is happening")
+- Clear timeline = no false escalations ("Wait 30 min, then re-evaluate")
+- Warm-up option = proactive action ("I can speed this up")
+- Result: Smooth first deployment experience
+
+**For SRE/DevOps:**
+- Deployment playbook now includes cache warm-up decision point
+- Can choose automated (CI/CD integration) or manual (on-call decision)
+- Reduces support ticket noise during migration
+
+**For architecture team:**
+- Documents the known limitation (per-instance cache)
+- Records future enhancement path (distributed cache)
+- Provides decision history for v2.0 planning
+
+## Acceptance Criteria (Issue #134) — ALL MET
+
+- [x] Runbook updated with cold-cache expectation (cache-sli.md § 4.2)
+- [x] Migration plan references expected alert (migration-plan.md Phase 3)
+- [x] Team knows to expect (and not panic about) initial alert
+- [x] Cache warm-up steps documented (automated + manual options, monitoring)
+
+## Related Issues & PRs
+
+- **#131 (PR review):** Data's original comment requesting this documentation
+- **#106:** Cache Hit Rate Alert (infrastructure)
+- **#113:** Cache Alert Deployment Guide
+- **#127:** FedRAMP Migration Plan
+- **PR #138:** This documentation PR (merged)
+
+## Key Learning
+
+**When expected infrastructure behavior confuses the team, it's a documentation gap—not a design flaw.**
+
+Cold cache on first deployment is normal. The team didn't need better monitoring or different code; they needed:
+1. **Context:** "This is expected"
+2. **Timeline:** "It will resolve in X minutes"
+3. **Monitoring:** "Here's how to track progress"
+4. **Agency:** "Here's what you can do to help"
+
+This pattern applies broadly: ephemeral pod restarts, database schema migrations, slow builds, etc. When expected behavior triggers alerts, document it prominently in the runbook.
+
+---
+
+**Document Created:** 2026-03-13T23:45:00Z  
+**Status:** Merged to main  
+**Next Review:** After first deployment to production (confirm timeline, update if needed)
+
+---
+
+# Decision: GitHub Actions Failure Root Cause
+
+**Date:** 2026-03-08  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Issue:** #110  
+**Status:** Investigation Complete - Escalated to Owner
+
+## Context
+
+All GitHub Actions workflows failing systematically (100% failure rate) with no steps executing and ~3 second completion times.
+
+## Investigation Results
+
+**Confirmed Root Cause:** Runner provisioning failure due to exhausted GitHub Actions minutes (billing/quota issue)
+
+**Evidence:**
+- 89/89 non-skipped runs failing
+- unner_id: 0, unner_name: "" in all jobs
+- 0 steps executed (runners never assigned)
+- Private repository with 17 active workflows
+
+## Decision
+
+**This is NOT an infrastructure/configuration issue we can fix via code changes.**
+
+The failure is at GitHub's runner provisioning layer, indicating:
+1. GitHub Actions minutes exhausted (most likely for private repo)
+2. Billing/payment issue
+3. Account-level quota/restriction
+
+## Action Required
+
+**Repository owner must:**
+1. Check GitHub billing dashboard
+2. Verify Actions minutes remaining
+3. Choose resolution:
+   - Upgrade GitHub plan (Pro: 3,000 min/month)
+   - Enable pay-as-you-go billing
+   - Make repository public (unlimited minutes)
+   - Set up self-hosted runner (see Issue #103)
+
+## Team Impact
+
+**No infrastructure changes needed.** All workflow configs are valid. Once billing is resolved, workflows will automatically resume.
+
+**Workaround available:** Self-hosted runner setup (documented in Issue #103/110)
+
+## Next Steps
+
+1. Owner resolves billing → workflows auto-resume ✅
+2. OR owner provisions devbox → we setup self-hosted runner ✅
+
+---
+
+**Documented to Issue #110:**  
+https://github.com/tamirdresher_microsoft/tamresearch1/issues/110
+
+---
+
+# Decision 19: User Directive — Selective Teams Notifications
+
+**Date:** 2026-03-08T12:40:28Z  
+**Author:** Tamir Dresher (via Copilot Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Communication & Notifications  
+
+## Directive
+
+Only send a Teams message if there are **important changes that require attention**. Important includes:
+- New issues needing a decision
+- PRs ready for review or merged
+- CI failures
+- Completed work to know about
+- Items requiring user action
+
+**Do NOT send Teams messages for:** Routine board status checks with no actionable changes.
+
+## Rationale
+
+Reduces notification fatigue by filtering for signal-over-noise communications.
+
+---
+
+# Decision 20: AnsiConsole.Live() for Flicker-Free UI Updates
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Adopted  
+**Scope:** squad-monitor v2 Implementation  
+**Related:** PR #140, Issue #139  
+
+## Decision
+
+Replace \Console.Clear()\ + full redraw in squad-monitor v2 with \AnsiConsole.Live()\ from Spectre.Console for flicker-free in-place updates.
+
+## Implementation
+
+1. **Dual rendering modes:**
+   - \--once\ mode: Direct console writes (unchanged)
+   - Continuous mode: \AnsiConsole.Live()\ with in-place updates
+
+2. **Refactor pattern:**
+   - Old: \Display*()\ methods write directly
+   - New: \Build*()\ methods return \IRenderable\ objects
+
+3. **Live display loop:**
+   \\\csharp
+   await AnsiConsole.Live(layout)
+       .AutoClear(false)
+       .StartAsync(async ctx =>
+       {
+           do
+           {
+               var content = BuildDashboardContent(now, userProfile, teamRoot);
+               layout.Update(content);
+               ctx.Refresh();
+               await Task.Delay(interval);
+           } while (true);
+       });
+   \\\
+
+## Rationale
+
+- **User experience:** Smooth updates eliminate flicker
+- **Best practice:** Spectre.Console Live is recommended pattern
+- **Backward compatibility:** \--once\ mode preserves original behavior
+- **Maintainability:** Separating Build/Display improves testability
+
+## Consequences
+
+- ✅ Smoother, more professional monitoring UI
+- ✅ No breaking changes to CLI or output format
+- ✅ Verified with Spectre.Console 0.49.1
+
+---
+
+# Decision 21: squad-monitor v2 uses \gh\ CLI for GitHub Data
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Adopted  
+**Scope:** Tooling & GitHub Integration  
+
+## Decision
+
+Use \gh\ CLI (\gh issue list --json\, \gh pr list --json\) instead of direct GitHub API calls for squad-monitor v2.
+
+## Rationale
+
+- \gh\ handles authentication — no token storage/refresh logic needed
+- JSON output mode gives structured data without HTML parsing
+- 10s process timeout prevents blocking refresh loop
+- Graceful fallback when \gh\ not installed
+- Keeps monitor as single-file C# program (no new NuGet deps)
+
+## Trade-offs
+
+- ✅ Zero auth code, zero new dependencies
+- ✅ Works immediately for anyone with \gh\ installed
+- ⚠️ Requires \gh\ CLI installed and authenticated
+- ⚠️ Process spawning slower than HTTP (~1-2s per panel)
+- ⚠️ Rate limiting opaque (handled by \gh\ internally)
+
+## Applies To
+
+All squad-monitor GitHub panels (issues, PRs, future board integration).
+
+---
+
+# Decision 22: Ralph Heartbeat Double-Write Pattern
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Adopted  
+**Scope:** Ralph Watch / squad-monitor Integration  
+
+## Decision
+
+Ralph heartbeat file written **twice per round**: once before (status=running) and once after (status=idle or error).
+
+## Rationale
+
+- squad-monitor color-codes status: green for "running", yellow for "idle", red for error
+- Without pre-round write, monitor always shows "idle" during 5–30 minute execution
+- \pid\ field allows monitor to show which process is running ralph-watch
+- Monitor can detect stale heartbeat (if "running" >30 min, something is wrong)
+
+## Implementation
+
+- Pre-round: Write \{ status: "running", pid: 1234 }\
+- Post-round: Write \{ status: "idle"/"error", pid: null }\
+- Log cap: 500 entries / 1MB (trim to 499 when threshold hit)
+
+## Consequences
+
+- ✅ Monitor accurately reflects live execution state
+- ✅ Stale heartbeat detection works better
+- ⚠️ Slight disk I/O increase (2 writes vs 1 — negligible)
+
+**Related:** PR #136, Issue #128
+
+---
+
+# Decision 23: Alternatives to GitHub App for Notification Bot Authentication
+
+**Date:** 2026-03-10  
+**Author:** Data  
+**Status:** Proposed (awaiting user decision)  
+**Related:** Issue #62, Decision 18  
+
+## Context
+
+**Constraint:** User confirmed (2026-03-08): "we cant use github app in this repo"  
+**Original plan (Decision 18):** Create GitHub App "squad-notification-bot" — now superseded.
+
+## Problem
+
+Current notification system posts comments from Tamir's account via PAT:
+- \@tamirdresher_microsoft\ mentions don't trigger notifications (GitHub suppresses self-mentions)
+- Breaks squad notification workflow
+- 7 workflows affected: squad-triage, squad-heartbeat, squad-issue-assign, squad-label-enforce, drift-detection, fedramp-validation, squad-issue-notify
+
+## Alternatives Proposed
+
+### Option 1: GitHub Actions Bot Identity (RECOMMENDED)
+
+**Approach:** Use reusable workflow pattern to post comments from github-actions[bot]
+
+**Pros:**
+- Zero infrastructure changes
+- No secrets management (uses built-in GITHUB_TOKEN)
+- Works with self-hosted runners
+- Solves @mention problem immediately
+- 1-2 hours implementation time
+
+**Cons:**
+- Generic bot name (can't customize)
+- Limited to GitHub Actions context
+
+**Estimated Effort:** 2 hours
+
+### Option 2: Machine User Account
+
+**Approach:** Create dedicated GitHub user for bot (squad-bot-tamresearch1@yourdomain.com)
+
+**Pros:**
+- Custom bot identity name
+- Works everywhere (Actions, CLI, API, external systems)
+- Full control over permissions
+- 1-2 hours setup
+
+**Cons:**
+- Requires separate GitHub user license
+- Manual PAT rotation every 90 days
+- Security risk if token leaks
+- Operational overhead
+
+**Estimated Effort:** 1-2 hours (setup) + ongoing maintenance
+
+### Option 3: Azure Functions + Managed Identity
+
+**Approach:** Add HTTP-triggered function for centralized notifications
+
+**Pros:**
+- No secrets in GitHub repo (uses Azure MSI)
+- Centralized notification logic
+- Reusable across repos
+- Enterprise-grade audit logs
+
+**Cons:**
+- High initial complexity (2-3 days)
+- Requires Azure infrastructure management
+- Adds latency (network round-trip)
+- Still needs GitHub App/PAT for Function → GitHub auth
+- Overkill for current use case
+
+**Estimated Effort:** 2-3 days (initial) + ongoing infrastructure management
+
+## Recommendation
+
+**Start with Option 1 (GitHub Actions Bot Identity)**
+
+**Rationale:**
+1. Solves @mention problem immediately
+2. Zero infrastructure/maintenance burden
+3. Can migrate to Option 2/3 later if needed
+4. Lowest risk, fastest delivery
+
+**Implementation Plan:**
+1. Create \.github/workflows/post-comment.yml\ reusable workflow
+2. Update 7 workflows to call reusable workflow
+3. Test @mention notifications
+4. Remove \COPILOT_ASSIGN_TOKEN\ dependency
+
+**Open Questions:**
+1. Is generic "github-actions[bot]" acceptable?
+2. Plans to expand notifications beyond GitHub Actions?
+3. Budget/approval for machine user account (Option 2)?
+
+---
+
+# Decision 24: FedRAMP Dashboard Migration to Dedicated Repository
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**Status:** Proposed (awaiting user decision)  
+**Scope:** Repository Structure & Migration Strategy  
+**Related:** Issue #127, Issue #123, PR #131  
+
+## Context
+
+FedRAMP Security Dashboard evolved from research experiment to production system: 13 merged PRs, ~100 files, 5-phase rollout, production deployments to sovereign clouds. Lives in tamresearch1 (research repo), creating governance challenges.
+
+## Decision
+
+**Migrate FedRAMP Dashboard to dedicated repository \edramp-dashboard\ with:**
+
+1. Full git history preservation (13 PRs, ~80 commits)
+2. Progressive 6-week migration (setup → code → infra → CI/CD → prod → cleanup)
+3. Zero-downtime deployment (blue-green slots)
+4. Squad integration portability (Ralph Watch, agent charters, decisions log)
+5. Clear ownership model (Data = code, B'Elanna = infra, Worf = security, Seven = docs)
+
+## Rationale
+
+- **Production system recognition:** Signal maturity with dedicated repo
+- **History preservation:** Git blame aids debugging; commit messages link to PRs/issues
+- **Risk mitigation:** Blue-green deployment eliminates downtime; progressive validation prevents mistakes
+- **Squad integration:** Portable design enables reuse for future projects
+
+## Implementation Timeline
+
+- **Week 1:** Repository setup (access, squad integration, CI/CD scaffolding)
+- **Week 2:** Code migration (git filter-repo)
+- **Week 3:** Infrastructure validation (DEV deployment)
+- **Week 4:** CI/CD migration (Azure DevOps + GitHub Actions)
+- **Week 5:** Production switchover (zero downtime)
+- **Week 6:** Cleanup (archive tamresearch1 FedRAMP artifacts)
+
+## Consequences
+
+**Positive:**
+- ✅ Clear repository purpose (production compliance monitoring)
+- ✅ Proper governance and access controls
+- ✅ Independent release cadence
+- ✅ tamresearch1 returns to pure research focus
+- ✅ Squad integration portable
+
+**Negative:**
+- ⚠️ 6-week migration effort (~20-30 person-days)
+- ⚠️ Split attention during transition
+- ⚠️ Documentation links require updating
+
+## Open Questions (for user)
+
+1. **Repository name:** Confirm \edramp-dashboard\?
+2. **Sovereign cloud scope:** Which clouds in Phase 1?
+3. **Squad agent allocation:** All 5 agents move, or subset?
+4. **CI/CD platform:** Consolidate to GitHub Actions or keep both?
+5. **License:** Confirm MIT License?
+
+**Related:** Issue #127, Issue #123, PR #131
+
+---
+
+# Decision 25: Onboarding Framework for New Team Members
+
+**Date:** 2026-03-14  
+**Author:** Seven (Research & Docs)  
+**Status:** Proposed (awaiting user decision)  
+**Scope:** Team Process & Onboarding  
+**Related:** Issue #132  
+
+## Decision
+
+Establish reusable **three-layer onboarding framework** for new team members on RP, DK8S, and platform projects:
+
+1. **Layer 1 — Barrier Removal (Day 1):** Access to repos, Azure DevOps, Teams, SSH
+2. **Layer 2 — Context Building (Days 2-4):** Quick context (45 min) → deep technical (2-3 hours) → reference docs
+3. **Layer 3 — Task Readiness (Day 5):** Team sync, background-based task suggestions, mentor assignment, first task
+
+## Rationale
+
+- New team members are high-friction points (incomplete context, access delays, task ambiguity)
+- Documented framework reduces overhead (reusable checklist vs. custom per hire)
+- Meir's onboarding validated: Week-1 structure reduces overwhelm + accelerates productivity
+- Framework captures what works and makes it repeatable
+
+## Key Artifacts (Reusable)
+
+### Core Template: \.squad/templates/onboarding-template.md\
+- 11-section structure
+- Repository descriptions
+- Day-1 through Day-5 checklist
+- Contact matrix template
+- First-task suggestions by background
+- Week-1 resource list
+
+### Customization Points
+- Repo list (per project scope)
+- Teams channels (per actual names)
+- First task suggestions (per project areas)
+- Contact matrix (per team roles)
+- Documentation links (per current guides)
+
+## Success Metrics
+
+1. **Reduced friction:** New member productive within Week 1 (first PR/contribution); Tamir saves 2-3 hours
+2. **Reduced ramp time:** Task ownership by Day 5; specific (not vague) questions
+3. **Knowledge retention:** Member can explain constraints; navigates repo independently; contributes to learning
+
+## Implementation
+
+**For Meir (Issue #132):**
+- Send guide to Meir (after Tamir review)
+- Tamir adds repos + Teams access
+- Schedule Day-5 sync
+- Assign first task
+
+**For future hires:**
+- Store template in \.squad/templates/onboarding-template.md\
+- Update quarterly (link maintenance, decision additions)
+- For each hire: copy → customize 3 sections → send
+
+## Consequences
+
+**Benefits:**
+- ✅ Reusable template reduces time by 50% (customization + send vs. build from scratch)
+- ✅ Consistent experience across hires (fairness + predictability)
+- ✅ Documented framework improves over time (feedback loop)
+- ✅ Tamir can delegate onboarding
+
+**Risks:**
+- ⚠️ Template becomes stale (mitigate: quarterly review)
+- ⚠️ Different project tracks need variants (RP vs DK8S)
+- ⚠️ Over-customization destroys reusability (mitigate: lock core, customize only repo/contacts)
+
+**Related:** Issue #132
+

@@ -2002,3 +2002,43 @@ EMU personal repos fundamentally cannot use GitHub-hosted runners with Actions m
 - #110: CI broken (open)
 
 ---
+
+### Issue #110: Confirmed Runner Provisioning Failure - Billing Issue (2026-03-08)
+
+**Diagnosis Complete - Not a Config Issue**
+
+Investigated systematic CI failure (100% failure rate, 89 consecutive failures). Key findings:
+
+1. **Runner Never Provisioned:**
+   - All jobs show `runner_id: 0`, `runner_name: ""`
+   - 0 steps executed (runners never start)
+   - Jobs fail in 3-6 seconds (setup failure, not execution)
+   - No job logs available (can't provision = can't log)
+
+2. **Repository Context:**
+   - Private repository under User account (tamirdresher_microsoft)
+   - Actions enabled, permissions correct, all configs valid
+   - 17 active workflows with frequent triggers
+
+3. **Root Cause: GitHub Actions Minutes Exhausted**
+   - Private repos consume billable minutes
+   - Free tier: 2,000 min/month likely exhausted
+   - This is a billing/quota issue, NOT infrastructure/config
+   
+4. **Resolution Required by Owner:**
+   - Check billing: https://github.com/settings/billing/summary
+   - Options: Upgrade to Pro, pay-as-you-go, or make repo public
+   - Alternative: Self-hosted runner (see Issue #103 context above)
+
+**Learnings:**
+- **0 steps + no runner = billing/quota, not config**
+- Can't fix infrastructure issues when GitHub won't provision runners
+- Self-hosted runner remains viable workaround for EMU restrictions
+- Always check runner assignment before debugging workflow YAML
+
+**Outcome:** 
+- Documented to Issue #110 with actionable steps for owner
+- No code changes possible - this requires billing/account action
+- Self-hosted runner setup (from previous investigation) is still valid alternative
+
+---

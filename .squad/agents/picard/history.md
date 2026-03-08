@@ -1479,3 +1479,26 @@ Data delivered solid implementation of Issue #128 requirements:
 **Decision:** Approved and merged. The core observability requirements are met. Detailed output parsing can be a future enhancement if needed.
 
 **Pattern observed:** Data consistently delivers robust error handling. The webhook file checks are exemplary - fail gracefully, log clearly, continue execution.
+
+## 2026-03-08T10:47:43Z — Round 1-2 Team Orchestration
+
+**Scribe Capture:**
+- Seven: Completed Meir onboarding draft (#132) ✅ → Establishes reusable 3-layer framework
+- Data: Completed GitHub Apps research (#62) ✅ → Posted 3 alternatives to GitHub App auth
+- Picard: Completed GitHub-Teams evaluation (#44) ✅ → Recommended closure with pending-user
+- Data: In progress on Squad Monitor v2 panels (#141) 🔄 → Designing real-time telemetry UI
+- Coordinator: Marked #110, #103, #17 with appropriate status labels + explanatory comments
+
+**New Decisions Added to decisions.md:**
+- Decision 19: Teams notification selectivity (user directive)
+- Decision 20: AnsiConsole.Live() for flicker-free UI
+- Decision 21: gh CLI for GitHub data (squad-monitor v2)
+- Decision 22: Ralph heartbeat double-write pattern
+- Decision 23: GitHub App alternatives (3 options)
+- Decision 24: FedRAMP dashboard repo migration (6-week plan)
+- Decision 25: Onboarding framework for new hires (3-layer model)
+
+**Inbox Processed:** 7 items merged to decisions.md, deleted from inbox
+
+**Session Log:** \.squad/log/2026-03-08T10-47-43Z-ralph-round1-2.md\ created
+

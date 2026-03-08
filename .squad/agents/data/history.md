@@ -18,6 +18,41 @@
 
 ## Learnings
 
+### 2026-03-08: ralph-watch metrics parsing — Agency output analysis (PR #137)
+
+**Task:** Parse Squad CLI agency output to extract detailed work metrics (issues closed, PRs merged, agent actions) per round.
+**Delivered:** Parse-AgencyMetrics function + metrics in all telemetry outputs (logs, heartbeat, Teams alerts).
+**Key decisions:**
+- Capture agency output via `2>&1 | Out-String` for full text processing
+- Use regex patterns for resilient parsing:
+  - Issues: `(?i)(clos(e|ed|ing)|fix(ed)?|resolv(e|ed|ing))\s+(issue\s+)?#?\d+`
+  - PRs: `(?i)merg(e|ed|ing)\s+(pr|pull\s+request)\s+#?\d+`
+  - Agent actions: `(?i)(squad|ralph|data|seven|picard|worf|...)\s+(created?|updated?|...)`
+- Deduplicate by number (hashtable) to avoid counting same issue/PR multiple times
+- Metrics added to heartbeat JSON as nested object for structured querying
+- Metrics appear in log lines only when non-zero to reduce noise
+- Teams alert includes metrics when present, showing work done before failure
+
+**Branch:** `squad/133-parse-ralph-watch-metrics` | **PR:** #137 | **Issue:** #133
+
+---
+
+### 2026-03-08: ralph-watch v8 — Telemetry for squad-monitor v2 (PR #136)
+
+**Task:** Update ralph-watch.ps1 to write heartbeat + log files that squad-monitor v2 reads.
+**Delivered:** v7→v8 upgrade with before/after heartbeat, log rotation, PS 5.1 fixes.
+**Key decisions:**
+- Heartbeat written twice per round (before=running, after=idle/error) so monitor shows real-time status
+- Added `status` and `pid` fields — monitor v2's heartbeat panel reads both
+- Log rotation capped at 500 entries or 1MB — prevents unbounded disk growth
+- Teams alert threshold fixed to >= 3 (was > 3, requiring 4 failures)
+- All `2>&1` replaced with `2>$null` for PS 5.1 compat (ErrorRecord objects break piping)
+- `[ordered]@{}` for heartbeat JSON to guarantee field ordering
+
+**Branch:** `squad/128-ralph-telemetry` | **PR:** #136 | **Issue:** #128
+
+---
+
 ### 2026-03-08: squad-monitor v2 — Multi-Panel Dashboard (PR #135)
 
 **Task:** Upgrade squad-monitor from orchestration-log-only to a multi-source dashboard.
@@ -1867,3 +1902,94 @@ This is now a standing directive for all agents, documented in the teams-monitor
 5. **Consecutive failure threshold**: >3 prevents alert fatigue from transient failures (network blips, pod restarts). Adjust based on observed failure patterns.
 
 ---
+
+### 2026-03-08: squad-monitor AnsiConsole.Live() — Flicker-free UI (PR #140)
+
+**Task:** Replace Console.Clear() + full redraw with AnsiConsole.Live() for smooth in-place updates.
+**Delivered:** Refactored rendering system using Spectre.Console Live display API.
+**Key decisions:**
+- Split rendering into two modes: runOnce (direct write) and continuous (Live display)
+- Refactored all Display* methods (void) into Build* methods returning IRenderable
+- Used List<IRenderable> + Rows to compose sections into single renderable tree
+- Added using Spectre.Console.Rendering for IRenderable type
+- BuildDashboardContent orchestrates all sections: header, Ralph heartbeat, Ralph log, GitHub issues, PRs, orchestration log
+- Live display uses AnsiConsole.Live(layout).StartAsync() with ctx.Refresh() in loop
+- Fixed property reference: AgentActivity.Task not Activity (matched existing record definition)
+- Build verified successfully before commit
+
+**File paths:**
+- .squad/tools/squad-monitor/Program.cs — main refactor
+- .squad/tools/squad-monitor/squad-monitor.csproj — already had Spectre.Console 0.49.1
+
+**Branch:** squad/139-ansiconsole-live | **PR:** #140 | **Issue:** #139
+
+---
+
+### 2026-03-10: Issue #62 — Alternatives to GitHub App Authentication
+
+**Task:** Propose alternatives to GitHub App authentication for notification bot after user confirmed GitHub Apps can't be used in this repo.
+
+**Context:**
+- Original plan (Decision 18): Use GitHub App so comments come from "squad-notification-bot[bot]" instead of user account
+- Problem: GitHub suppresses self-mentions → @tamirdresher_microsoft tags don't trigger notifications when posted by same user
+- Constraint: Can't use GitHub Apps in this repository
+- Current auth: Mix of GITHUB_TOKEN (built-in) and COPILOT_ASSIGN_TOKEN (user PAT)
+- 7 workflows post comments: squad-triage, squad-heartbeat, squad-issue-assign, squad-label-enforce, drift-detection, fedramp-validation, squad-issue-notify
+
+**Alternatives Proposed (Issue #62 comment):**
+
+1. **GitHub Actions Bot Identity (RECOMMENDED)**
+   - Use reusable workflow pattern with github-actions[bot] identity
+   - Zero infrastructure, no secrets, 2-hour implementation
+   - Cons: Generic bot name, Actions-only
+   
+2. **Machine User Account**
+   - Dedicated GitHub user with PAT token
+   - Custom bot name, works everywhere
+   - Cons: License cost, PAT rotation, operational overhead
+   
+3. **Azure Functions + Managed Identity**
+   - Extend existing /functions/ infrastructure
+   - Enterprise-grade with MSI, no secrets in GitHub
+   - Cons: High complexity (2-3 days), adds latency, still needs GitHub auth
+
+**Recommendation:** Option 1 (GitHub Actions bot identity) — solves @mention problem immediately with minimal complexity.
+
+**Learnings:**
+- **Reusable workflows** can change the identity of comments by using workflow_call trigger with explicit permissions
+- github-actions[bot] is a built-in identity that bypasses self-mention suppression
+- Azure Functions already in codebase (AlertProcessor, ArchiveExpiredResults) can be leveraged for notification expansion
+- GitHub's mention suppression is per-account, not per-token — even PAT from same user won't enable notifications
+
+**Files Referenced:**
+- `.github/workflows/squad-*.yml` — 7 workflows that post comments
+- `/functions/*.cs` — Existing Azure Functions infrastructure
+- `.squad/decisions.md` — Decision 18 (GitHub App plan)
+- `.squad/team.md`, `.squad/routing.md` — Squad member and routing config
+
+**Issue:** #62 | **Comment:** https://github.com/tamirdresher_microsoft/tamresearch1/issues/62#issuecomment-4018819029
+
+---
+
+## 2026-03-08T10:47:43Z — Round 1-2 Team Orchestration
+
+**Scribe Capture:**
+- Seven: Completed Meir onboarding draft (#132) ✅ → Establishes reusable 3-layer framework
+- Data: Completed GitHub Apps research (#62) ✅ → Posted 3 alternatives to GitHub App auth
+- Picard: Completed GitHub-Teams evaluation (#44) ✅ → Recommended closure with pending-user
+- Data: In progress on Squad Monitor v2 panels (#141) 🔄 → Designing real-time telemetry UI
+- Coordinator: Marked #110, #103, #17 with appropriate status labels + explanatory comments
+
+**New Decisions Added to decisions.md:**
+- Decision 19: Teams notification selectivity (user directive)
+- Decision 20: AnsiConsole.Live() for flicker-free UI
+- Decision 21: gh CLI for GitHub data (squad-monitor v2)
+- Decision 22: Ralph heartbeat double-write pattern
+- Decision 23: GitHub App alternatives (3 options)
+- Decision 24: FedRAMP dashboard repo migration (6-week plan)
+- Decision 25: Onboarding framework for new hires (3-layer model)
+
+**Inbox Processed:** 7 items merged to decisions.md, deleted from inbox
+
+**Session Log:** \.squad/log/2026-03-08T10-47-43Z-ralph-round1-2.md\ created
+

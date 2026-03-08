@@ -1766,6 +1766,46 @@ Common Azure CLI extension issues should be caught early in setup. The README pr
 
 **Task:** Investigate all GitHub Actions workflows failing with 0 steps executed, ~3 second completion time. Respond to Tamir's question about Microsoft EMU and free Actions minutes.
 
+---
+
+### 2026-03-08: Issue #116 — Cache Review Automation (CLOSED)
+
+**Task:** Automate monthly cache reviews so Tamir doesn't need to remember April 1 trigger date.  
+**Challenge:** GitHub Actions won't work due to EMU restrictions (Issue #110).
+
+**Solution Delivered:**
+- **Created:** `scripts/scheduled-cache-review.ps1` — PowerShell script that auto-creates cache review issues on the 1st of each month
+- **Integrated:** Modified `ralph-watch.ps1` to call scheduled tasks before each agency round
+- **Features:**
+  - Runs monthly on day 1
+  - Auto-generates issue with full checklist (Kusto queries, agenda, deliverables)
+  - Labels: `squad`, `squad:data`, `squad:belanna`
+  - Adds to project board as "Todo"
+  - Testing: `.\scripts\scheduled-cache-review.ps1 -Force`
+
+**Architecture Decision:**
+- **Why ralph-watch over GitHub Actions:** EMU restrictions prevent GitHub-hosted runners from provisioning. Ralph-watch runs locally and has access to gh CLI, git, and all repo permissions.
+- **Why PowerShell script:** Integrates naturally with existing ralph-watch.ps1 infrastructure, uses gh CLI for issue/board management, easy to test and debug.
+
+**Outcome:**
+- Issue #116 closed and moved to Done
+- Zero manual intervention needed going forward
+- Consistent monthly cache reviews starting April 1, 2026
+
+**Key Files:**
+- `scripts/scheduled-cache-review.ps1` — Monthly automation script
+- `ralph-watch.ps1` — Updated to call scheduled tasks (line ~302)
+- `.squad/skills/github-project-board/SKILL.md` — Board management commands
+
+**Pattern for Future Use:**
+Any scheduled/periodic automation should follow this pattern:
+1. Create PowerShell script in `scripts/` directory
+2. Add check + invocation in ralph-watch.ps1 before agency call
+3. Use gh CLI for GitHub operations (issues, boards, labels)
+4. Include `-Force` flag for manual testing
+
+---
+
 **Root Cause Identified:**
 Repository `tamresearch1` is owned by **personal user account** (`tamirdresher_microsoft`), not an organization. As of August 2023, GitHub policy change: **EMU-managed user namespace repositories cannot use GitHub-hosted runners at all.**
 

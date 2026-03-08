@@ -301,6 +301,20 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
+    # Step 0: Run scheduled tasks (cache reviews, etc.)
+    Write-Host "[$timestamp] Checking scheduled tasks..." -ForegroundColor Yellow
+    $scheduledScriptPath = Join-Path (Get-Location) "scripts\scheduled-cache-review.ps1"
+    if (Test-Path $scheduledScriptPath) {
+        try {
+            & $scheduledScriptPath
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "[$timestamp] Scheduled tasks completed" -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "[$timestamp] Warning: Scheduled task failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+    
     # Step 1: Update the repo to ensure we have the latest code
     Write-Host "[$timestamp] Pulling latest changes..." -ForegroundColor Yellow
     try {

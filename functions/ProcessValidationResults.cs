@@ -243,17 +243,33 @@ namespace FedRampDashboard.Functions
 
         private async Task WriteToCosmosDbAsync(CosmosDocument document)
         {
-            var container = _cosmosClient.GetContainer(_cosmosDbDatabase, _cosmosDbContainer);
+            var writeStart = DateTime.UtcNow;
             
-            // Upsert document (handles deduplication via ID)
-            var response = await container.UpsertItemAsync(
-                document,
-                new PartitionKey(document.Environment));
-            
-            _logger.LogInformation(
-                "Wrote to Cosmos DB: {Id}, RU charge: {RU}",
-                document.Id,
-                response.RequestCharge);
+            try
+            {
+                var container = _cosmosClient.GetContainer(_cosmosDbDatabase, _cosmosDbContainer);
+                
+                // Upsert document (handles deduplication via ID)
+                var response = await container.UpsertItemAsync(
+                    document,
+                    new PartitionKey(document.Environment));
+                
+                var duration = (DateTime.UtcNow - writeStart).TotalMilliseconds;
+                _logger.LogInformation(
+                    "Cosmos DB write successful: DocumentId={Id}, Size={SizeKb}KB, RU={RU}, Duration={Duration}ms",
+                    document.Id,
+                    document.ToString()?.Length / 1024 ?? 0,
+                    response.RequestCharge,
+                    duration);
+            }
+            catch (Exception ex)
+            {
+                var duration = (DateTime.UtcNow - writeStart).TotalMilliseconds;
+                _logger.LogError(ex,
+                    "Error writing document {Id} to Cosmos DB: Duration={Duration}ms",
+                    document.Id, duration);
+                throw;
+            }
         }
 
         private async Task WriteToLogAnalyticsAsync(ValidationResult result)
@@ -262,6 +278,8 @@ namespace FedRampDashboard.Functions
             {
                 return;
             }
+            
+            var writeStart = DateTime.UtcNow;
             
             try
             {
@@ -289,12 +307,18 @@ namespace FedRampDashboard.Functions
                     "Custom-ControlValidationResults_CL",
                     logEntry);
                 
-                _logger.LogInformation("Wrote to Log Analytics");
+                var duration = (DateTime.UtcNow - writeStart).TotalMilliseconds;
+                _logger.LogInformation(
+                    "Log Analytics write successful: ControlId={ControlId}, Status={Status}, Duration={Duration}ms",
+                    result.ControlId, result.Status, duration);
             }
             catch (Exception ex)
             {
+                var duration = (DateTime.UtcNow - writeStart).TotalMilliseconds;
                 // Log but don't fail - Log Analytics ingestion is best-effort
-                _logger.LogWarning(ex, "Failed to write to Log Analytics");
+                _logger.LogWarning(ex, 
+                    "Failed to write to Log Analytics: ControlId={ControlId}, Duration={Duration}ms",
+                    result.ControlId, duration);
             }
         }
 

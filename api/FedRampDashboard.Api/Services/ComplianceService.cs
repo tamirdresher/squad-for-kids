@@ -21,8 +21,12 @@ public class ComplianceService : IComplianceService
 
     public async Task<ComplianceStatus> GetComplianceStatusAsync(string? environment, string? controlCategory)
     {
-        var parameters = new Dictionary<string, object>();
-        var filters = new List<string> { "TimeGenerated > ago(24h)" };
+        var parameters = new Dictionary<string, object>
+        {
+            ["time_window"] = "24h"
+        };
+        
+        var filters = new List<string> { "TimeGenerated > ago(time_window)" };
         
         if (!string.IsNullOrEmpty(environment) && environment != "ALL")
         {
@@ -36,10 +40,17 @@ public class ComplianceService : IComplianceService
             parameters["category_param"] = controlCategory;
         }
 
+        // Use parameterized query - no string interpolation for security
         var whereClause = string.Join(" and ", filters);
-        var kqlQuery = $@"
+        var kqlQuery = @"
             ControlValidationResults_CL
-            | where {whereClause}
+            | where TimeGenerated > ago(24h)
+            " + (string.IsNullOrEmpty(environment) || environment == "ALL" 
+                ? "" 
+                : "| where Environment_s == @environment_param") + 
+            (string.IsNullOrEmpty(controlCategory) 
+                ? "" 
+                : "| where ControlCategory_s == @category_param") + @"
             | summarize 
                 pass_count = countif(Status_s == 'PASS'),
                 fail_count = countif(Status_s == 'FAIL')
@@ -67,22 +78,23 @@ public class ComplianceService : IComplianceService
             _ => "1d"
         };
 
+        // Use parameterized query - no string interpolation for security
         var parameters = new Dictionary<string, object>
         {
-            ["start_date"] = startDate,
-            ["end_date"] = endDate,
+            ["start_date"] = startDate.ToString("O"),
+            ["end_date"] = endDate.ToString("O"),
             ["environment_param"] = environment,
             ["bin_size"] = binSize
         };
 
         var kqlQuery = @"
             ControlValidationResults_CL
-            | where TimeGenerated between (start_date .. end_date)
-            | where Environment_s == environment_param
+            | where TimeGenerated >= @start_date and TimeGenerated <= @end_date
+            | where Environment_s == @environment_param
             | summarize 
                 pass_count = countif(Status_s == 'PASS'),
                 fail_count = countif(Status_s == 'FAIL')
-              by bin(TimeGenerated, bin_size)
+              by bin(TimeGenerated, " + binSize + @")
             | extend compliance_rate = todouble(pass_count) / (pass_count + fail_count) * 100
             | order by TimeGenerated asc
         ";

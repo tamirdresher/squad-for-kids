@@ -112,56 +112,76 @@ namespace FedRampDashboard.Functions
 
         private async Task<long> ArchiveDocumentAsync(BlobContainerClient containerClient, Document document)
         {
-            // Extract timestamp for organizing blobs by date
-            var timestamp = document.GetPropertyValue<DateTime>("timestamp");
-            var year = timestamp.Year;
-            var month = timestamp.Month.ToString("D2");
-            var day = timestamp.Day.ToString("D2");
-
-            // Build blob path: validation-archive/YYYY/MM/DD/{environment}/{document-id}.json.gz
-            var environment = document.GetPropertyValue<string>("environment");
-            var blobName = $"{year}/{month}/{day}/{environment}/{document.Id}.json.gz";
-
-            var blobClient = containerClient.GetBlobClient(blobName);
-
-            // Serialize document to JSON
-            var json = JsonSerializer.Serialize(document, new JsonSerializerOptions 
-            { 
-                WriteIndented = false 
-            });
-
-            // Compress with gzip
-            using var compressedStream = new MemoryStream();
-            using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Compress, leaveOpen: true))
-            using (var writer = new StreamWriter(gzipStream, Encoding.UTF8))
+            var archiveStart = DateTime.UtcNow;
+            
+            try
             {
-                await writer.WriteAsync(json);
-            }
-            compressedStream.Position = 0;
+                // Extract timestamp for organizing blobs by date
+                var timestamp = document.GetPropertyValue<DateTime>("timestamp");
+                var year = timestamp.Year;
+                var month = timestamp.Month.ToString("D2");
+                var day = timestamp.Day.ToString("D2");
 
-            // Upload to Blob Storage with Archive access tier
-            var uploadOptions = new BlobUploadOptions
-            {
-                AccessTier = Azure.Storage.Blobs.Models.AccessTier.Archive,
-                Metadata = new Dictionary<string, string>
+                // Build blob path: validation-archive/YYYY/MM/DD/{environment}/{document-id}.json.gz
+                var environment = document.GetPropertyValue<string>("environment");
+                var blobName = $"{year}/{month}/{day}/{environment}/{document.Id}.json.gz";
+
+                var blobClient = containerClient.GetBlobClient(blobName);
+
+                // Serialize document to JSON
+                var json = JsonSerializer.Serialize(document, new JsonSerializerOptions 
+                { 
+                    WriteIndented = false 
+                });
+
+                // Compress with gzip
+                using var compressedStream = new MemoryStream();
+                using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Compress, leaveOpen: true))
+                using (var writer = new StreamWriter(gzipStream, Encoding.UTF8))
                 {
-                    { "environment", environment },
-                    { "control_id", document.GetPropertyValue<string>("control")?.GetPropertyValue<string>("id") ?? "unknown" },
-                    { "timestamp", timestamp.ToString("O") },
-                    { "archived_at", DateTimeOffset.UtcNow.ToString("O") }
+                    await writer.WriteAsync(json);
                 }
-            };
+                compressedStream.Position = 0;
 
-            await blobClient.UploadAsync(compressedStream, uploadOptions);
+                var originalSizeBytes = Encoding.UTF8.GetByteCount(json);
+                var compressedSizeBytes = compressedStream.Length;
+                var compressionRatio = (1.0 - (double)compressedSizeBytes / originalSizeBytes) * 100;
 
-            var compressedSize = compressedStream.Length;
-            _logger.LogInformation(
-                "Archived document {DocumentId} to blob {BlobName} (size: {Size} bytes compressed)",
-                document.Id,
-                blobName,
-                compressedSize);
+                // Upload to Blob Storage with Archive access tier
+                var uploadOptions = new BlobUploadOptions
+                {
+                    AccessTier = Azure.Storage.Blobs.Models.AccessTier.Archive,
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "environment", environment },
+                        { "control_id", document.GetPropertyValue<string>("control")?.GetPropertyValue<string>("id") ?? "unknown" },
+                        { "timestamp", timestamp.ToString("O") },
+                        { "archived_at", DateTimeOffset.UtcNow.ToString("O") }
+                    }
+                };
 
-            return compressedSize;
+                await blobClient.UploadAsync(compressedStream, uploadOptions);
+
+                var duration = (DateTime.UtcNow - archiveStart).TotalMilliseconds;
+                _logger.LogInformation(
+                    "Document archived successfully: DocumentId={DocumentId}, BlobPath={BlobPath}, OriginalSize={OriginalSizeKb}KB, CompressedSize={CompressedSizeKb}KB, Compression={CompressionRatio}%, AccessTier=Archive, Duration={Duration}ms",
+                    document.Id,
+                    blobName,
+                    originalSizeBytes / 1024,
+                    compressedSizeBytes / 1024,
+                    compressionRatio,
+                    duration);
+
+                return compressedSizeBytes;
+            }
+            catch (Exception ex)
+            {
+                var duration = (DateTime.UtcNow - archiveStart).TotalMilliseconds;
+                _logger.LogError(ex,
+                    "Error archiving document {DocumentId}: Duration={Duration}ms",
+                    document.Id, duration);
+                throw;
+            }
         }
     }
 

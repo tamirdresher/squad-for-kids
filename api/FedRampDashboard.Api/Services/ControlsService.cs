@@ -32,11 +32,12 @@ public class ControlsService : IControlsService
         int limit, 
         int offset)
     {
+        // Use parameterized query - no string interpolation for security
         var parameters = new Dictionary<string, object>
         {
-            ["control_id"] = controlId,
-            ["limit_val"] = limit,
-            ["offset_val"] = offset
+            ["@control_id"] = controlId,
+            ["@limit_val"] = limit,
+            ["@offset_val"] = offset
         };
         
         var filters = new List<string> { "c.control.id = @control_id" };
@@ -44,31 +45,31 @@ public class ControlsService : IControlsService
         if (!string.IsNullOrEmpty(environment) && environment != "ALL")
         {
             filters.Add("c.environment = @environment_param");
-            parameters["environment_param"] = environment;
+            parameters["@environment_param"] = environment;
         }
         
         if (!string.IsNullOrEmpty(status) && status != "ALL")
         {
             filters.Add("c.test.status = @status_param");
-            parameters["status_param"] = status;
+            parameters["@status_param"] = status;
         }
         
         if (startDate.HasValue)
         {
             filters.Add("c.timestamp >= @start_date");
-            parameters["start_date"] = startDate.Value;
+            parameters["@start_date"] = startDate.Value;
         }
         
         if (endDate.HasValue)
         {
             filters.Add("c.timestamp <= @end_date");
-            parameters["end_date"] = endDate.Value;
+            parameters["@end_date"] = endDate.Value;
         }
 
         var whereClause = string.Join(" AND ", filters);
-        var query = $@"
+        var query = @"
             SELECT * FROM c 
-            WHERE {whereClause}
+            WHERE " + whereClause + @"
             ORDER BY c.timestamp DESC
             OFFSET @offset_val LIMIT @limit_val
         ";

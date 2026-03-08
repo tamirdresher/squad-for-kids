@@ -334,21 +334,14 @@ while ($true) {
     }
     
     try {
-        # Run agency directly — NO PIPES. Pipes cause agency to hang on exit.
-        # Use cmd /c with chcp 65001 for UTF-8 output
-        $tempOut = Join-Path $env:TEMP "ralph-round-$round.txt"
-        cmd /c "chcp 65001 >nul && agency copilot --yolo --autopilot --agent squad -p `"$prompt`" > `"$tempOut`" 2>&1"
+        # Call agency DIRECTLY — no pipes, no Start-Process, no cmd /c
+        # This is the only approach that reliably returns control
+        agency copilot --yolo --autopilot --agent squad -p $prompt
         $exitCode = $LASTEXITCODE
+        $agencyOutput = ""  # Can't capture without pipes — but that's OK
         # Display output after completion
-        if (Test-Path $tempOut) {
-            Get-Content $tempOut -Encoding utf8 | Write-Host
-            $agencyOutput = Get-Content $tempOut -Raw -Encoding utf8 -ErrorAction SilentlyContinue
-            Remove-Item $tempOut -Force -ErrorAction SilentlyContinue
-        } else {
-            $agencyOutput = ""
-        }
+        # No file cleanup needed — output streamed to console directly
         
-        $exitCode = $LASTEXITCODE
         if ($exitCode -eq 0) {
             Write-Host "[$timestamp] Round $round completed successfully" -ForegroundColor Green
             $consecutiveFailures = 0

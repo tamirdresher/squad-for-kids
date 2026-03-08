@@ -5268,3 +5268,8 @@ requests
 - docs/fedramp-dashboard-cache-sli.md (14.4KB)
 - infrastructure/phase4-cache-alert.bicep (2.9KB)
 - docs/fedramp/cache-reviews/template.md (6.1KB)
+
+### 2026-03-08: Fix notification workflow agent regex
+**By:** Data (Code Expert)
+**What:** Updated agent name matching regex in squad-issue-notify.yml to match current team roster (added B'Elanna, Seven; removed Geordi, Troi)
+**Why:** Workflow was detecting wrong agent names in issue close notifications

@@ -1363,3 +1363,78 @@ When user corrects attribution mid-research ("Ralph is not something I invented"
 - Await Tamir's feedback on corrected analysis
 - If approved, refine patent claims to focus exclusively on integration pattern and methodology
 - Consider provisional filing timeline (must file before public disclosure)
+
+### 2026-03-08: Issue #109 — Visibility & Visualization Tools Research
+
+**Context:** Tamir asked (issue #109): "does it make sense to use github project or something else to have visibility and visualization on the work we do here?"
+
+**Task:** Evaluate GitHub Projects vs. alternatives (Trello, Linear, Notion) for squad work visibility.
+
+**Actions Taken:**
+1. Web search on GitHub Projects 2024 features (board views, custom fields, automation, label filtering)
+2. Web search on Trello vs Linear vs Notion comparison for AI/dev team workflows
+3. Web search on GitHub Projects auto-population and label-based filtering
+4. Analyzed current squad setup: GitHub Issues + squad/status labels + Ralph Watch (5-min loop) + orchestration logs
+5. Posted comprehensive research analysis to issue #109 with recommendation
+
+**Key Findings:**
+
+1. **Current Squad Workflow Strengths:**
+   - GitHub Issues with `squad:*` and `status:*` labels = robust work queue
+   - Ralph Watch (5-min loop) = automated monitoring, triage, PR merges
+   - Orchestration logs = full execution audit trail
+   - gh CLI integration = full automation capability
+
+2. **Visibility Gap:**
+   - No visual board/Kanban view
+   - Can't see work distribution at a glance (e.g., "how many blocked?", "what's each agent working on?")
+   - No milestone/sprint planning view
+   - Hard to see team capacity balance
+
+3. **GitHub Projects Capabilities (2024):**
+   - Multiple views: Kanban, table, roadmap, calendar
+   - Auto-add workflows: Can auto-populate from `label:squad` filter
+   - Custom fields: Priority, Story Points, Agent, Sprint, etc.
+   - Automation: Auto-move cards on issue state changes
+   - Scale: Up to 50K items
+   - **Key limitation**: Workflow limits (Free = 1 auto-add), existing issues not retroactively added
+
+4. **Alternative Tools:**
+   - **Trello**: Visual Kanban, simple, but requires sync with GitHub (duplicate work)
+   - **Linear**: Fast, dev-focused, excellent for sprints, but paid (/user/mo) and requires migration
+   - **Notion**: All-in-one (docs + tasks), powerful AI, but requires sync and has learning curve
+
+5. **Recommendation: GitHub Projects**
+   - **Why**: Zero migration (uses existing labels/issues), free, native integration, Ralph-compatible
+   - **Setup**: Auto-add `label:squad` workflow + views (Kanban by status, Agent view, Timeline)
+   - **Effort**: 1-2 hours setup + 30-min one-time import of 13 existing issues
+   - **Maintenance**: ~0 (auto-add handles new issues)
+
+**Comment Posted:**
+- Full analysis on issue #109 with current state, tool comparison, recommendation
+- Implementation plan: Create project → auto-add workflow → configure views → one-time import
+- Fallback options if GitHub Projects insufficient after trial
+
+**Learnings:**
+
+1. **Research scope matters** — Picard's triage defined clear scope (current state, gap, tools, recommendation), which structured the research effectively
+
+2. **Label-based workflows are powerful** — Our existing `squad:*` and `status:*` labels can drive automated project board population without changing workflow
+
+3. **Native integration > feature richness** — GitHub Projects may be less polished than Linear, but zero sync overhead and native integration outweigh UI polish for this use case
+
+4. **Visibility tools should visualize, not duplicate** — Best tools show what's already happening (GitHub issues/PRs), not create parallel tracking systems
+
+5. **Free tier limitations matter** — GitHub Projects free tier = 1 auto-add workflow; can't split by agent unless we upgrade or use GitHub Actions
+
+6. **Ralph compatibility is critical** — Any visibility tool must work WITH Ralph's label-driven orchestration, not replace it
+
+7. **Research deliverable format** — Structured analysis (Current State → Tool Eval → Alternatives → Recommendation → Summary Table) makes decision-making easier for stakeholder
+
+**Status:** ✅ COMPLETE
+
+**Next Steps:**
+- Await Tamir's decision on GitHub Projects
+- If approved: assist with setup (create project, configure views, write one-time import script)
+- If hybrid approach: consider Notion for team wiki + GitHub Projects for task tracking
+

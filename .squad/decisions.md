@@ -837,6 +837,130 @@ Do **NOT** try to:
 - Double down on persistent memory and decision traces
 - Make agent history.md and decisions.md *first-class artifacts*, not hidden state
 - Promote "reasoning trace > compressed fact" as core philosophy (aligns with agent knowledge transfer patterns)
+
+---
+
+## Decision 16: GitHub Codespaces Enablement Blocker
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna Torres (Infrastructure Expert)  
+**Status:** ⏳ Pending User Action  
+**Scope:** Development Environment Setup  
+**Related Issue:** #167
+
+### Context
+
+Tamir requested Codespace creation and running the "claw experiment" in Codespace. PR #171 (Codespaces configuration) was already merged with full `.devcontainer/` setup.
+
+### Finding: Feature Not Enabled
+
+When attempting to create a Codespace via CLI:
+```
+Error: There are no available machine types for this repository
+```
+
+**Root Cause:** GitHub Codespaces feature is NOT enabled for the repository yet. This is a GitHub org-level setting that requires manual activation.
+
+### Required Action (by Tamir)
+
+1. Navigate to: `https://github.com/tamirdresher_microsoft/tamresearch1/settings/codespaces`
+2. Enable "GitHub Codespaces"
+3. Verify machine types are available (minimum: 2-core, 4-core standard)
+4. Once enabled, notify B'Elanna to proceed with automation
+
+### Why This Matters (Decision 1.1 Application)
+
+**User-Facing Explanation:** GitHub Codespaces is a cloud development environment feature that GitHub must explicitly enable for each repository. Even though we've created the configuration files (PR #171), GitHub won't provision containers until the feature is turned on in your repo's settings. This is a one-time admin action.
+
+### Label Applied
+
+- `status:pending-user` — Requires GitHub org configuration before automation can proceed
+
+---
+
+## Decision 17: Squad Issue Notification Workflow — SyntaxError Resolution
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**Status:** ✅ CLOSED  
+**Scope:** CI/CD & Squad Operations  
+**Related Issue:** #177
+
+### Root Cause
+
+The "Squad Issue Notification" workflow (`squad-issue-notify.yml`) was failing on all issue-closed events with a JavaScript syntax error. Line 38 contained an unescaped apostrophe in a JavaScript string literal:
+```javascript
+const agentMatch = lastComment.match(/(Picard|Data|B'Elanna|Seven|Worf)/i);
+```
+
+The apostrophe in `B'Elanna` terminated the single-quoted string prematurely, causing a parser error.
+
+### Decision
+
+**Fix at Source:** Escape the apostrophe in the regex pattern.
+
+### Action Taken
+
+- Fixed in commit 697632b (`.github/workflows/squad-issue-notify.yml`)
+- Escape sequence applied: `B\\'Elanna`
+- Issue closed with explanation
+- Project board updated to Done
+
+### Outcome
+
+The workflow now correctly parses agent names when processing closed issues and sends Teams notifications as intended.
+
+### Lessons & Recommendations
+
+1. **Inline JavaScript in GitHub Actions:** Always escape special characters in regex patterns used within GitHub Actions scripts
+2. **Test Automation:** Consider adding a linting step for inline scripts to prevent similar failures
+3. **Data's Review:** Review other `.github/workflows/*.yml` files for similar unescaped characters in inline scripts to prevent future failures
+
+---
+
+## Decision 18: Squad-IRL Community Contribution Strategy
+
+**Date:** January 2025  
+**Author:** Seven (Research & Docs)  
+**Status:** ✅ Implemented  
+**Scope:** Community Engagement & Reusability  
+**Related Issue:** #161
+
+### Context
+
+Squad research identified 8 high-impact use cases across DevOps, release management, and team coordination. These patterns address a gap in the community Squad-IRL library, which focuses primarily on consumer/commerce scenarios.
+
+### Decision
+
+**Publish all 8 use cases to bradygaster/Squad-IRL as GitHub issues formatted as user stories, sanitized of internal context, ready for community triage and contribution.**
+
+### Rationale
+
+1. **Market Gap:** Squad-IRL samples were enterprise/SaaS-focused; DevOps/infrastructure patterns were underrepresented.
+2. **Reusability:** These use cases are generic patterns that many engineering teams face, not org-specific.
+3. **Community Benefit:** Public issues lower barrier to contribution and establish clear scope for contributors.
+4. **Validation Without Commitment:** Issues remain community-owned; internal pilots can proceed independently.
+
+### Implementation Results
+
+- ✅ 8 public issues filed in bradygaster/Squad-IRL (bradygaster/Squad-IRL #1–#8)
+- ✅ All issues formatted as user stories with descriptions, workflows, team composition, tier classification
+- ✅ Sanitized of tamresearch1 refs, internal issue numbers, proprietary details
+- ✅ tamresearch1#161 closed with comment linking all 8 Squad-IRL issues
+- ✅ Project Board updated to "Done" status
+- ✅ Zero proprietary data leaked; context generalized appropriately
+
+### Outcomes
+
+- ✅ Stateful team coordination patterns available for public contribution
+- ✅ Community feedback loop established for pattern validation
+- ✅ Internal pilots and community contributions run in parallel (no blocking)
+
+### Future Considerations
+
+1. **Contributor Feedback:** Monitor Squad-IRL issue activity to prioritize internal pilots
+2. **Implementation Contribution:** If internal pilot succeeds, consider contributing agent code/samples to Squad-IRL
+3. **Tiering Validation:** Test whether Tier 1/2/3 classification aligns with community contributor interest
 - Build Squad Places integration *deeper* (agents discovering each other's decision traces is powerful)
 
 #### 2. Market Positioning
@@ -10513,4 +10637,143 @@ Issue #119 ("Tech Debt: Refactor AlertHelper tests to reference original source"
 
 ---
 
+
+
+## Decision: AlertHelper Test Refactor Pattern
+
+# Decision: AlertHelper Test Refactor Pattern
+
+**Date:** 2026-03-08  
+**Agent:** Data  
+**Issue:** #119  
+**Status:** Implemented
+
+## Context
+
+During PR #118 review, the Functions project had build errors that prevented the test project from referencing it. The AlertHelper.cs file was copied into the test project as a temporary workaround to unblock the PR.
+
+After PR #172 fixed the Functions build, issue #119 was created to clean up this technical debt.
+
+## Decision
+
+**Resolved tech debt by:**
+1. Removing the copied `AlertHelper.cs` from `tests\FedRampDashboard.Functions.Tests\`
+2. Adding a proper `<ProjectReference>` to `FedRampDashboard.Functions.csproj`
+3. Validating that all 47 tests pass against the original source
+
+## Rationale
+
+- **Project references are the correct pattern** for sharing code between projects in the same solution
+- File duplication creates maintenance burden (two copies to update)
+- Direct reference ensures tests validate actual production code, not a snapshot
+- Clean separation of concerns: Functions project owns AlertHelper, tests reference it
+
+## Validation
+
+- All 47 AlertHelper tests pass with project reference
+- Build succeeds with no additional dependencies required
+- Zero behavior changes in tests or implementation
+
+## Team Pattern
+
+**Going forward:**
+- Avoid file duplication across projects
+- Use project references for shared production code
+- If a project has build errors, fix the root cause rather than working around it
+- Document temporary workarounds as tech debt issues for cleanup
+
+## Related
+
+- PR #118: Original workaround implementation
+- PR #172: Functions build fix that unblocked this work
+- PR #175: This refactor
+
+
+---
+
+## Decision: GitHub Actions Workflow Bug Fixes
+
+# Decision: GitHub Actions Workflow Bug Fixes
+
+**Date:** 2026-03-13  
+**Agent:** Data  
+**Issues:** #170, #173, #174  
+**PR:** #176
+
+## Context
+
+Two categories of workflow failures were blocking Squad automation:
+1. Guard workflow returning 403 errors when checking PR file changes
+2. Member name matching failures for team members with special characters (apostrophes)
+
+## Decisions
+
+### 1. Explicit Permissions Declaration for Guard Workflow
+
+**Decision:** Add explicit `permissions:` section to `squad-main-guard.yml` workflow.
+
+**Rationale:**
+- GitHub Actions default permissions are restrictive
+- API calls like `github.rest.pulls.listFiles()` require explicit permission grants
+- Even though workflow runs in-repo, it doesn't automatically inherit all access
+
+**Implementation:**
+```yaml
+permissions:
+  pull-requests: read
+  contents: read
+```
+
+**Impact:** Guard workflow can now successfully read PR file lists without 403 errors.
+
+### 2. Name Normalization Function for Label Matching
+
+**Decision:** Implement consistent name normalization across all workflows that parse team.md by stripping non-alphanumeric characters.
+
+**Rationale:**
+- Team member display names can contain special characters (apostrophes, unicode, hyphens, etc.)
+- GitHub labels are lowercase and typically alphanumeric
+- Case-insensitive comparison alone is insufficient
+- Need deterministic transformation from display name → label → back to display name
+
+**Implementation:**
+```javascript
+const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+```
+
+**Applied to:**
+- `squad-issue-assign.yml` - member lookup when label applied
+- `sync-squad-labels.yml` - label generation from team roster
+- `squad-triage.yml` - member list display and assignment
+
+**Example:**
+- Display name: "B'Elanna"
+- Label: `squad:belanna`
+- Normalized: "belanna" (matches both)
+
+**Impact:** Issues labeled `squad:belanna` now correctly route to "B'Elanna" team member.
+
+## Alternatives Considered
+
+### For Bug 1 (Permissions)
+- **Use GITHUB_TOKEN with elevated permissions:** Rejected because default token should be sufficient; explicit declaration is better than token escalation
+- **Switch to PAT:** Rejected because this is unnecessary complexity for read-only operations
+
+### For Bug 2 (Name Matching)
+- **Require team.md names to be alphanumeric only:** Rejected because it restricts naming conventions (Star Trek characters have apostrophes)
+- **URL-encode special characters in labels:** Rejected because GitHub labels don't support URL encoding, and it would make labels unreadable
+- **Strip only apostrophes:** Rejected because it wouldn't handle other special characters (hyphens, accents, unicode) that might appear in names
+
+## Future Considerations
+
+1. **Validation on team.md changes:** Could add a workflow that validates all team member names normalize to unique label names (no collisions)
+2. **Centralized normalize function:** If workflows grow more complex, extract normalize() into a shared GitHub Action
+3. **Monitor for other permission issues:** Guard workflow fix suggests other workflows may have similar implicit permission assumptions
+
+## References
+
+- Issue #170: Member name matching with apostrophes
+- Issue #173: Guard workflow 403 on pulls.listFiles()
+- Issue #174: Duplicate of #173
+- PR #176: Fix workflow bugs: guard permissions and member name matching
 

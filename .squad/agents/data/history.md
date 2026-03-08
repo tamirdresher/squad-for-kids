@@ -390,6 +390,36 @@ var value = root.TryGetProperty("property", out var prop) ? prop.GetString() : d
 
 **Branch**: squad/106-caching-sli
 **PR**: #108
+
+---
+
+### 2026-03-08: Squad Issue Notification Workflow SyntaxError Fix (Issue #179)
+
+**Task:** Fix SyntaxError in `.github/workflows/squad-issue-notify.yml` when issue bodies contain backticks, code blocks, or special JavaScript characters.
+
+**Root Cause:** The workflow used `actions/github-script@v7` with direct template literal interpolation of issue content (title, summary, URL) into the JavaScript code. When issue bodies contained backticks or other special characters, they broke the JavaScript syntax: `SyntaxError: Unexpected identifier 'squad'`.
+
+**Solution:** Pass all issue data through environment variables instead of inline interpolation:
+- Added `env:` block with `ISSUE_NUMBER`, `ISSUE_TITLE`, `ISSUE_URL`, `CLOSED_BY`, `AGENT`, `SUMMARY`
+- Changed inline `${{ steps.issue.outputs.title }}` to `process.env.ISSUE_TITLE`
+- Changed template literal `` `#${{ steps.issue.outputs.number }}` `` to `` `#${process.env.ISSUE_NUMBER}` ``
+- Most critical: Changed `` text: `${{ steps.issue.outputs.summary }}` `` to `text: process.env.SUMMARY` (no template literal)
+
+**Why This Works:**
+- Environment variables in GitHub Actions are passed as plain strings to the process environment
+- `process.env.SUMMARY` reads the string value safely without parsing it as JavaScript
+- Special characters (backticks, quotes, braces) remain as data, not code
+
+**Key Learning:**
+- Never interpolate user-controlled content directly into `actions/github-script` inline scripts
+- Always use environment variables for content that may contain special characters
+- Pattern: `env: { CONTENT: ${{ ... }} }` → `process.env.CONTENT` in script
+- Template literals are safe when using `process.env` variables (`` `#${process.env.NUM}` ``)
+- Non-template properties should use `process.env` directly (`text: process.env.SUMMARY`)
+
+**Branch:** squad/179-fix-notification-workflow  
+**PR:** #180  
+**Issue:** #179
 **Outcome**: Complete post-merge monitoring established. Alert deployable to all environments. Monthly review process institutionalized.
 
 ---

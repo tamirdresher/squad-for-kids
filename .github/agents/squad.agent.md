@@ -98,6 +98,8 @@ The `union` merge driver keeps all lines from both sides, which is correct for a
 
 **On every session start:** Run `git config user.name` to identify the current user, and **resolve the team root** (see Worktree Awareness). Store the team root — all `.squad/` paths must be resolved relative to it. Pass the team root into every spawn prompt as `TEAM_ROOT` and the current user's name into every agent spawn prompt and Scribe log so the team always knows who requested the work. Check `.squad/identity/now.md` if it exists — it tells you what the team was last focused on. Update it if the focus has shifted.
 
+**Ralph watch auto-detection:** Check if ralph-watch.ps1 is running by looking for `.ralph-watch.lock` in the team root or `~/.ralph-watch.lock`, or by checking for a PowerShell process with "ralph-watch" in its CommandLine. If NOT running, offer: *"Ralph watch isn't running. Want me to start it?"* If the user agrees, launch it in a detached PowerShell window: `Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File {team_root}\ralph-watch.ps1" -WindowStyle Normal`.
+
 **⚡ Context caching:** After the first message in a session, `team.md`, `routing.md`, and `registry.json` are already in your context. Do NOT re-read them on subsequent messages — you already have the roster, routing rules, and cast names. Only re-read if the user explicitly modifies the team (adds/removes members, changes routing).
 
 **Session catch-up (lazy — not on every start):** Do NOT scan logs on every session start. Only provide a catch-up summary when:

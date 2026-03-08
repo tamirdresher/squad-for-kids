@@ -359,6 +359,21 @@ The Squad Places network has 8 enlisted squads sharing substantive knowledge on 
 
 ---
 
+### 2026-03-08: Squad Monitor Dashboard — Issue #144 Fix & PR #148 Merge
+
+**Task**: Fix empty panels in squad-monitor dashboard (Issue #144) and clean replacement for PR #147.
+
+**Delivered**:
+- Fixed Recently Merged PRs panel data source
+- Fixed Ralph metrics display (null coalescing for missing values)
+- Added better fallbacks for missing data
+- Cleaner code compared to dirty PR #147
+- PR #148 merged successfully
+
+**Status**: ✅ Completed — Issue #144 closed
+
+---
+
 ### 2026-03-06: Heartbeat Workflow Fix for Reliable CI/CD Signals (Issue #5)
 
 **Context:** Background task (Mode: background) to fix heartbeat workflow generating false alerts.
@@ -1992,4 +2007,27 @@ This is now a standing directive for all agents, documented in the teams-monitor
 **Inbox Processed:** 7 items merged to decisions.md, deleted from inbox
 
 **Session Log:** \.squad/log/2026-03-08T10-47-43Z-ralph-round1-2.md\ created
+---
 
+### 2026-03-13: Issue #146 - Squad agent auto-detect ralph-watch on session start
+
+**Task**: Add auto-detection logic to Squad coordinator so it checks if ralph-watch.ps1 is running on every session start and offers to launch it if not.
+
+**Delivered**:
+- Modified .github/agents/squad.agent.md (Team Mode section)
+- Added ralph-watch auto-detection paragraph after "On every session start"
+- Coordinator now checks for .ralph-watch.lock file or running PowerShell process
+- Offers user: "Ralph watch isn't running. Want me to start it?"
+- Launches in detached PowerShell window if user agrees
+
+**Implementation Details**:
+- Lock file locations: team root .ralph-watch.lock or ~/.ralph-watch.lock
+- Process detection: PowerShell process with "ralph-watch" in CommandLine
+- Launch command: Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File {team_root}\ralph-watch.ps1" -WindowStyle Normal
+- Ensures persistent monitoring loop is always active when users work
+
+**Key Decision**: Placed auto-detection in Team Mode section, right after user identification and team root resolution. This ensures ralph-watch check happens before any agent spawning, making it part of the coordinator's core session initialization.
+
+**Branch**: squad/146-ralph-autodetect
+**PR**: #149
+**Outcome**: Squad coordinator now auto-detects and offers to start ralph-watch, closing the gap where users forgot to launch the monitoring loop manually.

@@ -888,3 +888,100 @@ Applied `status:in-progress` — stakeholder mapping complete; technical analysi
 **Pattern Identified:** Scribe's role in cross-agent context delivery reduces review cycle time. When Worf documented decision to inbox, Picard had full context before reviewing code. No "why did you choose static methods?" delays; design was pre-approved via decision record.
 
 ---
+---
+
+### 2026-03-08: Azure Monitor Prometheus Security Review (Issue #150, Krishna's PRs)
+
+**Context:** Reviewed 3 Azure DevOps PRs implementing Azure Monitor Prometheus integration for DK8S clusters. PRs covered tenant-level subscription configuration, ARM templates for AMPLS/Private Endpoint/DCR Association, and pipeline integration.
+
+**Mission:** Security assessment from IAM, network security, subscription isolation, managed identity, DNS security, secrets management, and compliance perspectives.
+
+**Key Security Findings:**
+
+1. **✅ Architecturally Sound Implementation**
+   - System-assigned managed identity (zero credential management)
+   - AMPLS + Private Endpoint (data plane isolation, no public internet traversal)
+   - `Monitoring Metrics Publisher` RBAC (least-privilege, write-only metrics)
+   - Private DNS Zone for privatelink.monitor.azure.com (DNS isolation)
+   - Shared DCR/DCE/AMW per region (cost-optimized multi-tenancy with RBAC isolation)
+   - Feature flag protection (ENABLE_AZURE_MONITORING)
+
+2. **🟡 Subscription Isolation Concern (MEDIUM Risk)**
+   - Same AZURE_MONITOR_SUBSCRIPTION_ID for DEV and STG environments
+   - Functional but increases blast radius (subscription-level incident affects both)
+   - **Recommendation:** Separate PROD subscription at minimum; consider DEV/STG/PROD isolation for nation-state threat model
+   - **Rationale:** DK8S documented as nation-state target; defense-in-depth favors environment isolation
+
+3. **🟡 Rollback Script Security (Pending Review)**
+   - AzureMonitoringValidation.sh referenced but not provided in PR context
+   - **Critical validations required:** Script must be read-only (no destructive DCR/AMPLS deletion), mask tokens in logs, validate AMPLS connectivity + DNS resolution + managed identity auth
+   - **Blocker:** Must review script before PR #14968532 (pipeline integration) merge
+
+4. **RBAC Deep Dive: `Monitoring Metrics Publisher` Role**
+   - Grants: Microsoft.Insights/Metrics/Write (custom metrics ingestion only)
+   - Does NOT grant: Metrics read, alerting, Application Insights, role assignment
+   - ✅ **Verdict:** Correct least-privilege application; no over-privileging detected
+   - Consistent with team standards (.squad/decisions.md — Azure Functions write-only roles)
+
+5. **Network Security Architecture:**
+   `
+   AKS Metrics Profile → Private Endpoint (VNet-local IP)
+                      → AMPLS (publicNetworkAccess=Disabled)
+                      → DCR (RBAC enforcement)
+                      → AMW (metrics storage)
+   `
+   - ✅ Zero public internet exposure
+   - ✅ TLS + managed identity authentication
+   - ✅ Split-brain DNS protection (Private DNS Zone takes precedence)
+   - ⚠️ **Validation Required:** Confirm AMPLS publicNetworkAccess: Disabled explicit in ARM template
+
+6. **Compliance Alignment:**
+   - ✅ **DK8S Security Baseline:** Managed identity, private networking, zero secrets, least-privilege RBAC
+   - ✅ **Azure Best Practices:** Private Link for data plane, system-assigned MI, resource-scoped roles
+   - ✅ **FedRAMP AC-3/IA-5/SC-7/AU-2:** Role-based access, no shared credentials, boundary protection, audit logging
+
+**Security Verdict:** ✅ **APPROVED WITH MINOR RECOMMENDATIONS**
+
+**Risk Rating:** **LOW to MEDIUM**
+- IAM/RBAC: 🟢 LOW
+- Network Security: 🟢 LOW
+- Subscription Isolation: 🟡 MEDIUM (shared DEV/STG)
+- Managed Identity: 🟢 LOW
+- DNS Security: 🟢 LOW
+- Secrets Management: 🟢 LOW
+- Rollback Security: 🟡 MEDIUM (script not reviewed)
+
+**Recommendations:**
+1. 🟡 **Medium Priority:** Separate AZURE_MONITOR_SUBSCRIPTION_ID_PROD (distinct from DEV/STG) before PROD rollout
+2. 🟡 **Medium Priority:** Security review of AzureMonitoringValidation.sh before PR #14968532 merge
+3. 🟡 **Medium Priority:** Add explicit publicNetworkAccess: Disabled in ARM template (AMPLS)
+4. 🟢 **Low Priority:** Document Private DNS Zone configuration in infrastructure runbook
+5. 🟢 **Low Priority:** Add DNS resolution test (
+slookup) to rollback script
+
+**Pattern Recognition:**
+- **Managed Identity Over Secrets:** Krishna correctly applied zero-credential pattern (aligns with zure-monitor-helper.sh implementation using DefaultAzureCredential)
+- **Private Link for Observability:** AMPLS architecture mirrors existing DK8S patterns (Cosmos DB Private Endpoint, Log Analytics Private Link)
+- **Shared Infrastructure Multi-Tenancy:** DCR/DCE/AMW per region (not per cluster) demonstrates cost-security balance — RBAC + DCR Association enforce tenant isolation without per-resource overhead
+
+**Threat Model Insights:**
+- **Mitigated Threats:** Credential theft (no secrets), MITM (Private Link + TLS), unauthorized ingestion (RBAC), data exfiltration (AMPLS blocks public), lateral movement (identity scoped to metrics write only)
+- **Residual Risks:** Shared DEV/STG subscription blast radius (recommend PROD isolation), rollback script vulnerabilities (pending review)
+
+**Worf's Position:** Implementation is **architecturally secure** and demonstrates mature Azure security understanding. The shared DEV/STG subscription is acceptable given DK8S operational efficiency but not optimal for nation-state threat model. Rollback script must be reviewed for read-only validation (no destructive actions) before pipeline integration.
+
+**Artifacts Created:**
+- .squad/decisions/inbox/worf-pr150-review.md — 23KB comprehensive security assessment with RBAC deep dive, AMPLS architecture diagrams, threat model, compliance mapping, and rollback validation checklist
+
+**Key Learning:** Security reviews should distinguish between *functional* (works correctly) and *optimal* (defense-in-depth) implementations. The shared subscription is functional but sub-optimal from blast radius perspective — framing recommendation as "acceptable with reservation" provides nuanced guidance vs. binary approve/reject.
+
+**Cross-Reference:**
+- Issue #26 (Workload Identity/FIC) — Managed identity pattern consistent; future enhancement could use pod-level Workload Identity for metrics collection granularity
+- .squad/decisions.md (Azure Monitor patterns) — Aligns with existing team standards for managed identity + RBAC
+- zure-monitor-helper.sh — Validates implementation uses DefaultAzureCredential (zero secrets)
+
+**Follow-Up Required:**
+1. Krishna to provide AzureMonitoringValidation.sh for security review (before PR #14968532 merge)
+2. Verify AMPLS ARM template includes publicNetworkAccess: Disabled
+3. Consider PROD subscription separation discussion with B'Elanna (infrastructure owner)
+

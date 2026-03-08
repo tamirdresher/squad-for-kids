@@ -2042,3 +2042,143 @@ Investigated systematic CI failure (100% failure rate, 89 consecutive failures).
 - Self-hosted runner setup (from previous investigation) is still valid alternative
 
 ---
+
+---
+
+### 2026-03-12: Issue #150 — Azure Monitor Prometheus Integration Infrastructure Review
+
+**Task:** Review 3 ADO PRs from Krishna for Azure Monitor Prometheus integration from infrastructure/K8s/cluster provisioning perspective.
+
+**PRs Reviewed:**
+1. PR #14966543 (Infra.K8s.Clusters) — Add AZURE_MONITOR_SUBSCRIPTION_ID to Tenants.json
+2. PR #14968397 (WDATP.Infra.System.Cluster) — ARM templates + GoTemplates + Ev2 specs
+3. PR #14968532 (WDATP.Infra.System.ClusterProvisioning) — Pipeline stage integration
+
+**Review Verdict:** ✅ APPROVE with 4 MINOR CONCERNS (Non-Blocking)
+
+**Infrastructure Assessment:**
+
+1. **Ev2 Pattern Compliance:** ✅ FULLY COMPLIANT
+   - Follows canonical three-repo DK8S pattern (Inventory → ARM → Pipeline)
+   - RolloutSpec variants (per-cluster, per-tenant, per-servicetree) correctly implemented
+   - ServiceModel variants match RolloutSpecs
+   - GoTemplate parameter files correctly read from Tenant-level inventory
+   - ScopeBindings updated for validation script integration
+
+2. **ARM Template Design:** ✅ GOOD
+   - Resource naming follows DK8S conventions: {prefix}-{component}-{environment}-{region}-{cluster}
+   - Parameter handling: All parameters well-documented and sourced from inventory or shared resources
+   - Conditional deployment with feature flags: condition: "[parameters('enableAzureMonitoring')]" correctly applied
+   - AKS metrics profile injection: Correctly enables managed Prometheus metrics profile
+   - Role assignment: Monitoring Metrics Publisher role assigned to AKS managed identity
+
+3. **Pipeline Integration:** ✅ CORRECT
+   - Stage ordering: Workspace_ → Cluster_ → AzureMonitoring_ → [Karpenter_, ArgoCD_, ...] is correct
+   - Dependencies: AzureMonitoring_ depends on Cluster_, downstream stages depend on AzureMonitoring_
+   - Failure behavior: Pipeline stops on AzureMonitoring_ failure (correct blocking behavior)
+   - Pipelines NOT modified: Regional templates, ArgoCD pipelines, Rollback pipelines (correctly excluded)
+
+4. **Cluster Inventory Integration:** ✅ CORRECT
+   - Schema extension: AzureMonitorSubscriptionId follows DK8S inventory patterns (similar to ACR_SUBSCRIPTION)
+   - Tenant-level field: Appropriate for per-region shared resources (DCE, DCR, AMW)
+   - Test data files updated: Ensures schema validation passes in CI/CD
+   - Inventory flow: Tenants.json → GoTemplate → ARM parameters (correct flow)
+
+5. **AMPLS + Private Endpoint:** ⚠️ GOOD with 1 DNS CONCERN
+   - AMPLS configuration: Correct pattern for private endpoint connectivity to Azure Monitor
+   - Private endpoint: Correctly targets AMPLS with groupIds: ['azuremonitor']
+   - **DNS Zone Concern:** Verify privatelink.monitor.azure.com DNS zone is linked to AKS VNet
+   - Metrics flow: AKS → AMPLS → DCE/DCR/AMW (correct architecture)
+
+6. **Rollback Assessment:** ⚠️ PARTIAL COVERAGE
+   - Validation script: AzureMonitoringValidation.sh is detect-only (not remediate)
+   - Script checks flag state vs. reality, exits non-zero on mismatch
+   - Ev2 rollback mechanism: ARM conditional deployment removes resources if flag=false (correct)
+   - Recommendation: Clarify if script should remediate or remain detect-only
+
+**Four Minor Concerns (Non-Blocking):**
+
+1. **DNS Zone VNet Link Verification** — Verify privatelink.monitor.azure.com DNS zone is linked to AKS VNet. Add ARM resource for VNet link if missing.
+
+2. **Role Assignment Timing** — Ensure Monitoring Metrics Publisher role propagates (30-60 seconds) before metrics ingestion. Add dependsOn or delay.
+
+3. **Rollback Script Scope** — Clarify if AzureMonitoringValidation.sh should remediate (remove resources) or just detect mismatches. Current behavior is detect-only.
+
+4. **Pipeline Parallelization Opportunity** — If Karpenter/ArgoCD do not require AzureMonitoring_ to complete, consider parallel deployment to reduce pipeline time.
+
+**Recommendations:**
+
+**Pre-Merge:**
+- Address DNS Zone VNet link verification (critical for private endpoint resolution)
+- Add role assignment timing safeguards (dependsOn or delay)
+
+**Post-Merge:**
+- Test enable → disable → enable cycle in DEV
+- Monitor ARM deployment duration in STG (+2-3 minutes expected)
+- Verify no orphaned resources after disable
+- Verify metrics flow after enable
+
+**Deliverable:** Comprehensive infrastructure review document saved to .squad/decisions/inbox/belanna-pr150-review.md (25KB, 781 lines).
+
+**Learnings:**
+
+1. **DK8S Three-Repo Deployment Pattern:**
+   - Inventory repo (Tenants.json + schema) → ARM template repo (GoTemplates + ARM) → Pipeline repo (Ev2 orchestration)
+   - This pattern allows separation of concerns: inventory management, resource definitions, deployment orchestration
+   - Similar to how Karpenter, ArgoCD, and other cluster features are deployed
+
+2. **Tenant-Level vs. Cluster-Level Inventory Fields:**
+   - **Tenant-level:** Use for shared resources across clusters (e.g., Azure Monitor subscription, shared DCE/DCR/AMW)
+   - **Cluster-level:** Use for cluster-specific resources (e.g., cluster name, region, VNet)
+   - Pattern: Shared resources → Tenant-level, Isolated resources → Cluster-level
+
+3. **ARM Conditional Deployment with Feature Flags:**
+   - Pattern: "condition": "[parameters('enableFeature')]" in ARM template
+   - On disable: ARM does NOT deploy resources (clean state)
+   - On rollback: Set flag to alse, ARM removes resources (automatic cleanup)
+   - This is preferred over manual deletion scripts for feature gating
+
+4. **AMPLS Architecture for Azure Monitor Private Endpoint:**
+   - AMPLS (Azure Monitor Private Link Scope) is the hub for private endpoint connectivity
+   - Links to shared resources: DCE (Data Collection Endpoint), DCR (Data Collection Rule), AMW (Azure Monitor Workspace)
+   - Private endpoint targets AMPLS with groupIds: ['azuremonitor']
+   - DNS zone: privatelink.monitor.azure.com must be linked to AKS VNet for resolution
+   - Pattern: One AMPLS per cluster (or per tenant for efficiency)
+
+5. **Ev2 RolloutSpec Variants:**
+   - **Per-Cluster:** One deployment per cluster (high isolation, high resource count)
+   - **Per-Tenant:** One deployment per tenant (moderate isolation, moderate resource count)
+   - **Per-ServiceTree:** One deployment per service tree (low isolation, low resource count)
+   - Choice depends on blast radius tolerance and resource efficiency trade-offs
+
+6. **Validation Scripts in Ev2 Deployment:**
+   - **Detect-only scripts:** Check state, exit non-zero on mismatch, let Ev2 handle rollback
+   - **Remediate scripts:** Actively fix mismatches (remove resources, deploy resources)
+   - Typical DK8S pattern: Validation scripts are detect-only, Ev2 handles rollback via ServiceModel
+   - Naming: *Validation.sh for detect-only, *Remediation.sh for remediate
+
+7. **Pipeline Stage Dependencies:**
+   - **Serial dependencies:** Use when downstream stages require upstream completion (e.g., Cluster_ → AzureMonitoring_)
+   - **Parallel dependencies:** Use when stages are independent (e.g., AzureMonitoring_ and Karpenter_ could be parallel if no dependency)
+   - Trade-off: Serial = safer (guaranteed ordering), Parallel = faster (reduced pipeline time)
+   - Recommendation: Default to serial unless proven independent, then parallelize for optimization
+
+8. **Role Assignment Timing in ARM Deployments:**
+   - RBAC role assignments take 30-60 seconds to propagate in Azure
+   - If resources depend on role assignment (e.g., metrics ingestion), add:
+     - dependsOn in ARM template to enforce ordering
+     - Or 60-second delay in pipeline after role assignment
+     - Or retry logic for transient 403 errors
+   - Anti-pattern: Assume role assignment is immediate (causes transient failures)
+
+**Pattern Learned: Infrastructure Reviews Focus on Integration Points**
+
+Infrastructure reviews should focus on **integration points** where systems connect:
+1. **Inventory → ARM:** Schema correctness, parameter flow, GoTemplate syntax
+2. **ARM → Azure:** Resource naming, conditional deployment, role assignments
+3. **Azure → Network:** Private endpoints, DNS zones, VNet links
+4. **Pipeline → Ev2:** Stage ordering, dependencies, failure behavior
+5. **Feature Flags → Rollback:** Conditional deployment, validation scripts, Ev2 rollback
+
+**Result:** Review approved with 4 minor concerns. PRs are production-ready after addressing DNS Zone VNet link verification.
+

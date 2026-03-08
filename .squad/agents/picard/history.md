@@ -118,6 +118,111 @@ fedramp-dashboard/
 - CODEOWNERS in new repo enables agent-based code ownership
 - Ralph Watch can monitor multiple repos simultaneously (not covered in this plan but possible)
 
+---
+
+### 2026-03-09: Azure Monitor Prometheus Integration Review — Issue #150
+
+**Context:** Krishna Chaitanya requested architectural review of 3 Azure DevOps PRs implementing Azure Monitor Prometheus metrics collection across DK8s cluster provisioning pipeline.
+
+**Scope:**
+- **PR1 (14966543):** Infra.K8s.Clusters — Add AZURE_MONITOR_SUBSCRIPTION_ID to Tenants.json
+- **PR2 (14968397):** WDATP.Infra.System.Cluster — Add Azure Monitoring ARM templates
+- **PR3 (14968532):** WDATP.Infra.System.ClusterProvisioning — Add AzureMonitoring stage to pipelines
+
+**Architecture Pattern Identified:**
+```
+Configuration Layer (Tenants.json) 
+  → Template Layer (ARM Templates + Ev2 ServiceModels)
+  → Orchestration Layer (Pipeline Stages)
+```
+
+**Resource Ownership Model:**
+- **Shared (Per-Region):** AMW, DCE, DCR owned by ManagedPrometheus team
+- **Dedicated (Per-Cluster):** DCR Association, AMPLS, Private Endpoint, DNS, AKS metrics profile owned by cluster provisioning
+
+**Key Architectural Decisions Validated:**
+
+1. **Subscription Isolation:** AZURE_MONITOR_SUBSCRIPTION_ID (separate from ACR_SUBSCRIPTION)
+   - ✅ Correct: Separates monitoring costs, RBAC, blast radius
+   - Rationale: ACR is pull-heavy/latency-sensitive, Azure Monitor is push-heavy/eventually consistent
+
+2. **Feature Flag Rollout:** ENABLE_AZURE_MONITORING with tenant-level inheritance
+   - ✅ Progressive rollout: DEV → STG → PRD
+   - ✅ Cluster-level opt-out support
+
+3. **Pipeline Dependency Chain:**
+   - Workspace → Cluster → AzureMonitoring → [Karpenter, ArgoCD, InfraMonitoringCrds, ...]
+   - ✅ Sequential (conservative) for initial rollout
+   - ⚠️ Adds ~3-5 minutes deployment time (acceptable, future optimization possible)
+
+4. **Cross-Repo Consistency:**
+   - ✅ Schema evolution: ClustersInventorySchema.json updated before template consumption
+   - ✅ Naming conventions: Template.AzureMonitoring.Metrics.json pattern
+   - ✅ RBAC separation: Monitoring Metrics Publisher in separate template
+
+**Review Findings:**
+
+**✅ Approve with Observations:**
+- All 3 PRs architecturally sound, ready for STG deployment
+- Cross-repo consistency maintained
+- Rollback paths exist (Ev2 validation script)
+- STG.EUS2.9950 deployment validated
+
+**Recommendations:**
+
+*Immediate (Before Merge):*
+1. PR2: Add pre-flight DCR existence check to AzureMonitoringValidation.sh with actionable error messages
+2. PR1, PR3: Merge as-is (backward-compatible changes)
+
+*Post-Merge (Before PRD):*
+3. Rollback testing: Intentional validation failure to verify AKS metrics profile reversion
+4. Documentation: Troubleshooting runbook, opt-out guide, incident response
+5. ManagedPrometheus coordination: Confirm PRD regional resource deployment schedule
+
+*Phase 2 (Optimization):*
+6. Parallelize AzureMonitoring_ with non-dependent stages (Karpenter)
+7. Monitoring coverage metrics dashboard
+8. Automated drift detection
+
+**Production Readiness Assessment:**
+- ✅ Ready for STG: All checks passed, deployed to STG.EUS2.9950
+- ⏳ Blockers for PRD:
+  1. PRD tenant configuration in Tenants.json (depends on ManagedPrometheus PRD rollout)
+  2. Regional coverage validation (all PRD regions)
+  3. Rollback testing validation
+
+**Risk Assessment:**
+- 🟡 MEDIUM: Dependency on ManagedPrometheus team for regional resources
+- 🟢 LOW: Deployment time increase (~3-5 min)
+- 🟢 LOW: Configuration drift (clusters opt-out)
+- 🟢 LOW: RBAC permission gaps (Ev2 SP → AZURE_MONITOR_SUBSCRIPTION)
+
+**Deliverables:**
+- ✅ Architectural review: `.squad/decisions/inbox/picard-pr150-review.md`
+- ✅ Ready to post to Issue #150
+
+**Key Learnings:**
+
+**1. Multi-Repo Architecture Reviews:**
+- 3-PR pattern (config → template → orchestration) enables independent testing and rollback per layer
+- Tenant-level configuration with cluster overrides follows established pattern (ACR_SUBSCRIPTION precedent)
+- Validation scripts as Ev2 stage gates provide proper deployment guardrails
+
+**2. Cross-Team Dependency Management:**
+- Shared infrastructure (ManagedPrometheus regional resources) requires explicit pre-flight checks
+- Error messages must be actionable: "Contact team X if resource Y missing in subscription Z"
+- Recommended validation: Check existence of external dependencies before ARM deployment
+
+**3. Progressive Rollout Best Practices:**
+- Environment-based (DEV → STG → PRD) with feature flags enables safe expansion
+- Conservative dependency chains (sequential) safer for initial rollout vs. aggressive parallelization
+- Document both happy path AND rollback scenarios before production
+
+**4. Ev2 Deployment Patterns:**
+- Stage dependencies must be explicit and acyclic
+- Validation scripts exit codes control stage success/failure
+- ScopeBindings enable targeted re-deployments without full cluster rebuild
+
 **4. File Paths & References:**
 - Key FedRAMP file paths identified:
   - API: `api/FedRampDashboard.Api/Controllers/*.cs`, `api/openapi-fedramp-dashboard.yaml`

@@ -8788,3 +8788,162 @@ Krishna's implementation follows DK8S platform patterns **precisely**. All team 
 
 ---
 
+
+---
+
+## Decision N+1: Azure DevBox Provisioning via Portal UI
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #103  
+**Status:** ✅ Executed
+
+### Context
+
+Tamir requested a duplicate of the IDPDev devbox (1SOC project) with identical specifications.
+
+### Decision
+
+**Use Azure DevBox Portal UI for one-off DevBox provisioning, not CLI.**
+
+### Rationale
+
+1. **CLI Extension Unreliable:** \z devcenter\ extension failed to install (\pip failed with status code 1\)
+2. **Portal UI is Stable:** Web interface at https://devbox.microsoft.com is reliable and well-tested
+3. **Playwright Automation:** Browser automation provides reproducible, auditable provisioning steps
+4. **One-off Nature:** For single devbox creation, UI automation is faster than troubleshooting CLI issues
+
+### Implementation
+
+- **Tool:** Playwright via Edge browser (msedge) with persistent profile
+- **Portal:** https://devbox.microsoft.com
+- **Result:** IDPDev-2 created successfully in West Europe with matching specs
+
+### Trade-offs
+
+- **Pros:** Reliable, visual confirmation, no dependency on CLI extensions
+- **Cons:** Not scriptable for bulk operations (acceptable for one-off requests)
+
+### Recommendation
+
+For bulk or CI/CD DevBox provisioning, invest in fixing \z devcenter\ CLI. For ad-hoc requests from team members, continue using Portal + Playwright automation.
+
+---
+
+## Decision N+2: GitHub Actions Bot Identity for Squad Comments
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Issue:** #62  
+**PR:** #154  
+**Status:** ✅ Implemented
+
+### Problem
+
+Squad comments on issues/PRs came from Tamir's own GitHub account, causing:
+1. @mention notifications not triggering (GitHub doesn't notify you when you @mention yourself)
+2. Confusion about which comments are from automation vs. manual interaction
+
+### Constraints
+
+- **Cannot install GitHub Apps** in this repo (blocked by Microsoft org restrictions)
+- Must work with self-hosted runners
+- No additional infrastructure or secrets management desired
+- Solution must be simple and maintainable
+
+### Options Considered
+
+#### ✅ Option 1: GitHub Actions Bot Identity (SELECTED)
+
+Use GitHub's built-in bot account via explicit workflow permissions.
+
+**Implementation:**
+\\\yaml
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+\\\
+
+**Pros:**
+- Zero infrastructure changes
+- Comments from "github-actions[bot]" enable @mentions
+- No secrets management (uses built-in GITHUB_TOKEN)
+- Works with self-hosted runners
+- 1-2 hours implementation time
+
+**Cons:**
+- Generic bot name (not customized like "squad-bot")
+- Limited to GitHub Actions context
+
+#### ❌ Option 2: Machine User Account
+
+Create dedicated GitHub user account for the bot.
+
+**Why rejected:**
+- Requires separate GitHub license
+- Manual PAT rotation every 90 days
+- Security risk if token leaks
+- More operational overhead
+
+#### ❌ Option 3: Azure Functions + Service Identity
+
+Leverage Azure infrastructure for notification service.
+
+**Why rejected:**
+- High initial complexity (2-3 days implementation)
+- Requires Azure infrastructure management
+- Overkill for this use case
+- Still needs GitHub App or PAT for authentication
+
+### Decision
+
+**Selected Option 1** — GitHub Actions bot identity.
+
+### Implementation Details
+
+Added explicit \permissions:\ to 7 workflows:
+1. squad-triage.yml
+2. squad-heartbeat.yml
+3. squad-issue-assign.yml
+4. squad-label-enforce.yml
+5. sync-squad-labels.yml
+6. drift-detection.yml
+7. fedramp-validation.yml
+
+Created reusable \post-comment.yml\ workflow for future use (though not currently needed since \ctions/github-script\ already works).
+
+### Key Technical Insight
+
+The issue was **not** with the authentication method (workflows already used \GITHUB_TOKEN\), but with **missing explicit permissions**. GitHub's default permissions were too restrictive, preventing the bot identity from appearing.
+
+When \ctions/github-script\ uses the default \GITHUB_TOKEN\ AND the workflow has \permissions: issues: write\, comments appear from \github-actions[bot]\.
+
+### COPILOT_ASSIGN_TOKEN Preserved
+
+The PAT remains in 2 places, but ONLY for assigning @copilot (requires special GitHub API):
+- squad-heartbeat.yml line 94
+- squad-issue-assign.yml line 117
+
+These steps do NOT post comments — comment posting happens earlier with \GITHUB_TOKEN\.
+
+### Testing
+
+To verify:
+1. Merge PR #154
+2. Trigger any workflow that posts comments
+3. Confirm comment appears from \github-actions[bot]\
+4. Test @mention notification works
+
+### Outcome
+
+✅ @mentions now trigger notifications  
+✅ Zero additional infrastructure  
+✅ Simple and maintainable  
+✅ Works with self-hosted runners
+
+### Related
+
+- Issue #19 — Original GitHub App investigation (not viable)
+- Issue #62 — This implementation
+- PR #154 — Implementation PR

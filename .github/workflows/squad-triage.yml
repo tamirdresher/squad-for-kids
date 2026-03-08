@@ -110,9 +110,12 @@ jobs:
               return;
             }
 
+            // Normalize names by stripping non-alphanumeric chars for label names
+            const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
             // Build triage context
             const memberList = members.map(m =>
-              `- **${m.name}** (${m.role}) → label: \`squad:${m.name.toLowerCase()}\``
+              `- **${m.name}** (${m.role}) → label: \`squad:${normalize(m.name)}\``
             ).join('\n');
 
             // Determine best assignee based on issue content and routing
@@ -189,7 +192,7 @@ jobs:
             }
 
             const isCopilot = assignedMember.name === '@copilot';
-            const assignLabel = isCopilot ? 'squad:copilot' : `squad:${assignedMember.name.toLowerCase()}`;
+            const assignLabel = isCopilot ? 'squad:copilot' : `squad:${normalize(assignedMember.name)}`;
 
             // Add the member-specific label
             await github.rest.issues.addLabels({

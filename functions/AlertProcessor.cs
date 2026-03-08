@@ -2,30 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using StackExchange.Redis;
 
 namespace FedRampDashboard.Functions
 {
-    public static class AlertProcessor
+    public class AlertProcessor
     {
+        private readonly ILogger<AlertProcessor> _logger;
         private static readonly HttpClient _httpClient = new HttpClient();
         private static ConnectionMultiplexer _redis;
 
-        [FunctionName("AlertProcessor")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            ILogger log)
+        public AlertProcessor(ILogger<AlertProcessor> logger)
+        {
+            _logger = logger;
+        }
+
+        [Function("AlertProcessor")]
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestData req)
         {
             var startTime = DateTime.UtcNow;
-            log.LogInformation("AlertProcessor triggered at {Timestamp}", startTime);
+            _logger.LogInformation("AlertProcessor triggered at {Timestamp}", startTime);
 
             try
             {
@@ -34,20 +39,21 @@ namespace FedRampDashboard.Functions
                 {
                     var redisConnection = Environment.GetEnvironmentVariable("RedisConnectionString");
                     _redis = ConnectionMultiplexer.Connect(redisConnection);
-                    log.LogInformation("Redis connection established");
+                    _logger.LogInformation("Redis connection established");
                 }
 
                 // Parse incoming alert
-                var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var alert = JsonConvert.DeserializeObject<Alert>(requestBody);
+                var alert = await JsonSerializer.DeserializeAsync<Alert>(req.Body);
 
                 if (alert == null)
                 {
-                    log.LogWarning("Invalid alert payload received");
-                    return new BadRequestObjectResult("Invalid alert payload");
+                    _logger.LogWarning("Invalid alert payload received");
+                    var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                    await badResponse.WriteAsJsonAsync(new { error = "Invalid alert payload" });
+                    return badResponse;
                 }
 
-                using (log.BeginScope(new Dictionary<string, object>
+                using (_logger.BeginScope(new Dictionary<string, object>
                 {
                     ["AlertId"] = alert.AlertId,
                     ["AlertType"] = alert.AlertType,
@@ -56,63 +62,71 @@ namespace FedRampDashboard.Functions
                     ["ControlId"] = alert.Control?.Id ?? "none"
                 }))
                 {
-                    log.LogInformation(
+                    _logger.LogInformation(
                         "Processing alert: AlertId={AlertId}, Type={AlertType}, Severity={Severity}, Environment={Environment}",
                         alert.AlertId, alert.AlertType, alert.Severity, alert.Environment);
 
                     // Step 1: Enrich alert with metadata
                     var enrichStart = DateTime.UtcNow;
-                    await EnrichAlertAsync(alert, log);
-                    log.LogInformation("Alert enrichment completed in {Duration}ms", 
+                    await EnrichAlertAsync(alert, _logger);
+                    _logger.LogInformation("Alert enrichment completed in {Duration}ms", 
                         (DateTime.UtcNow - enrichStart).TotalMilliseconds);
 
                     // Step 2: Check for duplicates (30-min window)
-                    if (await IsDuplicateAsync(alert, log))
+                    if (await IsDuplicateAsync(alert, _logger))
                     {
-                        log.LogInformation("Alert {AlertId} is duplicate. Skipping.", alert.AlertId);
-                        return new OkObjectResult(new { status = "duplicate", alert_id = alert.AlertId });
+                        _logger.LogInformation("Alert {AlertId} is duplicate. Skipping.", alert.AlertId);
+                        var duplicateResponse = req.CreateResponse(HttpStatusCode.OK);
+                        await duplicateResponse.WriteAsJsonAsync(new { status = "duplicate", alert_id = alert.AlertId });
+                        return duplicateResponse;
                     }
 
                     // Step 3: Check suppression rules
-                    if (await IsSuppressedAsync(alert, log))
+                    if (await IsSuppressedAsync(alert, _logger))
                     {
-                        log.LogInformation("Alert {AlertId} is suppressed. Skipping.", alert.AlertId);
-                        return new OkObjectResult(new { status = "suppressed", alert_id = alert.AlertId });
+                        _logger.LogInformation("Alert {AlertId} is suppressed. Skipping.", alert.AlertId);
+                        var suppressedResponse = req.CreateResponse(HttpStatusCode.OK);
+                        await suppressedResponse.WriteAsJsonAsync(new { status = "suppressed", alert_id = alert.AlertId });
+                        return suppressedResponse;
                     }
 
                     // Step 4: Route alert based on severity
                     var routingStart = DateTime.UtcNow;
-                    var routingResults = await RouteAlertAsync(alert, log);
-                    log.LogInformation("Alert routing completed in {Duration}ms", 
+                    var routingResults = await RouteAlertAsync(alert, _logger);
+                    _logger.LogInformation("Alert routing completed in {Duration}ms", 
                         (DateTime.UtcNow - routingStart).TotalMilliseconds);
 
                     // Step 5: Store alert in cache for deduplication
-                    await StoreAlertInCacheAsync(alert, log);
+                    await StoreAlertInCacheAsync(alert, _logger);
 
-                    // Step 6: Log to Application Insights for audit trail
+                    // Step 6: logger to Application Insights for audit trail
                     var totalDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    log.LogInformation(
+                    _logger.LogInformation(
                         "Alert processed successfully: AlertId={AlertId}, Routing={Routing}, TotalDuration={Duration}ms",
-                        alert.AlertId, JsonConvert.SerializeObject(routingResults), totalDuration);
+                        alert.AlertId, JsonSerializer.Serialize(routingResults), totalDuration);
 
-                    return new OkObjectResult(new
+                    var response = req.CreateResponse(HttpStatusCode.OK);
+                    await response.WriteAsJsonAsync(new
                     {
                         status = "processed",
                         alert_id = alert.AlertId,
                         routing = routingResults,
                         processing_time_ms = totalDuration
                     });
+                    return response;
                 }
             }
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                log.LogError(ex, "Error processing alert. Duration={Duration}ms", duration);
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                _logger.LogError(ex, "Error processing alert. Duration={Duration}ms", duration);
+                var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await errorResponse.WriteAsJsonAsync(new { error = "Internal server error" });
+                return errorResponse;
             }
         }
 
-        private static async Task EnrichAlertAsync(Alert alert, ILogger log)
+        private static async Task EnrichAlertAsync(Alert alert, ILogger logger)
         {
             var enrichStart = DateTime.UtcNow;
             
@@ -125,7 +139,7 @@ namespace FedRampDashboard.Functions
                     alert.Control.Name = controlMetadata.Name;
                     alert.Control.Category = controlMetadata.Category;
                     
-                    log.LogInformation(
+                    logger.LogInformation(
                         "Control metadata enriched: ControlId={ControlId}, ControlName={ControlName}, Category={Category}",
                         alert.Control.Id, alert.Control.Name, alert.Control.Category);
                 }
@@ -134,34 +148,34 @@ namespace FedRampDashboard.Functions
                 if (string.IsNullOrEmpty(alert.RunbookUrl))
                 {
                     alert.RunbookUrl = GetRunbookUrl(alert.AlertType, alert.Control?.Id);
-                    log.LogInformation("Runbook URL attached: {RunbookUrl}", alert.RunbookUrl);
+                    logger.LogInformation("Runbook URL attached: {RunbookUrl}", alert.RunbookUrl);
                 }
 
                 // Add default remediation steps if missing
                 if (alert.RemediationSteps == null || !alert.RemediationSteps.Any())
                 {
                     alert.RemediationSteps = GetDefaultRemediationSteps(alert.AlertType);
-                    log.LogInformation(
+                    logger.LogInformation(
                         "Default remediation steps added: Count={StepCount}",
                         alert.RemediationSteps.Count);
                 }
                 
                 var duration = (DateTime.UtcNow - enrichStart).TotalMilliseconds;
-                log.LogInformation(
+                logger.LogInformation(
                     "Alert enrichment completed: AlertId={AlertId}, Duration={Duration}ms",
                     alert.AlertId, duration);
             }
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - enrichStart).TotalMilliseconds;
-                log.LogError(ex, 
+                logger.LogError(ex, 
                     "Error enriching alert {AlertId}: Duration={Duration}ms", 
                     alert.AlertId, duration);
                 throw;
             }
         }
 
-        private static async Task<bool> IsDuplicateAsync(Alert alert, ILogger log)
+        private static async Task<bool> IsDuplicateAsync(Alert alert, ILogger logger)
         {
             var checkStart = DateTime.UtcNow;
             
@@ -175,7 +189,7 @@ namespace FedRampDashboard.Functions
                 var duration = (DateTime.UtcNow - checkStart).TotalMilliseconds;
                 if (exists)
                 {
-                    log.LogWarning(
+                    logger.LogWarning(
                         "Duplicate alert detected: AlertId={AlertId}, DedupKey={DedupKey}, Duration={Duration}ms",
                         alert.AlertId, dedupKey, duration);
                 }
@@ -185,14 +199,14 @@ namespace FedRampDashboard.Functions
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - checkStart).TotalMilliseconds;
-                log.LogError(ex, 
+                logger.LogError(ex, 
                     "Error checking for duplicate alert {AlertId}: Duration={Duration}ms",
                     alert.AlertId, duration);
                 return false; // If cache is down, allow alert through
             }
         }
 
-        private static async Task<bool> IsSuppressedAsync(Alert alert, ILogger log)
+        private static async Task<bool> IsSuppressedAsync(Alert alert, ILogger logger)
         {
             var suppressCheckStart = DateTime.UtcNow;
             
@@ -206,7 +220,7 @@ namespace FedRampDashboard.Functions
                 if (isAcknowledged)
                 {
                     var duration = (DateTime.UtcNow - suppressCheckStart).TotalMilliseconds;
-                    log.LogInformation(
+                    logger.LogInformation(
                         "Alert suppressed: AlertId={AlertId}, Reason=Acknowledged, AckKey={AckKey}, Duration={Duration}ms",
                         alert.AlertId, ackKey, duration);
                     return true;
@@ -216,7 +230,7 @@ namespace FedRampDashboard.Functions
                 // For now, just check cache
 
                 var totalDuration = (DateTime.UtcNow - suppressCheckStart).TotalMilliseconds;
-                log.LogInformation(
+                logger.LogInformation(
                     "Suppression check passed: AlertId={AlertId}, Duration={Duration}ms",
                     alert.AlertId, totalDuration);
                 
@@ -225,21 +239,21 @@ namespace FedRampDashboard.Functions
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - suppressCheckStart).TotalMilliseconds;
-                log.LogError(ex, 
+                logger.LogError(ex, 
                     "Error checking suppression rules for alert {AlertId}: Duration={Duration}ms",
                     alert.AlertId, duration);
                 return false; // If cache is down, allow alert through
             }
         }
 
-        private static async Task<Dictionary<string, bool>> RouteAlertAsync(Alert alert, ILogger log)
+        private static async Task<Dictionary<string, bool>> RouteAlertAsync(Alert alert, ILogger logger)
         {
             var routeStart = DateTime.UtcNow;
             var results = new Dictionary<string, bool>();
 
             try
             {
-                log.LogInformation(
+                logger.LogInformation(
                     "Starting alert routing: AlertId={AlertId}, Severity={Severity}",
                     alert.AlertId, alert.Severity);
 
@@ -248,44 +262,44 @@ namespace FedRampDashboard.Functions
                 {
                     case "P0":
                         // P0: PagerDuty only (urgent)
-                        results["pagerduty"] = await SendToPagerDutyAsync(alert, log);
-                        log.LogInformation("Alert routed to PagerDuty: AlertId={AlertId}, Result={Result}", 
+                        results["pagerduty"] = await SendToPagerDutyAsync(alert, logger);
+                        logger.LogInformation("Alert routed to PagerDuty: AlertId={AlertId}, Result={Result}", 
                             alert.AlertId, results["pagerduty"]);
                         break;
 
                     case "P1":
                         // P1: PagerDuty (low urgency) + Teams
-                        results["pagerduty"] = await SendToPagerDutyAsync(alert, log);
-                        results["teams"] = await SendToTeamsAsync(alert, log);
-                        log.LogInformation(
+                        results["pagerduty"] = await SendToPagerDutyAsync(alert, logger);
+                        results["teams"] = await SendToTeamsAsync(alert, logger);
+                        logger.LogInformation(
                             "Alert routed to PagerDuty and Teams: AlertId={AlertId}, PagerDuty={PagerDutyResult}, Teams={TeamsResult}",
                             alert.AlertId, results["pagerduty"], results["teams"]);
                         break;
 
                     case "P2":
                         // P2: Teams only
-                        results["teams"] = await SendToTeamsAsync(alert, log);
-                        log.LogInformation("Alert routed to Teams: AlertId={AlertId}, Result={Result}",
+                        results["teams"] = await SendToTeamsAsync(alert, logger);
+                        logger.LogInformation("Alert routed to Teams: AlertId={AlertId}, Result={Result}",
                             alert.AlertId, results["teams"]);
                         break;
 
                     case "P3":
-                        // P3: Log only (could implement email digest here)
-                        log.LogInformation("P3 alert logged: AlertId={AlertId}, AlertType={AlertType}", 
+                        // P3: logger only (could implement email digest here)
+                        logger.LogInformation("P3 alert logged: AlertId={AlertId}, AlertType={AlertType}", 
                             alert.AlertId, alert.AlertType);
                         results["logged"] = true;
                         break;
 
                     default:
-                        log.LogWarning(
+                        logger.LogWarning(
                             "Unknown severity encountered: AlertId={AlertId}, Severity={Severity}. Routing to Teams.",
                             alert.AlertId, alert.Severity);
-                        results["teams"] = await SendToTeamsAsync(alert, log);
+                        results["teams"] = await SendToTeamsAsync(alert, logger);
                         break;
                 }
                 
                 var duration = (DateTime.UtcNow - routeStart).TotalMilliseconds;
-                log.LogInformation(
+                logger.LogInformation(
                     "Alert routing completed: AlertId={AlertId}, Routes={RouteCount}, Duration={Duration}ms",
                     alert.AlertId, results.Count, duration);
 
@@ -294,14 +308,14 @@ namespace FedRampDashboard.Functions
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - routeStart).TotalMilliseconds;
-                log.LogError(ex,
+                logger.LogError(ex,
                     "Error routing alert {AlertId}: Duration={Duration}ms",
                     alert.AlertId, duration);
                 throw;
             }
         }
 
-        private static async Task StoreAlertInCacheAsync(Alert alert, ILogger log)
+        private static async Task StoreAlertInCacheAsync(Alert alert, ILogger logger)
         {
             var cacheStart = DateTime.UtcNow;
             
@@ -314,20 +328,20 @@ namespace FedRampDashboard.Functions
                 await db.StringSetAsync(dedupKey, alert.AlertId, TimeSpan.FromMinutes(30));
                 
                 var duration = (DateTime.UtcNow - cacheStart).TotalMilliseconds;
-                log.LogInformation(
+                logger.LogInformation(
                     "Alert stored in cache: AlertId={AlertId}, DedupKey={DedupKey}, TTL=30min, Duration={Duration}ms",
                     alert.AlertId, dedupKey, duration);
             }
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - cacheStart).TotalMilliseconds;
-                log.LogError(ex, 
+                logger.LogError(ex, 
                     "Error storing alert {AlertId} in cache: Duration={Duration}ms",
                     alert.AlertId, duration);
             }
         }
 
-        private static async Task<bool> SendToPagerDutyAsync(Alert alert, ILogger log)
+        private static async Task<bool> SendToPagerDutyAsync(Alert alert, ILogger logger)
         {
             var sendStart = DateTime.UtcNow;
             
@@ -336,19 +350,19 @@ namespace FedRampDashboard.Functions
                 var routingKey = Environment.GetEnvironmentVariable("PagerDutyRoutingKey");
                 if (string.IsNullOrEmpty(routingKey))
                 {
-                    log.LogWarning("PagerDuty routing key not configured");
+                    logger.LogWarning("PagerDuty routing key not configured");
                     return false;
                 }
 
-                log.LogInformation(
+                logger.LogInformation(
                     "Sending alert to PagerDuty: AlertId={AlertId}, AlertType={AlertType}",
                     alert.AlertId, alert.AlertType);
 
-                var client = new PagerDutyClient(_httpClient, routingKey, log);
+                var client = new PagerDutyClient(_httpClient, routingKey, logger);
                 var result = await client.SendAlertAsync(alert);
                 
                 var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
-                log.LogInformation(
+                logger.LogInformation(
                     "PagerDuty send {Status}: AlertId={AlertId}, Duration={Duration}ms",
                     result ? "succeeded" : "failed", alert.AlertId, duration);
                 
@@ -357,14 +371,14 @@ namespace FedRampDashboard.Functions
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
-                log.LogError(ex, 
+                logger.LogError(ex, 
                     "Error sending alert {AlertId} to PagerDuty: Duration={Duration}ms",
                     alert.AlertId, duration);
                 return false;
             }
         }
 
-        private static async Task<bool> SendToTeamsAsync(Alert alert, ILogger log)
+        private static async Task<bool> SendToTeamsAsync(Alert alert, ILogger logger)
         {
             var sendStart = DateTime.UtcNow;
             
@@ -380,19 +394,19 @@ namespace FedRampDashboard.Functions
                 // Validate at least one webhook URL is configured
                 if (!webhookUrls.Values.Any(url => !string.IsNullOrEmpty(url)))
                 {
-                    log.LogWarning("No Teams webhook URLs configured");
+                    logger.LogWarning("No Teams webhook URLs configured");
                     return false;
                 }
 
-                log.LogInformation(
+                logger.LogInformation(
                     "Sending alert to Teams: AlertId={AlertId}, AlertType={AlertType}, Severity={Severity}",
                     alert.AlertId, alert.AlertType, alert.Severity);
 
-                var client = new TeamsClient(_httpClient, webhookUrls, log);
+                var client = new TeamsClient(_httpClient, webhookUrls, logger);
                 var result = await client.SendAlertAsync(alert);
                 
                 var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
-                log.LogInformation(
+                logger.LogInformation(
                     "Teams send {Status}: AlertId={AlertId}, Duration={Duration}ms",
                     result ? "succeeded" : "failed", alert.AlertId, duration);
                 
@@ -401,7 +415,7 @@ namespace FedRampDashboard.Functions
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
-                log.LogError(ex, 
+                logger.LogError(ex, 
                     "Error sending alert {AlertId} to Teams: Duration={Duration}ms",
                     alert.AlertId, duration);
                 return false;
@@ -478,100 +492,88 @@ namespace FedRampDashboard.Functions
     // Supporting classes
     public class Alert
     {
-        [JsonProperty("alert_type")]
+        [JsonPropertyName("alert_type")]
         public string AlertType { get; set; }
 
-        [JsonProperty("alert_id")]
+        [JsonPropertyName("alert_id")]
         public string AlertId { get; set; }
 
-        [JsonProperty("severity")]
+        [JsonPropertyName("severity")]
         public string Severity { get; set; }
 
-        [JsonProperty("timestamp")]
+        [JsonPropertyName("timestamp")]
         public DateTime Timestamp { get; set; }
 
-        [JsonProperty("control")]
+        [JsonPropertyName("control")]
         public ControlInfo Control { get; set; }
 
-        [JsonProperty("environment")]
+        [JsonPropertyName("environment")]
         public string Environment { get; set; }
 
-        [JsonProperty("region")]
+        [JsonPropertyName("region")]
         public string Region { get; set; }
 
-        [JsonProperty("cloud")]
+        [JsonPropertyName("cloud")]
         public string Cloud { get; set; }
 
-        [JsonProperty("metrics")]
+        [JsonPropertyName("metrics")]
         public Dictionary<string, object> Metrics { get; set; }
 
-        [JsonProperty("runbook_url")]
+        [JsonPropertyName("runbook_url")]
         public string RunbookUrl { get; set; }
 
-        [JsonProperty("remediation_steps")]
+        [JsonPropertyName("remediation_steps")]
         public List<string> RemediationSteps { get; set; }
 
-        [JsonProperty("vulnerabilities")]
+        [JsonPropertyName("vulnerabilities")]
         public List<VulnerabilityInfo> Vulnerabilities { get; set; }
 
-        [JsonProperty("deadline")]
+        [JsonPropertyName("deadline")]
         public DeadlineInfo Deadline { get; set; }
 
-        [JsonProperty("days_until_deadline")]
+        [JsonPropertyName("days_until_deadline")]
         public int? DaysUntilDeadline { get; set; }
 
-        [JsonProperty("review_reason")]
+        [JsonPropertyName("review_reason")]
         public string ReviewReason { get; set; }
-    }
-
-    public class ControlInfo
-    {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("category")]
-        public string Category { get; set; }
     }
 
     public class VulnerabilityInfo
     {
-        [JsonProperty("vulnerability_id")]
+        [JsonPropertyName("vulnerability_id")]
         public string VulnerabilityId { get; set; }
 
-        [JsonProperty("severity")]
+        [JsonPropertyName("severity")]
         public string Severity { get; set; }
 
-        [JsonProperty("cvss_score")]
+        [JsonPropertyName("cvss_score")]
         public double CvssScore { get; set; }
 
-        [JsonProperty("package_name")]
+        [JsonPropertyName("package_name")]
         public string PackageName { get; set; }
 
-        [JsonProperty("installed_version")]
+        [JsonPropertyName("installed_version")]
         public string InstalledVersion { get; set; }
 
-        [JsonProperty("fixed_version")]
+        [JsonPropertyName("fixed_version")]
         public string FixedVersion { get; set; }
 
-        [JsonProperty("image_name")]
+        [JsonPropertyName("image_name")]
         public string ImageName { get; set; }
     }
 
     public class DeadlineInfo
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("deadline_date")]
+        [JsonPropertyName("deadline_date")]
         public DateTime DeadlineDate { get; set; }
     }
 

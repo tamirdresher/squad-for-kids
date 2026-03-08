@@ -27,6 +27,9 @@ jobs:
             // Extract member name from label (e.g., "squad:ripley" → "ripley")
             const memberName = label.replace('squad:', '').toLowerCase();
 
+            // Normalize names by stripping non-alphanumeric chars (handles apostrophes, etc.)
+            const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
             // Read team roster — check .squad/ first, fall back to .ai-team/
             let teamFile = '.squad/team.md';
             if (!fs.existsSync(teamFile)) {
@@ -58,7 +61,7 @@ jobs:
                 }
                 if (inMembersTable && line.startsWith('|') && !line.includes('---') && !line.includes('Name')) {
                   const cells = line.split('|').map(c => c.trim()).filter(Boolean);
-                  if (cells.length >= 2 && cells[0].toLowerCase() === memberName) {
+                  if (cells.length >= 2 && normalize(cells[0]) === normalize(memberName)) {
                     assignedMember = { name: cells[0], role: cells[1] };
                     break;
                   }

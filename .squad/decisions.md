@@ -449,6 +449,146 @@ Adopt a **three-layer communication architecture**:
 | **Teams → GitHub** | WorkIQ + teams-monitor skill | Poll Teams for actionable messages, create GitHub issues |
 | **Squad → Teams** | Teams MCP Server | Post updates, reply to threads, send notifications |
 
+---
+
+## Decision 14: Codespaces Configuration with Copilot CLI and MCP Integration
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented (PR #171)  
+**Related Issue:** #167  
+**Scope:** Development Environment Setup
+
+### Problem Statement
+
+Users requested GitHub Codespaces setup similar to existing DevBox configuration, with:
+1. Copilot CLI configured and ready to use
+2. Agency (Squad agent framework) available
+3. All MCP (Model Context Protocol) servers configured
+4. Full development environment reproducible
+
+**Challenge:** Codespaces requires different configuration than VMs — container-based, Git-committed, different provisioning flow.
+
+### Solution Architecture
+
+**Three-Tier Approach:**
+- **Tier 1:** Base Image: `mcr.microsoft.com/devcontainers/universal:latest` (Node.js, git, Docker CLI, Python, Go, etc.)
+- **Tier 2:** Custom Dockerfile extending universal image with pre-installed Copilot CLI, Squad CLI, and utilities
+- **Tier 3:** Container Configuration (devcontainer.json) with 8 VS Code extensions, 5 ports, post-create automation
+
+**Post-Create Automation** (`post-create.sh`):
+1. Updates system packages
+2. Installs global npm packages (Copilot CLI, Squad CLI)
+3. Installs project dependencies (npm install)
+4. Copies MCP configuration to `~/.copilot/mcp-config.json`
+5. Verifies all tools installed successfully
+6. Provides next-steps guidance
+
+**Total setup time:** ~2-3 minutes (vs. 5-10 minutes for DevBox)
+
+### Key Design Decisions
+
+1. ✅ **Use Microsoft Universal Image:** Pre-built with essential tools, Microsoft-maintained
+2. ✅ **Two-Layer Setup:** Dockerfile + devcontainer.json for flexibility
+3. ✅ **Automatic Post-Create:** No manual CLI installation required
+4. ✅ **MCP Config Reuse:** Single source of truth (`.copilot/mcp-config.json`)
+5. ✅ **Pre-Configured Extensions:** 8 extensions for Copilot, Git, Docker, formatting
+6. ✅ **Port Forwarding:** 5 common ports (3000, 5000, 8080, 8888, 18888)
+7. ✅ **Manual Authentication:** User runs `copilot configure` after opening (security)
+
+### Consequences
+
+**Positive:**
+- ✅ Faster Setup: 2-3 minutes vs. 5-10 minutes for DevBox
+- ✅ Cost Effective: GitHub Codespaces quota vs. Azure compute
+- ✅ Reproducible: Configuration committed to Git, version-controlled
+- ✅ Team Friendly: Anyone can open identical Codespace
+- ✅ Copilot Ready: CLI and Squad framework pre-configured
+- ✅ MCP Discoverable: All servers automatically configured
+
+**Tradeoffs:**
+- Stateless by Default: Stops after 30 minutes of inactivity (unlike always-on DevBox)
+- Resource Limits: Container resources less than full VM
+- Cold Start: First open takes 2-3 minutes
+- Manual Auth: Must run `copilot configure` after opening (Phase 2 enhancement)
+
+### Implementation
+
+**File Structure:**
+```
+.devcontainer/
+├── devcontainer.json      (2.1 KB) — Main configuration
+├── Dockerfile             (1.0 KB) — Custom image
+├── post-create.sh         (4.3 KB) — Setup automation
+├── init.sh                (0.3 KB) — Pre-container init
+└── README.md              (9.6 KB) — Documentation
+```
+
+**Relationship to Existing Systems:**
+- DevBox Provisioning: Shared post-provisioning scripts, reuse `.copilot/mcp-config.json`, both support Copilot CLI + Squad
+- Squad Agent Framework: Squad CLI installed automatically, agents can use Copilot CLI and MCP servers
+- MCP Configuration: Centralized in `.copilot/mcp-config.json`, discoverable everywhere
+
+### Status
+
+- **Branch:** feature/codespaces-configuration
+- **PR:** #171 ✅ MERGED
+- **Files:** 5 new files in `.devcontainer/`
+- **Total Changes:** 691 insertions, 0 deletions
+- **Merge:** Complete, no conflicts
+
+---
+
+## Decision 15: Functions Project — Azure Functions Isolated Worker Model Migration
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Resolved  
+**Scope:** FedRampDashboard.Functions project
+
+### Context
+
+The Functions project had 64 build errors caused by mixing Azure Functions in-process model code with isolated worker model configuration. This blocked Issue #119 (AlertHelper refactoring tech debt).
+
+### Decision
+
+Migrated entire Functions project to isolated worker model (Azure Functions v4):
+- Added System.Text.Json NuGet package
+- Created Program.cs with ConfigureFunctionsWorkerDefaults()
+- Converted all functions from in-process to isolated worker:
+  - AlertProcessor.cs
+  - ProcessValidationResults.cs
+  - ArchiveExpiredResults.cs
+
+### Key Changes
+
+**HTTP Functions:**
+- HttpRequest/IActionResult → HttpRequestData/HttpResponseData
+- Static methods → Instance methods with ILogger injection
+- FunctionName → Function attribute
+
+**JSON Serialization:**
+- Newtonsoft.Json → System.Text.Json
+- JsonProperty → JsonPropertyName
+
+**CosmosDB Trigger:**
+- Document → JsonDocument
+- GetPropertyValue<T> → TryGetProperty pattern
+
+### Impact
+
+- ✅ Build now succeeds: 0 errors (was 64)
+- ✅ Unblocks issue #119 (Functions deployment & AlertHelper refactoring)
+- ✅ All functions use consistent modern isolated worker model
+- ⚠️ Breaking change: Functions must be redeployed with isolated worker runtime
+
+### Related
+
+- **Issue:** #169 (created for this fix)
+- **PR:** #172 ✅ MERGED
+- **Branch:** squad/169-fix-functions-build
+- **Blocker Resolved:** #119 now unblocked
+
 ### Key Findings
 
 #### Teams MCP Server Capabilities

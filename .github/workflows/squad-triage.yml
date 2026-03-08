@@ -8,6 +8,10 @@ jobs:
   triage:
     if: github.event.label.name == 'squad'
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
 

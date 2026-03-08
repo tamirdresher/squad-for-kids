@@ -2182,3 +2182,33 @@ Infrastructure reviews should focus on **integration points** where systems conn
 
 **Result:** Review approved with 4 minor concerns. PRs are production-ready after addressing DNS Zone VNet link verification.
 
+
+### 2026-03-08: Issue #150 Azure Monitor Prometheus Integration — Infrastructure Review
+
+**Assignment:** Infrastructure review of 3-PR implementation for Azure Monitor Prometheus integration.
+
+**Scope:**
+- PR #14966543 (Infra.K8s.Clusters) — Inventory schema
+- PR #14968397 (WDATP.Infra.System.Cluster) — ARM templates + GoTemplates + Ev2 specs
+- PR #14968532 (WDATP.Infra.System.ClusterProvisioning) — Pipeline integration
+
+**Analysis:**
+- Ev2 Deployment Pattern: Follows canonical 3-repo model (inventory → ARM → pipeline) correctly
+- RolloutSpec Variants: Three proper variants (Standard, HighSLO, Regional)
+- Feature Flag Implementation: Conditional deployment with ENABLE_AZURE_MONITORING
+- Pipeline Stage Ordering: Correct (AzureMonitoring_ after Cluster_, before dependent stages)
+- Shared Resources: Uses per-region DCE, DCR, AMW from ManagedPrometheus (reduces overhead)
+- Rollback: Script validates flag-vs-reality mismatches, ARM deletions idempotent
+
+**Minor Concerns (Non-Blocking):**
+1. AMPLS Private Endpoint DNS — Verify zone links to VNet correctly
+2. Role Assignment Timing — Ensure Monitoring Metrics Publisher succeeds before ingestion
+3. Rollback Script Scope — Only checks flag state, doesn't rollback ARM resources
+4. Pipeline Parallelization — Could run AzureMonitoring_ in parallel with non-dependent stages (Phase 2)
+
+**Verdict:** ✅ **APPROVE WITH 4 MINOR CONCERNS**
+- Well-architected infrastructure following DK8S patterns
+- Non-blocking concerns documented for post-merge attention
+- Ready for STG deployment
+
+**Deliverable:** Full review in decisions.md — consolidated with Picard + Worf assessments

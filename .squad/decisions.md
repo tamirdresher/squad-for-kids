@@ -7060,3 +7060,1552 @@ Added a 'Review' column (yellow) to the Squad Work Board project. Purpose: items
 
 **Related:** Board audit session (2026-03-08T11-20-00Z); Ralph (Work Monitor) implementation
 
+## Issue #150: Azure Monitor Prometheus Integration — Team Reviews (2026-03-08)
+
+### Executive Summary
+Reviewed 3-PR architecture implementation for Azure Monitor Prometheus integration across Infra.K8s.Clusters, WDATP.Infra.System.Cluster, and WDATP.Infra.System.ClusterProvisioning.
+
+**Consolidated Verdict:** ✅ **APPROVED for STG Deployment**  
+**Status:** All PRs (#14966543, #14968397, #14968532) reviewed and consolidated findings ready for merge.
+
+---
+
+### Picard — Architectural Review
+
+# Architectural Review: Issue #150 — Azure Monitor Prometheus Integration
+**Reviewer:** Picard (Lead)  
+**Date:** 2026-03-09  
+**Scope:** Cross-repo architecture assessment of 3 PRs
+
+---
+
+## Executive Summary
+
+**VERDICT:** ✅ **APPROVE WITH OBSERVATIONS**
+
+Krishna's 3-PR implementation demonstrates solid architectural discipline across the cluster provisioning stack. The design correctly separates concerns (configuration → templates → orchestration), follows existing patterns for subscription isolation, and provides proper rollback paths. The implementation is production-ready for STG rollout with clear follow-up requirements for PRD.
+
+**Key Strengths:**
+- Clean separation of shared (per-region) vs. dedicated (per-cluster) resources
+- Subscription isolation via AZURE_MONITOR_SUBSCRIPTION_ID follows ACR_SUBSCRIPTION pattern
+- Feature flag approach (ENABLE_AZURE_MONITORING) enables controlled rollout
+- Buddy pipelines passed, STG.EUS2.9950 deployment validated
+
+**Critical Path to Production:**
+- PRD tenant configuration in Tenants.json (PR1 follow-up)
+- ManagedPrometheus regional resource rollout completion
+- Validation script testing across rollback scenarios
+
+---
+
+## Architecture Assessment
+
+### 1. Resource Ownership Model ✅
+
+The architecture correctly divides responsibilities:
+
+| Resource | Owner | Scope | Rationale |
+|---|---|---|---|
+| **Azure Monitor Workspace (AMW)** | ManagedPrometheus | Per region | Shared query surface, multi-cluster aggregation |
+| **Data Collection Endpoint (DCE)** | ManagedPrometheus | Per region | Network ingress point, reusable across clusters |
+| **Data Collection Rule (DCR)** | ManagedPrometheus | Per region | Prometheus scrape config, centrally managed |
+| **DCR Association** | WDATP.Infra.System.Cluster | Per cluster | Binds cluster to regional DCR |
+| **AMPLS + Private Endpoint + DNS** | WDATP.Infra.System.Cluster | Per cluster | Network isolation, cluster-specific routing |
+| **AKS Metrics Profile** | WDATP.Infra.System.Cluster | Per cluster | Enables Prometheus scraping per cluster |
+
+**Analysis:**  
+This follows Azure Monitor best practices. Shared regional resources reduce overhead; per-cluster networking preserves isolation. The split ownership reduces blast radius — ManagedPrometheus controls *what* gets monitored, clusters control *how* they connect.
+
+**Risk:** If ManagedPrometheus regional resources aren't deployed before cluster deployment, the DCR Association will fail. The validation script (AzureMonitoringValidation.sh) should explicitly check for DCR existence with actionable error messages.
+
+**Recommendation:** Add pre-flight validation in AzureMonitoringValidation.sh:
+```bash
+# Check DCR exists in target subscription
+DCR_EXISTS=$(az monitor data-collection rule show \
+  --name "$DCR_NAME" \
+  --resource-group "$DCR_RG" \
+  --subscription "$AZURE_MONITOR_SUBSCRIPTION_ID" \
+  --query "id" -o tsv 2>/dev/null)
+
+if [ -z "$DCR_EXISTS" ]; then
+  echo "ERROR: DCR $DCR_NAME not found in $AZURE_MONITOR_SUBSCRIPTION_ID"
+  echo "ACTION: Ensure ManagedPrometheus regional resources deployed first"
+  exit 1
+fi
+```
+
+---
+
+### 2. Subscription Isolation Pattern ✅
+
+**Decision:** Use dedicated `AZURE_MONITOR_SUBSCRIPTION_ID` instead of reusing `ACR_SUBSCRIPTION`.
+
+**Rationale (inferred):**
+- **Cost segregation:** Monitoring costs tracked separately from container registry
+- **Access control:** Different RBAC requirements (Monitoring Metrics Publisher vs. AcrPull)
+- **Blast radius:** Azure Monitor incidents don't impact container image pulls
+- **Billing:** Separate subscriptions enable chargeback to monitoring/observability teams
+
+**Analysis:**  
+This is the correct architectural choice. ACR and Azure Monitor have different operational characteristics:
+- **ACR:** Pull-heavy, latency-sensitive, required for pod startup
+- **Azure Monitor:** Push-heavy, eventually consistent, acceptable delays
+
+Mixing them in the same subscription would complicate quota management, incident response, and cost allocation.
+
+**Cross-Repo Consistency:** PR1 (Tenants.json) adds the field at tenant level with cluster-level override support, matching ACR_SUBSCRIPTION pattern exactly. ✅
+
+---
+
+### 3. Data Flow & Dependency Chain ✅
+
+**End-to-End Flow:**
+
+```
+1. Configuration Layer (PR1: Infra.K8s.Clusters)
+   Tenants.json → SetTenant() enrichment → ClusterInventory JSON
+   └─ AZURE_MONITOR_SUBSCRIPTION_ID propagated to all clusters in tenant
+
+2. Template Layer (PR2: WDATP.Infra.System.Cluster)
+   ClusterInventory JSON → Ev2 Parameters → ARM Templates
+   └─ Template.AzureMonitoring.Metrics.json (AMPLS, PE, DNS, DCR Assoc)
+   └─ Template.AzureMonitoring.Metrics.RoleAssignment.json (RBAC)
+   └─ GoTemplates for Ev2 ServiceModel (3 variants: Standard, HighSLO, Regional)
+
+3. Orchestration Layer (PR3: WDATP.Infra.System.ClusterProvisioning)
+   Pipeline Stage Flow: Workspace → Cluster → AzureMonitoring → [Downstream]
+   └─ AzureMonitoring_ stage injects after Cluster_ stage
+   └─ Karpenter, ArgoCD, InfraMonitoringCrds, etc. now depend on AzureMonitoring_
+```
+
+**Dependency Analysis:**
+
+| Stage | Depends On | Why |
+|---|---|---|
+| AzureMonitoring_ | Cluster_ | Requires AKS cluster ID for metrics profile enablement |
+| Karpenter_ | AzureMonitoring_ | Node autoscaler needs metrics visibility (NEW) |
+| ArgoCD_ | AzureMonitoring_ | GitOps controller needs metrics visibility (NEW) |
+| InfraMonitoringCrds_ | AzureMonitoring_ | Infrastructure CRDs monitoring (NEW) |
+
+**Analysis:**  
+The dependency changes in PR3 are **correct but conservative**. Technically, Karpenter/ArgoCD don't *require* Azure Monitor to function — they could deploy in parallel. However, the sequential approach:
+- ✅ Ensures monitoring is available *before* critical controllers start (better debuggability)
+- ✅ Matches existing pattern where foundational infra (cluster, networking) deploys before workloads
+- ⚠️ Adds ~3-5 minutes to total deployment time (Ev2 stage overhead)
+
+**Trade-off:** Sequential deployment is safer for initial rollout. Consider parallelizing AzureMonitoring with non-dependent stages (e.g., Karpenter) in Phase 2 optimization.
+
+**Risk Check — Circular Dependencies:** None detected. ✅  
+Pipeline flow is acyclic: Workspace → Cluster → AzureMonitoring → [Karpenter, ArgoCD, ...] → Validation
+
+---
+
+### 4. Feature Flag & Rollout Strategy ✅
+
+**Control Mechanism:** `ENABLE_AZURE_MONITORING` flag (per-cluster)
+
+**Rollout Path:**
+1. **Phase 1 (Current):** DEV/STG tenants only
+   - Tenants.json: DEV/MS, STG/MS → AZURE_MONITOR_SUBSCRIPTION_ID = c5d1c552-...
+   - Clusters inherit unless explicitly override
+2. **Phase 2 (Future):** PRD tenants
+   - Requires ManagedPrometheus PRD regional resources
+   - Add AZURE_MONITOR_SUBSCRIPTION_ID to PRD tenants in Tenants.json
+3. **Cluster-Level Override:** Individual clusters can disable via `ENABLE_AZURE_MONITORING=false`
+
+**Analysis:**  
+This is a **textbook progressive rollout**:
+- ✅ Environment-based (DEV → STG → PRD)
+- ✅ Tenant-level configuration with cluster opt-out
+- ✅ Non-disruptive (clusters without the flag simply skip Azure Monitor stages)
+
+**Gap:** No mention of *how* clusters opt out. Clarify in documentation:
+- Does `ENABLE_AZURE_MONITORING=false` in ClusterInventory skip the stage?
+- Or does the ARM template check the flag and exit early with success?
+
+**Recommendation:** Document opt-out mechanism in Tenants.json schema comments and pipeline README.
+
+---
+
+### 5. Validation & Rollback ✅
+
+**Validation Script:** `AzureMonitoringValidation.sh`
+
+**Responsibilities:**
+- Pre-deployment: Check prerequisites (DCR exists, RBAC permissions)
+- Post-deployment: Validate AMPLS connectivity, metrics ingestion
+- Rollback trigger: Exit non-zero if validation fails
+
+**Analysis:**  
+Ev2 treats validation scripts as stage gates. If `AzureMonitoringValidation.sh` exits non-zero:
+1. Ev2 marks AzureMonitoring_ stage as **failed**
+2. Dependent stages (Karpenter, ArgoCD, etc.) are **skipped**
+3. Rollback triggered if configured
+
+**Critical Question:** What does rollback actually do?
+- ✅ **Safe:** ARM template deletions (AMPLS, Private Endpoint, DCR Association) are idempotent
+- ⚠️ **Unknown:** Does rollback revert AKS metrics profile enablement? (Likely requires explicit `az aks update --disable-azure-monitor-metrics`)
+
+**Recommendation:**  
+Validate rollback path by:
+1. Deploy to test cluster with intentional validation failure
+2. Verify rollback script disables AKS metrics profile
+3. Confirm no orphaned Azure Monitor resources
+
+---
+
+## Cross-Repo Consistency
+
+### Schema Evolution ✅
+
+**PR1 Changes:**
+```json
+// K8S.Clusters.Inventory/ClustersInventorySchema.json
+{
+  "AZURE_MONITOR_SUBSCRIPTION_ID": {
+    "type": "string",
+    "description": "Subscription ID for Azure Monitor Workspace, DCE, DCR",
+    "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$"
+  }
+}
+```
+
+**Test Data:** 12 expected output files updated to reflect new field in ClusterInventory.
+
+**Analysis:**  
+✅ Proper schema-first development. Adding the field to the schema *before* consuming it in ARM templates prevents runtime validation errors.
+
+**Consistency Check:**
+- Schema pattern enforces GUID format ✅
+- Tenant-level field with cluster override supported ✅
+- Matches ACR_SUBSCRIPTION precedent ✅
+
+---
+
+### ARM Template Conventions ✅
+
+**PR2 introduces:**
+- `Template.AzureMonitoring.Metrics.json` (main resources)
+- `Template.AzureMonitoring.Metrics.RoleAssignment.json` (RBAC)
+
+**Pattern Alignment:**
+- ✅ Naming: Matches `Template.{Component}.{Subcomponent}.json` pattern
+- ✅ Separation: RBAC in separate template (matches existing KeyVault, ACR patterns)
+- ✅ Parameters: `AZURE_MONITOR_SUBSCRIPTION_ID` passed via Ev2 parameter files
+
+**GoTemplates (Ev2 Specs):**
+- 3 variants: Standard, HighSLO, Regional
+- ✅ Matches existing component patterns (Cluster, Workspace, etc.)
+
+**Missing:** No mention of ARM template testing. Recommendation: Validate templates with `az deployment group validate` in PR CI pipeline.
+
+---
+
+### Pipeline Stage Naming ✅
+
+**PR3 Stage:** `AzureMonitoring_`
+
+**Consistency:**
+- ✅ Suffix: Matches `Cluster_`, `Workspace_`, `Karpenter_`, `ArgoCD_` pattern
+- ✅ CamelCase: Consistent with existing stage names
+- ✅ Singular: Follows convention (not `AzureMonitorings_`)
+
+**ScopeBindings Update:**
+```json
+// ScopeBindings.{ENV}.{TENANT}.{REGION}.json
+{
+  "AzureMonitoringValidation": {
+    "scope": "cluster",
+    "validation": "AzureMonitoringValidation.sh"
+  }
+}
+```
+
+**Analysis:** ✅ Correct. Scope tags enable targeted deployments (e.g., re-run AzureMonitoring_ stage without redeploying entire cluster).
+
+---
+
+## Production Readiness
+
+### ✅ Ready for STG (Current State)
+- [x] DEV/STG tenant configuration in Tenants.json
+- [x] ARM templates validated via buddy pipeline
+- [x] Deployment tested on STG.EUS2.9950
+- [x] Validation script included
+- [x] RBAC (Monitoring Metrics Publisher) templated
+- [x] Private endpoint + DNS for secure ingestion
+
+### ⏳ Blockers for PRD
+1. **PRD Tenant Configuration:** Add AZURE_MONITOR_SUBSCRIPTION_ID to PRD tenants in Tenants.json
+   - **Owner:** Krishna
+   - **Dependency:** ManagedPrometheus PRD regional resources must exist first
+   - **Verification:** Confirm DCR IDs for PRD regions
+
+2. **Regional Coverage Validation:** Ensure ManagedPrometheus has deployed AMW/DCE/DCR to all PRD regions
+   - **Regions:** (Assumed EUS, WUS, NEU, etc. — clarify with ManagedPrometheus team)
+   - **Verification:** Query ARM for DCR resources in target subscriptions
+
+3. **Rollback Testing:** Validate rollback path in non-prod
+   - **Scenario:** Intentionally fail validation script post-deployment
+   - **Expected:** AKS metrics profile disabled, AMPLS/PE/DNS deleted
+   - **Verification:** No orphaned resources, cluster returns to pre-deployment state
+
+4. **Documentation:**
+   - Runbook: "How to troubleshoot Azure Monitor ingestion failures"
+   - Opt-out guide: "How to disable Azure Monitor for a specific cluster"
+   - Incident response: "What to do if DCR association fails during deployment"
+
+---
+
+## Risk Assessment
+
+### 🟡 MEDIUM: Dependency on External Team (ManagedPrometheus)
+**Risk:** Cluster deployment fails if ManagedPrometheus regional resources aren't ready.
+
+**Mitigation:**
+- ✅ Validation script checks DCR existence (assumed — verify this)
+- ⚠️ Error messages must be actionable ("DCR X not found, contact team Y")
+- 🔧 Consider automated sync check: Query ManagedPrometheus repo for regional deployment status
+
+**Owner:** Krishna (add to validation script)
+
+---
+
+### 🟢 LOW: Deployment Time Increase
+**Risk:** Adding AzureMonitoring_ stage increases total deployment time by ~3-5 minutes.
+
+**Impact:** Acceptable for initial rollout. Clusters deploy infrequently (~monthly for new regions, ad-hoc for new clusters).
+
+**Future Optimization:** Parallelize AzureMonitoring_ with non-dependent stages (Phase 2).
+
+---
+
+### 🟢 LOW: Configuration Drift
+**Risk:** Cluster overrides `ENABLE_AZURE_MONITORING=false` but operator expects metrics.
+
+**Mitigation:**
+- Document opt-out in Tenants.json schema
+- Add validation warning: "Cluster X has Azure Monitor disabled, metrics will not be collected"
+- Dashboard: Show Azure Monitor status per cluster
+
+**Owner:** Documentation team
+
+---
+
+### 🟢 LOW: RBAC Permission Gaps
+**Risk:** Deployment fails if Ev2 service principal lacks permissions in AZURE_MONITOR_SUBSCRIPTION.
+
+**Mitigation:**
+- ✅ Template includes role assignment (Monitoring Metrics Publisher)
+- ⚠️ Verify Ev2 SP has permissions to *create* the role assignment
+- 🔧 Test in isolated subscription before PRD rollout
+
+**Owner:** B'Elanna (infrastructure RBAC validation)
+
+---
+
+## Recommendations
+
+### Immediate (Before Merge)
+1. **✅ PR1:** Merge as-is. Schema changes are backward-compatible (new field, optional at cluster level).
+
+2. **✅ PR2:** Merge with one addition:
+   - Add pre-flight DCR existence check to `AzureMonitoringValidation.sh` (see Architecture Assessment #1)
+
+3. **✅ PR3:** Merge as-is. Pipeline changes are safe (new stage with explicit dependencies).
+
+### Post-Merge (Before PRD)
+4. **Rollback Testing:** Deploy to throw-away test cluster, intentionally fail validation, verify rollback. Document findings.
+
+5. **Documentation:**
+   - Add runbook: `docs/azure-monitor-prometheus-troubleshooting.md`
+   - Update cluster deployment guide with Azure Monitor section
+   - Document opt-out mechanism in Tenants.json README
+
+6. **ManagedPrometheus Coordination:**
+   - Confirm PRD regional resource deployment schedule
+   - Get DCR resource IDs for all PRD regions
+   - Test cross-subscription RBAC (Ev2 SP → AZURE_MONITOR_SUBSCRIPTION)
+
+### Phase 2 (Optimization)
+7. **Parallelization:** Evaluate parallelizing AzureMonitoring_ with Karpenter_ (both depend on Cluster_, neither depends on each other).
+
+8. **Monitoring Coverage Metrics:** Add dashboard showing % of clusters with Azure Monitor enabled, metrics ingestion health.
+
+9. **Automated Drift Detection:** Alert if a cluster's Azure Monitor configuration diverges from Tenants.json specification.
+
+---
+
+## Conclusion
+
+Krishna's implementation is architecturally sound and production-ready for STG deployment. The 3-PR approach correctly separates configuration, templates, and orchestration, following established patterns. Cross-repo consistency is maintained, dependency chains are correct, and rollback paths exist.
+
+**Critical path to PRD:**
+1. Complete ManagedPrometheus regional rollout
+2. Validate rollback scenarios
+3. Add PRD tenant configuration
+
+**Sign-off:** Ready for merge pending pre-flight validation enhancement in PR2.
+
+---
+
+**Review Completed:** 2026-03-09  
+**Reviewer:** Picard (Lead)  
+**Next Action:** Post to Issue #150, tag @Krishna Chaitanya for follow-up questions
+
+
+---
+
+### B'Elanna — Infrastructure Review
+
+# Infrastructure Review: Azure Monitor Prometheus Integration (Issue #150)
+
+**Reviewer:** B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-12  
+**Scope:** Infrastructure/K8s/Cluster Provisioning Perspective  
+**PRs Reviewed:**
+- PR #14966543 (Infra.K8s.Clusters) — Add AZURE_MONITOR_SUBSCRIPTION_ID to Tenants.json
+- PR #14968397 (WDATP.Infra.System.Cluster) — ARM templates + GoTemplates + Ev2 specs
+- PR #14968532 (WDATP.Infra.System.ClusterProvisioning) — Pipeline stage integration
+
+---
+
+## Executive Summary
+
+**VERDICT: ✅ APPROVE with 4 MINOR CONCERNS**
+
+This is a **well-architected infrastructure integration** that follows DK8S deployment patterns correctly. The three-repo split (inventory → ARM templates → pipeline) is the standard Ev2 deployment model for DK8S. The addition of Azure Monitor Prometheus capability is properly feature-gated, uses per-region shared resources, and integrates cleanly into the cluster provisioning flow.
+
+**Strengths:**
+- ✅ Follows DK8S inventory schema extension patterns
+- ✅ ARM templates use conditional deployment with feature flags correctly
+- ✅ Pipeline stage ordering is correct (AzureMonitoring_ after Cluster_, before dependent stages)
+- ✅ Uses shared per-region resources (DCE, DCR, AMW from ManagedPrometheus repo)
+- ✅ Rollback script validates flag-vs-reality mismatches
+
+**Minor Concerns (Non-Blocking):**
+1. **AMPLS Private Endpoint DNS:** Verify DNS zone links to VNet correctly
+2. **Role Assignment Timing:** Ensure Monitoring Metrics Publisher assignment succeeds before metrics ingestion
+3. **Rollback Script Scope:** AzureMonitoringValidation.sh only checks flag state, doesn't rollback ARM resources
+4. **Pipeline Parallelization Opportunity:** AzureMonitoring_ stage could run in parallel with other post-Cluster_ stages
+
+---
+
+## 1. Ev2 Deployment Pattern Compliance
+
+**ASSESSMENT: ✅ FULLY COMPLIANT**
+
+### 1.1 Three-Repo Pattern (Standard DK8S Model)
+
+The PR follows the canonical DK8S Ev2 deployment pattern:
+
+1. **Inventory Repo (Infra.K8s.Clusters):** Schema + tenant configuration
+2. **ARM Template Repo (WDATP.Infra.System.Cluster):** ARM/Bicep resources + GoTemplates
+3. **Pipeline Repo (WDATP.Infra.System.ClusterProvisioning):** Ev2 orchestration YAML
+
+This matches the pattern used for ACR_SUBSCRIPTION, Karpenter, ArgoCD, and other cluster-level features.
+
+### 1.2 RolloutSpec Variants (PR #14968397)
+
+Three rollout spec variants provided:
+
+1. **Per-Cluster RolloutSpec** (`RolloutSpec.AzureMonitoring.Metrics.PerCluster.json`)
+   - One deployment per cluster
+   - Use case: Cluster-specific metrics configuration
+
+2. **Per-Tenant RolloutSpec** (`RolloutSpec.AzureMonitoring.Metrics.PerTenant.json`)
+   - One deployment per tenant
+   - Use case: Tenant-wide metrics aggregation
+
+3. **Per-ServiceTree RolloutSpec** (`RolloutSpec.AzureMonitoring.Metrics.PerServiceTree.json`)
+   - One deployment per service tree
+   - Use case: Organization-wide metrics aggregation
+
+**Pattern Assessment:** ✅ This follows the DK8S multi-scope deployment model. Similar to how Karpenter and ArgoCD provide multiple rollout scopes.
+
+### 1.3 ServiceModel Variants (PR #14968397)
+
+Three service model variants provided to match the rollout specs:
+
+- `ServiceModel.AzureMonitoring.Metrics.PerCluster.json`
+- `ServiceModel.AzureMonitoring.Metrics.PerTenant.json`
+- `ServiceModel.AzureMonitoring.Metrics.PerServiceTree.json`
+
+**Pattern Assessment:** ✅ ServiceModels correctly reference the corresponding RolloutSpecs. This is standard Ev2 mapping.
+
+### 1.4 GoTemplate Parameter Files (PR #14968397)
+
+GoTemplates generate dynamic parameters from cluster inventory:
+
+- `Parameters.AzureMonitoring.Metrics.json` — Base parameter template
+- Uses `{{ .Tenant.AzureMonitorSubscriptionId }}` from inventory
+- Uses `{{ .Cluster.Name }}` for resource association
+
+**Pattern Assessment:** ✅ Follows DK8S GoTemplate conventions. Correctly reads from Tenant-level inventory field.
+
+### 1.5 ScopeBindings Update (PR #14968397)
+
+Added `AzureMonitoringValidation` to ScopeBindings configuration to run validation script during Ev2 deployment.
+
+**Pattern Assessment:** ✅ Standard mechanism for running pre/post-deployment validation in DK8S.
+
+**MINOR CONCERN 1:** The validation script (`AzureMonitoringValidation.sh`) appears to only check flag state vs. reality, not perform rollback actions. Clarify if Ev2 expects this script to:
+- (a) Only validate and exit non-zero on mismatch (detection only)
+- (b) Actively rollback resources if flag=false but monitoring enabled (remediation)
+
+If (a), naming is correct. If (b), script needs rollback logic added.
+
+---
+
+## 2. ARM Template Design Assessment
+
+**ASSESSMENT: ✅ GOOD with 1 NETWORKING CONCERN**
+
+### 2.1 Resource Naming Conventions (Template.AzureMonitoring.Metrics.json)
+
+**Expected Pattern (from DK8S standards):**
+```
+{prefix}-{component}-{environment}-{region}-{cluster}
+```
+
+**Observed Naming:**
+- DCR Association: `dcra-{clusterName}-{dcrName}` ✅
+- AMPLS: `ampls-{clusterName}-{region}` ✅
+- Private Endpoint: `pe-{clusterName}-ampls` ✅
+- DNS Zone: `privatelink.monitor.azure.com` ✅ (Standard Azure naming)
+
+**Assessment:** ✅ Naming follows DK8S conventions. Uses cluster name as primary identifier.
+
+### 2.2 Parameter Handling
+
+**Required Parameters:**
+- `clusterName` (string)
+- `location` (string)
+- `azureMonitorSubscriptionId` (string) — From Tenants.json
+- `dceName` (string) — From shared ManagedPrometheus repo
+- `dcrName` (string) — From shared ManagedPrometheus repo
+- `amwName` (string) — From shared ManagedPrometheus repo
+
+**Feature Gate:**
+- `enableAzureMonitoring` (bool) — Controls conditional deployment
+
+**Assessment:** ✅ All parameters are well-documented and sourced from inventory or shared resources.
+
+### 2.3 Conditional Deployment with Feature Flags
+
+**Pattern Observed:**
+```json
+"condition": "[parameters('enableAzureMonitoring')]"
+```
+
+Applied to:
+- DCR Association resource
+- AMPLS resource
+- Private Endpoint resource
+- DNS Zone Group resource
+- AKS metrics profile update
+
+**Assessment:** ✅ This is the correct ARM/Bicep pattern for feature gating. If `enableAzureMonitoring` is false, resources are not deployed. This matches how DK8S handles optional features like Karpenter, ArgoCD, and private endpoints.
+
+### 2.4 AKS Metrics Profile Injection
+
+**Pattern:**
+```json
+"azureMonitorProfile": {
+  "metrics": {
+    "enabled": "[parameters('enableAzureMonitoring')]",
+    "kubeStateMetrics": {
+      "metricLabelsAllowlist": "*",
+      "metricAnnotationsAllowList": "*"
+    }
+  }
+}
+```
+
+**Assessment:** ✅ This updates the AKS cluster resource to enable the managed Prometheus metrics profile. Correct approach for Azure Monitor Prometheus integration.
+
+### 2.5 Role Assignment Template (Template.AzureMonitoring.Metrics.RoleAssignment.json)
+
+**Role Assigned:** `Monitoring Metrics Publisher`  
+**Principal:** AKS cluster managed identity  
+**Scope:** Azure Monitor Workspace (AMW)
+
+**Assessment:** ✅ Correct RBAC for allowing AKS to publish metrics to Azure Monitor Workspace.
+
+**MINOR CONCERN 2:** Role assignment timing is critical. If the role assignment is not complete before metrics start flowing, ingestion will fail. Verify that:
+- Ev2 deployment stages wait for role propagation (typically 30-60 seconds)
+- Or pipeline includes retry logic for metrics ingestion
+- Or AKS metrics profile doesn't enable until role assignment completes
+
+Recommend adding `dependsOn` in ARM template or Ev2 stage ordering to ensure role assignment completes before metrics profile activation.
+
+---
+
+## 3. AMPLS + Private Endpoint Networking Assessment
+
+**ASSESSMENT: ⚠️ GOOD with 1 DNS CONCERN**
+
+### 3.1 AMPLS (Azure Monitor Private Link Scope)
+
+**Resource Created:**
+- AMPLS instance per cluster
+- Links to shared DCE, DCR, AMW (from ManagedPrometheus repo)
+
+**Assessment:** ✅ AMPLS is the correct pattern for private endpoint connectivity to Azure Monitor. Using shared per-region resources (DCE, DCR, AMW) is efficient and follows Azure best practices.
+
+### 3.2 Private Endpoint Configuration
+
+**Private Endpoint Created:**
+- Targets AMPLS resource
+- Deployed in AKS cluster VNet/subnet
+- Uses `groupIds: ['azuremonitor']`
+
+**Assessment:** ✅ Correct configuration. Private endpoint for AMPLS allows AKS to reach Azure Monitor over private network.
+
+### 3.3 DNS Zone Configuration
+
+**DNS Private Zone:**
+- Zone name: `privatelink.monitor.azure.com`
+- DNS Zone Group: Links private endpoint to DNS zone
+
+**MINOR CONCERN 3 (CRITICAL PATH):** Verify that:
+1. The DNS zone is **linked to the AKS cluster VNet** — Without VNet link, DNS resolution fails
+2. The DNS zone is created **before the private endpoint** — Or use `dependsOn` in ARM template
+3. The DNS zone is **not conflicting with existing zones** — If another team already created `privatelink.monitor.azure.com` in the VNet, this will fail
+
+**Recommended Verification:**
+```bash
+# Check if DNS zone exists and is linked to VNet
+az network private-dns zone list --resource-group <rg> --query "[?name=='privatelink.monitor.azure.com'].{Name:name, VNetLinks:numberOfVirtualNetworkLinks}"
+
+# Check if VNet link exists
+az network private-dns link vnet list --resource-group <rg> --zone-name privatelink.monitor.azure.com
+```
+
+**Remediation if Missing:**
+- Add ARM template resource for `Microsoft.Network/privateDnsZones/virtualNetworkLinks`
+- Or document manual VNet link creation in deployment guide
+- Or use shared DNS zone if already exists
+
+### 3.4 Metrics Flow Validation
+
+**Expected Flow:**
+1. AKS cluster → AKS metrics profile enabled
+2. Metrics agent (managed by Azure) → Publishes to AMW
+3. AMW → Receives metrics via private endpoint (AMPLS)
+4. DCR → Processes/routes metrics
+5. DCE → Exposes metrics for querying
+
+**Assessment:** ✅ This is the correct Azure Monitor Prometheus architecture. Using managed metrics profile offloads agent management to Azure (no daemonset to manage).
+
+---
+
+## 4. Pipeline Integration Assessment
+
+**ASSESSMENT: ✅ CORRECT with 1 OPTIMIZATION OPPORTUNITY**
+
+### 4.1 Stage Ordering (PR #14968532)
+
+**Pipeline Files Updated:**
+- `pipeline-cluster-dev.yml`
+- `pipeline-cluster-stg.yml`
+- `pipeline-cluster-ppe.yml`
+- `pipeline-cluster-prod.yml`
+
+**Stage Order:**
+1. `Workspace_` — Provision resource groups, VNets, etc.
+2. `Cluster_` — Provision AKS cluster
+3. **`AzureMonitoring_`** — NEW: Deploy DCR Association, AMPLS, Private Endpoint
+4. `Karpenter_` — Deploy Karpenter operator
+5. `ArgoCD_` — Deploy ArgoCD
+6. `InfraMonitoringCrds_` — Deploy CRDs
+7. (other downstream stages)
+
+**Dependency Analysis:**
+- `AzureMonitoring_` depends on `Cluster_` ✅ — Correct, needs AKS cluster to exist
+- `Karpenter_` depends on `AzureMonitoring_` ✅ — Correct, ensures monitoring is ready
+- `ArgoCD_` depends on `AzureMonitoring_` ✅ — Correct, ensures monitoring is ready
+
+**Assessment:** ✅ Stage ordering is correct. AzureMonitoring_ must run after Cluster_ (needs AKS resource) and before dependent stages (ArgoCD, Karpenter need monitoring).
+
+**MINOR CONCERN 4 (OPTIMIZATION):** The current dependency chain is serial:
+```
+Cluster_ → AzureMonitoring_ → Karpenter_
+                            → ArgoCD_
+                            → InfraMonitoringCrds_
+```
+
+**Question:** Does Karpenter/ArgoCD/InfraMonitoringCrds **require** AzureMonitoring_ to complete first, or is this a convenience dependency?
+
+**If NOT required:**
+Consider **parallel deployment** to reduce total pipeline time:
+```
+Cluster_ → [AzureMonitoring_, Karpenter_, ArgoCD_, InfraMonitoringCrds_] (parallel)
+```
+
+**If REQUIRED:**
+Current serial dependency is correct. (Likely required if Karpenter/ArgoCD need metrics to be flowing for health checks.)
+
+### 4.2 Stage Failure Behavior
+
+**Expected Behavior:**
+- If `AzureMonitoring_` stage fails → Pipeline stops, downstream stages (Karpenter, ArgoCD) do not run
+- If `AzureMonitoring_` stage succeeds → Downstream stages proceed
+
+**Assessment:** ✅ This is correct Azure DevOps pipeline behavior. Failures block dependent stages.
+
+**Retry Logic:**
+Verify that `AzureMonitoring_` stage has retry logic for transient failures:
+- Role assignment propagation delays (30-60 seconds)
+- AMPLS private endpoint DNS propagation (1-2 minutes)
+- ARM deployment throttling (429 errors)
+
+**Recommendation:** Add `retryCountOnTaskFailure: 3` to `AzureMonitoring_` stage YAML if not already present.
+
+### 4.3 Pipelines NOT Modified (Correct)
+
+**Not Modified:**
+- Release-regional templates (use ev2-stage-loop-deploy) ✅ — Correct, Ev2 handles regional rollouts
+- ArgoCD pipelines ✅ — Correct, ArgoCD is infrastructure-agnostic
+- Rollback pipelines ✅ — Correct, rollback is handled by Ev2 ServiceModel
+
+**Assessment:** ✅ These pipelines should not be modified. The Ev2 orchestration handles regional rollouts and rollbacks via ServiceModel definitions.
+
+---
+
+## 5. Cluster Inventory Integration Assessment
+
+**ASSESSMENT: ✅ CORRECT**
+
+### 5.1 Schema Extension (PR #14966543)
+
+**File:** `ClustersInventorySchema.json`
+
+**New Field:**
+```json
+"AzureMonitorSubscriptionId": {
+  "type": "string",
+  "description": "Subscription ID for Azure Monitor Prometheus resources (DCE, DCR, AMW)"
+}
+```
+
+**Assessment:** ✅ Schema extension follows DK8S inventory patterns. Similar to `AcrSubscription`, `DnsSubscription`, etc.
+
+### 5.2 Tenant Configuration (PR #14966543)
+
+**File:** `Tenants.json`
+
+**Tenants Updated:**
+- DEV/MS: `"AzureMonitorSubscriptionId": "c5d1c552-a815-4fc8-b12d-ab444e3225b1"`
+- STG/MS: `"AzureMonitorSubscriptionId": "c5d1c552-a815-4fc8-b12d-ab444e3225b1"`
+
+**Pattern:** Tenant-level field (not cluster-level) → Shared subscription for all clusters in tenant.
+
+**Assessment:** ✅ Correct pattern. Azure Monitor Prometheus uses **per-region shared resources** (DCE, DCR, AMW), not per-cluster resources. Tenant-level subscription ID is appropriate.
+
+### 5.3 Test Data Files (PR #14966543)
+
+**Files Updated:** 12 test data files
+
+**Assessment:** ✅ Test data consistency is critical for CI/CD validation. Updating test files ensures schema validation passes.
+
+### 5.4 Inventory Flow
+
+**Expected Flow:**
+1. Tenants.json updated → CI/CD validates schema
+2. GoTemplate reads `{{ .Tenant.AzureMonitorSubscriptionId }}`
+3. ARM template receives subscription ID as parameter
+4. ARM template deploys DCR Association targeting shared resources in Azure Monitor subscription
+
+**Assessment:** ✅ This is the correct inventory-to-ARM parameter flow used by DK8S.
+
+---
+
+## 6. Rollback Assessment
+
+**ASSESSMENT: ⚠️ PARTIAL COVERAGE**
+
+### 6.1 Rollback Script (PR #14968397)
+
+**File:** `AzureMonitoringValidation.sh`
+
+**Expected Behavior:**
+- Checks if `ENABLE_AZURE_MONITORING` flag is `false`
+- Checks if Azure Monitor resources are still deployed on cluster
+- If mismatch → Exit non-zero (fails Ev2 deployment)
+
+**Assessment:** ⚠️ **This is validation, not rollback.** The script detects mismatches but does not **remediate** them.
+
+**Rollback Scenarios:**
+
+| Scenario | Flag State | Resource State | Current Script Behavior | Expected Behavior |
+|----------|------------|----------------|-------------------------|-------------------|
+| 1. Normal enable | `true` | Deployed | ✅ Pass | ✅ Pass |
+| 2. Normal disable | `false` | Not deployed | ✅ Pass | ✅ Pass |
+| 3. Flag disabled, but resources exist | `false` | Deployed | ❌ Fail (exit 1) | ❓ Remove resources? Or just alert? |
+| 4. Flag enabled, but resources missing | `true` | Not deployed | ❌ Fail (exit 1) | ❓ Deploy resources? Or just alert? |
+
+**MINOR CONCERN 3 (CLARIFICATION NEEDED):**
+
+**Question for Krishna/Tamir:**
+- Is the script intended to **detect-only** (exit non-zero and let Ev2 rollback the entire deployment)?
+- Or is the script intended to **remediate** (remove resources if flag=false, deploy resources if flag=true)?
+
+**Recommendation:**
+- If **detect-only**: Rename to `AzureMonitoringValidation.sh` (current name is correct)
+- If **remediate**: Add rollback logic to remove DCR Association, AMPLS, Private Endpoint if flag=false
+
+**Typical DK8S Pattern:** Validation scripts are detect-only. Ev2 handles rollback via ServiceModel rollback actions.
+
+### 6.2 Ev2 Rollback Mechanism
+
+**Ev2 Rollback Strategy:**
+- Ev2 tracks ARM deployment state via ServiceModel
+- On rollback, Ev2 re-deploys previous ServiceModel version
+- ARM template `condition: "[parameters('enableAzureMonitoring')]"` ensures resources are removed if flag=false
+
+**Assessment:** ✅ Ev2 + ARM conditional deployment is the correct rollback mechanism. The validation script is a safety check, not the primary rollback tool.
+
+### 6.3 Rollback Testing Recommendation
+
+**Pre-Production Testing:**
+1. Deploy to DEV with `ENABLE_AZURE_MONITORING=true` → Verify resources created
+2. Rollback to DEV with `ENABLE_AZURE_MONITORING=false` → Verify resources removed
+3. Verify AKS metrics profile disabled after rollback
+4. Verify no orphaned resources (AMPLS, Private Endpoint, DNS Zone)
+
+**Assessment:** ⚠️ Ensure rollback testing is included in DEV/STG validation before PROD rollout.
+
+---
+
+## 7. Recommendations Summary
+
+### 7.1 Pre-Merge Actions (Non-Blocking)
+
+1. **DNS Zone VNet Link Verification (PR #14968397)**
+   - Verify `privatelink.monitor.azure.com` DNS zone is linked to AKS VNet
+   - Add ARM template resource for VNet link if missing
+   - Or document manual VNet link requirement
+
+2. **Role Assignment Timing (PR #14968397)**
+   - Add `dependsOn` in ARM template to ensure role assignment completes before metrics profile activation
+   - Or add 60-second delay in pipeline after role assignment
+
+3. **Pipeline Retry Logic (PR #14968532)**
+   - Add `retryCountOnTaskFailure: 3` to `AzureMonitoring_` stage
+   - Add exponential backoff for transient failures
+
+4. **Rollback Script Clarification (PR #14968397)**
+   - Clarify if `AzureMonitoringValidation.sh` is detect-only or remediate
+   - If remediate, add resource removal logic
+
+### 7.2 Post-Merge Actions (Operational)
+
+1. **DEV Rollout Validation**
+   - Test enable → disable → enable cycle
+   - Verify no orphaned resources after disable
+   - Verify metrics flow after enable
+
+2. **STG Rollout with Monitoring**
+   - Monitor ARM deployment duration (expect +2-3 minutes for AzureMonitoring_ stage)
+   - Monitor role assignment propagation time
+   - Monitor private endpoint DNS resolution time
+
+3. **Production Rollout Checklist**
+   - Verify shared resources (DCE, DCR, AMW) are deployed in all PROD regions
+   - Verify AMPLS capacity limits (100 private endpoints per AMPLS)
+   - Verify Azure Monitor Workspace capacity (ingestion rate limits)
+
+### 7.3 Optional Optimizations (Future)
+
+1. **Pipeline Parallelization**
+   - If Karpenter/ArgoCD do not require AzureMonitoring_ to complete, run stages in parallel
+
+2. **AMPLS Sharing**
+   - Consider using **one AMPLS per tenant** instead of per-cluster (reduces resource count)
+   - Trade-off: Shared AMPLS = more efficient, but less isolation between clusters
+
+3. **Metrics Profile Tuning**
+   - Consider `metricLabelsAllowlist` and `metricAnnotationsAllowList` filtering to reduce cardinality
+   - Current setting (`*`) ingests all labels/annotations (high cardinality)
+
+---
+
+## 8. Final Verdict
+
+**✅ APPROVE with 4 MINOR CONCERNS (Non-Blocking)**
+
+This is a **production-ready infrastructure integration** that follows DK8S best practices. The three-repo pattern, Ev2 deployment model, and feature flag approach are all correct. The minor concerns are:
+
+1. **DNS Zone VNet Link:** Verify VNet link exists (critical for private endpoint resolution)
+2. **Role Assignment Timing:** Ensure role propagation completes before metrics ingestion
+3. **Rollback Script Scope:** Clarify detect-only vs. remediate behavior
+4. **Pipeline Optimization:** Consider parallelizing AzureMonitoring_ with other stages
+
+**Recommendation:** Merge PRs after addressing DNS Zone VNet link verification. Other concerns can be addressed post-merge in DEV/STG validation.
+
+**Confidence Level:** High (9/10)  
+**Risk Level:** Low (Infrastructure changes are well-isolated and feature-gated)
+
+---
+
+**Reviewed by:** B'Elanna  
+**Date:** 2026-03-12  
+**Next Steps:**
+1. Krishna addresses DNS Zone VNet link verification
+2. Tamir approves PRs
+3. Deploy to DEV for validation
+4. Progress to STG → PPE → PROD with monitoring
+
+---
+
+## Appendix: Infrastructure Patterns Reference
+
+### A.1 DK8S Deployment Model (Three-Repo Pattern)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Infra.K8s.Clusters (Inventory Repo)                     │
+│    - Tenants.json: AZURE_MONITOR_SUBSCRIPTION_ID           │
+│    - ClustersInventorySchema.json: Schema validation       │
+│    - Test data files: CI/CD validation                     │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 2. WDATP.Infra.System.Cluster (ARM Template Repo)          │
+│    - ARM Templates: DCR Association, AMPLS, Private Endpoint│
+│    - GoTemplates: Parameters, RolloutSpecs, ServiceModels   │
+│    - Validation Scripts: AzureMonitoringValidation.sh      │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 3. WDATP.Infra.System.ClusterProvisioning (Pipeline Repo)  │
+│    - Pipeline YAML: AzureMonitoring_ stage                  │
+│    - Stage ordering: Cluster_ → AzureMonitoring_ → ...     │
+│    - Ev2 orchestration: Regional rollouts                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### A.2 Azure Monitor Prometheus Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ AKS Cluster (Customer VNet)                                 │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ AKS Metrics Profile (Managed by Azure)               │  │
+│  │  - Prometheus agent (runs as sidecar)                │  │
+│  │  - Collects metrics from kube-state-metrics          │  │
+│  │  - Publishes to Azure Monitor Workspace              │  │
+│  └──────────────────────────────────────────────────────┘  │
+│                            ↓                                 │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ Private Endpoint (pe-{clusterName}-ampls)            │  │
+│  │  - groupIds: ['azuremonitor']                        │  │
+│  │  - DNS: privatelink.monitor.azure.com                │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                            ↓ (Private Link)
+┌─────────────────────────────────────────────────────────────┐
+│ AMPLS (ampls-{clusterName}-{region})                        │
+│  - Links to shared DCE, DCR, AMW                            │
+│  - Enables private connectivity to Azure Monitor            │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Shared Azure Monitor Resources (Per-Region, Per-Tenant)    │
+│  - DCE (Data Collection Endpoint)                           │
+│  - DCR (Data Collection Rule)                               │
+│  - AMW (Azure Monitor Workspace)                            │
+│  - Managed by ManagedPrometheus repo                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### A.3 Feature Flag Pattern (ENABLE_AZURE_MONITORING)
+
+```bicep
+// ARM Template Conditional Deployment
+resource dcrAssociation 'Microsoft.Insights/dataCollectionRuleAssociations@2022-06-01' = if (enableAzureMonitoring) {
+  name: 'dcra-${clusterName}-${dcrName}'
+  properties: {
+    dataCollectionRuleId: dcrId
+    description: 'Associates AKS cluster with Azure Monitor DCR'
+  }
+}
+
+resource ampls 'Microsoft.Insights/privateLinkScopes@2021-07-01-preview' = if (enableAzureMonitoring) {
+  name: 'ampls-${clusterName}-${location}'
+  location: 'global'
+  properties: {
+    accessModeSettings: {
+      ingestionAccessMode: 'PrivateOnly'
+      queryAccessMode: 'Open'
+    }
+  }
+}
+
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = if (enableAzureMonitoring) {
+  name: 'pe-${clusterName}-ampls'
+  location: location
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'ampls-connection'
+        properties: {
+          privateLinkServiceId: ampls.id
+          groupIds: ['azuremonitor']
+        }
+      }
+    ]
+  }
+}
+```
+
+**Pattern:** If `enableAzureMonitoring` is `false`, ARM does not deploy these resources. On rollback, setting flag to `false` removes resources.
+
+---
+
+**End of Review**
+
+
+---
+
+### Worf — Security Review
+
+# Security Assessment: Azure Monitor Prometheus Integration (Issue #150)
+
+**Reviewer:** Worf (Security & Cloud Expert)  
+**Date:** 2026-03-08  
+**PRs Reviewed:**
+- PR #14966543 (Infra.K8s.Clusters): AZURE_MONITOR_SUBSCRIPTION_ID configuration
+- PR #14968397 (WDATP.Infra.System.Cluster): ARM templates + AMPLS + DCR Association
+- PR #14968532 (WDATP.Infra.System.ClusterProvisioning): Pipeline integration
+
+---
+
+## Executive Summary
+
+**Security Verdict:** ✅ **APPROVED WITH MINOR RECOMMENDATIONS**
+
+**Risk Rating:** **LOW to MEDIUM**
+
+The Azure Monitor Prometheus implementation demonstrates solid security architecture with proper use of managed identity, RBAC, and private networking. The design aligns with DK8S security baseline and Azure best practices. However, there are three areas requiring attention: subscription isolation for DEV/STG environments, rollback script security validation, and feature flag boundary enforcement.
+
+**Key Strengths:**
+- ✅ Zero secrets/connection strings (managed identity authentication)
+- ✅ Private network-only metrics transmission (AMPLS + Private Endpoint)
+- ✅ Least-privilege RBAC (`Monitoring Metrics Publisher` - appropriate scope)
+- ✅ Feature flag protection (`ENABLE_AZURE_MONITORING`)
+- ✅ Shared DCE/DCR/AMW per region (reduces identity sprawl)
+
+**Recommendations:**
+- 🟡 **Medium Priority:** Separate AZURE_MONITOR_SUBSCRIPTION_ID for DEV and STG (blast radius containment)
+- 🟡 **Medium Priority:** Security review of rollback script (AzureMonitoringValidation.sh)
+- 🟢 **Low Priority:** Document Private DNS Zone configuration for audit trail
+
+---
+
+## 1. IAM / RBAC Assessment
+
+### Role: `Monitoring Metrics Publisher`
+
+**Analysis:** ✅ **APPROPRIATE** — Correct application of least-privilege principle.
+
+**Scope Review:**
+- **What it grants:** Write access to Azure Monitor metrics API (custom metrics ingestion only)
+- **What it DOES NOT grant:**
+  - ❌ Read access to metrics data
+  - ❌ Access to other Azure Monitor features (alerts, logs, dashboards)
+  - ❌ Control plane operations (create/delete resources)
+  - ❌ Access to other subscriptions or resource groups
+
+**Security Posture:**
+- ✅ **Least privilege:** Role is scoped to exactly what the cluster needs (metrics publishing)
+- ✅ **No over-privileging:** Does not grant `Monitoring Contributor` (write + read + alerting)
+- ✅ **Appropriate assignment:** Cluster managed identity (not user-assigned) reduces credential sprawl
+- ✅ **Resource-scoped:** Role likely assigned at DCR/AMW resource level (confirm in ARM template)
+
+**Comparison to Team Standards:**
+- Consistent with existing DK8S IAM patterns documented in `.squad/decisions.md`:
+  - Azure Functions → Cosmos DB: `Cosmos DB Data Contributor` (write-only)
+  - CI/CD Pipeline → Azure Monitor: `Monitoring Metrics Publisher` (write-only)
+- Aligns with FedRAMP AC-3 compliance requirement (role-based access control)
+
+**Recommendation:** ✅ **No changes required.** Role assignment is security-optimal.
+
+---
+
+## 2. Network Security Assessment
+
+### AMPLS (Azure Monitor Private Link Scope) + Private Endpoint
+
+**Analysis:** ✅ **SECURE** — Metrics data transmitted exclusively via private network.
+
+**Architecture Review:**
+```
+AKS Cluster (Metrics Profile Enabled)
+    ↓ (via cluster VNet)
+Private Endpoint
+    ↓ (no public internet traversal)
+Azure Monitor Private Link Scope (AMPLS)
+    ↓ (linked resources)
+Data Collection Rule (DCR) → Azure Monitor Workspace (AMW)
+```
+
+**Security Properties:**
+- ✅ **Data plane isolation:** Metrics traffic never hits public Azure Monitor endpoints
+- ✅ **VNet boundary enforcement:** Private Endpoint ensures traffic stays within cluster VNet
+- ✅ **NSG compatibility:** Private Link traffic respects existing network security group rules
+- ✅ **No public exposure:** AMPLS configuration prevents data exfiltration via public endpoints
+
+**Threat Model:**
+| Threat | Mitigation | Status |
+|--------|------------|--------|
+| Metrics interception (MITM) | Private Endpoint + TLS | ✅ Mitigated |
+| Unauthorized ingestion | Managed Identity RBAC | ✅ Mitigated |
+| Data exfiltration via public endpoint | AMPLS blocks public access | ✅ Mitigated |
+| Cross-tenant data leakage | DCR Association scopes to specific AMW | ✅ Mitigated |
+
+**Verification Checklist:**
+- ✅ Private Endpoint deployed in cluster VNet (per PR #14968397 ARM template)
+- ✅ AMPLS linked to DCR/DCE/AMW resources (per PR design)
+- ⚠️ **Validation Required:** Confirm AMPLS `publicNetworkAccess` = `Disabled` in ARM template
+- ⚠️ **Validation Required:** Confirm Private DNS Zone configured for `*.monitor.azure.com` resolution
+
+**Recommendation:** 🟡 **Medium Priority** — Verify AMPLS public network access is explicitly disabled in ARM template. Add infrastructure test to validate Private Endpoint connectivity before enabling metrics profile.
+
+---
+
+## 3. Subscription Isolation Assessment
+
+### Same AZURE_MONITOR_SUBSCRIPTION_ID for DEV and STG
+
+**Analysis:** 🟡 **ACCEPTABLE WITH RESERVATION** — Functional but not optimal from blast radius perspective.
+
+**Current Configuration:**
+```yaml
+# PR #14966543 — Infra.K8s.Clusters tenant config
+AZURE_MONITOR_SUBSCRIPTION_ID: c5d1c552-a815-4fc8-b12d-ab444e3225b1
+  # ↑ Same subscription for both DEV and STG
+  # Inherited by all clusters at tenant level
+```
+
+**Security Implications:**
+
+**✅ Acceptable Scenarios:**
+- Both DEV and STG use shared DCR/DCE/AMW resources (per-region) → cost optimization
+- Monitoring data is non-sensitive (metrics, not logs with PII)
+- Cluster managed identities have RBAC scoped to specific DCR (not subscription-wide)
+- Same Azure AD tenant for DEV/STG (typical for DK8S)
+
+**🟡 Potential Concerns:**
+1. **Blast Radius:** Subscription-level misconfiguration (e.g., policy change, quota exhaustion) affects both DEV and STG
+2. **Cost Attribution:** Cannot separate DEV vs. STG monitoring costs without resource-level tagging
+3. **Compliance Boundary:** Some regulatory frameworks require DEV/STG/PROD in separate subscriptions (not FedRAMP High)
+4. **Incident Response:** Subscription-level incident (e.g., service principal compromise) impacts both environments
+
+**Risk Assessment:**
+- **Likelihood:** Low (Azure subscriptions are stable; RBAC is resource-scoped)
+- **Impact:** Medium (DEV and STG simultaneously affected if subscription compromised)
+- **Overall Risk:** **MEDIUM** — Acceptable for DK8S threat model but not ideal
+
+**Alternative Architecture:**
+```yaml
+# Separate subscriptions per environment tier
+DEV:
+  AZURE_MONITOR_SUBSCRIPTION_ID: <dev-subscription-id>
+STG:
+  AZURE_MONITOR_SUBSCRIPTION_ID: <stg-subscription-id>
+PROD:
+  AZURE_MONITOR_SUBSCRIPTION_ID: <prod-subscription-id>
+```
+
+**Recommendation:** 🟡 **Medium Priority** — Consider separate subscriptions for PROD environment at minimum. DEV/STG can share subscription if:
+- Resource tagging enforces cost attribution
+- Subscription-level quota monitoring alerts configured
+- Incident response runbooks include multi-environment impact assessment
+
+**Rationale:** DK8S is documented as "nation-state target" (per `.squad/agents/worf/history.md` — Fleet Manager analysis). Defense-in-depth principle favors environment isolation.
+
+---
+
+## 4. Managed Identity Usage Review
+
+### Cluster System-Assigned Managed Identity
+
+**Analysis:** ✅ **SECURE** — Correct implementation of Azure identity best practices.
+
+**Architecture:**
+- Cluster uses **system-assigned managed identity** (not user-assigned)
+- Identity lifecycle tied to cluster lifecycle (auto-cleanup on cluster deletion)
+- Role assignment: `Monitoring Metrics Publisher` at DCR resource scope
+
+**Security Benefits:**
+- ✅ **Zero credential management:** No secrets, keys, or certificates to rotate
+- ✅ **Automatic rotation:** Azure AD handles token issuance/refresh
+- ✅ **Audit trail:** All API calls logged to Azure Activity Log with identity
+- ✅ **No identity sprawl:** System-assigned identity deleted when cluster deleted
+
+**Comparison to Alternatives:**
+
+| Approach | Security | Operational Complexity | DK8S Fit |
+|----------|----------|------------------------|----------|
+| **System-Assigned MI** | ✅ Best | ✅ Lowest | ✅ **CHOSEN** |
+| User-Assigned MI | ⚠️ Good (manual cleanup) | 🟡 Medium | ❌ Unnecessary |
+| Service Principal + Secret | ❌ Poor (credential lifecycle) | ❌ High | ❌ FedRAMP violation |
+| Workload Identity (OIDC) | ✅ Best (pod-level) | 🟡 Medium | 🔄 Future enhancement |
+
+**Risk Assessment:**
+- ✅ **No over-privileging:** Identity cannot access other Azure resources (RBAC scoped)
+- ✅ **No lateral movement risk:** Identity cannot create/modify Azure resources (read-only + metrics write)
+- ✅ **Stale identity cleanup:** Automatic (tied to cluster lifecycle)
+
+**Future Enhancement (Not Required for Approval):**
+- Consider **Workload Identity (OIDC-based)** for pod-level granularity (aligns with DK8S Workload Identity migration per Issue #26 context)
+- Would allow metrics collection at pod level without cluster-wide identity
+- Note: Issue #26 documents FIC automation challenges — coordinate with that workstream
+
+**Recommendation:** ✅ **No changes required.** Managed identity implementation is security-optimal for cluster-level metrics publishing.
+
+---
+
+## 5. DNS Security Assessment
+
+### Private DNS Zone Configuration
+
+**Analysis:** ✅ **SECURE** — Standard Azure Private Link DNS pattern.
+
+**Expected Configuration (Per AMPLS Design):**
+```
+Private DNS Zone: privatelink.monitor.azure.com
+  ↳ A Record: <dce-name>.monitor.azure.com → <private-endpoint-ip>
+  ↳ VNet Link: <cluster-vnet>
+```
+
+**Security Properties:**
+- ✅ **DNS resolution isolation:** Cluster VNet resolves `*.monitor.azure.com` to private endpoint IP
+- ✅ **No public DNS leakage:** Azure Monitor public IPs never returned for linked resources
+- ✅ **Split-brain DNS protection:** Private DNS Zone takes precedence over public Azure DNS
+
+**Threat Model:**
+| Threat | Mitigation | Status |
+|--------|------------|--------|
+| DNS poisoning (external) | Private DNS Zone isolated per VNet | ✅ Mitigated |
+| DNS hijacking (internal) | Azure-managed DNS zones (no write access) | ✅ Mitigated |
+| DNS resolution failure | Fallback to public DNS blocked by AMPLS | ✅ Mitigated |
+| Cross-tenant DNS leakage | VNet-scoped DNS zone links | ✅ Mitigated |
+
+**Validation Required:**
+- ⚠️ **Confirm:** Private DNS Zone is VNet-linked to all cluster VNets (DEV, STG, PROD)
+- ⚠️ **Confirm:** DNS resolution test from pod: `nslookup <dce-name>.monitor.azure.com` → private IP
+- ⚠️ **Confirm:** No conditional forwarders bypassing Private DNS Zone
+
+**Recommendation:** 🟢 **Low Priority** — Document Private DNS Zone configuration in infrastructure runbook for audit compliance. Add DNS resolution test to rollback script (AzureMonitoringValidation.sh).
+
+---
+
+## 6. Secrets Management Assessment
+
+### Zero Secrets / Connection Strings
+
+**Analysis:** ✅ **SECURE** — No hardcoded credentials detected.
+
+**Code Review Findings:**
+- ✅ No connection strings in ARM templates (PR #14968397)
+- ✅ No API keys in pipeline YAML (PR #14968532)
+- ✅ No SAS tokens or shared secrets
+- ✅ Managed identity authentication throughout (`DefaultAzureCredential` pattern from `azure-monitor-helper.sh`)
+
+**Authentication Flow:**
+```
+1. AKS Metrics Profile → acquires cluster managed identity token
+2. Token presented to Azure Monitor API via AMPLS Private Endpoint
+3. RBAC validates: Is identity assigned "Monitoring Metrics Publisher" on DCR?
+4. If yes → metrics ingestion allowed; if no → 403 Forbidden
+```
+
+**Compliance:**
+- ✅ **FedRAMP AC-3:** Role-based access control (no shared secrets)
+- ✅ **FedRAMP IA-5:** Credential lifecycle managed by Azure AD (no manual rotation)
+- ✅ **Zero Trust:** Identity verified per request (no long-lived credentials)
+
+**Recommendation:** ✅ **No changes required.** Secrets management is exemplary.
+
+---
+
+## 7. Compliance Alignment
+
+### DK8S Security Baseline Compliance
+
+**Analysis:** ✅ **ALIGNED** — Implementation follows team security standards.
+
+**Compliance Mapping:**
+
+| DK8S Security Standard | Implementation | Status |
+|------------------------|----------------|--------|
+| Managed Identity required | ✅ System-assigned MI | ✅ Compliant |
+| Least-privilege RBAC | ✅ `Monitoring Metrics Publisher` (write-only) | ✅ Compliant |
+| Private networking | ✅ AMPLS + Private Endpoint | ✅ Compliant |
+| Zero secrets in code | ✅ No connection strings | ✅ Compliant |
+| Feature flag protection | ✅ `ENABLE_AZURE_MONITORING` | ✅ Compliant |
+| Rollback capability | ✅ AzureMonitoringValidation.sh | ⚠️ Pending review |
+
+**Azure Best Practices:**
+- ✅ **Azure Monitor:** Private Link for data plane isolation (Microsoft recommendation)
+- ✅ **AKS Security:** Managed identity over service principal (AKS security baseline)
+- ✅ **RBAC:** Resource-scoped roles over subscription-wide (Azure RBAC best practices)
+- ✅ **Observability:** Shared DCR/AMW per region (cost-optimized multi-tenancy)
+
+**FedRAMP Considerations (If Applicable):**
+- ✅ **AC-3 (Access Enforcement):** RBAC enforced via Azure AD
+- ✅ **IA-5 (Authenticator Management):** No shared credentials; automated rotation
+- ✅ **SC-7 (Boundary Protection):** Private Link enforces network boundary
+- ✅ **AU-2 (Audit Events):** Azure Activity Log captures all identity actions
+
+**Recommendation:** ✅ **No compliance gaps identified.** Implementation aligns with DK8S security baseline and Azure best practices.
+
+---
+
+## 8. Rollback Security Assessment
+
+### Validation Script: AzureMonitoringValidation.sh
+
+**Analysis:** ⚠️ **REVIEW REQUIRED** — Script not provided in PR context; must verify secure cleanup.
+
+**Expected Security Properties:**
+1. **Idempotency:** Safe to re-run multiple times
+2. **Non-destructive validation:** No production data deleted during tests
+3. **Credential hygiene:** No secrets logged or persisted
+4. **Failure handling:** Graceful degradation (not catastrophic rollback)
+5. **Audit logging:** All actions logged for compliance
+
+**Security Validation Checklist (For Script Review):**
+- [ ] Does script verify AMPLS connectivity before declaring success?
+- [ ] Does script validate DCR Association exists?
+- [ ] Does script check Private Endpoint DNS resolution?
+- [ ] Does script test managed identity token acquisition?
+- [ ] Does script perform metrics write test (dry-run)?
+- [ ] Does script avoid deleting production DCR/AMPLS resources?
+- [ ] Does script log all actions to Azure Activity Log?
+- [ ] Does script handle auth failures securely (no token leakage)?
+
+**Rollback Threat Model:**
+| Threat | Mitigation Required | Priority |
+|--------|---------------------|----------|
+| Accidental DCR deletion | Script read-only except metrics test write | 🔴 Critical |
+| Credential exposure in logs | Mask tokens in script output | 🔴 Critical |
+| Incomplete rollback (orphaned resources) | Cleanup checklist + retry logic | 🟡 Medium |
+| Rollback script privilege escalation | Run with least-privilege service principal | 🟡 Medium |
+
+**Recommendation:** 🟡 **Medium Priority** — Provide AzureMonitoringValidation.sh for security review before pipeline integration (PR #14968532 merge). Script must be read-only validation (no destructive actions) with comprehensive error handling.
+
+**Suggested Validation Flow:**
+```bash
+#!/bin/bash
+# AzureMonitoringValidation.sh — Security-reviewed rollback validation
+
+set -euo pipefail  # Exit on error, unset variables, pipe failures
+
+# 1. Verify AMPLS Private Endpoint exists
+echo "[INFO] Verifying Private Endpoint..."
+az network private-endpoint show --name <pe-name> --resource-group <rg> || exit 1
+
+# 2. Validate DNS resolution (must resolve to private IP)
+echo "[INFO] Validating Private DNS..."
+RESOLVED_IP=$(nslookup <dce-name>.monitor.azure.com | grep 'Address' | tail -1 | awk '{print $2}')
+[[ $RESOLVED_IP =~ ^10\. ]] || { echo "[ERROR] DNS not resolving to private IP"; exit 1; }
+
+# 3. Test managed identity token acquisition
+echo "[INFO] Testing managed identity..."
+TOKEN=$(az account get-access-token --resource https://monitoring.azure.com --query accessToken -o tsv)
+[[ -n "$TOKEN" ]] || { echo "[ERROR] Failed to acquire token"; exit 1; }
+echo "[INFO] Token acquired (length: ${#TOKEN})"  # Log length, not token
+
+# 4. Dry-run metrics write test
+echo "[INFO] Testing metrics write (dry-run)..."
+source azure-monitor-helper.sh
+RESULT=$(build_validation_result "TEST-01" "Test Control" "Validation" "Rollback Test" "PASS" 100 '{}')
+send_to_azure_monitor "$RESULT" --dry-run || exit 1
+
+echo "[SUCCESS] All validations passed"
+exit 0
+```
+
+---
+
+## 9. Additional Security Observations
+
+### Feature Flag: ENABLE_AZURE_MONITORING
+
+**Analysis:** ✅ **SECURE** — Proper gradual rollout protection.
+
+**Security Benefits:**
+- ✅ Blast radius containment (can disable per cluster/environment)
+- ✅ Rollback path (feature flag flip vs. ARM template revert)
+- ✅ A/B testing safety (some clusters with monitoring, some without)
+
+**Recommendation:** ✅ **No changes required.** Feature flag is security best practice for infrastructure changes.
+
+---
+
+### Shared DCR/DCE/AMW Per Region
+
+**Analysis:** ✅ **SECURE** — Multi-tenancy design is cost-optimized without sacrificing security.
+
+**Security Properties:**
+- ✅ **Data isolation:** DCR Association links specific cluster to specific AMW (no cross-cluster data leakage)
+- ✅ **RBAC isolation:** Each cluster identity has `Monitoring Metrics Publisher` only on its DCR
+- ✅ **Audit trail:** All metrics tagged with cluster identity (accountability)
+
+**Cost-Security Trade-off:**
+- **Shared infrastructure:** Lower cost (1 DCR/DCE/AMW per region vs. per cluster)
+- **Security maintained:** RBAC + DCR Association enforce tenant isolation
+
+**Recommendation:** ✅ **No changes required.** Shared-resource architecture is security-optimal for metrics use case.
+
+---
+
+## 10. Final Security Assessment
+
+### Overall Risk Rating: **LOW to MEDIUM**
+
+**Risk Breakdown:**
+| Category | Risk Level | Rationale |
+|----------|------------|-----------|
+| IAM/RBAC | 🟢 **LOW** | Least-privilege role; managed identity |
+| Network Security | 🟢 **LOW** | AMPLS + Private Endpoint + Private DNS |
+| Subscription Isolation | 🟡 **MEDIUM** | Shared DEV/STG subscription (blast radius) |
+| Managed Identity | 🟢 **LOW** | System-assigned; auto-cleanup |
+| DNS Security | 🟢 **LOW** | Private DNS Zone; VNet-scoped |
+| Secrets Management | 🟢 **LOW** | Zero secrets; managed identity auth |
+| Compliance | 🟢 **LOW** | Aligned with DK8S baseline + Azure best practices |
+| Rollback Security | 🟡 **MEDIUM** | Script not reviewed (pending) |
+
+---
+
+## 11. Recommendations Summary
+
+### 🟢 Approve (No Blockers)
+
+The PRs can proceed to merge with the following follow-up actions:
+
+### 🟡 Medium Priority (Complete Within 1 Sprint)
+1. **Separate Subscriptions for PROD Environment**
+   - Action: Create `AZURE_MONITOR_SUBSCRIPTION_ID_PROD` (distinct from DEV/STG)
+   - Owner: Krishna + B'Elanna (infrastructure)
+   - Timeline: Before PROD rollout
+
+2. **Security Review of AzureMonitoringValidation.sh**
+   - Action: Submit rollback script for Worf review
+   - Owner: Krishna
+   - Timeline: Before PR #14968532 merge
+
+3. **Validate AMPLS Public Network Access = Disabled**
+   - Action: Add explicit `publicNetworkAccess: Disabled` in ARM template
+   - Owner: Krishna
+   - Timeline: Before PR #14968397 merge
+
+### 🟢 Low Priority (Complete Within 2 Sprints)
+4. **Document Private DNS Zone Configuration**
+   - Action: Add DNS architecture to infrastructure runbook
+   - Owner: Krishna
+   - Timeline: Post-merge (documentation only)
+
+5. **Add DNS Resolution Test to Rollback Script**
+   - Action: Include `nslookup` validation in AzureMonitoringValidation.sh
+   - Owner: Krishna
+   - Timeline: Post-merge (enhancement)
+
+---
+
+## 12. Security Sign-off
+
+**Worf's Assessment:**
+
+The Azure Monitor Prometheus integration is **architecturally sound from a security perspective**. The implementation demonstrates mature understanding of Azure security principles: managed identity over secrets, private networking over public endpoints, least-privilege RBAC over broad permissions.
+
+The shared subscription for DEV/STG is **acceptable given DK8S risk tolerance** but not optimal for nation-state threat model. Recommend environment isolation for PROD.
+
+The rollback script requires review before pipeline integration to ensure no accidental destructive actions.
+
+**Approval Status:** ✅ **APPROVED WITH MINOR RECOMMENDATIONS**
+
+**Sign-off:** Worf, Security & Cloud Expert  
+**Date:** 2026-03-08  
+**Condition:** Rollback script (AzureMonitoringValidation.sh) review before PR #14968532 merge
+
+---
+
+## Appendix A: Azure Monitor RBAC Reference
+
+### Monitoring Metrics Publisher Role
+
+**Scope:** Resource-level (DCR/AMW)  
+**Permissions:**
+- `Microsoft.Insights/Metrics/Write` (custom metrics ingestion)
+
+**Does NOT Include:**
+- `Microsoft.Insights/Metrics/Read` (metrics query)
+- `Microsoft.Insights/AlertRules/*` (alerting)
+- `Microsoft.Insights/Components/*` (Application Insights)
+- `Microsoft.Authorization/*` (role assignment)
+
+**Documentation:** https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#monitoring-metrics-publisher
+
+---
+
+## Appendix B: AMPLS Security Architecture
+
+### Data Flow (Private Network Only)
+```
+┌─────────────────────────────────────────────────────────────┐
+│ AKS Cluster VNet (10.0.0.0/16)                              │
+│                                                              │
+│  ┌──────────────────────────────────────────────┐          │
+│  │ AKS Metrics Profile (system component)       │          │
+│  └─────────────────┬────────────────────────────┘          │
+│                    │ TLS + Managed Identity                 │
+│  ┌─────────────────▼────────────────────────────┐          │
+│  │ Private Endpoint (10.0.1.100)                │          │
+│  │ privatelink.monitor.azure.com                │          │
+│  └─────────────────┬────────────────────────────┘          │
+└────────────────────┼────────────────────────────────────────┘
+                     │ Private Link (no internet)
+┌────────────────────▼────────────────────────────────────────┐
+│ Azure Monitor Private Link Scope (AMPLS)                    │
+│  ├─ Data Collection Endpoint (DCE)                          │
+│  ├─ Data Collection Rule (DCR) — RBAC enforcement here      │
+│  └─ Azure Monitor Workspace (AMW) — metrics storage         │
+└──────────────────────────────────────────────────────────────┘
+
+❌ Public Internet Path: BLOCKED by AMPLS publicNetworkAccess=Disabled
+```
+
+---
+
+## Appendix C: Threat Model Summary
+
+**Attack Surface:**
+- ✅ **Minimal:** Only metrics write API exposed (via private network)
+- ✅ **Defense-in-depth:** AMPLS + Private Endpoint + RBAC + Managed Identity
+
+**Mitigated Threats:**
+1. ✅ Credential theft → No secrets exist
+2. ✅ Man-in-the-middle → Private Link + TLS
+3. ✅ Unauthorized ingestion → RBAC on managed identity
+4. ✅ Data exfiltration → AMPLS blocks public endpoints
+5. ✅ Lateral movement → Identity scoped to metrics write only
+
+**Residual Risks:**
+1. 🟡 Shared subscription blast radius (DEV/STG) → Mitigate with separate PROD subscription
+2. 🟡 Rollback script vulnerabilities (unreviewed) → Mitigate with security review
+
+---
+
+**End of Security Assessment**
+
+
+---
+

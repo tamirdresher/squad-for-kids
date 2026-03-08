@@ -985,3 +985,32 @@ slookup) to rollback script
 2. Verify AMPLS ARM template includes publicNetworkAccess: Disabled
 3. Consider PROD subscription separation discussion with B'Elanna (infrastructure owner)
 
+
+### 2026-03-08: Issue #150 Azure Monitor Prometheus Integration — Security Review
+
+**Assignment:** Security review of 3-PR implementation for Azure Monitor Prometheus integration.
+
+**Scope:**
+- PR #14966543 (Infra.K8s.Clusters) — AZURE_MONITOR_SUBSCRIPTION_ID configuration
+- PR #14968397 (WDATP.Infra.System.Cluster) — ARM templates + AMPLS + DCR Association
+- PR #14968532 (WDATP.Infra.System.ClusterProvisioning) — Pipeline integration
+
+**Analysis:**
+- Managed Identity: Zero secrets/connection strings, proper RBAC usage
+- RBAC Scope: Monitoring Metrics Publisher correctly scoped (write-only, no read/alerting/control plane)
+- Network Security: Private network-only metrics transmission (AMPLS + Private Endpoint)
+- Feature Flag Protection: ENABLE_AZURE_MONITORING gate in place
+- Shared Resource Model: Reduces identity sprawl, centralizes monitoring configuration
+
+**Recommendations:**
+- 🟡 Separate AZURE_MONITOR_SUBSCRIPTION_ID for DEV and STG (blast radius containment)
+- 🟡 Security review of rollback script (AzureMonitoringValidation.sh)
+- 🟢 Document Private DNS Zone configuration for audit trail
+
+**Verdict:** ✅ **APPROVED**
+- Risk Rating: LOW-MEDIUM
+- Solid security architecture aligned with DK8S baseline
+- Recommendations for environment isolation documented
+- Ready for STG deployment
+
+**Deliverable:** Full review in decisions.md — consolidated with Picard + B'Elanna assessments

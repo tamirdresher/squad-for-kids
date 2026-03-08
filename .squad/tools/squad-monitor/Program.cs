@@ -1,4 +1,5 @@
 using Spectre.Console;
+using Spectre.Console.Rendering;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
@@ -32,13 +33,9 @@ AnsiConsole.MarkupLine($"[dim]Squad Monitor v2 - Refresh interval: {interval}s[/
 AnsiConsole.MarkupLine($"[dim]Team root: {teamRoot}[/]");
 AnsiConsole.WriteLine();
 
-do
+if (runOnce)
 {
-    if (!runOnce)
-    {
-        Console.Clear();
-    }
-
+    // Run once mode: render directly without Live display
     var now = DateTime.UtcNow;
     var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss} UTC[/]")
     {
@@ -47,29 +44,72 @@ do
     AnsiConsole.Write(header);
     AnsiConsole.WriteLine();
 
-    // --- Ralph Watch Status ---
     DisplayRalphHeartbeat(userProfile);
     DisplayRalphLog(userProfile);
-
-    // --- GitHub Issues ---
     DisplayGitHubIssues(teamRoot);
-
-    // --- GitHub PRs ---
     DisplayGitHubPRs(teamRoot);
-
-    // --- Orchestration Log (existing, now a section) ---
     var activities = LoadActivities(teamRoot);
     DisplayOrchestrationLog(activities);
+}
+else
+{
+    // Live mode: use AnsiConsole.Live() for flicker-free updates
+    var layout = new Layout("Root");
+    
+    await AnsiConsole.Live(layout)
+        .AutoClear(false)
+        .StartAsync(async ctx =>
+        {
+            do
+            {
+                var now = DateTime.UtcNow;
+                var content = BuildDashboardContent(now, userProfile, teamRoot);
+                layout.Update(content);
+                ctx.Refresh();
 
-    if (!runOnce)
-    {
-        AnsiConsole.MarkupLine($"\n[dim]Refreshing in {interval}s... (Ctrl+C to exit)[/]");
-        await Task.Delay(TimeSpan.FromSeconds(interval));
-    }
+                AnsiConsole.MarkupLine($"\n[dim]Refreshing in {interval}s... (Ctrl+C to exit)[/]");
+                await Task.Delay(TimeSpan.FromSeconds(interval));
 
-} while (!runOnce);
+            } while (true);
+        });
+}
 
 return 0;
+
+// ─── Dashboard Content Builder ─────────────────────────────────────────────
+
+static IRenderable BuildDashboardContent(DateTime now, string userProfile, string teamRoot)
+{
+    var sections = new List<IRenderable>();
+
+    // Header
+    var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss} UTC[/]")
+    {
+        Justification = Justify.Left
+    };
+    sections.Add(header);
+    sections.Add(Text.Empty);
+
+    // Ralph Watch Heartbeat
+    sections.Add(BuildRalphHeartbeatSection(userProfile));
+    
+    // Ralph Watch Log
+    sections.Add(BuildRalphLogSection(userProfile));
+    
+    // GitHub Issues
+    sections.Add(BuildGitHubIssuesSection(teamRoot));
+    
+    // GitHub PRs
+    sections.Add(BuildGitHubPRsSection(teamRoot));
+    
+    // Orchestration Log
+    var activities = LoadActivities(teamRoot);
+    sections.Add(BuildOrchestrationLogSection(activities));
+
+    // Combine all sections into a group
+    var rows = new Rows(sections);
+    return rows;
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -127,6 +167,387 @@ static string? RunProcess(string fileName, string arguments, string? workingDire
     {
         return null;
     }
+}
+
+// ─── Section Builders (return IRenderable) ──────────────────────────────────
+
+static IRenderable BuildRalphHeartbeatSection(string userProfile)
+{
+    var items = new List<IRenderable>();
+    
+    var section = new Rule("[cyan]Ralph Watch Loop[/]") { Justification = Justify.Left };
+    items.Add(section);
+
+    var heartbeatPath = Path.Combine(userProfile, ".squad", "ralph-heartbeat.json");
+    if (!File.Exists(heartbeatPath))
+    {
+        items.Add(new Markup("[dim]  No heartbeat file found — ralph-watch may not be running[/]"));
+        items.Add(Text.Empty);
+        return new Rows(items);
+    }
+
+    try
+    {
+        var json = File.ReadAllText(heartbeatPath);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        var lastRun = root.TryGetProperty("lastRun", out var lr) ? lr.GetString() : null;
+        var round = root.TryGetProperty("round", out var rn) ? rn.ToString() : "?";
+        var status = root.TryGetProperty("status", out var st) ? st.GetString() : "unknown";
+        var consecutiveFailures = root.TryGetProperty("consecutiveFailures", out var cf) ? cf.GetInt32() : 0;
+        var pid = root.TryGetProperty("pid", out var p) ? p.ToString() : "?";
+
+        var staleness = "unknown";
+        var stalenessColor = "dim";
+        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var lastRunDt))
+        {
+            var age = DateTime.UtcNow - lastRunDt;
+            staleness = FormatAge(age);
+            stalenessColor = age.TotalMinutes < 10 ? "green" : age.TotalMinutes < 30 ? "yellow" : "red";
+        }
+
+        var statusColor = status == "running" ? "green" : status == "idle" ? "yellow" : "red";
+        var failColor = consecutiveFailures == 0 ? "green" : consecutiveFailures < 3 ? "yellow" : "red";
+
+        items.Add(new Markup($"  Status: [{statusColor}]{Markup.Escape(status ?? "unknown")}[/]  |  " +
+                            $"Round: [white]{Markup.Escape(round)}[/]  |  " +
+                            $"Last run: [{stalenessColor}]{Markup.Escape(staleness)}[/]  |  " +
+                            $"Failures: [{failColor}]{consecutiveFailures}[/]  |  " +
+                            $"PID: [dim]{Markup.Escape(pid)}[/]"));
+    }
+    catch
+    {
+        items.Add(new Markup("[red]  Error reading heartbeat file[/]"));
+    }
+
+    items.Add(Text.Empty);
+    return new Rows(items);
+}
+
+static IRenderable BuildRalphLogSection(string userProfile)
+{
+    var items = new List<IRenderable>();
+    
+    var logPath = Path.Combine(userProfile, ".squad", "ralph-watch.log");
+    if (!File.Exists(logPath))
+    {
+        return Text.Empty; // No log file — skip silently
+    }
+
+    var section = new Rule("[cyan]Ralph Recent Rounds[/]") { Justification = Justify.Left };
+    items.Add(section);
+
+    try
+    {
+        using var fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var reader = new StreamReader(fs);
+        
+        var fileLength = fs.Length;
+        if (fileLength == 0)
+        {
+            items.Add(new Markup("[dim]  Log file exists but is empty[/]"));
+            items.Add(Text.Empty);
+            return new Rows(items);
+        }
+
+        var startPos = Math.Max(0, fileLength - 500);
+        fs.Seek(startPos, SeekOrigin.Begin);
+        var tail = reader.ReadToEnd();
+
+        var lines = tail.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var last5 = lines.TakeLast(5);
+
+        foreach (var line in last5)
+        {
+            var trimmed = line.Trim();
+            if (string.IsNullOrEmpty(trimmed)) continue;
+
+            var color = trimmed.Contains("✓") ? "green" :
+                       trimmed.Contains("→") ? "cyan" :
+                       trimmed.Contains("⚠") || trimmed.Contains("WARN") ? "yellow" :
+                       trimmed.Contains("✗") || trimmed.Contains("ERROR") ? "red" :
+                       "dim";
+            items.Add(new Markup($"  [{color}]{Markup.Escape(trimmed)}[/]"));
+        }
+    }
+    catch
+    {
+        items.Add(new Markup("[red]  Error reading ralph-watch.log[/]"));
+    }
+
+    items.Add(Text.Empty);
+    return new Rows(items);
+}
+
+static IRenderable BuildGitHubIssuesSection(string teamRoot)
+{
+    var items = new List<IRenderable>();
+    
+    var section = new Rule("[magenta]GitHub Issues (squad)[/]") { Justification = Justify.Left };
+    items.Add(section);
+
+    var output = RunProcess("gh", "issue list --label squad --json number,title,author,createdAt,labels,assignees --limit 20", teamRoot);
+    if (output == null)
+    {
+        items.Add(new Markup("[dim]  Could not fetch issues (gh CLI unavailable or not authenticated)[/]"));
+        items.Add(Text.Empty);
+        return new Rows(items);
+    }
+
+    try
+    {
+        using var doc = JsonDocument.Parse(output);
+        var issues = doc.RootElement;
+
+        if (issues.GetArrayLength() == 0)
+        {
+            items.Add(new Markup("[dim]  No open issues with 'squad' label[/]"));
+            items.Add(Text.Empty);
+            return new Rows(items);
+        }
+
+        var table = new Table()
+            .BorderColor(Color.Grey)
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("#").Width(6))
+            .AddColumn(new TableColumn("Title").Width(40))
+            .AddColumn(new TableColumn("Author").Width(15))
+            .AddColumn(new TableColumn("Labels").Width(20))
+            .AddColumn(new TableColumn("Assignees").Width(15))
+            .AddColumn(new TableColumn("Age").Width(8));
+
+        foreach (var issue in issues.EnumerateArray())
+        {
+            var number = issue.TryGetProperty("number", out var n) ? n.GetInt32().ToString() : "?";
+            var title = issue.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
+            var author = issue.TryGetProperty("author", out var a) && a.TryGetProperty("login", out var login) ? login.GetString() ?? "" : "";
+            var createdAt = issue.TryGetProperty("createdAt", out var c) && DateTime.TryParse(c.GetString(), out var created) ? FormatAge(DateTime.UtcNow - created) : "?";
+
+            var labelsList = new List<string>();
+            if (issue.TryGetProperty("labels", out var labels))
+            {
+                foreach (var label in labels.EnumerateArray())
+                {
+                    if (label.TryGetProperty("name", out var name))
+                    {
+                        var labelName = name.GetString() ?? "";
+                        if (!string.IsNullOrEmpty(labelName))
+                            labelsList.Add(labelName);
+                    }
+                }
+            }
+            var labelsStr = string.Join(", ", labelsList);
+
+            var assigneesList = new List<string>();
+            if (issue.TryGetProperty("assignees", out var assignees))
+            {
+                foreach (var assignee in assignees.EnumerateArray())
+                {
+                    if (assignee.TryGetProperty("login", out var aLogin))
+                    {
+                        var assigneeName = aLogin.GetString() ?? "";
+                        if (!string.IsNullOrEmpty(assigneeName))
+                            assigneesList.Add(assigneeName);
+                    }
+                }
+            }
+            var assigneesStr = assigneesList.Count > 0 ? string.Join(", ", assigneesList) : "[dim]none[/]";
+
+            if (title.Length > 40)
+                title = title.Substring(0, 37) + "...";
+
+            table.AddRow(
+                $"[cyan]{Markup.Escape(number)}[/]",
+                Markup.Escape(title),
+                $"[yellow]{Markup.Escape(author)}[/]",
+                $"[dim]{Markup.Escape(labelsStr)}[/]",
+                assigneesStr,
+                $"[dim]{Markup.Escape(createdAt)}[/]"
+            );
+        }
+
+        items.Add(table);
+    }
+    catch
+    {
+        items.Add(new Markup("[red]  Error parsing issue data[/]"));
+    }
+
+    items.Add(Text.Empty);
+    return new Rows(items);
+}
+
+static IRenderable BuildGitHubPRsSection(string teamRoot)
+{
+    var items = new List<IRenderable>();
+    
+    var section = new Rule("[magenta]GitHub Pull Requests[/]") { Justification = Justify.Left };
+    items.Add(section);
+
+    var output = RunProcess("gh", "pr list --json number,title,author,createdAt,headRefName,reviewDecision,statusCheckRollup,isDraft --limit 20", teamRoot);
+    if (output == null)
+    {
+        items.Add(new Markup("[dim]  Could not fetch PRs (gh CLI unavailable or not authenticated)[/]"));
+        items.Add(Text.Empty);
+        return new Rows(items);
+    }
+
+    try
+    {
+        using var doc = JsonDocument.Parse(output);
+        var prs = doc.RootElement;
+
+        if (prs.GetArrayLength() == 0)
+        {
+            items.Add(new Markup("[dim]  No open pull requests[/]"));
+            items.Add(Text.Empty);
+            return new Rows(items);
+        }
+
+        var table = new Table()
+            .BorderColor(Color.Grey)
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("#").Width(6))
+            .AddColumn(new TableColumn("Title").Width(35))
+            .AddColumn(new TableColumn("Author").Width(12))
+            .AddColumn(new TableColumn("Branch").Width(20))
+            .AddColumn(new TableColumn("Review").Width(10))
+            .AddColumn(new TableColumn("CI").Width(8))
+            .AddColumn(new TableColumn("Age").Width(8));
+
+        foreach (var pr in prs.EnumerateArray())
+        {
+            var number = pr.TryGetProperty("number", out var n) ? n.GetInt32().ToString() : "?";
+            var title = pr.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
+            var author = pr.TryGetProperty("author", out var a) && a.TryGetProperty("login", out var login) ? login.GetString() ?? "" : "";
+            var branch = pr.TryGetProperty("headRefName", out var b) ? b.GetString() ?? "" : "";
+            var createdAt = pr.TryGetProperty("createdAt", out var c) && DateTime.TryParse(c.GetString(), out var created) ? FormatAge(DateTime.UtcNow - created) : "?";
+            var isDraft = pr.TryGetProperty("isDraft", out var d) && d.GetBoolean();
+
+            var reviewDecision = pr.TryGetProperty("reviewDecision", out var rd) ? rd.GetString() ?? "" : "";
+            var reviewStatus = reviewDecision switch
+            {
+                "APPROVED" => "[green]✓[/]",
+                "CHANGES_REQUESTED" => "[red]✗[/]",
+                "REVIEW_REQUIRED" => "[yellow]?[/]",
+                _ => "[dim]—[/]"
+            };
+
+            var ciStatus = "[dim]—[/]";
+            if (pr.TryGetProperty("statusCheckRollup", out var rollup) && rollup.ValueKind == JsonValueKind.Array)
+            {
+                var statuses = rollup.EnumerateArray().ToList();
+                if (statuses.Count > 0)
+                {
+                    var allSuccess = statuses.All(s =>
+                    {
+                        if (s.TryGetProperty("__typename", out var tn))
+                        {
+                            var typename = tn.GetString();
+                            if (typename == "CheckRun" && s.TryGetProperty("conclusion", out var conclusion))
+                                return conclusion.GetString() == "SUCCESS";
+                            if (typename == "StatusContext" && s.TryGetProperty("state", out var state))
+                                return state.GetString() == "SUCCESS";
+                        }
+                        return false;
+                    });
+
+                    var anyPending = statuses.Any(s =>
+                    {
+                        if (s.TryGetProperty("__typename", out var tn))
+                        {
+                            var typename = tn.GetString();
+                            if (typename == "CheckRun" && s.TryGetProperty("status", out var status))
+                                return status.GetString() == "IN_PROGRESS" || status.GetString() == "QUEUED";
+                            if (typename == "StatusContext" && s.TryGetProperty("state", out var state))
+                                return state.GetString() == "PENDING";
+                        }
+                        return false;
+                    });
+
+                    ciStatus = allSuccess ? "[green]✓[/]" : anyPending ? "[yellow]…[/]" : "[red]✗[/]";
+                }
+            }
+
+            if (title.Length > 35)
+                title = title.Substring(0, 32) + "...";
+            if (branch.Length > 20)
+                branch = branch.Substring(0, 17) + "...";
+
+            var titleMarkup = isDraft ? $"[dim]{Markup.Escape(title)} (draft)[/]" : Markup.Escape(title);
+
+            table.AddRow(
+                $"[cyan]{Markup.Escape(number)}[/]",
+                titleMarkup,
+                $"[yellow]{Markup.Escape(author)}[/]",
+                $"[dim]{Markup.Escape(branch)}[/]",
+                reviewStatus,
+                ciStatus,
+                $"[dim]{Markup.Escape(createdAt)}[/]"
+            );
+        }
+
+        items.Add(table);
+    }
+    catch
+    {
+        items.Add(new Markup("[red]  Error parsing PR data[/]"));
+    }
+
+    items.Add(Text.Empty);
+    return new Rows(items);
+}
+
+static IRenderable BuildOrchestrationLogSection(List<AgentActivity> activities)
+{
+    var items = new List<IRenderable>();
+    
+    var section = new Rule("[yellow]Orchestration Activity (24h)[/]") { Justification = Justify.Left };
+    items.Add(section);
+
+    if (activities.Count == 0)
+    {
+        items.Add(new Markup("[dim]  No activities found in orchestration logs.[/]"));
+        items.Add(Text.Empty);
+        return new Rows(items);
+    }
+
+    var now = DateTime.UtcNow;
+    var recentActivities = activities.Count(a => (now - a.Timestamp).TotalHours <= 24);
+    var uniqueAgents = activities.Select(a => a.Agent).Distinct().ToList();
+    var totalAgents = uniqueAgents.Count;
+
+    var top10 = activities.Take(10).ToList();
+
+    var table = new Table()
+        .BorderColor(Color.Grey)
+        .Border(TableBorder.Rounded)
+        .AddColumn(new TableColumn("Agent").Width(10))
+        .AddColumn(new TableColumn("Activity").Width(50))
+        .AddColumn(new TableColumn("Age").Width(10));
+
+    foreach (var activity in top10)
+    {
+        var age = FormatAge(now - activity.Timestamp);
+        var activityText = activity.Task;
+        if (activityText.Length > 50)
+            activityText = activityText.Substring(0, 47) + "...";
+
+        var agentName = CapitalizeAgent(activity.Agent);
+
+        table.AddRow(
+            $"[cyan]{Markup.Escape(agentName)}[/]",
+            $"[white]{Markup.Escape(activityText)}[/]",
+            $"[dim]{Markup.Escape(age)}[/]"
+        );
+    }
+
+    items.Add(table);
+    items.Add(new Markup($"[dim]  Agents: {totalAgents} | Activities (24h): {recentActivities} | Showing top 10 of {activities.Count}[/]"));
+    items.Add(Text.Empty);
+    
+    return new Rows(items);
 }
 
 // ─── Ralph Heartbeat Panel ──────────────────────────────────────────────────

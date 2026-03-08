@@ -238,6 +238,186 @@ Configuration Layer (Tenants.json)
 
 ---
 
+### 2026-03-09: Deep Architecture Review — Krishna's Azure Monitor Prometheus PRs (Re-Review with DK8S Knowledge Base)
+
+**Context:** Tamir requested a second, deeper review of Krishna's 3 Azure Monitor PRs using the dk8s-platform-squad knowledge base at `C:\Users\tamirdresher\source\repos\dk8s-platform-squad`.
+
+**Scope:**
+- **PR1 (14966543):** DefenderCommon/Infra.K8s.Clusters — Add AZURE_MONITOR_SUBSCRIPTION_ID to Tenants.json
+- **PR2 (14968397):** WDATP/WDATP.Infra.System.Cluster — Add Azure Monitoring ARM templates, validation script, GoTemplates, Ev2 deployment specs
+- **PR3 (14968532):** WDATP/WDATP.Infra.System.ClusterProvisioning — Add AzureMonitoring stage to all cluster deployment pipelines
+
+**DK8S Platform Patterns Validated:**
+
+**1. Cross-Repo Dependency Model (3-tier architecture):**
+```
+Infra.K8s.Clusters (Level 1: Config Layer - inventory + schema)
+    ↓
+WDATP.Infra.System.Cluster (Level 2: Template Layer - ARM + Ev2 specs)
+    ↓
+WDATP.Infra.System.ClusterProvisioning (Level 3: Orchestration Layer - pipeline stages)
+```
+✅ **Matches documented pattern:** Each repo owns its appropriate layer with clean separation of concerns.
+
+**2. Resource Ownership Boundaries:**
+| Resource | Owner | Scope | Lifecycle |
+|----------|-------|-------|-----------|
+| AMW, DCE, DCR | ManagedPrometheus (external) | Per region | External team |
+| DCR Association | Cluster provisioning | Per cluster | Ev2 deployment |
+| AMPLS + Private Endpoint + DNS | Cluster provisioning | Per cluster | Ev2 deployment |
+| AKS Metrics Profile | Cluster provisioning | Per cluster | Ev2 deployment |
+
+✅ **Matches DK8S pattern:** Shared infrastructure (external team) + per-cluster resources (provisioning pipeline). No conflicts with documented ownership model.
+
+**3. Ev2 Deployment Compliance:**
+- ✅ Parameters files for ConfigGen expansion
+- ✅ RolloutSpec variants (per-cluster, per-tenant, per-servicetree)
+- ✅ ServiceModel definitions referencing ARM templates
+- ✅ ScopeBindings updates for targeted deployment
+- ✅ Validation script for pre-flight checks and rollback
+
+**All 5 required Ev2 components present per DK8S standards.**
+
+**4. Pipeline Stage Ordering:**
+```
+Before: Workspace → Cluster → [Karpenter, ArgoCD, InfraMonitoringCrds, ...]
+After:  Workspace → Cluster → AzureMonitoring → [Karpenter, ArgoCD, InfraMonitoringCrds, ...]
+```
+✅ **Sequential for initial rollout** (conservative) matches DK8S progressive rollout guidance: "Conservative dependency chains safer for initial rollout vs. aggressive parallelization."
+
+**5. ConfigGen Integration:**
+- ✅ Tenant-level configuration (`AZURE_MONITOR_SUBSCRIPTION_ID` in Tenants.json)
+- ✅ Cluster override capability (follows `ACR_SUBSCRIPTION` pattern)
+- ✅ Schema validation in ClustersInventorySchema.json
+- ✅ Inheritance via `SetTenant()` enrichment
+
+**6. Observability Strategy Alignment:**
+Prometheus → Azure Monitor Workspace (AMW) → Geneva MDM flow is correct. AMPLS provides private network connectivity (security-first approach).
+
+**New Patterns Introduced to DK8S:**
+
+**1. AMPLS (Azure Monitor Private Link Scope):**
+- ✅ Not documented in DK8S knowledge base before this implementation
+- ✅ Aligns with DK8S security-first approach (eliminates public internet exposure for metrics)
+- 📝 **Should be documented** in `docs/architecture/resource-model.md` for future reference
+
+**2. External Team Resource Dependency:**
+- ✅ ManagedPrometheus owns shared regional resources (DCE, DCR, AMW)
+- ✅ New cross-team dependency model for DK8S platform
+- 📝 **Should be documented** in `docs/architecture/dependency-graph.md`
+
+**Key Findings vs. First Review:**
+
+**Confirmed:**
+1. ✅ 3-PR pattern (config → template → orchestration) enables independent testing and rollback
+2. ✅ Resource ownership boundaries clearly defined
+3. ✅ Ev2 compliance follows DK8S ServiceModel + RolloutSpec + ScopeBindings pattern
+4. ✅ Progressive rollout via tenant-level feature flag with cluster override
+5. ✅ Sequential stage ordering (conservative for initial rollout)
+
+**New Observations from DK8S Knowledge Base:**
+
+6. ✅ **ARM template organization** matches documented pattern: `cg/GoTemplates/Ev2Deployment/{Parameters, RolloutSpecs, ServiceModels, Templates, Scripts}`
+7. ✅ **Naming conventions** follow DK8S standards: `Template.AzureMonitoring.Metrics.json`, `Parameters.AzureMonitoring`
+8. ⚠️ **AMPLS pattern** is new to DK8S—requires documentation for future implementations
+9. ⚠️ **External team dependency** (ManagedPrometheus) is new pattern—requires coordination guidelines
+
+**Recommendations (Updated):**
+
+*Before PRD:*
+1. **Pre-flight validation** (REQUIRED): Add DCR existence checks to `AzureMonitoringValidation.sh` with actionable error messages
+2. **Rollback testing** (REQUIRED): Validate `ENABLE_AZURE_MONITORING=false` path in DEV
+3. **ManagedPrometheus coordination** (REQUIRED): Confirm PRD regional resource deployment timeline
+4. **Documentation** (RECOMMENDED): Add AMPLS pattern to `docs/architecture/resource-model.md`
+
+*Phase 2 Optimization:*
+5. **Pipeline parallelization:** Run AzureMonitoring_ in parallel with Karpenter (estimated savings: 2-3 min/deployment)
+6. **Monitoring coverage dashboard:** Track which clusters have Azure Monitor enabled
+7. **Automated drift detection:** Alert on clusters with `ENABLE_AZURE_MONITORING=true` but no active metrics
+
+**Production Readiness Assessment:**
+
+✅ **Ready for STG:** Deployed to STG.EUS2.9950, validated via buddy pipeline and Azure CLI verification.
+
+⏳ **Blockers for PRD:**
+1. ManagedPrometheus PRD rollout (external dependency)
+2. Pre-flight validation script enhancement
+3. Rollback testing validation
+
+**Overall Verdict:**
+This is **exceptionally high-quality work** that demonstrates deep understanding of DK8S multi-repo architecture, Ev2 deployment patterns, ConfigGen integration, and progressive rollout strategy. Krishna's implementation follows DK8S patterns **precisely**—every component validates against documented standards from the dk8s-platform-squad knowledge base.
+
+**New Learnings:**
+
+**1. DK8S Knowledge Base Comprehensiveness:**
+The dk8s-platform-squad knowledge base contains:
+- **~50 repository taxonomy** (component vs provisioning repos)
+- **4-stage deployment pipeline** (CI/CD → ConfigGen → Ev2/ArgoCD → Verification)
+- **Ev2 compliance patterns** (RolloutSpec, ServiceModel, ScopeBindings, Parameters, ARM templates)
+- **ConfigGen hierarchy** (Base → Environment → Tenant → Region → Cluster)
+- **Resource ownership model** (Ev2 for infra, ArgoCD for apps, Operators for CRDs)
+- **Pipeline stage dependencies** (explicit, acyclic, conservative for initial rollout)
+
+**2. AMPLS as a New Pattern:**
+Azure Monitor Private Link Scope (AMPLS) is a **new pattern** for DK8S. No existing documentation. This PR introduces:
+- Per-cluster AMPLS resources (not shared regional)
+- Private Endpoint + Private DNS Zone for Azure Monitor connectivity
+- Eliminates public internet exposure for metrics ingestion
+
+**Recommendation:** Document this as a reusable pattern for future Azure service integrations (Key Vault, ACR, Storage) requiring private connectivity.
+
+**3. Cross-Team Dependency Coordination:**
+ManagedPrometheus team owns shared regional resources (AMW, DCE, DCR). DK8S provisioning depends on these resources existing before ARM deployment. This is a **new dependency model** for DK8S.
+
+**Key lessons:**
+- Pre-flight checks required for external dependencies
+- Error messages must be actionable ("Contact team X if resource Y missing")
+- Coordinate PRD rollout schedules across teams
+- Document which team owns what resources
+
+**4. Ev2 Deployment Flexibility:**
+RolloutSpec variants (per-cluster, per-tenant, per-servicetree) enable different deployment scopes:
+- **Per-cluster:** Deploy to specific clusters (buddy pipeline, canary testing)
+- **Per-tenant:** Deploy to all clusters in a tenant (DEV/MS, STG/MS)
+- **Per-servicetree:** Deploy to all clusters in a service tree (PRD/AME, PRD/GME)
+
+This flexibility supports progressive rollout strategy at multiple granularities.
+
+**Deliverables:**
+- ✅ Deep architecture review: `.squad/decisions/inbox/picard-krishna-review-deep.md`
+- ✅ DK8S platform patterns validated against dk8s-platform-squad knowledge base
+- ✅ New patterns identified (AMPLS, external team dependency)
+- ✅ Documentation recommendations for DK8S knowledge base
+
+**Signed:** Picard (Lead)  
+**Date:** 2026-03-09
+
+---
+
+### 2026-03-08: Deep Review - Krishna's Azure Monitor Prometheus PRs (Issue #150)
+
+**Activation:** Coordinator orchestrated 3-agent deep review using dk8s-platform-squad knowledge base  
+**Task:** Comprehensive architecture review of Krishna Chaitanya's 3 merged PRs enabling Azure Monitor Prometheus metrics  
+**Mode:** Background  
+**Status:** COMPLETED
+
+**Review Findings:**
+- ✅ **Architecture Score: 9.5/10 — APPROVE with pre-PRD items**
+- 9 key strengths identified (cross-repo layering, resource ownership, Ev2 compliance, progressive rollout, sequential stage ordering)
+- 5 architecture concerns noted (pre-flight validation, subscription isolation, schema override, rollback testing, PRD tenant configuration)
+
+**Key Recommendations (by priority):**
+1. **Required for PRD:** Pre-flight DCR existence checks, rollback testing validation, ManagedPrometheus coordination
+2. **Recommended:** Add AMPLS pattern to DK8S knowledge base documentation
+
+**Production Readiness:**
+- ✅ Ready for STG (already deployed and validated to STG.EUS2.9950)
+- ⏳ PRD blockers: ManagedPrometheus external dependency, pre-flight validation script, rollback testing
+
+**Deliverable:** `.squad/orchestration-log/2026-03-08T15-35-00Z-picard.md`
+
+---
+
 ### 2026-03-08: Ralph Round 1 Activation — Issue #122 Directive & Team Orchestration
 
 **Activation:** Tamir initiated Ralph (squad orchestrator) for Round 1  

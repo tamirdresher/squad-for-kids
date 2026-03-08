@@ -109,6 +109,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-drift, validate-manifests]
     if: always() && (needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true')
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
     
     steps:
       - name: Checkout code

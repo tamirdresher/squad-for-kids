@@ -10,6 +10,128 @@
 
 ## Learnings
 
+### 2026-03-14: Issue #132 — Meir Onboarding for BasePlatformRP Resource Provider Work
+
+**Task:** Research the Resource Provider (RP) project, compile comprehensive onboarding package with all relevant repos, documentation, Teams channels, architecture context, and key contacts. Draft professional onboarding message for Tamir to send to Meir (new team member).
+
+**Context:** Meir is joining to work on BasePlatformRP (Azure Resource Provider abstraction layer). Task requires:
+1. Understanding what "RP" means in this context (Azure Resource Provider, specifically BasePlatformRP)
+2. Identifying all relevant repositories and documentation
+3. Mapping team structure and roles
+4. Creating actionable week-1 checklist
+5. Drafting message for Tamir to send to Meir
+6. NOT closing the issue (per Tamir's explicit instruction)
+
+**Outcome:** Delivered comprehensive onboarding guide (`.squad/agents/seven/onboarding-meir-draft.md`, 15.7K characters) + GitHub comment with summary and action items. Posted to issue #132 with full context.
+
+**Key Findings:**
+
+1. **Resource Provider (RP) is Azure's API Framework**
+   - BasePlatformRP sits above both DK8S (Kubernetes) and Azure Infrastructure
+   - Acts as unified governance + deployment abstraction layer
+   - Combines infrastructure-as-code, FedRAMP compliance, Kubernetes orchestration, ARM patterns
+   - Three models: RPaaS (managed), Direct (custom), Hybrid (recommended for platforms)
+
+2. **Repository Ecosystem is Distributed by Purpose**
+   - **tamresearch1** — Core squad coordination (decisions, agent charters, continuous learning)
+   - **tamresearch1-dk8s-investigations** — Deep RP research (35K-char rp-registration-guide.md, architecture analysis, infrastructure reference)
+   - **idk8s-infrastructure** — Production infrastructure (Bicep templates, Kubernetes manifests)
+   - **BasePlatformRP** — To be created (actual RP implementation)
+
+3. **Documentation Structure is Layered by Audience & Urgency**
+   - **Onboarding priority (Day 1-2):** README, decisions 1-3, executive summary (45 min)
+   - **Core technical (Day 3-4):** Infrastructure patterns, security findings, RP registration guide (2-3 hours)
+   - **Reference:** FedRAMP docs, DK8S platform knowledge, workload migration guides
+   - **Key insight:** New team members need 3-layer structure (quick context → deep technical → ongoing reference)
+
+4. **Infrastructure Standards & Security Requirements Must Be Clear from Day 1**
+   - Decision 2 establishes patterns: Bicep, EV2 stamps, progressive rings, explicit dependencies
+   - Decision 3 identifies 6 critical/high security findings (cert rotation, network policy, WAF, OPA, encryption)
+   - **Why this matters:** RP design must incorporate compliance from start, not retrofit
+   - New team members must understand these constraints before writing code
+
+5. **RP Registration Guide is Authority Document**
+   - 35K characters, 15 sections covering: process, models, TypeSpec (mandatory since Jan 2024), manifest, auth, SDK, compliance, testing, regional deployment, timeline, pitfalls
+   - Located in tamresearch1-dk8s-investigations (research repo)
+   - **Blocker identified:** Current status shows Cosmos DB role assignment failure (IcM 757549503) blocking Private.BasePlatform RP registration
+   - Hybrid RP is recommended approach (managed types + direct types for complex workflows)
+
+6. **Team Structure Follows Agent Specialization Model**
+   - **B'Elanna** (Infrastructure): Kubernetes, Bicep, EV2, deployment patterns
+   - **Worf** (Security): Compliance (FedRAMP, cloud), threat modeling, security findings
+   - **Picard** (Architecture): Cross-repo design, system patterns, decision propagation
+   - **Data** (Code Quality): Implementation patterns, testing, code reviews
+   - **Seven** (Research & Docs, me!): Documentation, onboarding, architectural research
+   - **Ralph** (Orchestration): Automation, watch loops, issue processing
+   - **Tamir** (User/Lead): Product decisions, scope, timelines, final approval
+
+7. **Week-1 Checklist Structure Matters for Success**
+   - **Day 1:** Access (practical barrier removal)
+   - **Day 2:** Quick context (45 min) → establishes legitimacy of deeper study
+   - **Day 3-4:** Deep technical (2-3 hours) → builds competency foundation
+   - **Day 5:** Connection (team sync) → unblocks first task assignment
+   - **Why this works:** Balances urgency (get access fast) with depth (real understanding takes time) with velocity (pick task by Day 5)
+
+8. **Onboarding Message Pattern: Summary → Docs → Checklist → Contacts**
+   - Comment on GitHub issue summarizes deliverable + what Tamir needs to do
+   - Full guide (markdown file) has 11 sections organized by use case (not just sequential)
+   - Includes "first task suggestions" by background (infra, API, security, general)
+   - Emphasizes that Meir will learn from decision traces and continuous learning model
+
+9. **Critical Success Factors for New Team Member Onboarding**
+   - ✅ Repos are accessible (no blocked access)
+   - ✅ Documentation is cataloged and prioritized (not overwhelming)
+   - ✅ Team structure is clear (know who to ask what)
+   - ✅ Week 1 is guided (not "figure it out yourself")
+   - ✅ First task assignment is informed (aligned to background, realistic scope)
+   - ✅ Decision context is visible (compliance, architecture constraints understood)
+   - ✅ Continuous learning model is explained (how this team thinks + learns together)
+
+**Artifacts Created:**
+- `.squad/agents/seven/onboarding-meir-draft.md` — 15.7K-character comprehensive guide (11 sections, 4 repo descriptions, prioritized doc roadmap, week-1 checklist, contact matrix, first-task suggestions, FAQ-style guidance)
+- GitHub comment on issue #132 (3.6K-character summary with package overview, action items for Tamir, readiness status)
+- Identifies future need: Update guide when BasePlatformRP repo is created
+
+**Key Insights for Onboarding:**
+
+1. **Onboarding is knowledge transfer + barrier removal + context building**
+   - Knowledge transfer = documentation structure (prioritized, layered)
+   - Barrier removal = access (repos, Teams, tools)
+   - Context building = team structure, architecture concepts, continuous learning patterns
+
+2. **New team members need to understand *why* before *what***
+   - Why we use Bicep (Decision 2: infrastructure standards)
+   - Why security findings matter (Decision 3: compliance constraints)
+   - Why RP model choice is critical (affects all downstream decisions)
+
+3. **First task matters more than documentation**
+   - Even perfect docs don't guarantee productivity
+   - First task should be small, meaningful, paired with expert guidance
+   - Recommendations provided for 4 different backgrounds (infra, API, security, general)
+
+4. **Continuous learning is a team pattern**
+   - New members inherit this pattern from day 1 (via decisions.md, agent histories)
+   - Their learnings will be captured as skills + fed back to decisions
+   - Onboarding guide explains this inheritance explicitly
+
+**Next Steps (for Tamir):**
+1. Review the guide (any customizations needed?)
+2. Add Meir to 4 repos + Teams channels
+3. Send guide to Meir (or customize first)
+4. Schedule Day 5 sync to clarify RP scope + assign first task
+5. Confirm Meir is productive by end of Week 1
+
+**Learnings for Future Onboarding:**
+- Use this structure for future team members (it's reusable)
+- Keep rp-registration-guide.md updated (it's the authority doc)
+- Document decisions upfront (new members must understand constraints)
+- Pair documentation with first-task assignment (docs alone insufficient)
+- Assign team mentor for first week (reduces friction)
+
+**Issue Status:** Open (per Tamir's instruction — do NOT close until Meir is onboarded)
+
+---
+
 ### 2026-03-12: Issue #42 — Patent Filing Strategy UPDATE: Tamir's Clarification on Scope & External Filing
 
 **Previous Context:** Initial analysis researched Microsoft internal patent process (Anaqua portal, PRB workflow). However, Tamir provided critical clarification that changed the entire strategy.
@@ -1707,4 +1829,40 @@ Tamir was frustrated: "I can't understand without you writing it in a comment."
 **Inbox Processed:** 7 items merged to decisions.md, deleted from inbox
 
 **Session Log:** \.squad/log/2026-03-08T10-47-43Z-ralph-round1-2.md\ created
+
+
+## Learnings — Ralph Telemetry Analysis (Issue #152)
+
+**Date**: 2026-03-08  
+**Observation Window**: 15:19–16:37 UTC (78.5 minutes)
+
+### Key Metrics Extracted
+- **Average Round Duration**: 769.76 seconds (12.8 min across 4 rounds)
+- **Failure Rate**: 0% (perfect success rate)
+- **Rounds Per Hour**: 3.06 (not 12 as 5-min interval would suggest)
+- **Cold Start Impact**: First rounds took 20–22 min; subsequent rounds 4.6 min
+
+### Critical Finding: 5-Minute Interval is Suboptimal
+Ralph's actual behavior contradicts the 5-minute interval design:
+1. **Initial rounds (1a/1b)** took ~42 min combined, indicating deep repository scanning/indexing
+2. **Warm cache rounds (2-3)** completed in 4.6 min each, showing excellent caching strategy
+3. **Recommendation**: Increase to 15-minute default interval with exponential backoff
+
+### Ralph's Behavioral Pattern
+- **Full scans**: Issue/PR enumeration (Round 1a found 3 Issues, 2 PRs, 2 Actions)
+- **Smart caching**: Round 1b cached results (0 changes), Round 2-3 consistent 4.6-min performance
+- **No failures**: All 4 rounds exit code 0, suggesting high stability
+
+### Architectural Insight
+Ralph demonstrates a two-phase model:
+1. **Cold start** (~20 min): Builds indexes, performs deep repository enumeration
+2. **Warm operation** (~4-5 min): Incremental change detection with cache hits
+
+This suggests Ralph maintains state between runs and performs differential scanning rather than full rescans every time.
+
+### Recommendations Issued
+1. Change interval to 15 minutes (5-min too aggressive)
+2. Implement exponential backoff (30–60 min if no changes)
+3. Cap max round duration at 25–30 min to prevent accumulation
+4. Monitor cache effectiveness (currently excellent)
 

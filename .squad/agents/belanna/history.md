@@ -18,6 +18,30 @@
 
 ## Learnings
 
+### 2026-03-08: Deep Review - Krishna's Azure Monitor Prometheus PRs (Issue #150)
+
+**Activation:** Coordinator orchestrated 3-agent deep review using dk8s-platform-squad knowledge base  
+**Task:** Comprehensive infrastructure review of Krishna Chaitanya's 3 merged PRs enabling Azure Monitor Prometheus metrics  
+**Mode:** Background  
+**Status:** COMPLETED
+
+**Review Findings:**
+- ✅ **Infrastructure Score: 9/10 — APPROVE with 5 minor concerns**
+- 8 strengths identified (ARM template patterns, role assignments, conditional deployment, Ev2 compliance, pipeline integration)
+- 5 infrastructure concerns noted (DNS Zone VNet link verification, role propagation delays, pre-flight validation, shared resource ownership, environment subscription separation)
+
+**Key Recommendations (by priority):**
+1. **Immediate:** DNS Zone VNet link verification, role assignment propagation retry logic
+2. **Follow-up:** Pre-flight resource validation, shared resource ownership documentation, environment-specific subscriptions
+
+**Production Readiness:**
+- ✅ Ready for STG (already deployed)
+- ⏳ PRD concerns: Subscription isolation per environment, infrastructure dependency validation
+
+**Deliverable:** `.squad/orchestration-log/2026-03-08T15-35-00Z-belanna.md`
+
+---
+
 ### 2026-03-08: Ralph Round 1 Activation — GitHub Projects Setup (Issue #109)
 
 **Activation:** Tamir initiated Ralph Round 1  
@@ -2212,3 +2236,82 @@ Infrastructure reviews should focus on **integration points** where systems conn
 - Ready for STG deployment
 
 **Deliverable:** Full review in decisions.md — consolidated with Picard + Worf assessments
+## Learnings
+
+### 2026-03-08: Deep Azure Monitor Prometheus Infrastructure Review with DK8S Platform Knowledge
+
+**Context:** Second infrastructure review of Krishna's 3-PR Azure Monitor Prometheus integration, using dk8s-platform-squad knowledge base as reference standard.
+
+**Key DK8S Infrastructure Patterns Discovered:**
+
+1. **ARM Template Standards:**
+   - Resource naming: mps-dk8s-{env}-{region}-{id} (e.g., mps-dk8s-prd-eus2-1234)
+   - Managed identity naming: mps-{devgroup}-{env}-infra-k8s-{region}
+   - Role assignments must use guid(resourceId(...), roleId) pattern for idempotency
+   - Private endpoints require Private DNS Zone + VNet link resources
+   - Conditional deployment via "condition": "[parameters('enableFeature')]"
+
+2. **Ev2 RolloutSpec Ring Deployment Standard:**
+   - Stage 1: Canary (1 cluster, 60-min pause, health gate)
+   - Stage 2: Ring1 (10%, 120-min pause, depends on Canary)
+   - Stage 3: Global (remaining clusters, depends on Ring1)
+   - CRITICAL: orchestratedSteps must declare explicit dependencies
+
+3. **ServiceModel Pattern:**
+   - serviceResourceGroupDefinitions contain ARM template references
+   - ServiceModel.json maps to RolloutSpec.json via serviceModelPath
+   - ScopeBindings.json maps subscriptions to deployment targets
+
+4. **ConfigGen 5-Level Hierarchy:**
+   `
+   5. helm-{env}-{tenant}-{region}-{clusterID}-values.yaml  (HIGHEST)
+   4. helm-{env}-{tenant}-{region}-values.yaml
+   3. helm-{env}-{tenant}-values.yaml
+   2. helm-{env}-values.yaml
+   1. values.yaml  (LOWEST)
+   `
+   - Feature flags: Use GoTemplate conditionals like {{ if .EnableAzureMonitor }}
+   - Tenant inheritance: SetTenant() enrichment in Tenants.json
+
+5. **Validation Script Standards:**
+   - ENABLE_* flag pattern for feature toggles
+   - Exponential backoff retry: $delay = [Math]::Pow(2, )
+   - Detect-only validation: Exit non-zero on mismatch, let Ev2 rollback
+   - Rollback pattern: Get previous deployment, redeploy via Ev2
+
+6. **Pipeline Stage Ordering:**
+   - Template hierarchy: Infra.Pipelines.Templates → WDATP.Infra.System.PipelineTemplates → Component repos
+   - OneBranch stages: Build → PackageHelmChart → ValidateARM → PublishArtifacts → Deploy
+   - SDL scanning required: credscan, policheck (break: true)
+   - Stage dependencies: Use dependsOn for serial, omit for parallel
+
+7. **Azure Monitor Integration Specifics:**
+   - Shared per-region resources: DCE, DCR, AMW (from ManagedPrometheus repo)
+   - Per-cluster resources: DCR Association, AMPLS, Private Endpoint, AKS metrics profile
+   - Resource naming: dk8s-metrics-dce-{env}-{region}, dk8s-metrics-dcr-{env}-{region}
+   - Private Link Scope (AMPLS) blocks public internet access
+   - Role: "Monitoring Metrics Publisher" on cluster managed identity
+
+8. **Critical Integration Points:**
+   - AMPLS Private Endpoint → Private DNS Zone → VNet link (verify all 3)
+   - Role assignment timing: 30-60s propagation delay (use dependsOn or retry)
+   - DCR Association requires DCR, DCE, AMW to exist (pre-flight validation needed)
+   - AKS metrics profile: Update cluster resource after AMPLS + role assignment
+
+**Review Methodology Applied:**
+1. Read dk8s-platform-squad knowledge base for patterns
+2. Fetch PRs from ADO using Azure DevOps MCP tools
+3. Compare PR implementations against DK8S standards
+4. Identify gaps, anti-patterns, and alignment with infrastructure patterns
+5. Check existing review threads for concerns raised by other reviewers
+
+**Result:** Comprehensive infrastructure review delivered with 7 findings (5 minor concerns, 2 recommendations).
+
+**Files Referenced:**
+- docs/architecture/deployment-flow.md (pipeline stages)
+- docs/architecture/resource-model.md (ARM naming)
+- .squad/skills/azure-cloud-native/SKILL.md (AKS patterns)
+- .squad/skills/configgen-expertise/SKILL.md (ConfigGen hierarchy)
+- .squad/skills/microsoft-internal-tooling/SKILL.md (Ev2 patterns)
+- .squad/skills/powershell-automation/SKILL.md (validation scripts)
+

@@ -10,6 +10,33 @@
 
 ## Learnings
 
+### 2026-03-08: Deep Review - Krishna's Azure Monitor Prometheus PRs (Issue #150)
+
+**Activation:** Coordinator orchestrated 3-agent deep review using dk8s-platform-squad knowledge base  
+**Task:** Comprehensive security review of Krishna Chaitanya's 3 merged PRs enabling Azure Monitor Prometheus metrics  
+**Mode:** Background  
+**Status:** COMPLETED
+
+**Review Findings:**
+- ✅ **Security Score: 9/10 — APPROVE with P1 recommendations**
+- 6 security strengths validated (network security, identity & access, secret management, pipeline security, subscription patterns, DK8S alignment)
+- 3 medium-severity concerns identified (blast radius containment, network policy integration, rollback path security)
+- 2 compliance verification gaps identified (customer-managed key encryption, cross-tenant isolation)
+
+**P1 Recommendations (must address before PRD):**
+1. Environment Isolation — Separate AZURE_MONITOR_SUBSCRIPTION_ID for DEV/STG/PRD
+2. Network Policies — Add allowlist for pod-to-AMPLS egress
+3. Pre-Flight Validation — Add `az resource show` checks for DCE/DCR/AMW
+4. Rollback Cleanup — Update validation script to delete AMPLS/Private Endpoints
+
+**Production Readiness:**
+- ✅ Ready for STG (already deployed)
+- ⏳ PRD blockers: Environment subscription isolation, network policy integration, FedRAMP compliance verification
+
+**Deliverable:** `.squad/orchestration-log/2026-03-08T15-35-00Z-worf.md`
+
+---
+
 ### 2026-03-07: Alerting Code Quality & Load Testing (Issue #99, PR #101)
 
 **Context:** Post-PR #97 review follow-up to improve code quality and validate production readiness of the FedRAMP alerting pipeline.
@@ -95,6 +122,116 @@
 - Issue #99: FedRAMP Dashboard: Alerting Code Quality & Load Testing
 - PR #101: https://github.com/tamirdresher_microsoft/tamresearch1/pull/101
 - Follow-up to PR #97 review feedback
+
+### 2026-03-09: Deep Security Review - Krishna's Azure Monitor Prometheus PRs
+
+**Context:** Second security review of 3 merged ADO PRs for Azure Monitor Prometheus metrics integration, using dk8s-platform-squad knowledge base from `C:\Users\tamirdresher\source\repos\dk8s-platform-squad`.
+
+**PRs Reviewed:**
+1. **PR #14966543** (DefenderCommon/Infra.K8s.Clusters) - Adds AZURE_MONITOR_SUBSCRIPTION_ID to tenant config
+2. **PR #14968397** (WDATP/WDATP.Infra.System.Cluster) - Adds ARM templates, AMPLS, Private Endpoints, DCR Association
+3. **PR #14968532** (WDATP/WDATP.Infra.System.ClusterProvisioning) - Adds AzureMonitoring stage to pipelines
+
+**DK8S Security Patterns Discovered:**
+- **Zero-Trust Networking:** Default-deny network policies, mTLS via Linkerd, private endpoints for Azure services
+- **Workload Identity Pattern:** Azure AD + Kubernetes ServiceAccount OIDC federation (no secrets)
+- **AMPLS Best Practice:** Azure Monitor Private Link Scope for secure Log Analytics/DCE/DCR access
+- **CSI Secret Provider:** All secrets from Azure Key Vault, never in ConfigMaps/env vars
+- **RBAC Least Privilege:** Group-based namespace-scoped roles, cluster-level only for operators
+- **Subscription Isolation:** Separate subscriptions for DEV/STG/PRD, tenant-level resource groups
+- **Encryption Standards:** TLS 1.3 for APIs, mTLS for pod-to-pod, at-rest encryption for storage
+- **Pod Security:** Non-root containers (uid 1000+), read-only root filesystem, no privileged containers
+
+**Security Review Findings:**
+
+**✅ PASS — Network Security:**
+- Private endpoints used for AMPLS connectivity (DCE/DCR/AMW)
+- Private DNS zones created for privatelink.monitor.azure.com resolution
+- No public endpoint exposure in ARM template configuration
+- **Aligns with DK8S pattern:** Private endpoint access for all Azure services
+
+**✅ PASS — Identity & Access Management:**
+- Uses cluster's User-Assigned Managed Identity (no service principals)
+- "Monitoring Metrics Publisher" role assignment follows least-privilege principle
+- Scoped to specific DCR resource, not subscription-wide
+- **Aligns with DK8S pattern:** Managed Identity for Azure resource access
+
+**✅ PASS — Secret Management:**
+- No connection strings, API keys, or secrets in ARM templates
+- Subscription ID from tenant configuration (not hardcoded)
+- Managed Identity authentication eliminates secret storage
+- **Aligns with DK8S pattern:** Workload Identity and CSI Secret Provider (no secrets in code)
+
+**🟡 CONCERN — Blast Radius Containment:**
+- **Issue:** Same subscription ID (`c5d1c552-a815-4fc8-b12d-ab444e3225b1`) used for both DEV and STG environments
+- **Risk:** Security incident in DEV could impact STG resources if RBAC misconfigured
+- **DK8S Standard Violation:** Platform enforces separate subscriptions per environment for isolation
+- **Recommendation:** Use dedicated monitoring subscriptions per environment (DEV-specific, STG-specific, PRD-specific)
+- **Severity:** MEDIUM — Mitigated by RBAC but violates defense-in-depth principle
+
+**🟡 CONCERN — Pre-Flight Validation:**
+- **Issue:** ARM deployment assumes shared DCE/DCR/AMW resources exist (created by ManagedPrometheus repo)
+- **Risk:** Deployment fails if ManagedPrometheus deployment hasn't completed for region
+- **Gap:** No pre-flight validation in AzureMonitoringValidation.sh script to check resource existence
+- **Recommendation:** Add `az resource show` checks for DCE/DCR/AMW before ARM deployment
+- **Severity:** LOW — Operational risk, not security risk, but impacts rollback safety
+
+**🟡 CONCERN — Rollback Path Security:**
+- **Issue:** AzureMonitoringValidation.sh disables monitoring when `ENABLE_AZURE_MONITORING=false`, but doesn't clean up AMPLS/Private Endpoints
+- **Risk:** Orphaned private endpoints could create unexpected network paths
+- **Recommendation:** Add full teardown logic to validation script (delete AMPLS, Private Endpoint, DNS zones)
+- **Severity:** LOW — Resource leak, minimal security impact
+
+**⚠️ MISSING — Compliance & Audit:**
+- **Issue:** No mention of FedRAMP or compliance requirements in PR descriptions
+- **DK8S Context:** Platform has FedRAMP-relevant standards (encryption, audit logging, RBAC)
+- **Gap:** Azure Monitor Workspace may require specific compliance configurations (customer-managed keys, audit logging)
+- **Question:** Are DCE/DCR/AMW resources deployed with encryption at rest via customer-managed keys?
+- **Recommendation:** Verify ManagedPrometheus repo follows FedRAMP requirements (if applicable)
+- **Severity:** UNKNOWN — Depends on DK8S compliance scope
+
+**⚠️ MISSING — Network Policy Integration:**
+- **Issue:** PRs deploy monitoring infrastructure but don't update Kubernetes Network Policies
+- **DK8S Standard:** Default-deny network policies with explicit allowlists
+- **Gap:** No NetworkPolicy allowing cluster pods to reach Private Endpoint (10.x.x.x/16 range)
+- **Risk:** Monitoring may fail if network policies block pod-to-AMPLS traffic
+- **Recommendation:** Add NetworkPolicy allowing egress to AMPLS Private Endpoint CIDR or Service
+- **Severity:** MEDIUM — Could cause silent monitoring failure
+
+**✅ PASS — Pipeline Security:**
+- AzureMonitoring stage runs after Cluster stage, before application components
+- Dependencies properly declared (Karpenter, ArgoCD, etc. depend on AzureMonitoring)
+- No additional credential exposure in pipeline YAML
+- **Aligns with DK8S pattern:** EV2 deployment with ring-based rollout
+
+**✅ PASS — Subscription-Level Access:**
+- Uses tenant-level `AZURE_MONITOR_SUBSCRIPTION_ID` property
+- Follows same pattern as `ACR_SUBSCRIPTION` (established precedent)
+- Individual clusters can override if needed (flexibility preserved)
+- **Aligns with DK8S pattern:** Tenant-level configuration with cluster-level overrides
+
+**Critical Security Questions (Unanswered):**
+1. **AMPLS Configuration:** Is the AMPLS configured for "Private Only" mode (blocking public ingestion)?
+2. **Customer-Managed Keys:** Are DCE/DCR/AMW using customer-managed keys for encryption at rest?
+3. **Log Retention:** What is the retention policy for metrics data in AMW? (DK8S standard: 90 days)
+4. **Cross-Tenant Isolation:** Are AMW workspaces separated per tenant, or shared across tenants?
+5. **ServiceMonitor RBAC:** Do Prometheus ServiceMonitors have RBAC to read pod metrics, or is it cluster-wide?
+
+**Overall Assessment:**
+- **Architecture:** ✅ STRONG — Follows DK8S private networking patterns, managed identity, least privilege
+- **Implementation:** ✅ SOLID — ARM templates are clean, no secrets exposed, proper dependencies
+- **Gaps:** 🟡 MEDIUM — Environment isolation (shared subscription), missing network policies, rollback cleanup
+- **Compliance:** ⚠️ UNKNOWN — FedRAMP/encryption requirements not verified
+
+**Recommendation:** **APPROVE with CONDITIONS**
+1. Address subscription isolation (separate DEV/STG/PRD subscriptions) in follow-up
+2. Add NetworkPolicy for AMPLS Private Endpoint egress
+3. Add pre-flight validation for DCE/DCR/AMW existence
+4. Improve rollback script to clean up AMPLS/Private Endpoints
+
+**Related:**
+- DK8S Security Patterns: Zero-trust, Workload Identity, AMPLS, Network Policies
+- Decision #3: Security Findings from idk8s-infrastructure analysis (manual cert rotation, WAF, cross-cloud consistency)
 
 ### 2026-03-07: Security Dashboard & False Positive Measurement (Issues #77, #78)
 

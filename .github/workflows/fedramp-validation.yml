@@ -314,6 +314,10 @@ jobs:
     name: Alert on Validation Failure
     runs-on: ubuntu-latest
     if: failure()
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
     steps:
       - name: Prepare failure notification
         run: |

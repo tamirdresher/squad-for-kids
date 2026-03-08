@@ -38,10 +38,22 @@ function Write-RalphLog {
         [int]$ExitCode,
         [double]$DurationSeconds,
         [int]$ConsecutiveFailures,
-        [string]$Status
+        [string]$Status,
+        [hashtable]$Metrics = @{}
     )
     
-    $logEntry = "$Timestamp | Round=$Round | ExitCode=$ExitCode | Duration=${DurationSeconds}s | Failures=$ConsecutiveFailures | Status=$Status"
+    $metricsStr = ""
+    if ($Metrics.Count -gt 0) {
+        $metricsParts = @()
+        if ($Metrics.ContainsKey("issuesClosed")) { $metricsParts += "Issues=$($Metrics.issuesClosed)" }
+        if ($Metrics.ContainsKey("prsMerged")) { $metricsParts += "PRs=$($Metrics.prsMerged)" }
+        if ($Metrics.ContainsKey("agentActions")) { $metricsParts += "Actions=$($Metrics.agentActions)" }
+        if ($metricsParts.Count -gt 0) {
+            $metricsStr = " | " + ($metricsParts -join " | ")
+        }
+    }
+    
+    $logEntry = "$Timestamp | Round=$Round | ExitCode=$ExitCode | Duration=${DurationSeconds}s | Failures=$ConsecutiveFailures | Status=$Status$metricsStr"
     Add-Content -Path $logFile -Value $logEntry -Encoding utf8
 }
 
@@ -82,7 +94,8 @@ function Update-Heartbeat {
         [string]$Status,
         [int]$ExitCode = 0,
         [double]$DurationSeconds = 0,
-        [int]$ConsecutiveFailures = 0
+        [int]$ConsecutiveFailures = 0,
+        [hashtable]$Metrics = @{}
     )
     
     $heartbeat = [ordered]@{
@@ -95,7 +108,61 @@ function Update-Heartbeat {
         pid = $PID
     }
     
+    if ($Metrics.Count -gt 0) {
+        $heartbeat["metrics"] = [ordered]@{
+            issuesClosed = if ($Metrics.ContainsKey("issuesClosed")) { $Metrics.issuesClosed } else { 0 }
+            prsMerged = if ($Metrics.ContainsKey("prsMerged")) { $Metrics.prsMerged } else { 0 }
+            agentActions = if ($Metrics.ContainsKey("agentActions")) { $Metrics.agentActions } else { 0 }
+        }
+    }
+    
     $heartbeat | ConvertTo-Json | Out-File -FilePath $heartbeatFile -Encoding utf8 -Force
+}
+
+# Function to parse agency output for metrics
+function Parse-AgencyMetrics {
+    param(
+        [string]$Output
+    )
+    
+    $metrics = @{
+        issuesClosed = 0
+        prsMerged = 0
+        agentActions = 0
+    }
+    
+    if ([string]::IsNullOrWhiteSpace($Output)) {
+        return $metrics
+    }
+    
+    # Parse for closed issues - patterns like "closed issue #123", "close #45", "closing issue 67"
+    $issueMatches = [regex]::Matches($Output, '(?i)(clos(e|ed|ing)|fix(ed)?|resolv(e|ed|ing))\s+(issue\s+)?#?\d+')
+    $uniqueIssues = @{}
+    foreach ($match in $issueMatches) {
+        $issueNumber = [regex]::Match($match.Value, '\d+').Value
+        if ($issueNumber) {
+            $uniqueIssues[$issueNumber] = $true
+        }
+    }
+    $metrics.issuesClosed = $uniqueIssues.Count
+    
+    # Parse for merged PRs - patterns like "merged PR #456", "merge pull request #78"
+    $prMatches = [regex]::Matches($Output, '(?i)merg(e|ed|ing)\s+(pr|pull\s+request)\s+#?\d+')
+    $uniquePRs = @{}
+    foreach ($match in $prMatches) {
+        $prNumber = [regex]::Match($match.Value, '\d+').Value
+        if ($prNumber) {
+            $uniquePRs[$prNumber] = $true
+        }
+    }
+    $metrics.prsMerged = $uniquePRs.Count
+    
+    # Parse for agent actions - patterns like agent names followed by action verbs
+    # Common agent names: squad, ralph, data, seven, picard, worf, etc.
+    $agentActionMatches = [regex]::Matches($Output, '(?i)(squad|ralph|data|seven|picard|worf|troi|crusher|geordi|riker)\s+(created?|updated?|fixed?|merged?|closed?|opened?|added?|removed?|modified?)')
+    $metrics.agentActions = $agentActionMatches.Count
+    
+    return $metrics
 }
 
 # Function to send Teams alert
@@ -103,7 +170,8 @@ function Send-TeamsAlert {
     param(
         [int]$Round,
         [int]$ConsecutiveFailures,
-        [int]$ExitCode
+        [int]$ExitCode,
+        [hashtable]$Metrics = @{}
     )
     
     if (-not (Test-Path $teamsWebhookFile)) {
@@ -118,6 +186,37 @@ function Send-TeamsAlert {
         return
     }
     
+    $facts = @(
+        @{
+            name = "Round"
+            value = $Round
+        },
+        @{
+            name = "Consecutive Failures"
+            value = $ConsecutiveFailures
+        },
+        @{
+            name = "Last Exit Code"
+            value = $ExitCode
+        },
+        @{
+            name = "Timestamp"
+            value = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+        }
+    )
+    
+    if ($Metrics.Count -gt 0) {
+        if ($Metrics.ContainsKey("issuesClosed") -and $Metrics.issuesClosed -gt 0) {
+            $facts += @{ name = "Issues Closed"; value = $Metrics.issuesClosed }
+        }
+        if ($Metrics.ContainsKey("prsMerged") -and $Metrics.prsMerged -gt 0) {
+            $facts += @{ name = "PRs Merged"; value = $Metrics.prsMerged }
+        }
+        if ($Metrics.ContainsKey("agentActions") -and $Metrics.agentActions -gt 0) {
+            $facts += @{ name = "Agent Actions"; value = $Metrics.agentActions }
+        }
+    }
+    
     $message = @{
         "@type" = "MessageCard"
         "@context" = "https://schema.org/extensions"
@@ -127,24 +226,7 @@ function Send-TeamsAlert {
         sections = @(
             @{
                 activityTitle = "Ralph watch has experienced $ConsecutiveFailures consecutive failures"
-                facts = @(
-                    @{
-                        name = "Round"
-                        value = $Round
-                    },
-                    @{
-                        name = "Consecutive Failures"
-                        value = $ConsecutiveFailures
-                    },
-                    @{
-                        name = "Last Exit Code"
-                        value = $ExitCode
-                    },
-                    @{
-                        name = "Timestamp"
-                        value = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-                    }
-                )
+                facts = $facts
             }
         )
     }
@@ -208,11 +290,21 @@ while ($true) {
         Write-Host "[$timestamp] Continuing with existing code..." -ForegroundColor Yellow
     }
     
-    # Step 2: Run the agency copilot and capture exit code
+    # Step 2: Run the agency copilot and capture exit code + output
     $exitCode = 0
     $roundStatus = "idle"
+    $agencyOutput = ""
+    $metrics = @{
+        issuesClosed = 0
+        prsMerged = 0
+        agentActions = 0
+    }
+    
     try {
-        agency copilot --yolo --autopilot --agent squad -p $prompt
+        # Capture output to parse for metrics
+        $agencyOutput = agency copilot --yolo --autopilot --agent squad -p $prompt 2>&1 | Out-String
+        Write-Host $agencyOutput
+        
         $exitCode = $LASTEXITCODE
         if ($exitCode -eq 0) {
             Write-Host "[$timestamp] Round $round completed successfully" -ForegroundColor Green
@@ -225,6 +317,10 @@ while ($true) {
             $roundStatus = "error"
             $logStatus = "FAILED"
         }
+        
+        # Parse metrics from output
+        $metrics = Parse-AgencyMetrics -Output $agencyOutput
+        
     } catch {
         Write-Host "[$timestamp] Error: $($_.Exception.Message)" -ForegroundColor Red
         $exitCode = 1
@@ -237,11 +333,11 @@ while ($true) {
     $endTime = Get-Date
     $durationSeconds = ($endTime - $startTime).TotalSeconds
     
-    # Write structured log entry
-    Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Status $logStatus
+    # Write structured log entry with metrics
+    Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Status $logStatus -Metrics $metrics
     
-    # Write heartbeat AFTER round (status: idle or error)
-    Update-Heartbeat -Round $round -Status $roundStatus -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures
+    # Write heartbeat AFTER round (status: idle or error) with metrics
+    Update-Heartbeat -Round $round -Status $roundStatus -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Metrics $metrics
     
     # Rotate log if needed
     Invoke-LogRotation
@@ -249,10 +345,13 @@ while ($true) {
     # Send Teams alert if 3+ consecutive failures
     if ($consecutiveFailures -ge 3) {
         Write-Host "[$timestamp] Consecutive failures threshold reached ($consecutiveFailures), sending Teams alert..." -ForegroundColor Yellow
-        Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode
+        Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode -Metrics $metrics
     }
     
     Write-Host "[$timestamp] Next round in $intervalMinutes minutes..." -ForegroundColor DarkGray
     Write-Host "[$timestamp] Duration: $([math]::Round($durationSeconds, 2))s | Exit: $exitCode | Failures: $consecutiveFailures" -ForegroundColor DarkGray
+    if ($metrics.issuesClosed -gt 0 -or $metrics.prsMerged -gt 0 -or $metrics.agentActions -gt 0) {
+        Write-Host "[$timestamp] Metrics: Issues closed: $($metrics.issuesClosed), PRs merged: $($metrics.prsMerged), Agent actions: $($metrics.agentActions)" -ForegroundColor DarkGray
+    }
     Start-Sleep -Seconds ($intervalMinutes * 60)
 }

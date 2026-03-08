@@ -1633,3 +1633,29 @@ This is now a standing directive for all agents, documented in the teams-monitor
 5. **Always check secret existence before curl**: Prevents workflow failures and confusing error messages when secret not configured
 6. **Manual workflow_dispatch enables testing**: Critical for digest workflows that run infrequently; user can validate without waiting for cron
 
+---
+
+### 2026-03-08: Issue #112 - Reduce Ralph Teams Notification Frequency
+
+**Context:** User (Tamir) was getting too many "Ralph — Board Status Report" Teams messages. Ralph runs every 5 minutes via `ralph-watch.ps1` and was sending notifications after every iteration, even when nothing actionable happened.
+
+**Problem:** The original prompt in `ralph-watch.ps1` said "dont forget to update me in teams if needed" — this was too vague and caused Ralph to interpret every board check as "needed."
+
+**Solution:** Updated the prompt to explicitly specify when Teams notifications should be sent:
+- Only send for actionable items: new issues needing decisions, PRs ready/merged, CI failures, completed work, user action required
+- Explicitly state NOT to send for routine board status checks with no changes
+
+**Change Made:**
+- Modified `ralph-watch.ps1` line 8 prompt from:
+  - `'Ralph, Go! make sure the PR comments are also taken care of and then merge the PRs when they are ready and open new issues if needed. dont forget to update me in teams if needed'`
+- To:
+  - `'Ralph, Go! make sure the PR comments are also taken care of and then merge the PRs when they are ready and open new issues if needed. IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.'`
+
+**Outcome:** Committed fix with message referencing #112, pushed to main, and commented on issue. Ralph will now only send Teams notifications when there's something important to act on.
+
+**Learnings:**
+
+1. **Prompt clarity is critical for LLM behavior**: Vague instructions like "if needed" lead to over-triggering. Explicit positive and negative conditions improve precision.
+2. **Notification fatigue is real**: High-frequency automation (every 5 minutes) requires careful notification gating to avoid becoming noise.
+3. **Examples in prompts help**: Listing specific scenarios (PRs merged, CI failures) gives concrete guidance rather than abstract concepts.
+

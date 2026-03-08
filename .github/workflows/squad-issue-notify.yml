@@ -35,7 +35,7 @@ jobs:
             
             // Check for squad agent mentions
             let agent = 'Unknown';
-            const agentMatch = lastComment.match(/(Picard|Data|B'Elanna|Seven|Worf)/i);
+            const agentMatch = lastComment.match(/(Picard|Data|B\\'Elanna|Seven|Worf)/i);
             if (agentMatch) {
               agent = agentMatch[1];
             } else if (issue.closed_by) {

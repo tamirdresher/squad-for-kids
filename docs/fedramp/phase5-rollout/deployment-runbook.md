@@ -79,6 +79,15 @@ This runbook provides step-by-step deployment procedures for the FedRAMP Securit
 
 ---
 
+## 2.4 Cache Configuration & Monitoring
+
+- [ ] Cache hit rate SLI documentation reviewed (see `docs/fedramp-dashboard-cache-sli.md`)
+- [ ] Cache hit rate alert deployed to Application Insights
+- [ ] 30-day cache review scheduled (first Tuesday of each month)
+- [ ] Operational team trained on cache remediation playbook
+
+---
+
 ## 3. Deployment Environments
 
 ### 3.1 Environment Overview
@@ -751,7 +760,112 @@ pwsh run-smoke-tests.ps1 -Environment {env} -Verbose -IncludePerformance
 
 ---
 
-## 9. Deployment Contacts
+## 9. Cache Management Operations
+
+### 9.1 Overview
+
+The FedRAMP Dashboard API implements HTTP response caching with a 60-second TTL for status endpoints and 300-second TTL for trend endpoints. This section provides operational procedures for cache monitoring and management.
+
+**Reference Documentation:** `docs/fedramp-dashboard-cache-sli.md`
+
+### 9.2 Cache SLI & SLO
+
+**Service Level Indicator (SLI):** Cache Hit Rate  
+**Service Level Objective (SLO):** ≥ 70% cache hit rate (24-hour rolling window)
+
+**Impact:**
+- Expected performance: 80-85% cache hit rate under normal load
+- Backend query reduction: 80-85%
+- Latency improvement: 20-30% (P95 < 500ms)
+
+### 9.3 Monitoring Cache Performance
+
+**View Cache Hit Rate (Last 24 Hours):**
+```powershell
+# Query Application Insights
+$query = @"
+requests
+| where timestamp > ago(24h) and name has "compliance"
+| extend IsCacheHit = iff(duration < 100, 1, 0)
+| summarize CacheHits = sum(IsCacheHit), Total = count()
+| extend HitRate = round((CacheHits * 100.0) / Total, 2)
+"@
+
+az monitor app-insights query `
+  --app appi-fedramp-dashboard-prod `
+  --analytics-query $query
+```
+
+**Check Alert Status:**
+```powershell
+# List active cache-related alerts
+az monitor alert list `
+  --resource-group rg-fedramp-dashboard-prod `
+  --query "[?contains(name, 'Cache')]"
+```
+
+### 9.4 Cache Troubleshooting
+
+**Symptom:** Cache hit rate < 70% alert triggered
+
+**Investigation Steps:**
+1. Check if recent deployment cleared cache (expected behavior, resolves in 15-30 min)
+2. Analyze request patterns for unusual diversity
+3. Review recent changes to query parameters
+4. Check for bot/scraper traffic patterns
+
+**Emergency Cache Clear (Last Resort):**
+```powershell
+# Restart API pods to clear in-memory cache
+kubectl rollout restart deployment/fedramp-dashboard-api -n fedramp-dashboard
+
+# Verify pods restarted
+kubectl get pods -n fedramp-dashboard -w
+```
+
+**⚠️ Warning:** Cache clear impacts all users temporarily (expect 5-10% error rate spike for 1-2 minutes)
+
+### 9.5 Monthly Cache Review
+
+**Schedule:** First Tuesday of each month, 10 AM PT  
+**Duration:** 30 minutes  
+**Attendees:** Data (Code Expert), SRE On-Call, Infrastructure Lead
+
+**Review Checklist:**
+- [ ] Review 30-day cache hit rate trend (target: ≥70%)
+- [ ] Analyze top 10 query parameter combinations
+- [ ] Assess backend query reduction (target: 80-85%)
+- [ ] Check Cosmos DB RU savings
+- [ ] Identify optimization opportunities
+- [ ] Update cache configuration if needed (document in Issue/PR)
+- [ ] Archive review summary: `docs/fedramp/cache-reviews/YYYY-MM.md`
+
+**Review Template:**
+```markdown
+## Cache Configuration Review - [Month Year]
+Date: [Date]
+Attendees: [Names]
+
+### Metrics (30-day window)
+- Cache Hit Rate: [X]% (Target: ≥70%)
+- P95 Latency: [X]ms (Cached: [X]ms, Uncached: [X]ms)
+- Backend Query Reduction: [X]%
+- Cosmos DB RU Savings: [X] RU/month
+
+### Observations
+- [Observation 1]
+- [Observation 2]
+
+### Recommendations
+- [ ] Action 1: [Description] (Owner: [Name], Due: [Date])
+
+### Next Review
+Date: [First Tuesday of next month]
+```
+
+---
+
+## 10. Deployment Contacts
 
 | Role | Name | Email | Phone | Availability |
 |------|------|-------|-------|--------------|
@@ -765,9 +879,9 @@ pwsh run-smoke-tests.ps1 -Environment {env} -Verbose -IncludePerformance
 
 ---
 
-## 10. Appendix
+## 11. Appendix
 
-### 10.1 Deployment Checklist (Quick Reference)
+### 11.1 Deployment Checklist (Quick Reference)
 
 **Pre-Deployment:**
 - [ ] Code merged and tagged

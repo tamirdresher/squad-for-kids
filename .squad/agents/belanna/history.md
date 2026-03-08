@@ -1459,3 +1459,34 @@ etwork-policy-tests.sh, waf-rule-tests.sh, opa-policy-tests.sh
 - .azuredevops/fedramp-validation-phase1.yml (Pipeline YAML, 14KB)
 
 **PR:** #94 — squad/85-dashboard-phase1
+
+---
+
+## Learnings
+
+### Issue #103 — DevBox Infrastructure Assessment (2026-03-08)
+
+**Context:** User requested devbox provisioning and Teams notification of details.
+
+**Infrastructure State:**
+- **Phase 1-3 Complete:** Full IaC templates, scripts, Squad skill, and MCP server integration all built and documented
+- **Azure CLI Extension Issue:** `az extension add --name devcenter` fails with pip error
+- **No Azure DevCenter Configured:** DevCenter, Project, and Pool resources not yet set up in Azure
+- **Workaround Available:** REST API can be used directly if CLI extension fails
+
+**Key Files:**
+- `devbox-provisioning/README.md` — 304 lines of comprehensive documentation
+- `devbox-provisioning/scripts/clone-devbox.ps1` — Auto-detection and cloning script
+- `devbox-provisioning/scripts/provision.ps1` — Manual provisioning with parameters
+- `devbox-provisioning/bicep/main.bicep` — ARM template scaffolded for future use
+
+**Azure Environment:**
+- Subscription: WCD_MicroServices_Staging_LBI (eastus2euap-cloud)
+- User: tamirdresher@microsoft.com
+- State: Enabled, authenticated via Azure CLI
+
+**Decision:** Infrastructure is production-ready but requires Azure DevCenter resources to be provisioned first. Added `status:pending-user` label since Azure Portal configuration is needed before automation can run.
+
+**Teams Notification:** Sent comprehensive status card via webhook with infrastructure assessment, available scripts, blockers, and next steps.
+
+**Pattern:** When provisioning infrastructure that depends on external Azure resources, always check for resource existence first before attempting automation. REST API fallbacks are valuable when CLI extensions fail.

@@ -1524,3 +1524,58 @@ This is now a standing directive for all agents, documented in the teams-monitor
 
 ---
 
+
+---
+
+### 2026-03-08: Issue #104 - Teams Notification System for Issue Closes
+
+**Context:** User requested better awareness when issues are closed. Currently issues close silently with no notification, causing user to be unaware of completed work. User has Teams webhook available.
+
+**Solution Built:**
+
+1. **Issue Close Notifications** (.github/workflows/squad-issue-notify.yml)
+   - Triggers on issues.closed event
+   - Extracts issue metadata, last comment, and agent mentions via GitHub Script
+   - Sends Adaptive Card to Teams webhook with:
+     - Issue title, number, and link
+     - Closed by user/agent
+     - Summary from last comment (up to 500 chars)
+   - Uses secrets.TEAMS_WEBHOOK_URL (user must configure)
+
+2. **Daily Digest** (.github/workflows/squad-daily-digest.yml)
+   - Runs daily at 8:00 AM UTC (cron: '0 8 * * *')
+   - Manual trigger supported via workflow_dispatch
+   - Gathers last 24h activity:
+     - Closed issues (up to 10)
+     - Merged PRs (up to 10)
+     - Recently updated open issues (up to 10 with labels)
+   - Sends Adaptive Card digest with counts and lists
+   - Also uses secrets.TEAMS_WEBHOOK_URL
+
+**Technical Decisions:**
+
+- **Adaptive Cards over plain text**: Provides professional formatting, clickable actions, and structured data display in Teams
+- **GitHub Script for data gathering**: Cleaner than bash/curl for GitHub API interactions; handles pagination and filtering
+- **Secret-based webhook URL**: Keeps webhook private; user must add to repo secrets
+- **8:00 AM UTC schedule**: Aligns with typical work start time for most timezones; adjustable via cron
+- **Last 24h window**: Balances relevance (not too old) with completeness (captures full day's work)
+
+**Files Created:**
+- .github/workflows/squad-issue-notify.yml (130 lines)
+- .github/workflows/squad-daily-digest.yml (200 lines)
+
+**User Action Required:**
+- Add TEAMS_WEBHOOK_URL to repository secrets (Settings → Secrets → Actions)
+- Issue #104 marked with status:pending-user label until secret is configured
+
+**Outcome:** PR #107 created with both workflows. Commented on issue #104 with setup instructions and marked pending user action. When secret is added, notifications will activate automatically.
+
+**Learnings:**
+
+1. **Adaptive Cards are superior to plain JSON/text for Teams**: Provide rich formatting, buttons, fact sets, and better UX
+2. **GitHub Script action eliminates bash complexity**: JavaScript API client cleaner than curl for multi-step GitHub API operations
+3. **Workflow separation (single event vs digest)**: Better than one monolithic workflow; allows independent triggers and testing
+4. **Cron schedules need timezone consideration**: 8 AM UTC = midnight PST, 8 AM CET; document expected local time for user
+5. **Always check secret existence before curl**: Prevents workflow failures and confusing error messages when secret not configured
+6. **Manual workflow_dispatch enables testing**: Critical for digest workflows that run infrequently; user can validate without waiting for cron
+

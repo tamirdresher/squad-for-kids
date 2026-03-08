@@ -8,9 +8,28 @@ source: "manual"
 
 ## Context
 
-The squad has confirmed WorkIQ can **read** Teams messages but **cannot send** them. This skill implements a one-way bridge: Teams → GitHub. Agents systematically query WorkIQ for recent Teams activity, extract actionable items, and create GitHub issues so nothing falls through the cracks.
+The squad has two-way Teams communication:
+- **READ**: WorkIQ (`workiq-ask_work_iq`) reads Teams messages
+- **SEND**: Teams Incoming Webhook sends messages to Teams
 
-The reverse direction (GitHub → Teams) is handled by existing issue comments — stakeholders subscribe to GitHub notifications. True push notification to Teams requires a webhook or bot (out of scope for this skill).
+The webhook URL is stored as an environment variable `TEAMS_WEBHOOK_URL` or can be invoked directly via `Invoke-RestMethod`.
+
+### Sending Messages to Teams
+
+To send a message to Teams, use this PowerShell pattern:
+
+```powershell
+$webhookUrl = $env:TEAMS_WEBHOOK_URL
+$body = @{ text = "Your message here" } | ConvertTo-Json
+Invoke-RestMethod -Uri $webhookUrl -Method Post -ContentType "application/json" -Body $body
+```
+
+Or from a shell command agents can run:
+```bash
+powershell -Command "Invoke-RestMethod -Uri $env:TEAMS_WEBHOOK_URL -Method Post -ContentType 'application/json' -Body (ConvertTo-Json @{text='Your message here'})"
+```
+
+**IMPORTANT**: Always use `$env:TEAMS_WEBHOOK_URL` — never hardcode the webhook URL. It is set as a user environment variable.
 
 ## Trigger
 

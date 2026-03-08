@@ -8,7 +8,84 @@
 - **Joined:** 2026-03-02T15:01:26Z
 - **Note:** Recast from Neo (The Matrix) to Picard (Star Trek TNG/Voyager)
 
+## Core Context
+
+- **Project:** Cross-repo research and analysis team covering infrastructure, security, cloud native, and development across Azure DevOps and GitHub repositories
+- **User:** Tamir Dresher
+- **Role:** Lead
+- **Joined:** 2026-03-02T15:01:26Z
+- **Note:** Recast from Neo (The Matrix) to Picard (Star Trek TNG/Voyager)
+
 ## Learnings
+
+### 2026-03-08: Ralph Round 1 Activation — Issue #122 Directive & Team Orchestration
+
+**Activation:** Tamir initiated Ralph (squad orchestrator) for Round 1  
+**Board State:**
+- 0 open PRs (all recent PRs merged with approval)
+- 1 untriaged issue (#122) → user directive captured, closed
+- Issue #109 resolved: pending-user label removed, Tamir approved GitHub Projects setup
+- 3 tech debt issues (#120, #121) assigned to Data
+- Multiple pending-user issues flagged for audit
+
+**New Directive (Issue #122):** Always add explanatory comment when changing `status:pending-user` label. Never change label without comment explaining what is needed from user. Rationale: Improve UX; example incident was Issue #109.
+
+**Team Spawned:**
+- **Picard:** Audit pending-user issues for missing explanatory comments
+- **B'Elanna:** Set up GitHub Projects for repo per Issue #109
+- **Data:** Tech debt issues #120 (consolidate cache telemetry), #121 (config-driven endpoint filtering)
+- **Scribe:** Log orchestration state and decision merging
+
+**Key Decisions Recorded:**
+- Decision 1.1: Explanatory comments for pending-user status changes (adopted)
+- Merged Decision Inbox file into decisions.md
+- Orchestration logs created for all agents
+
+---
+
+### 2026-03-08: PR Reviews #117 and #118 — Cache Telemetry & AlertHelper Tests
+
+**Task:** Review two PRs from Data (Code Expert) following up on prior Picard review comments.
+
+**PR #117 — Explicit Cache Telemetry (Issue #115):**
+- **Approved:** Quality implementation replacing duration-based cache inference with explicit signals
+- **Key Strengths:**
+  1. RFC 7234-compliant Age header—proper HTTP semantics
+  2. Dual signal design: Age header (client-facing) + custom events (ops telemetry)
+  3. Complete query migration (KQL in alerts, templates, docs)
+  4. Eliminates false positives from fast uncached responses
+- **Architecture Notes:**
+  - Middleware uses MemoryStream buffering—necessary for response inspection, small perf cost acceptable
+  - ICacheTelemetryService defined but not used by middleware (both track independently)—intentional separation but worth noting for future consolidation
+  - Path filtering hardcoded (`/api/v1/compliance`)—consider config-driven if cache scope expands
+
+**PR #118 — AlertHelper Unit Tests (Issue #114):**
+- **Approved:** Comprehensive coverage (47 tests) delivers on PR #101 action item
+- **Key Strengths:**
+  1. Complete coverage: GenerateDedupKey, GenerateAckKey, SeverityMapping variants
+  2. Edge cases tested: null, empty, unicode, colons, whitespace
+  3. Cross-platform validation: PagerDuty/Teams/Email consistency verified
+  4. FluentAssertions used correctly—readable assertions
+- **Architectural Decision:**
+  - AlertHelper copied into test project (not referenced) due to Functions project build errors
+  - Pragmatic short-term solution; technical debt acknowledged in decision doc
+  - Risk of drift contained (AlertHelper stable, 86 lines, zero dependencies)
+  - Future action: refactor to reference original once Functions build fixed
+
+**CI/CD Context:** Both PRs blocked from automated CI validation due to Issue #110 (EMU runner restriction). Code quality evaluated on its own merits—both PRs production-ready.
+
+**Key Patterns:**
+1. **Explicit over Inferred:** Duration-based heuristics (< 100ms = cache hit) create false positives. Explicit signals (Age header, custom events) eliminate ambiguity.
+2. **Pragmatic Technical Debt:** Copying code to bypass build issues is acceptable when:
+   - Source is stable and small
+   - Divergence risk is contained
+   - Tests will catch drift
+   - Debt is documented
+3. **Review Without CI:** When CI is unavailable, code review focuses on structure, coverage, edge cases, and architecture alignment. Local test results + code inspection sufficient for approval.
+
+**Approval Decision:** Both PRs approved for merge. CI restoration is separate workstream (Issue #110).
+
+---
 
 ### 2026-03-08: Issue #109 Triage — GitHub Projects Visibility Decision
 

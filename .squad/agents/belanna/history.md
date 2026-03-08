@@ -8,9 +8,31 @@
 - **Joined:** 2026-03-02T15:01:26Z
 - **Note:** Recast from Trinity (The Matrix) to B'Elanna (Star Trek TNG/Voyager)
 
+## Core Context
+
+- **Project:** Cross-repo research and analysis team covering infrastructure, security, cloud native, and development across Azure DevOps and GitHub repositories
+- **User:** Tamir Dresher
+- **Role:** Infrastructure Expert
+- **Joined:** 2026-03-02T15:01:26Z
+- **Note:** Recast from Trinity (The Matrix) to B'Elanna (Star Trek TNG/Voyager)
+
 ## Learnings
 
-<!-- Append learnings below -->
+### 2026-03-08: Ralph Round 1 Activation — GitHub Projects Setup (Issue #109)
+
+**Activation:** Tamir initiated Ralph Round 1  
+**Task:** Set up GitHub Projects for repository per Issue #109 (Tamir approved)  
+
+**Context:** Issue #109 resulted in pending-user label being changed without explanation. Tamir approved GitHub Projects setup as a resolution mechanism. B'Elanna assigned to execute.
+
+**Expected Deliverables:**
+- GitHub Projects configured and ready for use
+- Project templates established
+- Documentation updated
+
+**Related:** New directive (Issue #122) emphasizes importance of clear communication when changing issue status — GitHub Projects may provide structured framework for pending-user workflows.
+
+---
 
 ### 2026-03-08: Issue #89 — Performance Baseline & Sovereign Rollout Execution Artifacts
 

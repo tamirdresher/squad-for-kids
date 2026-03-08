@@ -8,7 +8,36 @@
 - **Joined:** 2026-03-02T15:01:26Z
 - **Note:** Recast from Tank (The Matrix) to Data (Star Trek TNG/Voyager)
 
+## Core Context
+
+- **Project:** Cross-repo research and analysis team covering infrastructure, security, cloud native, and development across Azure DevOps and GitHub repositories
+- **User:** Tamir Dresher
+- **Role:** Code Expert
+- **Joined:** 2026-03-02T15:01:26Z
+- **Note:** Recast from Tank (The Matrix) to Data (Star Trek TNG/Voyager)
+
 ## Learnings
+
+### 2026-03-08: Ralph Round 1 Activation — Tech Debt Issues #120, #121
+
+**Activation:** Tamir initiated Ralph Round 1  
+**Tasks Assigned:**
+- Issue #120: Consolidate cache telemetry (tech debt)
+- Issue #121: Config-driven endpoint filtering (tech debt)
+
+**Context:**
+- Ralph board scan identified 3 tech debt issues as priority items
+- Data (Code Expert) assigned to both issues with claude-sonnet-4.5 (premium reasoning)
+- Related to ongoing work on cache optimization and configurability
+
+**Expected Deliverables:**
+- Issue #120: Consolidated telemetry system (cache signals unified)
+- Issue #121: Config-driven endpoint filtering implementation
+- Testing complete, documentation updated
+
+**Related:** Prior work on cache telemetry (PR #117) provides foundation; this consolidates into system-level strategy.
+
+---
 
 ### 2026-03-08: Issue #106 - FedRAMP Dashboard Post-Merge Caching SLI & Monitoring
 

@@ -1,6 +1,8 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using FedRampDashboard.Api.Services;
+using Microsoft.Extensions.Options;
+using FedRampDashboard.Api.Configuration;
 
 namespace FedRampDashboard.Api.Middleware;
 
@@ -8,13 +10,16 @@ public class CacheTelemetryMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ICacheTelemetryService _cacheTelemetry;
+    private readonly List<string> _monitoredEndpoints;
 
     public CacheTelemetryMiddleware(
         RequestDelegate next, 
-        ICacheTelemetryService cacheTelemetry)
+        ICacheTelemetryService cacheTelemetry,
+        IOptions<CacheTelemetryOptions> options)
     {
         _next = next;
         _cacheTelemetry = cacheTelemetry;
+        _monitoredEndpoints = options.Value.MonitoredEndpoints;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -28,9 +33,8 @@ public class CacheTelemetryMiddleware
         await _next(context);
         var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
         
-        // Track cache telemetry for compliance endpoints
-        if (context.Request.Path.StartsWithSegments("/api/v1/compliance") && 
-            context.Response.StatusCode == 200)
+        // Track cache telemetry for configured endpoints
+        if (ShouldTrackEndpoint(context.Request.Path) && context.Response.StatusCode == 200)
         {
             TrackCacheTelemetry(context, duration);
         }
@@ -39,6 +43,11 @@ public class CacheTelemetryMiddleware
         responseBody.Seek(0, SeekOrigin.Begin);
         await responseBody.CopyToAsync(originalBodyStream);
         context.Response.Body = originalBodyStream;
+    }
+
+    private bool ShouldTrackEndpoint(PathString path)
+    {
+        return _monitoredEndpoints.Any(endpoint => path.StartsWithSegments(endpoint));
     }
 
     private void TrackCacheTelemetry(HttpContext context, double duration)

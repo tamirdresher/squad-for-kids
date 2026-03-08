@@ -3,10 +3,15 @@ using Microsoft.Identity.Web;
 using FedRampDashboard.Api.Services;
 using FedRampDashboard.Api.Authorization;
 using FedRampDashboard.Api.Middleware;
+using FedRampDashboard.Api.Configuration;
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configuration
+builder.Services.Configure<CacheTelemetryOptions>(
+    builder.Configuration.GetSection(CacheTelemetryOptions.SectionName));
 
 // Azure AD / Entra ID Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

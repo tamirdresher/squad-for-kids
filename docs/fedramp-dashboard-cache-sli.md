@@ -90,29 +90,49 @@ These metrics are improved by caching but measured independently:
 
 ### 3.1 Application Insights Metrics
 
-**Built-in Metrics (Available Immediately):**
+**Explicit Cache Telemetry (Issue #115):**
+
+The API implements explicit cache telemetry through custom events and HTTP headers for precise cache hit/miss tracking:
+
+1. **Age Header** - Standard HTTP cache age header
+   - Added to all cached responses
+   - Value: `0` for cache miss, `>0` for cache hit (seconds since cached)
+   - Enables client-side cache awareness
+
+2. **Custom Events** - Application Insights custom events
+   - Event Types: `CacheHit`, `CacheMiss`
+   - Properties:
+     - `Endpoint`: Request path (e.g., `/api/v1/compliance/status`)
+     - `Method`: HTTP method (GET)
+     - `CacheStatus`: "HIT" or "MISS"
+     - `ResponseAge`: Age header value in seconds
+     - `Environment`: Query parameter value
+     - `ControlCategory`: Query parameter value
+   - Metrics:
+     - `Duration`: Response time in milliseconds
+
+**Built-in Metrics:**
 1. **Request Duration** (dependency: `requests` table)
    - Filter: `name contains "compliance/status" OR name contains "compliance/trend"`
    - Dimension: `resultCode` (200 cached vs. 200 fresh)
-   
-2. **Response Cache Header** (custom telemetry)
-   - Track `Age` header in responses (0 = cache miss, >0 = cache hit)
 
-**Custom Telemetry (Implemented in PR #102):**
+**Structured Logging:**
 ```csharp
 _logger.LogInformation(
-    "Compliance status retrieved: OverallRate={OverallRate}%, Duration={Duration}ms",
-    status.OverallComplianceRate, duration);
+    "Cache telemetry tracked: Endpoint={Endpoint}, Status={Status}, Age={Age}s, Duration={Duration}ms",
+    endpoint, status, age, duration);
 ```
 
 ### 3.2 Cache Hit Rate Calculation Query
 
-**Kusto Query (Application Insights Analytics):**
+**Primary Query (Explicit Telemetry - Recommended):**
 ```kusto
-requests
+// Uses explicit cache events (Issue #115)
+customEvents
 | where timestamp > ago(24h)
-| where name has "compliance"
-| extend IsCacheHit = iff(duration < 100, 1, 0)  // Cached responses < 100ms
+| where name in ("CacheHit", "CacheMiss")
+| where customDimensions.Endpoint has "compliance"
+| extend IsCacheHit = iff(name == "CacheHit", 1, 0)
 | summarize 
     TotalRequests = count(),
     CacheHits = sum(IsCacheHit),
@@ -125,13 +145,29 @@ requests
     CacheHitRate = round(CacheHitRate, 2)
 ```
 
-**Alternative (Using Age Header):**
+**Alternative Query (Age Header):**
 ```kusto
+// Uses Age header from custom properties
+customEvents
+| where timestamp > ago(24h)
+| where name in ("CacheHit", "CacheMiss")
+| where customDimensions.Endpoint has "compliance"
+| extend ResponseAge = tolong(customDimensions["ResponseAge"])
+| extend IsCacheHit = iff(ResponseAge > 0, 1, 0)
+| summarize 
+    TotalRequests = count(),
+    CacheHits = sum(IsCacheHit)
+| extend CacheHitRate = (CacheHits * 100.0) / TotalRequests
+```
+
+**Legacy Query (Duration-based - Deprecated):**
+```kusto
+// DEPRECATED: Uses duration < 100ms as proxy for cache hit
+// Replaced by explicit telemetry in Issue #115
 requests
 | where timestamp > ago(24h)
 | where name has "compliance"
-| extend AgeHeader = tolong(customDimensions["ResponseAge"])
-| extend IsCacheHit = iff(AgeHeader > 0, 1, 0)
+| extend IsCacheHit = iff(duration < 100, 1, 0)
 | summarize 
     TotalRequests = count(),
     CacheHits = sum(IsCacheHit)

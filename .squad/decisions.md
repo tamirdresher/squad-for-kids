@@ -5362,3 +5362,149 @@ Modified ralph-watch.ps1 line 8 prompt to replace vague condition with explicit 
 **Approved by:** Tamir Dresher (user/product owner)  
 **Implemented by:** Data (Code Expert)
 
+
+---
+
+# Decision: GitHub EMU User Namespace Actions Restriction (Issue #110)
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** Informational  
+**Scope:** CI/CD Infrastructure & GitHub Actions  
+**Related:** Issue #110
+
+## Finding
+
+**Root Cause:** Repository 	amresearch1 is owned by personal user account (	amirdresher_microsoft), not an organization. As of August 2023, GitHub policy:
+
+> **EMU-managed user namespace repositories cannot use GitHub-hosted runners.**
+
+This is **not a billing issue** — it's an architectural governance constraint.
+
+## GitHub EMU Actions Rules
+
+| Repository Type | GitHub-hosted Runners | Free Minutes | Notes |
+|----------------|---------------------|-------------|-------|
+| Organization-owned private | ✅ Allowed | 50,000/month | Included with Enterprise Cloud |
+| Personal namespace (EMU) | ❌ Blocked | N/A | Policy restriction since Aug 2023 |
+| Public repos | ✅ Allowed | Unlimited | Any ownership |
+| Self-hosted runners | ✅ Allowed | Unlimited | User manages infrastructure |
+
+## Solutions (No Payment Required)
+
+### Option 1: Transfer to Organization (RECOMMENDED)
+- Transfer repo to Microsoft org namespace (e.g., microsoft/tamresearch1)
+- ✅ 50,000 free Actions minutes/month
+- ✅ Zero workflow changes needed
+- ✅ Better governance and collaboration
+
+### Option 2: Self-Hosted Runner
+- Provision VM/container as runner
+- Change workflows: uns-on: self-hosted
+- ✅ Unlimited minutes
+- ⚠️ User manages runner lifecycle and security
+
+### Option 3: Make Repository Public
+- Change visibility to Public
+- ✅ Unlimited GitHub-hosted minutes
+- ⚠️ All code becomes publicly visible
+
+## Recommendation
+
+**Transfer repository to Microsoft organization namespace.** This is the cleanest solution with zero ongoing maintenance, full free Actions minutes, and better collaboration model.
+
+**Status:** Awaiting user decision on preferred approach. Comprehensive response posted to Issue #110.
+
+---
+
+# Decision: FedRAMP Cache Alert Deployment Strategy (Issue #113)
+
+**Date:** 2026-03-08  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Status:** Implemented
+
+## Decision
+
+**Deliver comprehensive deployment guide instead of automated CI/CD deployment.**
+
+### Rationale
+
+1. **CI/CD Unavailable:** Issue #110 blocks all GitHub Actions workflows. ETA for resolution unknown.
+
+2. **Manual Deployment is Viable:**
+   - Existing PowerShell script (deploy-cache-alert.ps1) handles automation
+   - Azure CLI provides full deployment capability
+   - Bicep template is validated and ready
+   - Environment-specific parameters are well-documented
+
+3. **Comprehensive Guide Reduces Risk:**
+   - Step-by-step procedures minimize deployment errors
+   - Pre-deployment verification ensures prerequisites are met
+   - Post-deployment validation confirms correct configuration
+   - Rollback procedures provide safety net
+
+4. **Progressive Deployment Requires Manual Gates:**
+   - Dev → Stg → Prod rollout needs human validation between phases
+   - 24-48 hour observation periods between environments
+   - False positive monitoring requires judgment
+   - Manual gates are actually preferable for initial deployment
+
+5. **Issue Template Solves Recurring Review:**
+   - GitHub issue templates provide lightweight automation
+   - No CI/CD required for monthly reviews
+   - Template includes pre-built queries and checklists
+   - Can be enhanced later with automation if needed
+
+## Implementation
+
+### Deliverables Created
+
+1. **Deployment Guide:** infrastructure/monitoring/CACHE_ALERT_DEPLOYMENT.md (10.2KB)
+   - Prerequisites and verification commands
+   - Phase-specific deployment procedures (dev → stg → prod)
+   - Post-deployment verification steps
+   - Rollback procedures
+   - Known issues and workarounds (Issue #110 blocker)
+
+2. **Issue Template:** .github/ISSUE_TEMPLATE/monthly-cache-review.md (4.3KB)
+   - Standard meeting agenda (30 minutes)
+   - Pre-built Application Insights KQL queries
+   - Deliverables checklist
+   - Reference documentation links
+
+3. **First Review Issue:** #116 (April 2026 Cache Review)
+   - Scheduled for Tuesday, April 1, 2026 at 10 AM PT
+   - Assigned to Data (Code Expert) and B'Elanna (Infrastructure)
+
+## Deployment Timeline
+
+**Immediate:**
+- ✅ Deployment guide ready
+- ✅ Monthly review template created
+- ✅ April 2026 review scheduled
+
+**After Issue #110 Resolves:**
+- Deploy to dev environment using PowerShell script
+- Monitor for 24-48 hours
+- Deploy to stg environment
+- Monitor for 2-3 days
+- Deploy to prod environment
+
+**April 1, 2026:**
+- Conduct first monthly cache review
+- Document baseline metrics
+- Schedule May 2026 review
+
+## Lessons Learned
+
+1. **Comprehensive guides beat minimal automation:** When CI/CD is blocked, a thorough deployment guide with verification steps is more valuable than waiting for automation.
+
+2. **Progressive deployment requires human judgment:** Dev → Stg → Prod rollouts benefit from manual gates to assess false positives and validate configuration.
+
+3. **Issue templates are lightweight automation:** GitHub issue templates provide reminders and checklists without requiring CI/CD infrastructure.
+
+4. **Document workarounds prominently:** When blocked by another issue, prominently document the blocker and workarounds in all related documentation.
+
+5. **Operational tasks need structure:** Recurring operational tasks (monthly reviews) benefit from standardized templates with pre-built queries and checklists.
+
+**Status:** Implemented — Deployment guide delivered, monthly reviews scheduled.

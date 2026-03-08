@@ -98,6 +98,58 @@
 
 - Week 1 execution begins: DEV baseline measurement
 - After Week 4 production validation, final approval required for Week 5 sovereign rollout
+
+### 2026-03-08: Issue #110 — GitHub EMU Actions Restriction Investigation
+
+**Task:** Investigate all GitHub Actions workflows failing with 0 steps executed (~3 second completion).
+
+**Finding:** Root cause identified as GitHub policy restriction on Enterprise Managed User (EMU) personal namespace repositories. As of August 2023, EMU-managed user namespace repositories **cannot use GitHub-hosted runners**. This is an architectural governance constraint, not a billing issue.
+
+**Diagnostic Signature (when EMU restriction occurs):**
+- ✅ Job starts
+- ❌ 0 steps execute
+- ⏱️ ~3 seconds total time
+- ❌ Empty `steps: []` in job metadata
+
+**Three Solutions (no payment required):**
+1. Transfer repo to organization namespace (RECOMMENDED) — 50,000 free Actions minutes/month
+2. Self-hosted runner — unlimited minutes, user manages infrastructure
+3. Make repository public — unlimited minutes, code becomes visible
+
+**Key Learning:** GitHub Actions behavior differs significantly between personal and organization namespaces in EMU environments. Comprehensive response posted to Issue #110 with diagnostic commands and decision matrix.
+
+### 2026-03-08: Issue #113 — Cache Alert Deployment with Blocked CI/CD
+
+**Task:** Deploy FedRAMP cache alert infrastructure after PR #108 merge. Issue #110 (CI/CD failure) blocks automated deployment.
+
+**Decision:** Deliver comprehensive deployment guide instead of waiting for automated CI/CD.
+
+**Rationale:**
+- CI/CD unavailable with unknown ETA for resolution
+- Manual deployment viable with existing PowerShell + Bicep infrastructure
+- Progressive deployment (dev → stg → prod) requires human judgment for false positive validation
+- Issue templates provide lightweight automation for recurring monthly reviews
+
+**Deliverables:**
+1. **Deployment Guide** (`infrastructure/monitoring/CACHE_ALERT_DEPLOYMENT.md` - 10.2KB)
+   - Prerequisites, phase-specific procedures, post-deployment validation, rollback procedures
+   - Known issues and workarounds documented
+
+2. **Issue Template** (`.github/ISSUE_TEMPLATE/monthly-cache-review.md` - 4.3KB)
+   - 30-minute agenda, pre-built KQL queries, checklist
+
+3. **First Review Scheduled** (Issue #116 — April 1, 2026)
+   - Assigned to Data and B'Elanna
+   - Establishes baseline for recurring monthly reviews
+
+**Lessons Learned:**
+1. Comprehensive guides beat minimal automation when CI/CD is blocked
+2. Progressive deployment benefits from manual gates (human judgment on false positives)
+3. GitHub issue templates provide reminders and checklists without CI/CD infrastructure
+4. Document blockers prominently in all related documentation
+5. Recurring operational tasks benefit from standardized templates with pre-built queries
+
+**Key Decision:** When CI/CD is unavailable, a thorough deployment guide with verification steps is more valuable than waiting for automation.
 - Post-rollout: Update runbook with production learnings and close Issue #89
 
 ### 2026-03-12: Issue #71 — DK8S Stability Runbook Tier 1 Consolidation (Operational Reference)

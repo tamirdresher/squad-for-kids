@@ -7,9 +7,17 @@ on:
       - 'docs/**'
       - '.github/workflows/squad-docs.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: self-hosted
+    outputs:
+      skip: ${{ steps.build.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,14 +29,24 @@ jobs:
         run: npm install --no-save markdown-it markdown-it-anchor
 
       - name: Build docs site
+        id: build
         run: |
           if (-not (Test-Path "docs\build.js")) {
             Write-Host "docs/build.js not found, skipping build"
+            "skip=true" >> $env:GITHUB_OUTPUT
             exit 0
           }
           node docs/build.js --out _site --base /squad
+          if (Test-Path "_site") {
+            Write-Host "Build successful, _site directory created"
+            "skip=false" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "Build completed but no _site directory created"
+            "skip=true" >> $env:GITHUB_OUTPUT
+          }
 
       - name: Upload Pages artifact
+        if: steps.build.outputs.skip != 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -36,6 +54,7 @@ jobs:
   deploy:
     needs: build
     runs-on: self-hosted
+    if: needs.build.outputs.skip != 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

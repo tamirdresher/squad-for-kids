@@ -45,22 +45,54 @@ function Write-RalphLog {
     Add-Content -Path $logFile -Value $logEntry -Encoding utf8
 }
 
+# Function to rotate log file (keep last $maxLogEntries entries, or rotate at $maxLogBytes)
+function Invoke-LogRotation {
+    if (-not (Test-Path $logFile)) { return }
+    
+    $fileInfo = Get-Item $logFile
+    $needsRotation = $false
+    
+    # Check size threshold
+    if ($fileInfo.Length -gt $maxLogBytes) {
+        $needsRotation = $true
+    }
+    
+    # Check entry count
+    if (-not $needsRotation) {
+        $lineCount = (Get-Content -Path $logFile -Encoding utf8 | Measure-Object -Line).Lines
+        if ($lineCount -gt $maxLogEntries) {
+            $needsRotation = $true
+        }
+    }
+    
+    if ($needsRotation) {
+        $allLines = Get-Content -Path $logFile -Encoding utf8
+        # Keep header + last ($maxLogEntries - 1) entries
+        $header = $allLines | Select-Object -First 1
+        $kept = $allLines | Select-Object -Last ($maxLogEntries - 1)
+        $rotatedHeader = "# Ralph Watch Log - Rotated $(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss') (kept last $($maxLogEntries - 1) entries)"
+        @($rotatedHeader) + $kept | Out-File -FilePath $logFile -Encoding utf8 -Force
+    }
+}
+
 # Function to update heartbeat file
 function Update-Heartbeat {
     param(
         [int]$Round,
-        [string]$Timestamp,
-        [int]$ExitCode,
-        [double]$DurationSeconds,
-        [int]$ConsecutiveFailures
+        [string]$Status,
+        [int]$ExitCode = 0,
+        [double]$DurationSeconds = 0,
+        [int]$ConsecutiveFailures = 0
     )
     
-    $heartbeat = @{
-        lastRun = $Timestamp
+    $heartbeat = [ordered]@{
+        lastRun = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
         round = $Round
+        status = $Status
         exitCode = $ExitCode
         durationSeconds = [math]::Round($DurationSeconds, 2)
         consecutiveFailures = $ConsecutiveFailures
+        pid = $PID
     }
     
     $heartbeat | ConvertTo-Json | Out-File -FilePath $heartbeatFile -Encoding utf8 -Force
@@ -136,24 +168,27 @@ while ($true) {
     Write-Host "[$timestamp] Ralph Round $round - launching agency" -ForegroundColor Cyan
     Write-Host "============================================" -ForegroundColor Cyan
     
+    # Write heartbeat BEFORE round (status: running)
+    Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
+    
     # Step 1: Update the repo to ensure we have the latest code
     Write-Host "[$timestamp] Pulling latest changes..." -ForegroundColor Yellow
     try {
         # Fetch latest changes
-        git fetch 2>&1 | Out-Null
+        git fetch 2>$null | Out-Null
         
         # Check if there are uncommitted changes
-        $status = git status --porcelain
-        if ($status) {
+        $gitStatus = git status --porcelain
+        if ($gitStatus) {
             Write-Host "[$timestamp] Local changes detected, stashing..." -ForegroundColor Yellow
-            git stash save "ralph-watch-auto-stash-$timestamp" 2>&1 | Out-Null
+            git stash save "ralph-watch-auto-stash-$timestamp" 2>$null | Out-Null
             $stashed = $true
         } else {
             $stashed = $false
         }
         
         # Pull latest changes
-        $pullResult = git pull 2>&1
+        $pullResult = git pull 2>$null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "[$timestamp] Repository updated successfully" -ForegroundColor Green
         } else {
@@ -163,7 +198,7 @@ while ($true) {
         # Restore stashed changes if any
         if ($stashed) {
             Write-Host "[$timestamp] Restoring local changes..." -ForegroundColor Yellow
-            $popResult = git stash pop 2>&1
+            git stash pop 2>$null | Out-Null
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "[$timestamp] Warning: Could not restore stashed changes. Use 'git stash list' to recover." -ForegroundColor Yellow
             }
@@ -175,23 +210,27 @@ while ($true) {
     
     # Step 2: Run the agency copilot and capture exit code
     $exitCode = 0
+    $roundStatus = "idle"
     try {
         agency copilot --yolo --autopilot --agent squad -p $prompt
         $exitCode = $LASTEXITCODE
         if ($exitCode -eq 0) {
             Write-Host "[$timestamp] Round $round completed successfully" -ForegroundColor Green
             $consecutiveFailures = 0
-            $status = "SUCCESS"
+            $roundStatus = "idle"
+            $logStatus = "SUCCESS"
         } else {
             Write-Host "[$timestamp] Round $round completed with exit code $exitCode" -ForegroundColor Yellow
             $consecutiveFailures++
-            $status = "FAILED"
+            $roundStatus = "error"
+            $logStatus = "FAILED"
         }
     } catch {
         Write-Host "[$timestamp] Error: $($_.Exception.Message)" -ForegroundColor Red
         $exitCode = 1
         $consecutiveFailures++
-        $status = "ERROR"
+        $roundStatus = "error"
+        $logStatus = "ERROR"
     }
     
     # Calculate duration
@@ -199,14 +238,17 @@ while ($true) {
     $durationSeconds = ($endTime - $startTime).TotalSeconds
     
     # Write structured log entry
-    Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Status $status
+    Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Status $logStatus
     
-    # Update heartbeat file
-    Update-Heartbeat -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures
+    # Write heartbeat AFTER round (status: idle or error)
+    Update-Heartbeat -Round $round -Status $roundStatus -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures
     
-    # Send Teams alert if consecutive failures exceed threshold
-    if ($consecutiveFailures -gt 3) {
-        Write-Host "[$timestamp] Consecutive failures threshold exceeded ($consecutiveFailures), sending Teams alert..." -ForegroundColor Yellow
+    # Rotate log if needed
+    Invoke-LogRotation
+    
+    # Send Teams alert if 3+ consecutive failures
+    if ($consecutiveFailures -ge 3) {
+        Write-Host "[$timestamp] Consecutive failures threshold reached ($consecutiveFailures), sending Teams alert..." -ForegroundColor Yellow
         Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode
     }
     

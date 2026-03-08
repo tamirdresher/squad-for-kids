@@ -99,98 +99,42 @@ jobs:
 
       - name: Send Teams digest
         if: env.TEAMS_WEBHOOK_URL != ''
+        uses: actions/github-script@v7
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        run: |
-          @'
-          {
-            "type": "message",
-            "attachments": [
-              {
-                "contentType": "application/vnd.microsoft.card.adaptive",
-                "content": {
-                  "type": "AdaptiveCard",
+        with:
+          script: |
+            const payload = {
+              type: "message",
+              attachments: [{
+                contentType: "application/vnd.microsoft.card.adaptive",
+                content: {
+                  type: "AdaptiveCard",
                   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                  "version": "1.4",
-                  "body": [
-                    {
-                      "type": "TextBlock",
-                      "text": "Squad Daily Digest",
-                      "weight": "Bolder",
-                      "size": "Large",
-                      "color": "Accent"
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "Last 24 hours activity",
-                      "isSubtle": true,
-                      "spacing": "None"
-                    },
-                    {
-                      "type": "FactSet",
-                      "facts": [
-                        {
-                          "title": "Issues Closed:",
-                          "value": "${{ steps.digest.outputs.closed_count }}"
-                        },
-                        {
-                          "title": "PRs Merged:",
-                          "value": "${{ steps.digest.outputs.merged_count }}"
-                        },
-                        {
-                          "title": "Open Issues:",
-                          "value": "${{ steps.digest.outputs.open_count }}"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "Issues Closed (Last 24h)",
-                      "weight": "Bolder",
-                      "spacing": "Medium"
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "${{ steps.digest.outputs.closed_list }}",
-                      "wrap": true,
-                      "spacing": "Small"
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "PRs Merged (Last 24h)",
-                      "weight": "Bolder",
-                      "spacing": "Medium"
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "${{ steps.digest.outputs.merged_list }}",
-                      "wrap": true,
-                      "spacing": "Small"
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "Recently Updated Open Issues",
-                      "weight": "Bolder",
-                      "spacing": "Medium"
-                    },
-                    {
-                      "type": "TextBlock",
-                      "text": "${{ steps.digest.outputs.open_list }}",
-                      "wrap": true,
-                      "spacing": "Small"
-                    }
+                  version: "1.4",
+                  body: [
+                    { type: "TextBlock", text: "Squad Daily Digest", weight: "Bolder", size: "Large", color: "Accent" },
+                    { type: "TextBlock", text: "Last 24 hours activity", isSubtle: true, spacing: "None" },
+                    { type: "FactSet", facts: [
+                      { title: "Issues Closed:", value: `${{ steps.digest.outputs.closed_count }}` },
+                      { title: "PRs Merged:", value: `${{ steps.digest.outputs.merged_count }}` },
+                      { title: "Open Issues:", value: `${{ steps.digest.outputs.open_count }}` }
+                    ]},
+                    { type: "TextBlock", text: "Issues Closed (Last 24h)", weight: "Bolder", spacing: "Medium" },
+                    { type: "TextBlock", text: `${{ steps.digest.outputs.closed_list }}`, wrap: true, spacing: "Small" },
+                    { type: "TextBlock", text: "PRs Merged (Last 24h)", weight: "Bolder", spacing: "Medium" },
+                    { type: "TextBlock", text: `${{ steps.digest.outputs.merged_list }}`, wrap: true, spacing: "Small" },
+                    { type: "TextBlock", text: "Recently Updated Open Issues", weight: "Bolder", spacing: "Medium" },
+                    { type: "TextBlock", text: `${{ steps.digest.outputs.open_list }}`, wrap: true, spacing: "Small" }
                   ],
-                  "actions": [
-                    {
-                      "type": "Action.OpenUrl",
-                      "title": "View Repository",
-                      "url": "${{ steps.digest.outputs.repo_url }}"
-                    }
+                  actions: [
+                    { type: "Action.OpenUrl", title: "View Repository", url: `${{ steps.digest.outputs.repo_url }}` }
                   ]
                 }
-              }
-            ]
-          }
-'@ | Set-Content -Path payload.json
-          
-          Invoke-RestMethod -Uri $env:TEAMS_WEBHOOK_URL -Method Post -ContentType "application/json" -InFile payload.json
+              }]
+            };
+            await fetch(process.env.TEAMS_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });

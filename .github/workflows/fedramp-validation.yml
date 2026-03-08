@@ -89,181 +89,119 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Generate FedRAMP controls matrix
-        run: |
-          @'
-          {
-            "report_date": "$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')",
-            "repo": "${{ github.repository }}",
-            "branch": "${{ github.ref }}",
-            "commit": "${{ github.sha }}",
-            "fedramp_controls": [
-              {
-                "control_id": "SC-7",
-                "control_name": "Boundary Protection",
-                "tests": ["network-policy-tests.sh"],
-                "description": "NetworkPolicies enforce zero-trust baseline and port restrictions"
-              },
-              {
-                "control_id": "SC-8",
-                "control_name": "Transmission Confidentiality",
-                "tests": ["network-policy-tests.sh"],
-                "description": "TLS enforcement in sovereign clouds, HTTP blocking"
-              },
-              {
-                "control_id": "SI-2",
-                "control_name": "Flaw Remediation",
-                "tests": ["trivy-pipeline.yml"],
-                "description": "Automated vulnerability scanning pipeline with CRITICAL gate"
-              },
-              {
-                "control_id": "SI-3",
-                "control_name": "Malicious Code Protection",
-                "tests": ["waf-rule-tests.sh", "opa-policy-tests.sh"],
-                "description": "WAF OWASP ruleset and OPA admission control"
-              },
-              {
-                "control_id": "SI-4",
-                "control_name": "Information System Monitoring",
-                "tests": ["waf-rule-tests.sh", "opa-policy-tests.sh"],
-                "description": "WAF logs and OPA/Gatekeeper violation auditing"
-              },
-              {
-                "control_id": "RA-5",
-                "control_name": "Vulnerability Scanning",
-                "tests": ["trivy-pipeline.yml"],
-                "description": "Automated weekly Trivy scans with configuration scanning"
-              },
-              {
-                "control_id": "CM-3",
-                "control_name": "Configuration Change Control",
-                "tests": ["opa-policy-tests.sh"],
-                "description": "OPA policies enforce safe Ingress configurations"
-              },
-              {
-                "control_id": "CM-7",
-                "control_name": "Least Functionality",
-                "tests": ["network-policy-tests.sh"],
-                "description": "NetworkPolicy allows only required ports/protocols"
-              },
-              {
-                "control_id": "IR-4",
-                "control_name": "Incident Handling",
-                "tests": ["runbook-validation-checklist.md"],
-                "description": "Emergency patch procedures and rollback capabilities"
-              }
-            ],
-            "cve_mitigations": [
-              {
-                "cve_id": "CVE-2026-24512",
-                "cvss": "8.8",
-                "description": "nginx config injection via Ingress path",
-                "mitigations": ["WAF blocks ';' and config directives", "OPA blocks path injection", "NetworkPolicy limits blast radius", "Trivy scans for vulnerable versions"]
-              },
-              {
-                "cve_id": "CVE-2025-1974",
-                "cvss": "7.5",
-                "description": "RCE via annotation-based injection",
-                "mitigations": ["OPA annotation allowlist blocks snippet directives"]
-              },
-              {
-                "cve_id": "CVE-2026-24514",
-                "cvss": "7.5",
-                "description": "Heartbeat endpoint DDoS",
-                "mitigations": ["WAF rate limiting on /healthz endpoint"]
-              }
-            ]
-          }
-'@ | Set-Content -Path /tmp/fedramp-controls-matrix.json
-          
-          Get-Content /tmp/fedramp-controls-matrix.json
-          Write-Output "✓ Compliance matrix generated"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const matrix = {
+              report_date: new Date().toISOString(),
+              repo: '${{ github.repository }}',
+              branch: '${{ github.ref }}',
+              commit: '${{ github.sha }}',
+              fedramp_controls: [
+                { control_id: "SC-7", control_name: "Boundary Protection", tests: ["network-policy-tests.sh"], description: "NetworkPolicies enforce zero-trust baseline and port restrictions" },
+                { control_id: "SC-8", control_name: "Transmission Confidentiality", tests: ["network-policy-tests.sh"], description: "TLS enforcement in sovereign clouds, HTTP blocking" },
+                { control_id: "SI-2", control_name: "Flaw Remediation", tests: ["trivy-pipeline.yml"], description: "Automated vulnerability scanning pipeline with CRITICAL gate" },
+                { control_id: "SI-3", control_name: "Malicious Code Protection", tests: ["waf-rule-tests.sh", "opa-policy-tests.sh"], description: "WAF OWASP ruleset and OPA admission control" },
+                { control_id: "SI-4", control_name: "Information System Monitoring", tests: ["waf-rule-tests.sh", "opa-policy-tests.sh"], description: "WAF logs and OPA/Gatekeeper violation auditing" },
+                { control_id: "RA-5", control_name: "Vulnerability Scanning", tests: ["trivy-pipeline.yml"], description: "Automated weekly Trivy scans with configuration scanning" },
+                { control_id: "CM-3", control_name: "Configuration Change Control", tests: ["opa-policy-tests.sh"], description: "OPA policies enforce safe Ingress configurations" },
+                { control_id: "CM-7", control_name: "Least Functionality", tests: ["network-policy-tests.sh"], description: "NetworkPolicy allows only required ports/protocols" },
+                { control_id: "IR-4", control_name: "Incident Handling", tests: ["runbook-validation-checklist.md"], description: "Emergency patch procedures and rollback capabilities" }
+              ],
+              cve_mitigations: [
+                { cve_id: "CVE-2026-24512", cvss: "8.8", description: "nginx config injection via Ingress path", mitigations: ["WAF blocks ';' and config directives", "OPA blocks path injection", "NetworkPolicy limits blast radius", "Trivy scans for vulnerable versions"] },
+                { cve_id: "CVE-2025-1974", cvss: "7.5", description: "RCE via annotation-based injection", mitigations: ["OPA annotation allowlist blocks snippet directives"] },
+                { cve_id: "CVE-2026-24514", cvss: "7.5", description: "Heartbeat endpoint DDoS", mitigations: ["WAF rate limiting on /healthz endpoint"] }
+              ]
+            };
+            const outPath = process.platform === 'win32' ? 'fedramp-controls-matrix.json' : '/tmp/fedramp-controls-matrix.json';
+            fs.writeFileSync(outPath, JSON.stringify(matrix, null, 2));
+            console.log(fs.readFileSync(outPath, 'utf8'));
+            console.log('Compliance matrix generated');
       
       - name: Create compliance summary
-        run: |
-          @"
-          # FedRAMP Compliance Summary
-          
-          **Report Date:** $(Get-Date -Format 'u')  
-          **Repository:** ${{ github.repository }}  
-          **Branch:** ${{ github.ref }}  
-          **Commit:** ${{ github.sha }}
-          
-          ## Test Suite Status
-          
-          | Component | Status | Purpose |
-          |-----------|--------|---------|
-          | Network Policy Tests | ✓ Present | Zero-trust networking validation |
-          | WAF Rule Tests | ✓ Present | Attack pattern blocking validation |
-          | OPA Policy Tests | ✓ Present | Admission control validation |
-          | Trivy Scanning | ✓ Present | Automated vulnerability detection |
-          | Test Plan | ✓ Present | Comprehensive test strategy (100+ tests) |
-          | Runbook | ✓ Present | Incident response procedures |
-          
-          ## FedRAMP Controls Validated
-          
-          ### Boundary Protection (SC-7)
-          - ✓ NetworkPolicy default-deny enforcement
-          - ✓ Namespace isolation
-          - ✓ Ingress controller allow-list
-          
-          ### Malicious Code Protection (SI-3)
-          - ✓ WAF OWASP DRS 2.1 rules
-          - ✓ OPA admission control
-          - ✓ Path injection prevention (CVE-2026-24512)
-          - ✓ Annotation injection prevention (CVE-2025-1974)
-          
-          ### Flaw Remediation (SI-2)
-          - ✓ Trivy vulnerability scanning
-          - ✓ CRITICAL vulnerability gate (blocks pipeline)
-          - ✓ Configuration scanning with conftest
-          
-          ### Vulnerability Scanning (RA-5)
-          - ✓ Automated scanning on PR/push
-          - ✓ Weekly scheduled scans
-          - ✓ Container image scanning
-          - ✓ Kubernetes manifest scanning
-          
-          ### Configuration Change Control (CM-3)
-          - ✓ OPA prevents unsafe Ingress configurations
-          - ✓ ArgoCD sync-wave ordering
-          - ✓ Helm template validation
-          
-          ### Incident Handling (IR-4)
-          - ✓ Emergency patching runbook
-          - ✓ Rollback procedures documented
-          - ✓ Alert-to-action chains (< 24h P0, < 48h Sovereign)
-          
-          ## CVE Mitigations Verified
-          
-          | CVE | CVSS | Status | Defense Layers |
-          |-----|------|--------|----------------|
-          | CVE-2026-24512 | 8.8 | ✓ Mitigated | WAF + OPA + NetworkPolicy + Trivy |
-          | CVE-2025-1974 | 7.5 | ✓ Mitigated | OPA annotation allowlist |
-          | CVE-2026-24514 | 7.5 | ✓ Mitigated | WAF rate limiting |
-          
-          ## Compliance Status
-          
-          ✅ **Test Suite Integrated into CI/CD**  
-          ✅ **All FedRAMP HIGH baseline controls validated**  
-          ✅ **Defense-in-depth architecture confirmed**  
-          ✅ **Incident response procedures documented**
-          
-          ## Next Steps
-          
-          1. **Enable on every PR:** Validation runs automatically on PR creation
-          2. **Production deployment:** Use ArgoCD progressive rollout (DEV → STG → PPE → Prod)
-          3. **Sovereign deployment:** Use STG-USGOV-01 test environment before sovereign production
-          4. **Alert integration:** Connect WAF/OPA logs to security operations dashboard
-          5. **Metrics tracking:** Monitor compliance status and control effectiveness over time
-          
-          ---
-          
-          **Maintained by:** Security & Cloud team  
-          **Issue:** #72 (FedRAMP Controls: Continuous Validation in CI/CD Pipeline)  
-          **Related PRs:** #55, #56, #70
-"@ | Set-Content -Path /tmp/COMPLIANCE_SUMMARY.md
-          
-          Get-Content /tmp/COMPLIANCE_SUMMARY.md
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const date = new Date().toISOString();
+            const summary = `# FedRAMP Compliance Summary
+
+            **Report Date:** ${date}
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref }}
+            **Commit:** ${{ github.sha }}
+
+            ## Test Suite Status
+
+            | Component | Status | Purpose |
+            |-----------|--------|---------|
+            | Network Policy Tests | ✓ Present | Zero-trust networking validation |
+            | WAF Rule Tests | ✓ Present | Attack pattern blocking validation |
+            | OPA Policy Tests | ✓ Present | Admission control validation |
+            | Trivy Scanning | ✓ Present | Automated vulnerability detection |
+            | Test Plan | ✓ Present | Comprehensive test strategy (100+ tests) |
+            | Runbook | ✓ Present | Incident response procedures |
+
+            ## FedRAMP Controls Validated
+
+            ### Boundary Protection (SC-7)
+            - ✓ NetworkPolicy default-deny enforcement
+            - ✓ Namespace isolation
+            - ✓ Ingress controller allow-list
+
+            ### Malicious Code Protection (SI-3)
+            - ✓ WAF OWASP DRS 2.1 rules
+            - ✓ OPA admission control
+            - ✓ Path injection prevention (CVE-2026-24512)
+            - ✓ Annotation injection prevention (CVE-2025-1974)
+
+            ### Flaw Remediation (SI-2)
+            - ✓ Trivy vulnerability scanning
+            - ✓ CRITICAL vulnerability gate (blocks pipeline)
+            - ✓ Configuration scanning with conftest
+
+            ### Vulnerability Scanning (RA-5)
+            - ✓ Automated scanning on PR/push
+            - ✓ Weekly scheduled scans
+            - ✓ Container image scanning
+            - ✓ Kubernetes manifest scanning
+
+            ### Configuration Change Control (CM-3)
+            - ✓ OPA prevents unsafe Ingress configurations
+            - ✓ ArgoCD sync-wave ordering
+            - ✓ Helm template validation
+
+            ### Incident Handling (IR-4)
+            - ✓ Emergency patching runbook
+            - ✓ Rollback procedures documented
+            - ✓ Alert-to-action chains (< 24h P0, < 48h Sovereign)
+
+            ## CVE Mitigations Verified
+
+            | CVE | CVSS | Status | Defense Layers |
+            |-----|------|--------|----------------|
+            | CVE-2026-24512 | 8.8 | ✓ Mitigated | WAF + OPA + NetworkPolicy + Trivy |
+            | CVE-2025-1974 | 7.5 | ✓ Mitigated | OPA annotation allowlist |
+            | CVE-2026-24514 | 7.5 | ✓ Mitigated | WAF rate limiting |
+
+            ## Compliance Status
+
+            ✅ **Test Suite Integrated into CI/CD**
+            ✅ **All FedRAMP HIGH baseline controls validated**
+            ✅ **Defense-in-depth architecture confirmed**
+            ✅ **Incident response procedures documented**
+
+            ---
+
+            **Maintained by:** Security & Cloud team
+            **Issue:** #72 (FedRAMP Controls: Continuous Validation in CI/CD Pipeline)
+            **Related PRs:** #55, #56, #70
+            `.replace(/^            /gm, '');
+            const outPath = process.platform === 'win32' ? 'COMPLIANCE_SUMMARY.md' : '/tmp/COMPLIANCE_SUMMARY.md';
+            fs.writeFileSync(outPath, summary);
+            console.log(summary);
       
       - name: Upload compliance artifacts
         if: always()
@@ -271,8 +209,8 @@ jobs:
         with:
           name: fedramp-compliance-reports
           path: |
-            /tmp/fedramp-controls-matrix.json
-            /tmp/COMPLIANCE_SUMMARY.md
+            fedramp-controls-matrix.json
+            COMPLIANCE_SUMMARY.md
           retention-days: 30
 
   check-control-drift:
@@ -323,27 +261,21 @@ jobs:
     steps:
       - name: Prepare failure notification
         run: |
-          @'
-          ⚠️  FedRAMP Validation Failed
-          
-          Repository: ${{ github.repository }}
-          Branch: ${{ github.ref }}
-          Commit: ${{ github.sha }}
-          Workflow: ${{ github.workflow }}
-          
-          This indicates a potential issue with FedRAMP test suite structure,
-          documentation, or compliance configuration.
-          
-          Action Required:
-          1. Review workflow logs for detailed error messages
-          2. Ensure all test suite files are present and valid
-          3. Verify markdown documentation syntax
-          4. Check for syntax errors in YAML configurations
-          
-          Issue: #72 - FedRAMP Controls: Continuous Validation in CI/CD Pipeline
-'@ | Set-Content -Path /tmp/validation-failure-alert.txt
-          
-          Get-Content /tmp/validation-failure-alert.txt
+          $text = "FedRAMP Validation Failed"
+          $text += "`n`nRepository: ${{ github.repository }}"
+          $text += "`nBranch: ${{ github.ref }}"
+          $text += "`nCommit: ${{ github.sha }}"
+          $text += "`nWorkflow: ${{ github.workflow }}"
+          $text += "`n`nThis indicates a potential issue with FedRAMP test suite structure,"
+          $text += "`ndocumentation, or compliance configuration."
+          $text += "`n`nAction Required:"
+          $text += "`n1. Review workflow logs for detailed error messages"
+          $text += "`n2. Ensure all test suite files are present and valid"
+          $text += "`n3. Verify markdown documentation syntax"
+          $text += "`n4. Check for syntax errors in YAML configurations"
+          $text += "`n`nIssue: #72 - FedRAMP Controls: Continuous Validation in CI/CD Pipeline"
+          $text | Set-Content -Path validation-failure-alert.txt
+          Get-Content validation-failure-alert.txt
       
       - name: Create issue comment on validation failure
         if: github.event_name == 'pull_request'

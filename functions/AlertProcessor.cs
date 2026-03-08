@@ -114,48 +114,88 @@ namespace FedRampDashboard.Functions
 
         private static async Task EnrichAlertAsync(Alert alert, ILogger log)
         {
-            // Lookup control metadata
-            if (alert.Control != null && string.IsNullOrEmpty(alert.Control.Name))
+            var enrichStart = DateTime.UtcNow;
+            
+            try
             {
-                var controlMetadata = GetControlMetadata(alert.Control.Id);
-                alert.Control.Name = controlMetadata.Name;
-                alert.Control.Category = controlMetadata.Category;
-            }
+                // Lookup control metadata
+                if (alert.Control != null && string.IsNullOrEmpty(alert.Control.Name))
+                {
+                    var controlMetadata = GetControlMetadata(alert.Control.Id);
+                    alert.Control.Name = controlMetadata.Name;
+                    alert.Control.Category = controlMetadata.Category;
+                    
+                    log.LogInformation(
+                        "Control metadata enriched: ControlId={ControlId}, ControlName={ControlName}, Category={Category}",
+                        alert.Control.Id, alert.Control.Name, alert.Control.Category);
+                }
 
-            // Attach runbook URL
-            if (string.IsNullOrEmpty(alert.RunbookUrl))
+                // Attach runbook URL
+                if (string.IsNullOrEmpty(alert.RunbookUrl))
+                {
+                    alert.RunbookUrl = GetRunbookUrl(alert.AlertType, alert.Control?.Id);
+                    log.LogInformation("Runbook URL attached: {RunbookUrl}", alert.RunbookUrl);
+                }
+
+                // Add default remediation steps if missing
+                if (alert.RemediationSteps == null || !alert.RemediationSteps.Any())
+                {
+                    alert.RemediationSteps = GetDefaultRemediationSteps(alert.AlertType);
+                    log.LogInformation(
+                        "Default remediation steps added: Count={StepCount}",
+                        alert.RemediationSteps.Count);
+                }
+                
+                var duration = (DateTime.UtcNow - enrichStart).TotalMilliseconds;
+                log.LogInformation(
+                    "Alert enrichment completed: AlertId={AlertId}, Duration={Duration}ms",
+                    alert.AlertId, duration);
+            }
+            catch (Exception ex)
             {
-                alert.RunbookUrl = GetRunbookUrl(alert.AlertType, alert.Control?.Id);
+                var duration = (DateTime.UtcNow - enrichStart).TotalMilliseconds;
+                log.LogError(ex, 
+                    "Error enriching alert {AlertId}: Duration={Duration}ms", 
+                    alert.AlertId, duration);
+                throw;
             }
-
-            // Add default remediation steps if missing
-            if (alert.RemediationSteps == null || !alert.RemediationSteps.Any())
-            {
-                alert.RemediationSteps = GetDefaultRemediationSteps(alert.AlertType);
-            }
-
-            log.LogInformation($"Alert enriched: {alert.AlertId}");
         }
 
         private static async Task<bool> IsDuplicateAsync(Alert alert, ILogger log)
         {
+            var checkStart = DateTime.UtcNow;
+            
             try
             {
                 var db = _redis.GetDatabase();
                 var dedupKey = AlertHelper.GenerateDedupKey(alert.AlertType, alert.Control?.Id, alert.Environment);
                 
                 var exists = await db.KeyExistsAsync(dedupKey);
+                
+                var duration = (DateTime.UtcNow - checkStart).TotalMilliseconds;
+                if (exists)
+                {
+                    log.LogWarning(
+                        "Duplicate alert detected: AlertId={AlertId}, DedupKey={DedupKey}, Duration={Duration}ms",
+                        alert.AlertId, dedupKey, duration);
+                }
+                
                 return exists;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error checking for duplicate alert");
+                var duration = (DateTime.UtcNow - checkStart).TotalMilliseconds;
+                log.LogError(ex, 
+                    "Error checking for duplicate alert {AlertId}: Duration={Duration}ms",
+                    alert.AlertId, duration);
                 return false; // If cache is down, allow alert through
             }
         }
 
         private static async Task<bool> IsSuppressedAsync(Alert alert, ILogger log)
         {
+            var suppressCheckStart = DateTime.UtcNow;
+            
             try
             {
                 // Check acknowledged alerts in Redis
@@ -165,62 +205,106 @@ namespace FedRampDashboard.Functions
                 
                 if (isAcknowledged)
                 {
-                    log.LogInformation($"Alert suppressed due to acknowledgment: {alert.AlertId}");
+                    var duration = (DateTime.UtcNow - suppressCheckStart).TotalMilliseconds;
+                    log.LogInformation(
+                        "Alert suppressed: AlertId={AlertId}, Reason=Acknowledged, AckKey={AckKey}, Duration={Duration}ms",
+                        alert.AlertId, ackKey, duration);
                     return true;
                 }
 
                 // Could check maintenance windows from Cosmos DB here
                 // For now, just check cache
 
+                var totalDuration = (DateTime.UtcNow - suppressCheckStart).TotalMilliseconds;
+                log.LogInformation(
+                    "Suppression check passed: AlertId={AlertId}, Duration={Duration}ms",
+                    alert.AlertId, totalDuration);
+                
                 return false;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error checking suppression rules");
+                var duration = (DateTime.UtcNow - suppressCheckStart).TotalMilliseconds;
+                log.LogError(ex, 
+                    "Error checking suppression rules for alert {AlertId}: Duration={Duration}ms",
+                    alert.AlertId, duration);
                 return false; // If cache is down, allow alert through
             }
         }
 
         private static async Task<Dictionary<string, bool>> RouteAlertAsync(Alert alert, ILogger log)
         {
+            var routeStart = DateTime.UtcNow;
             var results = new Dictionary<string, bool>();
 
-            // Routing logic based on severity
-            switch (alert.Severity)
+            try
             {
-                case "P0":
-                    // P0: PagerDuty only (urgent)
-                    results["pagerduty"] = await SendToPagerDutyAsync(alert, log);
-                    break;
+                log.LogInformation(
+                    "Starting alert routing: AlertId={AlertId}, Severity={Severity}",
+                    alert.AlertId, alert.Severity);
 
-                case "P1":
-                    // P1: PagerDuty (low urgency) + Teams
-                    results["pagerduty"] = await SendToPagerDutyAsync(alert, log);
-                    results["teams"] = await SendToTeamsAsync(alert, log);
-                    break;
+                // Routing logic based on severity
+                switch (alert.Severity)
+                {
+                    case "P0":
+                        // P0: PagerDuty only (urgent)
+                        results["pagerduty"] = await SendToPagerDutyAsync(alert, log);
+                        log.LogInformation("Alert routed to PagerDuty: AlertId={AlertId}, Result={Result}", 
+                            alert.AlertId, results["pagerduty"]);
+                        break;
 
-                case "P2":
-                    // P2: Teams only
-                    results["teams"] = await SendToTeamsAsync(alert, log);
-                    break;
+                    case "P1":
+                        // P1: PagerDuty (low urgency) + Teams
+                        results["pagerduty"] = await SendToPagerDutyAsync(alert, log);
+                        results["teams"] = await SendToTeamsAsync(alert, log);
+                        log.LogInformation(
+                            "Alert routed to PagerDuty and Teams: AlertId={AlertId}, PagerDuty={PagerDutyResult}, Teams={TeamsResult}",
+                            alert.AlertId, results["pagerduty"], results["teams"]);
+                        break;
 
-                case "P3":
-                    // P3: Log only (could implement email digest here)
-                    log.LogInformation($"P3 alert logged: {alert.AlertId}");
-                    results["logged"] = true;
-                    break;
+                    case "P2":
+                        // P2: Teams only
+                        results["teams"] = await SendToTeamsAsync(alert, log);
+                        log.LogInformation("Alert routed to Teams: AlertId={AlertId}, Result={Result}",
+                            alert.AlertId, results["teams"]);
+                        break;
 
-                default:
-                    log.LogWarning($"Unknown severity: {alert.Severity}. Routing to Teams.");
-                    results["teams"] = await SendToTeamsAsync(alert, log);
-                    break;
+                    case "P3":
+                        // P3: Log only (could implement email digest here)
+                        log.LogInformation("P3 alert logged: AlertId={AlertId}, AlertType={AlertType}", 
+                            alert.AlertId, alert.AlertType);
+                        results["logged"] = true;
+                        break;
+
+                    default:
+                        log.LogWarning(
+                            "Unknown severity encountered: AlertId={AlertId}, Severity={Severity}. Routing to Teams.",
+                            alert.AlertId, alert.Severity);
+                        results["teams"] = await SendToTeamsAsync(alert, log);
+                        break;
+                }
+                
+                var duration = (DateTime.UtcNow - routeStart).TotalMilliseconds;
+                log.LogInformation(
+                    "Alert routing completed: AlertId={AlertId}, Routes={RouteCount}, Duration={Duration}ms",
+                    alert.AlertId, results.Count, duration);
+
+                return results;
             }
-
-            return results;
+            catch (Exception ex)
+            {
+                var duration = (DateTime.UtcNow - routeStart).TotalMilliseconds;
+                log.LogError(ex,
+                    "Error routing alert {AlertId}: Duration={Duration}ms",
+                    alert.AlertId, duration);
+                throw;
+            }
         }
 
         private static async Task StoreAlertInCacheAsync(Alert alert, ILogger log)
         {
+            var cacheStart = DateTime.UtcNow;
+            
             try
             {
                 var db = _redis.GetDatabase();
@@ -229,16 +313,24 @@ namespace FedRampDashboard.Functions
                 // Store with 30-minute TTL
                 await db.StringSetAsync(dedupKey, alert.AlertId, TimeSpan.FromMinutes(30));
                 
-                log.LogInformation($"Alert stored in cache for deduplication: {dedupKey}");
+                var duration = (DateTime.UtcNow - cacheStart).TotalMilliseconds;
+                log.LogInformation(
+                    "Alert stored in cache: AlertId={AlertId}, DedupKey={DedupKey}, TTL=30min, Duration={Duration}ms",
+                    alert.AlertId, dedupKey, duration);
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error storing alert in cache");
+                var duration = (DateTime.UtcNow - cacheStart).TotalMilliseconds;
+                log.LogError(ex, 
+                    "Error storing alert {AlertId} in cache: Duration={Duration}ms",
+                    alert.AlertId, duration);
             }
         }
 
         private static async Task<bool> SendToPagerDutyAsync(Alert alert, ILogger log)
         {
+            var sendStart = DateTime.UtcNow;
+            
             try
             {
                 var routingKey = Environment.GetEnvironmentVariable("PagerDutyRoutingKey");
@@ -248,18 +340,34 @@ namespace FedRampDashboard.Functions
                     return false;
                 }
 
+                log.LogInformation(
+                    "Sending alert to PagerDuty: AlertId={AlertId}, AlertType={AlertType}",
+                    alert.AlertId, alert.AlertType);
+
                 var client = new PagerDutyClient(_httpClient, routingKey, log);
-                return await client.SendAlertAsync(alert);
+                var result = await client.SendAlertAsync(alert);
+                
+                var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
+                log.LogInformation(
+                    "PagerDuty send {Status}: AlertId={AlertId}, Duration={Duration}ms",
+                    result ? "succeeded" : "failed", alert.AlertId, duration);
+                
+                return result;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error sending to PagerDuty");
+                var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
+                log.LogError(ex, 
+                    "Error sending alert {AlertId} to PagerDuty: Duration={Duration}ms",
+                    alert.AlertId, duration);
                 return false;
             }
         }
 
         private static async Task<bool> SendToTeamsAsync(Alert alert, ILogger log)
         {
+            var sendStart = DateTime.UtcNow;
+            
             try
             {
                 var webhookUrls = new Dictionary<string, string>
@@ -276,12 +384,26 @@ namespace FedRampDashboard.Functions
                     return false;
                 }
 
+                log.LogInformation(
+                    "Sending alert to Teams: AlertId={AlertId}, AlertType={AlertType}, Severity={Severity}",
+                    alert.AlertId, alert.AlertType, alert.Severity);
+
                 var client = new TeamsClient(_httpClient, webhookUrls, log);
-                return await client.SendAlertAsync(alert);
+                var result = await client.SendAlertAsync(alert);
+                
+                var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
+                log.LogInformation(
+                    "Teams send {Status}: AlertId={AlertId}, Duration={Duration}ms",
+                    result ? "succeeded" : "failed", alert.AlertId, duration);
+                
+                return result;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error sending to Teams");
+                var duration = (DateTime.UtcNow - sendStart).TotalMilliseconds;
+                log.LogError(ex, 
+                    "Error sending alert {AlertId} to Teams: Duration={Duration}ms",
+                    alert.AlertId, duration);
                 return false;
             }
         }

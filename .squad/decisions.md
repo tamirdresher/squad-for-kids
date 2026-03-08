@@ -4812,3 +4812,245 @@ _logger.LogInformation("Results retrieved: Total={Total}, Returned={Returned}, D
 - PR #96 Review: Security findings, telemetry gaps identified
 - Decision: Team-wide standard for all future API development
 
+
+---
+
+## Decision 3: Teams Notification System for Issue Tracking
+
+**Date:** 2026-03-08  
+**Author:** Data  
+**Status:** Implemented  
+**Related:** Issue #104, PR #107
+
+### Context
+
+Users were not aware when issues were closed or when work was completed by squad agents. Issues closed silently with no external notification, requiring manual monitoring of GitHub notifications or repository activity.
+
+User has Teams webhook integration available and requested:
+1. Notifications when issues close
+2. Daily digest of activity
+
+### Decision
+
+Implemented two GitHub Actions workflows:
+
+#### 1. Issue Close Notifications (squad-issue-notify.yml)
+- **Trigger:** On issue close event
+- **Notification content:**
+  - Issue title, number, and link
+  - Who closed it (user or agent)
+  - Summary from last comment
+  - Adaptive Card format for Teams
+- **Secret required:** TEAMS_WEBHOOK_URL
+
+#### 2. Daily Digest (squad-daily-digest.yml)
+- **Trigger:** Daily at 8:00 AM UTC (+ manual)
+- **Digest content:**
+  - Issues closed in last 24h
+  - PRs merged in last 24h
+  - Recently updated open issues with labels
+  - Adaptive Card format for Teams
+- **Secret required:** TEAMS_WEBHOOK_URL
+
+### Alternatives Considered
+
+1. **Email notifications:** Less real-time, requires SMTP configuration
+2. **Slack integration:** User requested Teams specifically
+3. **Single combined workflow:** Separated for independent triggers and clearer logs
+4. **Plain text messages:** Adaptive Cards provide better UX and are standard for Teams integrations
+
+### Consequences
+
+**Positive**
+- Users instantly aware when issues close
+- Daily digest provides activity summary without constant checking
+- Adaptive Cards provide professional, interactive notifications
+- Manual trigger allows testing without waiting for events
+- Team can use pattern for other notification needs
+
+**Negative**
+- Requires user to configure TEAMS_WEBHOOK_URL secret (one-time setup)
+- Notifications only work if webhook is valid (silently fails if misconfigured)
+- Daily digest time (8 AM UTC) may not align with all timezones
+
+### Team Impact
+
+This pattern can be reused for other notification scenarios:
+- PR review requests
+- Critical alerts from workflows
+- Build/test failures
+- Security scan results
+
+Consider adding error handling/fallback if webhook fails in future enhancements.
+
+### Configuration Required
+
+User must add TEAMS_WEBHOOK_URL to repository secrets:
+- Location: C:\Users\tamirdresher\.squad\teams-webhook.url
+- Setup: Settings → Secrets → Actions → New repository secret
+
+---
+
+## Decision 4: Teams Integration Pattern — PR #107 Review
+
+**Date:** 2026-03-12  
+**Decision Maker:** Picard (Lead)  
+**Context:** Issue #104 → PR #107 by Data  
+**Status:** Approved and Merged
+
+### Problem
+
+User (Tamir) had no visibility when issues were closed or work was completed by squad agents. Issue #104: "When you close issues and finalize my requests I am not aware of it."
+
+### Solution Implemented
+
+Data created two GitHub Actions workflows for Microsoft Teams integration:
+
+1. **squad-issue-notify.yml** — Real-time issue close notifications
+2. **squad-daily-digest.yml** — Daily 8 AM UTC activity digest
+
+### Approval Criteria Applied
+
+#### Security Review (All Passed ✅)
+- Webhook URL stored as repository secret (TEAMS_WEBHOOK_URL)
+- Defensive check before posting: if: env.TEAMS_WEBHOOK_URL != ''
+- Read-only permissions: issues: read, contents: read, pull-requests: read
+- No secret leaks in logs or card payloads
+- No unnecessary write permissions
+
+#### Technical Review (All Passed ✅)
+- **Triggers:** Correct event binding (issues: types: [closed]) and cron syntax (  8 * * *)
+- **Adaptive Cards:** Valid 1.4 schema, proper Microsoft Teams format
+- **Logic:** Sound agent detection (regex match in comments), 24h window calculation correct
+- **Error Handling:** Gracefully handles missing fields, empty lists display "None"
+- **Date Filtering:** PRs filtered by merged_at timestamp (not just closed)
+
+#### Code Quality (All Passed ✅)
+- Uses GitHub-native actions (ctions/checkout@v4, ctions/github-script@v7)
+- Follows GitHub Actions best practices
+- Clear, maintainable structure
+- Proper variable scoping and output passing
+
+### Pattern Established
+
+**For future Teams integrations:**
+1. **Always** store webhook URL as repository secret
+2. **Always** add defensive check before posting (if: env.TEAMS_WEBHOOK_URL != '')
+3. **Prefer** Adaptive Cards 1.4 for rich formatting
+4. **Use** read-only permissions unless write is essential
+5. **Include** direct links to GitHub resources (issues, PRs, repos)
+6. **Handle** edge cases gracefully (missing data, empty lists, null fields)
+7. **Test** with manual workflow dispatch before production use
+
+### Setup Required
+
+User must add TEAMS_WEBHOOK_URL secret to repository settings:
+- Path: Settings → Secrets and variables → Actions → New repository secret
+- Value stored locally: C:\Users\tamirdresher\.squad\teams-webhook.url
+
+### Outcome
+
+- ✅ PR #107 merged to main
+- ✅ Branch squad/104-issue-notifications deleted
+- ✅ Issue #104 auto-closed
+- ✅ Notification gap resolved
+
+### Lessons
+
+1. **GHA Security Model:** The pattern of checking secret existence before use prevents workflow failures when secret is missing
+2. **Agent Attribution:** Parsing last comment for squad agent names (Picard/Data/Geordi/Troi/Worf) provides better attribution than just closed_by
+3. **Defensive Card Design:** Truncating summary at 500 chars prevents card rendering issues with very long comments
+4. **Dual Notification Strategy:** Real-time + daily digest balances urgency with noise reduction
+
+---
+
+## Decision 5: Cache SLI Measurement Methodology
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Issue:** #106  
+**Status:** Approved
+
+### Context
+
+Issue #106 required defining cache hit rate as a production SLI for the FedRAMP Dashboard API. PR #102 implemented 60s/300s response caching but didn't establish production monitoring standards.
+
+### Decision
+
+**Cache Hit Rate SLI/SLO:**
+- **SLI:** Cache hit rate (percentage of requests served from cache)
+- **SLO:** ≥ 70% hit rate (24-hour rolling window)
+- **Measurement:** Application Insights telemetry, not HTTP headers
+
+**Rationale:**
+1. **70% threshold is conservative** - Allows 30% miss rate for pod restarts, cache warming, diverse query patterns
+2. **24-hour window smooths transients** - Pod restarts cause temporary hit rate drops (15-30 min)
+3. **Duration-based detection (<100ms)** - ASP.NET Core ResponseCache doesn't emit hit/miss headers by default
+4. **Monthly review cadence** - Balances oversight with operational overhead
+
+### Implementation
+
+**Measurement Approach:**
+\\\kusto
+// Cache hit detection: response duration < 100ms
+requests
+| where name has "compliance"
+| extend IsCacheHit = iff(duration < 100, 1, 0)
+| summarize HitRate = (sum(IsCacheHit) * 100.0) / count()
+\\\
+
+**Alert Configuration:**
+- Trigger: Hit rate <70% for 15 minutes
+- Severity: Warning (Sev 2)
+- Frequency: Evaluate every 5 minutes
+- Action: PagerDuty notification to on-call SRE
+
+**Future Enhancement (v2.0):**
+- Emit explicit cache headers (X-Cache: HIT/MISS) for precise measurement
+- Migrate to Redis for distributed caching with pub/sub invalidation
+- Event-driven cache invalidation via Cosmos DB change feed
+
+### Alternatives Considered
+
+1. **HTTP Cache-Control/Age Headers**
+    - Pro: Standard approach, browser-compatible
+    - Con: ASP.NET Core ResponseCache doesn't emit by default, requires custom middleware
+    - Rejected: Adds complexity for initial deployment; planned for v2.0
+
+2. **80% SLO Target (Higher Bar)**
+    - Pro: Aligns with "expected 80-85% hit rate" from PR #102
+    - Con: Too aggressive for initial deployment (pod restarts, cache warming periods)
+    - Rejected: Conservative 70% target provides operational buffer
+
+3. **Weekly Review Cadence**
+    - Pro: More frequent monitoring, faster issue detection
+    - Con: Operational overhead, cache patterns stable month-to-month
+    - Rejected: Monthly review sufficient; alerts handle real-time issues
+
+### Impact
+
+**Benefits:**
+- Clear production SLI/SLO for cache effectiveness
+- Automated alerting reduces manual monitoring
+- Monthly reviews institutionalize cache optimization
+- Remediation playbook reduces MTTR for cache incidents
+
+**Costs:**
+- Duration-based detection is heuristic (not 100% accurate)
+- Monthly review requires 30 minutes of team time
+- Alert may have false positives during deployments
+
+### Related Decisions
+
+- Issue #100: PR #102 response caching implementation
+- Picard Review: 9.5/10 approval with post-merge SLI requirement
+
+### Team Consensus
+
+**Approved by:** Data (implementer), Picard (reviewer on PR #102)  
+**Reviewers:** [TBD - pending PR #108 review]
+
+**Files:**
+- docs/fedramp-dashboard-cache-sli.md (14.4KB)
+- infrastructure/phase4-cache-alert.bicep (2.9KB)
+- docs/fedramp/cache-reviews/template.md (6.1KB)

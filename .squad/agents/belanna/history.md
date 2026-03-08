@@ -1574,3 +1574,47 @@ Posted comment on Issue #103 explaining:
 4. **Documentation Gap:** The devbox-provisioning README should include a "Portal vs Scripts" section upfront to address this common confusion
 
 **Status:** Awaiting Tamir's response with Project/Pool/Name values to proceed with provisioning
+
+### 2026-03-19: Issue #103 — Azure DevCenter CLI Troubleshooting
+
+**Task:** Help Tamir troubleshoot Azure CLI error when running `az devcenter dev project list`.
+
+**Problem:** User reported Azure CLI error showing that the `devcenter` module wasn't in the discovered command modules list, indicating the Azure DevCenter CLI extension was not installed.
+
+**Root Cause:** Missing Azure CLI DevCenter extension. The `az devcenter` commands require the extension to be installed separately.
+
+**Solution Provided:**
+Posted troubleshooting comment to Issue #103 with:
+1. Root cause explanation
+2. Fix command: `az extension add --name devcenter`
+3. Verification steps: `az extension list --output table`
+4. Additional troubleshooting for auth/subscription issues
+5. References to existing devbox-provisioning infrastructure in the repo
+
+**Supporting Infrastructure:**
+The `devbox-provisioning/` directory already contains comprehensive Phase 1-3 infrastructure:
+- **Phase 1:** Bicep templates and PowerShell provisioning scripts
+- **Phase 2:** Squad skill for natural language DevBox provisioning
+- **Phase 3:** MCP Server integration (`@microsoft/devbox-mcp-server`)
+- **Documentation:** Full prerequisites, authentication, troubleshooting in `devbox-provisioning/README.md`
+- **Scripts:** `clone-devbox.ps1` (auto-detect and clone), `provision.ps1` (manual provisioning), `bulk-provision.ps1` (team environments)
+
+**Key Insight:**
+The Azure DevCenter extension is a prerequisite documented in `devbox-provisioning/README.md` (lines 23-27). The README already shows:
+```powershell
+az extension add --name devcenter
+az extension list --query "[?name=='devcenter']"
+```
+
+This troubleshooting aligns with existing Phase 1 documentation and helps users get past the initial setup barrier.
+
+**Outcome:**
+- Posted comprehensive troubleshooting comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/103#issuecomment-4018508265
+- Directed user to existing devbox-provisioning scripts and documentation
+- Once extension is installed, user can immediately use `clone-devbox.ps1` or `provision.ps1`
+
+**Learning:**
+Common Azure CLI extension issues should be caught early in setup. The README prereq section is crucial for preventing this class of errors. Consider adding a prerequisite validation script that checks for required extensions before running provisioning commands.
+
+---
+

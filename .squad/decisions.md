@@ -5273,3 +5273,92 @@ requests
 **By:** Data (Code Expert)
 **What:** Updated agent name matching regex in squad-issue-notify.yml to match current team roster (added B'Elanna, Seven; removed Geordi, Troi)
 **Why:** Workflow was detecting wrong agent names in issue close notifications
+
+---
+
+## Decision: User Directive on Teams Notification Frequency
+
+**Date:** 2026-03-08  
+**Author:** Tamir Dresher (User/Product Owner)  
+**Status:** ✅ Adopted  
+**Scope:** Automation Guidelines
+
+Only send Teams notifications for important events that require user attention — not after every iteration of background automation like Ralph.
+
+**Context:**
+Ralph runs every 5 minutes via ralph-watch.ps1. User was receiving "Ralph — Board Status Report" Teams messages after every iteration, causing notification fatigue and drowning out actionable items.
+
+**Decision:**
+Reduce Teams notification frequency to meaningful events only. Notifications should fire for:
+- New issues requiring user decisions
+- PRs ready for review or merged
+- CI/CD failures
+- Completed work user should be aware of
+- Items requiring user action
+
+Do NOT send notifications for:
+- Routine board status checks with no changes
+- Background processing with no user-facing impact
+- Work in progress with no blockers
+
+**Impact:**
+- Reduces notification noise in Teams
+- Enables Ralph to continue background work silently
+- Teams channel focuses on actionable items
+- User retains awareness of important changes
+
+**Related Decisions:**
+- Issue #112: Ralph notification frequency reduction
+- Issue #104: Teams notification system for issue closes
+
+---
+
+## Decision: Ralph Notification Frequency Reduction (#112)
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Implemented  
+**Scope:** Automation Configuration
+
+Updated Ralph prompt to explicitly specify Teams notification criteria, eliminating vague conditions that caused over-triggering.
+
+**Context:**
+Ralph runs every 5 minutes via ralph-watch.ps1 and launches a full Copilot session. The original prompt said "dont forget to update me in teams if needed" — too vague, resulting in Teams notifications after every iteration regardless of actionable work.
+
+**Decision:**
+Modified ralph-watch.ps1 line 8 prompt to replace vague condition with explicit guidance:
+
+**Before:**
+`
+'Ralph, Go! make sure the PR comments are also taken care of and then merge the PRs when they are ready and open new issues if needed. dont forget to update me in teams if needed'
+`
+
+**After:**
+`
+'Ralph, Go! make sure the PR comments are also taken care of and then merge the PRs when they are ready and open new issues if needed. IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.'
+`
+
+**Rationale:**
+1. **Prompt clarity is critical**: Vague instructions like "if needed" cause LLMs to interpret ambiguously, leading to false positives
+2. **Examples improve precision**: Listing specific scenarios (PRs merged, CI failures) provides concrete guidance
+3. **Negative cases matter**: Explicitly stating when NOT to notify prevents overreach
+4. **High-frequency automation requires strict gating**: 5-minute interval necessitates careful notification filtering to avoid noise
+
+**Benefits:**
+- Reduced notification fatigue for user
+- Teams channel remains actionable (signal vs noise)
+- Ralph continues background work silently unless intervention needed
+
+**Risks:**
+- User might miss some notifications if Ralph's interpretation differs
+- Can be tuned further if false negatives occur
+
+**Implementation:**
+- Commit: 9891b0f
+- File modified: ralph-watch.ps1
+- Issue commented: #112 closed/resolved
+
+**Team Consensus:**
+**Approved by:** Tamir Dresher (user/product owner)  
+**Implemented by:** Data (Code Expert)
+

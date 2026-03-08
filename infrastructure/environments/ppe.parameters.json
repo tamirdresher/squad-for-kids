@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "ppe" },
+    "location": { "value": "eastus2" },
+    "cosmosDbAccountName": { "value": "fedramp-dashboard-ppe" },
+    "cosmosDbThroughput": { "value": 2000 },
+    "cosmosDbEnableAutoscale": { "value": true },
+    "functionAppName": { "value": "fedramp-functions-ppe" },
+    "functionAppSku": { "value": "EP1" },
+    "appServiceName": { "value": "fedramp-api-ppe" },
+    "appServiceSku": { "value": "P1v2" },
+    "storageAccountName": { "value": "fedrampstope" },
+    "storageAccountSku": { "value": "Standard_GZRS" },
+    "logAnalyticsWorkspaceName": { "value": "fedramp-logs-ppe" },
+    "applicationInsightsName": { "value": "fedramp-appinsights-ppe" },
+    "keyVaultName": { "value": "fedramp-kv-ppe" },
+    "enableVNetIntegration": { "value": true },
+    "enablePrivateEndpoints": { "value": true },
+    "enableBackup": { "value": true },
+    "backupRetentionDays": { "value": 30 },
+    "enableSlotDeployment": { "value": true },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production",
+        "Project": "FedRAMP Dashboard",
+        "Owner": "infrastructure-team@contoso.com",
+        "CostCenter": "IT-Security",
+        "SLA": "99.5%"
+      }
+    }
+  }
+}

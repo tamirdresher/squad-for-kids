@@ -1490,4 +1490,37 @@ This is now a standing directive for all agents, documented in the teams-monitor
 4. Service layer abstraction critical for testability (mock data access in unit tests)
 5. RBAC documentation as important as technical implementation for enterprise adoption
 6. CSV export demand for audit workflows (JSON alone insufficient)
+**Learnings**:
+1. OpenAPI specs benefit from detailed response schemas and error codes upfront
+2. Policy-based authorization cleaner than inline role checks in controllers
+3. Managed Identity eliminates connection string management burden
+4. Service layer abstraction critical for testability (mock data access in unit tests)
+5. RBAC documentation as important as technical implementation for enterprise adoption
+6. CSV export demand for audit workflows (JSON alone insufficient)
+
+---
+
+### 2026-03-08: Round 3 Code Review - PR #102 API Hardening (Round 3, Ralph Orchestration)
+
+**Context:** Picard spawned as code reviewer for PR #102 (Data's API security hardening from Issue #100). Round 3 of Ralph's orchestration session.
+
+**Review Focus:**
+- Parameterized query implementation (KQL, Cosmos DB)
+- Response caching strategy and configuration
+- Structured telemetry pattern across 7 files
+- Security vulnerability elimination
+
+**Code Quality Assessment:**
+- ✅ **Security:** All string interpolation replaced with parameterized queries. SQL injection vulnerabilities eliminated across ComplianceService, ControlsService, AlertProcessor, etc.
+- ✅ **Performance:** ResponseCache attributes properly configured. VaryByQueryKeys ensures cache isolation per query parameter combination. Expected 80-85% query reduction.
+- ✅ **Telemetry:** Structured logging pattern consistent across all 7 files. BeginScope + LogInformation + duration tracking enables SLO/SLA monitoring.
+- ✅ **Documentation:** Decision record (data-issue100-api-hardening.md) explains parameterization patterns, caching rationale, telemetry architecture.
+
+**Recommendation:** ✅ **APPROVED — Ready to merge to main**
+
+**Key Insight:** Security hardening decisions documented **before code review** enables confident approval. Rationale for parameterization choices (KQL inline vs. let statements, Cosmos DB @parameter syntax) + performance expectations (80-85% reduction) + risk mitigation (cache staleness acceptable per UX) = reviewer confidence in both security and engineering trade-offs.
+
+**Pattern Identified:** Decision records serve as "security whitepaper + technical design doc" combined. Eliminates the "why parameterize query parameters instead of using stored procedures?" discussions during code review. Design decisions are pre-approved via decision record.
+
+---
 

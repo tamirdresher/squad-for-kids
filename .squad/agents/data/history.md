@@ -18,6 +18,47 @@
 
 ## Learnings
 
+### 2026-03-08: Squad Monitor round timing enhancements (PR #158, Issue #157)
+
+**Task:** Add start/end times for rounds and next round countdown to squad-monitor dashboard.
+**Delivered:** Enhanced Ralph Recent Rounds panel to show parsed timestamps, added next round countdown and heartbeat staleness detection.
+**Key changes:**
+- Parse log entries with regex to extract start time and duration: `2026-03-08T16:37:47 | Round=3 | Duration=277.9241812s`
+- Display formatted output: `Round 3 | Started 16:37:47 | Finished 16:42:24 | Duration 4m 37s | ✅`
+- Calculate next round time from `lastRun + 5 minutes` and show countdown when status is "idle"
+- Track heartbeat file age (`File.GetLastWriteTimeUtc`) to detect staleness (green < 1m, yellow < 6m, red > 6m)
+- Next round displays local time with countdown: `Next round: ~18:12:05 (in 2m 15s)` or `overdue` if past expected time
+**Technical details:**
+- Used `Regex` for robust log parsing with culture-invariant date parsing
+- Fallback to original line display for non-matching entries (e.g., reset header)
+- All time displays use local time for user convenience, internal calculations use UTC
+- Duration formatted as minutes:seconds for readability
+
+**Branch:** `squad/157-monitor-round-times` | **PR:** #158 | **Issue:** #157
+
+---
+
+### 2026-03-08: GitHub Actions bot identity — Squad comment workflows (PR #154)
+
+**Task:** Fix @mention notifications by making squad comments appear from `github-actions[bot]` instead of user account.
+**Delivered:** Added explicit permissions to 7 workflows to enable bot identity for all comments.
+**Key decisions:**
+- GitHub's built-in `GITHUB_TOKEN` posts as `github-actions[bot]` when workflows have explicit `permissions: issues: write`
+- All workflows already used `actions/github-script` without `github-token` override (correct pattern)
+- The issue was missing explicit permissions — GitHub's default permissions were too restrictive
+- Preserved `COPILOT_ASSIGN_TOKEN` in 2 places (squad-heartbeat.yml, squad-issue-assign.yml) — only used for assigning @copilot (special API), NOT for posting comments
+- Created reusable `post-comment.yml` workflow for future use (though not currently needed)
+- No infrastructure changes required — pure GitHub Actions feature
+
+**Constraints:**
+- Cannot install GitHub Apps in this repo (Microsoft org restrictions)
+- Cannot use custom bot identity without external infrastructure
+- Solution must work with self-hosted runners
+
+**Branch:** `squad/62-actions-bot-identity` | **PR:** #154 | **Issue:** #62
+
+---
+
 ### 2026-03-08: ralph-watch metrics parsing — Agency output analysis (PR #137)
 
 **Task:** Parse Squad CLI agency output to extract detailed work metrics (issues closed, PRs merged, agent actions) per round.
@@ -656,6 +697,53 @@ When testing unreleased features, distinguish between (1) published package stat
 - [#19](https://github.com/tamirdresher_microsoft/tamresearch1/issues/19#issuecomment-4016978431) — Root cause confirmed, Option #3 not applicable (GitHub Actions can't help)
 - [#1](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1#issuecomment-4016979102) — Version check confirmed; issue still relevant
 - [#22](https://github.com/tamirdresher_microsoft/tamresearch1/issues/22#issuecomment-4016979589) — Completion confirmation
+
+---
+
+### 2026-03-10: Ralph Watch Heartbeat — Issue #156 (PR #158)
+
+**Task**: Add periodic heartbeat output to ralph-watch.ps1 so long rounds (20-37 min) don't look frozen.
+
+**Delivered**:
+- **Background heartbeat job**: PowerShell background job prints `[HH:MM:SS] Round 8 running... (3m 12s elapsed)` every 60 seconds during agency execution
+- **lastHeartbeat timestamp**: Added to heartbeat JSON for monitor freshness tracking
+- **Round lifecycle messages**:
+  - Start: `[HH:MM:SS] Ralph Round 8 started`
+  - End: `[HH:MM:SS] Round 8 completed in 4m 32s (exit: 0)`
+  - Next: `[HH:MM:SS] Next round at HH:MM:SS (in 5 minutes)`
+- **Improved time formatting**: HH:MM:SS display format (was yyyy-MM-ddTHH:mm:ss ISO timestamp)
+
+**Key Technical Decisions**:
+1. **Background Job Pattern**: Used `Start-Job` to create a background PowerShell job that loops every 60s, prints heartbeat to console, and updates JSON file
+2. **Job Lifecycle**: Job started before agency call, stopped in `finally` block to ensure cleanup even on errors
+3. **Elapsed Time Display**: Calculate elapsed time from round start, format as `Xm Ys` for readability
+4. **JSON Timestamp Update**: Background job updates `lastHeartbeat` field in heartbeat JSON every 60s (separate from `lastRun` which updates only at round start/end)
+5. **Duration Display**: Changed from seconds-only to minutes+seconds format (4m 32s instead of 272s)
+6. **Time Format**: Console timestamps use HH:MM:SS (user-friendly) while JSON uses ISO 8601 (machine-parseable)
+
+**Implementation Details**:
+- Background job runs in isolated runspace with round number and heartbeat file path as parameters
+- Job output (Write-Host) appears in parent console automatically via job output streaming
+- `Stop-Job` + `Remove-Job` in finally block ensures job terminates when round ends
+- No mutex needed for JSON file updates — PowerShell file IO is thread-safe for small writes
+
+**Testing Path**:
+Run ralph-watch.ps1 during a long agency round. Console will show:
+```
+[15:30:00] Ralph Round 8 started
+[15:31:00] Round 8 running... (1m 00s elapsed)
+[15:32:00] Round 8 running... (2m 00s elapsed)
+[15:33:45] Round 8 completed in 3m 45s (exit: 0)
+[15:33:45] Next round at 15:38:45 (in 5 minutes)
+```
+
+**Files Modified**: 1
+- `ralph-watch.ps1` — Added Update-HeartbeatTimestamp function, background job, round lifecycle messages
+
+**Branch**: `squad/156-ralph-heartbeat` | **PR**: #158 | **Issue**: #156
+**Project Board**: Moved #156 to Review status
+
+**Impact**: Operators monitoring ralph-watch console can now see real-time progress during long rounds, eliminating confusion about whether the watch loop is frozen or actively running.
 
 ---
 

@@ -231,6 +231,7 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
     try
     {
         var json = File.ReadAllText(heartbeatPath);
+        var heartbeatFileAge = DateTime.UtcNow - File.GetLastWriteTimeUtc(heartbeatPath);
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 
@@ -256,7 +257,8 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
 
         var staleness = "unknown";
         var stalenessColor = "dim";
-        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var lastRunDt))
+        DateTime lastRunDt = DateTime.MinValue;
+        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out lastRunDt))
         {
             var age = DateTime.UtcNow - lastRunDt;
             staleness = FormatAge(age);
@@ -272,6 +274,31 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
                             $"Failures: [{failColor}]{consecutiveFailures}[/]  |  " +
                             $"PID: [dim]{Markup.Escape(pid)}[/]" +
                             metricsText));
+
+        // Calculate next round time (lastRun + 5 minutes)
+        if (lastRunDt != DateTime.MinValue && status == "idle")
+        {
+            var nextRoundTime = lastRunDt.AddMinutes(5);
+            var timeUntilNext = nextRoundTime - DateTime.UtcNow;
+            
+            if (timeUntilNext.TotalSeconds > 0)
+            {
+                var nextRoundStr = nextRoundTime.ToLocalTime().ToString("HH:mm:ss");
+                var countdown = timeUntilNext.TotalMinutes >= 1 
+                    ? $"{(int)timeUntilNext.TotalMinutes}m {timeUntilNext.Seconds}s"
+                    : $"{(int)timeUntilNext.TotalSeconds}s";
+                items.Add(new Markup($"  Next round: [cyan]~{nextRoundStr}[/] [dim](in {countdown})[/]"));
+            }
+            else
+            {
+                items.Add(new Markup($"  Next round: [yellow]overdue[/] [dim](expected {FormatAge(-timeUntilNext)} ago)[/]"));
+            }
+        }
+
+        // Show time since last heartbeat update
+        var heartbeatAge = FormatAge(heartbeatFileAge);
+        var heartbeatColor = heartbeatFileAge.TotalMinutes < 1 ? "green" : heartbeatFileAge.TotalMinutes < 6 ? "yellow" : "red";
+        items.Add(new Markup($"  Heartbeat updated: [{heartbeatColor}]{heartbeatAge}[/]"));
     }
     catch
     {
@@ -322,17 +349,60 @@ static IRenderable BuildRalphLogSection(string userProfile)
             return new Rows(items);
         }
 
+        // Parse log entries: 2026-03-08T16:37:47 | Round=3 | ExitCode=0 | Duration=277.9241812s | ...
+        var logEntryRegex = new Regex(@"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\s*\|\s*Round=(\d+)\s*\|\s*ExitCode=(\d+)\s*\|\s*Duration=([\d.]+)s");
+
         foreach (var line in last5)
         {
             var trimmed = line.Trim();
             if (string.IsNullOrEmpty(trimmed)) continue;
 
-            var color = trimmed.Contains("✓") ? "green" :
-                       trimmed.Contains("→") ? "cyan" :
-                       trimmed.Contains("⚠") || trimmed.Contains("WARN") ? "yellow" :
-                       trimmed.Contains("✗") || trimmed.Contains("ERROR") ? "red" :
-                       "dim";
-            items.Add(new Markup($"  [{color}]{Markup.Escape(trimmed)}[/]"));
+            var match = logEntryRegex.Match(trimmed);
+            if (match.Success)
+            {
+                var startTimeStr = match.Groups[1].Value;
+                var round = match.Groups[2].Value;
+                var exitCode = match.Groups[3].Value;
+                var durationStr = match.Groups[4].Value;
+
+                if (DateTime.TryParse(startTimeStr, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var startTime) &&
+                    double.TryParse(durationStr, NumberStyles.Float, CultureInfo.InvariantCulture, out var durationSecs))
+                {
+                    var endTime = startTime.AddSeconds(durationSecs);
+                    var startLocal = startTime.ToLocalTime().ToString("HH:mm:ss");
+                    var endLocal = endTime.ToLocalTime().ToString("HH:mm:ss");
+                    
+                    // Format duration as minutes:seconds
+                    var durationMinutes = (int)(durationSecs / 60);
+                    var durationSeconds = (int)(durationSecs % 60);
+                    var durationFormatted = $"{durationMinutes}m {durationSeconds}s";
+                    
+                    var statusIcon = exitCode == "0" ? "✅" : "❌";
+                    var color = exitCode == "0" ? "green" : "red";
+                    
+                    items.Add(new Markup($"  [{color}]Round {round} | Started {startLocal} | Finished {endLocal} | Duration {durationFormatted} | {statusIcon}[/]"));
+                }
+                else
+                {
+                    // Fallback to original line display
+                    var color = trimmed.Contains("✓") ? "green" :
+                               trimmed.Contains("→") ? "cyan" :
+                               trimmed.Contains("⚠") || trimmed.Contains("WARN") ? "yellow" :
+                               trimmed.Contains("✗") || trimmed.Contains("ERROR") ? "red" :
+                               "dim";
+                    items.Add(new Markup($"  [{color}]{Markup.Escape(trimmed)}[/]"));
+                }
+            }
+            else
+            {
+                // Non-structured log line (e.g., header)
+                var color = trimmed.Contains("✓") ? "green" :
+                           trimmed.Contains("→") ? "cyan" :
+                           trimmed.Contains("⚠") || trimmed.Contains("WARN") ? "yellow" :
+                           trimmed.Contains("✗") || trimmed.Contains("ERROR") ? "red" :
+                           "dim";
+                items.Add(new Markup($"  [{color}]{Markup.Escape(trimmed)}[/]"));
+            }
         }
     }
     catch

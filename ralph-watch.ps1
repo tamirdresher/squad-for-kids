@@ -306,13 +306,19 @@ while ($true) {
     }
     
     try {
-        # Run agency and let it stream directly to console (no pipe capture)
-        # Redirect to temp file for metrics parsing
+        # Run agency directly — NO PIPES. Pipes cause agency to hang on exit.
+        # Use cmd /c to run and capture exit code reliably
         $tempOut = Join-Path $env:TEMP "ralph-round-$round.txt"
-        agency copilot --yolo --autopilot --agent squad -p $prompt 2>$null | Tee-Object -FilePath $tempOut
+        cmd /c "agency copilot --yolo --autopilot --agent squad -p `"$prompt`" > `"$tempOut`" 2>&1"
         $exitCode = $LASTEXITCODE
-        $agencyOutput = if (Test-Path $tempOut) { Get-Content $tempOut -Raw -ErrorAction SilentlyContinue } else { "" }
-        if (Test-Path $tempOut) { Remove-Item $tempOut -Force -ErrorAction SilentlyContinue }
+        # Display output after completion
+        if (Test-Path $tempOut) {
+            Get-Content $tempOut | Write-Host
+            $agencyOutput = Get-Content $tempOut -Raw -ErrorAction SilentlyContinue
+            Remove-Item $tempOut -Force -ErrorAction SilentlyContinue
+        } else {
+            $agencyOutput = ""
+        }
         
         $exitCode = $LASTEXITCODE
         if ($exitCode -eq 0) {

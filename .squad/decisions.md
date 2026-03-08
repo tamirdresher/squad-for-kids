@@ -8955,3 +8955,317 @@ To verify:
 ---
 
 
+
+
+---
+
+# Decision: Cache Review Automation via Ralph-Watch
+
+**Date:** 2026-03-08  
+**Decision Maker:** B'Elanna (Infrastructure Expert)  
+**Context:** Issue #116 — Monthly cache reviews need automation  
+**Status:** Implemented
+
+---
+
+## Problem
+
+Tamir requested automation for the monthly FedRAMP cache review (scheduled April 1, 2026) because he won't remember to trigger it manually. The issue would otherwise sit idle until someone notices.
+
+---
+
+## Constraints
+
+1. **GitHub Actions unavailable** — EMU restrictions prevent GitHub-hosted runners from provisioning (Issue #110)
+2. **Must run automatically** — No manual intervention on the 1st of each month
+3. **Must integrate with existing tooling** — gh CLI, project boards, labels
+4. **Must be testable** — Ability to verify before going live
+
+---
+
+## Decision
+
+**Integrate scheduled automation into ralph-watch.ps1:**
+
+1. **Created:** `scripts/scheduled-cache-review.ps1`
+   - Checks if today is the 1st of the month
+   - Auto-creates issue with full cache review checklist
+   - Adds to project board as "Todo"
+   - Labels appropriately for squad triage
+
+2. **Modified:** `ralph-watch.ps1`
+   - Added "Step 0: Run scheduled tasks" before agency copilot invocation
+   - Calls scheduled-cache-review.ps1 every round
+   - Script self-checks date and exits quickly if not due
+
+3. **Testing:** Added `-Force` flag to allow manual testing anytime
+
+---
+
+## Alternatives Considered
+
+### ❌ GitHub Actions (rejected)
+- **Why not:** EMU restrictions prevent runner provisioning
+- **Evidence:** Issue #110 shows 0-step executions on all workflows
+
+### ❌ Windows Task Scheduler (rejected)
+- **Why not:** Requires manual setup on each machine running ralph-watch
+- **Problem:** Not portable, not versioned in git, fragile across environments
+
+### ❌ Azure DevOps Pipelines (rejected)
+- **Why not:** Adds external dependency, requires separate config
+- **Problem:** Not integrated with existing ralph-watch flow
+
+### ✅ Ralph-Watch Integration (selected)
+- **Why yes:** Already running continuously, has all permissions, uses gh CLI
+- **Benefits:** Portable, versioned, testable, zero external dependencies
+
+---
+
+## Implementation Details
+
+**Script Location:** `scripts/scheduled-cache-review.ps1`  
+**Integration Point:** `ralph-watch.ps1` line ~302 (before git pull)  
+**Frequency:** Every ralph-watch round (5 minutes), script self-gates to 1st of month  
+**Exit Behavior:** Exits quickly if not due, doesn't block main flow
+
+**Issue Template:** Full cache review checklist with:
+- Meeting agenda and attendees
+- Kusto queries for Application Insights
+- Deliverables checklist
+- Reference documentation links
+
+---
+
+## Impact
+
+**Positive:**
+- ✅ Zero manual intervention needed
+- ✅ Consistent format every month
+- ✅ Integrated with project board
+- ✅ Easy to test and modify
+- ✅ Versioned in git
+
+**Risks:**
+- ⚠️ If ralph-watch isn't running on April 1, review won't auto-create (acceptable — ralph-watch is expected to run continuously)
+- ⚠️ Script runs every round (5 min intervals), but self-checks date and exits quickly
+
+**Mitigations:**
+- Ralph-watch has heartbeat monitoring and Teams alerts
+- Script is idempotent — can be run multiple times safely
+- `-Force` flag allows manual triggering if needed
+
+---
+
+## Pattern for Future Use
+
+This establishes a pattern for any **scheduled automation** in the repo:
+
+1. Create standalone PowerShell script in `scripts/` directory
+2. Script should self-check conditions (date, state, etc.) and exit quickly if not due
+3. Integrate into ralph-watch.ps1 "scheduled tasks" section
+4. Use gh CLI for GitHub operations (portable, versioned)
+5. Include `-Force` flag for testing
+6. Document in `.squad/agents/belanna/history.md`
+
+**Examples for future:**
+- Weekly dependency updates
+- Monthly security scans
+- Quarterly documentation reviews
+- Periodic cleanup tasks
+
+---
+
+## Validation
+
+**Testing:**
+- ✅ Dry run: `.\scripts\scheduled-cache-review.ps1` (exits on non-1st day)
+- ✅ Integration: Modified ralph-watch.ps1 calls script before agency
+- ✅ Issue closed: #116 moved to Done column
+- ✅ Comment posted: Explained solution to Tamir
+
+**Next Milestone:** April 1, 2026 — verify automatic issue creation
+
+---
+
+## References
+
+- **Issue #116:** Cache Review: April 2026 (CLOSED)
+- **Issue #110:** GitHub Actions EMU restrictions
+- **Script:** `scripts/scheduled-cache-review.ps1`
+- **Integration:** `ralph-watch.ps1` line ~302
+- **Skill:** `.squad/skills/github-project-board/SKILL.md`
+
+
+---
+
+# Decision: Browser-Based DevBox Automation Limitations
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** 📝 Proposed  
+**Scope:** Infrastructure & Automation  
+**Related:** Issue #103
+
+## Context
+
+Investigated automating repository cloning within Microsoft DevBox (IDPDev-2) using Playwright browser automation as part of Issue #103.
+
+## Discovery
+
+**Browser-based DevBox connections are not automatable through traditional browser automation tools.**
+
+### Technical Details:
+- DevBox web client streams the remote Windows desktop as video/canvas content
+- Playwright (and similar tools like Selenium) can interact with:
+  - ✅ DevBox portal UI (buttons, menus, navigation)
+  - ✅ Web client toolbar and settings
+  - ❌ **Windows desktop UI elements inside the stream** (Start menu, File Explorer, Terminal, applications)
+
+### Why This Matters:
+The remote desktop is rendered as a streaming image/canvas element, not as DOM elements. Browser automation tools cannot "see" or interact with the Windows UI inside the stream - they only see pixels.
+
+## Recommendation
+
+**For DevBox automation, use:**
+
+### Option 1: DevBox MCP Server (Preferred)
+- Direct command execution without browser automation
+- Programmatic access to DevBox resources
+- More reliable and faster than browser automation
+
+### Option 2: Windows 365 Native App + Native Automation
+- If browser approach is required, use native Windows automation tools (PowerShell Remoting, WinRM, UI Automation)
+- Windows 365 App provides better integration than browser
+
+### Option 3: Direct SSH/Remote PowerShell (If Available)
+- If DevBox has SSH or PowerShell Remoting enabled
+- Direct terminal access bypasses UI entirely
+
+## Applies To:
+- All browser-based remote desktop solutions (Windows 365, Azure Virtual Desktop, DevBox)
+- Any scenario requiring programmatic interaction with remote Windows environments
+
+## Does NOT Apply When:
+- Only DevBox portal management is needed (creating, deleting, starting, stopping DevBoxes)
+- Using native automation tools with Windows 365 App
+- Using MCP Server or similar direct APIs
+
+## Impact
+
+**Positive:**
+- ✅ Avoids wasted effort on browser automation for remote desktop content
+- ✅ Points team toward correct automation approach (MCP Server, native tools)
+- ✅ Clarifies browser automation capabilities and limitations
+
+**Neutral:**
+- ℹ️ Requires different tooling strategy for DevBox content automation
+- ℹ️ May require additional setup (MCP Server installation, credentials)
+
+## Related Technologies
+
+Similar limitations apply to:
+- Azure Virtual Desktop (AVD)
+- Windows 365 Cloud PC
+- Any VNC/RDP-based browser clients (Guacamole, Apache, etc.)
+- Virtualization platforms with browser-based consoles
+
+## Action Items
+
+1. ✅ Document finding in B'Elanna's history
+2. ✅ Report to Tamir via Issue #103 comment
+3. ⏳ Await decision on preferred approach (MCP Server vs Manual)
+4. ⏳ If MCP Server selected, verify installation on IDPDev-2
+
+## References
+
+- Issue #103: https://github.com/tamirdresher_microsoft/tamresearch1/issues/103
+- DevBox Portal: https://devbox.microsoft.com
+- Screenshots: `devbox-idpdev2-connection.png`, `devbox-idpdev2-desktop.png`
+
+
+---
+
+# Decision: Azure DevBox CLI Workaround Strategy
+
+**Date:** 2026-03-08  
+**Agent:** B'Elanna  
+**Issue:** #103  
+**Status:** Implemented
+
+## Context
+
+Tamir requested investigation of Azure DevBox CLI functionality after DevBox IDPDev-2 was created. The Azure CLI `devcenter` extension fails to install, blocking direct CLI management.
+
+## Problem
+
+- `az extension add --name devcenter` fails with pip error
+- Direct REST API access to DevBox endpoints doesn't resolve
+- No native CLI method available for DevBox management in current environment
+
+## Investigation
+
+Searched EngHub, npm registry, and Azure documentation for alternatives:
+1. Azure CLI extension - blocked by installation error
+2. REST API - endpoints not accessible
+3. MCP server package - **FOUND and installed**
+4. Web portal - **working alternative**
+
+## Decision
+
+**Recommended approach:**
+1. **Short-term:** Use https://devbox.microsoft.com for manual management
+2. **Medium-term:** Configure @microsoft/devbox-mcp for Copilot-driven automation
+3. **Long-term:** Escalate Azure CLI extension issue to Azure team
+
+## Implementation
+
+- Installed `@microsoft/devbox-mcp@0.0.3-alpha.4` globally
+- Documented web portal as primary access method
+- Found EngHub resource with MCP setup instructions
+
+## Impact
+
+- DevBox management remains viable through web portal
+- Future automation possible via MCP integration with Copilot
+- CLI extension issue requires Azure platform team support
+
+## Resources
+
+- EngHub doc: https://eng.ms/docs/office-of-coo/commerce-ecosystems/commerce-internal/ai_productivity/00_references/projects/managingdevbox/readme
+- MCP package: `npm install -g @microsoft/devbox-mcp`
+- Web portal: https://devbox.microsoft.com
+
+
+---
+
+# Decision: Issue #1 Teams Message Format
+
+**Date:** 2026-03-08  
+**Agent:** Data (Code Expert)  
+**Context:** Issue #1 — Missing 'upstream' command in Squad CLI
+
+## Problem
+- The 'upstream' command fix (PR #225) was merged to main but npm v0.8.23 was published from an older commit
+- Need a Teams message for Tamir to send Brady requesting a new npm publish
+
+## Decision
+Crafted a brief, collaborative Teams message that:
+1. **Explains the problem** — Fix is merged in main but not in the published npm version
+2. **Specifies the solution** — Publish a new version (0.8.24+) from current main
+3. **Maintains tone** — Friendly and collaborative, recognizing Brady and Tamir work together
+4. **Fits Teams format** — Brief, clear, action-oriented
+
+## Message Template
+```
+Hi Brady, quick heads up on the upstream command issue. The fix (PR #225) is merged into main, but the current npm release (v0.8.23) was published from a commit before the merge went in—so the fix isn't available to users yet. Could you publish a new version (0.8.24 or later) from the current main branch? That should get everyone the upstream command. Thanks!
+```
+
+## Implementation
+- Posted as comment on issue #1
+- Added 'status:pending-user' label
+- Moved issue to "Pending User" on project board
+
+## Rationale
+This format ensures Brady has all the context he needs to take action without a lengthy explanation, while maintaining the collaborative tone appropriate for an internal team message.
+

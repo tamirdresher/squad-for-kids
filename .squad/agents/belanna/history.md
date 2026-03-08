@@ -2472,3 +2472,39 @@ pm install -g @microsoft/devbox-mcp\
 
 ---
 
+
+---
+
+### 2026-03-08: DevBox Browser Access Investigation (Issue #103)
+
+**Activation:** Tamir requested accessing IDPDev-2 DevBox via browser to clone repository  
+**Task:** Use Playwright to navigate DevBox portal, connect to IDPDev-2, and clone tamresearch1 repo  
+**Status:** PARTIAL SUCCESS - Connected to DevBox, identified limitation
+
+**What Worked:**
+- ✅ Successfully navigated to devbox.microsoft.com using Playwright
+- ✅ Authenticated with persistent browser session (cached credentials)
+- ✅ Located IDPDev-2 DevBox in portal (Running state)
+- ✅ Opened browser-based connection ("Open in browser" option)
+- ✅ Successfully connected and loaded Windows desktop
+
+**Key Discovery - Browser DevBox Limitation:**
+🚧 **Browser-based DevBox connections use remote desktop streaming** - The Windows desktop is rendered as a video/canvas stream in the browser. Playwright can interact with the web UI chrome (toolbar, buttons, menus) but **cannot interact with the actual Windows desktop UI elements** inside the streamed session (Start menu, File Explorer, Terminal, etc.).
+
+**Technical Details:**
+- DevBox web client URL: https://windows.cloud.microsoft/webclient/ent/{guid}?cpcEnv=ppe
+- Connection settings: Printer, File transfer, Clipboard, Microphone, Camera, Location all enabled
+- Remote session displayed as an image/canvas element that streams the desktop
+
+**Recommendations Provided:**
+1. **Option 1 (Recommended):** Use DevBox MCP Server for direct command execution
+2. **Option 2:** Manual connection via Windows 365 App for native desktop interaction
+
+**Screenshots Generated:**
+- devbox-idpdev2-connection.png - Connection settings screen
+- devbox-idpdev2-desktop.png - Successfully loaded Windows desktop
+
+**Infrastructure Learning:** Browser-based remote desktop solutions (Windows 365, Azure Virtual Desktop, DevBox) present a challenge for browser automation tools - they're not traditional web applications but streaming video of remote desktops. Direct MCP server integration or native app automation would be required for programmatic interaction with the remote OS.
+
+**Next Step:** Awaiting Tamir's decision on approach (MCP Server vs Manual)
+

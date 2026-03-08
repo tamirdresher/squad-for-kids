@@ -7,11 +7,33 @@
 # - Heartbeat file at $env:USERPROFILE\.squad\ralph-heartbeat.json
 # - Teams alerts on consecutive failures (>3)
 # - Exit code, duration, and round tracking
+# - Lockfile prevents duplicate instances per directory
 
 # Fix UTF-8 rendering in Windows PowerShell console
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
+
+# --- Single-instance lockfile ---
+$lockFile = Join-Path (Get-Location) ".ralph-watch.lock"
+if (Test-Path $lockFile) {
+    $lockContent = Get-Content $lockFile -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
+    if ($lockContent -and $lockContent.pid) {
+        $existing = Get-Process -Id $lockContent.pid -ErrorAction SilentlyContinue
+        if ($existing) {
+            Write-Host "ERROR: Ralph watch is already running in this directory (PID $($lockContent.pid), started $($lockContent.started))" -ForegroundColor Red
+            Write-Host "Kill it first: Stop-Process -Id $($lockContent.pid) -Force" -ForegroundColor Yellow
+            exit 1
+        }
+    }
+    # Stale lock — previous process died without cleanup
+    Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+}
+# Write lock
+[ordered]@{ pid = $PID; started = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss'); directory = (Get-Location).Path } | ConvertTo-Json | Out-File $lockFile -Encoding utf8 -Force
+# Clean up lock on exit
+Register-EngineEvent PowerShell.Exiting -Action { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue } | Out-Null
+trap { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue; break }
 
 $intervalMinutes = 5
 $round = 0

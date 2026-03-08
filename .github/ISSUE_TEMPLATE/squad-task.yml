@@ -1,0 +1,47 @@
+name: Squad Task
+description: Create a task for the Squad AI team
+labels: ["squad"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue will be triaged by the Squad lead and assigned to the appropriate team member.
+  - type: textarea
+    id: description
+    attributes:
+      label: What needs to be done?
+      description: Describe the task, feature, or bug clearly.
+      placeholder: Describe what you want the team to work on...
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Feature
+        - Bug
+        - Research / Spike
+        - Documentation
+        - Chore / Maintenance
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 — Blocking
+        - P1 — This sprint
+        - P2 — Next sprint
+        - Backlog
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any extra details, links, screenshots, or constraints.
+      placeholder: Optional additional context...
+    validations:
+      required: false

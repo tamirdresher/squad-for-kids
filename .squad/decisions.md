@@ -7027,3 +7027,36 @@ Establish reusable **three-layer onboarding framework** for new team members on 
 
 **Related:** Issue #132
 
+
+---
+
+## Decision 4.1: Review Column Added to Squad Work Board
+
+**Date:** 2026-03-08  
+**Author:** Tamir Dresher (User Request) — Implemented by Ralph (Work Monitor)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Workflow
+
+Added a 'Review' column (yellow) to the Squad Work Board project. Purpose: items the squad considers done but require user approval before marking as Done.
+
+**Workflow:**
+- **Main Flow:** Todo → In Progress → Review → Done
+- **Side States:** Blocked, Pending User
+- **Review Column Purpose:** Gate between squad-completed work and final user approval. Prevents premature closure of items that need user sign-off.
+
+**Rationale:**
+- User requested a clear workflow gate to prevent squad from closing items before user verification
+- Creates transparency: user can see what is ready for review
+- Reduces miscommunication about item completion status
+
+**Applies to:** All items tracked on Squad Work Board  
+**Does NOT apply when:** Items are not tracked on the board
+
+**Consequences:**
+- ✅ Clear visibility of work pending user review
+- ✅ Prevents premature closure
+- ✅ Improves workflow transparency
+- ✅ Establishes standard review gate pattern
+
+**Related:** Board audit session (2026-03-08T11-20-00Z); Ralph (Work Monitor) implementation
+

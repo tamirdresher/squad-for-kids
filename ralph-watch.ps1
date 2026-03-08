@@ -16,6 +16,8 @@ chcp 65001 | Out-Null
 $intervalMinutes = 5
 $round = 0
 $consecutiveFailures = 0
+$maxLogEntries = 500
+$maxLogBytes = 1048576  # 1MB
 
 # Log rotation settings
 $maxLogBytes = 1MB
@@ -311,14 +313,14 @@ while ($true) {
     
     try {
         # Run agency directly — NO PIPES. Pipes cause agency to hang on exit.
-        # Use cmd /c to run and capture exit code reliably
+        # Use cmd /c with chcp 65001 for UTF-8 output
         $tempOut = Join-Path $env:TEMP "ralph-round-$round.txt"
-        cmd /c "agency copilot --yolo --autopilot --agent squad -p `"$prompt`" > `"$tempOut`" 2>&1"
+        cmd /c "chcp 65001 >nul && agency copilot --yolo --autopilot --agent squad -p `"$prompt`" > `"$tempOut`" 2>&1"
         $exitCode = $LASTEXITCODE
         # Display output after completion
         if (Test-Path $tempOut) {
-            Get-Content $tempOut | Write-Host
-            $agencyOutput = Get-Content $tempOut -Raw -ErrorAction SilentlyContinue
+            Get-Content $tempOut -Encoding utf8 | Write-Host
+            $agencyOutput = Get-Content $tempOut -Raw -Encoding utf8 -ErrorAction SilentlyContinue
             Remove-Item $tempOut -Force -ErrorAction SilentlyContinue
         } else {
             $agencyOutput = ""

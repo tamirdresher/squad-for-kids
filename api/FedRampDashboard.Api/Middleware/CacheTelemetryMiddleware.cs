@@ -1,22 +1,20 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using FedRampDashboard.Api.Services;
 
 namespace FedRampDashboard.Api.Middleware;
 
 public class CacheTelemetryMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly TelemetryClient _telemetryClient;
-    private readonly ILogger<CacheTelemetryMiddleware> _logger;
+    private readonly ICacheTelemetryService _cacheTelemetry;
 
     public CacheTelemetryMiddleware(
         RequestDelegate next, 
-        TelemetryClient telemetryClient, 
-        ILogger<CacheTelemetryMiddleware> logger)
+        ICacheTelemetryService cacheTelemetry)
     {
         _next = next;
-        _telemetryClient = telemetryClient;
-        _logger = logger;
+        _cacheTelemetry = cacheTelemetry;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -52,31 +50,23 @@ public class CacheTelemetryMiddleware
         if (string.IsNullOrEmpty(ageHeader))
         {
             context.Response.Headers["Age"] = "0";
-            isCacheHit = false;
+            ageHeader = "0";
         }
 
-        var eventTelemetry = new EventTelemetry(isCacheHit ? "CacheHit" : "CacheMiss")
+        var endpoint = context.Request.Path.Value ?? string.Empty;
+        var method = context.Request.Method;
+        var environment = context.Request.Query["environment"].ToString() ?? "ALL";
+        var controlCategory = context.Request.Query["controlCategory"].ToString();
+
+        // Delegate to service for consistent telemetry tracking
+        if (isCacheHit)
         {
-            Timestamp = DateTimeOffset.UtcNow
-        };
-
-        eventTelemetry.Properties["Endpoint"] = context.Request.Path.Value ?? string.Empty;
-        eventTelemetry.Properties["Method"] = context.Request.Method;
-        eventTelemetry.Properties["CacheStatus"] = isCacheHit ? "HIT" : "MISS";
-        eventTelemetry.Properties["ResponseAge"] = ageHeader ?? "0";
-        eventTelemetry.Properties["Environment"] = context.Request.Query["environment"].ToString() ?? "ALL";
-        eventTelemetry.Properties["ControlCategory"] = context.Request.Query["controlCategory"].ToString() ?? "none";
-        
-        eventTelemetry.Metrics["Duration"] = duration;
-        
-        _telemetryClient.TrackEvent(eventTelemetry);
-
-        _logger.LogInformation(
-            "Cache telemetry tracked: Endpoint={Endpoint}, Status={Status}, Age={Age}s, Duration={Duration}ms",
-            context.Request.Path.Value, 
-            isCacheHit ? "HIT" : "MISS", 
-            ageHeader, 
-            duration);
+            _cacheTelemetry.TrackCacheHit(endpoint, method, environment, controlCategory, duration, ageHeader);
+        }
+        else
+        {
+            _cacheTelemetry.TrackCacheMiss(endpoint, method, environment, controlCategory, duration);
+        }
     }
 }
 

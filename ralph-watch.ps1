@@ -306,13 +306,13 @@ while ($true) {
     }
     
     try {
-        # Stream output live to console AND capture for metrics parsing
-        $outputLines = @()
-        agency copilot --yolo --autopilot --agent squad -p $prompt 2>$null | ForEach-Object {
-            Write-Host $_
-            $outputLines += $_
-        }
-        $agencyOutput = $outputLines -join "`n"
+        # Run agency and let it stream directly to console (no pipe capture)
+        # Redirect to temp file for metrics parsing
+        $tempOut = Join-Path $env:TEMP "ralph-round-$round.txt"
+        agency copilot --yolo --autopilot --agent squad -p $prompt 2>$null | Tee-Object -FilePath $tempOut
+        $exitCode = $LASTEXITCODE
+        $agencyOutput = if (Test-Path $tempOut) { Get-Content $tempOut -Raw -ErrorAction SilentlyContinue } else { "" }
+        if (Test-Path $tempOut) { Remove-Item $tempOut -Force -ErrorAction SilentlyContinue }
         
         $exitCode = $LASTEXITCODE
         if ($exitCode -eq 0) {

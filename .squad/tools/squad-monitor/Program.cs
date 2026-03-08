@@ -717,7 +717,7 @@ static IRenderable BuildOrchestrationLogSection(List<AgentActivity> activities)
         return new Rows(items);
     }
 
-    var now = DateTime.UtcNow;
+    var now = DateTime.Now;
     var recentActivities = activities.Count(a => (now - a.Timestamp).TotalHours <= 24);
     var uniqueAgents = activities.Select(a => a.Agent).Distinct().ToList();
     var totalAgents = uniqueAgents.Count;

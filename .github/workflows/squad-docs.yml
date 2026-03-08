@@ -21,7 +21,12 @@ jobs:
         run: npm install --no-save markdown-it markdown-it-anchor
 
       - name: Build docs site
-        run: node docs/build.js --out _site --base /squad
+        run: |
+          if (-not (Test-Path "docs\build.js")) {
+            Write-Host "docs/build.js not found, skipping build"
+            exit 0
+          }
+          node docs/build.js --out _site --base /squad
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

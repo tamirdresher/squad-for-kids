@@ -5,10 +5,6 @@ on:
     branches: [preview]
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   validate:
     runs-on: self-hosted
@@ -21,37 +17,39 @@ jobs:
 
       - name: Validate version consistency
         run: |
-          VERSION=$(node -e "console.log(require('./package.json').version)")
-          if ! grep -q "## \[$VERSION\]" CHANGELOG.md 2>/dev/null; then
-            echo "::error::Version $VERSION not found in CHANGELOG.md — update CHANGELOG.md before release"
+          $VERSION = node -e "console.log(require('./package.json').version)"
+          if (-not (Select-String -Path "CHANGELOG.md" -Pattern "## \[$VERSION\]" -Quiet 2>$null)) {
+            Write-Output "::error::Version $VERSION not found in CHANGELOG.md — update CHANGELOG.md before release"
             exit 1
-          fi
-          echo "✅ Version $VERSION validated in CHANGELOG.md"
+          }
+          Write-Output "✅ Version $VERSION validated in CHANGELOG.md"
 
       - name: Run tests
         run: node --test test/*.test.js
 
       - name: Check no .ai-team/ or .squad/ files are tracked
         run: |
-          FOUND_FORBIDDEN=0
-          if git ls-files --error-unmatch .ai-team/ 2>/dev/null; then
-            echo "::error::❌ .ai-team/ files are tracked on preview — this must not ship."
-            FOUND_FORBIDDEN=1
-          fi
-          if git ls-files --error-unmatch .squad/ 2>/dev/null; then
-            echo "::error::❌ .squad/ files are tracked on preview — this must not ship."
-            FOUND_FORBIDDEN=1
-          fi
-          if [ $FOUND_FORBIDDEN -eq 1 ]; then
+          $FOUND_FORBIDDEN = 0
+          git ls-files --error-unmatch .ai-team/ 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "::error::❌ .ai-team/ files are tracked on preview — this must not ship."
+            $FOUND_FORBIDDEN = 1
+          }
+          git ls-files --error-unmatch .squad/ 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "::error::❌ .squad/ files are tracked on preview — this must not ship."
+            $FOUND_FORBIDDEN = 1
+          }
+          if ($FOUND_FORBIDDEN -eq 1) {
             exit 1
-          fi
-          echo "✅ No .ai-team/ or .squad/ files tracked — clean for release."
+          }
+          Write-Output "✅ No .ai-team/ or .squad/ files tracked — clean for release."
 
       - name: Validate package.json version
         run: |
-          VERSION=$(node -e "console.log(require('./package.json').version)")
-          if [ -z "$VERSION" ]; then
-            echo "::error::❌ No version field found in package.json."
+          $VERSION = node -e "console.log(require('./package.json').version)"
+          if ([string]::IsNullOrEmpty($VERSION)) {
+            Write-Output "::error::❌ No version field found in package.json."
             exit 1
-          fi
-          echo "✅ package.json version: $VERSION"
+          }
+          Write-Output "✅ package.json version: $VERSION"

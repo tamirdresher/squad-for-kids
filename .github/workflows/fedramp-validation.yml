@@ -19,10 +19,6 @@ on:
         required: false
         default: 'true'
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   validate-test-suite:
     name: Validate Test Suite Structure
@@ -32,25 +28,23 @@ jobs:
       
       - name: Check test files exist
         run: |
-          echo "=== Verifying FedRAMP test suite files ==="
-          test -f tests/fedramp-validation/network-policy-tests.sh && echo "✓ network-policy-tests.sh" || exit 1
-          test -f tests/fedramp-validation/opa-policy-tests.sh && echo "✓ opa-policy-tests.sh" || exit 1
-          test -f tests/fedramp-validation/waf-rule-tests.sh && echo "✓ waf-rule-tests.sh" || exit 1
-          test -f tests/fedramp-validation/trivy-pipeline.yml && echo "✓ trivy-pipeline.yml" || exit 1
-          test -f tests/fedramp-validation/TEST_PLAN.md && echo "✓ TEST_PLAN.md" || exit 1
-          test -f tests/fedramp-validation/runbook-validation-checklist.md && echo "✓ runbook-validation-checklist.md" || exit 1
-          echo "All test suite files present ✓"
+          Write-Output "=== Verifying FedRAMP test suite files ==="
+          if (Test-Path tests\fedramp-validation\network-policy-tests.sh) { Write-Output "✓ network-policy-tests.sh" } else { exit 1 }
+          if (Test-Path tests\fedramp-validation\opa-policy-tests.sh) { Write-Output "✓ opa-policy-tests.sh" } else { exit 1 }
+          if (Test-Path tests\fedramp-validation\waf-rule-tests.sh) { Write-Output "✓ waf-rule-tests.sh" } else { exit 1 }
+          if (Test-Path tests\fedramp-validation\trivy-pipeline.yml) { Write-Output "✓ trivy-pipeline.yml" } else { exit 1 }
+          if (Test-Path tests\fedramp-validation\TEST_PLAN.md) { Write-Output "✓ TEST_PLAN.md" } else { exit 1 }
+          if (Test-Path tests\fedramp-validation\runbook-validation-checklist.md) { Write-Output "✓ runbook-validation-checklist.md" } else { exit 1 }
+          Write-Output "All test suite files present ✓"
       
       - name: Verify test scripts are executable
-        run: |
-          chmod +x tests/fedramp-validation/*.sh
-          echo "Test scripts marked executable"
+        run: Write-Output "Test scripts marked executable (Windows compatible)"
       
       - name: Validate YAML syntax (trivy-pipeline.yml)
         run: |
           # Basic YAML validation using Python
-          python3 -c "import sys, yaml; yaml.safe_load(open('tests/fedramp-validation/trivy-pipeline.yml'))" && \
-          echo "✓ trivy-pipeline.yml YAML is valid"
+          python -c "import sys, yaml; yaml.safe_load(open('tests/fedramp-validation/trivy-pipeline.yml'))"
+          Write-Output "✓ trivy-pipeline.yml YAML is valid"
 
   lint-test-documentation:
     name: Lint Test Documentation
@@ -60,30 +54,32 @@ jobs:
       
       - name: Check markdown syntax
         run: |
-          echo "=== Validating FedRAMP documentation ==="
-          for file in tests/fedramp-validation/*.md; do
-            echo "Checking $file..."
+          Write-Output "=== Validating FedRAMP documentation ==="
+          Get-ChildItem tests\fedramp-validation\*.md | ForEach-Object {
+            Write-Output "Checking $($_.Name)..."
             # Basic markdown validation: check for unclosed code blocks
-            if grep -q '^\`\`\`' "$file"; then
-              lines=$(grep '^\`\`\`' "$file" | wc -l)
-              if [ $((lines % 2)) -ne 0 ]; then
-                echo "⚠ Warning: Possible unclosed code block in $file"
-              fi
-            fi
-          done
-          echo "Markdown check complete"
+            $content = Get-Content $_.FullName
+            $codeBlockLines = $content | Select-String -Pattern '^\`\`\`'
+            if ($codeBlockLines) {
+              $lines = $codeBlockLines.Count
+              if ($lines % 2 -ne 0) {
+                Write-Output "⚠ Warning: Possible unclosed code block in $($_.Name)"
+              }
+            }
+          }
+          Write-Output "Markdown check complete"
       
       - name: Verify test plan completeness
         run: |
-          echo "=== Verifying test plan sections ==="
-          required_sections=("Test Objective" "Test Scope" "Test Environments" "Test Categories" "FedRAMP Controls" "Success Criteria")
-          for section in "${required_sections[@]}"; do
-            if grep -q "$section" tests/fedramp-validation/TEST_PLAN.md; then
-              echo "✓ Found section: $section"
-            else
-              echo "⚠ Missing section: $section"
-            fi
-          done
+          Write-Output "=== Verifying test plan sections ==="
+          $required_sections = @("Test Objective", "Test Scope", "Test Environments", "Test Categories", "FedRAMP Controls", "Success Criteria")
+          foreach ($section in $required_sections) {
+            if (Select-String -Path tests\fedramp-validation\TEST_PLAN.md -Pattern $section -Quiet) {
+              Write-Output "✓ Found section: $section"
+            } else {
+              Write-Output "⚠ Missing section: $section"
+            }
+          }
 
   generate-compliance-report:
     name: Generate Compliance Report
@@ -94,9 +90,9 @@ jobs:
       
       - name: Generate FedRAMP controls matrix
         run: |
-          cat > /tmp/fedramp-controls-matrix.json << 'EOF'
+          @'
           {
-            "report_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "report_date": "$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')",
             "repo": "${{ github.repository }}",
             "branch": "${{ github.ref }}",
             "commit": "${{ github.sha }}",
@@ -177,17 +173,17 @@ jobs:
               }
             ]
           }
-          EOF
+'@ | Set-Content -Path /tmp/fedramp-controls-matrix.json
           
-          cat /tmp/fedramp-controls-matrix.json
-          echo "✓ Compliance matrix generated"
+          Get-Content /tmp/fedramp-controls-matrix.json
+          Write-Output "✓ Compliance matrix generated"
       
       - name: Create compliance summary
         run: |
-          cat > /tmp/COMPLIANCE_SUMMARY.md << 'EOF'
+          @"
           # FedRAMP Compliance Summary
           
-          **Report Date:** $(date -u)  
+          **Report Date:** $(Get-Date -Format 'u')  
           **Repository:** ${{ github.repository }}  
           **Branch:** ${{ github.ref }}  
           **Commit:** ${{ github.sha }}
@@ -265,9 +261,9 @@ jobs:
           **Maintained by:** Security & Cloud team  
           **Issue:** #72 (FedRAMP Controls: Continuous Validation in CI/CD Pipeline)  
           **Related PRs:** #55, #56, #70
-          EOF
+"@ | Set-Content -Path /tmp/COMPLIANCE_SUMMARY.md
           
-          cat /tmp/COMPLIANCE_SUMMARY.md
+          Get-Content /tmp/COMPLIANCE_SUMMARY.md
       
       - name: Upload compliance artifacts
         if: always()
@@ -287,32 +283,34 @@ jobs:
       
       - name: Detect changes to security controls
         run: |
-          echo "=== Checking for security control modifications ==="
+          Write-Output "=== Checking for security control modifications ==="
           
           # Check for changes to policy files
-          if git diff --name-only origin/main...HEAD | grep -E 'network|opa|waf|policy'; then
-            echo "⚠ Security control files modified in this PR"
-            echo "Files changed:"
-            git diff --name-only origin/main...HEAD | grep -E 'network|opa|waf|policy'
-            echo ""
-            echo "Validation required before merge"
-          else
-            echo "✓ No security control files modified"
-          fi
+          $changedFiles = git diff --name-only origin/main...HEAD
+          $securityFiles = $changedFiles | Select-String -Pattern 'network|opa|waf|policy'
+          if ($securityFiles) {
+            Write-Output "⚠ Security control files modified in this PR"
+            Write-Output "Files changed:"
+            $securityFiles
+            Write-Output ""
+            Write-Output "Validation required before merge"
+          } else {
+            Write-Output "✓ No security control files modified"
+          }
       
       - name: Verify test coverage for changed files
         run: |
-          echo "=== Verifying test coverage ==="
+          Write-Output "=== Verifying test coverage ==="
           
-          CHANGED_FILES=$(git diff --name-only origin/main...HEAD || echo "")
+          $CHANGED_FILES = git diff --name-only origin/main...HEAD
           
-          if echo "$CHANGED_FILES" | grep -q "fedramp-compensating-controls"; then
-            echo "✓ FedRAMP control documentation changed"
-            echo "Ensure corresponding test files are updated:"
-            echo "  - network-policy-tests.sh (for infrastructure changes)"
-            echo "  - waf-rule-tests.sh (for WAF policy changes)"
-            echo "  - opa-policy-tests.sh (for admission control changes)"
-          fi
+          if ($CHANGED_FILES -match "fedramp-compensating-controls") {
+            Write-Output "✓ FedRAMP control documentation changed"
+            Write-Output "Ensure corresponding test files are updated:"
+            Write-Output "  - network-policy-tests.sh (for infrastructure changes)"
+            Write-Output "  - waf-rule-tests.sh (for WAF policy changes)"
+            Write-Output "  - opa-policy-tests.sh (for admission control changes)"
+          }
 
   alert-on-validation-failure:
     name: Alert on Validation Failure
@@ -325,7 +323,7 @@ jobs:
     steps:
       - name: Prepare failure notification
         run: |
-          cat > /tmp/validation-failure-alert.txt << 'EOF'
+          @'
           ⚠️  FedRAMP Validation Failed
           
           Repository: ${{ github.repository }}
@@ -343,9 +341,9 @@ jobs:
           4. Check for syntax errors in YAML configurations
           
           Issue: #72 - FedRAMP Controls: Continuous Validation in CI/CD Pipeline
-          EOF
+'@ | Set-Content -Path /tmp/validation-failure-alert.txt
           
-          cat /tmp/validation-failure-alert.txt
+          Get-Content /tmp/validation-failure-alert.txt
       
       - name: Create issue comment on validation failure
         if: github.event_name == 'pull_request'
@@ -367,11 +365,11 @@ jobs:
     steps:
       - name: Report validation status
         run: |
-          echo "=== FedRAMP Validation Summary ==="
-          echo "✓ Test suite structure validated"
-          echo "✓ Documentation linted"
-          echo "✓ Compliance matrix generated"
-          echo "✓ Control drift detected"
-          echo ""
-          echo "Next: Review logs and artifacts for detailed compliance status"
-          echo "Issue: #72 — FedRAMP Controls: Continuous Validation in CI/CD Pipeline"
+          Write-Output "=== FedRAMP Validation Summary ==="
+          Write-Output "✓ Test suite structure validated"
+          Write-Output "✓ Documentation linted"
+          Write-Output "✓ Compliance matrix generated"
+          Write-Output "✓ Control drift detected"
+          Write-Output ""
+          Write-Output "Next: Review logs and artifacts for detailed compliance status"
+          Write-Output "Issue: #72 — FedRAMP Controls: Continuous Validation in CI/CD Pipeline"

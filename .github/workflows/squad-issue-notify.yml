@@ -4,10 +4,6 @@ on:
   issues:
     types: [closed]
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   notify-teams:
     runs-on: self-hosted
@@ -58,7 +54,7 @@ jobs:
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
         run: |
-          cat << 'EOF' > payload.json
+          @'
           {
             "type": "message",
             "attachments": [
@@ -117,6 +113,6 @@ jobs:
               }
             ]
           }
-          EOF
+'@ | Set-Content -Path payload.json
           
-          curl -H "Content-Type: application/json" -d @payload.json "$TEAMS_WEBHOOK_URL"
+          Invoke-RestMethod -Uri $env:TEAMS_WEBHOOK_URL -Method Post -ContentType "application/json" -InFile payload.json

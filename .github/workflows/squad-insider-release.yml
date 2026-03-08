@@ -5,10 +5,6 @@ on:
     branches: [dev]
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   release:
     runs-on: self-hosted
@@ -27,17 +23,17 @@ jobs:
       - name: Read version from package.json
         id: version
         run: |
-          VERSION=$(node -e "console.log(require('./package.json').version)")
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          INSIDER_VERSION="${VERSION}-insider+${SHORT_SHA}"
-          INSIDER_TAG="v${INSIDER_VERSION}"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
-          echo "insider_version=$INSIDER_VERSION" >> "$GITHUB_OUTPUT"
-          echo "insider_tag=$INSIDER_TAG" >> "$GITHUB_OUTPUT"
-          echo "📦 Base Version: $VERSION (Short SHA: $SHORT_SHA)"
-          echo "🏷️ Insider Version: $INSIDER_VERSION"
-          echo "🔖 Insider Tag: $INSIDER_TAG"
+          $VERSION = node -e "console.log(require('./package.json').version)"
+          $SHORT_SHA = git rev-parse --short HEAD
+          $INSIDER_VERSION = "$VERSION-insider+$SHORT_SHA"
+          $INSIDER_TAG = "v$INSIDER_VERSION"
+          "version=$VERSION" >> $env:GITHUB_OUTPUT
+          "short_sha=$SHORT_SHA" >> $env:GITHUB_OUTPUT
+          "insider_version=$INSIDER_VERSION" >> $env:GITHUB_OUTPUT
+          "insider_tag=$INSIDER_TAG" >> $env:GITHUB_OUTPUT
+          Write-Output "📦 Base Version: $VERSION (Short SHA: $SHORT_SHA)"
+          Write-Output "🏷️ Insider Version: $INSIDER_VERSION"
+          Write-Output "🔖 Insider Tag: $INSIDER_TAG"
 
       - name: Create git tag
         run: |

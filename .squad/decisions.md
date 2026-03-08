@@ -8606,6 +8606,185 @@ The rollback script requires review before pipeline integration to ensure no acc
 
 **End of Security Assessment**
 
+---
+
+## Decision: Deep Multi-Agent Review of Krishna's Azure Monitor Prometheus PRs
+
+**Date:** 2026-03-08  
+**Decision Makers:** Picard (Architecture), B'Elanna (Infrastructure), Worf (Security)  
+**Context:** Deep review of Krishna Chaitanya's 3 merged PRs enabling Azure Monitor Prometheus metrics for DK8S clusters using dk8s-platform-squad knowledge base  
+**Status:** COMPLETED
+
+### Executive Summary
+
+Three comprehensive reviews of Krishna's Azure Monitor Prometheus integration PRs conducted by specialized agents using DK8S platform knowledge base context. All agents recommend **APPROVE with conditions**.
+
+| Reviewer | Score | Verdict | Key Finding |
+|----------|-------|---------|------------|
+| Picard (Architecture) | 9.5/10 | APPROVE | Exceptionally high-quality work following DK8S patterns precisely |
+| B'Elanna (Infrastructure) | 9/10 | APPROVE | Strong ARM template organization, 5 minor operational concerns |
+| Worf (Security) | 9/10 | APPROVE | Follows DK8S security patterns, P1 recommendations for PRD |
+
+### Consolidated Review Findings
+
+#### Architecture Review (Picard)
+
+**Strengths (9 areas):**
+1. Cross-repo layering (config → template → orchestration) enables independent testing
+2. Resource ownership boundaries clearly defined (no conflicts with ManagedPrometheus team)
+3. Full Ev2 compliance (RolloutSpec, ServiceModel, ScopeBindings, Parameters, ARM templates)
+4. Pipeline stage ordering preserves dependency graph integrity
+5. Progressive rollout via tenant-level feature flag with cluster override
+6. ARM template organization matches DK8S documented patterns
+7. Naming conventions follow DK8S standards
+8. AMPLS pattern integrates with DK8S security-first approach
+9. ConfigGen integration follows ACR_SUBSCRIPTION precedent
+
+**Pre-PRD Recommendations:**
+1. **Pre-flight validation** (REQUIRED) — Add DCR existence checks to `AzureMonitoringValidation.sh`
+2. **Rollback testing** (REQUIRED) — Validate `ENABLE_AZURE_MONITORING=false` path in DEV
+3. **ManagedPrometheus coordination** (REQUIRED) — Confirm PRD regional resource deployment timeline
+4. **Documentation** (RECOMMENDED) — Add AMPLS pattern to `docs/architecture/resource-model.md`
+
+---
+
+#### Infrastructure Review (B'Elanna)
+
+**Strengths (8 areas):**
+1. ARM template naming follows DK8S `mps-dk8s-{env}-{region}-{id}` convention
+2. Role assignments use `guid(resourceId(...), roleId)` for idempotency
+3. Conditional deployment via parameters (not hardcoded)
+4. `dependsOn` chains prevent resource creation race conditions
+5. Ev2 RolloutSpec follows ring deployment (Canary → Ring1 → Global)
+6. ServiceModel correctly references ARM template paths
+7. ScopeBindings properly map subscriptions to deployment targets
+8. orchestratedSteps declare explicit dependencies
+
+**Infrastructure Concerns (5 items):**
+1. DNS Zone VNet link may race with Private Endpoint creation — needs verification timing
+2. Role assignment propagation delays could cause transient failures — consider retry logic
+3. Pre-flight validation missing — add `az resource show` checks before ARM deployment
+4. Shared resource ownership model undocumented — document DCE/DCR/AMW lifecycle per subscription
+5. Subscription ID separation needed — consider separate AZURE_MONITOR_SUBSCRIPTION_ID per environment
+
+---
+
+#### Security Review (Worf)
+
+**Security Strengths (6 areas):**
+1. **Network Security:** AMPLS + Private Endpoints, no public exposure
+2. **Identity & Access:** Managed Identity with least-privilege "Monitoring Metrics Publisher" role
+3. **Secret Management:** No secrets in templates, Managed Identity auth eliminates storage
+4. **Pipeline Security:** Proper stage dependencies, no credential exposure
+5. **Subscription Access:** Follows DK8S ACR_SUBSCRIPTION pattern
+6. **DK8S Alignment:** Consistent with platform security patterns (zero-trust networking, workload identity)
+
+**P1 Recommendations (must address before PRD):**
+1. **Environment Isolation** — Use separate AZURE_MONITOR_SUBSCRIPTION_ID for DEV/STG/PRD
+2. **Network Policies** — Add NetworkPolicy allowing egress to AMPLS Private Endpoint CIDR
+3. **Pre-Flight Validation** — Add `az resource show` checks in validation script
+4. **Rollback Cleanup** — Update validation script to delete AMPLS/Private Endpoints when disabling
+
+**Medium-Severity Concerns (3 items):**
+1. Blast Radius Containment — DEV and STG share subscription (reduces isolation)
+2. Network Policy Integration — No explicit allow rules for pod-to-AMPLS traffic
+3. Rollback Path Security — Orphaned private endpoints after disable
+
+**Compliance Gaps (requires verification):**
+1. Are DCE/DCR/AMW deployed with customer-managed keys (FedRAMP requirement)?
+2. What is metric retention policy (DK8S standard: 90 days)?
+3. Is AMPLS configured for "Private Only" mode (blocking public ingestion)?
+4. Are AMW workspaces tenant-separated (cross-tenant isolation)?
+
+---
+
+### Production Readiness Assessment
+
+**✅ Ready for STG:**
+- All 3 PRs merged and deployed to STG.EUS2.9950
+- Buddy pipeline validation passed
+- Azure verification confirmed (DCR Association, AMPLS, Private Endpoint, AKS metrics profile)
+
+**⏳ Blockers for PRD:**
+1. ManagedPrometheus PRD rollout (external dependency)
+2. Pre-flight validation script enhancement
+3. Rollback testing validation
+4. Environment-specific subscription isolation
+5. NetworkPolicy integration for AMPLS egress
+
+---
+
+### Consensus Recommendations (Prioritized)
+
+| Priority | Action | Owner | Effort |
+|----------|--------|-------|--------|
+| **P0** | Pre-flight validation (DCR/DCE/AMW existence checks) | Krishna | 2-3 hours |
+| **P0** | Rollback testing (`ENABLE_AZURE_MONITORING=false`) | Krishna | 4 hours |
+| **P0** | Coordinate ManagedPrometheus PRD timeline | Cross-team | Async |
+| **P1** | NetworkPolicy for AMPLS egress | Krishna | 3-4 hours |
+| **P1** | Environment-specific subscriptions for PRD | Architecture | TBD |
+| **P2** | AMPLS pattern documentation | Picard | 2 hours |
+| **P2** | Compliance verification (CMK, retention, tenant isolation) | Worf | 4-6 hours |
+
+---
+
+### New Patterns Introduced to DK8S
+
+1. **Azure Monitor Private Link Scope (AMPLS)**
+   - Not documented in DK8S knowledge base before this implementation
+   - Per-cluster resources (AMPLS, Private Endpoint, Private DNS Zone)
+   - Aligns with DK8S security-first approach (eliminates public internet exposure)
+   - **Should be documented** in `docs/architecture/resource-model.md` for future reference
+
+2. **External Team Resource Dependency (ManagedPrometheus)**
+   - New cross-team dependency model for DK8S platform
+   - ManagedPrometheus owns shared regional resources (DCE, DCR, AMW)
+   - Pre-flight checks required for external dependencies
+   - **Should be documented** in `docs/architecture/dependency-graph.md` with coordination guidelines
+
+---
+
+### Decision
+
+**APPROVE for STG deployment** (already deployed and validated).
+
+**For PRD deployment:**
+1. Add pre-flight DCR/DCE/AMW existence checks to `AzureMonitoringValidation.sh` ✅ **REQUIRED**
+2. Validate rollback path (`ENABLE_AZURE_MONITORING=false`) in DEV ✅ **REQUIRED**
+3. Coordinate with ManagedPrometheus team for PRD regional resource deployment timeline ✅ **REQUIRED**
+4. Implement environment-specific subscriptions for DEV/STG/PRD isolation ✅ **REQUIRED for PRD**
+5. Add NetworkPolicy allowing AMPLS egress ✅ **REQUIRED for PRD**
+6. Update DK8S knowledge base with AMPLS pattern documentation 🟡 **RECOMMENDED**
+
+---
+
+### Overall Assessment
+
+This is **exceptionally high-quality work** that demonstrates deep understanding of:
+- DK8S multi-repo architecture (config → template → orchestration)
+- Ev2 deployment patterns (RolloutSpec, ServiceModel, ScopeBindings)
+- ConfigGen integration (tenant-level with cluster override)
+- Progressive rollout strategy (feature flags, ring deployment)
+- Security-first network design (AMPLS, Private Link, Managed Identity)
+
+Krishna's implementation follows DK8S platform patterns **precisely**. All team members validate architectural soundness and operational readiness for STG. PRD deployment requires addressing P0 blockers (pre-flight validation, rollback testing, ManagedPrometheus coordination) and P1 security recommendations (environment isolation, network policies).
+
+---
+
+**Signed:** 
+- Picard (Architecture Expert) — 9.5/10 score
+- B'Elanna (Infrastructure Expert) — 9/10 score
+- Worf (Security & Cloud) — 9/10 score
+
+**Date:** 2026-03-08  
+**Knowledge Base:** dk8s-platform-squad  
+**Issue:** #150 (deep review posted)  
+**References:**
+- `.squad/orchestration-log/2026-03-08T15-35-00Z-picard.md` (architecture details)
+- `.squad/orchestration-log/2026-03-08T15-35-00Z-belanna.md` (infrastructure details)
+- `.squad/orchestration-log/2026-03-08T15-35-00Z-worf.md` (security details)
+- `.squad/log/2026-03-08T15-35-00Z-krishna-deep-review.md` (session log)
+
 
 ---
 

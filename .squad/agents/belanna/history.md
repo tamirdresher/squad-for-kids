@@ -2315,3 +2315,38 @@ Infrastructure reviews should focus on **integration points** where systems conn
 - .squad/skills/microsoft-internal-tooling/SKILL.md (Ev2 patterns)
 - .squad/skills/powershell-automation/SKILL.md (validation scripts)
 
+
+---
+
+### 2026-03-08: DevBox Duplication (Issue #103)
+
+**Task:** Duplicate the IDPDev devbox per Tamir's request  
+**Method:** Azure DevBox Portal (CLI extension failed to install)
+
+**Process:**
+1. **CLI Attempt Failed:** z devcenter extension installation errors
+2. **UI Success:** Playwright automation via Edge browser at https://devbox.microsoft.com
+3. **DevBox Created:** IDPDev-2 with matching specs (16 vCPU, 64 GB RAM, 2,048 GB SSD)
+
+**Configuration:**
+- **Name:** IDPDev-2
+- **Project:** 1SOC (1/2 → 2/2 dev boxes used)
+- **Image:** 1es-office-enhancedtools-baseImage (v2024.1122.0)
+- **Region:** West Europe (matched original, despite latency warning from Central India)
+- **Status:** Creating... (25-65 min provisioning time)
+
+**DevBox Portal UI Patterns Discovered:**
+- No direct "duplicate" action — must create new with manual config matching
+- Actions menu (ellipsis/more) provides: Hibernate, Shut down, Restart, Take snapshot, Restore, More Info, Troubleshoot & repair, Support, Delete
+- "More Info" panel shows full specs (image, region, vCPU, RAM, SSD)
+- Region selection requires "Show all" to see non-recommended options
+- Region latency warnings require explicit "Continue" confirmation
+- Project selection shows dev box quota usage (e.g., "1/2 dev boxes used")
+
+**Deliverables:**
+- GitHub Issue #103: Commented with full devbox details and connection instructions
+- Teams: Adaptive card notification sent to webhook
+- Issue Label: Added status:pending-user (awaiting Tamir verification once provisioned)
+
+**Learning:** DevBox provisioning is UI-first. CLI tooling (z devcenter) exists but extension installation is unreliable. Portal automation via Playwright is more reliable for one-off provisioning tasks.
+

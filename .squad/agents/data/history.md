@@ -18,6 +18,27 @@
 
 ## Learnings
 
+### 2026-03-08: GitHub Actions bot identity — Squad comment workflows (PR #154)
+
+**Task:** Fix @mention notifications by making squad comments appear from `github-actions[bot]` instead of user account.
+**Delivered:** Added explicit permissions to 7 workflows to enable bot identity for all comments.
+**Key decisions:**
+- GitHub's built-in `GITHUB_TOKEN` posts as `github-actions[bot]` when workflows have explicit `permissions: issues: write`
+- All workflows already used `actions/github-script` without `github-token` override (correct pattern)
+- The issue was missing explicit permissions — GitHub's default permissions were too restrictive
+- Preserved `COPILOT_ASSIGN_TOKEN` in 2 places (squad-heartbeat.yml, squad-issue-assign.yml) — only used for assigning @copilot (special API), NOT for posting comments
+- Created reusable `post-comment.yml` workflow for future use (though not currently needed)
+- No infrastructure changes required — pure GitHub Actions feature
+
+**Constraints:**
+- Cannot install GitHub Apps in this repo (Microsoft org restrictions)
+- Cannot use custom bot identity without external infrastructure
+- Solution must work with self-hosted runners
+
+**Branch:** `squad/62-actions-bot-identity` | **PR:** #154 | **Issue:** #62
+
+---
+
 ### 2026-03-08: ralph-watch metrics parsing — Agency output analysis (PR #137)
 
 **Task:** Parse Squad CLI agency output to extract detailed work metrics (issues closed, PRs merged, agent actions) per round.

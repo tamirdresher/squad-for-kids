@@ -1866,3 +1866,48 @@ This suggests Ralph maintains state between runs and performs differential scann
 3. Cap max round duration at 25–30 min to prevent accumulation
 4. Monitor cache effectiveness (currently excellent)
 
+
+---
+
+## 2026-03-08: Issue #150 Finalization — Azure Monitor Prometheus Review Findings
+
+**Task:** Document learnings from Krishna's Azure Monitor Prometheus integration PRs review and close Issue #150.
+
+**What Was Reviewed:**
+Krishna submitted 3 PRs enabling Azure Monitor Prometheus metrics collection in DK8S cluster provisioning pipeline:
+- **PR #14966543** (Infra.K8s.Clusters) — Add AZURE_MONITOR_SUBSCRIPTION_ID to Tenants.json
+- **PR #14968397** (WDATP.Infra.System.Cluster) — ARM templates, GoTemplates, Ev2 deployment specs
+- **PR #14968532** (WDATP.Infra.System.ClusterProvisioning) — AzureMonitoring stage pipeline integration
+- **Status:** All 3 PRs merged and deployed to STG.EUS2.9950 via buddy pipeline
+
+**Review Process Used:**
+Three DK8S squad reviewers conducted comprehensive review from both tamresearch1 and dk8s-platform-squad knowledge bases:
+1. **Picard (Architecture)** — Cross-repo consistency, resource ownership model, production path
+2. **B'Elanna (Infrastructure)** — Ev2 patterns, pipeline ordering, minor operational concerns
+3. **Worf (Security)** — Network isolation, identity/access, blast radius, FedRAMP alignment
+
+**Key Architectural Patterns Identified (New to DK8S):**
+1. **AMPLS (Azure Monitor Private Link Scope)** — Eliminates public internet exposure for metrics. Recommend documenting in docs/architecture/resource-model.md.
+2. **External Team Resource Dependency Model** — ManagedPrometheus owns shared regional resources (DCE/DCR/AMW), while DK8S owns per-cluster networking (AMPLS/Private Endpoint/DNS). New cross-team coordination pattern.
+
+**Overall Assessment:**
+- **Combined Score:** 9/10 — Production-ready for STG
+- **Architecture Score:** 9.5/10 — Follows DK8S patterns (cross-repo layering, Ev2 compliance, ConfigGen hierarchy, progressive rollout)
+- **Infrastructure Score:** 9/10 — ARM templates clean/idempotent, Ev2 ring deployment correct
+- **Security Score:** 8.5/10 — Zero secrets, private networking, least-privilege RBAC
+
+**Critical PRD Action Items (P1 — Before Production Rollout):**
+1. Separate subscription IDs per environment (DEV/STG vs PRD)
+2. Pre-flight DCR/DCE/AMW validation in AzureMonitoringValidation.sh
+3. NetworkPolicy for AMPLS egress rules
+4. Role assignment retry logic (30-60s RBAC propagation)
+
+**Key Learnings:**
+1. Knowledge base scope matters — DK8S-specific review added validation depth
+2. Cross-team resource dependency patterns need canonical documentation
+3. New architectural patterns (AMPLS) should update platform reference materials
+4. Security concerns were mostly environmental/policy (subscription boundaries, NetworkPolicy) not design flaws
+5. Strong Ev2 compliance indicates high DK8S team expertise
+
+**Status:** ✅ COMPLETE — Knowledge base updated, ready to close
+

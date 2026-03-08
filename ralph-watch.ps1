@@ -120,6 +120,19 @@ function Invoke-LogRotation {
     }
 }
 
+# Function to update just the lastHeartbeat timestamp in heartbeat file
+function Update-HeartbeatTimestamp {
+    if (-not (Test-Path $heartbeatFile)) { return }
+    
+    try {
+        $heartbeat = Get-Content -Path $heartbeatFile -Raw -Encoding utf8 | ConvertFrom-Json
+        $heartbeat.lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+        $heartbeat | ConvertTo-Json | Out-File -FilePath $heartbeatFile -Encoding utf8 -Force
+    } catch {
+        # Silently fail if file is locked or corrupted
+    }
+}
+
 # Function to update heartbeat file
 function Update-Heartbeat {
     param(
@@ -133,6 +146,7 @@ function Update-Heartbeat {
     
     $heartbeat = [ordered]@{
         lastRun = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+        lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
         round = $Round
         status = $Status
         exitCode = $ExitCode
@@ -276,11 +290,12 @@ function Send-TeamsAlert {
 while ($true) {
     $round++
     $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
+    $displayTime = Get-Date -Format "HH:mm:ss"
     $startTime = Get-Date
     
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host "[$timestamp] Ralph Round $round - launching agency" -ForegroundColor Cyan
+    Write-Host "[$displayTime] Ralph Round $round started" -ForegroundColor Cyan
     Write-Host "============================================" -ForegroundColor Cyan
     
     # Write heartbeat BEFORE round (status: running)
@@ -333,6 +348,28 @@ while ($true) {
         agentActions = 0
     }
     
+    # Start heartbeat background job to print periodic updates during the round
+    $heartbeatJob = Start-Job -ScriptBlock {
+        param($RoundNum, $HeartbeatFile)
+        $roundStartTime = Get-Date
+        while ($true) {
+            Start-Sleep -Seconds 60
+            $elapsed = (Get-Date) - $roundStartTime
+            $elapsedStr = "{0}m {1:00}s" -f [math]::Floor($elapsed.TotalMinutes), $elapsed.Seconds
+            $timestamp = Get-Date -Format "HH:mm:ss"
+            Write-Host "[$timestamp] Round $RoundNum running... ($elapsedStr elapsed)" -ForegroundColor DarkYellow
+            
+            # Update lastHeartbeat timestamp in JSON
+            if (Test-Path $HeartbeatFile) {
+                try {
+                    $hb = Get-Content -Path $HeartbeatFile -Raw -Encoding utf8 | ConvertFrom-Json
+                    $hb.lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+                    $hb | ConvertTo-Json | Out-File -FilePath $HeartbeatFile -Encoding utf8 -Force
+                } catch {}
+            }
+        }
+    } -ArgumentList $round, $heartbeatFile
+    
     try {
         # Call agency DIRECTLY — no pipes, no Start-Process, no cmd /c
         # This is the only approach that reliably returns control
@@ -343,12 +380,10 @@ while ($true) {
         # No file cleanup needed — output streamed to console directly
         
         if ($exitCode -eq 0) {
-            Write-Host "[$timestamp] Round $round completed successfully" -ForegroundColor Green
             $consecutiveFailures = 0
             $roundStatus = "idle"
             $logStatus = "SUCCESS"
         } else {
-            Write-Host "[$timestamp] Round $round completed with exit code $exitCode" -ForegroundColor Yellow
             $consecutiveFailures++
             $roundStatus = "error"
             $logStatus = "FAILED"
@@ -363,11 +398,28 @@ while ($true) {
         $consecutiveFailures++
         $roundStatus = "error"
         $logStatus = "ERROR"
+    } finally {
+        # Stop heartbeat job
+        if ($heartbeatJob) {
+            Stop-Job -Job $heartbeatJob -ErrorAction SilentlyContinue
+            Remove-Job -Job $heartbeatJob -Force -ErrorAction SilentlyContinue
+        }
     }
     
     # Calculate duration
     $endTime = Get-Date
     $durationSeconds = ($endTime - $startTime).TotalSeconds
+    $durationMinutes = [math]::Floor($durationSeconds / 60)
+    $durationSecs = [math]::Floor($durationSeconds % 60)
+    $durationStr = "${durationMinutes}m ${durationSecs}s"
+    $endDisplayTime = Get-Date -Format "HH:mm:ss"
+    
+    # Show round completion
+    if ($exitCode -eq 0) {
+        Write-Host "[$endDisplayTime] Round $round completed in $durationStr (exit: $exitCode)" -ForegroundColor Green
+    } else {
+        Write-Host "[$endDisplayTime] Round $round completed in $durationStr (exit: $exitCode)" -ForegroundColor Yellow
+    }
     
     # Write structured log entry with metrics
     Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Status $logStatus -Metrics $metrics
@@ -384,10 +436,13 @@ while ($true) {
         Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode -Metrics $metrics
     }
     
-    Write-Host "[$timestamp] Next round in $intervalMinutes minutes..." -ForegroundColor DarkGray
-    Write-Host "[$timestamp] Duration: $([math]::Round($durationSeconds, 2))s | Exit: $exitCode | Failures: $consecutiveFailures" -ForegroundColor DarkGray
+    # Calculate next round time
+    $nextRoundTime = (Get-Date).AddSeconds($intervalMinutes * 60)
+    $nextRoundDisplayTime = $nextRoundTime.ToString("HH:mm:ss")
+    Write-Host "[$endDisplayTime] Next round at $nextRoundDisplayTime (in $intervalMinutes minutes)" -ForegroundColor DarkGray
+    
     if ($metrics.issuesClosed -gt 0 -or $metrics.prsMerged -gt 0 -or $metrics.agentActions -gt 0) {
-        Write-Host "[$timestamp] Metrics: Issues closed: $($metrics.issuesClosed), PRs merged: $($metrics.prsMerged), Agent actions: $($metrics.agentActions)" -ForegroundColor DarkGray
+        Write-Host "[$endDisplayTime] Metrics: Issues closed: $($metrics.issuesClosed), PRs merged: $($metrics.prsMerged), Agent actions: $($metrics.agentActions)" -ForegroundColor DarkGray
     }
     Start-Sleep -Seconds ($intervalMinutes * 60)
 }

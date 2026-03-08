@@ -258,7 +258,7 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
         var staleness = "unknown";
         var stalenessColor = "dim";
         DateTime lastRunDt = DateTime.MinValue;
-        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out lastRunDt))
+        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out lastRunDt))
         {
             var age = DateTime.Now - lastRunDt;
             staleness = FormatAge(age);
@@ -283,7 +283,7 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
             
             if (timeUntilNext.TotalSeconds > 0)
             {
-                var nextRoundStr = nextRoundTime.ToLocalTime().ToString("HH:mm:ss");
+                var nextRoundStr = nextRoundTime.ToString("HH:mm:ss");
                 var countdown = timeUntilNext.TotalMinutes >= 1 
                     ? $"{(int)timeUntilNext.TotalMinutes}m {timeUntilNext.Seconds}s"
                     : $"{(int)timeUntilNext.TotalSeconds}s";
@@ -365,12 +365,12 @@ static IRenderable BuildRalphLogSection(string userProfile)
                 var exitCode = match.Groups[3].Value;
                 var durationStr = match.Groups[4].Value;
 
-                if (DateTime.TryParse(startTimeStr, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var startTime) &&
+                if (DateTime.TryParse(startTimeStr, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var startTime) &&
                     double.TryParse(durationStr, NumberStyles.Float, CultureInfo.InvariantCulture, out var durationSecs))
                 {
                     var endTime = startTime.AddSeconds(durationSecs);
-                    var startLocal = startTime.ToLocalTime().ToString("HH:mm:ss");
-                    var endLocal = endTime.ToLocalTime().ToString("HH:mm:ss");
+                    var startLocal = startTime.ToString("HH:mm:ss");
+                    var endLocal = endTime.ToString("HH:mm:ss");
                     
                     // Format duration as minutes:seconds
                     var durationMinutes = (int)(durationSecs / 60);
@@ -817,7 +817,7 @@ static IRenderable BuildDetailedOrchestrationSection(List<AgentActivity> activit
         var grid = new Grid()
             .AddColumn(new GridColumn().Width(15))
             .AddColumn(new GridColumn().NoWrap())
-            .AddRow($"[cyan bold]{Markup.Escape(activity.Agent)}[/]", $"[{ageColor}]{Markup.Escape(ageStr)} — {Markup.Escape(activity.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"))}[/]")
+            .AddRow($"[cyan bold]{Markup.Escape(activity.Agent)}[/]", $"[{ageColor}]{Markup.Escape(ageStr)} — {Markup.Escape(activity.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"))}[/]")
             .AddRow($"[dim]Status:[/]", $"[{statusColor} bold]{Markup.Escape(activity.Status)}[/]");
 
         if (!string.IsNullOrWhiteSpace(activity.Task))
@@ -893,7 +893,7 @@ static void DisplayRalphHeartbeat(string userProfile)
 
         var staleness = "unknown";
         var stalenessColor = "dim";
-        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var lastRunDt))
+        if (lastRun != null && DateTime.TryParse(lastRun, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var lastRunDt))
         {
             var age = DateTime.Now - lastRunDt;
             staleness = FormatAge(age);
@@ -1277,7 +1277,7 @@ static AgentActivity? ParseOrchestrationLog(string filePath)
     var timestamp = new DateTime(
         int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value),
         int.Parse(match.Groups[4].Value), int.Parse(match.Groups[5].Value), int.Parse(match.Groups[6].Value),
-        DateTimeKind.Utc);
+        DateTimeKind.Local);
     var agentName = match.Groups[7].Value;
 
     var status = "Unknown";

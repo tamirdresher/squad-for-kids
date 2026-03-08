@@ -1,10 +1,10 @@
 ---
-updated_at: 2026-03-08T16:35:00Z
-focus_area: Board clear — all maintenance done
+updated_at: 2026-03-08T20:43:00Z
+focus_area: Board clear — all issues pending-user
 active_issues: []
-session_status: closed
+session_status: idle
 ---
 
 # What We're Focused On
 
-Ralph session complete (2 rounds). Data investigated #1 (Squad CLI upstream) — v0.8.23 exists but command still missing, moved to Pending User. Added 7 closed issues (#156, #157, #155, #152, #151, #150, #132) to project board as Done. All merged PRs verified — no unresolved comments. CI still failing (#110, pending Tamir). 13 open issues: 8 pending-user, 2 blocked, 1 pending decision (#1), 1 in progress (#103 devbox), 1 scheduled (#116 April). Teams notification sent.
+Ralph session complete (1 round). Board maintenance: added #167 and #168 to project board (were missing), set to Pending User. Fixed #17 board status from Blocked to Pending User (matching label). Verified all 4 recently merged PRs (#176, #175, #172, #171) have zero comments/reviews — no PR comments to address. Issue #119 confirmed closed (PR #175 merged). 10 open issues remain — ALL pending-user. No open PRs. No actionable work for agents. No Teams notification sent (no important changes requiring user attention).

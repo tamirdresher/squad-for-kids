@@ -16,20 +16,17 @@ The webhook URL is stored as an environment variable `TEAMS_WEBHOOK_URL` or can 
 
 ### Sending Messages to Teams
 
-To send a message to Teams, use this PowerShell pattern:
+The webhook URL is stored at `C:\Users\tamirdresher\.squad\teams-webhook.url` (NOT in the repo — it's a secret).
+
+To send a message to Teams, read the URL from that file and POST:
 
 ```powershell
-$webhookUrl = $env:TEAMS_WEBHOOK_URL
+$webhookUrl = Get-Content "$env:USERPROFILE\.squad\teams-webhook.url" -Raw
 $body = @{ text = "Your message here" } | ConvertTo-Json
-Invoke-RestMethod -Uri $webhookUrl -Method Post -ContentType "application/json" -Body $body
+Invoke-RestMethod -Uri $webhookUrl.Trim() -Method Post -ContentType "application/json" -Body $body
 ```
 
-Or from a shell command agents can run:
-```bash
-powershell -Command "Invoke-RestMethod -Uri $env:TEAMS_WEBHOOK_URL -Method Post -ContentType 'application/json' -Body (ConvertTo-Json @{text='Your message here'})"
-```
-
-**IMPORTANT**: Always use `$env:TEAMS_WEBHOOK_URL` — never hardcode the webhook URL. It is set as a user environment variable.
+**IMPORTANT**: Never hardcode the webhook URL. Always read from `~\.squad\teams-webhook.url`.
 
 ## Trigger
 

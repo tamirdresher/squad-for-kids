@@ -2763,6 +2763,55 @@ This pattern helps research work unblock business decisions rather than sit in "
 
 ---
 
+## Decision: PR #130 Approval - Ralph Watch Observability
+
+**Date:** 2025-06-01
+**Decider:** Picard (Lead)
+**Context:** Review of PR #130 implementing Issue #128 requirements
+
+### Decision
+
+**APPROVED AND MERGED** PR #130 - "feat: Add observability/telemetry to ralph-watch.ps1"
+
+### Rationale
+
+1. **Requirements Met:** All core Issue #128 requirements implemented:
+   - Structured logging (append-only, pipe-delimited)
+   - Heartbeat JSON file for staleness detection
+   - Teams alerts on >3 consecutive failures
+   - Exit code and duration tracking
+
+2. **Quality Standards:** 
+   - Robust error handling with graceful degradation
+   - No security issues (no hardcoded secrets, dynamic paths)
+   - Backward compatible (purely additive changes)
+   - Clean, maintainable PowerShell code
+
+3. **Trade-offs Accepted:**
+   - Issue #128 mentioned parsing agency output for detailed metrics (issues closed, PRs merged)
+   - Not implemented in this PR, but foundation is solid
+   - Can be enhanced later if needed without blocking core telemetry
+
+### Impact
+
+- Ralph watch loop now has production-grade observability
+- External monitoring (squad-monitor) can detect staleness via heartbeat file
+- Automatic Teams alerts prevent silent failure accumulation
+- Structured logs enable post-hoc analysis of patterns
+
+### Alternatives Considered
+
+Could have blocked on missing detailed output parsing, but:
+- Core telemetry requirements are complete
+- Foundation is extensible
+- Better to ship working observability now than wait for nice-to-have features
+
+### Team Guidance
+
+Pattern to adopt: When webhook or external notification files are missing, **fail gracefully with warning** rather than crashing. Data's implementation here is the template.
+
+---
+
 ## Decision: User Directive — Status Label Enforcement
 
 **Date:** 2026-03-07T17:45:41Z  

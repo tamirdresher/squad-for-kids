@@ -18,6 +18,121 @@
 
 ## Learnings
 
+### 2026-03-09: FedRAMP Dashboard Migration Planning — Issue #127
+
+**Context:** Tamir requested migration plan for FedRAMP Dashboard to dedicated repository following his decision on Issue #123 that the project is valid but belongs in its own repo.
+
+**Scope Analysis:**
+- **Current State:** 13 merged PRs (#94-98, #102, #108 + security/caching), ~100 files across 5 components
+- **Components:** API (.NET 8 REST), Functions (data pipeline), Dashboard UI (React), Infrastructure (Bicep), Tests (validation scripts)
+- **Investment:** 5-phase production rollout (data pipeline → API RBAC → UI → alerting → sovereign deployment)
+- **Production Status:** Deployed to DEV/STG, sovereign cloud configs ready
+
+**Migration Plan Delivered (PR #131):**
+
+**1. Purpose Clarification:**
+- **Primary Mission:** Production compliance monitoring platform for DK8S sovereign clouds (Azure Government, Fairfax, Mooncake)
+- **NOT:** Reference architecture or PoC
+- **IS:** Production system with real-time FedRAMP control validation, automated alerting (PagerDuty/Teams), RBAC (5 roles)
+
+**2. Inventory & Structure:**
+- **Moves:** ~100 files → new `fedramp-dashboard` repo
+  - `/api/FedRampDashboard.Api/` → `/src/api/`
+  - `/functions/` → `/src/functions/`
+  - `/dashboard-ui/` → `/src/dashboard-ui/`
+  - `/infrastructure/` → `/infrastructure/`
+  - `/tests/fedramp-*` → `/tests/`
+  - `/docs/fedramp-*.md` → `/docs/` (12 docs)
+- **Stays:** Squad config, research docs, training, shared dev environment
+
+**3. Repository Structure:**
+```
+fedramp-dashboard/
+├── .squad/                    # Squad integration
+├── src/api/                   # .NET 8 REST API
+├── src/functions/             # Azure Functions
+├── src/dashboard-ui/          # React + TypeScript
+├── infrastructure/            # Bicep IaC
+├── tests/                     # API tests + validation scripts
+├── docs/                      # Architecture, runbooks, security
+├── api-specs/                 # OpenAPI 3.0
+├── .azuredevops/              # CI/CD pipelines
+└── .github/                   # Actions + CODEOWNERS
+```
+
+**4. Migration Strategy (6 weeks):**
+- **Week 1:** Repository setup (access controls, squad integration, CI/CD scaffolding)
+- **Week 2:** Code migration (git filter-repo to preserve history)
+- **Week 3:** Infrastructure validation (DEV deployment, integration tests)
+- **Week 4:** CI/CD migration (Azure DevOps + GitHub Actions)
+- **Week 5:** Production switchover (blue-green deployment, zero downtime)
+- **Week 6:** Cleanup (archive tamresearch1 FedRAMP artifacts)
+
+**5. Ownership & Governance:**
+- API/Functions: Data (primary), Picard (backup)
+- Infrastructure: B'Elanna (primary), Picard (backup)
+- Security: Worf (primary), Seven (backup)
+- Documentation: Seven (primary), Picard (backup)
+- Orchestration: Scribe (primary), Picard (backup)
+
+**6. Key Architectural Decisions:**
+- **History Preservation:** Use git filter-repo (preserves 13 PRs, ~80 commits, authorship, blame)
+- **Deployment:** Blue-green deployment slots for zero downtime
+- **Progressive Validation:** DEV → STG → PROD with go/no-go decision points
+- **Squad Integration:** Ralph Watch, agent charters, decision logging all move to new repo
+
+**7. Risk Mitigation:**
+- Deployment disruption: Blue-green slots, low-traffic window, tested rollback
+- Git history loss: Test migration on throwaway repo first, backup tamresearch1
+- Broken cross-references: Automated link checker, search for "tamresearch1"
+- Squad integration failure: Test Ralph in new repo before migration
+- CI/CD gaps: Copy all pipelines (not rebuild), test in DEV first
+
+**Open Questions Posted (for Tamir):**
+1. Repository name: Confirm `fedramp-dashboard`?
+2. Sovereign cloud scope: Which clouds in Phase 1?
+3. Squad agent allocation: All 5 or subset?
+4. CI/CD platform: Consolidate to GitHub Actions or keep both?
+5. License: Confirm MIT?
+
+**Deliverables:**
+- ✅ Comprehensive migration plan: `docs/fedramp-migration-plan.md`
+- ✅ GitHub issue comment with executive summary
+- ✅ PR #131 created with full context
+- ✅ Issue #127 blocked on Tamir's decision
+
+**Key Learnings:**
+
+**1. Production System Identification:**
+- Signal: 13 PRs, 5-phase rollout, sovereign cloud configs, RBAC, production alerting
+- Pattern: When research work evolves to production scale, recognize the transition and recommend repository separation early
+- Lesson: Repository names matter—"tamresearch1" signals research intent, creates cognitive dissonance with production deployments
+
+**2. Migration Planning Scope:**
+- A good migration plan addresses: purpose, inventory, structure, strategy, ownership, risks, timeline, open questions
+- Go/no-go decision points at each phase prevent "point of no return" mistakes
+- History preservation is valuable (git blame, commit context, PR references) but requires tooling (git filter-repo)
+
+**3. Squad Integration Portability:**
+- Squad infrastructure (.squad/, ralph-watch.ps1, squad.config.ts) is designed for portability
+- CODEOWNERS in new repo enables agent-based code ownership
+- Ralph Watch can monitor multiple repos simultaneously (not covered in this plan but possible)
+
+**4. File Paths & References:**
+- Key FedRAMP file paths identified:
+  - API: `api/FedRampDashboard.Api/Controllers/*.cs`, `api/openapi-fedramp-dashboard.yaml`
+  - Functions: `functions/ProcessValidationResults.cs`, `functions/AlertProcessor.cs`
+  - Infrastructure: `infrastructure/phase1-data-pipeline.bicep`, `infrastructure/phase4-alerting.bicep`
+  - Tests: `tests/fedramp-validation/*.sh`, `tests/FedRampDashboard.Api.Tests/`
+  - Docs: `docs/fedramp-dashboard-phase*.md`, `FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md`
+
+**5. Ownership Model:**
+- Code ownership maps to agent expertise: Data (code), B'Elanna (infra), Worf (security), Seven (docs)
+- Decision authority escalation: Agent → Picard → Tamir
+- Backup owners prevent single points of failure
+
+---
+
 ### 2026-03-08: Ralph Round 1 Activation — Issue #122 Directive & Team Orchestration
 
 **Activation:** Tamir initiated Ralph (squad orchestrator) for Round 1  
@@ -1342,3 +1457,25 @@ Squad's work is operationally driven: real incidents (#46 from Teams Bridge), im
 **Findings:** All PR review comments have corresponding tracked issues. No orphaned action items discovered. The audit trail is complete and actionable.
 
 **Decision:** Squad:data owns post-CI validation gate. This prevents silent regressions from 34+ days of unvalidated deployments.
+
+## Learnings
+
+**[2026-03-08 11:00:00] PR #130 Review - Ralph Watch Observability**
+
+Data delivered solid implementation of Issue #128 requirements:
+- Structured append-only logging with pipe-delimited fields
+- JSON heartbeat file for external monitoring
+- Teams alerts on >3 consecutive failures with proper graceful degradation
+- Exit code and duration tracking with rounded metrics
+
+**Key review findings:**
+- Security: No hardcoded secrets, proper dynamic path resolution with $env:USERPROFILE
+- Robustness: Excellent defensive programming - missing webhook file doesn't crash, just warns
+- Backward compatibility: Zero breaking changes, purely additive observability
+- Code quality: Clean PowerShell with well-structured functions
+
+**Minor gap:** Issue #128 mentioned parsing agency output for detailed metrics (issues closed, PRs merged), but this wasn't implemented. Not blocking - the telemetry foundation is complete and extensible.
+
+**Decision:** Approved and merged. The core observability requirements are met. Detailed output parsing can be a future enhancement if needed.
+
+**Pattern observed:** Data consistently delivers robust error handling. The webhook file checks are exemplary - fail gracefully, log clearly, continue execution.

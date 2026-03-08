@@ -837,6 +837,130 @@ Do **NOT** try to:
 - Double down on persistent memory and decision traces
 - Make agent history.md and decisions.md *first-class artifacts*, not hidden state
 - Promote "reasoning trace > compressed fact" as core philosophy (aligns with agent knowledge transfer patterns)
+
+---
+
+## Decision 16: GitHub Codespaces Enablement Blocker
+
+**Date:** 2026-03-08  
+**Author:** B'Elanna Torres (Infrastructure Expert)  
+**Status:** ⏳ Pending User Action  
+**Scope:** Development Environment Setup  
+**Related Issue:** #167
+
+### Context
+
+Tamir requested Codespace creation and running the "claw experiment" in Codespace. PR #171 (Codespaces configuration) was already merged with full `.devcontainer/` setup.
+
+### Finding: Feature Not Enabled
+
+When attempting to create a Codespace via CLI:
+```
+Error: There are no available machine types for this repository
+```
+
+**Root Cause:** GitHub Codespaces feature is NOT enabled for the repository yet. This is a GitHub org-level setting that requires manual activation.
+
+### Required Action (by Tamir)
+
+1. Navigate to: `https://github.com/tamirdresher_microsoft/tamresearch1/settings/codespaces`
+2. Enable "GitHub Codespaces"
+3. Verify machine types are available (minimum: 2-core, 4-core standard)
+4. Once enabled, notify B'Elanna to proceed with automation
+
+### Why This Matters (Decision 1.1 Application)
+
+**User-Facing Explanation:** GitHub Codespaces is a cloud development environment feature that GitHub must explicitly enable for each repository. Even though we've created the configuration files (PR #171), GitHub won't provision containers until the feature is turned on in your repo's settings. This is a one-time admin action.
+
+### Label Applied
+
+- `status:pending-user` — Requires GitHub org configuration before automation can proceed
+
+---
+
+## Decision 17: Squad Issue Notification Workflow — SyntaxError Resolution
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**Status:** ✅ CLOSED  
+**Scope:** CI/CD & Squad Operations  
+**Related Issue:** #177
+
+### Root Cause
+
+The "Squad Issue Notification" workflow (`squad-issue-notify.yml`) was failing on all issue-closed events with a JavaScript syntax error. Line 38 contained an unescaped apostrophe in a JavaScript string literal:
+```javascript
+const agentMatch = lastComment.match(/(Picard|Data|B'Elanna|Seven|Worf)/i);
+```
+
+The apostrophe in `B'Elanna` terminated the single-quoted string prematurely, causing a parser error.
+
+### Decision
+
+**Fix at Source:** Escape the apostrophe in the regex pattern.
+
+### Action Taken
+
+- Fixed in commit 697632b (`.github/workflows/squad-issue-notify.yml`)
+- Escape sequence applied: `B\\'Elanna`
+- Issue closed with explanation
+- Project board updated to Done
+
+### Outcome
+
+The workflow now correctly parses agent names when processing closed issues and sends Teams notifications as intended.
+
+### Lessons & Recommendations
+
+1. **Inline JavaScript in GitHub Actions:** Always escape special characters in regex patterns used within GitHub Actions scripts
+2. **Test Automation:** Consider adding a linting step for inline scripts to prevent similar failures
+3. **Data's Review:** Review other `.github/workflows/*.yml` files for similar unescaped characters in inline scripts to prevent future failures
+
+---
+
+## Decision 18: Squad-IRL Community Contribution Strategy
+
+**Date:** January 2025  
+**Author:** Seven (Research & Docs)  
+**Status:** ✅ Implemented  
+**Scope:** Community Engagement & Reusability  
+**Related Issue:** #161
+
+### Context
+
+Squad research identified 8 high-impact use cases across DevOps, release management, and team coordination. These patterns address a gap in the community Squad-IRL library, which focuses primarily on consumer/commerce scenarios.
+
+### Decision
+
+**Publish all 8 use cases to bradygaster/Squad-IRL as GitHub issues formatted as user stories, sanitized of internal context, ready for community triage and contribution.**
+
+### Rationale
+
+1. **Market Gap:** Squad-IRL samples were enterprise/SaaS-focused; DevOps/infrastructure patterns were underrepresented.
+2. **Reusability:** These use cases are generic patterns that many engineering teams face, not org-specific.
+3. **Community Benefit:** Public issues lower barrier to contribution and establish clear scope for contributors.
+4. **Validation Without Commitment:** Issues remain community-owned; internal pilots can proceed independently.
+
+### Implementation Results
+
+- ✅ 8 public issues filed in bradygaster/Squad-IRL (bradygaster/Squad-IRL #1–#8)
+- ✅ All issues formatted as user stories with descriptions, workflows, team composition, tier classification
+- ✅ Sanitized of tamresearch1 refs, internal issue numbers, proprietary details
+- ✅ tamresearch1#161 closed with comment linking all 8 Squad-IRL issues
+- ✅ Project Board updated to "Done" status
+- ✅ Zero proprietary data leaked; context generalized appropriately
+
+### Outcomes
+
+- ✅ Stateful team coordination patterns available for public contribution
+- ✅ Community feedback loop established for pattern validation
+- ✅ Internal pilots and community contributions run in parallel (no blocking)
+
+### Future Considerations
+
+1. **Contributor Feedback:** Monitor Squad-IRL issue activity to prioritize internal pilots
+2. **Implementation Contribution:** If internal pilot succeeds, consider contributing agent code/samples to Squad-IRL
+3. **Tiering Validation:** Test whether Tier 1/2/3 classification aligns with community contributor interest
 - Build Squad Places integration *deeper* (agents discovering each other's decision traces is powerful)
 
 #### 2. Market Positioning

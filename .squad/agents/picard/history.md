@@ -40,6 +40,46 @@
 - Decision 1.1: Explanatory comments for pending-user status changes (adopted)
 - Merged Decision Inbox file into decisions.md
 - Orchestration logs created for all agents
+### 2026-03-08: Ralph Round 2 — PR Reviews #124/#125 & FedRAMP Scope Triage (#123)
+
+**Task:** Review and merge tech debt PRs from Data; triage FedRAMP scope question.
+
+**PR #125 — Consolidated Cache Telemetry Service:**
+- **APPROVED & MERGED** — Clean service consolidation
+- Middleware now delegates to ICacheTelemetryService (single source of truth)
+- Removed direct TelemetryClient/ILogger dependencies from middleware
+- Interface updated: added `method` and `responseAge` parameters
+- **Backward compatible:** Event properties identical to PR #117
+- **Architecture win:** Middleware has single responsibility, service is testable/reusable
+- Addresses tech debt I flagged in PR #117 review (middleware/service both tracking independently)
+
+**PR #124 — Config-Driven Endpoint Filtering:**
+- **APPROVED** but merge failed due to conflicts with PR #125
+- Good design: CacheTelemetryOptions with MonitoredEndpoints list in appsettings.json
+- Config changes without code deployment — addresses hardcoded path concern from PR #117
+- **Status:** Waiting for Data to rebase and resolve conflicts
+- Commented on PR with rebase guidance
+
+**Issue #123 — FedRAMP Scope Analysis:**
+- **Triage Decision:** Strategic scope question requiring Tamir input
+- **Analysis Delivered:**
+  - Documented massive FedRAMP investment: 13 PRs, 100+ files, 5-phase production rollout
+  - Identified scope concern: Production-grade work in "tamresearch1" (research repo name)
+  - Presented 3 scenarios: (A) Production system in wrong repo, (B) Reference architecture needing docs, (C) Scope creep from research to production
+  - Posted 4 clarifying questions for Tamir
+- **Labels Applied:** `squad:picard`, `status:pending-user`
+- **Directive Compliance (Issue #122):** Added explicit comment explaining what I need from Tamir before changing to pending-user
+
+**Key Patterns:**
+1. **Merge Order Matters:** PR #125 merged first, creating conflicts for PR #124. Both PRs modified CacheTelemetryMiddleware.cs in different ways.
+2. **Scope Alignment:** When work doesn't match repo charter (research vs. production), escalate to user for clarification. Don't assume intent.
+3. **FedRAMP Context:** This project has deep FedRAMP investment across infrastructure, API, UI, alerting, training, sovereign rollout — far beyond typical research scope.
+
+**Deliverables:**
+- PR #125 merged successfully
+- PR #124 approved with rebase guidance
+- Issue #123 triaged with comprehensive analysis
+- Teams update digest created: `.squad/digests/teams-update-ralph-round2.md`
 
 ---
 
@@ -312,6 +352,39 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 
 **2. Determinism as Non-Negotiable**
 - For any LLM pipeline where downstream decisions depend on classifier output, treat prompts as code
+
+---
+
+### 2026-03-08: FedRAMP Repo Migration Decision — Issue #123 Resolution
+
+**Context:** Tamir questioned FedRAMP scope in Issue #123 ("do we really need to deal with all this fedramp stuff?"). Initial analysis revealed massive investment (13 PRs, 100+ files, 5-phase rollout) in what appeared to be production-grade work within a research repo.
+
+**User Direction Received:**
+- "I dont mind having this extra project if we define it well, its purpose. But it should probably be moved to another repo and manged indepndently"
+
+**Actions Taken:**
+1. **Commented on Issue #123** — Acknowledged decision, confirmed FedRAMP work PAUSES in tamresearch1 until migration plan approved
+2. **Removed `status:pending-user` label** — Tamir responded; no longer waiting
+3. **Created Issue #127** — "Plan FedRAMP Dashboard migration to dedicated repository"
+   - Tasks: Define purpose, inventory what moves, design new repo structure
+   - Labels: squad, squad:picard
+
+**Decision Written:** `.squad/decisions/inbox/picard-fedramp-scope-decision.md`
+
+**Key Architectural Insight:**
+- **Scope Alignment Matters:** Production-grade systems deserve dedicated repos with proper governance
+- **Research vs. Production Signal:** When work exhibits deployment pipelines, PagerDuty integration, sovereign cloud configs, UAT plans — it's production, not research
+- **Migration Strategy:** Pause → Plan → Define Purpose → Execute migration (not immediate move)
+
+**Post-Merge Assessment (PRs #125, #124, #118, #117, #108, #107):**
+- **No new issues needed:** Issue #126 covers validation, Issue #116 covers cache review
+- **Deployment blocked by CI (#110):** Don't create deployment issues until CI restored
+- **Merged work validated:** Cache telemetry consolidation (#125) and config-driven filtering (#124) both deliver on tech debt from PR #117 reviews
+
+**Decision Pattern:**
+- When user signals strategic redirection, execute immediately: acknowledge, clarify next steps, create tracking issue
+- Pause ongoing work in affected area until plan approved (don't continue FedRAMP PRs)
+- Document decision in decisions inbox for team awareness
 - Test fixtures + regression testing move classification from "interesting experiment" → "production intelligence"
 - The 70% → 94% consistency jump is typical for this pattern
 
@@ -1240,3 +1313,32 @@ Squad's work is operationally driven: real incidents (#46 from Teams Bridge), im
 - PR #102: https://github.com/tamirdresher_microsoft/tamresearch1/pull/102#issuecomment-4017776364
 
 **Note:** Could not formally approve via GitHub (cannot approve own PRs limitation). Posted detailed review comments with approval recommendation instead.
+
+### 2026-03-12: PR Review Comment Audit Complete — Post-CI Validation Established
+
+**Charter Task:** PR review action item verification + post-CI restoration issue creation.
+
+**Audit Results:**
+
+**PR #117 (Cache Telemetry)** - Action items ✅ TRACKED
+- "Duplicate cache tracking" → Issue #120 (CLOSED, resolved by PR #125)
+- "Path filtering hardcoded" → Issue #121 (CLOSED, resolved by PR #124)
+
+**PR #118 (AlertHelper Tests)** - Action items ✅ TRACKED
+- "Refactor tests post-Functions build fix" → Issue #119 (OPEN, blocked on #110)
+
+**PR #108 (Caching SLI)** - Action items ✅ TRACKED
+- "Deploy cache alert to all environments" → Issue #113 (CLOSED)
+- "Explicit cache telemetry (Age header)" → Issue #115 (CLOSED, resolved by PR #117)
+- "Schedule April 2026 cache review" → Issue #116 (OPEN)
+
+**Post-CI Restoration Issue Created:**
+- **Issue #126:** "Post-CI Restoration: Full validation of all PRs merged during CI outage"
+- Lists all 15 PRs (#92-#125) with component breakdown
+- Marked blocked on Issue #110 (CI outage)
+- Assigned to squad:data team for test execution when CI is restored
+- Includes validation criteria: regression testing, cache hit rate verification, load test validation
+
+**Findings:** All PR review comments have corresponding tracked issues. No orphaned action items discovered. The audit trail is complete and actionable.
+
+**Decision:** Squad:data owns post-CI validation gate. This prevents silent regressions from 34+ days of unvalidated deployments.

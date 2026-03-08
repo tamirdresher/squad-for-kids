@@ -28,6 +28,31 @@ When primary data source (repository, database, API) is inaccessible, perform a 
 
 ---
 
+## Decision 1.1: Explanatory Comments for pending-user Status Changes
+
+**Date:** 2026-03-08  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Issue Management
+
+Always add a comment to an issue explaining **WHY** when changing its label to `status:pending-user`. Never change the label without adding a comment so the user knows what is needed from them.
+
+**Applies to:** All pending-user label assignments across the repository  
+**Does NOT apply when:** Label is being removed (transitioning away from pending-user)
+
+**Rationale:**  
+- User request to improve communication — ensure users understand why their issue is blocked waiting on their input
+- Example incident: Issue #109 had pending-user label changed without explanation, causing confusion
+
+**Consequences:**
+- ✅ Improved user experience and clarity
+- ✅ Reduces user confusion about action items
+- ✅ Creates clear audit trail of what was requested
+
+**Related:** Issue #122 (directive source); Issue #109 (incident that prompted directive)
+
+---
+
 ## Decision 2: Infrastructure Patterns for idk8s-infrastructure
 
 **Date:** 2026-03-02  
@@ -5806,4 +5831,398 @@ Both PRs approved for merge. Deployment follows manual runbook per Issue #113 (c
 
 **Decider:** Picard (Lead)  
 **Approved:** 2026-03-08
+
+
+---
+
+## Decision: Devbox as Self-Hosted Runner for CI
+
+**Date:** 2026-03-08  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Status:** Proposed  
+**Context:** Issues #103, #110
+
+### Problem
+
+EMU personal repos cannot provision GitHub-hosted runners, causing all CI workflows to fail. Tamir cannot move to an organization and needs CI working.
+
+### Decision
+
+Use a devbox as a self-hosted GitHub Actions runner.
+
+### Rationale
+
+1. **EMU Limitation is Fundamental:** EMU accounts on personal repos cannot use GitHub-hosted runners with Actions minutes. This is not a configuration issue—it's a platform restriction.
+
+2. **Self-Hosted Runner Bypasses Restriction:** Self-hosted runners don't use GitHub's compute allocation, so EMU restrictions don't apply.
+
+3. **Devbox is Already Available:** Organization likely has Dev Box pools provisioned. No additional infrastructure procurement needed.
+
+4. **Quick Setup:** Runner registration takes ~15 minutes once devbox is provisioned.
+
+5. **Dual Purpose:** Devbox serves as both development environment and CI infrastructure.
+
+### Implementation
+
+#### Phase 1: Devbox Provisioning (Issue #103)
+- Use Azure Portal (portal.azure.com) to create devbox
+- CLI may fail due to EMU extension marketplace restrictions
+- Alternative: Check existing pools with z devcenter dev dev-box list
+
+#### Phase 2: Self-Hosted Runner Setup (Issue #110)
+1. Get registration token via GitHub API
+2. Download GitHub Actions runner (Windows x64 v2.311.0)
+3. Configure with repository URL and token
+4. Run as service
+
+#### Phase 3: Workflow Updates
+- Change uns-on: ubuntu-latest to uns-on: self-hosted
+- Test with existing workflows
+- No other changes needed
+
+### Alternatives Considered
+
+1. **Move to Organization:** Rejected—Tamir cannot move repos per organizational policy
+2. **Use Codespaces:** Similar to devbox but less persistent; devbox preferred
+3. **Wait for EMU Fix:** No timeline; blocks all work
+4. **Run Tests Locally:** Not sustainable for team collaboration
+
+### Risks
+
+1. **Devbox Downtime:** If devbox stops, CI stops. Mitigation: Keep devbox running, set up auto-restart.
+2. **Security:** Self-hosted runners have broader access. Mitigation: Standard GitHub runner security practices.
+3. **Maintenance:** Runner updates needed periodically. Mitigation: GitHub notifies when updates available.
+
+### Success Criteria
+
+- [ ] Devbox provisioned and accessible
+- [ ] Self-hosted runner registered and online
+- [ ] At least one workflow runs successfully
+- [ ] Team can trigger builds via push/PR
+
+### Next Actions
+
+1. Tamir provisions devbox (Issue #103)
+2. B'Elanna assists with runner setup if needed
+3. Test with simple workflow
+4. Roll out to all workflows
+
+### Related
+
+- Issue #103: Create a devbox
+- Issue #110: CI broken (EMU runner provisioning)
+- [GitHub Docs: Self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners)
+
+---
+
+## Decision: FedRAMP Scope — Production vs. Research Repo Alignment
+
+**Date:** 2026-03-08  
+**Author:** Picard (Lead)  
+**Issue:** #123  
+**Status:** Pending User Decision
+
+### Context
+
+Tamir asked: **"Do we really need to deal with all this FedRAMP stuff? Should this squad do it?"**
+
+This question surfaced after observing significant FedRAMP-related work in the repository.
+
+### Findings
+
+#### FedRAMP Work Scope Assessment
+
+**Significant Investment Identified:**
+- 13 merged PRs implementing FedRAMP Dashboard
+- 100+ files across /docs/fedramp/, /api/, /functions/, /infrastructure/, /tests/
+- 5-phase production rollout: Data Pipeline → API/RBAC → React UI → Alerting → UAT/Training/Rollout
+- Production artifacts: EV2 deployment, sovereign cloud configs, PagerDuty/Teams integrations
+- Security hardening: P0 vulnerability assessments, compensating controls, network policies
+
+**Work Characteristics:**
+- **Production-grade:** UAT plans, training docs, progressive rollout (10%→25%→50%→100%)
+- **Enterprise-level:** Multi-tenant RBAC, Cosmos DB, Log Analytics, Application Insights
+- **Operational:** PagerDuty integration, Teams notifications, monthly review templates
+- **Compliance-focused:** FedRAMP control validation, drift detection, audit trails
+
+#### Scope Misalignment Concern
+
+**Repository Name:** "tamresearch1" suggests research/prototyping  
+**Squad Charter:** "Research and analysis team covering infrastructure, security, cloud native, and development"  
+**Actual Work:** Production platform development with operational responsibility
+
+**Red Flags:**
+1. Research repos shouldn't have production EV2 deployment scripts
+2. Squad charter says "research" but work is "product development"
+3. Sovereign cloud rollout plans suggest actual production usage
+4. UAT and training materials imply end-user customers
+
+### Decision Options Presented to User
+
+#### Option 1: Reposition as Production System
+- Transfer FedRAMP dashboard to proper platform repo (e.g., dk8s-infrastructure)
+- Hand off to platform team for operational ownership
+- Squad returns to R&D focus
+
+#### Option 2: Rebrand as Reference Architecture
+- Continue work but document as "FedRAMP Dashboard Reference Implementation"
+- Archive after completion as blueprint for other teams
+- Squad documents learnings, not maintains production
+
+#### Option 3: Retrospective on Scope Creep
+- Pause FedRAMP work
+- Conduct retrospective: How did research become production?
+- Decide if squad should own product delivery or return to R&D
+
+### Questions for User (Tamir)
+
+1. **Is tamresearch1 a production system or research prototype?**
+2. **Should this squad be building/maintaining a FedRAMP dashboard?**
+3. **Who is the customer for this dashboard?** (Platform team? Tenants? Auditors?)
+4. **Do you want us to continue, pause, or hand off this work?**
+
+### Impact on Squad
+
+**If Production:**
+- Squad charter needs updating: Research → Product Development
+- Operational responsibility: On-call rotation, incident response, SLA commitments
+- Reduced capacity for exploratory research work
+
+**If Reference Architecture:**
+- Time-boxed: Document and archive after completion
+- Knowledge transfer to actual implementation teams
+- Squad can return to research mode after handoff
+
+**If Scope Creep:**
+- Need to realign squad purpose
+- Establish clearer boundaries between R&D and production work
+- May need to spin off FedRAMP work to dedicated team
+
+### Recommendation
+
+**Primary Recommendation:** Clarify repo purpose before continuing any FedRAMP work.
+
+If repo purpose remains unclear, default to **Option 2 (Reference Architecture)**:
+- Rebrand as blueprint/reference implementation
+- Complete current phase (if nearly done)
+- Archive with comprehensive documentation
+- Hand off design to platform team for actual production build
+
+**Rationale:** Reference architectures align with "research" charter while preserving investment. Avoids long-term operational burden.
+
+### Related Context
+
+- **Issue #51:** FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md — P0 security assessment for production
+- **PRs #94-#98:** 5-phase FedRAMP Dashboard implementation
+- **Issue #89:** Performance baseline & sovereign rollout execution plan
+- **Issue #106:** Caching SLI monitoring (production SLO: 70% cache hit rate)
+
+### Next Steps
+
+1. **Waiting:** User response on Issue #123 clarifying repo purpose
+2. **After User Input:** Update squad charter to match actual scope
+3. **Routing:** Direct future FedRAMP work based on decision (continue/pause/handoff)
+
+### Status
+
+**Pending User Decision** — Cannot proceed with FedRAMP scope until Tamir clarifies repo purpose and squad role.
+
+---
+
+## Decision: Post-CI Restoration Validation Gate
+
+**Date:** 2026-03-12  
+**Decider:** Picard (Lead)  
+**Status:** DECIDED  
+**Issue:** #126
+
+### Decision
+
+Established Issue #126 as the post-CI restoration validation gate. When CI is restored (Issue #110 resolved), the squad:data team will execute a full test suite run against all 15 PRs merged during the CI outage (PR #92-#125).
+
+### Rationale
+
+**Risk Profile:**
+- 34+ days of unvalidated code merged across 15 PRs
+- Mix of critical components: FedRAMP pipeline, API security hardening, alerting, cache telemetry, UI
+- PR #102 introduced security parameterization that needs load validation
+- PR #101 alerting changes need throughput verification
+
+**Governance:**
+- All PR review action items verified as tracked (Issues #113-#121)
+- No orphaned review comments or untracked action items discovered
+- Validation responsibilities explicitly assigned to squad:data
+
+**Success Criteria:**
+1. Full test suite passes with no regressions
+2. PR #102 cache hit rate ≥75% validated in staging
+3. PR #101 load test (500+ alerts/hour) re-verified
+4. Any failures trigger post-mortem + rollback plan
+
+### Implementation
+
+- Issue #126 links all 15 affected PRs
+- Blocked on #110 (automatically lifts when CI restored)
+- Labeled squad:data for team visibility
+- No blocking—allows work to proceed on other issues while awaiting CI fix
+
+### Alternatives Considered
+
+1. **Immediate rollback of all PRs** — Rejected. Code quality reviews passed; CI outage is infrastructure issue, not code issue.
+2. **Partial validation (select PRs only)** — Rejected. 15 PRs are interdependent (cache telemetry depends on monitoring, alerting depends on code quality fixes).
+3. **Skip validation** — Rejected. 34 days of unvalidated code in production components is unacceptable risk.
+
+---
+
+## Decision 21: FedRAMP Repo Migration — Issue #123
+
+**Date:** 2026-03-08  
+**Author:** Picard (Lead) via Issue #123 confirmation  
+**Status:** ✅ Adopted  
+**Scope:** Repository Organization, Project Structure  
+**Related:** Issue #127 (Migration Plan)
+
+### Decision
+
+FedRAMP dashboard project is valid but should be moved to a dedicated repository and managed independently from tamresearch1. Existing code stays in tamresearch1 until migration plan is approved and executed.
+
+### Rationale
+
+- **tamresearch1 is a research repo.** FedRAMP dashboard has grown into production-grade work that deserves its own repo with proper governance.
+- **Production code deserves production structure.** Dedicated repo enables independent versioning, release management, deployment pipelines, and access control.
+- **Separation of concerns.** Squad infrastructure (.squad/, decisions, agents) stays in tamresearch1; FedRAMP code migrates to dedicated repo.
+
+### What This Means
+
+1. **Code stays in tamresearch1 for now** — No disruption to current work
+2. **Migration plan required** — Issue #127 created for detailed migration steps
+3. **FedRAMP work pauses** pending migration plan approval
+4. **After approval:** Code copied to new repo, migrated incrementally, old code removed from tamresearch1
+
+### Timeline
+
+- **Week 1-2:** Migration plan drafted (Issue #127)
+- **Week 2-3:** Team review and approval
+- **Week 3-4:** Execute migration
+- **Week 4+:** FedRAMP work resumes in dedicated repo
+
+### Impact
+
+- ✅ FedRAMP code gets dedicated production home
+- ✅ tamresearch1 stays focused on squad infrastructure
+- ✅ Clear separation enables independent FedRAMP governance
+- ⚠️ Requires careful coordinated move (dependencies, history preservation)
+- ⚠️ Cross-repo linking discipline needed (prevent orphaned references)
+
+### Next Steps
+
+1. Picard: Comment on Issue #123 confirming decision + referencing this decision entry
+2. Picard: Create detailed migration plan (Issue #127)
+3. Team: Review migration plan
+4. Picard: Execute migration upon approval
+
+---
+
+---
+
+
+
+---
+
+# Decision: Azure CLI Extension Installation Blocked — Manual Path Forward
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna  
+**Status:** Proposed  
+**Related Issues:** #103, #110  
+
+## Context
+
+Issue #103 requires devbox creation for self-hosted GitHub Actions runner. Azure CLI `devcenter` extension installation fails consistently with Windows registry error during pip installation:
+
+```
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+winreg.QueryValueEx(key, 'CSIDL_COMMON_APPDATA')
+```
+
+Multiple installation methods attempted:
+- `az extension add --source <blob URL>` → 404 error
+- `az extension add --name devcenter` → pip registry failure
+- Direct pip install to extensions path → same registry error
+
+**Root Cause:** Azure CLI's embedded Python (v3.12.8) pip module can't access Windows registry `CSIDL_COMMON_APPDATA` value. This is a pip/platformdirs library bug in the Azure CLI environment, not a DevCenter service issue.
+
+**Additional Blocker:** No DevCenter resources provisioned in subscription `c5d1c552-a815-4fc8-b12d-ab444e3225b1`. Even if CLI worked, no dev centers/projects/pools exist to create devboxes from.
+
+## Decision
+
+**Escalate to manual devbox creation** via Azure Portal (https://devbox.microsoft.com/) rather than attempting further CLI workarounds.
+
+## Rationale
+
+1. **CLI Extension is Not Critical Path:** Azure REST API (`az rest`) can query DevCenter resources, but creates no value without provisioned infrastructure
+
+2. **Infrastructure Provisioning is Prerequisite:** DevCenter resources require:
+   - DevCenter resource creation
+   - Project with dev box pool configuration
+   - Virtual network connection
+   - Dev box definition (image + SKU)
+   
+   These are administrative provisioning tasks typically done via Portal/IaC, not CLI extensions.
+
+3. **Manual Creation is Reliable:** Azure Portal devbox creation workflow doesn't depend on CLI extensions or pip environment
+
+4. **Time to Value:** Waiting for Microsoft to fix pip/registry bug in Azure CLI is unbounded. Manual creation unblocks Issue #103 → #110 → #126 → Teams notifications pipeline immediately.
+
+## Alternatives Considered
+
+### Alternative 1: Fix Azure CLI pip Environment
+**Approach:** Repair Windows registry `CSIDL_COMMON_APPDATA` or reinstall Azure CLI  
+**Rejected Because:** 
+- Registry fix requires admin privileges, may break other apps
+- Azure CLI reinstall doesn't guarantee pip/platformdirs fix
+- Still blocked on infrastructure provisioning
+
+### Alternative 2: Use Python Requests Library
+**Approach:** Bypass Azure CLI entirely, call DevCenter REST API directly with Python requests + Azure auth  
+**Rejected Because:**
+- Still requires DevCenter infrastructure to exist
+- Adds dependency management complexity (pip install requests, azure-identity)
+- REST API auth token management more complex than manual Portal workflow
+
+### Alternative 3: Provision Infrastructure via Bicep/ARM
+**Approach:** Deploy DevCenter resources via IaC templates  
+**Rejected Because:**
+- Requires Azure subscription permissions to create DevCenter resources
+- DevCenter provisioning is typically centralized by Azure admins (cost/governance)
+- Doesn't solve immediate devbox creation need
+
+## Consequences
+
+### Positive
+- ✅ Unblocks Issue #103 immediately (manual devbox creation works today)
+- ✅ No dependency on Azure CLI bug fixes or infrastructure provisioning timelines
+- ✅ Portal workflow is documented, repeatable, and supported
+- ✅ Provides Tamir with clear decision matrix (manual vs. org transfer vs. wait)
+
+### Negative
+- ❌ Manual process not scriptable/automatable
+- ❌ Doesn't solve underlying CLI extension bug (affects future devcenter commands)
+- ❌ Requires human intervention for each devbox creation
+
+### Neutral
+- ⚖️ If devbox creation becomes recurring need, consider:
+  - Repository transfer to organization namespace (50k free Actions minutes, no devbox needed)
+  - Azure admin provisioning of DevCenter infrastructure + CLI bug escalation to Microsoft
+
+## Action Items
+
+- [x] Document findings in Issue #103 comment
+- [x] Provide manual devbox creation instructions + runner setup steps
+- [ ] **[TAMIR]** Choose path: manual creation, org transfer, or infrastructure provisioning
+- [ ] **[BELANNA]** Execute chosen path to unblock Issue #110 → #126
+
+## Notes
+
+This decision documents why we're **not** pursuing CLI workarounds and instead recommending manual/organizational solutions. Pattern: when tooling AND infrastructure are both blocked, escalate to human decision-making rather than engineering around dual blockers.
 

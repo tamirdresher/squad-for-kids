@@ -340,6 +340,51 @@ triggers:
 
 ---
 
+### 2026-03-12: Issue #103 — DevBox Creation Blocked by Azure CLI Extension Failure
+
+**Task:** Create devbox for GitHub Actions self-hosted runner (critical path: #103 → #110 → #126 → Teams notifications).
+
+**Investigation Results:**
+
+1. **Azure CLI Extension Failure (Primary):**
+   - Both `az extension add --source <URL>` and `az extension add --name devcenter` fail with:
+     ```
+     FileNotFoundError: [WinError 2] The system cannot find the file specified
+     winreg.QueryValueEx(key, 'CSIDL_COMMON_APPDATA')
+     ```
+   - Root cause: pip can't access Windows registry values during extension installation
+   - This is a **pip/Windows environment bug** in Azure CLI's embedded Python, not a DevCenter service issue
+
+2. **Missing DevCenter Infrastructure (Blocker):**
+   - Verified no DevCenter resources exist in subscription `c5d1c552-a815-4fc8-b12d-ab444e3225b1`
+   - REST API calls confirm: `az resource list --resource-type "Microsoft.DevCenter/devcenters"` returns empty
+   - Even if CLI worked, no provisioned dev centers/projects/pools to create devboxes from
+
+3. **REST API Alternative Attempted:**
+   - Tried direct REST API calls via `az rest` to bypass extension requirement
+   - Works for listing resources (confirmed no dev centers), but can't create devboxes without infrastructure
+
+**Decision: Escalate to Manual Path**
+
+Since both CLI and infrastructure are blocked, provided Tamir with three options:
+1. **Manual devbox creation** via https://devbox.microsoft.com/ + self-hosted runner setup (detailed instructions in Issue #103 comment)
+2. **Transfer repo to organization namespace** (solves both #103 and #110 EMU restrictions, 50k free Actions minutes)
+3. **Wait for Azure admin** to provision DevCenter infrastructure + fix CLI pip issue
+
+**Deliverable:**
+- Comprehensive comment on Issue #103 with diagnostic findings, manual setup instructions, and alternative paths
+- Self-hosted runner registration steps from Issue #110 research integrated into guidance
+- Portal URL and step-by-step workflow for manual devbox creation
+
+**Pattern Learned:**
+When both tooling (CLI) and infrastructure (DevCenter) are unavailable, provide clear manual path forward with decision matrix rather than waiting indefinitely. Infrastructure provisioning is often a separate approval/procurement process outside technical control.
+
+**Next Steps:**
+- Waiting on Tamir's decision: manual creation, repo transfer, or infrastructure provisioning
+- Once devbox or organization runner available, Issue #110 → #126 pipeline unblocks
+
+---
+
 ### 2026-03-11: Issue #35 — Dev Box Provisioning Phase 1 Complete
 
 **Task:** Create Phase 1 scaffolding for DevBox provisioning infrastructure — Bicep templates, PowerShell scripts, documentation. Issue context: Tamir approved proceeding with two-phase approach (Phase 1 = IaC repo, Phase 2 = Squad skill).
@@ -1889,5 +1934,71 @@ When delivering post-merge deployment work:
 - #110: CI/CD blocker (open)
 - #116: April 2026 cache review (scheduled)
 - #106: Original cache monitoring issue (closed)
+
+---
+
+## 2026-03-08: Devbox and Self-Hosted Runner Strategy (Issues #103, #110)
+
+**Context:**
+Tamir hit two related blockers:
+1. Issue #103: Cannot install `az devcenter` extension (EMU account restrictions)
+2. Issue #110: All CI workflows failing (EMU personal repos can't provision GitHub-hosted runners)
+
+**Recommendations Provided:**
+
+### Issue #103: Devbox Provisioning
+EMU accounts have restricted Azure CLI extension marketplace access. Recommended four options:
+1. Add `--allow-preview true` flag
+2. Install from direct URL: `https://azcliprod.blob.core.windows.net/cli-extensions/devcenter-latest-py3-none-any.whl`
+3. **Use Azure Portal** (recommended for EMU): Navigate to portal.azure.com and create devbox via UI
+4. Check existing Dev Box pools: `az devcenter dev dev-box list`
+
+### Issue #110: CI Fix via Self-Hosted Runner
+EMU personal repos fundamentally cannot use GitHub-hosted runners with Actions minutes. Solution: **devbox as self-hosted runner**.
+
+**Implementation Plan:**
+1. Get runner registration token: `gh api -X POST repos/.../actions/runners/registration-token --jq .token`
+2. Download GitHub Actions runner in devbox (v2.311.0 for Windows)
+3. Configure runner with token: `./config.cmd --url ... --token ...`
+4. Run as service: `./run.cmd`
+5. Update workflows to use `runs-on: self-hosted`
+
+**Why This Works:**
+- Self-hosted runners bypass EMU GitHub-hosted runner restrictions entirely
+- Devbox provides persistent compute environment
+- 15-minute setup once devbox is provisioned
+- Immediate CI restoration
+
+**Learnings:**
+
+1. **EMU Account Limitations:**
+   - EMU accounts on personal repos cannot use GitHub-hosted runners
+   - Azure CLI extension marketplace may be restricted
+   - Azure Portal is more reliable than CLI for EMU users
+   - Organization may pre-provision Dev Box pools
+
+2. **Self-Hosted Runner as Infrastructure Solution:**
+   When GitHub-hosted runners are unavailable:
+   - Self-hosted runner is the only viable CI solution
+   - Requires persistent compute (VM, devbox, codespace)
+   - Runner registration via GitHub API is straightforward
+   - Workflows need minimal changes (`runs-on: self-hosted`)
+
+3. **Devbox as Development Infrastructure:**
+   Devboxes serve dual purpose:
+   - Development environment (IDE, tools, dependencies)
+   - CI/CD infrastructure (self-hosted runner host)
+   - Already provisioned and managed by organization
+   - No additional infrastructure costs
+
+**Next Steps:**
+1. Tamir provisions devbox (Issue #103)
+2. Set up self-hosted runner in devbox (15 min)
+3. Update workflows to use `runs-on: self-hosted`
+4. CI fully operational
+
+**Related Issues:**
+- #103: Devbox provisioning (open)
+- #110: CI broken (open)
 
 ---

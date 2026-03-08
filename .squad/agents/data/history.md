@@ -1783,3 +1783,72 @@ This is now a standing directive for all agents, documented in the teams-monitor
 5. Deploy to staging → prod after validation
 
 ---
+
+### 2026-03-10: Issue #128 — Ralph Watch Observability/Telemetry
+
+**Task**: Add comprehensive observability features to `ralph-watch.ps1` for production monitoring and incident response.
+
+**Requirements**:
+1. Structured log file with round results (timestamp, exit code, duration)
+2. Heartbeat JSON for staleness detection
+3. Teams alerts on consecutive failures (>3)
+4. Track consecutive failures and exit codes
+
+**Implementation** (ralph-watch.ps1 v7):
+
+**1. Structured Logging** (`C:\Users\tamirdresher\.squad\ralph-watch.log`)
+- Append-only format: `Timestamp | Round=N | ExitCode=X | Duration=Xs | Failures=N | Status=SUCCESS/FAILED/ERROR`
+- One line per round, UTF-8 encoding
+- Log file initialized on first run with header comment
+
+**2. Heartbeat File** (`C:\Users\tamirdresher\.squad\ralph-heartbeat.json`)
+```json
+{
+  "lastRun": "2026-03-10T14:35:22",
+  "round": 42,
+  "exitCode": 0,
+  "durationSeconds": 187.45,
+  "consecutiveFailures": 0
+}
+```
+- Updated every round for external monitoring (squad-monitor integration)
+- ISO 8601 timestamp format for parsing
+
+**3. Teams Alerts** (consecutive failures >3)
+- Reads webhook URL from `C:\Users\tamirdresher\.squad\teams-webhook.url`
+- Sends MessageCard with: round, consecutive failures, exit code, timestamp
+- Graceful degradation if webhook file missing or empty (logs warning, continues)
+- MessageCard format compatible with Office 365 connectors
+
+**4. Exit Code Tracking**
+- Captures `0` from `agency copilot` command
+- Resets consecutive failure counter on success (exit code 0)
+- Distinguishes: SUCCESS (0), FAILED (non-zero exit), ERROR (exception)
+
+**5. Duration Tracking**
+- Start/end timestamps captured with `Get-Date`
+- Duration displayed in console summary and logged
+- Performance metric for identifying slow rounds
+
+**Key Design Decisions**:
+1. **Dynamic path resolution**: Uses `C:\Users\tamirdresher` not hardcoded paths for portability
+2. **Additive observability**: All existing behavior preserved, telemetry is pure add-on
+3. **Graceful degradation**: Missing webhook file doesn't crash script, just logs warning
+4. **Pipe-delimited logs**: Simple parsing for external tools (grep, awk, PowerShell)
+5. **JSON heartbeat**: Standard format for machine consumption by squad-monitor
+
+**Files Changed**: 1
+- `ralph-watch.ps1` — 154 lines added (v6 → v7)
+
+**Branch**: squad/128-ralph-watch-observability
+**PR**: #130
+**Outcome**: Complete observability stack for Ralph production deployment. Ready for integration with squad-monitor dashboard.
+
+**Procedural Insights**:
+1. **Observability as a feature**: Telemetry should be designed at the start, not bolted on later. This retrofit was clean because the loop structure was simple.
+2. **Exit code semantics**: Distinguish between "completed with non-zero exit" (FAILED) vs "threw exception" (ERROR) for better root cause analysis.
+3. **Heartbeat pattern**: JSON file with last-run timestamp is simple staleness detection mechanism. Better than database/API for lightweight processes.
+4. **Teams webhook security**: Webhook URLs are secrets. Store in file not code. Graceful degradation means missing webhook doesn't break the loop.
+5. **Consecutive failure threshold**: >3 prevents alert fatigue from transient failures (network blips, pod restarts). Adjust based on observed failure patterns.
+
+---

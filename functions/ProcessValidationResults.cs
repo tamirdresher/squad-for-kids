@@ -55,40 +55,72 @@ namespace FedRampDashboard.Functions
         public async Task RunAsync(
             [EventGridTrigger] EventGridEvent eventGridEvent)
         {
+            var startTime = DateTime.UtcNow;
+            
             try
             {
-                _logger.LogInformation("Processing validation result event: {EventId}", eventGridEvent.Id);
-                
-                // Parse event data
-                var validationResult = JsonSerializer.Deserialize<ValidationResult>(eventGridEvent.Data.ToString());
-                
-                if (validationResult == null)
+                using (_logger.BeginScope(new Dictionary<string, object>
                 {
-                    _logger.LogWarning("Failed to parse validation result from event {EventId}", eventGridEvent.Id);
-                    return;
-                }
-                
-                // Transform to Cosmos DB document
-                var cosmosDocument = TransformToCosmosDocument(validationResult);
-                
-                // Write to Cosmos DB
-                await WriteToCosmosDbAsync(cosmosDocument);
-                
-                // Write to Log Analytics (if configured)
-                if (_logsClient != null)
+                    ["EventId"] = eventGridEvent.Id,
+                    ["EventType"] = eventGridEvent.EventType
+                }))
                 {
-                    await WriteToLogAnalyticsAsync(validationResult);
+                    _logger.LogInformation(
+                        "Processing validation result event: EventId={EventId}, EventType={EventType}",
+                        eventGridEvent.Id, eventGridEvent.EventType);
+                    
+                    // Parse event data
+                    var validationResult = JsonSerializer.Deserialize<ValidationResult>(eventGridEvent.Data.ToString());
+                    
+                    if (validationResult == null)
+                    {
+                        _logger.LogWarning("Failed to parse validation result from event {EventId}", eventGridEvent.Id);
+                        return;
+                    }
+                    
+                    using (_logger.BeginScope(new Dictionary<string, object>
+                    {
+                        ["ControlId"] = validationResult.ControlId,
+                        ["Environment"] = validationResult.Environment,
+                        ["Status"] = validationResult.Status
+                    }))
+                    {
+                        _logger.LogInformation(
+                            "Validation result parsed: ControlId={ControlId}, Environment={Environment}, Status={Status}, TestName={TestName}",
+                            validationResult.ControlId, validationResult.Environment, 
+                            validationResult.Status, validationResult.TestName);
+                        
+                        // Transform to Cosmos DB document
+                        var cosmosDocument = TransformToCosmosDocument(validationResult);
+                        
+                        // Write to Cosmos DB
+                        var cosmosStart = DateTime.UtcNow;
+                        await WriteToCosmosDbAsync(cosmosDocument);
+                        var cosmosDuration = (DateTime.UtcNow - cosmosStart).TotalMilliseconds;
+                        _logger.LogInformation("Cosmos DB write completed in {Duration}ms", cosmosDuration);
+                        
+                        // Write to Log Analytics (if configured)
+                        if (_logsClient != null)
+                        {
+                            var logAnalyticsStart = DateTime.UtcNow;
+                            await WriteToLogAnalyticsAsync(validationResult);
+                            var logAnalyticsDuration = (DateTime.UtcNow - logAnalyticsStart).TotalMilliseconds;
+                            _logger.LogInformation("Log Analytics write completed in {Duration}ms", logAnalyticsDuration);
+                        }
+                        
+                        var totalDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                        _logger.LogInformation(
+                            "Successfully processed validation result: ControlId={ControlId}, TestName={TestName}, Status={Status}, TotalDuration={Duration}ms",
+                            validationResult.ControlId, validationResult.TestName, validationResult.Status, totalDuration);
+                    }
                 }
-                
-                _logger.LogInformation(
-                    "Successfully processed validation result: {ControlId}/{TestName} [{Status}]",
-                    validationResult.ControlId,
-                    validationResult.TestName,
-                    validationResult.Status);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing validation result event {EventId}", eventGridEvent.Id);
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                _logger.LogError(ex, 
+                    "Error processing validation result event: EventId={EventId}, Duration={Duration}ms", 
+                    eventGridEvent.Id, duration);
                 throw; // Trigger retry via Azure Functions runtime
             }
         }
@@ -101,6 +133,8 @@ namespace FedRampDashboard.Functions
         public async Task<HttpResponseData> SubmitAsync(
             [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
+            var startTime = DateTime.UtcNow;
+            
             try
             {
                 _logger.LogInformation("Received HTTP validation result submission");
@@ -110,33 +144,56 @@ namespace FedRampDashboard.Functions
                 
                 if (validationResult == null)
                 {
+                    _logger.LogWarning("Invalid validation result JSON received");
                     var badRequestResponse = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
                     await badRequestResponse.WriteStringAsync("Invalid validation result JSON");
                     return badRequestResponse;
                 }
                 
-                // Transform and store
-                var cosmosDocument = TransformToCosmosDocument(validationResult);
-                await WriteToCosmosDbAsync(cosmosDocument);
-                
-                if (_logsClient != null)
+                using (_logger.BeginScope(new Dictionary<string, object>
                 {
-                    await WriteToLogAnalyticsAsync(validationResult);
+                    ["ControlId"] = validationResult.ControlId,
+                    ["Environment"] = validationResult.Environment,
+                    ["Status"] = validationResult.Status
+                }))
+                {
+                    _logger.LogInformation(
+                        "Processing validation result: ControlId={ControlId}, Environment={Environment}, Status={Status}",
+                        validationResult.ControlId, validationResult.Environment, validationResult.Status);
+                    
+                    // Transform and store
+                    var cosmosDocument = TransformToCosmosDocument(validationResult);
+                    await WriteToCosmosDbAsync(cosmosDocument);
+                    
+                    if (_logsClient != null)
+                    {
+                        await WriteToLogAnalyticsAsync(validationResult);
+                    }
+                    
+                    var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    _logger.LogInformation(
+                        "Validation result stored successfully: Id={Id}, Duration={Duration}ms",
+                        cosmosDocument.Id, duration);
+                    
+                    // Return success
+                    var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
+                    await response.WriteAsJsonAsync(new { 
+                        message = "Validation result stored successfully",
+                        id = cosmosDocument.Id,
+                        timestamp = cosmosDocument.Timestamp,
+                        processing_time_ms = duration
+                    });
+                    
+                    return response;
                 }
-                
-                // Return success
-                var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(new { 
-                    message = "Validation result stored successfully",
-                    id = cosmosDocument.Id,
-                    timestamp = cosmosDocument.Timestamp
-                });
-                
-                return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing HTTP validation result submission");
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                _logger.LogError(ex, 
+                    "Error processing HTTP validation result submission. Duration={Duration}ms", 
+                    duration);
+                
                 var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
                 await errorResponse.WriteStringAsync($"Error: {ex.Message}");
                 return errorResponse;

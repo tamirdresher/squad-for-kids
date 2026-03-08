@@ -67,29 +67,14 @@ namespace FedRampDashboard.Functions
 
         private string GetWebhookUrl(string severity)
         {
-            var key = severity switch
-            {
-                "P0" => "critical",
-                "P1" => "critical",
-                "P2" => "medium",
-                "P3" => "low",
-                _ => "medium"
-            };
-
+            var key = AlertHelper.SeverityMapping.ToTeamsWebhookKey(severity);
             _webhookUrls.TryGetValue(key, out var url);
             return url;
         }
 
         private object BuildAdaptiveCard(Alert alert)
         {
-            var color = alert.Severity switch
-            {
-                "P0" => "attention",
-                "P1" => "warning",
-                "P2" => "good",
-                "P3" => "default",
-                _ => "default"
-            };
+            var color = AlertHelper.SeverityMapping.ToTeamsCardStyle(alert.Severity);
 
             var body = new List<object>
             {

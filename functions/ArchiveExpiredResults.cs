@@ -53,44 +53,64 @@ namespace FedRampDashboard.Functions
                 return;
             }
 
-            _logger.LogInformation("Processing {Count} expired Cosmos DB documents for archival", documents.Count);
+            var startTime = DateTime.UtcNow;
+            _logger.LogInformation(
+                "Processing {Count} Cosmos DB documents for archival", 
+                documents.Count);
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(_archiveContainerName);
             await containerClient.CreateIfNotExistsAsync();
 
             int successCount = 0;
             int errorCount = 0;
+            int skippedCount = 0;
+            long totalBytesArchived = 0;
 
             foreach (var doc in documents)
             {
                 try
                 {
                     // Check if document has TTL expired (deletion event)
-                    // In Cosmos DB change feed, expired documents appear with _ts (time-to-live) metadata
                     var ttl = doc.GetPropertyValue<int?>("ttl");
                     if (ttl.HasValue && ttl.Value > 0)
                     {
-                        // Document is not expired yet, skip
+                        skippedCount++;
                         continue;
                     }
 
-                    await ArchiveDocumentAsync(containerClient, doc);
-                    successCount++;
+                    var docId = doc.Id;
+                    using (_logger.BeginScope(new Dictionary<string, object>
+                    {
+                        ["DocumentId"] = docId,
+                        ["Environment"] = doc.GetPropertyValue<string>("environment") ?? "unknown"
+                    }))
+                    {
+                        var archiveStart = DateTime.UtcNow;
+                        var bytesArchived = await ArchiveDocumentAsync(containerClient, doc);
+                        var archiveDuration = (DateTime.UtcNow - archiveStart).TotalMilliseconds;
+                        
+                        totalBytesArchived += bytesArchived;
+                        successCount++;
+                        
+                        _logger.LogInformation(
+                            "Document archived: DocumentId={DocumentId}, Size={Size} bytes, Duration={Duration}ms",
+                            docId, bytesArchived, archiveDuration);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to archive document {DocumentId}", doc.Id);
                     errorCount++;
+                    _logger.LogError(ex, "Failed to archive document {DocumentId}", doc.Id);
                 }
             }
 
+            var totalDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
             _logger.LogInformation(
-                "Archival complete: {SuccessCount} succeeded, {ErrorCount} failed",
-                successCount,
-                errorCount);
+                "Archival batch complete: Success={SuccessCount}, Errors={ErrorCount}, Skipped={SkippedCount}, TotalBytes={TotalBytes}, Duration={Duration}ms",
+                successCount, errorCount, skippedCount, totalBytesArchived, totalDuration);
         }
 
-        private async Task ArchiveDocumentAsync(BlobContainerClient containerClient, Document document)
+        private async Task<long> ArchiveDocumentAsync(BlobContainerClient containerClient, Document document)
         {
             // Extract timestamp for organizing blobs by date
             var timestamp = document.GetPropertyValue<DateTime>("timestamp");
@@ -134,11 +154,14 @@ namespace FedRampDashboard.Functions
 
             await blobClient.UploadAsync(compressedStream, uploadOptions);
 
+            var compressedSize = compressedStream.Length;
             _logger.LogInformation(
                 "Archived document {DocumentId} to blob {BlobName} (size: {Size} bytes compressed)",
                 document.Id,
                 blobName,
-                compressedStream.Length);
+                compressedSize);
+
+            return compressedSize;
         }
     }
 

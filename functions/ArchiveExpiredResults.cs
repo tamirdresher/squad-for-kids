@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -46,7 +48,7 @@ namespace FedRampDashboard.Functions
                 Connection = "CosmosDbEndpoint",
                 LeaseContainerName = "leases",
                 CreateLeaseContainerIfNotExists = true)] 
-            IReadOnlyList<Document> documents)
+            IReadOnlyList<JsonDocument> documents)
         {
             if (documents == null || documents.Count == 0)
             {
@@ -68,21 +70,28 @@ namespace FedRampDashboard.Functions
 
             foreach (var doc in documents)
             {
+                string docId = "unknown";
                 try
                 {
+                    var root = doc.RootElement;
+                    
                     // Check if document has TTL expired (deletion event)
-                    var ttl = doc.GetPropertyValue<int?>("ttl");
+                    var ttl = root.TryGetProperty("ttl", out var ttlProp) && ttlProp.ValueKind == JsonValueKind.Number 
+                        ? ttlProp.GetInt32() 
+                        : (int?)null;
                     if (ttl.HasValue && ttl.Value > 0)
                     {
                         skippedCount++;
                         continue;
                     }
 
-                    var docId = doc.Id;
+                    docId = root.TryGetProperty("id", out var idProp) ? idProp.GetString() : "unknown";
+                    var environment = root.TryGetProperty("environment", out var envProp) ? envProp.GetString() : "unknown";
+                    
                     using (_logger.BeginScope(new Dictionary<string, object>
                     {
                         ["DocumentId"] = docId,
-                        ["Environment"] = doc.GetPropertyValue<string>("environment") ?? "unknown"
+                        ["Environment"] = environment
                     }))
                     {
                         var archiveStart = DateTime.UtcNow;
@@ -100,7 +109,7 @@ namespace FedRampDashboard.Functions
                 catch (Exception ex)
                 {
                     errorCount++;
-                    _logger.LogError(ex, "Failed to archive document {DocumentId}", doc.Id);
+                    _logger.LogError(ex, "Failed to archive document {DocumentId}", docId);
                 }
             }
 
@@ -110,21 +119,25 @@ namespace FedRampDashboard.Functions
                 successCount, errorCount, skippedCount, totalBytesArchived, totalDuration);
         }
 
-        private async Task<long> ArchiveDocumentAsync(BlobContainerClient containerClient, Document document)
+        private async Task<long> ArchiveDocumentAsync(BlobContainerClient containerClient, JsonDocument document)
         {
             var archiveStart = DateTime.UtcNow;
+            var root = document.RootElement;
             
             try
             {
                 // Extract timestamp for organizing blobs by date
-                var timestamp = document.GetPropertyValue<DateTime>("timestamp");
+                var timestamp = root.TryGetProperty("timestamp", out var tsProp) 
+                    ? tsProp.GetDateTime() 
+                    : DateTime.UtcNow;
                 var year = timestamp.Year;
                 var month = timestamp.Month.ToString("D2");
                 var day = timestamp.Day.ToString("D2");
 
                 // Build blob path: validation-archive/YYYY/MM/DD/{environment}/{document-id}.json.gz
-                var environment = document.GetPropertyValue<string>("environment");
-                var blobName = $"{year}/{month}/{day}/{environment}/{document.Id}.json.gz";
+                var environment = root.TryGetProperty("environment", out var envProp) ? envProp.GetString() : "unknown";
+                var docId = root.TryGetProperty("id", out var idProp) ? idProp.GetString() : "unknown";
+                var blobName = $"{year}/{month}/{day}/{environment}/{docId}.json.gz";
 
                 var blobClient = containerClient.GetBlobClient(blobName);
 
@@ -148,13 +161,21 @@ namespace FedRampDashboard.Functions
                 var compressionRatio = (1.0 - (double)compressedSizeBytes / originalSizeBytes) * 100;
 
                 // Upload to Blob Storage with Archive access tier
+                var controlId = "unknown";
+                if (root.TryGetProperty("control", out var controlProp) && 
+                    controlProp.ValueKind == JsonValueKind.Object &&
+                    controlProp.TryGetProperty("id", out var controlIdProp))
+                {
+                    controlId = controlIdProp.GetString() ?? "unknown";
+                }
+                
                 var uploadOptions = new BlobUploadOptions
                 {
-                    AccessTier = Azure.Storage.Blobs.Models.AccessTier.Archive,
+                    AccessTier = AccessTier.Archive,
                     Metadata = new Dictionary<string, string>
                     {
                         { "environment", environment },
-                        { "control_id", document.GetPropertyValue<string>("control")?.GetPropertyValue<string>("id") ?? "unknown" },
+                        { "control_id", controlId },
                         { "timestamp", timestamp.ToString("O") },
                         { "archived_at", DateTimeOffset.UtcNow.ToString("O") }
                     }
@@ -165,7 +186,7 @@ namespace FedRampDashboard.Functions
                 var duration = (DateTime.UtcNow - archiveStart).TotalMilliseconds;
                 _logger.LogInformation(
                     "Document archived successfully: DocumentId={DocumentId}, BlobPath={BlobPath}, OriginalSize={OriginalSizeKb}KB, CompressedSize={CompressedSizeKb}KB, Compression={CompressionRatio}%, AccessTier=Archive, Duration={Duration}ms",
-                    document.Id,
+                    docId,
                     blobName,
                     originalSizeBytes / 1024,
                     compressedSizeBytes / 1024,
@@ -177,9 +198,10 @@ namespace FedRampDashboard.Functions
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - archiveStart).TotalMilliseconds;
+                var docId = root.TryGetProperty("id", out var idProp) ? idProp.GetString() : "unknown";
                 _logger.LogError(ex,
                     "Error archiving document {DocumentId}: Duration={Duration}ms",
-                    document.Id, duration);
+                    docId, duration);
                 throw;
             }
         }

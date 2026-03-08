@@ -48,6 +48,7 @@ if (runOnce)
     DisplayRalphLog(userProfile);
     DisplayGitHubIssues(teamRoot);
     DisplayGitHubPRs(teamRoot);
+    DisplayRecentlyMergedPRs(teamRoot);
     var activities = LoadActivities(teamRoot);
     DisplayOrchestrationLog(activities);
 }
@@ -101,6 +102,9 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
     
     // GitHub PRs
     sections.Add(BuildGitHubPRsSection(teamRoot));
+    
+    // Recently Merged PRs
+    sections.Add(BuildRecentlyMergedPRsSection(teamRoot));
     
     // Orchestration Log
     var activities = LoadActivities(teamRoot);
@@ -197,6 +201,20 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
         var status = root.TryGetProperty("status", out var st) ? st.GetString() : "unknown";
         var consecutiveFailures = root.TryGetProperty("consecutiveFailures", out var cf) ? cf.GetInt32() : 0;
         var pid = root.TryGetProperty("pid", out var p) ? p.ToString() : "?";
+        
+        // Extract metrics if available
+        var metricsText = "";
+        if (root.TryGetProperty("metrics", out var metrics))
+        {
+            var issuesClosed = metrics.TryGetProperty("issuesClosed", out var ic) ? ic.GetInt32() : 0;
+            var prsMerged = metrics.TryGetProperty("prsMerged", out var pm) ? pm.GetInt32() : 0;
+            var agentActions = metrics.TryGetProperty("agentActions", out var aa) ? aa.GetInt32() : 0;
+            
+            if (issuesClosed > 0 || prsMerged > 0 || agentActions > 0)
+            {
+                metricsText = $"  |  Metrics: [cyan]{issuesClosed}[/] issues, [cyan]{prsMerged}[/] PRs, [cyan]{agentActions}[/] actions";
+            }
+        }
 
         var staleness = "unknown";
         var stalenessColor = "dim";
@@ -214,7 +232,8 @@ static IRenderable BuildRalphHeartbeatSection(string userProfile)
                             $"Round: [white]{Markup.Escape(round)}[/]  |  " +
                             $"Last run: [{stalenessColor}]{Markup.Escape(staleness)}[/]  |  " +
                             $"Failures: [{failColor}]{consecutiveFailures}[/]  |  " +
-                            $"PID: [dim]{Markup.Escape(pid)}[/]"));
+                            $"PID: [dim]{Markup.Escape(pid)}[/]" +
+                            metricsText));
     }
     catch
     {
@@ -246,7 +265,7 @@ static IRenderable BuildRalphLogSection(string userProfile)
         var fileLength = fs.Length;
         if (fileLength == 0)
         {
-            items.Add(new Markup("[dim]  Log file exists but is empty[/]"));
+            items.Add(new Markup("[dim]  Log file exists but is empty — waiting for first round to complete[/]"));
             items.Add(Text.Empty);
             return new Rows(items);
         }
@@ -257,6 +276,13 @@ static IRenderable BuildRalphLogSection(string userProfile)
 
         var lines = tail.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         var last5 = lines.TakeLast(5);
+        
+        if (last5.Count() == 0)
+        {
+            items.Add(new Markup("[dim]  Waiting for round activity...[/]"));
+            items.Add(Text.Empty);
+            return new Rows(items);
+        }
 
         foreach (var line in last5)
         {
@@ -382,7 +408,7 @@ static IRenderable BuildGitHubPRsSection(string teamRoot)
 {
     var items = new List<IRenderable>();
     
-    var section = new Rule("[magenta]GitHub Pull Requests[/]") { Justification = Justify.Left };
+    var section = new Rule("[magenta]GitHub Pull Requests (Open)[/]") { Justification = Justify.Left };
     items.Add(section);
 
     var output = RunProcess("gh", "pr list --json number,title,author,createdAt,headRefName,reviewDecision,statusCheckRollup,isDraft --limit 20", teamRoot);
@@ -499,6 +525,76 @@ static IRenderable BuildGitHubPRsSection(string teamRoot)
     return new Rows(items);
 }
 
+static IRenderable BuildRecentlyMergedPRsSection(string teamRoot)
+{
+    var items = new List<IRenderable>();
+    
+    var section = new Rule("[magenta]GitHub Pull Requests (Recently Merged)[/]") { Justification = Justify.Left };
+    items.Add(section);
+
+    // Get closed PRs from the last 7 days
+    var output = RunProcess("gh", "pr list --state merged --limit 10 --json number,title,author,mergedAt,headRefName", teamRoot);
+    if (output == null)
+    {
+        items.Add(new Markup("[dim]  Could not fetch merged PRs[/]"));
+        items.Add(Text.Empty);
+        return new Rows(items);
+    }
+
+    try
+    {
+        using var doc = JsonDocument.Parse(output);
+        var prs = doc.RootElement;
+
+        if (prs.GetArrayLength() == 0)
+        {
+            items.Add(new Markup("[dim]  No recently merged pull requests[/]"));
+            items.Add(Text.Empty);
+            return new Rows(items);
+        }
+
+        var table = new Table()
+            .BorderColor(Color.Grey)
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("#").Width(6))
+            .AddColumn(new TableColumn("Title").Width(40))
+            .AddColumn(new TableColumn("Author").Width(12))
+            .AddColumn(new TableColumn("Branch").Width(20))
+            .AddColumn(new TableColumn("Merged").Width(10));
+
+        foreach (var pr in prs.EnumerateArray())
+        {
+            var number = pr.TryGetProperty("number", out var n) ? n.GetInt32().ToString() : "?";
+            var title = pr.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
+            var author = pr.TryGetProperty("author", out var a) && a.TryGetProperty("login", out var login) ? login.GetString() ?? "" : "";
+            var branch = pr.TryGetProperty("headRefName", out var b) ? b.GetString() ?? "" : "";
+            var mergedAt = pr.TryGetProperty("mergedAt", out var m) && DateTime.TryParse(m.GetString(), out var merged) ? FormatAge(DateTime.UtcNow - merged) : "?";
+
+            if (title.Length > 40)
+                title = title.Substring(0, 37) + "...";
+            if (branch.Length > 20)
+                branch = branch.Substring(0, 17) + "...";
+
+            table.AddRow(
+                $"[green]{Markup.Escape(number)}[/]",
+                Markup.Escape(title),
+                $"[yellow]{Markup.Escape(author)}[/]",
+                $"[dim]{Markup.Escape(branch)}[/]",
+                $"[green]{Markup.Escape(mergedAt)}[/]"
+            );
+        }
+
+        items.Add(table);
+    }
+    catch
+    {
+        items.Add(new Markup("[red]  Error parsing merged PR data[/]"));
+    }
+
+    items.Add(Text.Empty);
+    return new Rows(items);
+}
+
 static IRenderable BuildOrchestrationLogSection(List<AgentActivity> activities)
 {
     var items = new List<IRenderable>();
@@ -576,6 +672,20 @@ static void DisplayRalphHeartbeat(string userProfile)
         var status = root.TryGetProperty("status", out var st) ? st.GetString() : "unknown";
         var consecutiveFailures = root.TryGetProperty("consecutiveFailures", out var cf) ? cf.GetInt32() : 0;
         var pid = root.TryGetProperty("pid", out var p) ? p.ToString() : "?";
+        
+        // Extract metrics if available
+        var metricsText = "";
+        if (root.TryGetProperty("metrics", out var metrics))
+        {
+            var issuesClosed = metrics.TryGetProperty("issuesClosed", out var ic) ? ic.GetInt32() : 0;
+            var prsMerged = metrics.TryGetProperty("prsMerged", out var pm) ? pm.GetInt32() : 0;
+            var agentActions = metrics.TryGetProperty("agentActions", out var aa) ? aa.GetInt32() : 0;
+            
+            if (issuesClosed > 0 || prsMerged > 0 || agentActions > 0)
+            {
+                metricsText = $"\n  Metrics: [cyan]{issuesClosed}[/] issues closed, [cyan]{prsMerged}[/] PRs merged, [cyan]{agentActions}[/] agent actions";
+            }
+        }
 
         var staleness = "unknown";
         var stalenessColor = "dim";
@@ -593,7 +703,8 @@ static void DisplayRalphHeartbeat(string userProfile)
                                $"Round: [white]{Markup.Escape(round)}[/]  |  " +
                                $"Last run: [{stalenessColor}]{Markup.Escape(staleness)}[/]  |  " +
                                $"Failures: [{failColor}]{consecutiveFailures}[/]  |  " +
-                               $"PID: [dim]{Markup.Escape(pid)}[/]");
+                               $"PID: [dim]{Markup.Escape(pid)}[/]" +
+                               metricsText);
     }
     catch
     {
@@ -849,6 +960,77 @@ static void DisplayGitHubPRs(string teamRoot)
     AnsiConsole.WriteLine();
 }
 
+static void DisplayRecentlyMergedPRs(string teamRoot)
+{
+    var section = new Rule("[cyan]GitHub Pull Requests (Recently Merged)[/]") { Justification = Justify.Left };
+    AnsiConsole.Write(section);
+
+    var json = RunProcess("gh", "pr list --state merged --limit 10 --json number,title,author,mergedAt,headRefName", teamRoot);
+    if (json == null)
+    {
+        AnsiConsole.MarkupLine("[dim]  Could not fetch merged PRs[/]");
+        AnsiConsole.WriteLine();
+        return;
+    }
+
+    try
+    {
+        using var doc = JsonDocument.Parse(json);
+        var prs = doc.RootElement;
+
+        if (prs.GetArrayLength() == 0)
+        {
+            AnsiConsole.MarkupLine("[dim]  No recently merged pull requests[/]");
+            AnsiConsole.WriteLine();
+            return;
+        }
+
+        var table = new Table();
+        table.Border(TableBorder.Simple);
+        table.AddColumn(new TableColumn("[bold]#[/]").RightAligned());
+        table.AddColumn(new TableColumn("[bold]Title[/]").LeftAligned());
+        table.AddColumn(new TableColumn("[bold]Author[/]").LeftAligned());
+        table.AddColumn(new TableColumn("[bold]Branch[/]").LeftAligned());
+        table.AddColumn(new TableColumn("[bold]Merged[/]").RightAligned());
+
+        foreach (var pr in prs.EnumerateArray())
+        {
+            var number = pr.GetProperty("number").GetInt32();
+            var title = pr.GetProperty("title").GetString() ?? "";
+            if (title.Length > 50) title = title[..50] + "…";
+
+            var author = pr.TryGetProperty("author", out var auth) && auth.TryGetProperty("login", out var login)
+                ? login.GetString() ?? "" : "";
+            
+            var branch = pr.TryGetProperty("headRefName", out var b) ? b.GetString() ?? "" : "";
+            if (branch.Length > 25) branch = branch[..25] + "…";
+
+            var mergedStr = "";
+            if (pr.TryGetProperty("mergedAt", out var mergedAt) &&
+                DateTime.TryParse(mergedAt.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var mergedDt))
+            {
+                mergedStr = FormatAge(DateTime.UtcNow - mergedDt);
+            }
+
+            table.AddRow(
+                $"[green]#{number}[/]",
+                $"[white]{Markup.Escape(title)}[/]",
+                $"[cyan]{Markup.Escape(author)}[/]",
+                $"[dim]{Markup.Escape(branch)}[/]",
+                $"[green]{Markup.Escape(mergedStr)}[/]"
+            );
+        }
+
+        AnsiConsole.Write(table);
+    }
+    catch
+    {
+        AnsiConsole.MarkupLine("[red]  Error parsing merged PR data[/]");
+    }
+
+    AnsiConsole.WriteLine();
+}
+
 // ─── Orchestration Log Panel ────────────────────────────────────────────────
 
 static List<AgentActivity> LoadActivities(string teamRoot)
@@ -895,9 +1077,29 @@ static AgentActivity? ParseOrchestrationLog(string filePath)
     var agentName = match.Groups[7].Value;
 
     var status = "Unknown";
-    var statusMatch = Regex.Match(content, @"\*\*Status:\*\*\s*(.+)");
+    var statusMatch = Regex.Match(content, @"\*\*Status:\*\*\s*(.+?)(?:\r?\n|$)");
     if (statusMatch.Success)
+    {
         status = statusMatch.Groups[1].Value.Trim();
+    }
+    else
+    {
+        // Try alternate status patterns
+        var altStatusMatch = Regex.Match(content, @"^##\s*Status:\s*(.+?)(?:\r?\n|$)", RegexOptions.Multiline);
+        if (altStatusMatch.Success)
+            status = altStatusMatch.Groups[1].Value.Trim();
+    }
+    
+    // If status is still Unknown, check for emojis or common patterns in the content
+    if (status == "Unknown")
+    {
+        if (content.Contains("✅") || Regex.IsMatch(content, @"(?i)(completed|success|done)"))
+            status = "✅ Completed";
+        else if (content.Contains("⏳") || Regex.IsMatch(content, @"(?i)in.progress"))
+            status = "⏳ In Progress";
+        else if (content.Contains("❌") || Regex.IsMatch(content, @"(?i)failed"))
+            status = "❌ Failed";
+    }
 
     var task = "";
     var assignmentMatch = Regex.Match(content, @"## Assignment\s*(.+?)(?=##|$)", RegexOptions.Singleline);

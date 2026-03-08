@@ -17,6 +17,10 @@ $intervalMinutes = 5
 $round = 0
 $consecutiveFailures = 0
 
+# Log rotation settings
+$maxLogBytes = 1MB
+$maxLogEntries = 500
+
 $prompt = 'Ralph, Go! make sure the PR comments are also taken care of and then merge the PRs when they are ready and open new issues if needed. IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.'
 
 # Initialize observability paths

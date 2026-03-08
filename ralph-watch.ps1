@@ -348,27 +348,60 @@ while ($true) {
         agentActions = 0
     }
     
-    # Start heartbeat background job to print periodic updates during the round
-    $heartbeatJob = Start-Job -ScriptBlock {
-        param($RoundNum, $HeartbeatFile)
-        $roundStartTime = Get-Date
+    # Start background activity monitor — tails agency session log + prints elapsed time
+    $roundStartTime = Get-Date
+    $activityRunspace = [PowerShell]::Create()
+    $activityRunspace.AddScript({
+        param($RoundNum, $HeartbeatFile, $AgencyLogDir, $RoundStart)
+        $lastLogSize = 0
+        $seenLines = @{}
         while ($true) {
-            Start-Sleep -Seconds 60
-            $elapsed = (Get-Date) - $roundStartTime
+            Start-Sleep -Seconds 30
+            $elapsed = (Get-Date) - $RoundStart
             $elapsedStr = "{0}m {1:00}s" -f [math]::Floor($elapsed.TotalMinutes), $elapsed.Seconds
-            $timestamp = Get-Date -Format "HH:mm:ss"
-            Write-Host "[$timestamp] Round $RoundNum running... ($elapsedStr elapsed)" -ForegroundColor DarkYellow
+            $ts = Get-Date -Format "HH:mm:ss"
             
-            # Update lastHeartbeat timestamp in JSON
+            # Find latest agency session log
+            $latestSession = Get-ChildItem $AgencyLogDir -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            $activity = ""
+            if ($latestSession) {
+                $logFiles = Get-ChildItem $latestSession.FullName -Filter "*.log" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+                if ($logFiles -and $logFiles.Length -gt $lastLogSize) {
+                    $newContent = Get-Content $logFiles.FullName -Tail 20 -ErrorAction SilentlyContinue
+                    foreach ($line in $newContent) {
+                        if (-not $seenLines.ContainsKey($line) -and $line -match "(spawn|agent|merge|close|commit|push|label|comment|issue|PR|triage)") {
+                            $short = $line.Trim()
+                            if ($short.Length -gt 100) { $short = $short.Substring(0, 100) + "..." }
+                            $activity = $short
+                            $seenLines[$line] = $true
+                        }
+                    }
+                    $lastLogSize = $logFiles.Length
+                }
+            }
+            
+            # Print status line
+            if ($activity) {
+                [Console]::ForegroundColor = 'DarkCyan'
+                [Console]::WriteLine("  [$ts] Round $RoundNum ($elapsedStr) | $activity")
+                [Console]::ResetColor()
+            } else {
+                [Console]::ForegroundColor = 'DarkGray'
+                [Console]::WriteLine("  [$ts] Round $RoundNum running... ($elapsedStr elapsed)")
+                [Console]::ResetColor()
+            }
+            
+            # Update heartbeat
             if (Test-Path $HeartbeatFile) {
                 try {
                     $hb = Get-Content -Path $HeartbeatFile -Raw -Encoding utf8 | ConvertFrom-Json
-                    $hb.lastHeartbeat = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+                    $hb | Add-Member -NotePropertyName "lastHeartbeat" -NotePropertyValue (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ') -Force
                     $hb | ConvertTo-Json | Out-File -FilePath $HeartbeatFile -Encoding utf8 -Force
                 } catch {}
             }
         }
-    } -ArgumentList $round, $heartbeatFile
+    }).AddArgument($round).AddArgument($heartbeatFile).AddArgument("$env:USERPROFILE\.agency\logs").AddArgument($roundStartTime) | Out-Null
+    $activityHandle = $activityRunspace.BeginInvoke()
     
     try {
         # Call agency DIRECTLY — no pipes, no Start-Process, no cmd /c
@@ -399,10 +432,10 @@ while ($true) {
         $roundStatus = "error"
         $logStatus = "ERROR"
     } finally {
-        # Stop heartbeat job
-        if ($heartbeatJob) {
-            Stop-Job -Job $heartbeatJob -ErrorAction SilentlyContinue
-            Remove-Job -Job $heartbeatJob -Force -ErrorAction SilentlyContinue
+        # Stop activity monitor runspace
+        if ($activityRunspace) {
+            $activityRunspace.Stop()
+            $activityRunspace.Dispose()
         }
     }
     

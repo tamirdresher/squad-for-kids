@@ -101,6 +101,133 @@
 
 ---
 
+### 2026-03-08: Functions Project Build Fix — Isolated Worker Model Migration (Issue #169)
+
+**Task:** Fix 64 build errors in FedRampDashboard.Functions project to unblock #119 (AlertHelper refactoring).
+
+**Root Cause:** Functions project was mixing Azure Functions in-process model code with isolated worker model configuration. Caused missing namespaces and type errors.
+
+**Solution:** Migrated entire project to isolated worker model (Azure Functions v4):
+
+1. **Added NuGet Package:** System.Text.Json (standard for isolated model)
+2. **Created Program.cs:** Added `ConfigureFunctionsWorkerDefaults()` configuration
+3. **Converted HTTP Functions:**
+   - AlertProcessor.cs: HttpRequest/IActionResult → HttpRequestData/HttpResponseData
+   - ProcessValidationResults.cs: Same migration pattern
+   - ArchiveExpiredResults.cs: Same migration pattern
+4. **Converted JSON Serialization:** Newtonsoft.Json → System.Text.Json (JsonProperty → JsonPropertyName)
+5. **Converted CosmosDB Trigger:** Document → JsonDocument with TryGetProperty pattern
+
+**Build Results:**
+- Before: 64 errors, 4 warnings
+- After: 0 errors, 0 warnings ✅
+
+**PR & Merge:**
+- **Branch:** squad/169-fix-functions-build
+- **PR:** #172
+- **Status:** ✅ MERGED
+- **Guard workflow:** 403 on pulls.listFiles (not blocking)
+
+**Impact:**
+- ✅ Unblocks #119 (AlertHelper refactoring tech debt)
+- ✅ Functions ready for isolated worker deployment
+- ⚠️ Breaking change: Must be redeployed with isolated worker runtime
+
+**Key Learning:**
+- Azure Functions v4 requires isolated worker model (in-process is deprecated)
+- System.Text.Json is the standard JSON library for isolated functions
+- Migration is straightforward: mostly type and namespace changes
+- Both HTTP triggers and CosmosDB triggers follow same pattern
+
+---
+
+### 2026-03-08: Azure Functions Isolated Worker Model Migration (Issue #169)
+
+**Task:** Fix 64 build errors in FedRampDashboard.Functions project caused by mixed Azure Functions models and missing dependencies.
+
+**Root Cause:** The project .csproj was configured for isolated worker model (Microsoft.Azure.Functions.Worker) but AlertProcessor.cs used the old in-process model (Microsoft.AspNetCore.Http, Microsoft.Azure.WebJobs). Missing System.Text.Json package for JsonPropertyName attributes.
+
+**Solution:** Migrated entire codebase to isolated worker model and added missing dependencies:
+
+1. **Added System.Text.Json NuGet package** (v10.0.3) - Required for JsonPropertyName attributes
+2. **Created Program.cs** - Entry point for isolated worker host using ConfigureFunctionsWorkerDefaults()
+3. **Converted AlertProcessor.cs:**
+   - Changed from static class → instance class with ILogger<AlertProcessor> injection
+   - Microsoft.AspNetCore.Http → Microsoft.Azure.Functions.Worker.Http
+   - HttpRequest → HttpRequestData
+   - IActionResult/OkObjectResult/BadRequestObjectResult → HttpResponseData with CreateResponse()
+   - FunctionName attribute → Function attribute
+   - Newtonsoft.Json (JsonConvert) → System.Text.Json (JsonSerializer)
+   - [JsonProperty] → [JsonPropertyName]
+   - Removed duplicate ControlInfo class (kept version in ProcessValidationResults.cs)
+4. **Fixed ProcessValidationResults.cs** - Added using System.Text.Json.Serialization
+5. **Converted ArchiveExpiredResults.cs:**
+   - IReadOnlyList<Document> → IReadOnlyList<JsonDocument>
+   - document.GetPropertyValue<T>("prop") → root.TryGetProperty("prop", out var prop) pattern
+   - document.Id → extracted from JsonElement
+   - Added Azure.Storage.Blobs.Models using for AccessTier
+
+**Key Conversion Patterns:**
+
+In-process model → Isolated worker model:
+```csharp
+// OLD (in-process)
+[FunctionName("AlertProcessor")]
+public static async Task<IActionResult> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+    ILogger log)
+{
+    var body = await new StreamReader(req.Body).ReadToEndAsync();
+    var data = JsonConvert.DeserializeObject<T>(body);
+    return new OkObjectResult(result);
+}
+
+// NEW (isolated worker)
+[Function("AlertProcessor")]
+public async Task<HttpResponseData> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+{
+    var data = await JsonSerializer.DeserializeAsync<T>(req.Body);
+    var response = req.CreateResponse(HttpStatusCode.OK);
+    await response.WriteAsJsonAsync(result);
+    return response;
+}
+```
+
+CosmosDB Document → JsonDocument:
+```csharp
+// OLD
+Document doc;
+var value = doc.GetPropertyValue<string>("property");
+
+// NEW
+JsonDocument doc;
+var root = doc.RootElement;
+var value = root.TryGetProperty("property", out var prop) ? prop.GetString() : default;
+```
+
+**Testing Strategy:**
+- Verified dotnet build succeeds with 0 errors (was 64)
+- All missing dependencies resolved
+- No functional changes to business logic
+
+**Key Learning:**
+- Azure Functions v4 isolated worker model is fundamentally different from in-process model
+- Cannot mix in-process (Microsoft.AspNetCore.*) and isolated worker (Microsoft.Azure.Functions.Worker.*) packages
+- Program.cs is required for isolated worker - use ConfigureFunctionsWorkerDefaults()
+- JsonDocument.RootElement provides access to properties via TryGetProperty pattern
+- HttpResponseData requires CreateResponse() + WriteAsJsonAsync() for JSON responses
+- Always declare variables outside try block if used in catch block (scope issue)
+
+**Branch:** squad/169-fix-functions-build  
+**Commit:** 1430937  
+**PR:** #172  
+**Issue:** #169
+
+
+
+---
+
 ### 2026-03-08: Squad Monitor round timing enhancements (PR #158, Issue #157)
 
 **Task:** Add start/end times for rounds and next round countdown to squad-monitor dashboard.
@@ -2506,3 +2633,82 @@ Issue #119 REMAINS BLOCKED until Functions project build is fixed. The dependenc
 4. Dashboard UI unused variables (non-critical)
 
 **Status:** Round 3 scan showed all remaining items pending-user or blocked. Board clear.
+
+---
+
+## Session 2026-03-08 (Tech Debt Cleanup)
+
+### Issue #119: AlertHelper Tests Refactor
+
+**Task:** Remove copied AlertHelper.cs workaround now that Functions project builds cleanly.
+
+**Context:**
+- During PR #118, AlertHelper.cs was copied to test project due to Functions build errors
+- PR #172 fixed Functions build, unblocking this tech debt item
+- Original source: `functions\AlertHelper.cs`
+- Copied file: `tests\FedRampDashboard.Functions.Tests\AlertHelper.cs`
+
+**Work Completed:**
+1. Created branch `squad/119-refactor-alerthelper-tests`
+2. Removed duplicate AlertHelper.cs from test project
+3. Added `<ProjectReference>` to FedRampDashboard.Functions.csproj
+4. Validated: All 47 tests pass against original source
+5. Committed changes with conventional commit format
+6. Pushed and created PR #175
+7. Updated project board item to "Review" status
+
+**Learnings:**
+- Project references are the correct pattern for shared code between projects
+- File duplication was necessary as temporary workaround but created maintenance burden
+- Test validation confirmed refactor preserves behavior
+- Clean resolution of technical debt enables better maintainability
+
+**Issue:** #119  
+**PR:** #175  
+**Status:** Ready for review ✅
+
+---
+
+### 2026-03-13: Issue #170, #173, #174 - GitHub Actions Workflow Bugs
+
+**Task**: Fix two critical workflow bugs preventing automation from functioning properly.
+
+**Bug 1 - Guard Workflow Permissions (#173, #174)**:
+**Problem**: The `squad-main-guard.yml` workflow had no `permissions:` section. When the workflow called `github.rest.pulls.listFiles()`, the API returned 403 "Resource not accessible by integration" because the default GitHub token lacked `pull-requests: read` permission.
+
+**Solution**: Added explicit permissions section at workflow level (after `on:`, before `jobs:`):
+```yaml
+permissions:
+  pull-requests: read
+  contents: read
+```
+
+**Bug 2 - Member Name Normalization (#170)**:
+**Problem**: Team member names with special characters (apostrophes, etc.) in team.md didn't match label-derived names. Example: "B'Elanna" in team.md lowercased to `b'elanna`, but the label `squad:belanna` (no apostrophe) didn't match because the comparison was only case-insensitive, not character-normalized.
+
+**Solution**: Implemented name normalization function that strips all non-alphanumeric characters before comparison:
+```javascript
+const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+```
+
+Applied consistently across all workflows that parse team.md:
+- `squad-issue-assign.yml` - member lookup from label
+- `sync-squad-labels.yml` - label generation from team.md
+- `squad-triage.yml` - member list display and assignment logic
+
+**Files Modified**: 4
+- .github/workflows/squad-main-guard.yml (permissions added)
+- .github/workflows/squad-issue-assign.yml (normalize function added)
+- .github/workflows/sync-squad-labels.yml (normalize function added)
+- .github/workflows/squad-triage.yml (normalize function added, used in two places)
+
+**Branch**: squad/170-fix-workflow-bugs
+**PR**: #176
+**Outcome**: Both bugs fixed in single PR. Guard workflow can now read PR file lists. Name matching now handles special characters consistently. Workflows will correctly route issues labeled `squad:belanna` to "B'Elanna" team member.
+
+**Learnings**:
+1. **GitHub Actions default permissions are restrictive**: Even though the workflow runs in the repo, API calls require explicit permission grants. Always declare `permissions:` when using GitHub API.
+2. **Special character normalization is critical for label matching**: Unicode, apostrophes, hyphens, and spaces in display names must be stripped consistently when generating and matching label names.
+3. **Consistency across workflows matters**: When multiple workflows parse the same data source (team.md), they must use identical normalization logic or label/name mismatches will cause silent failures.
+4. **Name normalization should be total**: Regex `[^a-z0-9]` strips everything non-alphanumeric, not just apostrophes. This future-proofs against other special characters (hyphens, accents, unicode).
+

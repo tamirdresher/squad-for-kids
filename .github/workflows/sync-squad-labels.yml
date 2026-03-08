@@ -107,9 +107,12 @@ jobs:
               { name: 'squad', color: SQUAD_COLOR, description: 'Squad triage inbox — Lead will assign to a member' }
             ];
 
+            // Normalize names by stripping non-alphanumeric chars for label names
+            const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
             for (const member of members) {
               labels.push({
-                name: `squad:${member.name.toLowerCase()}`,
+                name: `squad:${normalize(member.name)}`,
                 color: MEMBER_COLOR,
                 description: `Assigned to ${member.name} (${member.role})`
               });

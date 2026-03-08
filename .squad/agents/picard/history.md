@@ -725,6 +725,29 @@ User visibility drives discoverability. Simple label system allows GitHub-native
 **Key Assessment Points:**
 
 1. **Research Vindication — Exact Pattern Predicted:**
+
+---
+
+### 2026-03-12: PR #107 Review — Teams Notifications Workflows
+
+**Context:** Reviewed and merged PR #107 addressing issue #104 (user notification gap for closed issues). Data created two GitHub Actions workflows for Teams integration:
+1. `squad-issue-notify.yml` — Posts adaptive card to Teams when issues close
+2. `squad-daily-digest.yml` — Daily 8 AM UTC digest of closed/merged/open items
+
+**Review Findings:**
+- ✅ **Security:** Proper secret handling (TEAMS_WEBHOOK_URL), read-only permissions, no leaks
+- ✅ **Triggers:** Correct event binding (issues:closed) and cron schedule (0 8 * * *)
+- ✅ **Adaptive Cards:** Valid 1.4 schema, proper FactSet structure, handles edge cases
+- ✅ **Logic:** Smart agent detection (parses comments for Picard/Data/Geordi/Troi/Worf), 24h window calculation correct
+- ✅ **Error Handling:** Defensive checks (if webhook != ''), graceful fallbacks (empty lists → "None")
+
+**Outcome:** Approved and merged. Issue #104 auto-closed. Branch deleted.
+
+**Key Pattern:** Data's implementation followed GHA best practices—minimal permissions, defensive secret checks, proper card schema. No changes required. This closes the notification gap Tamir identified.
+
+**Setup Reminder:** User must add `TEAMS_WEBHOOK_URL` secret to repo settings for workflows to post (stored locally at `C:\Users\tamirdresher\.squad\teams-webhook.url`).
+
+---
    - January 2026 Sev2 (IcM 731055522) analysis identified: Istio ztunnel + infrastructure daemonsets + DNS create cascading failure loops
    - STG-EUS2-28 exhibits identical pattern: ztunnel pods fail → NodeStuck deletes nodes based on daemonset health → churn amplifies blast radius
    - B'Elanna's Tier 1/2 plan (Issues #24, #25) specifically designed mitigations for this failure mode
@@ -947,3 +970,64 @@ Result: **Faster, more confident code review** because the "why" is already docu
 ---
 
 **Status**: Both PRs approved for merge to main. Ready for production deployment.
+
+---
+
+## Triage Round — March 8, 2026
+
+**Timestamp:** 2026-03-08 07:32:13
+
+### Issues Triaged
+
+**Issue #105**: Trail research request
+- **User asked:** How did issues #50, #99, #46, #51, #40 originate?
+- **Analysis:** Traced each issue to its source (incident-driven, PR review, user request)
+- **Pattern identified:** Three issue origins: 1) Incidents (Teams-bridged), 2) PR post-merge items, 3) Direct user requests
+- **Key insight:** Issue #46 (STG-EUS2-28) validated our Tier 1/2 stability research weeks before incident. We predicted the exact failure pattern (Istio + infrastructure + cascading automation).
+- **Action:** Documented complete trail for each issue. Kept open per user request.
+- **Assignment:** squad:picard (Lead owns explanation/context)
+
+**Issue #104**: Notification system for closed issues
+- **Problem:** User unaware when squad closes issues, no visibility into outcomes
+- **Available asset:** Teams webhook at user home directory
+- **Solution proposed:** Multi-phase approach:
+  1. Phase 1: Teams webhook integration (immediate)
+  2. Phase 2: Daily digest email (optional)
+  3. Phase 3: Structured close comments (quick win)
+- **Recommendation:** Start Phase 3 (structured comments), add Phase 1 (Teams webhook)
+- **Assignment:** squad:data (Code Expert — webhook integration and Ralph workflow modification)
+
+**Issue #103**: Devbox provisioning request
+- **Request:** Create devbox, share details via Teams webhook
+- **Infrastructure check:** devbox-provisioning/ exists with Bicep, mcp-server, scripts
+- **Assessment:** Infrastructure incomplete, no end-to-end workflow documented
+- **Scope clarification needed:** Type (Win/Linux), access method, lifecycle, cost constraints
+- **Assignment:** squad:belanna (Infrastructure Expert — Azure provisioning and IaC)
+
+**Issue #106 (created)**: Post-merge follow-up for PR #102
+- **Origin:** Consolidated three post-merge items from FedRAMP Dashboard PR #102
+- **Scope:** Document 60s cache as SLI, Application Insights alert for cache hit rate <70%, 30-day cache review
+- **Priority:** Medium (dashboard production-ready, these improve ops visibility)
+- **Label:** squad (untriaged, awaiting assignment)
+
+### Decisions Made
+
+1. **Issue origin patterns validated**: Squad work is driven by real incidents, code quality, and user requests — not arbitrary. This reinforces legitimacy of our work to user.
+
+2. **Triage ownership principle**: Lead (Picard) owns research/context issues, Code Expert (Data) owns tooling/workflow, Infrastructure (B'Elanna) owns provisioning.
+
+3. **Notification system design**: Phased approach prioritizes quick wins (structured comments) before infrastructure investment (webhook integration).
+
+### Trail Insights Discovered
+
+- **Issue #46 vindication**: STG-EUS2-28 incident proved our stability research value. We predicted cascading failures (Draino → Karpenter → Istio → NodeStuck) weeks before it happened. This validates proactive research investment.
+- **Issue #40 success story**: User asked for visibility tool → Data delivered C# console app in <24h. Direct user request → immediate value.
+- **Issue #50/#51 emergency response**: Both spawned from #46 incident. Shows squad's ability to rapidly triage and delegate (B'Elanna for NodeStuck, Worf for security).
+
+### Process Observations
+
+- **User wants visibility**: Issue #104 (notification system) and #40 (activity monitor) both address squad transparency. User needs to know what we're doing and when we're done.
+- **Documentation as proof**: Detailed trail explanation in #105 demonstrates squad's decision-making process. User asked "did they open because of something I did, or something you decided?" — answer shows clear causality.
+
+---
+

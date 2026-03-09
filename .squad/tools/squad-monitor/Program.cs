@@ -119,6 +119,9 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
     sections.Add(header);
     sections.Add(Text.Empty);
 
+    // Live Agent Activity (tails agency/copilot logs) — top priority visibility
+    sections.Add(BuildLiveAgentFeedSection(userProfile));
+
     // Ralph Watch Heartbeat
     sections.Add(BuildRalphHeartbeatSection(userProfile));
     
@@ -137,9 +140,6 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
     // Orchestration Log
     var activities = LoadActivities(teamRoot);
     sections.Add(BuildOrchestrationLogSection(activities));
-
-    // Live Agent Activity (tails agency/copilot logs)
-    sections.Add(BuildLiveAgentFeedSection(userProfile));
 
     // Combine all sections into a group
     var rows = new Rows(sections);

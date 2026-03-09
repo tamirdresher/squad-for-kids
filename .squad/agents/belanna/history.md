@@ -480,6 +480,51 @@ New: Scheduler detects missed 7 AM task, runs immediately with `catchUp=true` fl
 
 **Impact:** Establishes foundation for multi-squad collaboration across organization; complements existing upstream/subsquad features without breaking changes.
 
+### 2026-03-15: PR Merge Conflicts Resolution — PRs #216, #217, #218, #220 (COMPLETED)
+
+**Assignment:** Resolve merge conflicts and merge 4 blocked PRs after PR #219 was merged.
+
+**PRs Processed (Sequential Order):**
+1. **PR #216 (squad/215-teams-message-monitoring)** → Issue #215
+   - **Conflict Type:** Git stash required for local changes
+   - **Resolution:** Auto-resolved after stash via union merge (.squad/ append-only files)
+   - **Status:** ✅ Merged successfully, issue closed, project board updated
+
+2. **PR #217 (squad/207-live-activity-panel)** → Issue #207
+   - **Conflict Type:** Merge conflicts in dashboard-ui/ files (README.md, LiveActivityPanel.tsx, LiveActivityPage.tsx, useActivityPoller.ts)
+   - **Resolution:** Kept branch version (--ours) — Picard-approved enhanced implementation with raw log view feature
+   - **Status:** ✅ Merged successfully, issue closed, project board updated
+
+3. **PR #218 (squad/214-podcaster-research)** → Issue #214
+   - **Conflict Type:** Same dashboard-ui/ conflicts as PR #217
+   - **Resolution:** Kept main version (--theirs) — main now has the latest LiveActivity implementation from PR #217
+   - **Status:** ✅ Merged successfully, issue closed, project board updated
+
+4. **PR #220 (squad/199-squad-scheduling)** → Issue #199
+   - **Conflict Type:** No conflicts! Clean auto-merge
+   - **Resolution:** None needed
+   - **Status:** ✅ Merged successfully, issue closed, project board updated
+
+**Merge Conflict Patterns Observed:**
+- **.squad/ files:** Union merge strategy in .gitattributes worked perfectly — auto-resolved append-only files
+- **Local changes:** ralph-watch activity created local modifications requiring git stash before merging
+- **Dashboard UI files:** Both PRs #217 and #218 added the same LiveActivity feature files, creating "both added" conflicts
+  - PR #217 had enhanced implementation with raw log view (kept for that branch)
+  - PR #218 inherited main's version after PR #217 merged (avoided duplicate features)
+- **Binary files:** None encountered (expected .squad/tools/squad-monitor/bin/ conflicts didn't appear)
+- **Sequential nature critical:** Each merge changed main, affecting subsequent PR merges
+
+**Key Learnings:**
+1. **Union merge strategy effective:** .gitattributes merge=union for .squad/ files auto-resolved history/log conflicts
+2. **Order matters:** Processing PRs sequentially (not parallel) essential — each merge changes main baseline
+3. **Context-aware conflict resolution:** Used --ours for branch with approved enhancements, --theirs when main had latest
+4. **Project board automation:** Successfully updated all issues to Done status via gh project commands
+5. **Fast-forward warnings harmless:** "not possible to fast-forward" messages expected when main diverged during merge
+
+**All PRs Merged:** 4/4 ✅  
+**All Issues Closed:** 4/4 ✅  
+**All Project Board Items Updated:** 4/4 ✅
+
 ---
 
 ### 2026-03-09: Kubernetes Platform Adoption Spec Review — Issue #195 (Cross-Agent Assessment)

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("squad-monitor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+422d7f84b8f4b2b6926dac9dd73c22e7aca2e7d5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2ffcb9f8de96f9a1fd4c4861ecf42b7b3677dceb")]
 [assembly: System.Reflection.AssemblyProductAttribute("squad-monitor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("squad-monitor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

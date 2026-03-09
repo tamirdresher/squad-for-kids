@@ -3181,3 +3181,85 @@ Documented What NOT to adopt (GUI, generic clones, cloud execution, project frag
 
 **Learning:** When researching tools, **always distinguish between:** (a) official vs unofficial APIs (risk profile), (b) input vs output modalities (actual capabilities), and (c) async vs real-time use cases (different optimization targets). The same TTS platform can be perfect for one use case and terrible for another.
 
+### 2026-03-25: Seven — Repository Sanitization for Public Demo — Issue #225 (IN PROGRESS)
+
+**Assignment:** Create a comprehensive plan for sanitizing the tamresearch1 repository to create a clean, public-facing demo of Squad capabilities without exposing sensitive data. This will support upstream contribution to bradygaster/squad and serve as a reference implementation.
+
+**Key Analysis:**
+
+1. **8 Categories of Sensitive Data Identified:**
+   - 🔴 **Teams Webhook URLs** (CRITICAL) — 15+ files with direct channel access
+   - 🟡 **Azure Resource IDs** (HIGH) — 30+ files with CosmosDB, KeyVault, infrastructure names
+   - 🔴 **Personal Information/PII** (CRITICAL) — 100+ files with names, emails, usernames
+   - 🟡 **Internal Microsoft References** (MEDIUM) — 50+ files with DK8S, idk8s, Aurora service names
+   - 🟢 **API Keys/Tokens** (LOW) — Already properly secured with GitHub Secrets pattern
+   - 🟡 **Internal URLs** (MEDIUM) — 20+ files with *.contoso.com endpoints
+   - 🟡 **GitHub Org/Project Data** (MEDIUM) — 15+ files with project board IDs, field IDs
+   - 🟢 **Debug Logs/Artifacts** (LOW) — 20+ temporary state/log files
+
+2. **Sanitization Strategy — Three-Tiered Approach:**
+   - **Automated Patterns** (20+ regex replacements): Personal names → "Demo User", Azure resources → "demo-*", MS services → generic equivalents
+   - **File Exclusions** (50+ patterns): Agent histories (privacy), Azure infrastructure (too Microsoft-specific), project code (not Squad-related)
+   - **Manual Review** (8 critical areas): Webhooks, project IDs, configuration files, documentation
+
+3. **PowerShell Automation Script Features:**
+   - Dry run mode for validation before execution
+   - Pattern-specific change tracking with descriptions
+   - Selective file processing (text files only, exclude binaries)
+   - Output directory isolation (no in-place modifications)
+   - Detailed stats reporting (files scanned/sanitized/excluded/total changes)
+
+4. **Demo Repository Scope:**
+   - **INCLUDE** ✅: `.squad/` structure (charters, decisions, routing, skills), ralph-watch.ps1, Podcaster, workflows, screenshots, public README
+   - **EXCLUDE** ❌: Agent histories, Azure/infrastructure code, project-specific API/UI, internal research, temporary files, training materials
+
+5. **Public-Facing README Strategy:**
+   - Value proposition: "AI-Powered Team of Specialized Agents"
+   - Feature showcase: Multi-agent collaboration, Ralph Watch, knowledge base, routing, project integration, continuous learning
+   - Quick start guide with prerequisites and setup steps
+   - Repository structure documentation
+   - Key concepts explained (agents, decisions, skills, routing)
+   - Customization guide for creating own agents/skills
+   - Integration points (GitHub, Teams, development tools)
+
+6. **Execution Plan — 11 Phases:**
+   - Phase 1 ✅: Planning & analysis (COMPLETED — SANITIZATION_PLAN.md, script, checklist, demo README created)
+   - Phase 2-3: Automated sanitization + manual review
+   - Phase 4-5: File validation + demo enhancements
+   - Phase 6-7: Testing & documentation quality
+   - Phase 8-9: PR creation + team review
+   - Phase 10: Demo repository creation
+   - Phase 11: Upstream contribution to bradygaster/squad
+
+**Key Learnings:**
+
+1. **Personal Data is Pervasive in Agent Histories** — Agent history files contain work logs with personal context (user names, internal references, team decisions). For privacy, histories must be excluded from public demos even though they showcase learning patterns. Solution: Keep charter.md (role definition) but exclude history.md (work log).
+
+2. **Webhook URLs are Secret Infrastructure** — Teams Incoming Webhooks provide direct write access to private channels. Even though they're stored as GitHub Secrets in workflows, the **usage patterns** and references to `${{ secrets.TEAMS_WEBHOOK_URL }}` expose that this capability exists. For public demos, replace with placeholder URLs and document configuration steps.
+
+3. **Azure Resource Names Encode Internal Information** — Naming patterns like `fedramp-dashboard-dev`, `fedramp-kv-dev`, `fedrampstodev` leak: (a) project context (FedRAMP compliance), (b) environment topology (dev/staging/prod), (c) Azure subscription structure. Replace with generic `demo-*` equivalents to remove organizational fingerprint.
+
+4. **Sanitization Requires Automation + Human Judgment** — Pure find-replace can't handle: (a) context-dependent decisions (is "contoso" a placeholder or real?), (b) semantic meaning (is this file internal research or reusable pattern?), (c) edge cases (GitHub project IDs need placeholders + documentation). Script handles 90%, human review handles the remaining 10%.
+
+5. **Demo Repos Need Different README Strategy** — Internal README focuses on "what we're building" (project goals, current status, next steps). Public demo README focuses on "what you can do with this" (capabilities, setup instructions, customization guide, integration points). Shift from implementation documentation to user onboarding.
+
+6. **File Exclusion is as Important as Content Sanitization** — Excluding infrastructure/, api/, dashboard-ui/ removes 1000+ files that would require deep sanitization (Azure resource definitions, API keys in config, internal URLs, business logic). Better to exclude entire subsystems than sanitize them incompletely.
+
+7. **Upstream Contribution Requires Generic Examples** — Contributing Squad examples to bradygaster/squad requires removing all Microsoft/Azure-specific context. Generic examples are more valuable to community: "K8S-Platform" instead of "DK8S", "example.com" instead of "contoso.com", "demo-org" instead of "msazure".
+
+**Architecture Insight:**
+- **Sanitization is Multi-Dimensional Risk Management:** It's not just about removing secrets (tokens, keys) — it's also about removing organizational fingerprints (naming patterns, internal service references), personal data (names, emails), and operational patterns (webhook usage, project structure). Each dimension requires different detection/mitigation strategy.
+
+**Deliverables:**
+- Created `SANITIZATION_PLAN.md` — 8 categories, 150+ files analyzed, risk assessment, success criteria
+- Created `scripts/sanitize-for-demo.ps1` — Automated 20+ pattern replacements, file exclusions, dry run mode
+- Created `DEMO_README.md` — Public-facing showcase with value proposition, quick start, customization guide
+- Created `SANITIZATION_CHECKLIST.md` — 11-phase execution plan with 80+ tasks
+- Opened draft PR #226 on branch `squad/225-sanitized-demo-repo`
+
+**Status:** Phase 1 complete (planning). Next: Execute sanitization script and manual review (Phase 2-3).
+
+**Open Question for Team:** Should we create the demo repository under a new GitHub org (e.g., "squad-demos") or under the existing org with clear naming (e.g., "squad-showcase-sanitized")? New org provides complete separation, existing org maintains attribution.
+
+**Related Issue:** #41 (blog post about Squad productivity) — Sanitized demo repository will provide concrete examples for blog content.
+

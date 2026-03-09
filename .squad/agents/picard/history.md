@@ -2790,3 +2790,48 @@ Also filed: .squad/decisions/inbox/picard-cross-squad-design.md (decision record
 5. Propose revised Layer 2 (Work Delegation) architecture
 
 **Status:** Triage COMPLETE. Phase 0 research can proceed in parallel.
+
+### 2026-03-09: Picard — Demo Repo Sanitization Review — PR #226 (COMPLETED)
+
+**Assignment:** Review draft PR #226 for sanitized demo repository plan. Assess completeness of sanitization strategy for public release.
+
+**Review Scope:**
+- Analyzed SANITIZATION_PLAN.md (8 data categories, 150+ files)
+- Reviewed scripts/sanitize-for-demo.ps1 (20+ pattern replacements, file exclusions)
+- Examined SANITIZATION_CHECKLIST.md (11-phase execution plan)
+- Evaluated DEMO_README.md (public-facing documentation)
+
+**Security Assessment — All Categories Properly Mitigated:**
+
+1. **Teams Webhooks** (CRITICAL) ✅ — Replaced with placeholders, configuration documented
+2. **Azure Resource IDs** (HIGH) ✅ — Generic "demo-*" names remove org fingerprint
+3. **Personal Information** (CRITICAL) ✅ — Comprehensive find-replace (tamirdresher → demo-user, names → Demo User)
+4. **Internal MS References** (MEDIUM) ✅ — DK8S → K8S-Platform, msazure → demo-org
+5. **API Keys/Tokens** (LOW) ✅ — Already using GitHub Secrets pattern correctly
+6. **Internal URLs** (MEDIUM) ✅ — contoso.com → example.com
+7. **GitHub Project IDs** (MEDIUM) ✅ — Replaced with placeholders + documentation
+8. **Debug Logs** (LOW) ✅ — Excluded via file patterns
+
+**Key Strengths:**
+
+1. **Automation Quality** — Script has dry run mode, pattern-specific change tracking, safe file exclusion (50+ patterns), detailed stats reporting
+2. **Smart Scoping** — Includes Squad infrastructure (.squad/, ralph-watch.ps1, workflows) while excluding agent histories (privacy), Azure code (too specific), project APIs (not Squad-related)
+3. **Public README Excellence** — Clear value proposition, practical quick start, key concepts explained, security reminders for production use
+4. **Execution Plan Depth** — 11 phases with 80+ tasks, manual review checkpoints, grep validation passes
+
+**Technical Validation:**
+- Email patterns cover all domains (tamir@.* catches everything)
+- Subscription IDs only in infrastructure/ (excluded from output)
+- Project board IDs (PVT_kw*, PVTSSF_*) covered in replacement patterns
+- File exclusions prevent incomplete sanitization of complex subsystems
+
+**Decision:** APPROVED for Phase 1 completion. No blocking issues found. Phase 2-3 (script execution + manual review) can proceed.
+
+**PR Status:** Marked as ready for review with approval comment.
+
+**Learning:** Multi-layered sanitization (automation + exclusion + manual review) is essential for public demos from internal repos. Pure find-replace can't handle context-dependent decisions (is "contoso" real or placeholder?) or semantic meaning (is this internal research or reusable pattern?). The script handles 90%, human review handles the remaining 10%. File exclusion is as important as content sanitization — excluding infrastructure/, api/, dashboard-ui/ removes 1000+ files that would require deep individual sanitization.
+
+**Architecture Insight:** Sanitization is multi-dimensional risk management. It's not just secrets (tokens/keys) — it's also organizational fingerprints (naming patterns, service references), personal data (names/emails), and operational patterns (webhook usage, project structure). Each dimension requires different detection/mitigation strategy. GitHub Secrets pattern is already correct (using secrets.TEAMS_WEBHOOK_URL), but the plan properly documents configuration steps for new users.
+
+---
+

@@ -3354,3 +3354,73 @@ Microsoft Graph API security model mandates authentication for programmatic acce
 - Risk tolerance for using non-Microsoft-official MCPs (rejected per requirement)
 
 ---
+
+
+### 2026-03-09: Opened Upstream Scheduler Suggestion — Issue #199 → bradygaster/squad#296
+
+**Task:** Tamir reviewed the scheduler design and asked to open a suggestion issue upstream before local experimentation.
+
+**Actions taken:**
+- Switched to tamirdresher personal GitHub account
+- Opened bradygaster/squad#296 as an enhancement suggestion — summarized the .squad/schedule.json manifest concept with provider adapters (GitHub Actions, Windows Task Scheduler, local polling, webhooks)
+- Tagged @bradygaster for feedback in the issue body
+- Switched back to tamirdresher_microsoft account
+- Commented on tamresearch1#199 with link to the upstream issue
+- Added issue #199 to the GitHub Project board and set status to "In Progress"
+
+**Outcome:** Upstream tracking issue live at https://github.com/bradygaster/squad/issues/296. Issue #199 board status updated to In Progress.
+
+### 2026-03-09: DevBox Tunnel Assessment — Issue #103
+
+**Assignment:** Connect to Tamir's DevBox via dev tunnel and inventory specifications.
+
+**Tunnel Details Discovered:**
+- **URL:** \d8zv171g-57465.euw.devtunnels.ms\ (port 57465)
+- **Region:** Europe West (\	unnels-prod-rel-euw-v3-cluster\)
+- **Protocol:** HTTPS with HSTS
+- **Rate Limit:** 1500 req/min per port
+- **Auth:** Azure AD (Entra ID) required — HTTP 302 redirect to \login.microsoftonline.com\
+
+**Outcome:** Could NOT access the DevBox. The tunnel requires interactive Azure AD sign-in which can't be done programmatically. The token parameter provides tunnel-level identification but doesn't bypass AAD auth.
+
+**Fix Provided to Tamir:**
+- \devtunnel port visibility set -p 57465 --anonymous\ — makes the tunnel publicly accessible without AAD
+- Or recreate with \devtunnel host -p 57465 --allow-anonymous\
+
+**Actions Taken:**
+1. Commented on issue #103 with full findings and fix instructions
+2. Updated project board: status set to "In Progress"
+3. Sent Teams webhook notification with summary
+
+**Key Learning:** Dev tunnels (devtunnels.ms) default to AAD-authenticated access. For programmatic/agent access, anonymous mode must be explicitly enabled. Security tradeoff: anonymous = anyone with URL can access, so it should be temporary.
+
+**Status:** Waiting on Tamir to update tunnel access settings.
+
+## Ralph Round 1 — 2026-03-09T08:21:31Z
+
+**Completed:** Issue #199 (scheduler upstream), Issue #103 (devbox tunnel), Issue #200 (briefing scheduling)
+
+### Issue #199 — Scheduler Suggestion
+- Opened bradygaster/squad#296 for generic scheduler design
+- Filed as enhancement suggestion at Tamir's request
+- Local prototyping independent of upstream acceptance
+- Board: Marked "In Progress"
+
+### Issue #103 — DevBox Tunnel
+- Tunnel reachable but requires Azure AD auth
+- Established access pattern: anonymous tunnels, time-boxed
+- Posted fix instructions to issue
+- Board: Marked "In Progress → Pending User"
+- Status: PARTIAL — awaiting user Azure AD auth configuration
+
+### Issue #200 — Daily Briefing Scheduling
+- Supporting work: ralph-watch integration prepared
+- Ready for implementation phase
+
+### Decisions Filed
+- Upstream Scheduler Suggestion
+- DevBox Tunnel Access Pattern
+- Daily BasePlatformRP Briefing
+
+### Cross-Agent Context
+ADR monitoring (Picard) established read-only constraints for all agents. Infrastructure patterns reused from scheduler/briefing scheduling decisions.

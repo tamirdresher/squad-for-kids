@@ -12156,3 +12156,132 @@ Public decisions and files are shared; private ones are guarded.
 ### Status
 **READY FOR COMMUNITY REVIEW** — RFC complete with implementation roadmap, risk analysis, and architectural guidance.
 
+
+---
+
+## Decision: Upstream Scheduler Suggestion (Issue #199)
+
+**Date:** 2026-03-09  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented
+
+### Summary
+Opened bradygaster/squad#296 as an enhancement suggestion for a generic, provider-agnostic scheduler system at Tamir's request. Local experimentation independent of upstream acceptance.
+
+### Rationale
+- Generic scheduler design benefits all Squad users
+- Early upstream feedback before implementation investment
+- Keeps local experimentation decoupled from upstream decisions
+
+### Impact
+- Issue #199 status: "In Progress"
+- Decision: File upstream early, prototype locally
+
+---
+
+## Decision: Daily ADR Channel Monitoring (Issue #198)
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**Status:** ✅ Implemented
+
+### Summary
+Added daily read-only monitoring of IDP ADR Notifications Teams channel at 07:00 UTC weekdays via ralph-watch.ps1. Live ADR detected and notified.
+
+### Constraints (CRITICAL)
+- **NEVER** post to IDP ADR Notifications channel
+- **NEVER** comment on ADR documents
+- Only send private summaries to Tamir via Teams webhook
+- Only notify on actionable items (no noise)
+
+### Implementation
+- Schedule: .squad/schedule.json → daily-adr-check
+- Scripts: .squad/scripts/daily-adr-check.ps1
+- Integration: ralph-watch.ps1 time trigger
+- State: .squad/monitoring/adr-check-state.json
+
+### Team Impact
+All agents must respect ADR read-only policy.
+
+---
+
+## Decision: DevBox Tunnel Access Pattern (Issue #103)
+
+**Date:** 2026-03-09  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** 🟡 Proposed (Pending User Implementation)
+
+### Summary
+Access pattern for sharing DevBox via dev tunnels requires Azure AD auth workaround:
+1. Use anonymous access temporarily: \devtunnel host -p <port> --allow-anonymous\
+2. Time-box the exposure — only during active agent work
+3. Revoke after use — close tunnel or switch to AAD
+4. Document tunnel URL in issue thread
+
+### Rationale
+- Agents cannot perform interactive AAD sign-in
+- Anonymous tunnels provide programmatic access
+- Time-boxing limits security exposure
+
+### Risk Mitigation
+- Short-lived tunnel sessions only
+- Consider read-only API over shell access
+- Monitor tunnel access logs
+
+### Status
+Issue #103: Pending User (awaiting Azure AD auth configuration)
+
+---
+
+## Decision: Daily BasePlatformRP Briefing (Issue #200)
+
+**Date:** 2026-03-09  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented
+
+### Summary
+Implemented daily RP status briefing via ralph-watch.ps1 integration at 9:00 AM weekdays.
+
+### Rationale
+- Existing infrastructure: Ralph runs 24/7
+- Unified observability with ralph-watch logging
+- Simpler than Task Scheduler or GitHub Actions
+- Works in dev environment immediately
+
+### Implementation
+- Script: .squad/scripts/daily-rp-briefing.ps1 (standalone, reusable)
+- Integration: ralph-watch.ps1 time-check (Hour == 9, weekdays only)
+- Format: Teams Adaptive Card v1.4 with clickable links
+- Data: GitHub API via \gh\ CLI
+
+### Testing
+Validated with -DryRun: Generates Adaptive Card, fetches PRs/issues, identifies review items.
+
+### Pattern Established
+Time-based scheduled tasks in ralph-watch.ps1 can now check \(Get-Date).Hour\ and \(Get-Date).Minute\ for specific times. Reusable for other daily/weekly automation.
+
+---
+
+## Decision: Upstream Repository Management
+
+**Date:** 2026-03-09  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Implemented
+
+### Summary
+Cleaned upstream configuration by removing unused bradygaster-squad connection and fixing dk8s-platform-squad upstream (never synced). Applied to Issue #1.
+
+### Patterns Established
+1. **Verification Before Sync**: Verify accessibility using \git ls-remote <repo-url>\ before clone/sync
+2. **Complete Cleanup**: Delete JSON entry AND synced directory in .squad/_upstream_repos/
+3. **Timestamp Updates**: Update \last_synced\ after successful sync
+4. **Embedded Repo Warning**: Git warnings about embedded repos are expected and acceptable
+
+### Rationale
+- upstream.json accurately reflects available upstreams
+- Prevents stale content accumulation
+- Clear audit trail via timestamps
+- Graceful handling of accessibility issues
+
+### Status
+dk8s-platform-squad verified and synced. Audit trail established.

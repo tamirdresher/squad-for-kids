@@ -1,0 +1,34 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Squad state files
+.ralph-watch.lock
+.ralph-state.json
+.squad/commit-*.txt
+
+# Agent histories (privacy)
+.squad/agents/*/history.md
+
+# Logs
+*.log
+.squad/*.log
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+~$*

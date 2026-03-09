@@ -1,0 +1,25 @@
+{
+  "name": "squad-demo",
+  "version": "1.0.0",
+  "description": "AI Squad Demo - Multi-agent collaboration for software development",
+  "scripts": {
+    "squad": "squad",
+    "ralph": "pwsh -File ralph-watch.ps1"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "squad",
+    "automation",
+    "github",
+    "copilot"
+  ],
+  "author": "Demo User",
+  "license": "MIT",
+  "dependencies": {
+    "@bradygaster/squad": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

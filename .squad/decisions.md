@@ -13738,3 +13738,164 @@ Implemented Podcaster agent using edge-tts (Python) for text-to-speech conversio
 - **MVP (current):** edge-tts free tier
 - **Medium-term:** Voice selection config, batch processing
 - **Production:** Azure AI Speech Service migration for higher rate limits
+
+---
+
+## Decision: Sanitized Demo Repository Approach
+
+**Date:** 2026-03-25
+**Author:** Picard
+**Status:** ✅ Adopted
+**Scope:** Knowledge Sharing, Open Source
+
+### Context
+
+Issue #242 requested a clean, sanitized repository that can be shared publicly to demonstrate Squad capabilities. Previous attempt (Issue #225) just pointed to the same repo, which wasn't helpful.
+
+Tamir's feedback: "I want a clean and sanitized one so I could share with others so they could learn from it."
+
+### Decision
+
+Create a **standalone sanitized directory** (`sanitized-demo/`) that can be pushed to a new public repository. The directory contains:
+
+#### Included (Shareable)
+- ✅ All agent charters (sanitized)
+- ✅ Team.md, routing.md, decisions.md (generified)
+- ✅ Ralph-watch.ps1 (sanitized, working example)
+- ✅ Key skills (github-project-board with full instructions)
+- ✅ Squad.config.ts, package.json
+- ✅ Comprehensive README.md
+- ✅ Blog draft (personal story, sanitized)
+
+#### Excluded (Privacy/Security)
+- ❌ Agent history.md files (personal work logs)
+- ❌ Actual webhook URLs (provide setup instructions instead)
+- ❌ Real GitHub project/field IDs (provide placeholder instructions)
+- ❌ Infrastructure code (Azure-specific, not Squad-related)
+- ❌ Application code (FedRAMP dashboard, not Squad-related)
+
+#### Sanitization Applied
+- Personal names → Generic placeholders (`{ProjectOwner}`, `Demo User`)
+- Organization names → `demo-org`, `{organization}`
+- Repository names → `squad-demo`, `{repository}`
+- Internal services → Removed or genericized
+- Azure resources → Removed entirely
+- Microsoft-specific references → Removed
+- Real IDs/credentials → Replaced with `<YOUR_ID_HERE>` placeholders
+
+### Rationale
+
+**Standalone directory approach** chosen over:
+- ❌ Sanitizing in-place (too risky, might miss something)
+- ❌ Creating branch (still tied to private repo)
+- ❌ Forking (inherits commit history with sensitive data)
+
+**Fresh directory** allows:
+- ✅ Complete control over what's included
+- ✅ Clean git history (no sensitive commits)
+- ✅ Easy to verify before publishing
+- ✅ User can push to any repo they want
+
+### Implementation
+
+Created `sanitized-demo/` with:
+1. 20 files across 18 directories
+2. Complete Squad structure (.squad/, .github/, docs/)
+3. Working ralph-watch.ps1 script
+4. 6 agent charters (Picard, Data, B'Elanna, Seven, Worf, Ralph, Scribe)
+5. Full README with setup instructions
+6. Example decisions and skills
+7. Blog draft showing real-world usage
+
+### Impact
+
+✅ Squad can be shared publicly for learning
+✅ No sensitive data exposure risk
+✅ Complete, working example (not just docs)
+✅ Others can clone and customize
+✅ Promotes Squad framework adoption
+
+### Related Issues
+
+- #242 - Send me the repo of the demo of the blog
+- #225 - Previous attempt (just pointed to same repo)
+
+---
+
+## Decision: Blog Post Writing Style — Content For vs. Content About
+
+**Date:** 2026-03-09
+**Author:** Seven (Research & Docs)
+**Status:** ✅ Adopted
+**Scope:** Documentation & Communications
+
+### Problem
+
+Initial blog draft (2,500 words) was rejected as "too marketing-like" and "too much on how Squad works, less on what was built."
+
+Feedback indicated:
+- Blog went too deep into Squad framework explanation (Decisions system, Skills library, team structure)
+- Insufficient focus on actual deliverables (Podcaster agent, Squad Monitor, DevBox setup, cross-squad orchestration)
+- Writing style was promotional rather than technical/engineering-focused
+- Didn't match Tamir's direct, honest writing voice
+
+### Decision
+
+**Content philosophy: Content *For* vs. Content *About*.**
+
+- **Content ABOUT Squad:** Explains how the system works. Audience: People interested in AI team architecture.
+- **Content FOR Squad users:** Showcases what was built/shipped. Audience: Engineers wanting to replicate patterns or understand productivity impact.
+
+**This blog post is Content FOR engineers.** Not a technical whitepaper on Squad internals. Not a product pitch on AI teams. A story of "here's what we shipped in 48 hours; here's why it works; here's why you might want to try it."
+
+#### Specific Changes
+
+**1. Cut Squad Framework Explanation by 70%**
+- Removed: Lengthy "Meet the Team" section (Star Trek naming rationale, charter deep-dive)
+- Removed: Multi-paragraph "Skills and Decisions" institutional memory section
+- Kept: Just enough context to understand the work (5 agents, each has a role, Ralph checks queue every 5 minutes)
+
+**2. Frontload Metrics**
+- 14 PRs merged in 48 hours
+- 6 security findings documented
+- 50K LOC analyzed
+- 0 manual prompts required
+- Lead with impact, explain how afterward
+
+**3. Shift from Framework to Deliverables**
+- From: "Here's how decisions are documented"
+- To: "Here are 6 deliverables we shipped: Podcaster agent, Squad Monitor, DevBox setup, Teams monitoring, cross-squad orchestration, provider-agnostic scheduling"
+
+**4. Technical Tone, Not Promotional**
+- Removed flowery language ("magical," "breakthrough," "revolutionary")
+- Added trade-off analysis (why ralph-watch vs squad-cli watch, with feature comparison)
+- Kept engineering focus (specialization prevents conflict, async beats sync, documented reasoning)
+
+**5. Condensed from 2,500 to 1,500 Words**
+- Every paragraph must earn its place
+- Removed filler and transition text
+- Direct prose, sparse punctuation, short sentences
+
+### Rationale
+
+**Engineers read for outcomes, not infrastructure.** When a developer reads "14 PRs merged in 48 hours," they think "how do I get that?" not "tell me about your decision logging system."
+
+**Writing style reveals credibility.** Promotional language reads as marketing. Direct language reads as technical. Tamir's blog audience expects the latter.
+
+**Content type matters.** A technical deep-dive on Squad internals would be 5,000 words with architecture diagrams. A leadership/productivity blog post about what Squad enabled is 1,500 words with concrete examples. Different forms for different purposes.
+
+### Consequences
+
+✅ **Blog is now suitable for Tamir's publication channels** (dev.to, internal Microsoft blog, speaking circuit)
+✅ **Focused on action/outcomes** — readers can see replicable patterns
+✅ **Shorter read time** — engineers will actually finish it
+✅ **Technical credibility** — no marketing fluff, direct voice
+
+⚠️ **Less comprehensive** — deep Squad architecture dives belong in separate documentation (architecture blog post, technical deep-dive)
+⚠️ **Requires visual scaffolding** — fewer words means images/diagrams matter more for readability
+
+### Related
+
+- Issue #41: Blog post "How an AI Squad Changed My Productivity"
+- Content strategy: Technical blog (Squad internals) vs. Productivity blog (Squad impact) are separate pieces
+- Writer's voice: Match Tamir's direct, honest, engineering-focused style over promotional/marketing language

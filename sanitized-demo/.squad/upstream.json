@@ -1,0 +1,13 @@
+{
+  "upstream": {
+    "source": "https://github.com/bradygaster/squad",
+    "enabled": true,
+    "syncSchedule": "daily",
+    "inheritDecisions": true,
+    "inheritSkills": true
+  },
+  "localOverrides": {
+    "allowDecisionOverride": false,
+    "allowSkillOverride": true
+  }
+}

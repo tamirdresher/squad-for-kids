@@ -3356,3 +3356,126 @@ Documented What NOT to adopt (GUI, generic clones, cloud execution, project frag
 
 **Related Issue:** #41 (blog post about Squad productivity) — Sanitized demo repository will provide concrete examples for blog content.
 
+
+### 2026-03-09: Seven — Blog Draft Revision for Issue #41 (COMPLETED)
+
+**Assignment:** Revise blog post to be more engineering-focused, less marketing-speak. Tamir's feedback indicated the draft went "too deep into how Squad works, less into what I built and extended." Needed to match Tamir's direct, technical writing style.
+
+**Key Changes Made:**
+
+1. **Reduced Squad Framework Explanation by 70%** — Removed lengthy "Meet the Team," "How Charters Work," deep dives into Decisions system. Kept only what's essential to understand the work.
+
+2. **Shifted Narrative Focus:**
+   - FROM: "Here's how Squad works in theory"
+   - TO: "Here's what we shipped in 48 hours with Squad"
+
+3. **Cut Content from 2,500 to 1,500 words** — Tighter, punchier. No flowery language. Each paragraph must earn its place.
+
+4. **Frontloaded Real Metrics:**
+   - 14 PRs merged
+   - 6 security findings
+   - ~50K LOC analyzed
+   - Zero manual prompts
+
+5. **Replaced Abstract Concepts with Concrete Deliverables:**
+   - Podcaster agent (not "multimodal output research")
+   - Squad Monitor standalone repo (not "observability framework discussion")
+   - DevBox setup guide (not "cloud execution infrastructure exploration")
+   - Teams message monitoring (not "notification system design")
+   - Cross-squad orchestration (not "federation protocol research")
+
+6. **Technical Tone Throughout:**
+   - Removed "magical" language
+   - Kept trade-off analysis (why ralph-watch vs squad-cli watch)
+   - Direct rationale for each decision
+   - Engineering problems, engineering solutions
+
+7. **Condensed Ralph Watch Explanation:**
+   - Removed unnecessary PowerShell walkthrough
+   - Focused on capability: "every 5 minutes, checks issues, merges PRs, opens new work"
+   - Included squad-cli comparison with feature table
+
+**Lessons Learned:**
+
+1. **Content For vs. Content About** — The original blog was about Squad (the framework). Tamir wanted blog about Squad's *output* (what they built). Different audience, different emphasis. Technical audience cares about results, not infrastructure.
+
+2. **Writing Style Matters More Than Comprehensiveness** — Long, detailed explanation of decisions/skills system wasn't wrong, just wrong *tone* for Tamir's audience. Direct prose, concrete examples, less scaffolding. Let the work speak for itself.
+
+3. **Metrics First, Context Second** — Lead with "14 PRs in 48 hours." That grabs engineers. Explain how afterward. Reverse pyramid structure.
+
+4. **Avoid Explaining the Machinery** — When explaining why ralph-watch was chosen over squad-cli, focus on the gap (parallel execution, Teams integration, etc.), not on detailed feature comparison. Engineers assume you've done the homework.
+
+**Deliverables:**
+- Revised log-draft-ai-squad-productivity.md — 1,500 words, engineering-focused, Tamir's voice
+- Commented on issue #41 with status update showing what changed and why
+
+**Status:** ✅ COMPLETE — Draft ready for Tamir's review/edits. Can be published with minor tweaks.
+
+**Related:** Issue #41 (ongoing)
+### 2026-03-25: Seven — Blog Post Revision Strategy (Issue #41) — COMPLETED
+
+**Assignment:** Continue blog post work with revised content strategy.
+
+**Problem Identified:**
+- Original blog draft (2,500 words) was rejected as "too marketing-like"
+- Too much focus on Squad framework explanation (Decisions system, Skills library, team structure)
+- Insufficient focus on actual deliverables (Podcaster agent, Squad Monitor, DevBox setup, cross-squad orchestration)
+- Writing style was promotional rather than technical/engineering-focused
+- Didn't match Tamir's direct, honest, engineering voice
+
+**Decision: Content FOR vs. Content ABOUT**
+- **Content ABOUT Squad:** Explains how the system works (for AI architecture enthusiasts)
+- **Content FOR engineers:** Showcases what was built and shipped (for practitioners)
+- **This post is FOR engineers.** A story of "here's what we shipped in 48 hours; here's why it works; here's why you might replicate it."
+
+**Execution:**
+1. **Cut Squad Framework Explanation by 70%**
+   - Removed: Lengthy "Meet the Team" section (Star Trek naming, charter deep-dive)
+   - Removed: Multi-paragraph "Skills and Decisions" institutional memory section
+   - Kept: Minimal context (5 agents, each has a role, Ralph checks queue every 5 minutes)
+
+2. **Frontload Metrics (Lead with Impact)**
+   - 14 PRs merged in 48 hours
+   - 6 security findings documented
+   - 50K LOC analyzed
+   - 0 manual prompts required
+
+3. **Shift from Framework to Deliverables**
+   - 6 key outputs: Podcaster agent, Squad Monitor, DevBox setup, Teams monitoring, cross-squad orchestration, provider-agnostic scheduling
+
+4. **Technical Tone, Not Promotional**
+   - Removed flowery language ("magical," "breakthrough," "revolutionary")
+   - Added trade-off analysis (ralph-watch vs squad-cli watch, with feature comparison)
+   - Kept engineering focus (specialization, async beats sync, documented reasoning)
+
+5. **Condensed 2,500 → 1,500 Words**
+   - Every paragraph must earn its place
+   - Removed filler and transition text
+   - Direct prose, sparse punctuation, short sentences
+
+**Rationale:**
+- **Engineers read for outcomes, not infrastructure detail**
+- **Writing style reveals credibility.** Promotional = marketing. Technical = trustworthy.
+- **Content type matters.** Different forms for different purposes: productivity blog (1,500w) ≠ technical deep-dive (5,000w).
+
+**Consequences:**
+✅ Blog now suitable for Tamir's publication channels (dev.to, Microsoft internal blog, speaking circuit)
+✅ Focused on action/outcomes—readers see replicable patterns
+✅ Shorter read time—engineers will finish it
+✅ Technical credibility—no marketing fluff
+⚠️ Less comprehensive—deep Squad architecture belongs in separate documentation
+⚠️ Visual scaffolding needed—fewer words means images/diagrams matter more
+
+**Decision Created:** Merged to `.squad/decisions.md` - Documented content philosophy and specific revision choices.
+**Status:** ✅ CLOSED (Issue #41 commented)
+
+**Next Steps:**
+1. Tamir reviews revised draft and approves tone/content
+2. Add screenshots/graphics at placeholders
+3. Choose publication outlet
+4. Publish
+
+**Key Takeaway:** Always clarify content intent early. "Blog post" is ambiguous. This is the productivity/impact story variant, not technical deep-dive.
+
+---
+

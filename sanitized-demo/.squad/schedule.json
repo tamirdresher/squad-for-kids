@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "timezone": "UTC",
+  "schedule": [
+    {
+      "name": "Daily Digest",
+      "agent": "@picard",
+      "cron": "0 9 * * 1-5",
+      "description": "Generate daily status digest for team",
+      "enabled": false
+    },
+    {
+      "name": "Weekly Planning",
+      "agent": "@picard",
+      "cron": "0 10 * * 1",
+      "description": "Weekly planning and prioritization",
+      "enabled": false
+    },
+    {
+      "name": "Security Audit",
+      "agent": "@worf",
+      "cron": "0 14 * * 3",
+      "description": "Weekly security review of open PRs",
+      "enabled": false
+    }
+  ]
+}

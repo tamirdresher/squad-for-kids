@@ -18,6 +18,40 @@
 
 ## Learnings
 
+### 2026-03-25: Picard — Sanitized Demo Repository — Issue #242
+
+**Assignment:** Create a clean, sanitized demo repository that can be shared publicly to teach others about Squad.
+
+**Approach:**
+- Created standalone `sanitized-demo/` directory (19 files, complete Squad structure)
+- Included 6 agent charters (Picard, Data, B'Elanna, Seven, Worf, Ralph, Scribe)
+- Sanitized ralph-watch.ps1 (working autonomous monitoring script)
+- Comprehensive README.md with setup instructions
+- Example decisions and skills (github-project-board fully documented)
+- Blog draft showing real-world Squad usage
+- Complete squad.config.ts, package.json, .gitignore
+
+**Sanitization Applied:**
+- All personal names → Generic placeholders
+- Organization/repo names → demo-org/squad-demo
+- Webhook URLs → Removed (setup instructions provided)
+- GitHub project IDs → Placeholders with instructions to obtain
+- Azure resources → Removed entirely
+- Microsoft-internal references → Genericized or removed
+
+**Key Files:**
+- `sanitized-demo/README.md` - Main entry point
+- `sanitized-demo/.squad/agents/*/charter.md` - Agent definitions
+- `sanitized-demo/ralph-watch.ps1` - Autonomous monitoring
+- `sanitized-demo/.squad/skills/github-project-board/SKILL.md` - Complete skill example
+- `sanitized-demo/blog-draft.md` - Personal story about Squad
+
+**Decision Created:** `.squad/decisions/inbox/picard-sanitized-demo.md` - Documented approach and rationale for standalone directory vs. alternatives.
+
+**Status:** Complete. Commented on #242 with instructions. Directory ready to push to new public repo.
+
+---
+
 ### 2026-03-09: Picard — ADR Channel Monitoring Status Check — Issue #198
 
 **Assignment:** Check current state of ADR monitoring integration and report findings.
@@ -2832,6 +2866,35 @@ Also filed: .squad/decisions/inbox/picard-cross-squad-design.md (decision record
 **Learning:** Multi-layered sanitization (automation + exclusion + manual review) is essential for public demos from internal repos. Pure find-replace can't handle context-dependent decisions (is "contoso" real or placeholder?) or semantic meaning (is this internal research or reusable pattern?). The script handles 90%, human review handles the remaining 10%. File exclusion is as important as content sanitization — excluding infrastructure/, api/, dashboard-ui/ removes 1000+ files that would require deep individual sanitization.
 
 **Architecture Insight:** Sanitization is multi-dimensional risk management. It's not just secrets (tokens/keys) — it's also organizational fingerprints (naming patterns, service references), personal data (names/emails), and operational patterns (webhook usage, project structure). Each dimension requires different detection/mitigation strategy. GitHub Secrets pattern is already correct (using secrets.TEAMS_WEBHOOK_URL), but the plan properly documents configuration steps for new users.
+
+---
+
+### 2026-03-25: Picard — Sanitized Demo Repository (Issue #242) — COMPLETED
+
+**Assignment:** Create a clean, sanitized repository that can be shared publicly to demonstrate Squad capabilities.
+
+**Execution:**
+- Created standalone `sanitized-demo/` directory (20 files, complete Squad structure)
+- Included 6 agent charters (sanitized: Picard, Data, B'Elanna, Seven, Worf, Ralph, Scribe)
+- Included sanitized teams.md, routing.md, decisions.md with generic organization names
+- Sanitized and included working ralph-watch.ps1 (autonomous monitoring script with placeholders)
+- Comprehensive README.md with setup instructions and value proposition
+- Example decisions and skills (github-project-board fully documented)
+- Blog draft showing real-world Squad usage
+- Complete squad.config.ts, package.json, .gitignore
+
+**Sanitization Applied:**
+- All personal names → Generic placeholders (`{ProjectOwner}`, `Demo User`)
+- Organization/repo names → `demo-org` / `squad-demo`
+- Webhook URLs → Removed (setup instructions provided instead)
+- GitHub project IDs → Placeholders with instructions to obtain
+- Azure resources → Completely removed
+- Microsoft-internal references → Genericized or removed
+
+**Decision Created:** Merged to `.squad/decisions.md` - Documented approach and rationale for standalone directory vs. alternatives.
+**Status:** ✅ CLOSED (Issue #242 commented)
+
+**Next Phase:** User clones `sanitized-demo/`, creates new public repo, pushes content.
 
 ---
 

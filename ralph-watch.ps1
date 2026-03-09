@@ -2,9 +2,10 @@
 # Launches a full Copilot session that can do actual work
 # To stop: Ctrl+C
 # 
-# Observability Features:
+# Observability Features (v8 — aligned with squad-monitor v2):
 # - Structured logging to $env:USERPROFILE\.squad\ralph-watch.log
 # - Heartbeat file at $env:USERPROFILE\.squad\ralph-heartbeat.json
+<<<<<<< Updated upstream
 # - Teams alerts on consecutive failures (>3)
 # - Exit code, duration, and round tracking
 # - Lockfile prevents duplicate instances per directory
@@ -34,18 +35,29 @@ if (Test-Path $lockFile) {
 # Clean up lock on exit
 Register-EngineEvent PowerShell.Exiting -Action { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue } | Out-Null
 trap { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue; break }
+=======
+#   → Written BEFORE round (status=running) and AFTER (status=idle/error)
+#   → Includes pid, status, round, lastRun, exitCode, consecutiveFailures
+# - Teams alerts on 3+ consecutive failures
+# - Log rotation: capped at 500 entries / 1MB
+# - PS 5.1 compatible (no -AsHashtable, [ordered]@{}, 2>$null)
+>>>>>>> Stashed changes
 
 $intervalMinutes = 5
 $round = 0
 $consecutiveFailures = 0
 $maxLogEntries = 500
+<<<<<<< Updated upstream
 $maxLogBytes = 1048576  # 1MB
+=======
+$maxLogBytes = 1MB  # 1048576
+>>>>>>> Stashed changes
 
 # Log rotation settings
 $maxLogBytes = 1MB
 $maxLogEntries = 500
 
-$prompt = 'Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round. CRITICAL: Read .squad/skills/github-project-board/SKILL.md BEFORE starting — you MUST update the GitHub Project board status for every issue you touch (use gh project item-add and gh project item-edit commands from the skill). Move issues to Todo/In Progress/Done/Blocked/Pending User columns as appropriate. IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.'
+$prompt = 'Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round. CRITICAL: Read .squad/skills/github-project-board/SKILL.md BEFORE starting — you MUST update the GitHub Project board status for every issue you touch (use gh project item-add and gh project item-edit commands from the skill). BOARD WORKFLOW: BEFORE spawning an agent for an issue, FIRST move that issue to "In Progress" (option 238ff87a) on the board. When the agent completes and PR is merged, move to "Done" (4830e3e3). When blocked, move to "Blocked" (c6316ca6). The board must reflect what is CURRENTLY being worked on in real-time. IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.'
 
 # Initialize observability paths
 $squadDir = Join-Path $env:USERPROFILE ".squad"

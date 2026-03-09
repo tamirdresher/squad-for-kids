@@ -257,6 +257,52 @@ This is the leverage every engineer deserves.
 
 ---
 
+## "Holy Shit That Is Too Fun" — Community Response
+
+I didn't expect this part.
+
+When I started sharing what the Squad was doing in the "Welcome to Squad" Teams channel, people didn't just say "cool." They started *designing their own squads*. The reactions were immediate and visceral — "this is amazing," "Holy shit that is too fun" — and within days, people were prototyping use cases I hadn't even considered.
+
+Here's what got people most excited:
+
+**Personal squads.** Not shared team infrastructure — *your own* always-on AI team, customized to your daily work. One person's Squad handles Kubernetes operator development. Another's focuses on documentation and compliance. The idea that everyone gets their own squad, tailored to their role, landed hard.
+
+**Mobile and remote access.** Using cli-tunnel, you can control your Squad session from your phone or any browser — zero servers, private-by-default. Someone immediately asked: "Wait, I can check on my Squad from my couch?" Yes. Yes you can.
+
+**Voice-enabled agents.** Multiple people brought up voice MCPs — hands-free development where you talk to your Squad while walking or commuting. We're not there yet, but the pieces exist.
+
+**Accessibility.** This one hit home. People are using Squad to support cognitive disabilities — ADHD, executive function challenges, memory issues. When I said "I'm not an organized person," several people in the channel said "same, and this actually solves it." Squad doesn't judge you for forgetting. It just picks up where you left off.
+
+**Horizontal scaling.** Engineers started asking: can I run *multiple* Squad instances on the same repo, partitioned by labels or folders? Yes. We're already doing it — Ralph handles orchestration on one loop while individual agents work focused issues on separate sessions.
+
+**The governance debate.** This was the most interesting discussion: how much structure should a personal squad have? Some people want strict guardrails and approval gates. Others want full autonomy — "let the Squad ship and I'll review in the morning." There's no right answer yet, but the fact that people are debating it means they're taking it seriously.
+
+The best signal? People explicitly saying "this solves a real problem I was already researching." Not hypothetical value. Not "that's neat." Actual problems, already felt, now solvable.
+
+---
+
+## New Tools We Built Along the Way
+
+Running a Squad at this scale surfaced real operational needs. So we built tools.
+
+### Podcaster (`scripts/podcaster.ps1`)
+
+Not everyone wants to read a 3,000-word research report. So we built Podcaster — a PowerShell script that converts any markdown file into spoken audio using edge-tts (or Windows System.Speech as a fallback). Now I listen to Seven's research reports while making coffee. It's surprisingly useful for catching nuances you'd skim past while reading.
+
+### Squad Monitor v2
+
+When you have Ralph running 24/7 and agents working in parallel, you need visibility. Squad Monitor v2 is a live terminal dashboard showing Ralph's status, open GitHub issues, pending PRs, and orchestration activity in real time. It adapts dynamically to your terminal height — fullscreen on a monitor, compact on a laptop. Think `htop` but for your AI team.
+
+### Teams Message Monitoring
+
+Ralph was already watching GitHub. But we also needed him watching our Teams channels — people post review requests, questions, and action items there too. Using WorkIQ, we wired silent Teams channel monitoring into Ralph's loop every 15 minutes. He scans for anything requiring Squad attention (review requests, blockers, decision questions) and routes them into GitHub issues automatically. No more "did anyone see my message in Teams?"
+
+### cli-tunnel
+
+Remote access to Squad sessions from any device. No servers to provision, no ports to forward, private by default. Start a tunnel, get a URL, open it on your phone. Check on Ralph from the grocery store. I'm not saying I've done this, but I'm not saying I haven't.
+
+---
+
 ## What's Next: Ideas We're Exploring
 
 ### 1. Devboxes and Codespaces
@@ -278,7 +324,13 @@ The Squad already works across multiple repositories. We've analyzed infrastruct
 - Detect cross-repo dependencies and conflicts
 - Coordinate changes across services (e.g., API contract changes affecting multiple consumers)
 
-### 3. Continuous Learning
+### 3. Cross-Squad Orchestration
+
+This is the big one. Right now, each Squad is an island — my Squad doesn't know your Squad exists. But what if they could work together?
+
+We're designing cross-squad orchestration (tracked in [bradygaster/squad#316](https://github.com/bradygaster/squad/issues/316)) where different squads operate as peers: discovering each other, sharing context, and handing off work across team boundaries. Imagine my infrastructure Squad detecting a security issue and handing it to your security-focused Squad with full context — no human relay needed. It's early, but the architecture is taking shape.
+
+### 4. Continuous Learning
 
 Every session teaches the Squad what works:
 - Which patterns led to successful outcomes
@@ -332,6 +384,16 @@ I don't manage the Squad's memory. The Squad manages its own memory via decision
 
 My job is to provide context: "Here's the problem, here's why it matters, here's what success looks like."
 
+### 6. The Boring Stuff Will Bite You (Technical Lessons)
+
+I burned real hours on problems that had nothing to do with AI and everything to do with PowerShell:
+
+- **PowerShell 5.1 vs 7 compatibility matters.** Ralph *must* run under `pwsh.exe` (PowerShell 7), not `powershell.exe` (5.1). We learned this the hard way when scripts silently failed.
+- **UTF-8 BOM is critical for PS 5.1 script parsing.** Without the byte-order mark, PS 5.1 misreads scripts with special characters. Save your `.ps1` files with BOM encoding.
+- **stderr from native commands causes false failures in PS 5.1.** A `try/catch` block will catch stderr output from `git` or `npm` as an exception, even when the command succeeded. This made Ralph think everything was broken when it wasn't.
+- **Always push fixes immediately.** Ralph does `git pull` at the start of every loop. If you fix something locally but don't push, Ralph will pull the old code next round and revert your fix. Ask me how many times I learned this lesson.
+- **Multiple Ralph processes can collide.** We added a lockfile mechanism after discovering two Ralph instances both trying to merge the same PR simultaneously. Now the first one grabs the lock, the second one skips the round.
+
 [IMAGE: Venn diagram showing "Human: Context & Goals" + "AI: Memory & Execution" = "Productive System"]
 
 ---
@@ -356,7 +418,7 @@ The only difference is I applied these principles to my **personal productivity*
 
 I spent years failing at productivity tools. None of them worked because they all required the thing I'm bad at: remembering to use them consistently.
 
-AI changes this completely. The Squad doesn't need me to remember. It remembers for me. It works while I sleep. It documents decisions I would have forgotten. It researches problems I don't have time to investigate.
+AI changes this completely. The Squad doesn't need me to remember. It remembers for me. It works while I sleep. It documents decisions I would have forgotten. It researches problems I don't have time to investigate. In a few weeks, we've shipped 220+ issues and 60+ PRs — and the pace is accelerating, not slowing down.
 
 **This is the leverage every engineer deserves.**
 
@@ -375,6 +437,7 @@ If you're tired of abandoning productivity systems after two weeks, maybe it's n
 Want to build your own Squad?
 
 - **Squad CLI**: [github.com/bradygaster/squad](https://github.com/bradygaster/squad) (install with `npm install -g @bradygaster/squad`)
+- **Demo Repository**: We're preparing a clean demo repo ([issue #225](https://github.com/bradygaster/squad/issues/225)) so you can try Squad without needing internal infrastructure — just clone, configure, and go.
 - **GitHub Copilot**: Enable for your repository
 - **Charters**: Start simple—define 3-5 specialists you need
 - **GitHub Issues**: Use them as your work queue

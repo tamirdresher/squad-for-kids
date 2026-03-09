@@ -10777,3 +10777,215 @@ const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 - Issue #174: Duplicate of #173
 - PR #176: Fix workflow bugs: guard permissions and member name matching
 
+---
+
+## Decision 19: CI Workflow Fixes — Windows Self-Hosted Runner Compatibility
+
+**Date:** 2025-01-21  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented  
+**Scope:** CI/CD & Workflows  
+**Related Issues:** #188, #189  
+**Related PR:** #190
+
+### Problem
+
+GitHub Actions workflows running on self-hosted Windows runners require explicit permissions blocks and defensive checks for directory existence when using Actions designed for Linux/bash environments.
+
+### Decision
+
+**Pattern: Explicit Permissions + Windows-Safe Directory Checks**
+
+When deploying on Windows self-hosted runners:
+
+1. **Explicit Permissions at Job Level:**
+   ```yaml
+   permissions:
+     contents: write      # For git operations (tags, commits)
+     pages: write         # For GitHub Pages deployment
+     id-token: write      # For OIDC authentication
+   ```
+
+2. **Windows-Safe Directory Checks:**
+   ```yaml
+   - name: Build docs site
+     id: build
+     run: |
+       # ... build logic ...
+       if (Test-Path "_site") {
+         "skip=false" >> $env:GITHUB_OUTPUT
+       } else {
+         "skip=true" >> $env:GITHUB_OUTPUT
+       }
+   
+   - name: Upload Pages artifact
+     if: steps.build.outputs.skip != 'true'
+     uses: actions/upload-pages-artifact@v3
+   ```
+
+3. **Cross-Job Communication via Job Outputs:**
+   ```yaml
+   jobs:
+     build:
+       outputs:
+         skip: ${{ steps.build.outputs.skip }}
+     deploy:
+       needs: build
+       if: needs.build.outputs.skip != 'true'
+   ```
+
+### Rationale
+
+- Self-hosted runners don't have default token permissions
+- Actions like `upload-pages-artifact` internally use bash scripts incompatible with Windows
+- Defensive checks prevent workflow failures when expected outputs don't exist
+- Keeps workflows on self-hosted runner without migration
+
+### Files Modified
+
+- `.github/workflows/squad-release.yml`
+- `.github/workflows/squad-docs.yml`
+
+### Consequences
+
+✅ **Benefits:**
+- Windows runner workflows reliable and predictable
+- No unexpected permission errors
+- No undefined output failures
+- No migration to GitHub-hosted runners needed
+
+⚠️ **Trade-offs:**
+- Requires explicit permission declarations (slightly more verbose)
+- Directory checks add minimal overhead
+
+---
+
+## Decision 20: Environment Variable Pattern for User Content in GitHub Actions Scripts
+
+**Date:** 2026-03-08  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Adopted  
+**Scope:** Team Standard  
+**Related Issue:** #179  
+**Related PR:** #180
+
+### Problem
+
+The `squad-issue-notify.yml` workflow was failing with `SyntaxError: Unexpected identifier` when issue bodies contained backticks, code blocks, or special JavaScript characters. The root cause was direct interpolation of user-controlled content into JavaScript template literals within `actions/github-script@v7`.
+
+### Decision
+
+**Standard Pattern: Always pass user content through environment variables when using actions/github-script.**
+
+### Anti-Pattern (Vulnerable):
+```yaml
+- uses: actions/github-script@v7
+  with:
+    script: |
+      const title = `${{ github.event.issue.title }}`;  # BREAKS if title has backticks
+      const body = `${{ github.event.issue.body }}`;    # BREAKS if body has code blocks
+```
+
+### Recommended Pattern (Safe):
+```yaml
+- uses: actions/github-script@v7
+  env:
+    ISSUE_TITLE: ${{ github.event.issue.title }}
+    ISSUE_BODY: ${{ github.event.issue.body }}
+  with:
+    script: |
+      const title = process.env.ISSUE_TITLE;  # Safe - reads as plain string
+      const body = process.env.ISSUE_BODY;    # Safe - no parsing
+```
+
+### Rationale
+
+1. **Environment variables are passed as plain strings** — GitHub Actions sets them without JavaScript parsing
+2. **Special characters remain data, not code** — Backticks, quotes, braces are literal characters, not syntax
+3. **No escaping required** — The environment variable mechanism handles all escaping automatically
+4. **Works for all user content** — Issue bodies, PR descriptions, comments, commit messages, file contents
+
+### Applies To
+
+- All workflows using `actions/github-script@v7` (or any version)
+- Any script that processes user-controlled content
+- Teams notifications, Slack alerts, issue comments, PR comments
+- Content from: `github.event.issue.body`, `github.event.comment.body`, `github.event.pull_request.body`, step outputs
+
+### Does NOT Apply When
+
+- Content is from trusted sources only (e.g., static strings, repository variables)
+- Content is already sanitized/escaped by another tool
+
+### Implementation
+
+1. Identify all user-controlled content being interpolated
+2. Move each piece of content to an `env:` block
+3. Replace inline `${{ }}` interpolation with `process.env.VAR_NAME`
+4. Test with content containing backticks, quotes, and special characters
+
+### Consequences
+
+✅ **Benefits:**
+- Eliminates SyntaxError from special characters in user content
+- No escaping logic required (simpler, less error-prone)
+- Works universally for all character sets and languages
+- Aligns with security best practices (treat user input as data, not code)
+
+⚠️ **Trade-offs:**
+- Slightly more verbose (requires env block + process.env references)
+- May require refactoring existing workflows
+
+---
+
+## Decision 21: Issue #46 — STG-EUS2-28 DK8S Stability Overlap
+
+**Date:** 2026-03-09  
+**Owner:** Picard (Lead)  
+**Status:** ✅ Closed (Recommended)  
+**Scope:** Project Management & Team Coordination  
+**Related Investigation:** `.squad/orchestration-log/2026-03-09T01-25-00Z-picard.md`
+
+### Finding
+
+**DK8S team is actively working on all items in Issue #46.**
+
+Specific evidence from Teams communications (Runtime Platform):
+- **Nada Jasikova:** Direct STG-EUS2-28 investigation with live debugging (node drain failures, Karpenter health, Istio startup issues)
+- **Roy Mishael:** Pod Disruption Budget (PDB) mitigations deployed for `prom-mdm-converter` (concrete Tier 1/2 prevention)
+- **Moshe Peretz:** Cluster provisioning and setup stability improvements in progress with cross-team guidelines alignment
+
+These actions align precisely with Tier 1/2 mitigation objectives (prevention + containment).
+
+### Decision
+
+**Close Issue #46 as "aligned/duplicate"** with public comment acknowledging DK8S team's active work and offering squad collaboration if specific gaps exist.
+
+### Rationale
+
+- No resource duplication possible — DK8S has domain expertise and active ownership
+- Squad cannot add value by duplicating stability work
+- Squad can add value only in *specific* assistance areas (e.g., documentation, monitoring, cross-cluster validation)
+- Closing reduces noise and keeps issue board focused on squad-originated work
+
+### Recommendation Implementation
+
+1. ✅ **Acknowledge:** Comment posted to Issue #46 confirming DK8S team is already investigating and mitigating
+2. ✅ **Link to DK8S artifacts:** Provide visibility into how DK8S team's work connects to the original issue scope
+3. ✅ **Offer collaboration:** Ask DK8S if squad can assist with specific gaps
+4. 🔄 **Reframe if needed:** If squad needs ongoing visibility or coordination role, convert to lightweight tracking artifact (not primary work)
+
+### Status
+
+- ✅ Investigation complete
+- ✅ Comment posted to Issue #46
+- ✅ Recommendation delivered to squad leadership
+- ✅ Issue closed by coordinator
+- ✅ Decision logged for future reference
+
+### Next Steps (Post-Close)
+
+1. Check with DK8S if squad should contribute to specific tasks
+2. Archive Issue #46 in decision log for future reference if pattern repeats
+3. Review squad project for similar overlap patterns (optimize future intake)
+

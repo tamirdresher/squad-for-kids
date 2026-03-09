@@ -18,6 +18,31 @@
 
 ## Learnings
 
+### 2026-03-09: Issue #46 — STG-EUS2-28 DK8S Stability Overlap Analysis
+
+**Context:** Tamir asked whether the work outlined in Issue #46 (Tier 1/2 cluster stability mitigations for STG-EUS2-28) is already being done by DK8S team members. Squad had not responded to his 2026-03-08 comment.
+
+**Research Findings:**
+
+**Teams Communications (Runtime Platform / DK8S):**
+- **Active STG-EUS2-28 Investigation:** Nada Jasikova is directly investigating failures with live debugging. Issues: Node drain failures, Karpenter >20% unhealthy nodes, Istio ztunnel startup failures.
+- **Stability Improvements Deployed:** Roy Mishael introduced Pod Disruption Budget (PDB) changes for `prom-mdm-converter` to prevent outages during node drains—concrete Tier 1/2 mitigation.
+- **Provisioning Cleanup in Progress:** Moshe Peretz confirmed active cluster provisioning and setup stability improvements with cross-team alignment on guidelines.
+- **Pattern:** Mitigations align with Tier 1/2 objectives (prevention + containment), but not formally labeled as such in Teams chats.
+
+**Azure DevOps Search:** No overlapping ADO work items found—issue #46 not yet formally filed in ADO or tracked under different terms.
+
+**Decision:** DK8S team is actively working on all items referenced in Issue #46. No duplication or conflict detected.
+
+**Recommendation to Squad:** Close Issue #46 as "aligned/duplicate" with suggestion to:
+1. Link issue to DK8S team artifacts for visibility
+2. Inquire with DK8S if squad can assist with specific gaps
+3. Reframe as coordination artifact if squad needs ongoing visibility
+
+**Outcome:** Comment posted to Issue #46 with findings and recommendation. Issue status ready for user/lead decision on closure vs. repurposing.
+
+---
+
 ### 2026-03-09: FedRAMP Dashboard Migration Planning — Issue #127
 
 **Context:** Tamir requested migration plan for FedRAMP Dashboard to dedicated repository following his decision on Issue #123 that the project is valid but belongs in its own repo.

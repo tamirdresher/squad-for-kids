@@ -15,6 +15,7 @@
 | Tamir Dresher | 👤 Human — Project Owner | — | 👤 Human |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
+| Neelix | News Reporter | `.squad/agents/neelix/charter.md` | ✅ Active |
 
 ## Human Members
 

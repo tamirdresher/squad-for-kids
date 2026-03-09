@@ -122,6 +122,82 @@ Three extensions to existing infrastructure:
 
 ---
 
+### 2026-03-09: Data — Standalone Squad-Monitor Repository Structure
+
+**Date:** 2026-03-09  
+**Agent:** Data  
+**Issue:** #229  
+**Status:** ✅ IMPLEMENTED & MERGED (PR #231)
+
+**Decision:** Create standalone repository at `squad-monitor-standalone/` with sanitized, open-source ready codebase.
+
+**Key Architecture Decisions:**
+1. **.NET 8 target** (not .NET 10) — Broader LTS compatibility
+2. **AgentLogParser.cs** — New component for live agent log parsing
+3. **--config-dir flag** — Configurable config directory override
+4. **Cross-platform paths** — Path.Combine() throughout
+5. **Full sanitization** — All Microsoft/internal references removed
+6. **Dual documentation** — README.md (comprehensive) + QUICKSTART.md (5-min setup)
+
+**Consequences:**
+- ✅ Squad-monitor now shareable as open-source tool
+- ✅ Live agent log parsing for real-time visibility
+- ✅ Cross-platform friendly (.NET 8, Path.Combine)
+- ⚠️ Agent log parsing depends on undocumented Copilot CLI log format (may break on format changes)
+
+**Next Steps:**
+1. Merge PR #231 ✅ (DONE)
+2. Extract to new GitHub repo (manual, future work)
+3. Add GitHub Actions CI/CD (future work)
+4. Publish as NuGet package (future work)
+
+**Artifacts:**
+- `squad-monitor-standalone/` — Full standalone structure
+- PR #231 — Merged to main
+- Issue #229 — Auto-closed, archived
+
+---
+
+### 2026-03-09: Seven — Patent Email Compilation for Brady Gaster
+
+**Date:** 2026-03-09  
+**Agent:** Seven (Research & Docs)  
+**Issue:** #230  
+**Status:** 🔄 PENDING USER (Tamir to review & send)
+
+**Decision:** Create draft email in Outlook Web summarizing Squad patent research findings. Leave as DRAFT (not auto-sent) for Tamir's human review before sending.
+
+**Rationale:**
+- Patent discussions involve legal/strategic implications — auto-send inappropriate
+- Comprehensive synthesis required (500KB+ patent research reviewed, distilled to ~2700 words)
+- Actionable next steps included (4 decision points for Brady/Tamir)
+
+**Key Content:**
+- **Verdict:** YES, Squad is patentable (narrowly: Ralph monitoring, Casting governance, Git-native state, Drop-box memory)
+- **Prior Art:** NEC patent + 11+ frameworks (CrewAI, MetaGPT, gitclaw, LangGraph, etc.)
+- **Cost/Timeline:** ~$3-5K, 2-4 weeks
+- **Critical:** Must file BEFORE public disclosure — patent rights lost otherwise
+- **Blocking Risk:** gitclaw timing investigation needed
+
+**Artifacts Created:**
+- `patent-email-for-brady.md` — Full email compilation
+- `brady-patent-email-draft.png` — Outlook screenshot
+- Issue #230 comment — Full context
+
+**Communication Protocol Established:**
+- Always create DRAFT for legal/strategic communications (never auto-send)
+- Provide comprehensive summary doc for reference
+- Screenshot evidence for verification
+- Comment on originating issue with full context
+
+**Follow-up Actions:**
+- **Tamir:** Review Outlook draft, send when ready
+- **Tamir/Brady:** Address 4 next-step questions (inventorship, disclosure status, gitclaw timing, strategic intent)
+
+**Status:** Draft email ready in Outlook for Tamir's review.
+
+---
+
 ## Archive
 
 (None yet)

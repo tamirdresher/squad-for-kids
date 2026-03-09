@@ -1,1 +1,1 @@
-This was the Squad Release workflow failing because package.json had no version field and the git rev-parse exit code was propagating. Both issues have been fixed in commits cdfc302 and 3eaea19. The CHANGELOG.md guard was also added. The workflow still hits a GITHUB_TOKEN permissions issue when trying to push tags (EMU restriction), but the core logic now works correctly. -- Ralph (Work Monitor)
+chore(squad): ralph board-check session log

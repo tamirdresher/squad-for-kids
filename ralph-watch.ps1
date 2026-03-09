@@ -304,68 +304,23 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
-    # Step 0: Run scheduled tasks (cache reviews, etc.)
-    Write-Host "[$timestamp] Checking scheduled tasks..." -ForegroundColor Yellow
-    $scheduledScriptPath = Join-Path (Get-Location) "scripts\scheduled-cache-review.ps1"
-    if (Test-Path $scheduledScriptPath) {
+    # Step 0: Run scheduled tasks via Squad Scheduler
+    # The scheduler reads .squad/schedule.json and evaluates all triggers
+    Write-Host "[$timestamp] Evaluating Squad schedule..." -ForegroundColor Yellow
+    $schedulerPath = Join-Path (Get-Location) ".squad\scripts\Invoke-SquadScheduler.ps1"
+    if (Test-Path $schedulerPath) {
         try {
-            & $scheduledScriptPath
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "[$timestamp] Scheduled tasks completed" -ForegroundColor Green
+            # Run scheduler for local-polling provider
+            $scheduleResult = & $schedulerPath -ScheduleFile ".\.squad\schedule.json" -StateFile ".\.squad\monitoring\schedule-state.json" -Provider "local-polling"
+            
+            if ($scheduleResult.tasksFired -gt 0) {
+                Write-Host "[$timestamp] Squad scheduler fired $($scheduleResult.tasksFired) task(s)" -ForegroundColor Green
             }
         } catch {
-            Write-Host "[$timestamp] Warning: Scheduled task failed: $($_.Exception.Message)" -ForegroundColor Yellow
+            Write-Host "[$timestamp] Warning: Squad scheduler error: $($_.Exception.Message)" -ForegroundColor Yellow
         }
-    }
-    
-    # Daily RP Briefing at 9:00 AM (workdays only)
-    $currentHour = (Get-Date).Hour
-    $currentMinute = (Get-Date).Minute
-    $dayOfWeek = (Get-Date).DayOfWeek
-    $briefingTime = ($currentHour -eq 9 -and $currentMinute -lt $intervalMinutes)
-    $isWeekday = ($dayOfWeek -ne 'Saturday' -and $dayOfWeek -ne 'Sunday')
-    
-    if ($briefingTime -and $isWeekday) {
-        Write-Host "[$timestamp] Running daily BasePlatformRP briefing..." -ForegroundColor Cyan
-        $briefingScriptPath = Join-Path (Get-Location) "scripts/daily-rp-briefing.ps1"
-        if (Test-Path $briefingScriptPath) {
-            try {
-                & $briefingScriptPath -SkipWeekends
-                if ($LASTEXITCODE -eq 0) {
-                    Write-Host "[$timestamp] Daily briefing sent successfully" -ForegroundColor Green
-                } else {
-                    Write-Host "[$timestamp] Warning: Daily briefing failed with exit code $LASTEXITCODE" -ForegroundColor Yellow
-                }
-            } catch {
-                Write-Host "[$timestamp] Warning: Daily briefing error: $($_.Exception.Message)" -ForegroundColor Yellow
-            }
-        } else {
-            Write-Host "[$timestamp] Warning: Daily briefing script not found at $briefingScriptPath" -ForegroundColor Yellow
-        }
-    }
-    
-    # Daily ADR Channel Check at 10:00 AM Israel time (~07:00 UTC on weekdays)
-    # Issue #198 — Read-only monitoring of IDP ADR Notifications channel
-    $adrCheckHourUTC = 7  # 07:00 UTC ≈ 10:00 AM Israel
-    $adrCheckTime = ($currentHour -eq $adrCheckHourUTC -and $currentMinute -lt $intervalMinutes)
-    
-    if ($adrCheckTime -and $isWeekday) {
-        Write-Host "[$timestamp] Running daily ADR channel check (Issue #198)..." -ForegroundColor Cyan
-        $adrCheckScript = Join-Path (Get-Location) ".squad\scripts\daily-adr-check.ps1"
-        if (Test-Path $adrCheckScript) {
-            try {
-                & $adrCheckScript -SkipWeekends
-                if ($LASTEXITCODE -eq 0) {
-                    Write-Host "[$timestamp] ADR channel check completed" -ForegroundColor Green
-                } else {
-                    Write-Host "[$timestamp] Warning: ADR check exited with code $LASTEXITCODE" -ForegroundColor Yellow
-                }
-            } catch {
-                Write-Host "[$timestamp] Warning: ADR check error: $($_.Exception.Message)" -ForegroundColor Yellow
-            }
-        } else {
-            Write-Host "[$timestamp] Warning: ADR check script not found at $adrCheckScript" -ForegroundColor Yellow
-        }
+    } else {
+        Write-Host "[$timestamp] Warning: Squad scheduler not found at $schedulerPath" -ForegroundColor Yellow
     }
     
     # Step 1: Update the repo to ensure we have the latest code

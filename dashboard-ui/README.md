@@ -8,6 +8,7 @@ React-based UI for the FedRAMP Security Dashboard (Phase 3).
 - **Control Detail**: Drill-down view for specific FedRAMP controls
 - **Environment View**: Per-environment compliance summaries
 - **Trend Analysis**: Historical trends and drift detection
+- **Live Activity** *(NEW)*: Real-time monitoring of Ralph's orchestration rounds with agent status, tasks, and event stream
 
 ## Technology Stack
 
@@ -87,3 +88,38 @@ localStorage.setItem('mock_user_role', 'Security Admin');
 ```
 
 In production, the app uses Azure AD JWT tokens for authentication.
+
+## Live Activity Panel (Issue #207)
+
+**Status:** Prototype implementation complete
+
+### Overview
+The Live Activity Panel provides real-time monitoring of Ralph's orchestration engine, displaying agent spawns, completions, and current status.
+
+### Implementation
+- **Parser Service** (`src/services/activityParser.ts`): Parses orchestration logs from `.squad/orchestration-log/*.md`
+- **Custom Hook** (`src/hooks/useActivityPoller.ts`): Polls orchestration logs and heartbeat every 5 seconds
+- **React Component** (`src/components/LiveActivityPanel.tsx`): Material-UI table + timeline display
+- **Page Component** (`src/components/pages/LiveActivityPage.tsx`): Full-page view with instructions
+
+### Data Sources
+1. **Orchestration Logs** (`.squad/orchestration-log/*.md`): Structured agent events (spawns, completions, failures)
+2. **Heartbeat JSON** (`~/.squad/ralph-heartbeat.json`): Round status, timing, elapsed seconds
+
+### Features Implemented
+- ✅ Agent activity table with status icons (Done/Running/Queued/Failed)
+- ✅ Actions log with timestamped event stream
+- ✅ Round status bar (number, elapsed time, counts)
+- ✅ Auto-refresh every 5 seconds
+- ✅ Mock data for demonstration (file system integration pending)
+
+### Future Enhancements
+- [ ] Real file system integration (replace mock data with actual file reading)
+- [ ] Keyboard shortcuts ('l' for raw logs, 'p' for pause)
+- [ ] Duration tracking for running agents (time since spawn)
+- [ ] Idle state countdown ("Next round in Xm Ys")
+- [ ] Performance optimization (virtualized list for 100+ actions)
+
+### Accessing the Panel
+Navigate to `/activity` route in the dashboard (requires `canViewDashboard` permission).
+

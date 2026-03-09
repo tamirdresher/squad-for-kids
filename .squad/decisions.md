@@ -9148,6 +9148,238 @@ Create dedicated GitHub user account for the bot.
 - Requires separate GitHub license
 - Manual PAT rotation every 90 days
 - Security risk if token leaks
+
+---
+
+## Decision 42: Codex Security & Squad Integration
+
+**Date:** 2026-03-09  
+**Author:** Worf (Security & Cloud)  
+**Issue:** #212 — Security & integration assessment  
+**Status:** 🟡 Proposed  
+**Scope:** Security, Integration Architecture
+
+### Context
+
+Seven completed Codex research (Issue #211) identifying Codex as a multi-agent orchestration platform with strong sandboxing, Skills API, and worktree isolation. This security assessment evaluates whether Codex can safely join Squad's agent ecosystem.
+
+### Decision
+
+OpenAI Codex is **approved for integration as a specialized autonomous subagent** (spawned by Ralph via TypeScript/Python SDK for code-generation tasks) with mandatory security guardrails. Codex is **NOT approved as a general Squad team member**.
+
+### Key Security Findings
+
+1. **CVE-2025-61260 (CVSS 9.8):** Critical command injection via project-local config files in Codex CLI < 0.23.0. Patched. Validates our hostile-input assumptions.
+2. **Sandboxing:** OS-native (AppContainer/Seatbelt/Landlock), open-sourced, co-developed with Microsoft. Robust.
+3. **Compliance:** SOC 2 Type II achieved. FedRAMP High via Azure OpenAI. Sovereign cloud NOT confirmed.
+4. **Data handling:** Local-first, zero retention in enterprise mode, Azure boundary isolation.
+
+### Mandatory Guardrails (Non-Negotiable)
+
+1. Azure OpenAI Service ONLY (no public API)
+2. Codex CLI >= v0.23.0 (CVE patched)
+3. Pre-flight secret scanning before every invocation
+4. Read-only sandbox + directory allowlist (src/ + tests/)
+5. Human review gate (no auto-merge)
+6. Ephemeral isolated compute (not developer laptops)
+7. Config file validation (reject .codex/config.toml, suspicious .env)
+8. Audit logging to compliance system
+9. Provider abstraction layer before adding to squad.config.ts
+
+### Integration Path
+
+- **Recommended:** Codex as subagent via `@openai/codex-sdk` (TypeScript) or `openai-codex-sdk` (Python), spawned by Ralph
+- **Not recommended:** Codex as Squad team member (lacks async collaboration, persistent identity, decision tracking)
+- **Prerequisite:** Provider abstraction layer to avoid 5th-provider sprawl
+
+### Implementation Timeline
+
+- Phase 1 (2 weeks): Azure OpenAI resource + sandbox policy + secret scanning
+- Phase 2 (2 weeks): SDK integration + audit logging + security pentest
+- Phase 3 (1 week): Pilot on non-critical repo + security sign-off
+
+### Consequences
+
+- ✅ Enables autonomous code generation within Squad's security framework
+- ✅ Validates 3-layer defense model: data isolation + execution sandbox + audit/review
+- ⚠️ Adds operational overhead (policy framework, audit logging, version management)
+- ⚠️ Sovereign cloud work blocked until Fairfax/Mooncake support confirmed
+
+---
+
+## Decision 43: Podcaster Agent TTS Technology Selection
+
+**Date:** 2026-03-09  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #214 — Podcaster agent TTS research  
+**Status:** 🟡 Proposed  
+**Scope:** Infrastructure, Agent Capability
+
+### Decision
+
+**Use `@andresaya/edge-tts` (npm) for MVP, upgrade to Azure AI Speech Service for production.**
+
+### MVP: Edge TTS
+
+- **Cost:** Free — no API key, no Azure subscription required
+- **Quality:** Neural voices identical to Edge browser Read Aloud (300+ voices)
+- **Setup:** `npm install @andresaya/edge-tts` — works immediately
+- **Multi-voice:** Supports assigning different voices per segment (e.g., AriaNeural + GuyNeural)
+- **Risk:** Unofficial API — Microsoft could restrict access. Acceptable for internal MVP.
+- **Tested:** Package confirmed available (v1.8.0), active maintenance, TypeScript support
+
+### Production: Azure AI Speech Service
+
+- **Trigger to upgrade:** Edge TTS breaks, need SSML emotion/emphasis control, or external distribution
+- **Cost:** ~$16/M chars with 5M free/month — covers ~2,500 pages of reports
+- **Advantage:** Enterprise SLA, full SSML, Custom Neural Voice, compliance-ready
+
+### Eliminated Options
+
+- **System.Speech (PowerShell):** Only 2 robotic SAPI5 voices (David, Zira). Not available in PS7+. Dead end.
+- **Azure OpenAI TTS:** Only 13-23 voices, regional deployment constraints, no advantage over Speech Service.
+
+### Architecture Decision
+
+Use Node.js (not PowerShell) as the TTS runtime:
+- Better npm ecosystem integration (edge-tts is a Node package)
+- Project already has `package.json` and `node_modules/`
+- PowerShell orchestration (Ralph Watch) calls Node.js script for TTS work
+
+### Impact
+
+- No Azure costs for MVP phase
+- Node.js dependency added to project
+- Audio files stored in `.squad/podcasts/` directory
+- Future upgrade path to Azure Speech Service is clean (swap TTS provider, keep pipeline)
+
+### Consequences
+
+- ✅ Zero-cost MVP with neural-quality audio
+- ✅ No Azure subscription dependency for initial development
+- ✅ Clean upgrade path to enterprise TTS
+- ⚠️ Edge TTS is unofficial — could break without warning
+- ⚠️ Limited SSML control vs Azure Speech Service
+
+### Mitigation
+
+- Abstract TTS provider behind interface (swap Edge TTS → Azure Speech without pipeline changes)
+- Monitor edge-tts GitHub issues for deprecation signals
+- Keep Azure Speech Service integration code ready as fallback
+
+---
+
+## Decision 44: Multimodal Agent Architecture for Squad
+
+**Date:** 2026-03-09  
+**Author:** Seven (Research & Docs)  
+**Issue:** #213 — Multimodal agent research  
+**Status:** 🟡 Proposed  
+**Scope:** Agent Architecture, Model Selection
+
+### Context
+
+Issue #213 requests a media/creative agent for diagrams, images, audio, and video processing. Research was conducted across Gemini, GPT-4o, and Claude multimodal capabilities.
+
+### Decision Points
+
+**1. Multimodal Agent Should NOT Default to Gemini**
+
+- `gemini-3-pro-preview` (Gemini 2.5 Pro) is reasoning-only — it cannot generate images
+- The Flash variant with native image gen is not in our model catalog
+- For diagrams (primary use case), Mermaid code generation works with any LLM
+- Claude Sonnet 4.5 generates excellent Mermaid code as our default model
+
+**Recommendation:** Default to `claude-sonnet-4.5` for diagram code generation. Use `gpt-image-1` for actual image synthesis. Add Gemini Flash as future enhancement.
+
+**2. Separate Multimodal and Podcaster Agents**
+
+- Multimodal agent uses: Mermaid-CLI, D2, image generation APIs, Playwright
+- Podcaster agent uses: Azure AI Speech Service, TTS, audio file handling
+- Completely different tool chains, skills, and routing rules
+- Combining them creates a bloated, unfocused agent
+
+**Recommendation:** Create two separate agents — "Geordi" for visual/multimodal, separate agent for Podcaster (#214).
+
+**3. Code-Based Diagrams Over AI Image Generation**
+
+- Mermaid diagrams are version-controllable, diffable, and GitHub-native
+- Any LLM can generate Mermaid code (no special model needed)
+- AI-generated images are non-deterministic and can't be incrementally edited in code
+- Mermaid-CLI renders to SVG/PNG reliably in CI/CD
+
+**Recommendation:** Use Mermaid as primary diagram tool. Reserve image generation APIs for creative/illustrative tasks only.
+
+**4. Agent Name: "Geordi"**
+
+- **Rationale:** Geordi La Forge (Star Trek TNG) — chief engineer whose VISOR gives him vision across the electromagnetic spectrum. Perfect metaphor for a visual/multimodal agent.
+- **Name not yet in registry.**
+
+### Consequences
+
+- ✅ Leverages existing model catalog (no new models needed for primary use case)
+- ✅ Code-based diagrams integrate with existing Git workflows
+- ✅ Clear separation of concerns between visual and audio agents
+- ⚠️ True image generation requires GPT-4o API calls (cost consideration)
+- ⚠️ Gemini Flash image gen would require catalog addition
+
+### Action Items
+
+- [ ] Add "Geordi" to `.squad/casting/registry.json`
+- [ ] Create agent charter at `.squad/agents/geordi/charter.md`
+- [ ] Install mermaid-cli as Squad tool dependency
+- [ ] Evaluate adding `gemini-2.0-flash-exp` to model catalog for future image gen
+- [ ] Coordinate with Podcaster agent (#214) to avoid overlap
+
+---
+
+## Decision 45: Squad Scheduler Architecture — Phase 1
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**Issue:** #199 — Provider-agnostic scheduling for Squad  
+**Status:** 🟡 Proposed  
+**Scope:** Team Operations, Automation
+
+### Context
+
+Squad needs automated scheduling that isn't bound to a specific provider. B'Elanna designed a provider-agnostic architecture with `.squad/schedule.json` as the manifest format. The manifest exists and is well-structured with 5 tasks. However, no runtime engine reads it — `ralph-watch.ps1` uses hardcoded time checks instead.
+
+### Decision
+
+**Approve Phase 1 MVP implementation (local-first):**
+
+1. **Cron parser** — Pure PowerShell function `Test-CronExpression` for 5-field cron evaluation with timezone support
+2. **Scheduler engine** — `Invoke-SquadScheduler` reads schedule.json, evaluates triggers, dispatches tasks
+3. **Ralph integration** — Replace ~60 lines of hardcoded time checks with single `Invoke-SquadScheduler` call
+4. **Execution state** — `.squad/monitoring/schedule-state.json` tracks last run times and outcomes
+
+**Phase 2 (deferred):** GitHub Actions and Windows Task Scheduler provider adapters.
+
+### Rationale
+
+- Schedule.json format is already proven (5 tasks defined, timezone-aware, retry policies)
+- ralph-watch.ps1 hardcoded triggers are fragile and don't scale
+- Local-first aligns with Tamir's request to experiment before upstreaming
+- ~7h effort for immediate payoff in maintainability
+
+### Open Questions (for Tamir)
+
+1. **Missed execution policy:** If Ralph was offline when a daily task was due, should it fire on next startup?
+2. **Agent autonomy:** Can agents add schedule entries, or humans only?
+3. **Assignment:** B'Elanna for engine, Data for cron parser, or single owner?
+
+### Upstream
+
+Tracking issue filed at bradygaster/squad#296 for Brady's input on making this a Squad platform feature.
+
+### Consequences
+
+- ✅ Immediate improvement in scheduler maintainability
+- ✅ Proven format (schedule.json) reduces design work
+- ✅ Experimental local approach aligns with Tamir's request
+- ⚠️ Cron parser written in PowerShell (less portable than platform-agnostic)
+- ⚠️ Phase 2 provider adapters required for cross-platform scheduling
 - More operational overhead
 
 #### ❌ Option 3: Azure Functions + Service Identity
@@ -12555,3 +12787,305 @@ The guard was designed to prevent .squad/ files from being committed to main. Ho
 
 - Issue #193, #194: User feedback on email noise
 - .github/workflows/squad-main-guard.yml: Implementation file
+
+---
+
+## Decision 4: Squad Platform Adapter Architecture — Prompt-Level Abstraction Preserved
+
+**Date:** 2026-03-09
+**Author:** Picard (Lead)
+**Issue:** #196
+**Status:** Proposed
+**Scope:** Team Process & Architecture
+
+### Context
+
+Responded to bradygaster/squad#294 question about whether new PlatformAdapter/CommunicationAdapter layers (PRs #191, #263) conflict with the original "prompt-level abstraction" vision from issue #8.
+
+### Key Insight
+
+The two approaches are complementary, not conflicting:
+1. **Agent-level abstraction** remains prompt-level (CLI tools, MCP) — per issue #8 guidance
+2. **Coordinator/runtime abstraction** uses code-level adapters — new work for Squad's own cross-platform plumbing
+
+Tamir's ADO research (concept mapping, WIQL templates) directly feeds the ADO adapter specification.
+
+### Decision
+
+Adapters are **execution-layer implementation detail**, not architectural shift.
+
+**Action:** Established Tamir's position as hands-on contributor to multi-platform Squad vision. Posted perspective to tamirdresher_microsoft/tamresearch1#196 (not to bradygaster/squad — per issue instructions).
+
+### Consequence
+
+No code changes required in tamresearch1 until factories are wired in bradygaster/squad.
+
+---
+
+## Decision 5: Watch Command Strategy — squad-cli vs ralph-watch.ps1
+
+**Date:** 2026-03-09
+**Author:** B'Elanna (Infrastructure Expert)
+**Issue:** #210
+**Status:** ✅ ADOPTED
+**Scope:** Infrastructure — Watch/Polling System
+
+### Problem
+
+Squad has two work monitoring tools. Should we switch to squad-cli watch, keep ralph-watch.ps1, or use both?
+
+### Key Findings
+
+**squad-cli watch v0.8.25** (triage-and-report tool):
+- ✅ Gained: Deterministic rules-engine routing (vs AI-prompt triage)
+- ✅ Gained: Native PR categorization, Copilot auto-assignment
+- ❌ Still missing: Agent spawning (cannot execute work autonomously)
+- ⚠️ Lacks: Lock management, telemetry, Teams alerts, log rotation, project board updates
+
+**ralph-watch.ps1 v8** (full operator):
+- ✅ Spawns agents, manages locks, writes telemetry, sends Teams alerts
+- ✅ Project board integration, log rotation, git sync
+- ✅ Battle-tested, production-grade reliability
+
+### Decision
+
+**Keep ralph-watch.ps1 as primary operator.** squad-cli watch is triage-only; architectural gap is agent spawning.
+
+### Next Steps
+
+1. Monitor squad-cli releases for agent execution capability
+2. Consider adopting squad-sdk rules engine inside ralph-watch (future hybrid approach)
+3. Re-evaluate at v0.9.x or when agent execution feature ships
+
+---
+
+## Decision 6: Live Agent Activity Panel Architecture (Issue #207)
+
+**Date:** 2026-03-09
+**Author:** Data (Code Expert)
+**Issue:** #207
+**Status:** Proposed
+**Scope:** Dashboard UI, Monitoring, Orchestration Observability
+
+### Problem
+
+Ralph's orchestration system runs agent rounds every 5 minutes, but the current dashboard has no live view of what's happening during an active round. Users cannot see which agents are running, what they're working on, or progress status.
+
+### Architecture Decision
+
+**Three-layer file-based architecture**:
+
+1. **Data Collection** (2-5s polling):
+   - Heartbeat JSON: Round status, elapsed time, process ID
+   - Orchestration logs: Agent spawns, tasks, board updates, completions
+   - Process list (fallback): Verify Ralph still running
+
+2. **Event Processing**:
+   - TypeScript parser: Extract events from orchestration markdown
+   - React Context: Centralized state management
+   - Polling hook: 2s heartbeat, 5s log scans, auto-update elapsed time
+
+3. **Presentation**:
+   - LiveActivityPanel component: Top bar, agent table, actions log
+   - Three view modes: Processed (default), raw log, summary bar
+   - Keyboard shortcuts: 'a' toggle, 'p' pause
+
+### Implementation
+
+**~4 hours**: Parsing (1-2h), state management (1h), UI (2-3h), integration (1h)
+
+### Success Criteria
+
+- Real-time agent activity display (within 5s)
+- Processed view with human-readable summaries
+- Graceful fallback when Ralph not running
+- <100ms render time with 100+ entries
+
+---
+
+## Decision 7: Adopt Worktree Isolation for Parallel Agent Tasks
+
+**Date:** 2026-03-09
+**Author:** Seven (Research & Docs)
+**Issue:** #211
+**Status:** Proposed
+**Scope:** Team Process & Architecture
+
+### Context
+
+Codex research identified three adoption-ready patterns: git worktrees (isolation), Skills system (consistency), declarative automations (scheduling).
+
+### Three Proposals
+
+#### 1. Git Worktrees (LOW-RISK)
+
+**Replace branch-based isolation with worktrees.** Single biggest reliability improvement available (prevents merge conflicts between concurrent agents). Timeline: 2 weeks.
+
+#### 2. Skills System (MEDIUM-TERM)
+
+**Formalize reusable agent workflows.** Create .squad/skills/ with structured definitions (instructions, tools, success criteria). Timeline: 4 weeks.
+
+#### 3. Scheduled Automations (MEDIUM-TERM)
+
+**Extend ralph-watch.ps1 with scheduled tasks.** Add 	asks.scheduled to squad.config.ts for nightly/weekly background work. Timeline: 3 weeks.
+
+### Success Criteria
+
+1. **Worktrees:** Zero branch cleanup, zero merge conflicts (2-week trial)
+2. **Skills:** 3 workflows documented; agent prompts reference Skills
+3. **Scheduled:** 2 background tasks run automatically; logged to Teams
+
+---
+
+## Decision 8: Codex Security Assessment — Integration as Specialized Subagent
+
+**Date:** 2026-03-09
+**Author:** Worf (Security & Cloud)
+**Issue:** #212
+**Status:** Proposed
+**Scope:** Security & Integration
+
+### Verdict
+
+✅ **TECHNICALLY FEASIBLE WITH GUARDRAILS** | ⚠️ **ARCHITECTURAL CONCERNS**
+
+Codex (via Azure OpenAI Service) can safely integrate as specialized subagent for autonomous code generation. Complement (not replace) GitHub Copilot.
+
+### Security: ✅ APPROVED
+
+- ✅ Local-first data handling, zero retention
+- ✅ Multi-layered sandboxing, approval workflows
+- ✅ FedRAMP High, SOC 2 Type II compliance
+- ⚠️ Sovereign cloud (Fairfax/Mooncake): NOT confirmed
+
+### Mandatory Mitigations
+
+1. Read-only sandbox + directory allowlist
+2. Pre-flight secret scanning before spawn
+3. Azure OpenAI EXCLUSIVELY (not public API)
+4. Human review gate (no auto-merge)
+5. Quarterly security audits
+
+### Recommended Architecture
+
+Codex as **specialized autonomous subagent** spawned by Ralph for code-generation tasks (not general team member).
+
+**Implementation:** 2-3 weeks for production integration
+
+---
+
+---
+## Decision: Office 365 Automation Strategy
+
+# Decision Proposal: Office 365 Automation Strategy
+
+**Date:** 2026-07-14  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #183  
+**Status:** 🟡 Proposed  
+**Scope:** Infrastructure / Integrations
+
+## Context
+
+Issue #183 requires enabling agents to send emails, create calendar events, and post to Teams. Tamir's constraints: Microsoft-official MCPs only, no Azure AD app registration possible.
+
+## Decision
+
+Adopt a three-tier approach to Office 365 automation:
+
+### Tier 1: WorkIQ MCP (Immediate — No Setup)
+- Use existing WorkIQ for email reading/drafting, calendar creation, meeting scheduling, Teams reading
+- Coverage: ~80% of use cases
+
+### Tier 2: Playwright Browser Automation (Short-Term Workaround)
+- Use Playwright skill to automate Outlook Web for autonomous email sending
+- Per Tamir's suggestion: "open outlook in the browser and send from there"
+- Create a reusable squad skill for this
+
+### Tier 3: Microsoft Agent 365 MCP (Long-Term)
+- Request IT admin to enroll tenant in Agent 365 Frontier preview
+- Enables mcp_MailTools and mcp_CalendarTools with full autonomous send/schedule capability
+- One-time admin PowerShell setup, no per-app registration needed
+
+## Consequences
+
+- ✅ Immediate progress with WorkIQ (already available)
+- ✅ Browser automation provides workaround for autonomous sending
+- ⚠️ Playwright approach is fragile (UI changes can break it)
+- ⚠️ Agent 365 Frontier requires IT admin cooperation and may have licensing requirements
+- ✅ All three tiers use Microsoft-official tools only
+
+## Alternatives Considered
+
+- **@softeria/ms-365-mcp-server** — Rejected (not Microsoft-official, per Tamir's directive)
+- **@pnp/cli-microsoft365-mcp** — Rejected (not Microsoft-official)
+- **Microsoft MCP Server for Enterprise** — Evaluated but only covers Entra ID directory queries, not email/calendar
+- **Power Automate flows** — Viable alternative but adds complexity outside MCP ecosystem
+
+## Action Required
+
+Tamir to confirm:
+1. Should we build the Playwright email-sending skill? (Tier 2)
+2. Should we draft the IT admin request for Agent 365 Frontier? (Tier 3)
+3. Is the current WorkIQ capability sufficient for now? (Tier 1 only)
+
+# Decision 24: Multimodal Agent Architecture — Gemini 3.1 Flash
+
+**Date:** 2026-03-10  
+**Author:** Data (Code Expert)  
+**Issue:** #213  
+**Status:** APPROVED FOR IMPLEMENTATION (awaiting casting approval)  
+**Scope:** Squad Agent Architecture & Multimodal Integration
+
+## Verdict
+
+**Gemini 3.1 Flash is the optimal choice for Squad's new multimodal agent.** Implementation architecture is production-ready and requires minimal squad.config.ts changes.
+
+### Key Findings
+
+| Dimension | Gemini 3.1 Flash | GPT-5.2-Codex | Claude 3.5 |
+|-----------|-----------------|---------------|-----------|
+| **Cost Advantage** | **5× cheaper** | Baseline | 6× more |
+| **Audio/Video** | ✅ Both supported | ❌ | ❌ |
+
+### Status
+
+**Result:** APPROVED FOR IMPLEMENTATION  
+**Ownership:** Data (Code Expert), B'Elanna (Infrastructure), Ralph (Orchestration)
+
+---
+
+# Decision 25: Podcaster Agent (Picard) Architecture
+
+**Date:** 2026-03-09  
+**Issue:** #214  
+**Author:** Seven (Research & Docs)  
+**Status:** Ready for Implementation
+
+Two-phase TTS strategy: edge-tts MVP (Phase 1, /mo) → Azure OpenAI TTS (Phase 2, .50–3/mo).
+
+---
+
+# Decision 26: ADR Teams Monitoring Architecture
+
+**Date:** 2026-03-09  
+**Issue:** #198  
+**Author:** Worf (Security & Cloud)  
+**Status:** APPROVED & OPERATIONAL
+
+Continue existing ADR monitoring system. No changes required. System is production-ready, secure, auditable.
+
+---
+
+# Decision 27: Squad Scheduler Architecture (Declarative Scheduling)
+
+**Date:** 2026-03-09  
+**Issue:** #199  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** IMPLEMENTED & OPERATIONAL
+
+Deployed 470-line scheduler engine replacing hardcoded time checks. All tasks declared in .squad/schedule.json. Supports cron + interval triggers, provider abstraction, execution state tracking. Phase 1 complete (local-polling, copilot-agent). Phase 2 roadmap (GitHub Actions, Windows Task Scheduler).
+
+---
+
+*Decisions merged from inbox on 2026-03-09T12-01-18Z by Scribe. All Round 2 agent work documented in orchestration logs.*

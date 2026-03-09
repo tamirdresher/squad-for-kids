@@ -10,6 +10,111 @@
 
 ## Learnings
 
+### 2026-03-09: Worf — Codex Security Assessment — Issue #212 (COMPLETED, ROUND 2)
+
+**Assignment:** Evaluate OpenAI Codex as potential Squad subagent from security perspective. CVE-2025-61260 flagged.
+
+**Deliverable:** 
+- Security assessment covering: data handling, sandboxing, compliance, credential exposure risks
+- Mandatory mitigations: subagent-only deployment with 9 guardrails
+- FedRAMP compliance verified (GPT-5.2/5.3 in Azure Government)
+- Critical risks identified: credential exposure, prompt injection, data exfiltration
+
+**Status:** Waiting for user review on project board. Recommends subagent-only execution with strict guardrails.
+
+---
+
+### 2026-03-09: Worf — OpenAI Codex Security Assessment — Issue #212
+
+**Assignment:** Evaluate OpenAI Codex as potential Squad subagent/team member from security perspective.
+
+**Scope:** Data handling, sandboxing, compliance (FedRAMP), EMU integration, credential exposure risks, integration architecture.
+
+**Research:**
+- Web research: Codex API security model, Azure OpenAI Service capabilities, enterprise compliance
+- Comparison analysis: Codex vs GitHub Copilot for Squad deployment patterns
+- Integration architecture: Autonomy vs operational overhead vs security maturity requirements
+
+**Security Findings:**
+
+1. **Data Handling: ✅ SAFE**
+   - Local-first architecture: code snippets only sent to API (not entire repos)
+   - Azure OpenAI Service isolation: data stays within Microsoft cloud boundary
+   - Zero retention in FedRAMP regions: no model training on customer data
+   - SOC 2 + FedRAMP High compliance verified
+
+2. **Sandboxing: ✅ ROBUST**
+   - Multi-layered: read-only, workspace-write, full-access modes
+   - Platform-specific: Seatbelt on macOS, Docker + firewall on Linux
+   - Configurable approval policies for command execution
+   - Network isolation capabilities (can be air-gapped)
+
+3. **Compliance: ✅ STRONG**
+   - FedRAMP High authorized for Codex models (GPT-5.2/5.3) in Azure Government
+   - EMU (Entra ID managed users) fully supported
+   - DoD IL4/IL5 support available
+   - ⚠️ Sovereign cloud (Fairfax/Mooncake) support NOT confirmed yet
+
+4. **Critical Risks Identified:**
+   - **Credential Exposure (HIGH):** .env files, Azure keys, API credentials could be read during code analysis
+   - **Prompt Injection (MEDIUM):** Malicious code comments could manipulate code generation
+   - **Data Exfiltration (HIGH with public API, LOW with Azure OpenAI):** Code containing business logic could leak
+   - **Sandbox Escape (LOW probability, CRITICAL impact):** Local vulnerabilities could enable arbitrary execution
+
+**Mandatory Mitigations:**
+- Pre-flight secret scanning validator (blocks .env, *.key, secrets.json)
+- Read-only sandbox + explicit directory allowlist (src/ + tests/ only)
+- Human review gate on all generated code (no auto-merge)
+- Azure OpenAI Service ONLY (not public API)
+- Ephemeral isolated compute (not developer laptops)
+- Audit logging of all API calls
+
+**Integration Architecture Assessment:**
+
+vs GitHub Copilot:
+- Copilot: Low autonomy, excellent context, minimal overhead (IDE plugin)
+- Codex API: High autonomy, good context, significant overhead (requires orchestration)
+
+Recommendation: Deploy Codex as **specialized autonomous subagent** (spawned by Ralph for code-generation tasks), NOT as general team member.
+
+Required: 2-3 week integration effort (Azure OpenAI resource + policy framework + orchestration).
+
+**Architectural Concern:** Adding Codex = 5th AI provider to manage. Need provider abstraction layer first to avoid "provider sprawl."
+
+**Deliverable:** `.squad/decisions/inbox/worf-codex-security.md` — comprehensive security assessment + implementation roadmap.
+
+**Verdict:** ✅ **Approved for integration with guardrails** | ⚠️ Defer sovereign cloud work | ⏳ Establish provider abstraction before expanding multi-model routing
+
+**Key Learning:** Enterprise AI agent integration requires 3-layer defense: data isolation (Azure boundary) + execution sandboxing (policy + container) + audit & review (human gates + logging).
+
+---
+
+### 2026-03-10: Codex Security Assessment Update — Issue #212 (Follow-up)
+
+**Assignment:** Updated security assessment incorporating new CVE data and SDK availability for Codex integration.
+
+**New Findings Since March 9:**
+
+1. **CVE-2025-61260 (CVSS 9.8):** Critical command injection in Codex CLI < v0.23.0 via project-local `.env` and `.codex/config.toml` files. Discovered by Check Point Research. Patched in v0.23.0. Validates our pre-flight scanning requirement.
+
+2. **Windows AppContainer Sandbox:** Co-developed with Microsoft, open-sourced for community audit. Adds OS-native isolation on Windows alongside macOS Seatbelt and Linux Landlock+seccomp.
+
+3. **Official SDKs Available:** TypeScript (`@openai/codex-sdk`) and Python (`openai-codex-sdk`) SDKs now production-ready, confirming programmatic integration path for Ralph subagent architecture.
+
+4. **Compliance Update:** SOC 2 Type II confirmed. FedRAMP 20x Low on track. Sovereign cloud (Fairfax/Mooncake) still NOT confirmed for Codex models.
+
+**Updated Mandatory Guardrails:** Added config file validation (reject `.codex/config.toml` and suspicious `.env` files) and version pinning (>= 0.23.0) to mitigations list based on CVE-2025-61260.
+
+**Integration Recommendation Confirmed:** Codex as specialized subagent (via SDK, spawned by Ralph) — NOT as general Squad team member. Prerequisite: provider abstraction layer to avoid 5th-provider sprawl.
+
+**Deliverables:**
+- Comment posted on Issue #212 with full updated assessment
+- `.squad/decisions/inbox/worf-212-codex-security.md` — formal security decision
+
+**Key Learning:** Real-world CVEs (CVE-2025-61260) validate "assume hostile input" security posture. Project-local config file trust is a systemic attack vector for AI coding agents — always validate before loading.
+
+---
+
 ### 2026-03-09: Kubernetes Platform Adoption Spec Review — Issue #195 (Cross-Agent Assessment)
 
 **Assignment:** Security & cloud expert providing comprehensive security assessment of functional specification for "Standardized Microservices Platform on Kubernetes" (Issue #195).
@@ -924,6 +1029,34 @@ All five agents (Picard, B'Elanna, Worf, Data, Seven) encountered the same Azure
 - **R-SEC-06 (HIGH):** Stale FIC accumulation → identity sprawl, unnecessary trust relationships
 - **R-SEC-07 (HIGH):** Sovereign cloud FIC mismatch → compliance violation
 
+---
+
+### 2026-03-09: Issue #212 — Codex Security Assessment (Ralph Round 2)
+
+**Assignment:** Evaluate OpenAI Codex as potential Squad subagent/team member from security perspective in Ralph's Round 2 work-check cycle.
+
+**Security Assessment Completed:**
+
+1. **CVE-2025-61260 (CVSS 9.8):** Critical command injection via project-local config files in Codex CLI < 0.23.0. Patched. Validates hostile-input assumptions.
+2. **Sandboxing:** OS-native (AppContainer/Seatbelt/Landlock), open-sourced, co-developed with Microsoft. Robust.
+3. **Compliance:** SOC 2 Type II achieved. FedRAMP High via Azure OpenAI. Sovereign cloud NOT confirmed.
+4. **Data Handling:** Local-first, zero retention in enterprise mode, Azure boundary isolation.
+
+**Decision:** Codex approved for integration as **specialized autonomous subagent** (spawned by Ralph via SDK), NOT as general Squad team member. 9 mandatory guardrails required.
+
+**Implementation Path:**
+- Recommended: Codex as subagent via `@openai/codex-sdk` (TypeScript) or `openai-codex-sdk` (Python)
+- Prerequisite: Provider abstraction layer to avoid 5th-provider sprawl
+- Phase 1 (2 weeks): Azure OpenAI resource + sandbox policy + secret scanning
+
+**Consequences:**
+- ✅ Enables autonomous code generation within security framework
+- ✅ Validates 3-layer defense: data isolation + execution sandbox + audit/review
+- ⚠️ Operational overhead: policy framework, audit logging, version management
+- ⚠️ Sovereign cloud work blocked until Fairfax/Mooncake confirmed
+
+**Status:** Decision merged to `.squad/decisions.md`; moved to "Waiting for user review" on project board.
+
 **Worf's Position:** This is a **first-order security concern**. DK8S is explicitly described as a nation-state target. Identity continuity failures during Fleet-orchestrated migration create attack surface. **Do not proceed with Fleet Manager adoption until resolved at platform level.**
 
 **Artifacts Created:**
@@ -1234,3 +1367,153 @@ slookup) to rollback script
 
 **Next Steps:** Await response from spec authors and DK8s Security team. Do NOT proceed with production onboarding until security architecture is addressed.
 
+
+
+### 2026-03-10: Issue #212 Codex Security & Integration Assessment — COMPLETED
+
+**Task:** Evaluate OpenAI Codex as potential Squad subagent/member  
+**Status:** ✅ APPROVED FOR INTEGRATION (with mandatory guardrails)  
+**Verdict:** Codex can be integrated as autonomous subagent spawned by Ralph, NOT as general team member
+
+**Security Findings (Updated March 10):**
+
+1. **CVE-2025-61260 (CRITICAL)** — Command injection in Codex CLI < 0.23.0
+   - Attack chain: Malicious .env → .codex/config.toml → arbitrary MCP server execution → RCE
+   - Mitigation: Version pinning (>= 0.23.0) + pre-flight secret scanning mandatory
+   - This validates our "assume hostile input" paranoia principle
+
+2. **Data Handling: ACCEPTABLE**
+   - Code stays local; only relevant snippets sent to API
+   - Azure OpenAI Service ONLY (no public OpenAI API — mandatory boundary enforcement)
+   - Enterprise data NOT used for model training
+   - Zero data retention in government deployments
+
+3. **Sandboxing: ROBUST**
+   - macOS: Apple Seatbelt (Production)
+   - Linux: Landlock + seccomp (Production)
+   - Windows: AppContainer + Restricted Token + ACLs (open-source, auditable)
+   - Always read-only .git directory; fine-grained per-agent sandbox policies
+
+4. **Compliance: STRONG**
+   - SOC2 Type II: ✅ Achieved
+   - FedRAMP High: ✅ Authorized (Government Cloud)
+   - FISMA/NIST 800-53: ✅ Compliant
+   - DoD IL4/IL5: ✅ Supported; IL6 in development
+   - ⚠️ Sovereign Cloud (Fairfax/Mooncake): NOT confirmed — defer
+
+5. **Integration Architecture (RECOMMENDED PATH):**
+   - Codex as Squad team member: ❌ NO (lacks async collaboration, contextual reasoning)
+   - Codex as Ralph-spawned subagent: ✅ YES (TypeScript/Python SDKs available)
+   - Execution model: Pre-flight scanning → sandboxed read-only + workspace-write → 5min timeout → PR draft for human review
+
+6. **Risk Register:**
+   | Risk | Severity | Likelihood | Mitigation |
+   |------|----------|------------|-----------|
+   | Credential exposure via .env/config | CRITICAL | HIGH | Pre-flight scanning + config validation |
+   | Data exfiltration (public API) | HIGH | MEDIUM | Azure OpenAI Service ONLY |
+   | Prompt injection | MEDIUM | MEDIUM | Human review gate, no auto-merge |
+   | Sandbox escape (OS-level) | CRITICAL impact | LOW | Ephemeral compute, container hardening |
+   | Supply chain (CVE-2025-61260) | CRITICAL | MEDIUM | Version pinning, config validation |
+   | Provider sprawl | MEDIUM | HIGH | Provider abstraction layer required |
+
+**Mandatory Requirements (Non-Negotiable):**
+1. Azure OpenAI Service ONLY
+2. Codex CLI >= v0.23.0
+3. Pre-flight secret scanning before every invocation
+4. Read-only sandbox + directory allowlist (src/ + tests/ only)
+5. Human review gate — no auto-merge
+6. Ephemeral isolated compute (not developer laptops)
+7. Config file validation (reject .codex/config.toml + suspicious .env)
+8. Audit logging to Azure Monitor/Sentinel
+9. Provider abstraction layer in squad.config.ts
+
+**Operational Readiness:**
+- ⚠️ Integration is technically feasible but operationally premature
+- Blocker: Provider abstraction layer must be established first
+- Prevents provider sprawl (currently 4 providers: Claude, GPT-4/5, Gemini, GitHub Copilot; Codex = 5th)
+- Effort estimate: 2-3 weeks for production-ready integration
+
+**Key Learning:**
+Codex is a "specialist subagent" tool, not a generalist team member. The architecture mirrors our threat model philosophy: narrow scope (code generation only) + strong isolation boundaries (ephemeral sandbox) + audit trails (all API calls logged). Specialist subagents are lower-risk than generalist team members because their attack surface is constrained and their trust boundaries are well-defined.
+
+**Recommendation to Tamir:**
+Build provider abstraction layer first (3-5 days), then integrate Codex as Ralph subagent for autonomous code generation tasks. Security stance: APPROVED. Timeline: POST provider abstraction.
+
+**Issue Status:** ✅ CLOSED (comment posted, assessment complete)
+
+**Deliverable:** 
+- Security assessment posted to Issue #212
+- Recommendation: Proceed with integration as subagent (Ralph-spawned) with mandatory guardrails documented
+
+---
+
+"Trust, but verify. Codex is trustworthy in a sandbox with guards at the gate." — Worf
+
+---
+
+### 2026-03-09: Worf — ADR Teams Monitoring Assessment — Issue #198 (COMPLETED)
+
+**Assignment:** Evaluate feasibility of keeping watch on ADR Teams chat and alerting on notification changes. Requested by Tamir Dresher.
+
+**Scope:** Research Microsoft Teams monitoring capabilities, security implications, WorkIQ MCP tools availability, and design a scalable monitoring approach.
+
+**Research Findings:**
+1. **WorkIQ MCP Tool Availability: ✅ CONFIRMED**
+   - workiq-ask_work_iq tool is available in this environment
+   - Supports scoped queries to specific Teams channels
+   - Filters by date range, sender, content keywords
+   - Returns structured results (sender, timestamp, message content)
+
+2. **Current Implementation Status: ✅ OPERATIONAL**
+   - Daily ADR monitoring system already implemented and running
+   - Script: .squad/scripts/daily-adr-check.ps1
+   - Schedule: Daily 07:00 UTC (10 AM Israel), weekdays
+   - State tracking: .squad/monitoring/adr-check-state.json
+   - Three templated queries: New ADRs, Review Requests, Blockers
+   - Teams webhook delivery with Adaptive Cards
+   - Last check: 2026-03-09 10:17 UTC
+
+3. **Security Assessment: ✅ SECURE**
+   - Read-only guarantee enforced at query/script/metadata layers
+   - No posts, edits, or channel modifications
+   - Teams webhook authentication secured
+   - Audit trail maintained in monitoring directory
+   - Rate limiting via daily schedule (prevents API abuse)
+   - Smart notification filtering (only sends Teams alerts when actionable items exist)
+
+**Architecture Validated:**
+1. WorkIQ query engine (read-only access to IDP ADR Notifications)
+2. State tracking (duplicate prevention, audit trail)
+3. Teams webhook delivery (secure, Adaptive Card format)
+
+**Known Operational Issue:**
+- ADO → Power Automate service hook returns 401 Unauthorized
+- Blocks automated ADR detection pipeline
+- Requires PIM elevation (ask Shay Lavi for SC-ALT account Member status)
+- Separate track from monitoring capability
+
+**Security Guardrails in Place:**
+1. Read-only guarantee (enforced at three layers)
+2. No auto-escalation (summaries to Tamir only)
+3. Webhook isolation (separate from agent credentials)
+4. Scope limiting (IDP ADR Notifications channel exclusively)
+5. State expiry (lookback window prevents unbounded queries)
+
+**Recommendations:**
+1. Continue daily scans as configured — production-ready
+2. Future: Add alert severity levels (High/Medium/Low)
+3. Monitoring: Verify webhook token freshness (expires after 12 months)
+4. Optimization: Keyword filtering if ADR volume increases
+
+**Conclusion:**
+Teams ADR monitoring system meets security, compliance, and operational requirements. No additional work required.
+
+**Deliverable:**
+- Security & Cloud feasibility assessment posted to Issue #198
+- Issue #198 closed as COMPLETED
+- No external exposure of Teams data — read-only with audit trail
+
+**Security Stance:** APPROVED — Operational, Secure, Production-Ready
+
+---
+"Keep watch, but with hands in pockets. The system works." — Worf

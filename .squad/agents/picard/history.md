@@ -18,6 +18,65 @@
 
 ## Learnings
 
+### 2026-03-09: Picard — ADR Channel Monitoring Status Check — Issue #198
+
+**Assignment:** Check current state of ADR monitoring integration and report findings.
+
+**Key Findings:**
+- Monitoring infrastructure is fully operational (schedule, script, queries, state tracking all in place)
+- **CRITICAL**: The upstream ADR notification pipeline is broken — ADO → Power Automate returns 401 Unauthorized
+- Nada Jasikova flagged no ADRs since Jan 15; Ramaprakash Ganesan provided fix path (PIM elevation via Shay Lavi)
+- Recent activity: ArgoCD Promotion Model ADR (PR 13150168) posted via DK8S Bot — channel can still receive messages
+- Joshua Johnson previously flagged service account migration need — this incident validates that concern
+
+**ADR Knowledge Accumulated:**
+- ArgoCD Promotion Model ADR (PR 13150168) — active, collaborators: Nada Jasikova, Ramaprakash Ganesan
+- Regional AMW vs Tenant-Level AMW ADR (PR 14971229) — from initial scan
+- ADR automation design: ADO PR events → IDP repo filter → /docs/design markdown scan → Teams channel post
+- Key people: Shay Lavi (permissions), Joshua Johnson (architecture input), Adir Atias (reviewer)
+
+**Status:** Posted status update on #198. Awaiting Tamir's confirmation on whether the 401 auth issue has been resolved.
+
+---
+
+### 2026-03-09: Picard — Squad Scheduling Design — Issue #199 (COMPLETED, ROUND 2)
+
+**Assignment:** Design squad scheduling system. Audit existing schedule.json usage and recommend integration.
+
+**Deliverable:** Assessment that schedule.json exists but unused. Phase 1 fix identified: ~7 hours of integration work.
+
+**Status:** Waiting for user review on project board.
+
+---
+
+### 2026-03-09: Picard — Cross-Squad Orchestration Architecture — Issue #197 (COMPLETED, ROUND 3)
+
+**Assignment:** Design cross-squad orchestration model. Analyze implications and propose architecture.
+
+**Deliverable:** Decision to extend existing Squad primitives rather than build parallel federation system.
+- Bidirectional Upstreams with `mode: "collaborate"` support
+- Delegation via GitHub Issues (not custom JSON)
+- Context Projection for read-only snapshot sharing
+- Phased rollout: Phase 0 (upstream issues), Phase 1 (manual), Phase 2-4 (tooling + implementation)
+
+**Status:** Approved. Recommended 3 upstream issues for bradygaster/squad. Waiting for user review on project board.
+
+---
+
+### 2026-03-09: Picard — Squad Platform Adapter Analysis — Issue #196
+
+**Assignment:** Read bradygaster/squad#294 (question about PlatformAdapter/CommunicationAdapter layer vs prompt-level abstraction) and draft Tamir's perspective response.
+
+**Key Architectural Insight:** The adapter layer (PRs #191, #263) and the prompt-level abstraction (issue #8) solve different problems and coexist:
+- **Agent-level:** Prompt-level abstraction (CLI tools, MCP) — agents call `gh`/`az` directly
+- **Coordinator/runtime-level:** Code-level adapters (PlatformAdapter, CommunicationAdapter) — Squad's own plumbing for cross-platform coordination
+
+**Tamir's ADO research context:** His concept mapping, WIQL templates, and field-mapping work serves as the specification for what an ADO adapter implementation needs to handle. GitHub ↔ ADO concepts don't map 1:1 (iterations ≠ milestones, area paths ≠ labels).
+
+**Decision:** Posted response to tamirdresher_microsoft/tamresearch1#196 (not on bradygaster/squad — per issue instructions).
+
+---
+
 ### 2026-03-09: Daily ADR Channel Monitoring — Issue #198
 
 **Assignment:** Set up automated daily monitoring of the IDP ADR Notifications Teams channel. Read-only — never comment on the channel or ADRs.
@@ -34,6 +93,53 @@
 **Key constraint:** Squad must NEVER post to the ADR channel or comment on ADRs. This is enforced at the query template level, script level, and schedule metadata level.
 
 **Integration pattern:** Uses the same WorkIQ → Teams webhook pipeline as the daily RP briefing. The channel-scan.md digest pipeline could absorb this channel in the future.
+
+**Architecture Deep-Dive (2026-03-09 follow-up):**
+
+Conducted comprehensive analysis of monitoring architecture and posted to Issue #198 (#issuecomment-4023083193). Key findings:
+
+1. **Three-Layer Design Validation:**
+   - Layer 1 (Scheduling): Cron + Ralph Watch integration working correctly
+   - Layer 2 (Query): WorkIQ queries via MCP returning structured signal
+   - Layer 3 (Notification): Adaptive Card builder + state tracking functional
+
+2. **Read-Only Multi-Layer Enforcement:**
+   - Template level: Query files marked READ-ONLY with no write operations
+   - Script level: PowerShell limited to observation + webhook (no channel writes)
+   - Metadata level: Explicit flags in schedule.json prevent accidental mutations
+   - **Pattern:** Constraint enforcement should be layered (multiple independent checks)
+
+3. **Knowledge Accumulation Framework:**
+   - **Phase 1 (Current):** Daily passive observation + pattern extraction
+   - **Phase 2 (2-3 weeks):** Deep-read ADR documents + reviewer analysis + pattern synthesis
+   - **Phase 3 (Month 2):** Intelligence layer (summarization, relevance scoring, event-driven alerts)
+   - **Insight:** Build knowledge incrementally — observe → synthesize → act → predict
+
+4. **Observer-Curator Pattern Validation:**
+   - Squad demonstrates successful autonomous monitoring model
+   - Passive observation (never interfere) + intelligent synthesis (extract signal) + selective escalation (only surface actionable)
+   - **Lesson:** This pattern scales to other channels/systems (incidents, deployments, security alerts)
+
+5. **Future Enhancement Options Identified:**
+   - Event-driven alerts via Power Automate (real-time instead of daily)
+   - Multi-channel ADR monitoring expansion
+   - AI summarization of full PR content + review threads
+   - Relevance scoring (affects Squad work?) + proactive surfacing
+
+**Tamir's Latest Direction:** \"Make sure you really read the ADRs and the conversations... I want you to get smart on these.\"
+
+**Response Strategy:** Transition from high-level alerts to deep understanding. Recommend:
+1. Weekly synthesis after 5 daily runs → ADR knowledge base
+2. Monthly deep-read of 5-10 full ADR documents + threads
+3. Cross-reference ADRs with Squad project impacts (FedRAMP, K8s spec, etc.)
+4. Build decision patterns: Who decides? What causes delays? What criteria matter?
+
+**Key Learnings for Future Monitoring:**
+- Multi-layer constraint enforcement prevents accidental policy violations
+- Scheduled passive observation is sufficient for 24h+ decision cycles
+- State deduplication critical for avoiding alert fatigue
+- Integration with existing platforms (Teams webhook, Ralph Watch) reduces friction
+- Building domain knowledge requires synthesis + pattern analysis (not just data collection)
 
 ### 2026-03-09: Kubernetes Platform Adoption Spec Review — Issue #195 (Cross-Agent Assessment)
 
@@ -310,6 +416,147 @@ Configuration Layer (Tenants.json)
 - Code ownership maps to agent expertise: Data (code), B'Elanna (infra), Worf (security), Seven (docs)
 - Decision authority escalation: Agent → Picard → Tamir
 - Backup owners prevent single points of failure
+
+---
+
+### 2026-03-09: Podcaster Agent Design — Issue #214 (Assigned to Picard)
+
+**Assignment:** Design a Podcaster/Broadcaster agent that converts Squad's long-form text outputs (research reports, briefings, blog drafts) into professionally narrated audio (2-5 minute podcasts).
+
+**Scope:** Research TTS options, propose architecture, design agent integration, post design proposal to GitHub issue.
+
+**TTS Technology Research:**
+
+Evaluated 4 options against criteria (quality, voices, customization, cost, integration):
+
+1. **Azure Speech Service** ⭐ **RECOMMENDED**
+   - **Quality:** HD Neural Voices (2024) — natural, emotive, nearly indistinguishable from human
+   - **Voices:** 500+ across 150+ languages
+   - **Customization:** Full SSML (speech synthesis markup) for pitch, rate, emphasis, emotion
+   - **Integration:** REST API + PowerShell SDK
+   - **Cost:** ~$15-20 per 1M characters
+   - **Status:** Production-ready, globally available
+
+2. **Azure OpenAI TTS**
+   - **Quality:** Good (comparable to Azure Speech)
+   - **Voices:** Limited (23 vs 500+ in Speech Service)
+   - **Constraint:** Regional (North Central US, Sweden Central only)
+   - **Verdict:** Good fallback, less flexible
+
+3. **System.Speech (Windows Built-in)**
+   - **Quality:** Poor (obviously robotic, 1980s TTS)
+   - **Setup:** Zero — built into Windows
+   - **Verdict:** MVP prototype only, unacceptable for production
+
+4. **GitHub Copilot Audio**
+   - **Status:** Experimental (Copilot Labs only, not production)
+   - **Capabilities:** 3 modes (Scripted, Emotive, Story), English-only
+   - **Access:** No programmatic API yet
+   - **Verdict:** Monitor for future releases
+
+**Podcaster Agent Design:**
+
+**Core Concept:**
+```
+🎙️ Podcaster — Audio Narrator & Briefing Producer
+Input: Research reports (Seven), daily briefings (#200), blog drafts (#41), decisions
+Output: MP3/WAV audio files (2-5 min), Teams delivery, archival in .squad/podcasts/
+Trigger: Daily at 08:55 UTC (Ralph Watch schedule), future event-driven (Scribe)
+```
+
+**Processing Pipeline:**
+```
+Markdown Input
+  → [Extract outline: sections, key points]
+  → [SSML formatting: tone, pauses, emphasis]
+  → [Azure Speech Service TTS]
+  → [MP3 encoding: 128 kbps CBR, mono]
+  → [Teams webhook delivery to #podcasts-squad]
+  → [Archive metadata in .squad/podcasts/]
+```
+
+**Voice Strategy:**
+- **Primary Narrator:** Azure HD Neural Voice (male: Ryan/Soren, female: Aria/Elena)
+- **Style:** Professional podcast host — conversational, clear, well-paced
+- **Customization:** SSML for emphasis, pacing, pitch variation
+- **Phase 2:** Dual-voice dialogue (Host + Expert) for interactive content
+
+**Triggering Model:**
+- **MVP (Immediate):** Scheduled daily at 08:55 UTC (aligns with daily briefing cycle)
+- **Phase 2:** Event-driven (Scribe tags research as "podcast-ready")
+
+**Integration:**
+- **Scheduler:** Ralph Watch (existing infrastructure)
+- **Delivery:** Teams webhook to dedicated #podcasts-squad channel
+- **Charter:** Podcaster agent to be registered in .squad/team.md
+- **Content Sources:** Research reports, daily briefings, blog drafts, decision briefs
+
+**MVP Scope (2 weeks):**
+1. Provision Azure Speech resource (if not exists)
+2. Build `podcaster-tts.ps1` PowerShell wrapper
+3. Test with 1 research report (A/B test 3 voices with Tamir)
+4. Integrate into ralph-watch.ps1 daily schedule
+5. Verify Teams delivery and audio quality
+
+**Phase 2 (4 weeks):**
+- Event-driven integration (Scribe coordination)
+- Podcast RSS feed (iTunes/Spotify compatible)
+- Dual-voice conversational mode
+- Archive indexing & search
+
+**Acceptance Criteria (MVP):**
+- [ ] Azure Speech resource provisioned
+- [ ] TTS wrapper tested with sample markdown
+- [ ] One full research report converted (quality ≥ "professional podcast" rating)
+- [ ] Daily trigger working in ralph-watch
+- [ ] Teams delivery verified
+- [ ] Podcaster agent registered in team.md
+
+**Risk Mitigations:**
+- **Cost overruns:** Monitor character counts, set Azure spending limits, cache outputs
+- **Quality not acceptable:** A/B test voices before production, iterate on SSML tuning
+- **Schedule conflicts:** Use exclusive time slot (08:55 UTC), document in ralph-watch
+- **API failures:** Implement retry logic, error alerts, graceful degradation (skip day if needed)
+- **Markdown parsing errors:** Validate structure, strip problematic SSML chars, test with real content
+
+**Deliverables:**
+- ✅ **Design Document:** `.squad/decisions/inbox/picard-podcaster-design.md` (9.9 KB)
+- ✅ **GitHub Comment:** Posted design proposal to Issue #214
+- ⏳ **Pending Tamir Decisions:**
+  1. Voice preference (Ryan, Soren, Aria, Elena)?
+  2. Schedule time OK (08:55 AM Israel)?
+  3. Create #podcasts-squad or use existing channel?
+  4. MVP scope (all content or narrow)?
+  5. Agent name ("Podcaster" or alternative)?
+
+**Key Learnings:**
+
+**1. TTS Landscape Shift (2024):**
+- HD Neural Voices from Azure represent significant quality leap (natural emotion, prosody variation)
+- Azure Speech Service dominance: 500+ voices vs. OpenAI's 23 — massive difference for long-form narration
+- All viable options tied to Azure ecosystem (Speech Service, OpenAI endpoint, or Windows API) — no pure GitHub/open-source option
+
+**2. Audio Content Integration Pattern:**
+- Squad can now offer multimodal content (text + audio) without rebuilding the core agent
+- Scheduled audio generation fits Ralph Watch pattern — can add more daily triggers
+- Teams webhook delivery proven path for media (images → podcasts next)
+- Archive pattern (.squad/podcasts/) enables future RSS/podcast platform integrations
+
+**3. Architectural Decision: Why Scheduled Over Event-Driven (MVP):**
+- Scheduled approach: Predictable, isolates timing from content production, simpler first implementation
+- Event-driven (Phase 2): Requires Scribe coordination protocol, more moving parts to debug
+- Recommendation: Prove scheduled MVP first, then add event triggers once workflow stabilizes
+
+**4. Voice Selection Impact:**
+- HD Neural voices now have personality (Ryan = warm, Soren = professional, Aria = energetic, Elena = calm)
+- Matching voice to content type could improve engagement (e.g., decision briefs → calm/professional voice)
+- Future: Custom voice cloning could brand Podcaster as extension of Tamir's own voice
+
+**Next Steps:**
+1. Await Tamir's decisions on the 5 open questions
+2. If approved, begin Azure Speech resource provisioning (Week 1)
+3. Develop podcaster-tts.ps1 and test with 1 research report (Week 2)
+4. Integrate daily trigger and verify Teams delivery (Week 3)
 
 ---
 
@@ -599,6 +846,78 @@ This flexibility supports progressive rollout strategy at multiple granularities
 3. **Review Without CI:** When CI is unavailable, code review focuses on structure, coverage, edge cases, and architecture alignment. Local test results + code inspection sufficient for approval.
 
 **Approval Decision:** Both PRs approved for merge. CI restoration is separate workstream (Issue #110).
+
+---
+
+### 2026-03-09: Cross-Squad Delegation Framework — Issue #195 (DK8S Spec Review)
+
+**Assignment:** Analyze GitHub issue #195 ("Delegate this to the dk8s squad to review this and tell me what it thinks") and provide cross-squad delegation strategy.
+
+**Context:** 
+- Tamir requested delegation of a functional specification for standardized Kubernetes microservices platform (DK8s adoption) to the DK8S team for review
+- Spec is comprehensive on architecture but has CRITICAL security gaps (identity, secrets, network policy, pod security)
+- Worf's security review identified 10 gaps requiring attention before pilot validation starts 2026-03-16
+
+**What "This" Refers To:**
+The functional specification document contains:
+- High-level DK8s platform architecture and adoption rationale
+- Pilot validation approach (2-4 weeks)
+- Multi-region deployment strategy
+- 5-phase rollout plan (infrastructure → observability → disaster recovery → migration → optimization)
+
+**Cross-Squad Delegation Today (Without #197 Cross-Squad System):**
+
+Manual workflow identified:
+1. File work item in DK8S ADO project with full context
+2. Mention platform owners (Nada Jasikova, Roy Mishael, Moshe Peretz) + Teams channel
+3. Provide consolidated findings (Picard + Worf + B'Elanna)
+4. Wait 1-2 weeks for their architectural validation
+5. Integrate feedback loop back to GitHub issue
+
+**Key Questions DK8S Squad Can Answer:**
+- Architectural: Does multi-region topology work? Compatible with cluster provisioning? Works with Prometheus/Grafana?
+- Security/Compliance: How to handle dSTS vs. Entra ID? Production-approved secrets model? Pod security standards?
+- Operational: Multi-region failover runbook? Cluster upgrade strategy? Data plane SLAs?
+
+**Recommendation to Tamir:**
+File in ADO with full scope (all security gaps), plan for 2-week pilot delay (extend from 2026-03-16 to 2026-03-30). Rationale:
+- 1-week turnaround would be rushed → suboptimal feedback
+- Better to integrate feedback before pilot than after
+- Still allows March completion target
+
+**Posted Analysis:** GitHub issue #195 comment with full delegation framework  
+**Decision Needed:** Timeline trade-off confirmation from Tamir
+
+**Key Learnings:**
+
+**1. Cross-Squad Coordination Patterns:**
+- Delegation requires complete context (not just high-level question)
+- External squad (DK8S) owns authoritative decision on feasibility
+- Manual workflow: ADO filing + Teams mention + feedback loop
+- Future: Issue #197 cross-squad system will automate this handoff
+
+**2. Scope of Delegation:**
+- What we keep: Architectural soundness assessment, security gap identification, research methodology
+- What we delegate: Production operational validation, platform compatibility assessment, existing roadmap conflicts
+- Clean boundary: Our expertise = architecture + security; DK8S expertise = operations + production scale
+
+**3. Timeline Risk:**
+- Pilot starting 2026-03-16 (6 days out) is too aggressive for external squad coordination
+- 2-week buffer enables: External review (1 week) + our revision (1 week) + pilot prep (1 week)
+- Decision: User choice on timeline vs. quality tradeoff
+
+**4. Documentation Pattern:**
+- Consolidate internal findings (Picard lead + Worf security + B'Elanna infrastructure) before delegating
+- Create "delegation brief" that summarizes our analysis + specific questions for them
+- Provide acceptance criteria for "ready for pilot" (functional requirements + security baseline)
+
+**Deliverables:**
+- ✅ Cross-squad delegation analysis: Posted to GitHub issue #195
+- ✅ Framework documented for future cross-squad requests
+- ⏳ Pending: Tamir's decision on timeline and ADO filing
+
+**Signed:** Picard (Lead)  
+**Date:** 2026-03-09
 
 ---
 
@@ -1710,6 +2029,52 @@ Result: **Faster, more confident code review** because the "why" is already docu
 
 **Post-Merge Actions:**
 1. Deploy cache alert to all environments (dev → stg → prod)
+
+---
+
+### 2026-03-09: Issue #199 — Squad Scheduler Architecture (Ralph Round 2)
+
+**Assignment:** Design Squad scheduler architecture in Ralph's Round 2 work-check cycle.
+
+**Architecture Design Completed:**
+
+**Discovery:** `.squad/schedule.json` exists and is well-structured
+- Provider-agnostic format (B'Elanna's design)
+- 5 tasks already defined
+- Timezone-aware, retry policies included
+- **Critical gap:** No runtime engine reads it — `ralph-watch.ps1` uses hardcoded time checks
+
+**Decision: Phase 1 MVP Approved (Local-First)**
+
+**Components:**
+1. **Cron parser:** Pure PowerShell function `Test-CronExpression` — 5-field cron evaluation with timezone support
+2. **Scheduler engine:** `Invoke-SquadScheduler` — reads schedule.json, evaluates triggers, dispatches tasks
+3. **Ralph integration:** Replace ~60 lines of hardcoded time checks with single `Invoke-SquadScheduler` call
+4. **Execution state:** `.squad/monitoring/schedule-state.json` — tracks last run times and outcomes
+
+**Phase 2 (deferred):** GitHub Actions and Windows Task Scheduler provider adapters
+
+**Rationale:**
+- Schedule.json format proven (5 tasks, timezone-aware, retry policies)
+- ralph-watch hardcoded triggers fragile and don't scale
+- Local-first aligns with Tamir's request to experiment before upstreaming
+- ~7h effort for immediate maintainability payoff
+
+**Open Questions for Tamir:**
+1. **Missed execution policy:** If Ralph offline when daily task due, should it fire on next startup?
+2. **Agent autonomy:** Can agents add schedule entries, or humans only?
+3. **Assignment:** B'Elanna for engine, Data for cron parser, or single owner?
+
+**Upstream:** Tracking issue filed at bradygaster/squad#296
+
+**Consequences:**
+- ✅ Immediate improvement in scheduler maintainability
+- ✅ Proven format reduces design work
+- ✅ Experimental approach aligns with Tamir's request
+- ⚠️ Cron parser in PowerShell (less portable)
+- ⚠️ Phase 2 adapters required for cross-platform
+
+**Status:** Decision merged to `.squad/decisions.md`; moved to "Waiting for user review" on project board.
 2. Schedule April 2026 cache review (recurring monthly)
 3. Validate alert triggers correctly (optional: synthetic low hit rate test)
 
@@ -2198,3 +2563,228 @@ User requested hiding Done items older than 3 days from project board without de
 ### Cross-Team Impact
 Pattern can be reused for other status-based automation needs (e.g., auto-close stale items in specific columns).
 
+
+### 2026-03-09: Issue #196 - Enterprise Documentation Links Addendum
+
+**Context:** Tamir requested addendum to issue #196 response with links to recently merged enterprise capability docs and blog posts.
+
+**Key Findings:**
+- **PR #191** (merged 2026-03-08): Core Azure DevOps platform adapter feature
+  - Introduced: docs/features/enterprise-platforms.md, docs/specs/platform-adapter-prd.md
+  - Blog post: docs/blog/025-squad-goes-enterprise-azure-devops.md
+  - 1,303 lines, 57 tests, full ADO support (Work Items, WIQL, Tags, Area Paths)
+  
+- **PR #278** (merged 2026-03-08): Release notes blog #026
+  - File: docs/blog/026-whats-new-ado-comms-subsquads.md
+  - Covers: ADO adapter, CommunicationAdapter, SubSquads rename, security hardening
+  
+- **PR #263** (merged 2026-03-08): CommunicationAdapter for platform-agnostic agent-human communication
+
+**Key File Paths:**
+- Enterprise docs: docs/features/enterprise-platforms.md
+- PRD: docs/specs/platform-adapter-prd.md  
+- Blogs: docs/blog/025-squad-goes-enterprise-azure-devops.md, docs/blog/026-whats-new-ado-comms-subsquads.md
+
+**Architectural Insight:**
+Platform adapters are thin CLI wrappers (not replacements). They normalize outputs and handle platform quirks while maintaining "prompt-level abstraction" — agents issue unified commands regardless of underlying platform (GitHub/ADO).
+
+**User Preference:**
+Tamir wants comprehensive documentation links when referencing new features — include feature guides, PRDs, blog posts, and release notes with specific PR references.
+
+**Action Taken:**
+Posted addendum comment to issue #196 with complete link set (docs, blogs, PRs) explaining enterprise capabilities and recent merges.
+
+
+---
+
+## Issue #294 Analysis — Squad Adapter Architecture (2026-03-09)
+
+**Source:** bradygaster/squad#294 (external contributor question)
+
+### Question
+External contributor (@EmmittJ) questions whether adapters in PRs #191/#263 represent:
+- Option A: Vision shift from prompt-level to code-level abstraction?
+- Option B: Foundational work for future multi-platform routing?
+
+### Finding: Option B (Foundational Work)
+
+**Evidence:**
+- Factories are "wired up nowhere yet" — scaffolding signal
+- Both PRs complete data models + factory interfaces, no integration
+- Aligns with our Feb 2026 decision: "prompt-level abstraction at execution time"
+
+### Key Insight
+Adapters preserve prompt-level abstraction by:
+- Being thin CLI wrappers (not SDK layers)
+- Normalizing outputs, handling platform quirks
+- Enabling agents to issue unified commands without platform knowledge
+- Next phase: Wire factories into agent command routing
+
+### Architectural Model
+`
+[Agent Layer] → Unified commands
+[Adapter Layer] → Route to CLI (gh, az, Teams)
+[Platform Layer] → Native APIs
+`
+
+### Actionable Decision
+- Adapters don't represent a shift; they unlock Phase 2 of multi-platform vision
+- Track factory wiring as dependency for tamresearch1
+- No code changes needed until bradygaster/squad completes Phase 2
+
+### Relevance to tamresearch1
+- Validates our ADO research approach (concept mapping, WIQL work)
+- Confirms platform abstraction is feasible without SDK wrappers
+- Research-to-execution pipeline: concept mapping → adapter design → factory wiring → agent routing
+
+**Filed:** picard-squad-294-insights.md (inbox)
+**Comment Posted:** tamirdresher_microsoft/tamresearch1#196
+
+
+### 2026-03-09: Ralph Round 1 — Issue #196 Execution
+
+**Task:** Read bradygaster/squad#294 comment, draft Tamir's response on Platform Adapter architecture.
+
+**Execution:** Posted perspective to tamirdrescher_microsoft/tamresearch1#196. Clarified that adapter layers and prompt-level abstraction are complementary, not conflicting. Established Tamir's position as hands-on contributor to multi-platform Squad vision.
+
+**Decision Captured:** Decision 4 in .squad/decisions.md
+
+**Session:** ralph-round-1 (2026-03-09T11-06-19Z)
+
+**Outcome:** Issue moved to "Waiting for user review" on project board.
+
+
+
+---
+
+### 2026-03-12: Squad Scheduler Architecture Assessment — Issue #199
+
+**Assignment:** Review B'Elanna's scheduler design, assess existing schedule.json manifest, evaluate ralph-watch.ps1 integration, and provide Lead architectural assessment.
+
+**Key Findings:**
+1. .squad/schedule.json exists with 5 well-structured tasks (heartbeat, digest, briefing, ADR check, upstream sync)
+2. alph-watch.ps1 has hardcoded time checks (briefing @ 9 AM, ADR @ 07:00 UTC) — does NOT read schedule.json
+3. B'Elanna's design is sound but the scheduler engine (the bridge between manifest and execution) doesn't exist yet
+4. Upstream issue filed at bradygaster/squad#296
+
+**Gap Identified:** schedule.json is a dead manifest — no runtime reads it. Adding a scheduled task requires editing PowerShell code instead of adding a JSON entry. The declarative intent exists but the engine does not.
+
+**Recommendation:** Phase 1 MVP (local-first, ~7h effort):
+- P1a: Cron parser function (`Test-CronExpression`)
+- P1b: Scheduler engine (`Invoke-SquadScheduler`)
+- P1c: Replace ralph-watch hardcoded triggers with single `Invoke-SquadScheduler` call
+- P1d: Execution state tracking in `.squad/monitoring/schedule-state.json`
+
+**Decisions Surfaced for Tamir:**
+1. Missed execution policy (run on next startup?)
+2. Agent autonomy on schedule editing (propose via PR vs direct edit?)
+3. Phase 1 assignment (B'Elanna recommended)
+
+**Comment Posted:** tamirdresher_microsoft/tamresearch1#199
+**Decision Filed:** .squad/decisions/inbox/picard-199-scheduling.md
+
+## Issue #197 - Cross-Squad Orchestration Architecture (2026-03-10)
+
+**Request:** Design a solution for orchestrating work across squads in brady squad repo.
+
+### Research Findings
+
+**Current State in Squad:**
+- Squad supports upstream inheritance (PR #225): child squads inherit from parent squads
+- Squad supports external consulting (squad consult): personal squad works on external repos
+- Squad supports team root resolution via worktrees, config.json, SQUAD_TEAM env var
+- Squad supports companion repos (squad link): link to external team roots
+- Issue #242 proposes tiered deployment (hub repos, meta-hub for cross-org)
+
+**Missing: Lateral Peer Collaboration**
+- Upstream is hierarchical (mandatory inheritance)
+- Cross-squad orchestration needs to be horizontal (optional, negotiated peer support)
+- Issue #242 provides infrastructure (meta-hub registry); this design provides protocols
+
+### Architectural Design: 5 Cross-Squad Patterns
+
+1. **Work Delegation (No Subsumption)** - Squad A requests help from Squad B, Squad B works under own identity
+2. **Shared Decision Propagation** - Squad A publishes decision, Squad B decides independently whether to adopt
+3. **Status Visibility** - Meta-hub Ralph aggregates board state across all squads daily
+4. **Conflict Resolution** - Squad disagreements escalate to meta-hub for arbitration (3-5 days vs 3+ weeks)
+5. **Context Impersonation** - Squad A agent can temporarily work under Squad B context (4h duration, auto-revert)
+
+### Platform-Agnostic Notification Layer
+
+**CommunicationAdapter Interface** extends PR #191 platform adapter pattern to comms:
+- GitHub Discussions, ADO Work Item Discussions, Teams webhooks, .squad/log/ fallback
+- No GitHub lock-in; alignment with multi-platform philosophy
+
+### Implementation Phases (10 weeks)
+
+Phase 1: Work Request Protocol + CommunicationAdapter interface
+Phase 2: Decision Propagation + cross-squad index
+Phase 3: Status Visibility + Meta-hub Ralph aggregation
+Phase 4: Conflict Resolution + arbitration interface
+Phase 5: Context Impersonation + session tracking
+
+### Relation to Issue #242
+
+Orthogonal but complementary:
+- #242: Infrastructure (where squads store state)
+- This design: Protocols (how squads work together)
+- Synergy: Phases 3-4 use meta-hub registry from #242
+
+### Outcome
+
+Architectural design posted to issue #197 as GitHub comment
+URL: https://github.com/tamirdresher_microsoft/tamresearch1/issues/197#issuecomment-4023011687
+
+Also filed: .squad/decisions/inbox/picard-cross-squad-design.md (decision record)
+
+
+### 2025-03-15: Cross-Squad Orchestration Architecture — Issue #197
+
+**Assignment:** Design a solution for orchestrating work across independent squads, building on B'Elanna's federation protocol proposal and upstream bradygaster/squad research.
+
+**Research Conducted:**
+- Deep dive into bradygaster/squad codebase: upstreams, SubSquads (streams-prd.md), worktree strategies, meta-hub PRD, delegation patterns
+- Reviewed B'Elanna's comprehensive "Squad Federation Protocol" proposal (custom registry, delegation envelopes, acceptance flows, conflict detection)
+- Analyzed existing 3-tier hierarchy model (Squad → Hub → Meta-Hub) already designed in upstream
+
+**Key Finding:** bradygaster/squad already has a designed but unimplemented 3-tier hierarchy with meta-hub, cross-squad registry, and GitHub Discussions support. B'Elanna's federation protocol substantially overlaps with this existing design while adding genuinely valuable task delegation mechanics.
+
+**Architecture Decision:** Extend existing Squad primitives (upstreams, issues, labels) rather than building a parallel federation protocol:
+1. **Bidirectional Upstreams** — extend `upstream.json` with `mode: "collaborate"` and trust levels
+2. **Delegation via GitHub Issues** — structured issues with `squad-delegation` label, not custom JSON envelopes
+3. **Context Projection** — read-only snapshots of source squad context, no identity impersonation
+
+**Phased approach:** Phase 1 (manual delegation via Issues) requires zero tooling and can start immediately. Phases 2-4 require upstream buy-in from bradygaster/squad.
+
+**Decision:** Wrote `.squad/decisions/inbox/picard-197-cross-squad.md` with full architecture rationale.
+**Outcome:** Posted Lead architectural review as comment on #197, covering what exists vs. what's missing, where B'Elanna adds value vs. over-engineers, and 3 upstream issues to file.
+## Learnings
+
+### Issue #196 Analysis (2026-03-09)
+- Analyzed EmmittJ's architectural question on bradygaster/squad#294 regarding adapter layer design (PRs #191, #263)
+- **Key finding:** Adapters represent foundational scaffolding toward true platform agnosticism, not a vision shift
+- **Architecture validation:** The two-layer model (Agent → Adapter → Platform) maintains prompt-level abstraction while enabling multi-platform support
+- **Next checkpoint:** Wire adapter factories into agent command dispatch (Phase 2) — this is the critical dependency
+- **Team implication:** Our multi-platform vision aligns with Squad's emerging architecture; ADO research validates feasibility
+
+---
+
+### 2026-03-09: Picard — Cross-Squad Orchestration Triage (ROUND 1, COMPLETED)
+
+**Assignment:** Triage issue #197. Analyze B'Elanna's 5-layer orchestration design and Tamir's feedback. Document architecture pivot. Assign Phase 0 research.
+
+**Deliverable:**
+- Analyzed B'Elanna's comprehensive design (5-layer async orchestration via GitHub Issues)
+- Identified Tamir's architecture pivot: **runtime-level integration (subprocess or config-loading) vs issue-based async delegation**
+- Created decision doc: `.squad/decisions/picard-triage-197.md`
+- Assigned Phase 0 research: Seven (feasibility study) + Picard (decision-making)
+- Posted triage comment on issue #197 with Phase 0 scope
+
+**Phase 0 Tasks Defined:**
+1. Review Squad CLI session model — can squads spawn as subprocesses?
+2. Analyze `.squad/upstream.md` — extension points for peer squad config loading?
+3. Survey bradygaster/squad for subprocess orchestration precedent
+4. Document feasibility of both approaches with pros/cons
+5. Propose revised Layer 2 (Work Delegation) architecture
+
+**Status:** Triage COMPLETE. Phase 0 research can proceed in parallel.

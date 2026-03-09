@@ -1,11 +1,14 @@
-name: Squad Protected Branch Guard
+name: Squad Protected Branch Guard (DISABLED)
 
 on:
-  pull_request:
-    branches: [main, preview]
-  push:
-    branches: [main, preview]
   workflow_dispatch:
+  # Disabled per user request (issues #193, #194)
+  # The workflow fires on push to main AFTER merge, generating failure emails
+  # for .squad/ files that are always part of squad work. Pure noise.
+  # pull_request:
+  #   branches: [main, preview]
+  # push:
+  #   branches: [main, preview]
 
 permissions:
   pull-requests: read

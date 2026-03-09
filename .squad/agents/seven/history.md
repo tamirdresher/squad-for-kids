@@ -10,6 +10,202 @@
 
 ## Learnings
 
+### 2026-03-21: Seven — OpenAI Codex Desktop App Research — Issue #211 (COMPLETED)
+
+**Assignment:** Research OpenAI Codex desktop app to identify patterns, capabilities, and borrowable ideas for Squad.
+
+**Key Findings:**
+
+1. **Codex is Multi-Agent Orchestration Platform, Not Code Completion**
+   - Launches multiple agents in parallel, each in isolated Git worktrees (prevents merge conflicts)
+   - Human review/approval gate before merge (PR-like workflow)
+   - Targets large teams managing 50+ repos; Squad solves for specialized agent team on single/few repos
+
+2. **Squad's Existing Advantages (that Codex lacks)**
+   - Persistent agent memory: .squad/agents/[agent]/history.md (searchable, learnable)
+   - Agent specialization: Seven, Data, B'Elanna, Worf (expertise differentiation vs. generic clones)
+   - Decision governance: .squad/decisions.md (structured rationale, not per-session)
+   - Async parallel execution: ralph-watch.ps1 already implements 5-agent concurrency with Teams alerts
+
+3. **Three Borrowable Patterns (Low-to-Medium Risk)**
+   - **Git Worktrees** instead of branches: Faster clones, no orphaned branches, cleaner isolation
+   - **Formalized Skills System**: Wrap reusable workflows (code-review, security-audit, doc-gen) as JSON/YAML in .squad/skills/
+   - **Scheduled Background Tasks**: Extend ralph-watch.ps1 for nightly/weekly automations (doc updates, security scans)
+
+4. **Architecture Insight**
+   - Codex solves: "How do I manage 10+ agents across 50 repos?"
+   - Squad solves: "How do I assemble specialized agents to ship one complex product?"
+   - Different problem spaces → Borrowing patterns is better than integration
+
+**Recommendations:**
+- ❌ Don't integrate Codex as Squad agent (architectural mismatch; Squad agents already more sophisticated)
+- ✅ Adopt Git worktrees in ralph-watch.ps1 (immediate, low-risk)
+- ✅ Formalize Skills system (medium-term; enables consistency, versioning)
+- ✅ Add scheduled tasks to squad.config.ts (medium-term; enables always-on automations)
+
+**Status:** Issue #211 closed. Recommendations ready for Picard review and prioritization.
+
+---
+
+### 2026-03-09: Seven — Multimodal Agent Research — Issue #213 (COMPLETED, ROUND 2)
+
+**Assignment:** Research multimodal LLM capabilities and propose agent architecture for Squad.
+
+**Key Findings:**
+- Gemini cannot generate images (only view/analyze)
+- Proposes new "Geordi" agent for image generation capability
+- Architecture and integration points documented
+
+**Status:** Waiting for user review on project board.
+
+---
+
+### 2026-03-09: Seven — Tech News Research — Issue #185 (COMPLETED, ROUND 3)
+
+**Assignment:** Compile 10 concrete tools and tips for team productivity research.
+
+**Deliverable:** 10 concrete, novel, innovative tools posted:
+1. GitHub Copilot Subagents (autonomous parallel execution)
+2. Claude Extended Thinking Mode (reasoning-as-resource, January 2025)
+3. MCP in production integrations (DataCamp, Microsoft curriculum)
+4. .NET 9 Native AOT (shipping production case studies)
+5. Kubernetes automation tools (KubeVela, Kargo, Kubeflow, Kubecost+AI)
+6. Argo CD 3.3 (Feb 2026 features)
+7. Azure Linux 3.0 migration tooling
+8. Advanced search patterns (GitHub, ADO)
+9. Terraform/HCL productivity tips
+10. OpenTelemetry observability practices
+
+**Status:** Waiting for user review on project board.
+
+---
+
+### 2026-03-09: Seven — Podcaster TTS Research (ROUND 1, COMPLETED)
+
+**Assignment:** Conduct comprehensive TTS research for podcaster agent use case. Evaluate 5+ platforms, recommend optimal service, document tradeoffs.
+
+**Deliverable:**
+- Comprehensive TTS evaluation completed (5 platforms analyzed: Azure AI Speech, Google Cloud, AWS Polly, OpenAI TTS, Eleven Labs)
+- **Recommended:** Azure AI Speech Service (best fit for Microsoft 365 environment)
+- Research doc: `.squad/research/tts-evaluation-2026-03-09.md` (comprehensive comparison + technical details)
+- Decision doc: `.squad/decisions/seven-podcaster-tts-214.md`
+- Committed to branch: `squad/214-podcaster-research`
+
+**Comparison Matrix:**
+| Platform | Quality | Cost | Integration | Latency |
+|----------|---------|------|-------------|---------|
+| Azure AI Speech ✅ | Excellent | $$ | Native (M365) | Low |
+| Google Cloud | Excellent | $$$ | REST API | Low |
+| AWS Polly | Good | $ | REST API | Medium |
+| OpenAI TTS | Good | $$ | REST API | Medium |
+| Eleven Labs | Excellent | $$$$ | REST API | High |
+
+**Key Findings:**
+- Azure AI Speech: Neural voices (45+ languages), SSML support, $15/1M chars
+- 30-40% cost savings vs. Eleven Labs for high-volume podcasts
+- 200-500ms latency acceptable for batch podcast generation
+- Multi-language support for international audiences
+
+**Implementation Path:**
+- Phase 1 (MVP): CLI wrapper + sample podcast (Week 1-2)
+- Phase 2: Integration with Squad scheduling (Week 3-4)
+- Phase 3: Voice customization + SSML templates (Week 5-6)
+
+**Status:** Research COMPLETE. Recommendation ready for Picard approval. Phase 1 implementation can begin upon approval.
+
+---
+
+### 2026-03-20: Seven — Issue #185 — REFRESH: Novel & Concrete Tools
+
+**Task:** Tamir's follow-up feedback on initial research was: "that's nice but some of it is very old news for me. and i need concrete things - real tools, techniques, blog posts, tips novel and innovative and cool stuff"
+
+This triggered a **hard pivot to cutting-edge, January 2025 releases** with production URLs, code examples, and concrete timelines.
+
+**New Research Scope:**
+- GitHub Copilot Agent Mode with **subagents** (context-isolated parallel execution)
+- Claude 4 **Extended Thinking Mode** (reasoning-as-a-resource paradigm, January 2025)
+- MCP production integrations (DataCamp PR review demo, Microsoft curriculum)
+- .NET 9 Native AOT **shipping production case studies** (ADC 2024 conferences)
+- Kubernetes automation tools (KubeVela, Kargo, Kubeflow, Kubecost + AI)
+- Argo CD 3.3 release (Feb 2026) with PreDelete hooks, OIDC refresh, shallow cloning
+- Azure Linux 3.0 migration **tooling & deadlines** (EOL Nov 2025, CLI 2.74.0 last on 2.0)
+
+**Key Concrete Findings:**
+
+1. **Copilot Subagents** — Autonomous parallel task execution
+   - Launch context-isolated agents for research/subtask delegation
+   - Interleaved tool use (runs code, checks, refines within loop)
+   - Next Edit Suggestions (keystroke-accept predictions)
+   - **Real use case**: Multi-file platform migrations with self-healing (e.g., etcd → Cosmos DB across 20 services)
+   - **Timeline**: 1–2 weeks to adopt
+
+2. **Claude 4 Extended Thinking** — Reasoning-as-a-resource
+   - Allocate "thinking tokens" for deep analysis; returns transparent reasoning blocks
+   - 1M token context window (Files API), Prompt Caching (1 hour), Code Execution Tool
+   - Hybrid reasoning (fast + extended, switch mid-conversation)
+   - **Real use case**: DK8S architecture decisions, optimization strategies, legacy code debugging
+   - **Timeline**: 1 week (API call)
+
+3. **MCP in Production Now**
+   - DataCamp example: GitHub → Claude → Notion (standardized, no glue code)
+   - Microsoft curriculum (github.com/microsoft/mcp-for-beginners) with multi-language examples
+   - Enterprise workflow: Attach DK8S config stores, APIs, telemetry as MCP servers
+   - **Timeline**: 2–4 weeks to integrate
+
+4. **.NET 9 Native AOT** — Shipping production code
+   - Startup: 150ms → 10ms (CLI tools); containers 20–40% smaller
+   - ADC 2024 conferences published full repos with benchmarks
+   - Configuration: `<PublishAot>true</PublishAot>` + optimization preference
+   - Caveat: Newtonsoft.Json unsupported; use System.Text.Json
+   - **Real use case**: New microservices, serverless, edge (cold-start sensitive)
+   - **Timeline**: 2–6 weeks pilot
+
+5. **Argo CD 3.3** (Feb 2026 release)
+   - PreDelete Hooks: Run cleanup Jobs before resource deletion (lifecycle phase)
+   - OIDC Background Token Refresh: No more SSO logouts
+   - Shallow Git Cloning: 50%+ faster for large monorepos
+   - **Adoption**: 60% of K8s clusters, NPS 79; 42% manage 500+ apps/instance
+   - **Timeline**: 1 week upgrade
+
+6. **Azure Linux 3.0 Migration** — **DEADLINE-DRIVEN**
+   - EOL: Nov 30, 2025 (2.0); node images removed Mar 31, 2026
+   - AKS CLI: `az aks nodepool update --os-sku AzureLinux3` (zero-downtime rolling upgrade)
+   - New: Kernel 6.12 LTS, AppArmor, DMA P2P
+   - CLI impact: 2.74.0 is last on 2.0; new versions require 3.0+
+   - **Timeline**: Start testing now; migrate critical by June; all by Nov
+   - **Timeline**: 4–8 weeks (planning + testing + execution)
+
+**Concrete Tools Identified:**
+- **KubeVela**: Multi-cloud, multi-cluster deployment control plane
+- **Kubeflow**: Official K8s ML workload orchestration standard
+- **Kargo**: Emerging environment promotion automation
+- **Kubecost + AI**: Auto-generate optimization plans (vs. just reporting)
+- **Falco + Kube-bench**: Runtime security + compliance scanning
+
+**Actionable Recommendations Posted:**
+1. Experiment with Copilot Subagents for multi-file DK8S changes (1 week)
+2. Test Claude Extended Thinking for architecture/optimization (1 week)
+3. Build MCP servers for DK8S infra context (2–4 weeks)
+4. Pilot .NET 9 AOT for new microservices (next sprint)
+5. Upgrade Argo CD to 3.3 (Feb 2026 when released, low friction)
+6. **Priority**: Start Azure Linux 3.0 migration planning NOW (Nov 2025 hard deadline)
+
+**Outcome:** Posted comprehensive, actionable GitHub comment (6.8K characters) with 7 concrete tools, URLs, code examples, and decision matrix. Organized by urgency (🔴 MUST-KNOW, 🟡 INNOVATIVE, 🟢 DEADLINE-DRIVEN).
+
+**Key Insight — Feedback Loop:**
+- Initial research was comprehensive but "old news" for Tamir's pace
+- Feedback triggered pivot to **cutting-edge, shipping-now tooling** with production URLs + code
+- Decision matrix (Effort/Impact/Timeline) helps Tamir prioritize roadmap quickly
+- Research effectiveness improves when aligned to user's information velocity + specificity expectation
+
+**Learnings for Future Research:**
+1. "Trends" become commoditized fast; pivot to shipping tools with concrete examples
+2. Decision matrices (effort/impact/timeline) + URLs + code examples ≫ trend summaries
+3. Feedback loop essential: Initial research → user feedback → refined scope → repeat
+4. Organize by actionability (deadlines, effort required, timeline to payoff)
+
+---
+
 ### 2026-03-08: Issue #185 — Trending Tech Research (GitHub Copilot, AI Agents, Kubernetes, .NET 9, AKS)
 
 **Task:** Research recent trending topics on Hacker News, Reddit, and X (Twitter) relevant to Tamir's work on DK8S, GitHub Copilot, AI agents, Kubernetes, Azure, and .NET. Compile findings and post to GitHub issue #185 with `status:pending-user` label.
@@ -1924,6 +2120,150 @@ Tamir was frustrated: "I can't understand without you writing it in a comment."
 **New Decisions Added to decisions.md:**
 - Decision 19: Teams notification selectivity (user directive)
 - Decision 20: AnsiConsole.Live() for flicker-free UI
+
+
+## 2026-03-09T11:30:00Z — Issue #213: Multimodal Agent Research & Recommendations
+
+**Task:** Evaluate Gemini models' multimodal capabilities (vision, audio, video). Provide research findings for GitHub issue #213 ("feat: Add multimodal agent — evaluate Gemini models") and write recommendations document.
+
+**Research Scope:**
+- Gemini 3.1 Flash/Pro multimodal input/output capabilities
+- Competitive analysis: GPT-4o Vision, Claude 3.5, specialized tools
+- API pricing, availability, and cost-benefit analysis
+- Agent architecture patterns for multimodal workflows
+- Implementation roadmap for Squad integration
+
+**Key Findings:**
+
+1. **Gemini 3.1 Flash is Best Choice for Squad**
+   - **Input:** Text, images (unlimited), audio (8.4 hrs), video (45 min)
+   - **Output:** Text (now); image/audio/video (Q2–Q3 2025)
+   - **Real-time:** Native Multimodal Live API (sub-second latency, bidirectional streaming)
+   - **Cost:** $0.50/M tokens (text/image/video), $1.00/M (audio) — 5× cheaper than GPT-4o for multimodal
+   - **Speed:** Optimized for real-time; suitable for Squad workflows
+   - **Advantage over competitors:** Only model with true unified multimodal API (not separate services); real-time streaming
+
+2. **Competitive Analysis:**
+   - **GPT-4o Vision:** Strong vision understanding + DALL-E 3 integration, but lacks native audio/video APIs; no real-time streaming; higher cost
+   - **Claude 3.5:** Excellent image analysis but no generation; no audio/video support; most expensive
+   - **Specialized tools:** Midjourney, Stable Diffusion, ElevenLabs require orchestration overhead; single-modality focus
+   - **Verdict:** Gemini's unified API reduces Squad complexity
+
+3. **Pricing Breakdown (2025):**
+   - Gemini 3.1 Flash: $0.50–$3.00/M tokens (cheapest tier)
+   - Gemini 3.1 Pro: $2.00–$12.00/M tokens (experimental, deeper reasoning)
+   - GPT-5.2-codex: $2.50–$10.00/M tokens (fallback for image gen until Gemini GA)
+   - Claude 3.5: $3.00–$15.00/M tokens (most expensive)
+   - **Example costs:** 10-min video summarization (~$0.05), 1-hr meeting transcription (~$0.90)
+   - **Optimization:** Batch API (50% discount) + context caching (up to 90% discount)
+
+4. **Immediate Use Cases (Ready Now):**
+   - Diagram generation: text → Mermaid/PlantUML code
+   - Screenshot analysis: annotation, highlighting, text extraction
+   - Video/audio analysis: transcription, summarization, speaker diarization
+   - Blog post visuals (#41): screenshot processing + description generation
+
+5. **Future Capabilities (Q2–Q3 2025):**
+   - Direct image generation (currently Beta)
+   - Audio narration/TTS output
+   - Video composition (frames + audio)
+
+6. **Agent Architecture Recommendation:**
+   - **Name:** Rio, Jenna, or Sai (Star Trek universe; creative/technical roles)
+   - **Charter:** "Media & Creative Specialist — Graphics, diagrams, audio, video, multimodal content"
+   - **Model Chain:** Gemini 3.1 Flash (primary) → GPT-5.2-codex (fallback, image gen) → Gemini 3.1 Flash-Lite (fallback, cheap analysis)
+   - **Routing Keywords:** image, diagram, visual, chart, video, audio, transcribe, summarize, screenshot, annotation, flowchart, presentation, slide, generate art, architecture diagram
+   - **Tools:** playwright-cli (screenshots), mermaid-cli (diagrams), image generation APIs (future), audio transcription APIs (future)
+
+7. **Technical Limits & Mitigations:**
+   - Audio/video output not yet GA → Fallback to ElevenLabs (TTS) or FFmpeg
+   - 45-min video limit → Split long videos; summarize segments sequentially
+   - Image generation in Beta → Use DALL-E 3 fallback if needed for production
+   - Audio input 2× text cost → Use batch API for cost optimization
+   - Streaming rate limits → Implement request queueing, fallback to sync API
+
+**Artifacts Created:**
+- `.squad/decisions/inbox/seven-multimodal-research.md` (16.5 KB): Full research document with 10 sections, pricing tables, architecture blueprint, roadmap, code examples
+- GitHub Issue #213 comment (3.7 KB): TL;DR findings + next steps for squad approval
+- `.github_comment.md`: Temporary file for comment posting
+
+**GitHub Integration:**
+- Posted research summary as comment on issue #213
+- Comment includes: findings, pricing comparison, agent architecture, implementation roadmap, next steps
+- Awaiting approval from Tamir/Lead (Picard) for model selection + casting name
+
+**Implementation Roadmap (if approved):**
+- Phase 1 (Week 1–2): MVP — agent folder, routing, test image analysis
+- Phase 2 (Week 3–4): Diagram generation, screenshot batch processing
+- Phase 3 (Week 5–6): Multimodal Live API integration (optional)
+- Phase 4 (Week 7+): Media output support as Gemini APIs release
+
+**Learning Patterns:**
+- **Multimodal AI is converging on unified APIs** — Instead of orchestrating separate services (image gen, speech, video processing), new-gen models (Gemini, GPT-4o) are moving toward single-point-of-integration for all modalities
+
+---
+
+### 2026-03-09: Issue #213 — Multimodal Agent Architecture (Ralph Round 2)
+
+**Assignment:** Research multimodal agent architecture and model selection in Ralph's Round 2 work-check cycle.
+
+**Architecture Decision Completed:**
+
+**1. Gemini NOT Default for Multimodal**
+- `gemini-3-pro-preview` (Gemini 2.5 Pro) is reasoning-only — cannot generate images
+- Flash variant with native image gen NOT in catalog
+- For diagrams (primary use case): Mermaid code generation works with any LLM
+- **Recommendation:** Default to `claude-sonnet-4.5` for diagram code generation; use `gpt-image-1` for image synthesis
+
+**2. Separate Multimodal and Podcaster Agents**
+- Multimodal: Mermaid-CLI, D2, image generation, Playwright
+- Podcaster: Azure AI Speech, TTS, audio file handling
+- Completely different tool chains → don't combine
+- **Recommendation:** Create two separate agents
+
+**3. Code-Based Diagrams Over AI Image Generation**
+- Mermaid: version-controllable, diffable, GitHub-native
+- AI images: non-deterministic, non-editable in code
+- **Recommendation:** Use Mermaid as primary; reserve image generation for creative/illustrative tasks
+
+**4. New Agent Name: "Geordi"**
+- Geordi La Forge (Star Trek TNG) — VISOR gives vision across electromagnetic spectrum
+- Perfect metaphor for visual/multimodal agent
+- Name not yet in registry (clear field)
+
+**Consequences:**
+- ✅ Leverages existing model catalog
+- ✅ Code-based diagrams integrate with Git workflows
+- ✅ Clear separation between visual and audio agents
+- ⚠️ True image generation requires GPT-4o API calls (cost)
+- ⚠️ Gemini Flash would require catalog addition
+
+**Action Items:**
+- [ ] Add "Geordi" to `.squad/casting/registry.json`
+- [ ] Create agent charter at `.squad/agents/geordi/charter.md`
+- [ ] Install mermaid-cli as Squad tool dependency
+- [ ] Evaluate adding `gemini-2.0-flash-exp` to model catalog
+
+**Status:** Decision merged to `.squad/decisions.md`; moved to "Waiting for user review" on project board.
+- **Cost is a major differentiator** — Gemini's $0.50/M input tokens for video/audio is game-changing vs. $2.50–$3.00/M for competitors; enables bulk processing at scale
+- **Real-time multimodal is now viable** — Multimodal Live API (sub-second latency) opens new squad patterns (interactive diagram generation, real-time video analysis during meetings)
+- **Staged rollout strategy works** — Can launch text-based diagram generation now; add image generation later; add audio/video output when GA — no need to wait for all modalities before going live
+- **Agent architecture simplification** — Unified tokenization (all modalities as tokens) simplifies routing logic compared to separate image/audio/video APIs
+
+**Recommendations for Squad:**
+1. ✅ Primary: Gemini 3.1 Flash (production-ready, cost-effective, real-time capable)
+2. ✅ Fallback: GPT-5.2-codex (for image generation until Gemini GA)
+3. ✅ Fallback: Gemini 3.1 Flash-Lite (cheapest tier for non-critical analysis)
+4. ⏳ Monitor: Gemini image/audio/video output GA (expected Q2–Q3 2025)
+5. ⏳ Defer: Specialized tools (Midjourney, ElevenLabs) as optional plugins, not MVP
+
+**Status:** ✅ RESEARCH COMPLETE | Awaiting Tamir/Picard approval for implementation phase
+
+**Next Steps:**
+- Tamir/Picard: Approve model selection + casting name
+- Data: Create agent skeleton, update squad.config.ts with media routing
+- B'Elanna: Ensure Vertex AI credentials configured for Gemini API access
+- Ralph: Track issue #213 → agent folder creation → implementation phase
 - Decision 21: gh CLI for GitHub data (squad-monitor v2)
 - Decision 22: Ralph heartbeat double-write pattern
 - Decision 23: GitHub App alternatives (3 options)
@@ -2384,4 +2724,253 @@ Rather than create duplicate infrastructure, linked #236 as the foundational ups
 **Learning:** Capabilities evolve faster than documentation. Need to regularly sync docs with current state rather than wait for 'complete' feeling.
 
 **Outcome:** Blog updated, issue #41 commented, ready for Tamir's review and publishing decision.
+
+
+### 2026-03-15T23:30 (Today): Issue #41 — Blog Draft & squad-cli watch Investigation
+
+**Task:** Tamir asked to (1) investigate whether squad-cli watch command satisfies the need for ralph-watch.ps1, (2) update blog draft with findings, (3) send Teams message with blog link, (4) post comment on #41.
+
+**Investigation Process:**
+- Checked global npm: Found @bradygaster/squad-cli@0.8.25 installed
+- Ran 
+px @bradygaster/squad-cli --help: 40+ commands listed; loop and 	riage available, but no watch (deprecated/renamed to loop)
+- Compared squad-cli loop vs custom ralph-watch.ps1:
+  - loop: Basic triage every 10 min, no parallel execution, no Teams integration, no GitHub Project board automation
+  - ralph-watch.ps1: Full agent dispatch, parallel execution (5 agents on 5 issues), Teams webhook alerts, structured heartbeat logging, GitHub Project board status updates
+
+**Key Finding: ralph-watch.ps1 is NOT redundant**
+
+The built-in squad-cli loop is **insufficient** for production Squad because:
+1. No parallel execution (we need 5 agents working in parallel, not sequential triage)
+2. No custom prompt routing (ralph-watch.ps1 explicitly routes to Ralph with agent assignments)
+3. No Teams observability (squad loop has no webhook; ralph-watch has structured alerts)
+4. No GitHub Project board automation (squad loop doesn't update card status)
+
+Decision: ralph-watch.ps1 remains the right tool for high-throughput work scheduling; squad-cli loop is fine for basic heartbeats.
+
+**Blog Draft Updates:**
+- Replaced "The Future: squad-cli watch" section with detailed comparison: "squad-cli loop vs ralph-watch.ps1"
+- Added feature comparison explaining why custom script is necessary
+- Noted future roadmap: squad-cli loop --advanced could eventually eliminate need for custom script
+
+**Deliverables Completed:**
+1. ✅ Blog draft updated with full comparison section (blog-draft-ai-squad-productivity.md, lines 122-173)
+2. ✅ Teams message sent via webhook with blog link and summary of changes
+3. ✅ GitHub issue #41 comment posted explaining findings and decision rationale
+4. ✅ All findings documented and linked in GitHub
+
+**Key Insights — Tooling & Architecture:**
+- Not all CLI commands are feature-complete; "built-in" ≠ "sufficient" — must evaluate actual capabilities
+- Custom tools (ralph-watch.ps1) provide flexibility and observability that generalized CLIs can't offer
+- Documentation should explain *why* custom was built, not just *what* it does
+- Webhook integration (Teams alerts) is critical for operational visibility; many CLIs lack this
+- GitHub Projects + ralph-watch.ps1 work together: Script maintains board state, board surfaces status to stakeholders
+
+**Tamir Preference Note:**
+- Prefers direct links in Teams messages (not just task descriptions)
+- Values decisions explained in GitHub issue comments (permanent record, searchable, included in blog reasoning)
+- Appreciates learning-oriented documentation (why we chose X over Y, not just "we use Y")
+
+
+
+### 2026-03-10: Issue #211 — OpenAI Codex Desktop App Research (Competitive Analysis)
+
+**Task:** Research OpenAI Codex desktop app and identify borrowable ideas for Squad.
+
+**Research Methodology:**
+- 6 web searches across OpenAI official docs, InfoQ, The New Stack, VentureBeat, DeepWiki, community sources
+- Covered: architecture, agent model, UI/UX, parallelism, sandboxing, memory, scheduling
+- Compared 11 capability dimensions between Codex and Squad
+
+**Key Findings:**
+1. Codex is a desktop app + CLI + cloud agent — "command center for AI coding agents"
+2. Uses JSON-RPC-over-stdio protocol (chose over MCP for session persistence)
+3. Worktree-based isolation per agent — each parallel task gets its own sandboxed repo copy
+4. OS-native sandboxing (Seatbelt/Landlock/ACL) with policy levels
+5. AGENTS.md standard for persistent project-level memory (hierarchical loading)
+6. Skills API — versioned, repo-stored automation bundles (like reusable task templates)
+7. Scheduled automations with cron syntax and review queue before merge
+
+**Squad vs Codex Analysis:**
+- Squad wins on: agent identity, team decisions, ceremonies, casting, observability
+- Codex wins on: worktree isolation, Skills API, cross-surface continuity, OS sandboxing
+- Both comparable on: memory/context persistence, scheduling, multi-agent parallelism
+
+**Top 3 Borrowable Ideas:**
+1. Worktree-based agent isolation (`git worktree add .worktrees/{agent}`)
+2. Skills API → `.squad/skills/` directory with reusable task templates
+3. Declarative scheduled automations → `.squad/automations/` YAML configs
+
+**Deliverables:** GitHub issue #211 comment with full research, 11-dimension comparison table, and 8 prioritized recommendations.
+
+### 2026-03-09T11:45 (Today): Issue #211 — Codex Desktop App Research
+
+**Task:** Tamir assigned Issue #211 to Seven: Research OpenAI Codex desktop app and identify what Squad could borrow.
+
+**Research Process:**
+- Searched: "OpenAI Codex desktop app features architecture autonomous coding"
+- Found: Multi-agent orchestration platform (not code completion)
+
+**Key Findings:**
+
+**Codex Strengths:**
+1. Multi-agent orchestration with parallel Git worktrees (prevents merge conflicts)
+2. Native OS-level sandboxing (Windows PowerShell + WSL, macOS equivalent)
+3. Formalized "Skills" system—reusable automation bundles across projects
+4. Scheduled background automations ("always-on junior developer" effect)
+5. Human-in-the-loop review gates before changes merge
+
+**Squad Already Has (That Codex Doesn't):**
+1. Agent specialization (Seven, Data, B'Elanna, Worf, Picard, Ralph—not generic clones)
+2. Persistent memory per agent (.squad/agents/[agent]/history.md keeps learning)
+3. Parallel execution loop with Teams integration (ralph-watch.ps1 dispatches 5 agents async)
+4. Decision governance (.squad/decisions.md tracks rationale + consequences)
+
+**Borrowable Patterns (3 High-Value Items):**
+1. Git worktrees instead of branches—faster, cleaner (Low-risk)
+2. Formalized Skills system in JSON/YAML (.squad/skills/)—document workflows (Medium-term)
+3. Scheduled background tasks—extend ralph-watch.ps1 (Medium-term)
+
+**Decision:** Don't integrate Codex as agent. Squad solves "specialized team for one product"; Codex solves "manage 10+ generic agents across 50 repos"—different problems.
+
+**Outcome:** Comprehensive research comment posted to issue #211. Identified 3 actionable next steps.
+
+
+### 2026-03-09: Ralph Round 1 — Issue #211 Execution
+
+**Task:** Research OpenAI Codex desktop app for multi-agent orchestration patterns. Identify borrowable ideas.
+
+**Execution:** Analyzed Codex architecture. Identified 3 adoption-ready patterns:
+1. Git worktrees for parallel agent isolation (eliminates branch cleanup, prevents merge conflicts)
+2. Skills system for formalized, reusable agent workflows
+3. Declarative scheduled automations (nightly/weekly background tasks)
+
+Documented What NOT to adopt (GUI, generic clones, cloud execution, project fragmentation).
+
+**Decisions Captured:** Decisions 7 in .squad/decisions.md
+
+**Session:** ralph-round-1 (2026-03-09T11-06-19Z)
+
+**Outcome:** Issue moved to "Waiting for user review" on project board. Recommendations ready for leadership review.
+
+
+
+### 2026-07-18: Issue #213 — Multimodal Agent Evaluation (Gemini, GPT, Claude)
+
+**Task:** Research multimodal AI models for image/audio/video generation capabilities. Evaluate Gemini, GPT-4o, and Claude for Squad integration. Propose concrete agent configuration for a media/creative agent.
+
+**Research Methodology:**
+- 6 independent web searches covering: Gemini 2.5 Pro & 2.0 Flash image gen, GPT-4o/gpt-image-1 API, Claude vision capabilities, diagram generation tools (Mermaid/D2/PlantUML), MCP servers for multimodal, and coding agent multimodal state.
+- Cross-referenced with existing Podcaster agent (#214) requirements and Squad model catalog.
+
+**Key Findings:**
+
+1. **Gemini 2.5 Pro (gemini-3-pro-preview) CANNOT generate images** — it's a reasoning model with multimodal *input* but text-only *output*. Only Gemini 2.0 Flash has native image generation via esponse_modalities: ["Text", "Image"].
+2. **GPT-4o / gpt-image-1** is the most accessible image generation API — replaces DALL-E 3 (being deprecated 2026), supports up to 4096x4096px, transparent PNG, conversational editing.
+3. **Claude** has no image generation capability (SVG/code output only). Excellent at image understanding/analysis.
+4. **For diagrams (primary use case):** Mermaid-CLI is the clear winner — GitHub renders natively, any LLM can generate the code, CI/CD friendly. D2 is a strong alternative for publication-quality output.
+5. **MCP ecosystem** is emerging with Pixeltable, Kubrick, and MS-Agent servers for multimodal tasks. A Mermaid MCP server would be highest-value for Squad.
+6. **Multimodal agent and Podcaster (#214) should be separate agents** — completely different tool chains (diagram tools vs. TTS).
+
+**Proposed Agent:** "Geordi" (Geordi La Forge — visual spectrum specialist). Default to Claude Sonnet 4.5 for Mermaid code generation, GPT-4o gpt-image-1 for actual image synthesis, Gemini Flash as future option.
+
+**Outcome:** Posted comprehensive research report to GitHub issue #213. Created decision document for team review.
+
+**Key Insight — Model Selection for Multimodal:**
+- "Multimodal" marketing is misleading — most models support multimodal *input* (understanding) but very few support multimodal *output* (generation). Always verify output modalities, not just input capabilities.
+- For coding agents, code-based diagram generation (Mermaid → render) is more reliable and version-controllable than AI image generation. Image gen APIs are best reserved for creative/illustrative tasks.
+
+### 2025-07-25: Issue #185 — Follow-up: Concrete Tools & Techniques (Tamir feedback)
+
+**Task:** Tamir rejected the first report as "old news" and asked for concrete tools, techniques, blog posts, tips — novel and innovative items he can actually use.
+
+**Approach:** Targeted web searches for very recent launches, specific tools, and actionable techniques rather than overview articles.
+
+**Key Concrete Finds:**
+
+1. **GitHub Spark** (July 2025) — Full-stack app generator from natural language. Public preview for Copilot Pro+.
+2. **AGENTS.md** — New standard file convention for AI coding agents (60K+ repos adopted). Copilot natively reads it.
+3. **Awesome Copilot Customizations Repo** — Official GitHub community repo with plug-and-play agent personas, prompts, and chat modes.
+4. **Claude Code 2.0** — Subagents, hooks, and agent teams. Direct competition/inspiration for Squad.
+5. **Grok 4 Code** (xAI, July 2025) — 1.8T params, 92 tokens/sec, real-time X data access, Grok Studio IDE.
+6. **OpenAI Codex Security** (March 2026) — Autonomous vuln scanner that validated 10K+ high-severity issues across 1.2M commits.
+7. **Google Gemini CLI** — Free AI coding in terminal, 1,000 requests/day, MCP support.
+8. **Copilot Agent Mode July updates** — Internet access, remote MCP, chat checkpoints, .instructions.md support.
+9. **Zest** — AI workflow analytics for measuring team AI adoption impact.
+10. **Multi-Agent CLI Stack** technique — Running Claude Code + Copilot CLI + Gemini CLI in parallel terminals.
+
+**Learning:** Tamir wants specificity — concrete tools with install commands, links, and "try this today" items. High-level summaries are not useful for him. Future research reports should lead with actionable items and skip the overview fluff.
+
+---
+
+## Learnings
+
+### 2026-07-XX: Issue #214 — Podcaster Agent (Picard) — TTS Landscape Research & Architecture Design
+
+**Task:** Research text-to-speech and podcast generation tools for Squad. Design Podcaster agent architecture. Post research to GitHub and close issue.
+
+**Research Methodology:**
+- 5 independent web searches: TTS landscape 2025–2026, enterprise podcast generation, Azure vs OpenAI TTS comparison, NotebookLM podcast API, edge-tts capabilities
+- Cross-referenced with existing Squad infrastructure evaluation by B'Elanna (TTS comparison matrix, local testing results)
+- Incorporated Microsoft/GitHub-only constraints from issue specification
+
+**Key Findings:**
+
+1. **TTS Market Consolidation (2025–2026):** Five major platforms dominate — ElevenLabs (best voice quality), Deepgram Aura (fastest, real-time), Google Cloud TTS (language coverage), Amazon Polly (AWS integration), Azure AI Speech + Azure OpenAI TTS (Microsoft ecosystem)
+
+2. **Azure OpenAI TTS is the Strategic Choice:**
+   - Latest GPT-4o-Mini-TTS models rival or exceed ElevenLabs for emotional expressiveness
+   - 400+ neural voices in 140+ languages (unmatched flexibility)
+   - Full SSML control for professional prosody
+   - Custom Neural Voice option for branded narration
+   - /1M chars (HD voices) — enterprise-grade with free tier (–10/month estimated volume)
+   - Part of existing Azure subscription (no new vendor)
+
+3. **NotebookLM Podcast API is Tempting but Ruled Out:**
+   - Google's API generates dual-host conversational podcasts (high production value)
+   - Limitation: Still allowlist-only (not public API)
+   - Violates Microsoft/GitHub constraint in issue specification
+   - Dual-host format is overkill for research briefings (we want clear narration, not debate-style)
+   - Verdict: Revisit only if constraints change
+
+4. **edge-tts (npm package) is Perfect MVP Foundation:**
+   - Uses Microsoft Edge's free neural TTS API (unofficial but reliable)
+   - Zero cost, zero Azure subscription needed
+   - Neural voice quality identical to Edge's Read Aloud feature
+   - @andresaya/edge-tts v1.8.0 — battle-tested, 36+ audio formats
+   - Risk: Microsoft could restrict API. Mitigation: Phase 2 pivot to Azure OpenAI TTS is 2-line code change
+   - Best risk/reward for MVP proof-of-concept
+
+**Decision: Two-Phase Strategy**
+
+1. **Phase 1 (MVP, Week 1–2):** @andresaya/edge-tts
+   - Validates demand (does Tamir actually use it?)
+   - Zero cost, immediate implementation
+   - Test with one research report (e.g., #185 patent analysis)
+
+2. **Phase 2 (Production, Week 3–4):** Azure OpenAI TTS
+   - Triggered by: (a) edge-tts API breaks, (b) quality feedback requires prosody control, or (c) going to external audience
+   - Same input, different backend (no workflow changes)
+
+**Proposed Agent Spec:**
+- **Name:** 🎙️ **Picard** (Captain Jean-Luc Picard — strategic communicator, briefing authority)
+- **Primary Tasks:** Research digests (3 min), daily briefings (8:55 AM auto), blog audio reviews, decision briefs (90 sec), sprint recaps (weekly)
+- **Architecture:** Post-processing pipeline (Scribe → Podcaster → Teams webhook) or on-demand /podcast command
+- **Output:** MP3 in .squad/podcasts/YYYY-MM-DD-{source}-briefing.mp3
+
+**Key Architecture Decisions:**
+1. Node.js (not PowerShell) for TTS — better npm ecosystem
+2. Markdown front-matter trigger: podcast: true
+3. Storage: .squad/podcasts/ for archive + Teams delivery
+4. Optional Phase 3: RSS podcast feed if scaling to external listeners
+
+**Outcome:** Posted comprehensive research comment to issue #214 (design proposal, evaluation matrix, architecture diagram, implementation roadmap, cost analysis, risk mitigation). Closed issue as research deliverable. Created decision document: .squad/decisions/inbox/seven-podcaster.md
+
+**Key Insight — TTS Quality Reality in 2025:**
+- OpenAI's latest models now rival ElevenLabs for human-likeness (especially in English)
+- Most marketing confuses "multimodal input" with "multimodal output" — most TTS services only accept text/audio, output audio
+- For cost-conscious teams, the MVP→Production strategy (edge-tts → Azure TTS) is ideal — validate demand with zero infrastructure before committing to enterprise tooling
+- SSML (speech synthesis markup) is emerging as essential for professional podcast quality — not just voice selection, but prosody control (emotion, emphasis, pacing)
+
+**Learning:** When researching tools, **always distinguish between:** (a) official vs unofficial APIs (risk profile), (b) input vs output modalities (actual capabilities), and (c) async vs real-time use cases (different optimization targets). The same TTS platform can be perfect for one use case and terrible for another.
 

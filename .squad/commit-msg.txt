@@ -1,81 +1,93 @@
-## Live Agent Activity Panel for Squad Monitor
+## Add a Podcaster/Broadcaster Agent to Squad
 
 ### Problem
-The monitor currently only shows **historical orchestration log entries** — what agents wrote after completing work. It does NOT show what's happening **right now** during an active Ralph round or agency session.
+Squad produces a LOT of text — research reports, blog drafts, patent analysis, architecture docs, daily briefings, issue summaries. Reading all of it is time-consuming. Tamir wants an agent that can convert these outputs into short audio briefings/podcasts he can listen to instead of read.
 
-### Requirements
+### Inspiration
+- **Google NotebookLM** — generates conversational podcast-style audio summaries from documents
+- **GitHub Copilot Desktop** — has text-to-speech/audio capabilities
+- **Constraint:** We can only use Microsoft and GitHub tools (no Google services)
 
-#### 1. Raw Live Log View
-- Tail the active agency session log from `~/.agency/logs/session_*/`
-- Auto-detect the most recent session directory
-- Stream new lines as they appear (like `tail -f`)
-- Color-code by severity (errors in red, agent spawns in cyan, tool calls in yellow)
-- Toggle-able with a keypress (e.g., `'l'` for live log)
+### What the Podcaster Would Do
 
-#### 2. Processed Activity View (DEFAULT)
-This is the **primary view** — a structured, human-readable summary of what's happening right now:
+1. **Research Digests** — When Seven finishes a research report, the Podcaster creates a 2-5 minute audio summary
+2. **Daily Briefings** — Convert the daily RP status briefing (#200) into an audio version
+3. **PR Summaries** — "Here's what your team shipped today" as a quick audio recap
+4. **Blog Drafts** — Read back blog posts (#41) so Tamir can review by listening
+5. **Decision Briefs** — When issues need Tamir's input (pending-user), create a short audio explaining the decision needed
+6. **Sprint Recaps** — End-of-sprint audio summary of what was accomplished
 
-**Active Round Summary Bar:**
+### Implementation Research
+
+#### Microsoft/GitHub Tools to Evaluate
+
+1. **Azure AI Speech Service (Cognitive Services)**
+   - Text-to-Speech with neural voices (very natural sounding)
+   - SSML support for tone, pacing, emphasis
+   - Multiple voices — could do "conversational" style with two voices
+   - REST API callable from PowerShell/Node
+   - Would need an Azure subscription + Speech resource
+
+2. **Microsoft Edge TTS / PlayReady**
+   - Edge has built-in read-aloud with natural voices
+   - Could potentially use the edge-tts npm package (uses Edge's free TTS API)
+   - No Azure subscription needed
+   - Quality is very good for narration
+
+3. **Azure OpenAI TTS**
+   - OpenAI's text-to-speech models via Azure OpenAI Service
+   - Very natural, supports multiple voices and styles
+   - Available through Azure OpenAI endpoints
+
+4. **GitHub Copilot Audio (if available)**
+   - Copilot Desktop reportedly has audio capabilities
+   - Research what's available and if it can be used programmatically
+
+5. **PowerShell System.Speech**
+   - Built-in Windows TTS (System.Speech.Synthesis)
+   - Low quality but zero setup — good for MVP/prototype
+   - `Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak("Hello")`
+
+#### Architecture Options
+
+**Option A: Post-processing Pipeline**
 ```
-Round 67 | Running 4m 23s | 3 agents spawned | 2 issues touched | 1 PR created
-```
-
-**Agent Activity Table:**
-```
-Agent      | Status      | Current Task                        | Duration
------------+-------------+-------------------------------------+---------
-Picard     | ✅ Done     | Triaged #198, #199                  | 45s
-Data       | 🔄 Running  | Implementing #200 (daily briefing)  | 2m 10s
-B'Elanna   | 🔄 Running  | Researching #197 (cross-squad orch) | 1m 30s
-Worf       | ⏳ Queued   | Waiting for Data to finish          | -
-```
-
-**Actions Log (processed):**
-```
-10:31:19  Ralph started round 67
-10:31:25  Spawned Picard (triage 3 new issues)
-10:31:45  Picard assigned #198 → Picard, #199 → B'Elanna
-10:32:01  Spawned Data (implement #200)
-10:32:15  Spawned B'Elanna (research #197)
-10:33:40  Picard completed (45s)
-10:34:02  Data created branch feat/daily-briefing
-10:35:10  Data opened PR #201
-```
-
-#### 3. Detection Logic
-Parse agency session logs for patterns:
-- `Spawning agent` / `agent completed` → agent lifecycle
-- `gh issue` / `gh pr` → GitHub actions
-- `edit` / `create` → file operations  
-- `Running tool` → tool invocations
-- `Error` / `failed` → failures
-- Agent name extraction from prompts/responses
-
-#### 4. UI Integration
-- New panel in the monitor dashboard (alongside Ralph Watch Loop, Issues, PRs)
-- Keypress `'a'` to toggle between Processed View (default) and Raw Log View
-- When no round is active, show: "Idle — next round in Xm Ys" with last round summary
-- Auto-scroll with option to pause (`'p'` key)
-
-#### 5. Data Flow
-```
-agency session log (raw text)
-    ↓ parse
-Structured events (agent spawn, tool call, completion, error)
-    ↓ aggregate
-Live dashboard (agent table + actions log + summary bar)
+Agent completes research → Scribe logs it → Podcaster picks it up → Generates audio → Posts to Teams/saves to file
 ```
 
-### Non-Goals
-- Don't modify ralph-watch.ps1 — read-only from the monitor side
-- Don't interfere with the running agency process
-- Don't persist processed data (ephemeral, live-only)
+**Option B: On-demand**
+```
+Tamir asks "podcast the latest research" → Podcaster reads the doc → Generates audio → Plays/sends it
+```
+
+**Option C: Automated daily podcast**
+```
+Daily at 8:55 AM → Podcaster gathers overnight activity → Generates 3-min morning briefing audio → Sends via Teams
+```
+
+### Proposed Agent
+
+```
+🎙️  {CastName}  — Podcaster/Broadcaster    Audio summaries, briefings, content narration
+```
+
+- **Primary task:** Convert long-form text into short, digestible audio
+- **Format:** MP3 or WAV files, 2-5 minutes typical
+- **Delivery:** Teams webhook (audio attachment), local file, or direct playback
+- **Style:** Professional but conversational, like a tech podcast host
+- **Trigger:** Automatic after major research/reports, or on-demand
 
 ### Acceptance Criteria
-- [ ] Monitor shows real-time agent activity during active rounds
-- [ ] Processed view shows agent table with status, task, duration
-- [ ] Actions log shows timestamped, human-readable event stream
-- [ ] Raw log view available as toggle
-- [ ] Graceful fallback when no session is active
+- [ ] Research which MS/GitHub TTS option works best (quality vs. setup complexity)
+- [ ] Prototype: convert one research report into audio
+- [ ] Evaluate audio quality — is it good enough to replace reading?
+- [ ] If viable: add Podcaster agent to squad, define charter and routing
+- [ ] Integration with existing workflow (Scribe handoff, Teams delivery)
+
+### Related
+- #200 — Daily RP status briefing (candidate for audio version)
+- #213 — Multimodal agent (potential overlap — could be same agent or separate)
+- #41 — Blog post (candidate for audio review)
+- .squad/team.md — Team roster
 
 -- Filed by Squad Coordinator

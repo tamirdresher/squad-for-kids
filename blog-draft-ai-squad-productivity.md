@@ -119,9 +119,40 @@ That's it. Ralph wakes up every 5 minutes, pulls the latest code, reviews open i
 - Research analysis completed overnight
 - Comments on PRs addressed with full reasoning
 
-**The Future: `squad-cli watch` Command**
+### squad-cli loop vs ralph-watch.ps1: Why We Didn't Use squad watch
 
-Right now, Ralph runs via this PowerShell script. But there's a better version coming: the `squad-cli watch` command. Once it's stable, the entire loop will be built into the CLI—no script needed, just `squad watch --interval 5m` and the agent handles the rest.
+We tested the new `squad-cli loop` command that comes with squad v0.8.23+. Here's the comparison:
+
+**`squad-cli loop` (Built-in CLI):**
+- ✅ Simple: `squad loop --interval 5m` instead of custom script
+- ✅ Managed: Handles heartbeat, logging, state management
+- ✅ Built for Squad projects: Direct integration with .squad/ config
+- ❌ **Limited execution model:** Only supports triage/categorization, not full agent work dispatch
+- ❌ **No parallel execution:** Processes one issue at a time (we need 5 agents running on 5 issues simultaneously)
+- ❌ **No custom prompting:** Uses hardcoded logic, can't route to specific agents
+- ❌ **No observability:** No Teams integration, no structured metrics output
+
+**`ralph-watch.ps1` (Custom Loop):**
+- ✅ **Full agent dispatch:** Spawns the `agency copilot` CLI with complete Squad context
+- ✅ **Parallel execution:** Can maximize parallelism (e.g., spawn 5 agents for 5 actionable issues in one round)
+- ✅ **Custom routing:** Prompts Ralph with explicit agent assignment logic
+- ✅ **Teams observability:** Structured logging → heartbeat file → Teams webhook (failure alerts, metrics)
+- ✅ **GitHub Project board integration:** ralph-watch prompts Ralph to maintain board status in real-time
+- ✅ **Granular metrics:** Tracks PRs merged, issues closed, consecutive failures, round timing
+- ❌ **More complex:** PowerShell script, requires webhook config, error handling overhead
+
+**The Decision:**
+We built `ralph-watch.ps1` because the built-in `squad loop` didn't exist yet (or was incomplete) when we needed the capability. Now that we have it, `squad loop` is sufficient for simple periodic checks, but **ralph-watch.ps1 remains the right choice for parallel, high-throughput work scheduling** like our production Squad environment.
+
+Think of it this way:
+- `squad loop` = basic heartbeat ("is everything still working?")
+- `ralph-watch.ps1` = active task dispatch ("here's 5 things to do in parallel, get them done")
+
+**The Future: `squad-cli loop --advanced`**
+
+Eventually, `squad-cli loop` could support full agent dispatch, custom prompting, and Teams integration. When that lands, ralph-watch.ps1 becomes legacy. But for now, the custom script is the only way to get true parallel execution with Squad agents.
+
+
 
 ---
 

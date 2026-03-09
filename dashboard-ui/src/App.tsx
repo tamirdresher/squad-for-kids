@@ -6,6 +6,7 @@ import { OverviewPage } from './components/pages/OverviewPage';
 import { ControlDetailPage } from './components/pages/ControlDetailPage';
 import { EnvironmentViewPage } from './components/pages/EnvironmentViewPage';
 import { TrendAnalysisPage } from './components/pages/TrendAnalysisPage';
+import { LiveActivityPage } from './components/pages/LiveActivityPage';
 import { useAuth } from './hooks/useAuth';
 
 const theme = createTheme({
@@ -51,7 +52,11 @@ const App: React.FC = () => {
               <Route path="/trends" element={<TrendAnalysisPage />} />
             )}
             
-            <Route 
+            {permissions.canViewDashboard && (
+              <Route path="/activity" element={<LiveActivityPage />} />
+            )}
+            
+            <Route
               path="*" 
               element={
                 permissions.canViewDashboard 

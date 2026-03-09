@@ -98,6 +98,15 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
 {
     var sections = new List<IRenderable>();
 
+    // Determine how many issue rows we can show based on terminal height.
+    // Reserve ~30 lines for: header(2) + ralph heartbeat(3) + ralph log(8) +
+    // PRs section(~12) + merged PRs(~6) + orchestration(~12) + padding.
+    // Each issue row takes ~3 lines in the table (content + borders).
+    int termHeight = 50; // sensible default
+    try { termHeight = Console.WindowHeight; } catch { }
+    int reservedLines = 32;
+    int maxIssueRows = Math.Max(3, (termHeight - reservedLines) / 3);
+
     // Header
     var header = new Rule($"[yellow bold]Squad Monitor v2[/] [dim]— {now:yyyy-MM-dd HH:mm:ss}[/]")
     {
@@ -112,8 +121,8 @@ static IRenderable BuildDashboardContent(DateTime now, string userProfile, strin
     // Ralph Watch Log
     sections.Add(BuildRalphLogSection(userProfile));
     
-    // GitHub Issues
-    sections.Add(BuildGitHubIssuesSection(teamRoot));
+    // GitHub Issues (limited by terminal height)
+    sections.Add(BuildGitHubIssuesSection(teamRoot, maxIssueRows));
     
     // GitHub PRs
     sections.Add(BuildGitHubPRsSection(teamRoot));
@@ -414,14 +423,14 @@ static IRenderable BuildRalphLogSection(string userProfile)
     return new Rows(items);
 }
 
-static IRenderable BuildGitHubIssuesSection(string teamRoot)
+static IRenderable BuildGitHubIssuesSection(string teamRoot, int maxRows = 8)
 {
     var items = new List<IRenderable>();
     
     var section = new Rule("[magenta]GitHub Issues (squad)[/]") { Justification = Justify.Left };
     items.Add(section);
 
-    var output = RunProcess("gh", "issue list --label squad --json number,title,author,createdAt,labels,assignees --limit 20", teamRoot);
+    var output = RunProcess("gh", $"issue list --label squad --json number,title,author,createdAt,labels,assignees --limit {maxRows}", teamRoot);
     if (output == null)
     {
         items.Add(new Markup("[dim]  Could not fetch issues (gh CLI unavailable or not authenticated)[/]"));

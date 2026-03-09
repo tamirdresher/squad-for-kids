@@ -71,6 +71,12 @@
       "persistent_name": "Ralph",
       "universe": "Star Trek TNG/Voyager",
       "status": "active"
+    },
+    "neelix": {
+      "created_at": "2026-03-09T17:45:00Z",
+      "persistent_name": "Neelix",
+      "universe": "Star Trek TNG/Voyager",
+      "status": "active"
     }
   }
 }

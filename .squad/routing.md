@@ -12,6 +12,7 @@ How to decide who handles what.
 | Code review | {Name} | Review PRs, check quality, suggest improvements |
 | Testing | {Name} | Write tests, find edge cases, verify fixes |
 | Scope & priorities | {Name} | What to build next, trade-offs, decisions |
+| News broadcasts, daily briefings, status updates | Neelix | Styled squad activity reports, Teams delivery |
 | Async issue work (bugs, tests, small features) | @copilot 🤖 | Well-defined tasks matching capability profile |
 | Session logging | Scribe | Automatic — never needs routing |
 
@@ -63,4 +64,5 @@ When triaging, the Lead should ask:
 | C#, Go, .NET, clean code | Data | — |
 | Documentation, presentations, analysis | Seven | — |
 | Audio content generation, TTS, markdown to audio | Podcaster | — |
+| News, briefings, status reports, Teams updates | Neelix | Seven |
 

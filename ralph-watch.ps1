@@ -360,6 +360,23 @@ while ($true) {
         Write-Host "[$timestamp] Continuing with existing code..." -ForegroundColor Yellow
     }
     
+    # Step 1.5: Teams message monitoring (every 3rd round, weekdays only)
+    if (($round % 3) -eq 1) {
+        $dow = (Get-Date).DayOfWeek
+        if ($dow -ne 'Saturday' -and $dow -ne 'Sunday') {
+            $teamsMonitorScript = Join-Path (Get-Location) ".squad\scripts\teams-monitor-check.ps1"
+            if (Test-Path $teamsMonitorScript) {
+                Write-Host "[$timestamp] Running Teams message monitor..." -ForegroundColor Yellow
+                try {
+                    & $teamsMonitorScript -LookbackMinutes 30
+                    Write-Host "[$timestamp] Teams monitor check completed" -ForegroundColor Green
+                } catch {
+                    Write-Host "[$timestamp] Warning: Teams monitor failed: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+        }
+    }
+    
     # Step 2: Run the agency copilot and capture exit code + output
     $exitCode = 0
     $roundStatus = "idle"

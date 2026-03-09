@@ -26,6 +26,13 @@ $nextReviewDateFormatted = $nextReviewDate.ToString("MMMM d, yyyy")
 
 Write-Host "🗓️  Creating cache review issue for $reviewMonth..." -ForegroundColor Cyan
 
+$checklistBlock = @'
+- [ ] Query Application Insights for 30-day metrics
+- [ ] Prepare access pattern analysis
+- [ ] Review any open action items from previous month
+- [ ] Check for cache-related incidents or alerts
+'@
+
 # Issue body template
 $issueBody = @"
 # FedRAMP Dashboard Cache Configuration Review - $reviewMonth
@@ -38,10 +45,7 @@ $issueBody = @"
 
 ## Pre-Review Checklist
 
-- [ ] Query Application Insights for 30-day metrics
-- [ ] Prepare access pattern analysis
-- [ ] Review any open action items from previous month
-- [ ] Check for cache-related incidents or alerts
+$checklistBlock
 
 ---
 

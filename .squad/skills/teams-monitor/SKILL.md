@@ -30,9 +30,11 @@ Invoke-RestMethod -Uri $webhookUrl.Trim() -Method Post -ContentType "application
 
 ## Trigger
 
-- **Session start**: Every agent session should run the Teams check as part of initialization
-- **Ralph loop**: If a Ralph/orchestrator loop is active, run the check every cycle (~every few minutes)
+- **Scheduled (Primary)**: Runs every 20 minutes via Ralph's loop using `.squad/schedule.json` and Squad Scheduler (task ID: `teams-message-monitor`)
+- **Session start**: Any agent session can run the Teams check as part of initialization
 - **On-demand**: Any agent can invoke this skill when asked to "check Teams"
+
+The scheduled check uses the script at `.squad/scripts/teams-monitor-check.ps1` which is dispatched by the Squad Scheduler engine.
 
 ## Workflow
 

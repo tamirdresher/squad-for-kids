@@ -2766,6 +2766,8 @@ Also filed: .squad/decisions/inbox/picard-cross-squad-design.md (decision record
 - **Architecture validation:** The two-layer model (Agent → Adapter → Platform) maintains prompt-level abstraction while enabling multi-platform support
 - **Next checkpoint:** Wire adapter factories into agent command dispatch (Phase 2) — this is the critical dependency
 - **Team implication:** Our multi-platform vision aligns with Squad's emerging architecture; ADO research validates feasibility
+- **Next checkpoint:** Wire adapter factories into agent command dispatch (Phase 2) — this is the critical dependency
+- **Team implication:** Our multi-platform vision aligns with Squad's emerging architecture; ADO research validates feasibility
 
 ---
 

@@ -10,6 +10,140 @@
 
 ## Learnings
 
+### 2026-03-25: Seven — Podcaster Agent TTS Evaluation — Issue #214 (COMPLETED)
+
+**Assignment:** Research Text-to-Speech (TTS) options for converting Squad outputs (research reports, briefings, blog drafts, patent analysis) into audio podcasts. Evaluate 5 options, identify best approach, and recommend implementation path.
+
+**What I Found:**
+
+1. **Five TTS Options Evaluated:**
+   - **Azure AI Speech Service** ✅ RECOMMENDED
+     * Production-ready neural voices (500+ voices, 100+ languages)
+     * $15 per 1M characters (~$0.02–$0.15 per 500-word article)
+     * Free tier: 0.5M characters/month
+     * Enterprise compliance (GDPR, HIPAA, SOC 2, SLAs)
+     * Fully Microsoft-owned (satisfies "Microsoft tools only" constraint)
+     * Cloud-based; ~1–3 second latency per request
+     * Implementation: REST API or SDKs (Node.js, Python, C#, Java, Go)
+   
+   - **edge-tts** ⚠️ NOT RECOMMENDED
+     * Free, uses Microsoft Edge's internal Read Aloud API (unofficial)
+     * Good voice quality (same neural models as Azure subset)
+     * MAJOR RISKS: Unofficial/unsupported, no SLA, legal risks for commercial use, Microsoft could shut down anytime
+     * Rate limits not published; subject to IP blocking
+     * Only suitable for prototyping, not production
+   
+   - **Azure OpenAI TTS** ⚠️ VIABLE BUT NOT OPTIMAL
+     * Models: TTS-1 ($15/1M chars), TTS-1 HD ($30/1M chars), GPT-4o-mini-tts
+     * No price advantage vs. Azure Speech Service
+     * Fewer voices (~6 vs. 500+ in Speech Service)
+     * Overkill for simple document TTS (designed for multimodal agents)
+     * Skip in favor of Azure Speech Service
+   
+   - **GitHub Copilot Audio** ❌ NOT VIABLE
+     * Has text-to-speech capability (reads responses aloud in VS Code)
+     * FATAL FLAW: No public API; UI-only feature
+     * Not automatable; not designed for batch processing
+     * Only for developer productivity (dictation, hands-free coding)
+   
+   - **PowerShell System.Speech** ⚠️ MVP/DEMO ONLY
+     * Free, Windows-native (via System.Speech.Synthesis)
+     * SAPI voices (Microsoft David Desktop, Zira Desktop) sound robotic/synthetic
+     * Voice quality unacceptable for professional podcasts
+     * Windows-only, no neural voices accessible
+     * Good for internal MVP/proof-of-concept, not production
+
+2. **Constraint Analysis:**
+   - Project requirement: "Microsoft/GitHub tools only"
+   - Eliminates: Google NotebookLM (inspiration but not implementable)
+   - Leaves only: Azure Speech Service as viable production option
+
+3. **Architecture Comparison (3 Options):**
+   - **Option A (Post-Processing Pipeline):** Scribe logs → Podcaster daemon → generates audio. Decoupled but adds infrastructure complexity.
+   - **Option B (On-Demand):** User requests "podcast this article" → generates audio on-demand (~3–5 sec latency). Simple, synchronous, no background infrastructure.
+   - **Option C (Automated Daily):** Scheduled trigger (e.g., 8:55 AM) → generates morning briefing podcast → sends to Teams. Proactive but limited cadence.
+   - **Recommendation:** Option B (on-demand) as primary, with optional daily batch capability.
+
+4. **Cost Analysis:**
+   - Scenario: 250 documents/month (~8,000 words avg) = 2M characters/month
+   - Azure Speech Service: $30/month = $360/year
+   - PowerShell: $0/year (but poor quality)
+   - Budget impact: MINIMAL—$360/year is negligible
+
+**Work Completed:**
+- Researched all 5 TTS options (availability, pricing, quality, compliance, constraints)
+- Compared: Azure AI Speech vs. edge-tts vs. Azure OpenAI TTS vs. GitHub Copilot vs. PowerShell System.Speech
+- Evaluated vs. project constraint ("Microsoft/GitHub tools only")
+- Analyzed 3 architecture options (post-processing, on-demand, daily batch)
+- Created comprehensive 14-page research document with:
+  * Detailed analysis of each TTS option (availability, pricing, quality, risks)
+  * Comparison table of all options
+  * NotebookLM reference (why we can't use Google service)
+  * Architecture option comparison
+  * Cost analysis
+  * Implementation checklist
+  * Risk mitigation table
+- Wrote decision document for team (inbox/seven-podcaster-tts-recommendation.md)
+- Committed research to branch squad/214-podcaster-research
+
+**Key Resources Created:**
+- `.squad/research/214-podcaster-tts-analysis.md` — comprehensive research document
+- `.squad/decisions/inbox/seven-podcaster-tts-recommendation.md` — team decision and next steps
+
+**Key Decision:**
+- **Azure AI Speech Service is the recommended production TTS engine**
+- Standard Neural Voices tier (~$15/1M characters)
+- On-demand architecture (Option B) as primary implementation
+- Annual cost: ~$360 for typical usage
+- Next phase: Picard to review, prioritize, and provision Azure resource
+
+**Status:** Research complete. Decision documented. Awaiting Picard approval for implementation phase.
+
+---
+
+### 2026-03-07: Seven — DevBox Infrastructure Documentation — Issue #103 (COMPLETED)
+
+**Assignment:** Document DevBox provisioning infrastructure and close GitHub issue #103 requesting devbox creation and details.
+
+**What I Found:**
+
+1. **Complete DevBox Provisioning Infrastructure Exists**
+   - Phase 1 (✅): Bicep IaC templates + PowerShell scripts (provision.ps1, clone-devbox.ps1, bulk-provision.ps1)
+   - Phase 2 (✅): Natural language Squad skill for DevBox operations
+   - Phase 3 (✅): MCP Server integration (@microsoft/devbox-mcp-server) with 7 core tools
+   - Full documentation in devbox-provisioning/README.md
+
+2. **Current State**
+   - DevBoxes already provisioned and running (IDPDev, IDPDev-2)
+   - Accessible via: Web portal, CLI tunnel, Windows App, or MCP Server
+   - Maintained by B'Elanna (Infrastructure Expert)
+
+3. **Documentation Gap**
+   - Infrastructure was complete but issue lacked summary of capabilities
+   - No quick-reference for accessing/cloning devboxes
+   - Previous comments didn't aggregate all available options
+
+**Work Completed:**
+- Investigated devbox-provisioning/ folder structure and capabilities
+- Reviewed all 56+ comments on issue #103 to understand context
+- Analyzed screenshots showing active devbox deployment
+- Posted comprehensive summary comment with:
+  - Infrastructure phases overview
+  - Active devbox status
+  - Quick-start commands (clone/provision)
+  - Links to full documentation
+  - MCP Server reference
+- Closed issue #103 with resolution status
+
+**Key Resources Created:**
+- GitHub comment with complete infrastructure summary
+- Reference to devbox-provisioning/README.md for troubleshooting
+- Quick-start guide for cloning existing devboxes
+
+**Status:** Issue #103 closed successfully. DevBox infrastructure fully documented and referenced.
+
+---
+
 ### 2026-03-21: Seven — OpenAI Codex Desktop App Research — Issue #211 (COMPLETED)
 
 **Assignment:** Research OpenAI Codex desktop app to identify patterns, capabilities, and borrowable ideas for Squad.

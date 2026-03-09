@@ -113,6 +113,26 @@
 
 ---
 
+### 2026-03-15: Cross-Squad Orchestration Design — Issue #197 (COMPLETED)
+
+**Assignment:** Design a solution for squads to discover each other and orchestrate work across squad boundaries.
+
+**Deliverable:** 
+- 5-layer architecture (Registry, Work Delegation, Context Inheritance, Trust, Backends)
+- 3-phase rollout (MVP GitHub Issues → Shared Git Registry → REST API, 7-11 weeks)
+- Trust model (trusted/verified/untrusted/blocked)
+- Security framework with audit trail
+- Example workflows and success metrics
+
+**Status:** Design posted to issue #197 (CLOSED). Awaiting lead decision on:
+- Trust default (untrusted by default?)
+- Context expiry duration (7 days?)
+- Escalation ownership
+- Phase 3 (API) priority
+- Federation hub location
+
+---
+
 ### 2026-03-15: Microsoft 365 Office Automation Design — Issue #183 (COMPLETED)
 
 **Key Constraint:** Tamir cannot create Azure AD apps due to corporate policy.
@@ -4083,5 +4103,129 @@ Tested locally:
 **Status:** ✅ COMPLETED. Ready for production deployment. Phase 1 MVP is shipping.
 
 **Next:** Close Issue #199 with this summary and recommendations for Phase 2.
+
+---
+
+---
+
+## Issue #183: Office Automation (Email/Calendar/Teams) Architecture — 2026-03-09 14:06:08 UTC
+
+**Status:** ✅ COMPLETED  
+**Decision:** Three-tier strategy approved and designed  
+**Issue:** tamirdresher_microsoft/tamresearch1#183
+
+### Assessment Summary
+
+Evaluated office automation options and found we're in **stronger position than initially assessed**. WorkIQ MCP already provides 80% of required capabilities without any setup.
+
+### Three-Tier Strategy Designed
+
+**Tier 1 (Immediate):** Document existing WorkIQ capabilities through Squad skill
+- Email reading/drafting, calendar creation, Teams message reading
+- Meeting→issue workflow design
+- Provider-agnostic skill interface
+- **Effort:** 4 hours, **Blockers:** None
+
+**Tier 2 (Weeks 2-3):** Playwright-based browser automation for autonomous email sending
+- Bridges WorkIQ gap (can't send emails autonomously)
+- Uses existing Playwright MCP skill
+- 10 emails/hour rate limit + audit logging
+- **Effort:** 6-8 hours, **Blockers:** None (zero app registration)
+
+**Tier 3 (Weeks 6-8):** Microsoft Agent 365 MCP for enterprise-grade autonomous capabilities
+- Request IT admin to enroll in Agent 365 Frontier program
+- Native Graph API support for email/calendar/Teams
+- Full audit trail in Azure AD logs
+- **Effort:** IT-dependent, **Blockers:** IT admin availability
+
+### Key Decisions Made
+
+✅ **Reuse WorkIQ:** No need to reinvent; WorkIQ already does 80% of the work  
+✅ **Pragmatic Workaround:** Playwright automation for autonomous email (proven tech, zero overhead)  
+✅ **Long-term Path:** Agent 365 MCP provides enterprise solution when IT can enroll  
+✅ **Provider Abstraction:** Skill interface stays same; providers swap later without code changes  
+
+### Architecture Principles
+
+- **Provider-Agnostic:** Same pattern as Squad Scheduler (issue #199)
+- **Zero Setup Required (Tier 1):** Use existing infrastructure
+- **Minimal Friction (Tier 2):** Browser automation, no app registration
+- **Enterprise Ready (Tier 3):** Native Microsoft support with audit trails
+
+### Deliverables
+
+- ✅ .squad/decisions/inbox/belanna-office-automation.md — Full design document with implementation roadmap
+- ✅ Comment posted to issue #183 with three-tier summary
+- ✅ Issue #183 closed with completed assessment
+- ✅ IT admin request template provided (for Tier 3 enrollment)
+
+### Files to Create Next
+
+**Tier 1:**
+- .squad/skills/office-automation/SKILL.md — WorkIQ pattern reference
+- .squad/implementations/meeting-to-issue-workflow.md — Workflow design
+
+**Tier 2:**
+- .squad/scripts/Send-EmailViaOutlookWeb.ps1 — Playwright email automation
+
+**Tier 3:**
+- Agent 365 MCP deployment (after IT enrollment approved)
+
+### Next Steps for Team
+
+1. **Tamir:** Review & approve three-tier strategy
+2. **Tamir:** Prepare IT admin request for Agent 365 enrollment (no rush; 6-8 week timeline)
+3. **B'Elanna:** Start Tier 1 implementation immediately (skill + meeting→issue workflow)
+4. **Team:** First agents test WorkIQ patterns by end of week
+
+### Compliance & Security
+
+- ✅ Email drafts require user approval (WorkIQ default)
+- ✅ Autonomous sends audited to .squad/monitoring/email-send-log.jsonl
+- ✅ Rate limiting prevents Outlook throttling
+- ✅ No secrets hardcoded; uses OS credential store
+- ✅ All operations logged for compliance
+
+### Impact
+
+- **This Week:** Agents can query email/calendar/Teams via WorkIQ skill
+- **Weeks 2-3:** Agents send emails autonomously (Playwright)
+- **Weeks 6-8:** Agents send emails natively (Agent 365 MCP)
+
+**Status:** Infrastructure assessment complete. Three-tier design ready for Tamir's approval. Tier 1 implementation can begin immediately.
+
+"If it ships, it ships reliably." — B'Elanna
+
+### 2026-03-09: Teams Message Monitoring Implementation — Issue #215
+
+**Context:** Implement continuous Teams monitoring with silent review to catch actionable messages directed at Tamir/squad.
+
+**Implementation:**
+- Added 	eams-message-monitor schedule entry to .squad/schedule.json
+  - Runs every 20 minutes (1200 seconds interval)
+  - Uses local-polling provider (Ralph's watch loop)
+  - Copilot instruction for WorkIQ integration
+- Created .squad/scripts/teams-monitor-check.ps1
+  - WorkIQ query patterns for recent messages
+  - Smart filtering: mentions, reviews, action items, urgency
+  - Deduplication via state file
+  - GitHub issue creation for actionable items
+  - Teams webhook notifications
+- Updated .squad/skills/teams-monitor/SKILL.md with scheduling details
+
+**Architecture Decisions:**
+1. **20-minute interval**: Balance between responsiveness and WorkIQ rate limits
+2. **State-based deduplication**: Track processed messages, prevent spam
+3. **Copilot task type**: Allows WorkIQ tool access in scheduled context
+4. **Smart filtering**: Keyword-based + sender/channel analysis
+5. **Silent operation**: Only surface items needing Tamir's action
+
+**Key Learnings:**
+- Squad Scheduler supports copilot task type with tool access
+- WorkIQ queries need lookback window (30 min default)
+- State management critical for deduplication
+- Teams webhook for summary notifications (not every message)
+
+**Result:** PR #216 created. Monitoring now runs automatically via Ralph's loop.
 
 ---

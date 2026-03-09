@@ -125,6 +125,36 @@
       "timeout": 3600,
       "notifyOnFailure": ["teams", "issue-comment"],
       "tags": ["sync", "upstream"]
+    },
+    {
+      "id": "teams-message-monitor",
+      "name": "Teams Message Monitor",
+      "description": "Monitor Teams channels for actionable messages directed at the squad. Silent review with smart filtering - only surface items requiring Tamir's attention.",
+      "enabled": true,
+      "trigger": {
+        "type": "interval",
+        "intervalSeconds": 1200
+      },
+      "task": {
+        "type": "copilot",
+        "instruction": "Use WorkIQ (workiq-ask_work_iq tool) to scan recent Teams messages from the last 30 minutes. Focus on: direct mentions of Tamir or the squad, review requests, action items, urgent items, decisions needing input. Silently evaluate each item - only create a GitHub issue or notification if Tamir specifically needs to act. Use teams-monitor skill workflow for filtering and issue creation. Avoid spam - be selective.",
+        "scriptRef": ".squad/scripts/teams-monitor-check.ps1"
+      },
+      "providers": ["local-polling"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 60
+      },
+      "timeout": 600,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "teams", "communication"],
+      "metadata": {
+        "issue": "#215",
+        "owner": "belanna",
+        "checkInterval": "20 minutes",
+        "smartFiltering": true,
+        "silentReview": true
+      }
     }
   ],
   "defaults": {

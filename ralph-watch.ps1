@@ -471,15 +471,15 @@ while ($true) {
     $activityHandle = $activityRunspace.BeginInvoke()
     
     try {
-        # Call agency DIRECTLY — no pipes, no Start-Process, no cmd /c
-        # This is the only approach that reliably returns control
-        # Redirect stderr (2>&1) so PS 5.1 doesn't convert agency's emoji
-        # banner output into NativeCommandError exceptions
+        # PS 5.1 converts native stderr to NativeCommandError exceptions.
+        # Agency writes emoji banners to stderr, causing false failures.
+        # Fix: suppress stderr-to-error conversion with ErrorAction SilentlyContinue
+        # and call agency without pipes so $LASTEXITCODE is preserved.
         $ErrorActionPreference_saved = $ErrorActionPreference
-        $ErrorActionPreference = "Continue"
-        agency copilot --yolo --autopilot --agent squad -p $prompt 2>&1 | Write-Host
-        $ErrorActionPreference = $ErrorActionPreference_saved
+        $ErrorActionPreference = "SilentlyContinue"
+        agency copilot --yolo --autopilot --agent squad -p $prompt
         $exitCode = $LASTEXITCODE
+        $ErrorActionPreference = $ErrorActionPreference_saved
         $agencyOutput = ""  # Can't capture without pipes — but that's OK
         # Display output after completion
         # No file cleanup needed — output streamed to console directly

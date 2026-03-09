@@ -21,7 +21,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { subDays, format as formatDate } from 'date-fns';
+import { subDays } from 'date-fns';
 import { apiClient } from '../../services/api.service';
 import type { ComplianceTrend, ControlDriftList, Granularity, DriftSeverity } from '../../types/api.types';
 import { LoadingSpinner } from '../common/LoadingSpinner';
@@ -40,7 +40,7 @@ export const TrendAnalysisPage: React.FC = () => {
   const [granularity, setGranularity] = useState<Granularity>('daily');
   const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState<Date>(new Date());
-  const [driftThreshold, setDriftThreshold] = useState<number>(10);
+  const [driftThreshold] = useState<number>(10);
 
   useEffect(() => {
     fetchTrendData();

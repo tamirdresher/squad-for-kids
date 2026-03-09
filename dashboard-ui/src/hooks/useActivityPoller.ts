@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { 
   LiveActivityState, 
   AgentEvent, 
-  parseOrchestrationLog, 
   aggregateEvents,
-  formatElapsedTime
 } from '../services/activityParser';
 
 interface UseActivityPollerOptions {

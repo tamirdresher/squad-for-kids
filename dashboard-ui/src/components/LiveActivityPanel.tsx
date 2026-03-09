@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -22,7 +22,7 @@ import {
   HourglassEmpty as HourglassIcon,
   Error as ErrorIcon,
 } from '@mui/icons-material';
-import { LiveActivityState, AgentRow, ActionEntry } from '../services/activityParser';
+import { LiveActivityState, AgentRow } from '../services/activityParser';
 
 interface LiveActivityPanelProps {
   state: LiveActivityState;
@@ -39,15 +39,14 @@ interface LiveActivityPanelProps {
  * - Actions log (timestamped event stream)
  */
 export const LiveActivityPanel: React.FC<LiveActivityPanelProps> = ({ state, loading, error }) => {
-  const [autoScroll, setAutoScroll] = useState(true);
   const actionsListRef = React.useRef<HTMLDivElement>(null);
 
   // Auto-scroll to latest action
   useEffect(() => {
-    if (autoScroll && actionsListRef.current) {
+    if (actionsListRef.current) {
       actionsListRef.current.scrollTop = 0;
     }
-  }, [state.actions, autoScroll]);
+  }, [state.actions]);
 
   // Status icon helper
   const getStatusIcon = (status: AgentRow['status']) => {
@@ -62,20 +61,6 @@ export const LiveActivityPanel: React.FC<LiveActivityPanelProps> = ({ state, loa
         return <ErrorIcon color="error" />;
       default:
         return null;
-    }
-  };
-
-  // Action type color helper
-  const getActionColor = (type: ActionEntry['type']) => {
-    switch (type) {
-      case 'spawn':
-        return 'info';
-      case 'complete':
-        return 'success';
-      case 'fail':
-        return 'error';
-      default:
-        return 'default';
     }
   };
 

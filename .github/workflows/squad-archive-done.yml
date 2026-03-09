@@ -1,0 +1,155 @@
+name: Squad Archive Done Items
+
+on:
+  schedule:
+    # Run daily at 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  archive-done-items:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      issues: write
+      repository-projects: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Archive old Done items
+        uses: actions/github-script@v7
+        env:
+          PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
+          DONE_STATUS_ID: '4830e3e3'
+          DAYS_THRESHOLD: 3
+        with:
+          script: |
+            const projectId = process.env.PROJECT_ID;
+            const doneStatusId = process.env.DONE_STATUS_ID;
+            const daysThreshold = parseInt(process.env.DAYS_THRESHOLD);
+            
+            // Calculate the cutoff date
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
+            
+            console.log(`🔍 Looking for items in Done status older than ${daysThreshold} days (before ${cutoffDate.toISOString()})`);
+            
+            // Query project items using GraphQL
+            const query = `
+              query($projectId: ID!) {
+                node(id: $projectId) {
+                  ... on ProjectV2 {
+                    items(first: 100) {
+                      nodes {
+                        id
+                        fieldValues(first: 20) {
+                          nodes {
+                            ... on ProjectV2ItemFieldSingleSelectValue {
+                              name
+                              field {
+                                ... on ProjectV2SingleSelectField {
+                                  name
+                                }
+                              }
+                            }
+                            ... on ProjectV2ItemFieldDateValue {
+                              date
+                              field {
+                                ... on ProjectV2Field {
+                                  name
+                                }
+                              }
+                            }
+                          }
+                        }
+                        content {
+                          ... on Issue {
+                            number
+                            title
+                            url
+                            updatedAt
+                          }
+                          ... on PullRequest {
+                            number
+                            title
+                            url
+                            updatedAt
+                          }
+                        }
+                      }
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            
+            let archivedCount = 0;
+            let checkedCount = 0;
+            
+            try {
+              const result = await github.graphql(query, {
+                projectId: projectId
+              });
+              
+              const items = result.node.items.nodes;
+              console.log(`📋 Found ${items.length} total items on the project board`);
+              
+              for (const item of items) {
+                // Check if item is in Done status
+                const statusField = item.fieldValues.nodes.find(fv => 
+                  fv.field?.name === 'Status'
+                );
+                
+                if (statusField && statusField.name === 'Done') {
+                  checkedCount++;
+                  
+                  // Get the item's last update time
+                  const content = item.content;
+                  if (content && content.updatedAt) {
+                    const updatedAt = new Date(content.updatedAt);
+                    
+                    // Check if it's older than the threshold
+                    if (updatedAt < cutoffDate) {
+                      console.log(`📦 Archiving: ${content.number ? '#' + content.number : 'item'} - ${content.title || 'untitled'} (last updated: ${updatedAt.toISOString()})`);
+                      
+                      // Archive the item
+                      const archiveMutation = `
+                        mutation($projectId: ID!, $itemId: ID!) {
+                          archiveProjectV2Item(input: {projectId: $projectId, itemId: $itemId}) {
+                            item {
+                              id
+                            }
+                          }
+                        }
+                      `;
+                      
+                      try {
+                        await github.graphql(archiveMutation, {
+                          projectId: projectId,
+                          itemId: item.id
+                        });
+                        archivedCount++;
+                      } catch (error) {
+                        console.error(`❌ Failed to archive item ${item.id}: ${error.message}`);
+                      }
+                    } else {
+                      console.log(`⏳ Skipping: ${content.number ? '#' + content.number : 'item'} - ${content.title || 'untitled'} (last updated: ${updatedAt.toISOString()}) - not old enough`);
+                    }
+                  }
+                }
+              }
+              
+              console.log(`\n✅ Summary:`);
+              console.log(`   - Checked ${checkedCount} Done items`);
+              console.log(`   - Archived ${archivedCount} items older than ${daysThreshold} days`);
+              
+            } catch (error) {
+              console.error(`❌ Error querying project: ${error.message}`);
+              throw error;
+            }

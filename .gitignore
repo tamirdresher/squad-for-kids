@@ -20,3 +20,7 @@ node_modules/
 
 # Upstream synced repos (local clones, not committed)
 .squad/_upstream_repos/
+
+# .NET build artifacts
+bin/
+obj/

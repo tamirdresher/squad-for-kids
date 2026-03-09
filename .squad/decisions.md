@@ -539,6 +539,36 @@ Users requested GitHub Codespaces setup similar to existing DevBox configuration
 
 ---
 
+## Decision 2.1: Cloud Storage for Podcast Audio Files
+
+**Date:** 2025-01-21  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #236  
+**Status:** ✅ Implemented  
+
+Store podcast audio files in OneDrive or Azure Blob Storage instead of Git repository. Repository stays lean, users upload via PowerShell/Python scripts with graceful fallback (OneDrive Sync → Graph API → Azure Blob Storage).
+
+**Key Changes:**
+- Added `.gitignore` patterns for `*.mp3`, `*.wav`, `*-audio.mp3`
+- Created `scripts/upload-podcast.ps1` (PowerShell)
+- Created `scripts/upload-podcast.py` (Python)
+- 3 upload methods with automatic fallback
+
+**Rationale:** 
+- Immediate usability (OneDrive Sync requires no auth)
+- Enterprise-ready options (Graph API for automation, Azure Blob for large scale)
+- No Git LFS quota overhead
+
+**Consequences:**
+- ✅ Repository stays lean; no audio bloat
+- ✅ Faster clone/pull/push operations
+- ⚠️ Manual upload step added to workflow
+- ⚠️ Requires OneDrive/Azure availability
+
+**Related:** PODCASTER_README.md, scripts/upload-podcast.{ps1,py}
+
+---
+
 ## Decision 15: Functions Project — Azure Functions Isolated Worker Model Migration
 
 **Date:** 2026-03-08  

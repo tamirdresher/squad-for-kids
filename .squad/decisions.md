@@ -12495,3 +12495,63 @@ Implement automated archiving via GitHub Actions workflow that:
 - [ ] Consider adding metrics/reporting of archived items
 - [ ] Document pattern for other status-based automations
 
+
+---
+
+## Decision: Disable Squad Protected Branch Guard Workflow
+
+**Date:** 2026-03-09  
+**Author:** B'Elanna (Infrastructure Expert, requested by Tamir)  
+**Status:** ✅ Executed  
+**Scope:** CI/CD & Workflow Management  
+**Issue:** #193, #194  
+
+### Context
+
+The .github/workflows/squad-main-guard.yml workflow was detecting .squad/ files on pushes to main and failing, generating email noise. Squad files are routine parts of normal squad operations in this research/tool repository.
+
+### Problem
+
+1. **Guard was not preventative** — Triggers on push events AFTER merges, so it cannot prevent anything
+2. **Email noise** — Generated failure notifications on every push to main containing .squad/ files
+3. **Not applicable to research repo** — This is a tool/research repository, not an app. .squad/ files are expected and integral to team workflows
+
+### Decision
+
+**Disable the squad-main-guard.yml workflow for automated triggers.**
+
+### Implementation
+
+Modified .github/workflows/squad-main-guard.yml:
+- Removed pull_request and push event triggers
+- Configured to trigger only on workflow_dispatch (manual runs)
+- Workflow can still be executed manually for testing if needed
+
+### Impact
+
+**Positive:**
+- ✅ Eliminates failure email notifications on every push to main
+- ✅ Reduces CI/CD noise in developer inbox
+- ✅ Workflow remains available for manual testing via GitHub Actions UI
+
+**Neutral:**
+- ℹ️ Manual trigger available if testing or re-enabling is needed
+- ℹ️ No impact on other branch protection workflows
+
+### Rationale
+
+The guard was designed to prevent .squad/ files from being committed to main. However:
+1. In this repository, .squad/ files are **legitimate and expected** (team decisions, orchestration logs, session history)
+2. The guard fires **AFTER** merges (on push), so it **cannot prevent** the condition it's checking for
+3. For a research/tool repo using squad workflows, the guard provides **no value** and only adds noise
+
+### Trade-offs
+
+- **Removed:** Automated protection against .squad/ files on main (not needed)
+- **Kept:** Manual testing capability via workflow_dispatch
+- **Available:** Can be re-enabled or modified if guard requirements change
+
+### Related
+
+- Issue #193, #194: User feedback on email noise
+- .github/workflows/squad-main-guard.yml: Implementation file

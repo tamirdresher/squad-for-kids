@@ -34,6 +34,17 @@
 - `.squad/agents/podcaster/charter.md` — Agent charter and responsibilities
 - `.squad/agents/podcaster/history.md` — This file
 
+### Issue #247 Verification (March 9, 2026)
+- **Status:** System fully operational
+- **Verification:** End-to-end test successful (test file → 156 KB MP3 in ~2 seconds)
+- **Existing Output:** 4 podcast files already generated in repo root:
+  - EXECUTIVE_SUMMARY-audio.mp3 (3.91 MB)
+  - RESEARCH_REPORT-audio.mp3 (4.32 MB)
+  - QUICK_REFERENCE-audio.mp3 (2.42 MB)
+  - QUICK_REFERENCE-conversational.mp3 (3.94 MB)
+- **Finding:** Podcasts ARE being generated; user may have been looking in wrong location or expected different delivery mechanism
+- **Recommendation:** Consider adding MP3 file list to README or creating a dedicated `/podcasts` directory for better discoverability
+
 ## Next Steps
 - Test with additional document types (reports, briefings, etc.)
 - Add configuration file for voice selection and audio parameters
@@ -41,3 +52,10 @@
 - Consider Azure AI Speech Service migration path for scale
 - Add audio caching to avoid regeneration
 - Create API endpoint for on-demand conversion
+- Improve podcast file discoverability (dedicated directory or index)
+
+### Issue #247 Follow-up (March 9, 2026, 22:05 UTC)
+- **Decision Proposed:** Implement Option C (dedicated `/podcasts` directory + auto-generated index)
+- **Decision Status:** Merged to decisions.md, awaiting team approval
+- **Orchestration Log:** `.squad/orchestration-log/2026-03-09T22-05-31Z-podcaster.md`
+- **Next Action:** Implement directory structure and output path changes once team approves

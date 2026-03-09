@@ -3231,3 +3231,29 @@ Applied consistently across all workflows that parse team.md:
 - Cross-platform path handling (Path.Combine) is essential for portable .NET tools
 - Configurable directory structure (--config-dir) makes tool more flexible
 
+
+### Issue #242 — Complete Sanitized Demo (2026-03-09)
+**Task:** Add all missing infrastructure to sanitized demo (scheduling, workflows, Teams/email bridge, monitoring)
+
+**What was added:**
+- 6 GitHub Actions workflows: triage, heartbeat, daily digest, issue notify, label sync, label enforce
+- Scheduling system: schedule.json with 6 scheduled tasks (ralph heartbeat, daily digest, teams monitor, etc.)
+- ralph-watch.ps1: Full autonomous watch script with observability, Teams/email monitoring, scheduled task evaluation
+- squad-monitor-standalone: Complete C# monitoring dashboard for real-time agent activity
+- Skills: github-project-board, teams-monitor
+- Documentation: WORKFLOWS.md (complete workflow guide), SCHEDULING.md (scheduling deep dive)
+- Updated README with all new components and integration guides
+
+**Sanitization applied:**
+- Personal names → "YourName", "YourOrg", "YourTeam"
+- Webhook URLs → Placeholder instructions
+- Azure resource IDs, Teams channel IDs → Placeholders
+- Internal Microsoft references → Generic names
+- All structure and logic kept intact
+
+**Key learnings:**
+- Squad automation stack: 6 workflows + scheduling + monitoring + Teams bridge
+- Ralph watch: Autonomous polling loop (every 5 min) with observability (logs, heartbeat, metrics)
+- Schedule system: Interval/cron triggers, multiple providers (local-polling, github-actions, copilot-agent)
+- Teams integration: Incoming Webhooks (notifications) + WorkIQ MCP (read messages/emails)
+- Sanitization pattern: Remove personal data but keep all structure/logic

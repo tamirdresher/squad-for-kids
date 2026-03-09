@@ -9987,6 +9987,359 @@ $token = az account get-access-token --resource https://devcenter.azure.com
 ## Implementation Plan (Once Unblocked)
 
 1. **Obtain Dev Center details** from Tamir via Azure Portal
+
+---
+
+# Decision: Podcaster File Location and Discoverability
+
+**Date:** 2026-03-09  
+**Author:** Podcaster (Audio Content Generator)  
+**Status:** 📋 Proposed  
+**Scope:** Podcaster Infrastructure  
+**Related Issues:** #247  
+
+## Context
+User reported "didn't get any podcast" despite system generating 4 MP3 files successfully. Investigation revealed all podcasts exist in repo root but may not be discoverable.
+
+## Current State
+- Podcasts generated in repository root directory (same location as source markdown)
+- Naming convention: `{source-filename}-audio.mp3` or `{source-filename}-conversational.mp3`
+- No index or manifest file listing available podcasts
+- No dedicated directory for podcast outputs
+- README doesn't mention where to find generated audio files
+
+## Problem
+User expectation disconnect: podcasts ARE being generated but users don't know:
+1. Where to find them (repo root vs. dedicated directory)
+2. Which files have audio versions
+3. How to discover available podcasts without browsing filesystem
+
+## Proposed Solution Options
+
+### Option A: Dedicated Podcasts Directory (Recommended)
+- Create `/podcasts` directory for all MP3 outputs
+- Update podcaster-prototype.py to output to `/podcasts/{filename}-audio.mp3`
+- Add podcasts/.gitkeep to preserve directory in git
+- Update README with link to podcasts directory
+
+**Pros:** Clean separation, easy discovery, doesn't clutter root  
+**Cons:** Breaking change for existing scripts expecting root location  
+
+### Option B: Podcast Index File
+- Keep podcasts in root
+- Generate `PODCASTS.md` index file listing all available audio files with metadata
+- Update on each podcast generation
+- Link from main README
+
+**Pros:** No breaking changes, maintains current structure  
+**Cons:** Root directory still cluttered, requires index maintenance  
+
+### Option C: Both Directory + Index
+- Move to `/podcasts` directory
+- Generate `/podcasts/README.md` with index and metadata
+- Update main README
+
+**Pros:** Best discoverability, clean structure, self-documenting  
+**Cons:** More implementation work  
+
+## Recommendation
+**Option C** — Implement dedicated directory with auto-generated index for best user experience.
+
+## Implementation Checklist
+- [ ] Create `/podcasts` directory
+- [ ] Update `podcaster-prototype.py` output path
+- [ ] Add index generation to prototype script
+- [ ] Move existing 4 MP3 files to `/podcasts`
+- [ ] Update main README.md with podcasts section
+- [ ] Update PODCASTER_README.md documentation
+- [ ] Test end-to-end workflow
+
+---
+
+# Decision: cli-tunnel as Default Terminal Recording & Remote Access Tool
+
+**Date:** 2026-03-09  
+**Author:** Seven (Research & Docs)  
+**Status:** Proposed  
+**Scope:** Tooling & Workflow Standards  
+**Related:** Issue #245
+
+## Decision
+
+Adopt **cli-tunnel** as the team's standard tool for:
+1. Terminal recording (for blog posts, tutorials, demos)
+2. Remote access to Copilot CLI and Squad sessions
+3. Live presentations with interactive terminal output
+4. Multi-session monitoring during development
+
+## Context
+
+Tamir Dresher built cli-tunnel to enable remote access to GitHub Copilot CLI + Squad sessions. Research shows it solves multiple team needs:
+
+**Problem Space:**
+- Screen recordings of terminals are static, not copy/paste-able
+- No standard way to access terminal sessions remotely (e.g., from phone)
+- Multi-repo Squad demos require switching between terminals
+- Presentations with live terminal output are hard to share
+
+**cli-tunnel Solution:**
+- PTY-based terminal wrapping preserves authentic output (colors, prompts, interactivity)
+- Microsoft Dev Tunnels provide secure relay (private by default, Microsoft/GitHub auth)
+- Hub mode + Grid view enable multi-session monitoring
+- Terminal recording (30fps .webm) happens in browser, no server-side infrastructure
+- Works with ANY CLI app: copilot, vim, python, htop, k9s, ssh
+
+## Technical Architecture
+
+```
+Phone/browser → WebSocket → devtunnel → cli-tunnel server
+                                              ↓
+                                         PTY (node-pty)
+                                              ↓
+                                    copilot/vim/any CLI
+                                    (full TUI with colors)
+                                              ↓
+                                   WebSocket → xterm.js
+```
+
+**Not ACP/JSON-RPC** — Uses PTY to preserve raw terminal output for pixel-perfect rendering.
+
+## Recommended Usage Patterns
+
+### 1. Terminal Recording for Blog Posts
+```bash
+cli-tunnel --name demo copilot --agent squad
+# Open in browser, click ⏺ to record
+# Stop recording → .webm download
+```
+
+### 2. Remote Copilot Access
+```bash
+cli-tunnel copilot --yolo
+# Scan QR code on phone
+# Continue session from anywhere
+```
+
+### 3. Multi-Repo Demo Presentations
+```bash
+# Terminal 1
+cli-tunnel --name frontend copilot
+
+# Terminal 2  
+cli-tunnel --name backend copilot
+
+# Phone/browser: Open hub, use Grid Tiles view
+```
+
+### 4. Local Development Only
+```bash
+cli-tunnel --local --port 3000 copilot
+# Access at http://localhost:3000 only
+```
+
+## Team Benefits
+
+✅ **Standardized terminal recording workflow** — No more screen capture tools with inconsistent quality  
+✅ **Remote Squad control** — Check agent progress from phone, send follow-up instructions  
+✅ **Better demos** — Live terminal output in presentations, shareable via QR code  
+✅ **Multi-session monitoring** — Grid view for cross-repo development  
+✅ **Zero infrastructure** — Microsoft Dev Tunnels handle relay, TLS, auth  
+✅ **Security by default** — 9-layer security model, private tunnels, audit logging
+
+## Risks & Mitigations
+
+⚠️ **Dependency on Microsoft Dev Tunnels**  
+- Mitigation: `--local` flag for localhost-only access (no tunnel dependency)
+
+⚠️ **Recording limited to 10 minutes on mobile**  
+- Mitigation: Use desktop browser for longer recordings, or record in segments
+
+⚠️ **Canvas capture not supported (xterm.js WebGL renderer limitation)**  
+- Mitigation: Current MediaRecorder-based recording works; canvas capture planned for future
+
+⚠️ **Session expiry after 4 hours**  
+- Mitigation: Reconnect from hub dashboard; long-running sessions use tmux/screen first
+
+## Skill Documentation
+
+Created comprehensive skill at:
+- `.squad/skills/cli-tunnel/SKILL.md` (team repo)
+- `~/.copilot/skills/cli-tunnel/SKILL.md` (global machine skills)
+
+Copilot CLI can now recommend cli-tunnel for terminal recording, remote access, and presentation scenarios.
+
+## Next Steps
+
+1. Add cli-tunnel to team onboarding docs
+2. Create example demos using cli-tunnel for blog posts
+3. Update Squad documentation to mention remote control capability
+4. Consider adding cli-tunnel integration directly to Squad CLI
+
+---
+
+# Decision: Image Generation Strategy for Copilot CLI
+
+**Date:** 2026-03-09  
+**Author:** Seven (Research & Docs)  
+**Status:** 📋 Proposed — Awaiting Team Decision  
+**Scope:** Skills & Capabilities  
+**Related Issues:** #246  
+
+## Decision
+
+When the team needs image or graphics generation capabilities:
+
+1. **For Technical Documentation (flowcharts, architecture diagrams, ERDs):**
+   - Use **Copilot CLI → Mermaid/SVG/PlantUML** (native, free)
+   - Store diagram source in git (`.mmd`, `.puml`, `.d2` files)
+   - Render via CLI tools: `mmdc`, `plantuml`, `d2`
+
+2. **For Marketing/Photorealistic Images (brand graphics, mockups, concept art):**
+   - Use **Azure OpenAI DALL-E 3** via Python CLI wrapper
+   - Requires Azure subscription + OpenAI resource provisioning
+   - Cost: ~$0.04–$0.08 per image (standard/HD)
+
+3. **NOT AVAILABLE:**
+   - ❌ GitHub Models image generation (doesn't exist)
+   - ❌ Microsoft Designer API (no public API)
+   - ❌ Direct Copilot CLI image generation (requires external orchestration)
+
+## Rationale
+
+### Why This Approach?
+
+**Problem:**
+- Issue #246 requested image/graphics generation using "only Copilot CLI, GitHub Models, and MS-approved sources"
+- Research revealed GitHub Models has NO image generation capabilities (text/code only)
+- Need solution that meets MS-approved requirement + works from CLI
+
+**Analysis:**
+1. **GitHub Models Status:**
+   - Current offerings: GPT-4, Claude, Gemini, Llama (text/code only)
+   - No DALL-E or image models on models.github.com
+   - Multimodal input (can read images) but NOT multimodal output
+
+2. **Microsoft-Approved Options:**
+   - Azure OpenAI Service: Official, enterprise-grade, DALL-E 3 available
+   - Text-based graphics: Mermaid, SVG (Copilot can generate code)
+   - Designer API: Doesn't exist publicly
+
+3. **Cost-Benefit:**
+   - Text diagrams: FREE, version-controlled, meets 80% of use cases
+   - Azure DALL-E: ~$0.04/image, meets 20% (marketing/art)
+   - Hybrid approach = optimal cost efficiency
+
+**Why NOT Other Options:**
+- Unofficial tools (microsoftdesigner PyPI package): Violates "MS-approved" requirement
+- Third-party APIs (Replicate, Hugging Face): Not Microsoft-owned
+- Wait for GitHub Models: No timeline announced
+
+## Implementation
+
+### Phase 1: Text-Based Graphics (Already Available)
+
+**Tools:**
+- Mermaid CLI: `npm install -g @mermaid-js/mermaid-cli`
+- PlantUML: `brew install plantuml` or download JAR
+- D2: `brew install d2` or from d2lang.com
+
+**Workflow:**
+```bash
+# 1. Generate Mermaid code with Copilot
+copilot-cli chat "Create flowchart for user authentication with OAuth"
+
+# 2. Save to .mmd file
+# (Copilot outputs code, save it)
+
+# 3. Render to SVG
+mmdc -i auth-flow.mmd -o auth-flow.svg
+
+# 4. Commit to git
+git add auth-flow.mmd auth-flow.svg
+git commit -m "Add auth flow diagram"
+```
+
+**Status:** ✅ Ready now (no setup required)
+
+### Phase 2: Azure DALL-E 3 (Requires Provisioning)
+
+**Prerequisites:**
+1. Azure subscription (existing)
+2. Create Azure OpenAI resource
+3. Deploy DALL-E 3 model
+4. Store credentials in GitHub Secrets
+
+**Implementation:**
+- Python CLI script: See `.squad/skills/image-generation/SKILL.md` (complete code provided)
+- Store in `scripts/generate-image.py`
+- Document in team README
+
+**Cost Estimate:**
+- Light use (10 images/month): ~$0.40–$0.80/month
+- Moderate use (100 images/month): ~$4.00–$8.00/month
+- Heavy use (1000 images/month): ~$40.00–$80.00/month
+
+**Status:** 📋 Awaiting team decision on Azure resource provisioning
+
+## Consequences
+
+### If Approved
+
+**Pros:**
+- ✅ Clear strategy for text vs. photorealistic graphics
+- ✅ Cost-optimized (free for most use cases)
+- ✅ Microsoft-approved stack (Azure OpenAI)
+- ✅ CLI-compatible (Python scripts)
+- ✅ Version-controlled diagrams (Mermaid in git)
+- ✅ Enterprise-ready (Azure SLA)
+
+**Cons:**
+- ⚠️ Azure setup required for DALL-E (1-2 hours)
+- ⚠️ Ongoing cost for photorealistic images
+- ⚠️ Not one-step "prompt → image" (requires script)
+- ⚠️ GitHub Models gap persists (no image gen there)
+
+### If Deferred
+
+**Alternative Path:**
+- Continue using Mermaid/SVG for all diagrams (free, native)
+- Manual Microsoft Designer for one-off photorealistic images (UI only)
+- Revisit when GitHub Models adds image generation (timeline unknown)
+
+## Open Questions
+
+1. **Should we provision Azure OpenAI resource now?**
+   - Depends on frequency of marketing/art image needs
+   - Can defer if text diagrams suffice
+
+2. **Should we build a custom MCP server for DALL-E?**
+   - Pros: One-step generation from Copilot CLI
+   - Cons: Infrastructure overhead, maintenance burden
+   - Recommendation: Defer until demand justifies complexity
+
+3. **Should we create a GitHub Action for automated diagram rendering?**
+   - Pros: Auto-generate diagrams on PR (Mermaid → SVG in CI)
+   - Cons: Build time increase
+   - Recommendation: Good future enhancement
+
+4. **Will GitHub Models add image generation?**
+   - No public timeline
+   - Monitor models.github.com for updates
+   - If added, migrate from Azure DALL-E to GitHub Models
+
+## Recommendation
+
+**Immediate Action:**
+- ✅ Adopt text-based graphics (Mermaid, SVG) for all documentation
+- ✅ Document workflow in team README
+- 📋 Decide on Azure OpenAI provisioning based on photorealistic image needs
+
+**Long-Term:**
+- Monitor GitHub Models for image generation additions
+- Consider MCP server if DALL-E usage becomes frequent
+- Evaluate cost vs. benefit after 3 months of Mermaid usage
+
+**Status:** Awaiting Tamir's decision on Azure OpenAI resource provisioning.
 2. **Create PowerShell wrapper** for DevBox REST API operations
 3. **Establish RDP connection** using API-retrieved connection details
 4. **Enable PowerShell remoting** on DevBox if not already configured

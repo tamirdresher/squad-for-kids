@@ -13089,3 +13089,141 @@ Deployed 470-line scheduler engine replacing hardcoded time checks. All tasks de
 ---
 
 *Decisions merged from inbox on 2026-03-09T12-01-18Z by Scribe. All Round 2 agent work documented in orchestration logs.*
+
+---
+
+## Decision 2: Provider-Agnostic Scheduling System Design
+
+# Decision: Provider-Agnostic Scheduling System Design
+
+**Date:** 2025-01-21  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #199 — Generic scheduling system for Squad  
+**PR:** #220  
+**Status:** Design Complete — Awaiting User Decisions
+
+---
+
+## Context
+
+Squad's current scheduling infrastructure works but is fragmented:
+- Schedules scattered across 4 locations (workflows, schedule.json, scripts, ralph-watch)
+- No persistence — if ralph-watch stops, tasks are missed forever
+- No recovery from missed tasks (machine reboot = lost trigger)
+- GitHub Actions workflows have hardcoded cron schedules (not synced with schedule.json)
+- Provider logic mixed with scheduler logic (hard to extend)
+
+**User Request (Issue #199):**
+> Can we find a way for squad to have its own schedule/calendar so it could trigger itself automatically when needed and not forget stuff? Can we do it generic to not be bound to specific provider?
+
+---
+
+## Decision: 3-Layer Architecture
+
+Designed a **provider-agnostic scheduling system** with:
+
+1. **Core Scheduler Engine**
+   - SQLite database for persistence (`.squad/monitoring/scheduler.db`)
+   - Catch-up logic for missed tasks
+   - Queryable audit trail
+
+2. **Provider Abstraction Layer**
+   - Plugin architecture for executors
+   - Providers: LocalPolling, GitHubActions, WindowsScheduler, CopilotAgent, AzureDevOps, Webhook
+   - Clean interface: `CanHandle()`, `Execute()`, `IsAvailable()`
+
+3. **Persistence Layer**
+   - SQLite tables: schedules, executions, state
+   - Survives process crashes and machine reboots
+
+---
+
+## Key Design Choices
+
+### 1. SQLite Over JSON Files
+**Decision:** Use SQLite database instead of JSON state files
+
+**Why:**
+- **Queryable:** SQL queries for debugging ("why didn't task X run?")
+- **ACID transactions:** Prevent corruption from concurrent writes
+- **Schema validation:** Enforces data consistency
+- **Performance:** Indexed queries for fast lookups
+
+**Alternative Considered:** Continue using JSON files  
+**Rejected Because:** Not queryable, prone to corruption, no schema validation
+
+---
+
+### 2. Provider Abstraction Layer
+**Decision:** Implement plugin architecture for task executors
+
+**Why:**
+- **Extensibility:** Easy to add new providers (Azure DevOps, K8s CronJobs, webhooks)
+- **Testability:** Each provider can be tested independently
+- **Separation of Concerns:** Scheduler logic decoupled from execution logic
+- **Fallback Support:** Provider priority + automatic fallback
+
+**Alternative Considered:** Keep provider logic inline in scheduler  
+**Rejected Because:** Hard to extend, tightly coupled, difficult to test
+
+---
+
+### 3. Catch-Up Logic
+**Decision:** Detect and execute missed tasks on scheduler restart
+
+**Why:**
+- **Reliability:** Tasks never forgotten, even after machine reboot
+- **User Experience:** If machine was off during 7 AM trigger, task runs when user logs back in
+- **Configurable:** `catchUpWindowMinutes` (default: 120) prevents replaying days-old tasks
+
+---
+
+## Pending User Decisions
+
+### Decision Point 1: Primary Provider Strategy
+**Options:**
+- **A. Local Polling Primary** — ralph-watch runs 24/7, Windows Scheduler as backup
+- **B. Persistent Primary** — Windows Scheduled Tasks run everything, ralph-watch optional
+- **C. Hybrid (Recommended)** — Critical tasks use Windows Scheduler, dynamic tasks use ralph-watch
+
+**B'Elanna's Recommendation:** **Option C (Hybrid)**
+
+### Decision Point 2: GitHub Actions Integration
+**Options:**
+- **A. Generate Workflows** — Script reads schedule.json, writes workflow YAML files
+- **B. Single Dispatcher (Recommended)** — One workflow calls `Invoke-SquadScheduler.ps1` every 5 min
+- **C. Keep Separate** — Workflows remain independent (status quo)
+
+**B'Elanna's Recommendation:** **Option B (Single Dispatcher)**
+
+### Decision Point 3: Rollout Strategy
+**Options:**
+- **A. Phased (Recommended)** — Deploy Phase 1-3 in 2 weeks, Phase 4-6 over 4 weeks
+- **B. Big Bang** — Deploy all 6 phases at once (2-3 weeks, higher risk)
+
+**B'Elanna's Recommendation:** **Option A (Phased)**
+
+---
+
+## Next Steps
+
+1. **Get user feedback** on decision points (primary provider, GitHub sync, rollout)
+2. **Implement Phase 1** (persistence layer) — 1 week
+3. **Test on tamresearch1** with existing schedules
+4. **Roll out Phases 2-6** iteratively over 5 weeks
+
+---
+
+## References
+
+- **Issue:** #199 — Generic scheduling system for Squad
+- **PR:** #220 — Provider-agnostic scheduling system design
+- **Design Docs:**
+  - `.squad/implementations/squad-scheduler-design-v2.md` (1,468 lines, 41KB)
+  - `.squad/implementations/squad-scheduler-roadmap.md` (12KB)
+
+---
+
+*— B'Elanna (Infrastructure Expert)*  
+*"If it ships, it ships reliably. Automates everything twice."*
+

@@ -18,6 +18,80 @@
 
 ## Learnings
 
+### 2025-01-21: B'Elanna — Provider-Agnostic Scheduling System Design — Issue #199 (COMPLETED)
+
+**Assignment:** Research and design a generic, provider-agnostic scheduling system for Squad that:
+- Never forgets tasks (persistent state)
+- Works anywhere (not bound to specific provider)
+- Triggers itself automatically
+- Single source of truth (schedule.json)
+
+**Investigation Findings:**
+- Squad already has `.squad/schedule.json` with 5 scheduled tasks
+- `Invoke-SquadScheduler.ps1` (242 lines) operational — evaluates cron/interval triggers
+- ralph-watch.ps1 (493 lines) runs as 5-min polling daemon
+- **Gaps identified:**
+  - No persistence — if ralph-watch stops, tasks missed forever
+  - No catch-up logic — missed trigger windows never recovered
+  - GitHub Actions workflows have hardcoded cron (not integrated with schedule.json)
+  - Provider logic mixed with scheduler — hard to extend to Azure/K8s/webhooks
+  - No queryable audit trail — can't answer "why didn't task X run?"
+
+**Deliverable: 3-Layer Architecture Design**
+
+1. **Core Scheduler Engine**
+   - SQLite database replaces JSON state files (`.squad/monitoring/scheduler.db`)
+   - Catch-up logic detects/executes missed tasks (configurable window: 120 min)
+   - Queryable audit trail (tables: schedules, executions, state)
+
+2. **Provider Abstraction Layer**
+   - Plugin architecture with clean interface: `CanHandle()`, `Execute()`, `IsAvailable()`
+   - Providers: LocalPolling, GitHubActions, WindowsScheduler, CopilotAgent, AzureDevOps, Webhook
+   - Provider priority + fallback (e.g., local-polling → github-actions → windows-scheduler)
+
+3. **Persistence Layer**
+   - SQLite with 3 tables: schedules (config), executions (audit trail), state (last_run, next_run)
+   - Survives process crashes and machine reboots
+   - SQL queries for debugging: "show failed tasks", "find stuck tasks", "why didn't X run"
+
+**6-Phase Implementation Plan:**
+- Phase 1 (Week 1): Persistence — SQLite database
+- Phase 2 (Week 2): Provider abstraction
+- Phase 3 (Week 2): Catch-up logic
+- Phase 4 (Week 3-4): Windows Scheduler integration (persistent across reboots)
+- Phase 5 (Week 5): GitHub Actions sync (unify workflow cron with schedule.json)
+- Phase 6 (Week 6): Observability dashboard
+- **MVP:** Phases 1-3 (2 weeks) — persistence + providers + catch-up
+
+**Key Innovation: Catch-Up Logic**
+Example scenario:
+```
+6:00 AM — ralph-watch running, daily briefing scheduled for 7:00 AM
+6:30 AM — Windows updates, machine reboots (ralph-watch killed)
+8:00 AM — User logs back in, starts ralph-watch
+```
+Current: Briefing never runs (missed window)  
+New: Scheduler detects missed 7 AM task, runs immediately with `catchUp=true` flag
+
+**Decision Points (Awaiting User Feedback):**
+1. Primary provider strategy: Local polling vs. Windows Scheduler vs. Hybrid (recommended)
+2. GitHub Actions integration: Generate workflows vs. Single dispatcher (recommended)
+3. Rollout strategy: Phased (recommended) vs. Big bang
+
+**Artifacts:**
+- `.squad/implementations/squad-scheduler-design-v2.md` (1,468 lines, 41KB)
+- `.squad/implementations/squad-scheduler-roadmap.md` (12KB)
+- PR #220 created with full design
+- Issue #199 commented with design summary
+
+**Status:** Design complete. Supersedes v1 design doc. Ready for Phase 1 implementation pending user decisions on provider strategy and rollout plan.
+
+**Technical Learnings:**
+- SQLite on Windows with PowerShell: Use `System.Data.SQLite` (bundled with PowerShell 7+)
+- Windows Task Scheduler integration: `Register-ScheduledTask` cmdlet, convert cron to Windows triggers
+- Provider pattern in PowerShell: Use classes with inheritance (PowerShell 5.0+)
+- Catch-up window design: Balance between "always catch up" (replay days of missed tasks) vs. "too late, skip it"
+- State management: Dual-write during Phase 1 migration (JSON + SQLite) for safety
 ### 2026-03-09: B'Elanna — Dev Box Setup Guide — Issue #103 (COMPLETED)
 
 **Assignment:** Create Dev Box for Tamir and share details via Teams webhook.
@@ -4108,6 +4182,84 @@ Tested locally:
 
 ---
 
+## Round 2 Spawning — 2026-03-09
+
+### 2026-03-09: B'Elanna — Issue #199 (ROUND 2)
+
+**Assignment:** Provider-Agnostic Scheduling System Design (Round 2 background work)
+**Model:** claude-sonnet-4.5
+**Mode:** background
+
+**Deliverable:** 3-Layer Architecture Design
+- Core Scheduler Engine (SQLite persistence, catch-up logic, audit trail)
+- Provider Abstraction Layer (LocalPolling, GitHubActions, WindowsScheduler, CopilotAgent, AzureDevOps, Webhook)
+- Persistence Layer (SQLite tables: schedules, executions, state)
+
+**Design Documents:**
+- .squad/implementations/squad-scheduler-design-v2.md (1,468 lines)
+- .squad/implementations/squad-scheduler-roadmap.md (6-phase implementation)
+
+**PR:** #220 (Full architecture, decision points, phased rollout)
+
+**Key Decisions:**
+1. SQLite over JSON (queryable, ACID, schema validation)
+2. Provider Plugin Pattern (extensible, testable, decoupled)
+3. Catch-Up Logic (120-min window, prevent task loss)
+
+**Pending User Decisions:**
+1. Primary Provider Strategy: Local Polling vs. Windows Scheduler vs. Hybrid (recommended)
+2. GitHub Actions Integration: Generate Workflows vs. Single Dispatcher (recommended)
+3. Rollout Strategy: Phased (recommended) vs. Big Bang
+
+**Status:** ✅ Design complete, awaiting user decisions for Phase 1 implementation
+
+**Orchestration Log:** .squad/orchestration-log/2026-03-09T12-50-00Z-belanna-199.md
+
+---
+
+### 2026-03-09: B'Elanna — Issue #103 (ROUND 2)
+
+**Assignment:** Dev Box Creation / Environment Setup (Round 2 background work)
+**Model:** claude-sonnet-4.5
+**Mode:** background
+
+**Deliverable:** Dev Box Setup Guide Documentation
+- Infrastructure requirements
+- Step-by-step provisioning
+- Browser connectivity configuration
+- Troubleshooting section
+
+**PR:** #219 (Complete setup guide)
+
+**Key Findings:**
+- Azure Dev Box managed development environments
+- Browser connectivity via Bastion or direct IP
+- Team member onboarding workflow
+- Azure CLI extension workaround documented
+
+**Status:** ✅ Research & documentation complete, awaiting team review
+
+**Orchestration Log:** .squad/orchestration-log/2026-03-09T12-50-00Z-belanna-103.md
+
+**Notes:** Azure CLI extension issue documented with workaround; REST API and portal alternatives available
+
+---
+
+## Coordinator Summary
+
+**Ralph (Coordinator) — Round 2 Board Management:**
+- ✅ Processed 5 PRs from Round 2 agents
+- ✅ Moved B'Elanna #219, #220 to Review
+- ✅ Moved Seven #218 to Review
+- ✅ Moved issues #199, #103 to Review
+- ✅ All 5 PRs awaiting user review
+
+**Session Log:** .squad/log/2026-03-09T12-50-00Z-ralph-round2.md
+
+---
+
+*Scribe Documentation: 2026-03-09T12:50:00Z*
+*Orchestration logs written, decisions merged, history updated*
 ## Issue #183: Office Automation (Email/Calendar/Teams) Architecture — 2026-03-09 14:06:08 UTC
 
 **Status:** ✅ COMPLETED  

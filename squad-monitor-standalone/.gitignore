@@ -1,0 +1,47 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.cache
+*.csproj.user
+.vs/
+.vscode/
+.idea/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+**/packages/*
+*.nuget.props
+*.nuget.targets
+
+## Squad Monitor specific
+*.lock
+ralph-watch.lock
+automation-watch.lock
+.squad/
+!.squad/.gitkeep
+
+## OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Logs
+*.log

@@ -17,3 +17,6 @@ node_modules/
 # .squad/skills/               — Permanent skills
 # .squad/templates/            — Templates
 # .squad/agents/               — Agent config
+
+# Upstream synced repos (local clones, not committed)
+.squad/_upstream_repos/

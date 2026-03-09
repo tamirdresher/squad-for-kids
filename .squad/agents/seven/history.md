@@ -2813,6 +2813,99 @@ Rather than create duplicate infrastructure, linked #236 as the foundational ups
    - **P8**: SFI Compliance Automation (pre-commit hooks, validation scripts)
 
 5. **Critical Insight: Repository Evolution Pattern**
+
+
+## Learnings — Patent Email to Brady Gaster (Issue #230)
+
+**Date**: 2026-03-09  
+**Task**: Compile all patent research and create draft email to Brady Gaster in Outlook
+
+### Work Completed
+
+1. **Document Review & Compilation**
+   - Reviewed comprehensive patent research: PATENT_RESEARCH_REPORT.md (25K+ words), PATENT_CLAIMS_DRAFT.md (provisional patent draft), PATENT_RESEARCH_METHODOLOGY.md (research approach), ISSUE_42_SUMMARY.md (executive summary)
+   - Compiled key findings into email-ready format with clear structure: key finding, strong novel claims, what's not patentable, Microsoft patent process, filing strategy, next steps
+   - Created `patent-email-for-brady.md` in repo root as reference document with full context
+
+2. **Draft Email Creation in Outlook Web**
+   - Used Playwright browser automation to navigate to Outlook (https://outlook.office.com/mail/)
+   - Authenticated with Tamir's account (tamirdresher@microsoft.com)
+   - Composed new email with:
+     - **To:** Brady Gaster (autocomplete worked correctly)
+     - **Subject:** Squad Patent Research — Novel Claims & Next Steps
+     - **Body:** Comprehensive summary (~2700 words) covering all key findings, recommendations, and action items
+   - **Left as DRAFT** (not sent) — per instructions, Tamir reviews before sending
+   - Screenshot saved: `brady-patent-email-draft.png`
+
+3. **Key Findings Shared with Brady**
+   - YES, Squad IS Patentable (narrowly focused on novel patterns)
+   - 4 Strong Novel Claims: Ralph monitoring, Casting governance, Git-native state, Drop-box memory
+   - Prior art landscape: NEC patent + 11+ frameworks establish broad orchestration prior art
+   - Microsoft patent process: ~$3-5K (covered), 2-4 week timeline
+   - Critical timing: Must file BEFORE public disclosure
+   - Next steps: Inventorship clarification, public disclosure status, gitclaw timing investigation
+
+### Technical Learnings
+
+1. **Playwright Browser Automation for Outlook**
+   - Outlook Web requires authentication flow (redirects to login.microsoftonline.com)
+   - Account picker allows SSO with Windows-connected accounts (e1370 clicked successfully)
+   - Autocomplete for recipients works well (typing "Brady Gaster" + Enter selected correctly)
+   - Email fields use dynamic refs — must take fresh snapshot after each interaction
+   - Draft auto-saves (saw "Draft saved at 19:52" and "19:54" timestamps)
+   - Closing browser leaves draft intact (verified behavior)
+
+2. **Patent Research Synthesis**
+   - Large documents (200KB+ decisions.md, 560KB+ research report) require strategic reading (view_range, grep patterns)
+   - Executive summary (ISSUE_42_SUMMARY.md) provided best starting point for email compilation
+   - Key insight: Narrow claims strategy is critical — broad orchestration is heavily prior-art'd
+   - gitclaw timing investigation is blocking issue for git-state claims (must resolve before filing)
+
+3. **Communication Strategy for Technical Patents**
+   - Balance technical detail with executive clarity
+   - Lead with verdict (YES/NO) before diving into analysis
+   - Use tiered structure: Strong claims first, then weak/not patentable, then process
+   - Call out critical timing (public disclosure = patent rights lost)
+   - End with clear next steps and decision points
+
+### Collaboration Pattern
+
+**User Request:** "Send to brady everything we discovered about the patent and the idea for patent we had"
+**Approach:** Create draft for review (not auto-send) — respects human-in-the-loop for high-stakes communications
+
+**Evidence of Success:**
+- ✅ All patent documents reviewed and synthesized
+- ✅ Email draft created in Outlook with correct recipient and subject
+- ✅ Body content comprehensive but concise (highlights key findings without overwhelming)
+- ✅ Draft status preserved for Tamir review
+- ✅ Issue #230 commented with full summary and supporting documents linked
+- ✅ Screenshot captured for verification
+
+### Process Improvement Recommendations
+
+1. **Patent Communication Template**
+   - Establish standard format for patent disclosure emails: Executive verdict → Novel claims → Prior art → Process → Timeline → Next steps
+   - Template reduces compilation time for future patent research communications
+
+2. **Outlook Automation Pattern**
+   - Document Playwright patterns for Outlook Web interactions (login flow, recipient autocomplete, draft preservation)
+   - Consider skill/script for "compose Outlook draft" automation (reusable across team)
+
+3. **Large Document Handling**
+   - When synthesizing 500KB+ documents, start with executive summaries or grep for key sections
+   - Use line number lookups to navigate efficiently
+   - Create intermediate markdown artifacts (like patent-email-for-brady.md) as synthesis checkpoints
+
+### Related Work
+
+- **Upstream:** Patent research completed by Seven (Issue #42 analysis)
+- **Downstream:** Tamir reviews draft and decides on send timing
+- **Dependencies:** gitclaw timeline investigation needed before filing (mentioned in email)
+- **Cross-reference:** PATENT_RESEARCH_REPORT.md, PATENT_CLAIMS_DRAFT.md, PATENT_RESEARCH_METHODOLOGY.md, ISSUE_42_SUMMARY.md
+
+**Status:** ✅ COMPLETE — Draft email ready for Tamir's review in Outlook
+
+---
    - Repository is excellent at **documenting intentions** (research, designs, plans)
    - Strong at **automation infrastructure** (Squad, ralph-watch, CI workflows)
    - Weak at **work integration** — Tamir's daily work (ConfigGen) not reflected in repository tooling

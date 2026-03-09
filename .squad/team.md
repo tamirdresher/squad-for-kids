@@ -11,6 +11,7 @@
 | Worf | Security & Cloud | `.squad/agents/worf/charter.md` | ✅ Active |
 | Data | Code Expert | `.squad/agents/data/charter.md` | ✅ Active |
 | Seven | Research & Docs | `.squad/agents/seven/charter.md` | ✅ Active |
+| Podcaster | Audio Content Generator | `.squad/agents/podcaster/charter.md` | ✅ Active |
 | Tamir Dresher | 👤 Human — Project Owner | — | 👤 Human |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |

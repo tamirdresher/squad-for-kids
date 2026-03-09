@@ -62,4 +62,5 @@ When triaging, the Lead should ask:
 | Security, Azure, networking | Worf | — |
 | C#, Go, .NET, clean code | Data | — |
 | Documentation, presentations, analysis | Seven | — |
+| Audio content generation, TTS, markdown to audio | Podcaster | — |
 

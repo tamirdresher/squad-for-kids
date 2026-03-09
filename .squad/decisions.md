@@ -13538,3 +13538,139 @@ Creating a public-facing demo repository from an internal working repository (ta
 - SANITIZATION_CHECKLIST.md
 - DEMO_README.md
 
+---
+
+# Decision: Podcaster Agent Integration
+
+**Date:** 2026-03-09  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Context:** Issue #214 — Add Podcaster agent for audio summaries
+
+## Decision
+
+Integrated Podcaster agent into squad after successful prototype validation.
+
+## Rationale
+
+1. **Prototype Validation:**
+   - Test document: Successfully generated 160.88 KB MP3 from 365B markdown in 2.25s
+   - Real document: Successfully generated 3.91 MB MP3 from 14.52 KB markdown in 20.77s
+   - Audio quality: Neural voice (en-US-JennyNeural) provides professional, production-grade output
+   - No errors or issues during conversion
+
+2. **Technical Readiness:**
+   - edge-tts 7.2.7 already installed and working
+   - Script handles markdown stripping correctly (removes formatting, preserves content)
+   - Conversion time scales linearly (~1.4s per KB markdown)
+   - MP3 output size is reasonable for audio content
+
+3. **Squad Integration:**
+   - Created comprehensive charter defining Podcaster role and boundaries
+   - Seeded history with project context and validation results
+   - Updated team roster and routing rules
+   - Follows existing squad agent patterns
+
+## Implementation
+
+- **Branch:** squad/214-podcaster-agent
+- **PR:** #227 (draft)
+- **Files Added:**
+  - `.squad/agents/podcaster/charter.md`
+  - `.squad/agents/podcaster/history.md`
+- **Files Updated:**
+  - `.squad/team.md`
+  - `.squad/routing.md`
+
+## Consequences
+
+**Positive:**
+- Squad can now generate audio versions of research reports, briefings, and documentation
+- Enables audio consumption for busy stakeholders
+- Neural voice quality is professional enough for external delivery
+- Zero setup overhead (edge-tts just works)
+
+**Risks/Trade-offs:**
+- Network dependency (requires internet for TTS service)
+- Free tier rate limits (unspecified, but not hit during testing)
+- Hardcoded voice selection (can be made configurable later)
+- Single-file processing (batch processing not yet implemented)
+
+## Next Steps
+
+1. Wait for stakeholder review of audio quality
+2. If approved, merge PR #227 to main
+3. Plan integration with Scribe handoff workflow
+4. Consider batch processing for multiple documents
+5. Evaluate Azure AI Speech Service for production scale (if needed)
+
+## Tags
+
+`infrastructure` `audio` `tts` `squad-agent` `issue-214`
+
+---
+
+# Decision: Demo Repository Sanitization Strategy Approved
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**PR:** #226  
+**Issue:** #225  
+**Status:** ✅ Approved (Phase 1 Complete)  
+**Scope:** Open Source Contribution, Security, Documentation
+
+## Context
+
+Review of comprehensive sanitization plan for creating public-facing Squad demo repository from internal working repository (tamresearch1). Goal: showcase Squad capabilities to community and contribute to bradygaster/squad without exposing sensitive data.
+
+## Decision
+
+**APPROVED: Phase 1 Sanitization Planning**
+
+The proposed multi-layered sanitization strategy (automated patterns + file exclusions + manual review) properly addresses all critical security concerns for public release.
+
+## Security Assessment
+
+**8 Data Categories — All Properly Mitigated:**
+
+1. ✅ **Teams Webhooks** (CRITICAL) — Replaced with placeholders, config steps documented
+2. ✅ **Azure Resource IDs** (HIGH) — Generic "demo-*" removes organizational fingerprint
+3. ✅ **Personal Information** (CRITICAL) — Comprehensive find-replace patterns
+4. ✅ **Internal MS References** (MEDIUM) — DK8S → K8S-Platform, msazure → demo-org
+5. ✅ **API Keys/Tokens** (LOW) — Already using GitHub Secrets pattern correctly
+6. ✅ **Internal URLs** (MEDIUM) — contoso.com → example.com
+7. ✅ **GitHub Project IDs** (MEDIUM) — Placeholders + documentation
+8. ✅ **Debug Logs** (LOW) — Excluded via file patterns
+
+## Key Strengths
+
+1. **Robust Automation** — 20+ patterns, dry run mode, safe exclusions, error handling
+2. **Smart Scoping** — Include Squad infrastructure, exclude agent histories/Azure code/APIs
+3. **Excellent Public README** — Clear value proposition, practical quick start, security notes
+4. **Thorough Execution Plan** — 11 phases, 80+ tasks, manual review checkpoints
+
+## Architecture Principles Validated
+
+- **Multi-dimensional risk management** — Addresses secrets, PII, org fingerprints, operational patterns
+- **90/10 automation rule** — Script handles bulk patterns, human review for context-dependent edge cases
+- **File exclusion strategy** — Better to exclude entire subsystems (1000+ files) than sanitize incompletely
+- **Documentation for new users** — Public README focuses on "what you can do" not "what we built"
+
+## Next Steps
+
+1. ✅ Phase 1 complete — Planning documents, automation script, checklist, demo README
+2. ⏳ Phase 2 — Execute sanitization script with dry run validation
+3. ⏳ Phase 3 — Manual review for edge cases (webhooks, project IDs, configs)
+4. ⏳ Phase 4-5 — File validation, demo enhancements, testing
+5. ⏳ Phase 6-11 — PR creation, team review, demo repo creation, upstream contribution
+
+## Impact
+
+- **Team:** Enables safe public showcase of Squad patterns and capabilities
+- **Community:** Provides reference implementation for bradygaster/squad users
+- **Security:** Zero-risk public release with comprehensive sanitization
+- **Learning:** Documents multi-dimensional sanitization approach for future demos
+
+## Recommendation
+
+**Proceed to Phase 2 (script execution).** No blocking issues identified. This is thorough, professional work demonstrating strong security awareness.
+

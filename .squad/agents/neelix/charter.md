@@ -40,6 +40,20 @@ End-of-week summary with stats, highlights, and "top stories".
 ### 🎯 Status Flash
 Quick board snapshot: what's in progress, what's blocked, what needs attention.
 
+## Teams Delivery
+
+**Webhook file:** `$env:USERPROFILE\.squad\teams-webhook.url`  
+Read this file to get the webhook URL, then POST Adaptive Card JSON to it.
+
+Example PowerShell to send:
+```powershell
+$webhookUrl = (Get-Content "$env:USERPROFILE\.squad\teams-webhook.url" -Raw).Trim()
+$body = @{ text = "📰 **BREAKING:** Your news here" } | ConvertTo-Json
+Invoke-RestMethod -Uri $webhookUrl -Method Post -ContentType "application/json" -Body $body
+```
+
+Or use the `workiq-ask_work_iq` tool if available in the Copilot session.
+
 ## Teams Message Style
 
 Use Adaptive Cards or rich markdown with:

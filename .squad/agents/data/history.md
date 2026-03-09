@@ -3173,3 +3173,61 @@ Applied consistently across all workflows that parse team.md:
 **Issue:** #214
 **Status:** ✅ Complete, awaiting review
 
+
+---
+
+### 2026-03-09: Data — Standalone Squad-Monitor Repository (Issue #229)
+
+**Task:** Create standalone repository structure for squad-monitor, making it shareable as an open-source observability tool for GitHub Copilot agent workflows.
+
+**What Was Built:**
+1. **Core C# Application:**
+   - Extracted Program.cs from .squad/tools/squad-monitor/ (~1400 lines)
+   - Created AgentLogParser.cs (NEW) — live agent log parser
+   - Set up .NET 8 project (SquadMonitor.csproj)
+   
+2. **AgentLogParser.cs (NEW Functionality):**
+   - Tails ~/.agency/logs/session_*/process-*.log in real-time
+   - Parses tool invocations ("Tool invocation result: {tool}")
+   - Detects sub-agent spawns ('"agent_type": "task"')
+   - Captures background task launches with descriptions
+   - Maintains rolling buffer of 50 most recent events
+   - Integrated into dashboard's "Live Agent Activity" section
+   
+3. **Sanitization:**
+   - Removed ALL Teams webhook URLs (replaced with generic examples)
+   - Removed ALL Microsoft internal references
+   - Removed personal names, Azure resource IDs
+   - Made paths cross-platform (Path.Combine throughout)
+   - Added --config-dir flag for configurable .squad location
+   
+4. **Documentation:**
+   - README.md (11KB) — architecture, features, usage, troubleshooting
+   - QUICKSTART.md — 5-minute setup guide
+   - automation-watch.ps1 (sanitized) — generic automation loop
+   - LICENSE (MIT), .gitignore
+
+**Technical Decisions:**
+- .NET 8 target (not .NET 10) — broader compatibility
+- Configurable config directory via --config-dir flag
+- Cross-platform friendly (no Windows-specific paths)
+- AgentLogParser uses FileStream with ReadWrite sharing for log tailing
+- Rolling buffer pattern (max 50 entries) to prevent memory growth
+
+**Build Status:**
+✅ Build succeeds: `dotnet build squad-monitor-standalone/src/SquadMonitor/SquadMonitor.csproj`
+✅ Build time: 1.2s
+
+**Outcome:**
+- Created standalone structure at squad-monitor-standalone/
+- Branch: squad/229-standalone-monitor
+- PR #231 opened: https://github.com/tamirdresher_microsoft/tamresearch1/pull/231
+- Issue #229 commented with summary
+- Ready for extraction to new GitHub repo and NuGet package publishing
+
+**Learnings:**
+- Sanitizing code for open-source requires careful review (webhooks, internal refs, personal info)
+- AgentLogParser pattern (file tailing with rolling buffer) works well for log monitoring
+- Cross-platform path handling (Path.Combine) is essential for portable .NET tools
+- Configurable directory structure (--config-dir) makes tool more flexible
+

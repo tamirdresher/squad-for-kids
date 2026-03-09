@@ -13674,3 +13674,37 @@ The proposed multi-layered sanitization strategy (automated patterns + file excl
 
 **Proceed to Phase 2 (script execution).** No blocking issues identified. This is thorough, professional work demonstrating strong security awareness.
 
+
+---
+
+## Podcaster Agent — Technical Decisions (Issue #214)
+
+**Date:** 2026-03-09  
+**Agent:** Data (Code Expert)  
+**Status:** ✅ APPROVED — PR #228 merged, Issue #214 closed  
+
+### Decision Summary
+Implemented Podcaster agent using edge-tts (Python) for text-to-speech conversion. Chosen for free tier with production-quality neural voices, zero Azure setup required.
+
+### Key Technical Decisions
+1. **TTS Engine:** edge-tts (free tier, no subscription required)
+2. **Voice:** en-US-JennyNeural (professional female, clear narration)
+3. **Implementation:** Python (edge-tts npm has TypeScript compatibility issues)
+4. **Markdown Stripping:** Comprehensive regex-based approach for clean plain text
+5. **Agent Structure:** Full squad agent (charter, history, team.md routing)
+
+### Test Results
+- Input: EXECUTIVE_SUMMARY.md (14.52 KB)
+- Output: EXECUTIVE_SUMMARY-audio.mp3 (3.91 MB)
+- Duration: ~6 minutes 8 seconds
+- Status: ✅ Production-ready
+
+### Impact
+- Handoff points: Seven → Podcaster → Tamir (audio distribution)
+- Related issues: #200 (daily briefing), #41 (blog post audio)
+- Files created: .squad/agents/podcaster/{charter.md, history.md}
+
+### Trade-offs & Roadmap
+- **MVP (current):** edge-tts free tier
+- **Medium-term:** Voice selection config, batch processing
+- **Production:** Azure AI Speech Service migration for higher rate limits

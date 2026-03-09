@@ -3124,3 +3124,110 @@ Applied consistently across all workflows that parse team.md:
 
 **Outcome:** Issue moved to "Waiting for user review" on project board. Design ready for implementation pending approval.
 
+---
+
+### 2026-03-09: Podcaster Agent Verification (Issue #214)
+
+**Task:** Verify the Podcaster agent prototype for audio summaries, ensure it works, and complete the agent setup in the squad structure.
+
+**Execution:**
+1. Verified edge-tts installation (v7.2.7 already installed)
+2. Ran prototype on EXECUTIVE_SUMMARY.md successfully
+3. Created `.squad/agents/podcaster/` directory structure
+4. Wrote comprehensive charter documenting role, expertise, and responsibilities
+5. Wrote history.md with learnings and technical decisions
+6. Updated `.squad/team.md` to add Podcaster to team roster
+7. Updated `.squad/routing.md` with audio content generation routing
+8. Created branch `squad/214-podcaster-verify`, committed, pushed
+9. Created PR #228
+10. Commented on issue #214 with detailed test results
+
+**Test Results:**
+- Input: EXECUTIVE_SUMMARY.md (14.52 KB markdown)
+- Output: EXECUTIVE_SUMMARY-audio.mp3 (3.91 MB)
+- Duration: ~6 minutes 8 seconds
+- Voice: en-US-JennyNeural (Microsoft Neural TTS)
+- Conversion time: 31.68 seconds
+- Status: ✅ Production-ready
+
+**Key Learnings:**
+- edge-tts library provides production-quality neural voices without Azure setup
+- Free tier is sufficient for MVP; Azure AI Speech Service for production scale
+- Markdown stripping logic is comprehensive (YAML, code blocks, HTML comments, links, images, formatting)
+- Speech rate: ~150 words per minute
+- Network dependency: requires internet connection to Microsoft TTS service
+
+**Architecture Decisions:**
+- edge-tts over Azure AI Speech — Free tier, zero setup, production-grade quality for MVP
+- Python over Node.js — edge-tts npm package has TypeScript compatibility issues
+- Markdown stripping — Comprehensive regex-based approach removes all formatting artifacts
+- Synchronous processing — Async/await pattern for TTS conversion, blocking for user feedback
+
+**Key Files:**
+- `scripts/podcaster-prototype.py` — Main prototype implementation
+- `PODCASTER_README.md` — Comprehensive prototype documentation
+- `.squad/agents/podcaster/charter.md` — Agent charter and responsibilities
+- `.squad/agents/podcaster/history.md` — Agent history and learnings
+
+**PR:** #228
+**Issue:** #214
+**Status:** ✅ Complete, awaiting review
+
+
+---
+
+### 2026-03-09: Data — Standalone Squad-Monitor Repository (Issue #229)
+
+**Task:** Create standalone repository structure for squad-monitor, making it shareable as an open-source observability tool for GitHub Copilot agent workflows.
+
+**What Was Built:**
+1. **Core C# Application:**
+   - Extracted Program.cs from .squad/tools/squad-monitor/ (~1400 lines)
+   - Created AgentLogParser.cs (NEW) — live agent log parser
+   - Set up .NET 8 project (SquadMonitor.csproj)
+   
+2. **AgentLogParser.cs (NEW Functionality):**
+   - Tails ~/.agency/logs/session_*/process-*.log in real-time
+   - Parses tool invocations ("Tool invocation result: {tool}")
+   - Detects sub-agent spawns ('"agent_type": "task"')
+   - Captures background task launches with descriptions
+   - Maintains rolling buffer of 50 most recent events
+   - Integrated into dashboard's "Live Agent Activity" section
+   
+3. **Sanitization:**
+   - Removed ALL Teams webhook URLs (replaced with generic examples)
+   - Removed ALL Microsoft internal references
+   - Removed personal names, Azure resource IDs
+   - Made paths cross-platform (Path.Combine throughout)
+   - Added --config-dir flag for configurable .squad location
+   
+4. **Documentation:**
+   - README.md (11KB) — architecture, features, usage, troubleshooting
+   - QUICKSTART.md — 5-minute setup guide
+   - automation-watch.ps1 (sanitized) — generic automation loop
+   - LICENSE (MIT), .gitignore
+
+**Technical Decisions:**
+- .NET 8 target (not .NET 10) — broader compatibility
+- Configurable config directory via --config-dir flag
+- Cross-platform friendly (no Windows-specific paths)
+- AgentLogParser uses FileStream with ReadWrite sharing for log tailing
+- Rolling buffer pattern (max 50 entries) to prevent memory growth
+
+**Build Status:**
+✅ Build succeeds: `dotnet build squad-monitor-standalone/src/SquadMonitor/SquadMonitor.csproj`
+✅ Build time: 1.2s
+
+**Outcome:**
+- Created standalone structure at squad-monitor-standalone/
+- Branch: squad/229-standalone-monitor
+- PR #231 opened: https://github.com/tamirdresher_microsoft/tamresearch1/pull/231
+- Issue #229 commented with summary
+- Ready for extraction to new GitHub repo and NuGet package publishing
+
+**Learnings:**
+- Sanitizing code for open-source requires careful review (webhooks, internal refs, personal info)
+- AgentLogParser pattern (file tailing with rolling buffer) works well for log monitoring
+- Cross-platform path handling (Path.Combine) is essential for portable .NET tools
+- Configurable directory structure (--config-dir) makes tool more flexible
+

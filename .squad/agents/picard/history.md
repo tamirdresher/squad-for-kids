@@ -2129,3 +2129,31 @@ From squad's DK8s research:
 3. Future: Teams webhook + Power Automate for real-time alerts if needed
 
 **Key Learning:** WorkIQ capability is well-suited for scheduled monitoring tasks. It's query-based rather than event-driven, which works fine for daily checks but requires explicit scheduling for proactive alerts. For Tamir's use case, this is sufficient—no external tools needed to start.
+
+## Ralph Round 1 — 2026-03-09T08:21:31Z
+
+**Completed:** Issue #198 (ADR daily monitoring) — SUCCESS with live ADR detected
+
+### Issue #198 — Daily ADR Monitoring
+- Implemented daily read-only monitoring of IDP ADR Notifications channel
+- Schedule: 07:00 UTC weekdays via ralph-watch.ps1
+- Found live ADR requiring attention
+- Teams notification sent to Tamir via webhook
+- Board: Marked "In Progress"
+
+### Implementation
+- Deliverables: schedule.json, daily-adr-check.ps1, workiq query template, state file
+- Integration: ralph-watch.ps1 time-based trigger
+- Monitoring baseline established
+
+### Constraints Established (CRITICAL)
+- **NEVER** post to IDP ADR Notifications channel
+- **NEVER** comment on ADR documents
+- Only send private summaries via Teams webhook
+- Only notify on actionable items (no noise)
+
+### Decision Filed
+- Daily ADR Channel Monitoring — read-only policy constraints documented
+
+### Cross-Agent Context
+All agents must respect ADR read-only policy. Scheduling pattern reused from parallel issue #200 work.

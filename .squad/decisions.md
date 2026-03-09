@@ -11905,3 +11905,254 @@ Adopt a decentralized, GitHub-native peer-to-peer collaboration protocol enablin
 - **Full RFC:** https://github.com/tamirdresher_microsoft/tamresearch1/issues/197#issuecomment-4021469701
 - **Target:** bradygaster/squad upstream contribution
 - **Status:** Ready for community review
+
+---
+
+## Decision: Upstream Sync Verification Standards
+
+**Date:** 2026-03-15
+**Author:** Data (Code Expert)
+**Status:** ✅ Implemented
+**Scope:** Upstream Infrastructure
+
+### Context
+
+Issue #1 requested proof that upstream connection works, not just configuration verification. This revealed the distinction between upstream *configuration* (upstream.json) and upstream *sync* (actual content cloning).
+
+### Decision
+
+When verifying upstream functionality:
+
+1. **Configuration Check** - Verify upstream.json has correct entries
+2. **Sync Verification** - Check .squad/_upstream_repos/{name}/ exists with content
+3. **Content Access Test** - Read actual files from synced upstream
+4. **Upstream-Only Proof** - Access content that doesn't exist locally to prove it's reading from upstream
+
+### Implementation
+
+Created verification checklist:
+- upstream.json has entry with last_synced timestamp
+- .squad/_upstream_repos/{upstream-name}/ directory exists
+- File count > 0 in upstream directory
+- Can read and extract specific content from upstream files
+- Content accessed is confirmed not present in local repo
+
+### Why This Matters
+
+- Configuration alone doesn't prove functionality
+- Sync creates local clone for agent access
+- Testing must verify end-to-end capability, not just config state
+- Upstream-only content access is definitive proof
+
+### Consequences
+
+- ✅ Clear verification standard for upstream functionality
+- ✅ Distinguishes configuration from sync completion
+- ✅ Provides concrete test method (upstream-only content access)
+- 🔍 Exposed that dk8s-platform-squad configured but never synced
+
+### Related
+
+- Issue #1
+- PR #186 (git remote upstream setup)
+- .squad/upstream.json configuration
+
+---
+
+## Decision: ADR Teams Channel Monitoring Approach
+
+**Date:** 2026-03-09
+**Decision Maker:** Picard (Lead)
+**Issue:** #198 — Monitor IDP ADR Notifications Teams channel
+
+### Problem Statement
+
+Tamir requested Squad to monitor the IDP ADR Notifications Teams channel and alert him when attention is needed, without commenting on the channel itself.
+
+### Analysis
+
+#### Current Capabilities
+✅ **WorkIQ (MS 365 Copilot) provides direct access** to the IDP ADR Notifications channel
+- Query-based read access to channel messages and metadata
+- Can retrieve recent ADR activity, PR status, approvals, blockers
+- Real-time message content with context and links
+
+#### What We Cannot Do Yet
+❌ Event-driven notifications — WorkIQ is query-based, not event-based
+❌ Real-time alerts — requires Teams webhooks or Power Automate
+
+### Decision
+
+**Implement hybrid monitoring:**
+
+1. **Daily scheduled check** (WorkIQ query at 10:00 AM UTC)
+   - Squad runs query: "What's new in IDP ADR Notifications?"
+   - Report to Tamir if:
+     - New ADRs assigned to him as reviewer
+     - Any ADRs blocked or escalated
+     - Decisions pending his input
+
+2. **Fallback: Manual query** — Tamir can ask "Check ADR channel" anytime for immediate status
+
+3. **Future: Event automation** — If Tamir needs real-time alerts:
+   - Implement Teams webhook → Power Automate → email/Slack
+   - Or use MS Graph API + Timer trigger
+
+### Current State (Snapshot)
+- ✅ Channel healthy, actively posting
+- 📌 New ADR: "Regional AMW vs Tenant-Level AMW" — in normal review cycle, no blockers
+- ✅ Earlier ADR approved — logging-operator CMP rendering
+- ❌ No urgent items requiring immediate action
+
+### Status
+**READY FOR IMPLEMENTATION** — WorkIQ access is confirmed and working. Squad can begin daily monitoring upon Tamir's confirmation.
+
+---
+
+## RFC: Cross-Squad Orchestration Protocol — Dynamic Discovery & Delegation
+
+**Date:** 2026-03-15
+**RFC Author:** B'Elanna (Infrastructure Expert, tamresearch1)
+**Related Issue:** #197
+
+### Problem Statement
+
+Current Squad architecture supports **vertical hierarchy** (upstream inheritance) and **horizontal scaling** (subsquads), but lacks **lateral collaboration**. Independent squads cannot:
+- Dynamically discover each other
+- Delegate work across squad boundaries
+- Share context while maintaining separate identities
+- Coordinate on overlapping scope
+
+This RFC proposes a **Squad Federation Protocol** enabling peer-to-peer orchestration.
+
+### Solution Overview
+
+#### 1. Dynamic Squad Discovery
+
+When a user points their squad to a repository with .squad/, the system:
+1. **Detects squad presence** via .squad/identity/squad-id.json
+2. **Resolves squad metadata** (name, capabilities, domain, contact)
+3. **Registers in local peer config** (.squad/federation/known-squads.json)
+4. **Enables activation** — other squads can target it for delegation
+
+Implementation: .squad/identity/squad-id.json contains:
+- id: UUID (immutable squad identity)
+- 
+ame: Display name
+- capabilities: Tags (e.g., "auth", "backend", "platform")
+- domain: Primary focus area
+- contact: Issue URL or webhook for delegation requests
+- ederation_policy: Accept/reject rules for incoming delegations
+
+#### 2. Inter-Squad Activation Protocol
+
+**Scenario:** User runs Copilot with Squad Agent in original repo:
+`
+copilot --squad --prompt "Add OAuth integration" --with-squads "['auth-squad']"
+`
+
+**Flow:**
+1. Squad Agent evaluates prompt → identifies auth-squad as needed
+2. Locates auth-squad via local peer config or GitHub discovery
+3. Creates **delegation envelope** with:
+   - Task description & acceptance criteria
+   - Required context (decisions, files, constraints)
+   - Return expectations (PR, branch, artifact)
+   - Timeout & escalation contact
+4. Stores in .squad/federation/delegations/outbound/{task-id}/
+5. **Activates remote squad** with scoped context:
+   - Clones/fetches remote squad repo
+   - Runs copilot --squad --activate-delegation {task-id} --parent-context
+   - Remote squad enters "federation mode": 
+     - Inherits task scope + delegating squad's decisions (read-only)
+     - Maintains own identity + decisions
+     - Decision attribution: marks decisions made during delegation
+
+#### 3. Context Sharing & Hybrid Identity
+
+During delegation, executing squad:
+- **Inherits (read-only):** Delegating squad's relevant decisions, shared files, constraints
+- **Maintains:** Own agents, own decision-making, own identity in commits
+- **Decision marking:** All decisions made during delegation tagged with scope attribution
+- **Attribution:** Commits include delegation context in footer with Co-authored-by
+
+#### 4. Result Delivery & Return Path
+
+Executing squad completes work and:
+
+**Option A (Recommended): Pull Request**
+- Creates PR in delegating squad repo
+- Links to original task
+- Includes delegation context in PR body
+- Delegating squad reviews & merges
+
+**Option B: Branch Handoff**
+- Creates branch in remote repo
+- Signals completion via status update
+- Delegating squad fetches & integrates
+
+**Option C: Export Bundle**
+- Exports decisions + commits as bundle
+- Stores in outbound federation directory
+- Delegating squad imports & reconciles
+
+#### 5. Conflict Detection & Resolution
+
+**File-level conflicts:**
+- Git merge conflicts: standard resolution
+- Lock file conflicts: lead mediation
+- Implementation: Pre-merge dry-run in delegation complete event
+
+**Decision-level conflicts:**
+- Overlapping scope: both squads making decisions on same component
+- Detection: Check .squad/federation/delegations/ for concurrent tasks
+- Resolution: Lead intervention (flag as blocked, notify both)
+
+#### 6. Security & Federation Boundaries
+
+**Public vs. Private:**
+Public decisions and files are shared; private ones are guarded.
+
+**Federation Policy Rules:**
+- Accept/reject list for incoming delegations
+- Max concurrent delegation limits
+- Approval requirements for breaking changes
+- Audit all operations enabled
+
+**Audit Trail:**
+- All federation operations logged to .squad/federation/audit.log
+- Track: who delegated, what task, when accepted, status changes, results delivered
+- Exportable for compliance
+
+#### 7. Implementation Phases
+
+**Total: 12-17 weeks (3-4 months)**
+
+- Phase 1: Identity + discovery infrastructure (2-3 weeks)
+- Phase 2: Delegation protocol (3-4 weeks)
+- Phase 3: Result delivery (2-3 weeks)
+- Phase 4: Conflict management (3-4 weeks)
+- Phase 5: Security & audit (2-3 weeks)
+
+### Success Criteria
+
+- ✅ Dynamic discovery works for >5 repos
+- ✅ Delegation envelope > 90% successful delivery
+- ✅ Result merge success rate > 95%
+- ✅ Conflict detection catches overlaps in <100ms
+- ✅ Audit trail complete & exportable
+- ✅ Security policy enforced without manual checks
+- ✅ No breaking changes to existing upstream/subsquad features
+
+### Key Architectural Insights
+
+- **Hybrid Identity Model:** Executing squads inherit task context but maintain own decision authority
+- **Federation is Push-Based:** Unlike upstream (pull-based inheritance), federation enables active delegation
+- **Conflict Prevention Over Resolution:** Design emphasizes detection + human-in-loop rather than automatic merging
+- **Security Boundary:** Public decisions vs. private history prevents unintended exposure
+- **Transitive Delegation:** Enables complex workflows (frontend → backend → data) while maintaining accountability
+- **No Central Infrastructure:** Peer discovery via GitHub topics + local registry keeps federation decentralized
+
+### Status
+**READY FOR COMMUNITY REVIEW** — RFC complete with implementation roadmap, risk analysis, and architectural guidance.
+

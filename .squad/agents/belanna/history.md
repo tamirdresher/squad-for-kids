@@ -18,100 +18,87 @@
 
 ## Learnings
 
-### 2026-03-15: Cross-Squad Orchestration Architecture Design — Issue #197
+### 2026-03-15: Cross-Squad Orchestration Architecture Design — Issue #197 (COMPLETED)
 
-**Assignment:** Research and design solution for orchestrating work across squads in bradygaster/squad repository.
+**Assignment:** Design solution for orchestrating work across squads, incorporating dynamic squad discovery and inter-squad activation patterns.
 
-**Context:** Current squad architecture supports vertical inheritance (upstreams) and horizontal scaling (subsquads), but lacks peer-to-peer collaboration — the ability for independent squads to delegate tasks, share runtime context, and coordinate work while maintaining separate identities.
+**User Request (Latest):** Tamir requested refined design with dynamic discovery: "Squad could be found dynamically when user points his squad to repo that has a squad in there. One option for the interaction is to run again copilot with agent squad in the other repo with a prompt."
 
-**Research Findings:**
+**Context:** Current squad architecture supports vertical inheritance (upstreams) and horizontal scaling (subsquads), but lacks peer-to-peer collaboration.
 
-1. **Upstream Feature Analysis:**
-   - Upstream inheritance is one-way, read-only, static context sharing (org → team → repo)
-   - Supports 3 source types: git (cloned repos), local (live paths), export (JSON snapshots)
-   - Inherited content: skills, decisions, wisdom, casting policy, routing
-   - Resolution at session start only (not live)
-   - Implementation: `/packages/squad-cli/src/cli/commands/upstream.ts`, SDK resolver in `/packages/squad-sdk/src/upstream/`
-   - Config: `.squad/upstream.json`, cached clones in `.squad/_upstream_repos/`
+**Design Approach:**
 
-2. **SubSquads Feature:**
-   - Horizontal work partitioning via label-based workstream filtering
-   - Same squad, different instances (shared decisions.md)
-   - Addressed in `/docs/blog/023-subsquads-horizontal-scaling.md`
+**Squad Federation Protocol** — 7 core components:
 
-3. **Architectural Gap:**
-   - No lateral collaboration protocol
-   - No task delegation between squads
-   - No runtime context sharing (only static inheritance)
-   - No conflict detection when multiple squads work on overlapping scope
-   - No identity boundaries (impersonation model)
-
-**Design Proposal Created:**
-
-**Squad Federation Protocol** — 6 core components:
-
-1. **Discovery & Registry (Hybrid Model):**
-   - Squad identity file: `.squad/identity/squad-id.json` with UUID, capabilities, domain
-   - Discovery via GitHub topics + local peer config
+1. **Dynamic Squad Discovery (NEW):**
+   - Detects `.squad/identity/squad-id.json` when pointing to new repos
+   - Builds local peer registry (`.squad/federation/known-squads.json`)
+   - Optional GitHub topic discovery (`squad sync-federation --github-topic squad-enabled`)
    - No central infrastructure needed
 
-2. **Task Delegation:**
-   - Delegation envelope with task, context, acceptance criteria, return path
-   - Storage: `.squad/federation/delegations/{outbound,inbound}/`
-   - Status tracking: pending → accepted → in_progress → completed
-   - Context import: delegating squad's decisions, shared files, constraints
+2. **Inter-Squad Activation Protocol (REFINED):**
+   - User runs: `copilot --squad --prompt "..." --with-squads "['auth-squad']"`
+   - Squad Agent locates target squad dynamically
+   - Creates delegation envelope with scoped context
+   - Activates remote squad with: `copilot --squad --activate-delegation {task-id} --parent-context`
+   - Remote squad enters "federation mode"
 
-3. **Context Sharing & Impersonation:**
-   - Hybrid identity mode: inherit task context, maintain own identity
-   - Selective import: read delegating squad's relevant decisions, not internal history
-   - Decision attribution: mark decisions made during delegation with context
+3. **Hybrid Identity Model (KEY INNOVATION):**
+   - Executing squad maintains own identity in commits (prevents impersonation)
+   - Inherits task context + delegating squad's decisions (read-only)
+   - Decisions marked with delegation context (delegated_from, scope)
+   - Attribution via Co-authored-by trailers
 
-4. **Return Path & Result Delivery:**
-   - Recommended: Pull Request from executing squad to delegating squad
-   - Alternative: Branch handoff, export bundle
-   - Completion notification via status update
+4. **Result Delivery — 3 Options:**
+   - **Option A (Recommended):** Pull Request from executing squad to delegating squad repo
+   - **Option B:** Branch handoff with status notification
+   - **Option C:** Export bundle (decisions + commits as artifact)
 
 5. **Conflict Detection & Resolution:**
-   - File-level conflicts (git merge conflicts, lock files)
-   - Decision-level conflicts (scope overlaps)
-   - Resolution strategies: Lead mediation, scope partitioning, merge policies
+   - **File-level:** Git merge conflicts (standard resolution) + lock file conflicts (lead mediation)
+   - **Decision-level:** Overlapping scope detection, lead intervention for blocked states
 
-6. **Security & Boundaries:**
-   - Public vs. private context (decisions, files, history)
-   - Federation policy: accept/reject rules, max concurrent delegations
-   - File sharing policy: allowed/blocked paths
-   - Audit trail: all federation operations logged
+6. **Security & Federation Boundaries:**
+   - Public vs. private decisions schema (`.squad/federation/sharing-policy.json`)
+   - Federation policy rules (accept/reject, max concurrent delegations, approval requirements)
+   - Immutable audit trail (`.squad/federation/audit.log`)
 
-**Implementation Roadmap:**
+7. **Transitive Delegation Support:**
+   - Frontend → Backend → Data flows enabled
+   - Nested delegation context maintained with attribution
+   - Cycle detection + max depth limit (3)
+
+**Implementation Phases:**
 - Phase 1: Identity & discovery (2-3 weeks)
-- Phase 2: Task delegation (3-4 weeks)
+- Phase 2: Delegation protocol (3-4 weeks)
 - Phase 3: Result delivery (2-3 weeks)
 - Phase 4: Conflict management (3-4 weeks)
 - Phase 5: Security & audit (2-3 weeks)
 - **Total:** 12-17 weeks (3-4 months)
 
-**Examples:**
-- Frontend squad delegates "Add OAuth endpoint" to Auth squad
-- Platform squad broadcasts breaking change to all consumer squads
-- Backend squad sub-delegates to Data squad (transitive delegation)
+**Key Decisions:**
+✅ Peer-to-peer discovery (no central server)
+✅ Push-based delegation (complements pull-based upstream)
+✅ Hybrid identity (maintain separate authority while collaborating)
+✅ Conflict prevention over automatic resolution (human-in-loop)
+✅ Public/private decision boundaries (security model)
 
-**Next Steps:**
-- RFC issue in bradygaster/squad with proposal
-- Prototype Phase 1 in feature branch
-- Dogfood with tamresearch1 + 2-3 other repos
+**Deliverables:**
+- RFC document: `.squad/decisions/inbox/belanna-cross-squad-orchestration-rfc.md` (COMPLETE)
+- Comment on issue #197: https://github.com/tamirdresher_microsoft/tamresearch1/issues/197#issuecomment-4021548869
+- Project board updated (in-progress)
 
-**Deliverable:** 
-- Full design proposal: https://github.com/tamirdresher_microsoft/tamresearch1/issues/197#issuecomment-4021469701
-- Posted to issue #197 as actionable RFC for bradygaster/squad
+**Status:** ⚠️ Unable to create issue in bradygaster/squad (EMU permission limitation). RFC ready for Brady/maintainers to copy and socialize.
 
-**Key Architectural Insights:**
-- Squad architecture is modular: coordinator → agents → decisions
-- Upstream is pull-based inheritance; federation needs push-based coordination
-- SubSquads scale instances; federation coordinates teams
-- Security boundary is critical: public decisions vs. private history
-- Conflict resolution requires human-in-loop for architectural decisions
+**Architectural Insights:**
+- Squad architecture excels at vertical hierarchy (upstream) + horizontal scaling (subsquads)
+- Federation adds **lateral coordination layer** — independent squads delegating without hierarchy
+- Dynamic discovery enables **discovery-on-demand** pattern (no upfront registration)
+- Hybrid identity prevents impersonation while enabling true collaboration
+- Conflict prevention (detection + human-in-loop) better than automatic merge for architectural decisions
+- Transitive delegation enables **complex multi-team workflows** (e.g., platform → consumers → sub-teams)
 
-**Impact:** Provides foundation for multi-squad collaboration pattern that complements existing upstream/subsquad features. Addresses real need for cross-team coordination in large organizations.
+**Impact:** Establishes foundation for multi-squad collaboration across organization; complements existing upstream/subsquad features without breaking changes.
 
 ---
 

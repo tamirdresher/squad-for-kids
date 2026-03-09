@@ -2346,3 +2346,42 @@ Rather than create duplicate infrastructure, linked #236 as the foundational ups
 **Decision Impact:**
 - Recommendation for .squad/decisions/inbox/: "ConfigGen Integration Strategy" — should ConfigGen tooling be first-class citizen in tamresearch1, or remain external?
 
+
+### 2026-03-16: Issue #41 — Blog Post Update: Capturing Squad Evolution
+
+**Task:** Review repository for work completed since initial blog draft, update blog post to reflect new workflows, skills, federation protocol, and continuous learning system.
+
+**Discoveries:**
+
+1. **15+ GitHub Workflows Now Operational**
+   - Squad Heartbeat (smart triage), Squad Daily Digest (8 AM UTC)
+   - FedRAMP Validation (controls matrix), Drift Detection (Helm/Kustomize)
+   - Squad Promote (safe promotion), Squad Release, and more
+   - Automation is now continuous, not periodic
+
+2. **Skills System Mature (7 documented)**
+   - devbox-provisioning, github-project-board, squad-conventions
+   - configgen-support-patterns, dk8s-support-patterns, teams-monitor, dotnet-build-diagnosis
+   - Skills promote to upstream for all squads to inherit
+
+3. **Upstream Inheritance Adopted**
+   - bradygaster/squad is now upstream source
+   - DevBox Provisioning Skill already promoted to upstream
+   - Creates innovation flywheel: local → documented → upstream → available to all
+
+4. **GitHub Project Board Fully Automated**
+   - Inbox → Triage → Ready → In Progress → In Review → Done
+   - Automatic transitions, Ralph nudges stalled items, zero manual overhead
+
+5. **Squad Federation Protocol (RFC stage)**
+   - Cross-squad coordination, task delegation, conflict resolution
+   - Real-world use cases documented
+
+6. **Continuous Learning Formalized**
+   - Knowledge cycles: Work → Decisions → Skills → Promotion → Better Work
+   - Mistakes become documented anti-patterns
+
+**Learning:** Capabilities evolve faster than documentation. Need to regularly sync docs with current state rather than wait for 'complete' feeling.
+
+**Outcome:** Blog updated, issue #41 commented, ready for Tamir's review and publishing decision.
+

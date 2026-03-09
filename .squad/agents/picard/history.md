@@ -2090,3 +2090,25 @@ From squad's DK8s research:
 - His practical, enterprise-focused perspective
 - His architectural philosophy (thin adapters, CLI-first, capability negotiation)
 - His communication style (direct, example-driven, enthusiastic but realistic)
+
+## Issue #198: ADR Teams Channel Monitoring
+
+**Request:** Monitor IDP ADR Notifications Teams channel; alert Tamir when attention needed; do not comment on the channel itself.
+
+**Feasibility Assessment:**
+✅ **WorkIQ provides full read access** to Teams channels
+- Query-based (not event-driven)
+- Returns recent messages, metadata, activity status
+- Confirmed working on IDP ADR Notifications channel
+
+**Current State Snapshot:**
+- New ADR: "Regional AMW vs Tenant-Level AMW" (PR 14971229) — active review, no blockers
+- Earlier ADR on logging-operator CMP rendering — approved (Roy Mishael → Adir Atias)
+- Channel healthy, no urgent escalations
+
+**Proposed Solution:**
+1. Daily WorkIQ check (10:00 AM UTC) for new/updated ADRs
+2. Report blockers, pending decisions, items needing Tamir's input
+3. Future: Teams webhook + Power Automate for real-time alerts if needed
+
+**Key Learning:** WorkIQ capability is well-suited for scheduled monitoring tasks. It's query-based rather than event-driven, which works fine for daily checks but requires explicit scheduling for proactive alerts. For Tamir's use case, this is sufficient—no external tools needed to start.

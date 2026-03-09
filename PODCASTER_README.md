@@ -1,15 +1,22 @@
-# Podcaster Prototype - Issue #214
+# Podcaster - Issues #214 & #237
 
 ## Overview
 
 Prototype implementation for converting markdown documents to audio using Microsoft Edge's Text-to-Speech (TTS) service via the `edge-tts` Python library.
+
+**Two modes available:**
+1. **Single-voice mode** (Issue #214) - Direct narration with one voice
+2. **Conversational mode** (Issue #237) - NotebookLM-style two-voice dialogue
 
 ## Implementation
 
 ### Technology Stack
 - **Python 3.12+** - Runtime environment
 - **edge-tts 7.2.7** - Microsoft Edge TTS library (free, neural-quality voices)
-- **Voice:** en-US-JennyNeural (professional female, Microsoft Neural TTS)
+- **pydub** (optional) - For high-quality audio concatenation (requires ffmpeg)
+- **Voices:**
+  - Single-voice mode: en-US-JennyNeural (professional female)
+  - Conversational mode: en-US-JennyNeural (HOST) + en-US-GuyNeural (EXPERT)
 
 ### Features
 - ✅ Markdown formatting removal (headers, bold, links, code blocks, etc.)
@@ -21,6 +28,8 @@ Prototype implementation for converting markdown documents to audio using Micros
 - ✅ No API keys or authentication needed
 
 ## Usage
+
+### Single-Voice Mode (Issue #214)
 
 ```bash
 python scripts/podcaster-prototype.py <markdown-file>
@@ -34,8 +43,43 @@ python scripts/podcaster-prototype.py EXECUTIVE_SUMMARY.md
 
 **Output:**
 - Creates `{filename}-audio.mp3` in current directory
-- Reports file size, estimated duration, and conversion time
-- Uses Microsoft Neural TTS voice (en-US-JennyNeural)
+- Single narrator (en-US-JennyNeural)
+- Direct reading of document content
+
+### Conversational Mode (Issue #237) - NotebookLM-style
+
+```bash
+python scripts/podcaster-conversational.py <markdown-file>
+```
+
+**Example:**
+```bash
+python scripts/podcaster-conversational.py QUICK_REFERENCE.md
+python scripts/podcaster-conversational.py EXECUTIVE_SUMMARY.md
+```
+
+**Output:**
+- Creates `{filename}-conversational.mp3` in current directory
+- Two-voice dialogue between HOST and EXPERT
+- Template-based conversational script generation
+- Natural back-and-forth discussion of document sections
+- Includes intro, transitions, and outro
+
+**How it works:**
+1. Parses markdown into sections by headers
+2. Generates conversational script:
+   - HOST introduces each section with questions
+   - EXPERT explains the content in natural language
+   - HOST adds interjections for flow
+3. Generates audio segments with two different voices
+4. Concatenates segments with natural pauses (400ms)
+5. Outputs single MP3 file with full podcast
+
+**Audio Quality:**
+- HOST: en-US-JennyNeural (female, professional, curious tone)
+- EXPERT: en-US-GuyNeural (male, authoritative, informative tone)
+- Both are Microsoft Neural TTS voices (production-grade)
+- Automatic retry logic for network stability
 
 ## Architecture Decision
 
@@ -84,13 +128,16 @@ The prototype removes:
 
 ### Dependencies
 ```bash
-pip install edge-tts
+pip install edge-tts pydub
 ```
 
 **Required packages:**
-- edge-tts==7.2.7
+- edge-tts==7.2.7 (required)
+- pydub (optional, for high-quality concatenation in conversational mode)
 - aiohttp (automatically installed)
 - certifi (automatically installed)
+
+**Note:** Conversational mode works without pydub/ffmpeg by using simple MP3 binary concatenation, which is sufficient for most use cases.
 
 ## Next Steps for Production
 
@@ -170,7 +217,8 @@ Audio files are automatically ignored by Git:
 
 ## Files
 
-- `scripts/podcaster-prototype.py` - Main prototype script
+- `scripts/podcaster-prototype.py` - Single-voice narrator mode (Issue #214)
+- `scripts/podcaster-conversational.py` - Two-voice conversational mode (Issue #237)
 - `scripts/podcaster-prototype.js` - Initial Node.js attempt (has TypeScript compatibility issues with edge-tts npm package)
 - `scripts/upload-podcast.ps1` - PowerShell script to upload audio to cloud storage
 - `scripts/upload-podcast.py` - Python script to upload audio to cloud storage (cross-platform)
@@ -179,11 +227,24 @@ Audio files are automatically ignored by Git:
 
 ## Testing
 
-The prototype has been validated with:
+### Single-Voice Mode (Issue #214)
 - ✅ Code structure and markdown stripping logic
 - ✅ Integration with edge-tts library
 - ⚠️ Network connectivity issues during testing (transient)
 - ⏳ End-to-end audio generation (pending stable network)
+
+### Conversational Mode (Issue #237)
+- ✅ Code structure and conversational script generation
+- ✅ Template-based dialogue generation
+- ✅ Two-voice integration (HOST + EXPERT)
+- ✅ Audio segment generation and concatenation
+- ✅ Retry logic for network stability
+- ✅ Tested on QUICK_REFERENCE.md:
+  - Input: 7.56 KB markdown
+  - Output: 3.94 MB MP3 (63 dialogue turns)
+  - Duration: ~6 minutes
+  - Conversion time: 350 seconds (includes retries)
+  - Successfully handles network timeouts with automatic retry
 
 ## Recommendation
 

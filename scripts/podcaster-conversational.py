@@ -291,24 +291,34 @@ async def main():
             # Concatenate segments
             print("\n🔗 Concatenating audio segments...")
             
-            # Try using pydub if available
+            # Try using pydub if available and ffmpeg is present
+            use_pydub = False
             try:
                 from pydub import AudioSegment
-                from pydub.playback import play
-                
-                combined = AudioSegment.empty()
-                pause = AudioSegment.silent(duration=400)  # 400ms pause between speakers
-                
-                for segment_file in segment_files:
-                    audio = AudioSegment.from_mp3(str(segment_file))
-                    combined += audio + pause
-                
-                combined.export(str(output_path), format="mp3")
-                print("   Using pydub for high-quality concatenation")
-                
-            except ImportError:
+                # Test if ffmpeg is available
+                test_audio = AudioSegment.from_mp3(str(segment_files[0]))
+                use_pydub = True
+            except (ImportError, FileNotFoundError):
+                use_pydub = False
+            
+            if use_pydub:
+                try:
+                    combined = AudioSegment.empty()
+                    pause = AudioSegment.silent(duration=400)  # 400ms pause between speakers
+                    
+                    for segment_file in segment_files:
+                        audio = AudioSegment.from_mp3(str(segment_file))
+                        combined += audio + pause
+                    
+                    combined.export(str(output_path), format="mp3")
+                    print("   Using pydub for high-quality concatenation")
+                except Exception as e:
+                    print(f"   pydub failed: {str(e)[:80]}, falling back to simple concatenation")
+                    use_pydub = False
+            
+            if not use_pydub:
                 # Fallback: simple binary concatenation (works for MP3)
-                print("   Using simple concatenation (pydub not available)")
+                print("   Using simple concatenation (pydub/ffmpeg not available)")
                 with open(output_path, 'wb') as outfile:
                     for segment_file in segment_files:
                         with open(segment_file, 'rb') as infile:

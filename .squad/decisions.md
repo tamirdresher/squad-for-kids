@@ -13899,3 +13899,47 @@ Feedback indicated:
 - Issue #41: Blog post "How an AI Squad Changed My Productivity"
 - Content strategy: Technical blog (Squad internals) vs. Productivity blog (Squad impact) are separate pieces
 - Writer's voice: Match Tamir's direct, honest, engineering-focused style over promotional/marketing language
+
+---
+
+## Decision 15: Sanitized Demo Infrastructure Completion
+
+**Date:** 2026-03-09  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Implemented  
+**Scope:** Demo & Documentation  
+**Related Issues:** #242  
+
+### Decision
+
+Complete the sanitized demo repository with ALL infrastructure and automation components:
+
+1. **GitHub Actions Workflows** — Add all 6 core workflows (triage, heartbeat, digest, notify, label sync, enforce)
+2. **Scheduling System** — Include schedule.json with comprehensive task definitions
+3. **Ralph Watch Script** — Full autonomous watch script with observability
+4. **Squad Monitor Dashboard** — Real-time monitoring dashboard (C# + .NET 8)
+5. **Skills** — Essential skills (github-project-board, teams-monitor)
+6. **Documentation** — Complete guides for workflows and scheduling
+
+### Rationale
+
+The initial sanitized demo only included agent charters and basic .squad/ structure. Missing critical components prevented demonstration of:
+- How autonomous operation works (Ralph watch polling)
+- How Teams/email integration works (WorkIQ bridge)
+- How scheduled tasks work (schedule.json + Squad Scheduler)
+- How to monitor agent activity (Squad Monitor dashboard)
+- How GitHub Actions integrate (6 core workflows)
+
+### Implementation
+
+- **Files Added:** 6 GitHub Actions workflows, ralph-watch.ps1, schedule.json, squad-monitor-standalone/ directory, skills documentation
+- **Documentation Updated:** README.md with 5 new sections covering workflows, scheduling, monitoring, Teams bridge, observability
+
+### Impact
+
+- ✅ Demo is now complete and representative of production Squad setup
+- ✅ Users can see the full automation stack in action
+- ✅ All infrastructure patterns documented
+- ✅ Ready for public release / blog post / demo video
+
+---

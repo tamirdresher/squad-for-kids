@@ -1,1 +1,20 @@
-chore(squad): ralph board-check session log
+chore: Scribe round 1 — orchestration and decision inbox merge
+
+- Created orchestration log for Data agent (Issue #1 closed)
+  * Upgraded squad-cli to v0.8.25
+  * Configured upstream connection to bradygaster/squad
+  * Documented available commands
+
+- Created session log for Ralph round 1
+  * Added 6 missing issues to project board (#183, #185, #193-196)
+  * Coordinated Data agent work
+  * Merged decision inbox items
+
+- Merged 3 decision inbox files into decisions.md
+  * belanna-office365-mcp: WorkIQ vs MCP Enterprise decision paths
+  * copilot-directive: Microsoft-official MCP requirement
+  * picard-platform-adapter: Architecture philosophy clarification
+
+- Inbox files deleted after merge
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

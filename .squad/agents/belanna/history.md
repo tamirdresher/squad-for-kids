@@ -18,6 +18,103 @@
 
 ## Learnings
 
+### 2026-03-15: Cross-Squad Orchestration Architecture Design — Issue #197
+
+**Assignment:** Research and design solution for orchestrating work across squads in bradygaster/squad repository.
+
+**Context:** Current squad architecture supports vertical inheritance (upstreams) and horizontal scaling (subsquads), but lacks peer-to-peer collaboration — the ability for independent squads to delegate tasks, share runtime context, and coordinate work while maintaining separate identities.
+
+**Research Findings:**
+
+1. **Upstream Feature Analysis:**
+   - Upstream inheritance is one-way, read-only, static context sharing (org → team → repo)
+   - Supports 3 source types: git (cloned repos), local (live paths), export (JSON snapshots)
+   - Inherited content: skills, decisions, wisdom, casting policy, routing
+   - Resolution at session start only (not live)
+   - Implementation: `/packages/squad-cli/src/cli/commands/upstream.ts`, SDK resolver in `/packages/squad-sdk/src/upstream/`
+   - Config: `.squad/upstream.json`, cached clones in `.squad/_upstream_repos/`
+
+2. **SubSquads Feature:**
+   - Horizontal work partitioning via label-based workstream filtering
+   - Same squad, different instances (shared decisions.md)
+   - Addressed in `/docs/blog/023-subsquads-horizontal-scaling.md`
+
+3. **Architectural Gap:**
+   - No lateral collaboration protocol
+   - No task delegation between squads
+   - No runtime context sharing (only static inheritance)
+   - No conflict detection when multiple squads work on overlapping scope
+   - No identity boundaries (impersonation model)
+
+**Design Proposal Created:**
+
+**Squad Federation Protocol** — 6 core components:
+
+1. **Discovery & Registry (Hybrid Model):**
+   - Squad identity file: `.squad/identity/squad-id.json` with UUID, capabilities, domain
+   - Discovery via GitHub topics + local peer config
+   - No central infrastructure needed
+
+2. **Task Delegation:**
+   - Delegation envelope with task, context, acceptance criteria, return path
+   - Storage: `.squad/federation/delegations/{outbound,inbound}/`
+   - Status tracking: pending → accepted → in_progress → completed
+   - Context import: delegating squad's decisions, shared files, constraints
+
+3. **Context Sharing & Impersonation:**
+   - Hybrid identity mode: inherit task context, maintain own identity
+   - Selective import: read delegating squad's relevant decisions, not internal history
+   - Decision attribution: mark decisions made during delegation with context
+
+4. **Return Path & Result Delivery:**
+   - Recommended: Pull Request from executing squad to delegating squad
+   - Alternative: Branch handoff, export bundle
+   - Completion notification via status update
+
+5. **Conflict Detection & Resolution:**
+   - File-level conflicts (git merge conflicts, lock files)
+   - Decision-level conflicts (scope overlaps)
+   - Resolution strategies: Lead mediation, scope partitioning, merge policies
+
+6. **Security & Boundaries:**
+   - Public vs. private context (decisions, files, history)
+   - Federation policy: accept/reject rules, max concurrent delegations
+   - File sharing policy: allowed/blocked paths
+   - Audit trail: all federation operations logged
+
+**Implementation Roadmap:**
+- Phase 1: Identity & discovery (2-3 weeks)
+- Phase 2: Task delegation (3-4 weeks)
+- Phase 3: Result delivery (2-3 weeks)
+- Phase 4: Conflict management (3-4 weeks)
+- Phase 5: Security & audit (2-3 weeks)
+- **Total:** 12-17 weeks (3-4 months)
+
+**Examples:**
+- Frontend squad delegates "Add OAuth endpoint" to Auth squad
+- Platform squad broadcasts breaking change to all consumer squads
+- Backend squad sub-delegates to Data squad (transitive delegation)
+
+**Next Steps:**
+- RFC issue in bradygaster/squad with proposal
+- Prototype Phase 1 in feature branch
+- Dogfood with tamresearch1 + 2-3 other repos
+
+**Deliverable:** 
+- Full design proposal: https://github.com/tamirdresher_microsoft/tamresearch1/issues/197#issuecomment-4021469701
+- Posted to issue #197 as actionable RFC for bradygaster/squad
+
+**Key Architectural Insights:**
+- Squad architecture is modular: coordinator → agents → decisions
+- Upstream is pull-based inheritance; federation needs push-based coordination
+- SubSquads scale instances; federation coordinates teams
+- Security boundary is critical: public decisions vs. private history
+- Conflict resolution requires human-in-loop for architectural decisions
+
+**Impact:** Provides foundation for multi-squad collaboration pattern that complements existing upstream/subsquad features. Addresses real need for cross-team coordination in large organizations.
+
+---
+
 ### 2026-03-09: Kubernetes Platform Adoption Spec Review — Issue #195 (Cross-Agent Assessment)
 
 **Assignment:** Infrastructure expert providing operational depth assessment of functional specification for "Standardized Microservices Platform on Kubernetes" (Issue #195).

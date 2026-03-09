@@ -11807,3 +11807,101 @@ The adapter pattern specifically supports:
 - PR #191: PlatformAdapter implementation (GitHub + ADO)
 - PR #263: CommunicationAdapter implementation
 - External Issue bradygaster/squad#294: Community question that prompted this clarification
+
+---
+
+## Decision 2026-03-15: Squad Federation Protocol for Cross-Squad Orchestration
+
+**Date:** 2026-03-15  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Adopted - RFC  
+**Scope:** Architecture & Platform Design  
+**Related:** Issue #197  
+
+### Context
+
+Current squad architecture supports:
+- **Vertical inheritance** via upstreams (org → team → repo)
+- **Horizontal scaling** via subsquads (workstream partitioning)
+
+But lacks **lateral collaboration** — the ability for independent squads to delegate tasks, share runtime context, and coordinate work across peer squads.
+
+### Decision: Approve Squad Federation Protocol Design
+
+Adopt a decentralized, GitHub-native peer-to-peer collaboration protocol enabling squads to:
+1. Discover each other (via GitHub topics + local peer config)
+2. Delegate tasks with acceptance criteria and return paths
+3. Share runtime context (decisions, files, constraints) selectively
+4. Coordinate work without central infrastructure
+
+### Core Components
+
+1. **Discovery & Registry**
+   - Squad identity: `.squad/identity/squad-id.json` (UUID, capabilities, domain)
+   - Hybrid discovery: GitHub topics + local peer config
+   - No central infrastructure required
+
+2. **Task Delegation**
+   - Delegation envelope: task + context + acceptance criteria + return path
+   - Storage: `.squad/federation/delegations/{outbound,inbound}/`
+   - Status flow: pending → accepted → in_progress → completed
+
+3. **Context Sharing**
+   - Hybrid identity: inherit task context, maintain own identity
+   - Selective import: decisions, shared files, constraints
+   - Exclude: internal history, team roster, routing
+
+4. **Return Path**
+   - Recommended: Pull Request from executing squad
+   - Completion notification via status update
+
+5. **Conflict Resolution**
+   - Detection: file conflicts, decision conflicts
+   - Strategies: Lead mediation, scope partitioning, merge policies
+
+6. **Security**
+   - Public vs. private context boundaries
+   - Federation policy (accept/reject rules)
+   - Audit trail for all operations
+
+### Implementation Roadmap
+
+**5 phases over 12-17 weeks:**
+- Phase 1: Identity + discovery infrastructure
+- Phase 2: Basic task delegation
+- Phase 3: Context sharing and conflict detection
+- Phase 4: Advanced conflict resolution
+- Phase 5: Security policies and audit
+
+### Why This Matters
+
+**Enables real-world collaboration:**
+- Frontend squad → Backend squad: "Add OAuth endpoint"
+- Platform squad → Consumer squads: "Migrate to auth v2.0"
+- Squad A + Squad B: Coordinate shared infrastructure changes
+
+**Complements existing features:**
+- Upstreams: vertical inheritance (org policies)
+- Federation: lateral collaboration (task delegation)
+- SubSquads: horizontal scaling (partition work)
+
+### Consequences
+
+- ✅ Provides architectural foundation for multi-squad collaboration in large organizations
+- ✅ Addresses real gap in current squad capabilities
+- ✅ Maintains compatibility with existing features
+- ✅ GitHub-native (no external infrastructure)
+- ⚠️ Requires community feedback and validation through prototyping
+
+### Next Steps
+
+1. Post RFC to bradygaster/squad for community feedback
+2. Prototype Phase 1 (identity + discovery) in feature branch
+3. Dogfood with tamresearch1 + 2-3 other repos
+4. Iterate based on real-world usage
+
+### References
+
+- **Full RFC:** https://github.com/tamirdresher_microsoft/tamresearch1/issues/197#issuecomment-4021469701
+- **Target:** bradygaster/squad upstream contribution
+- **Status:** Ready for community review

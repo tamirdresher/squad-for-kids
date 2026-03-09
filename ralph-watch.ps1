@@ -5,10 +5,12 @@
 # Observability Features (v8 — aligned with squad-monitor v2):
 # - Structured logging to $env:USERPROFILE\.squad\ralph-watch.log
 # - Heartbeat file at $env:USERPROFILE\.squad\ralph-heartbeat.json
-<<<<<<< Updated upstream
 # - Teams alerts on consecutive failures (>3)
 # - Exit code, duration, and round tracking
 # - Lockfile prevents duplicate instances per directory
+#   → Written BEFORE round (status=running) and AFTER (status=idle/error)
+#   → Includes pid, status, round, lastRun, exitCode, consecutiveFailures
+# - Log rotation: capped at 500 entries / 1MB
 
 # Fix UTF-8 rendering in Windows PowerShell console
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -35,23 +37,12 @@ if (Test-Path $lockFile) {
 # Clean up lock on exit
 Register-EngineEvent PowerShell.Exiting -Action { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue } | Out-Null
 trap { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue; break }
-=======
-#   → Written BEFORE round (status=running) and AFTER (status=idle/error)
-#   → Includes pid, status, round, lastRun, exitCode, consecutiveFailures
-# - Teams alerts on 3+ consecutive failures
-# - Log rotation: capped at 500 entries / 1MB
-# - PS 5.1 compatible (no -AsHashtable, [ordered]@{}, 2>$null)
->>>>>>> Stashed changes
 
 $intervalMinutes = 5
 $round = 0
 $consecutiveFailures = 0
 $maxLogEntries = 500
-<<<<<<< Updated upstream
 $maxLogBytes = 1048576  # 1MB
-=======
-$maxLogBytes = 1MB  # 1048576
->>>>>>> Stashed changes
 
 # Log rotation settings
 $maxLogBytes = 1MB

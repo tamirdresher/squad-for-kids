@@ -9,39 +9,8 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: What needs to be done?
-      description: Describe the task, feature, or bug clearly.
-      placeholder: Describe what you want the team to work on...
-    validations:
-      required: true
-  - type: dropdown
-    id: type
-    attributes:
-      label: Type
-      options:
-        - Feature
-        - Bug
-        - Research / Spike
-        - Documentation
-        - Chore / Maintenance
-    validations:
-      required: true
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      options:
-        - P0 — Blocking
-        - P1 — This sprint
-        - P2 — Next sprint
-        - Backlog
-    validations:
-      required: false
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional context
-      description: Any extra details, links, screenshots, or constraints.
-      placeholder: Optional additional context...
+      label: Description
+      description: Optional - describe the task or leave blank if the title is sufficient.
+      placeholder: Add details here if needed...
     validations:
       required: false

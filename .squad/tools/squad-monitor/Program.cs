@@ -53,6 +53,10 @@ if (runOnce)
     DisplayRecentlyMergedPRs(teamRoot);
     var activities = LoadActivities(teamRoot);
     DisplayOrchestrationLog(activities);
+    
+    // Live Agent Feed
+    var liveAgentFeed = BuildLiveAgentFeedSection(userProfile);
+    AnsiConsole.Write(liveAgentFeed);
 }
 else
 {

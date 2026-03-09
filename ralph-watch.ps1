@@ -473,7 +473,12 @@ while ($true) {
     try {
         # Call agency DIRECTLY — no pipes, no Start-Process, no cmd /c
         # This is the only approach that reliably returns control
-        agency copilot --yolo --autopilot --agent squad -p $prompt
+        # Redirect stderr (2>&1) so PS 5.1 doesn't convert agency's emoji
+        # banner output into NativeCommandError exceptions
+        $ErrorActionPreference_saved = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        agency copilot --yolo --autopilot --agent squad -p $prompt 2>&1 | Write-Host
+        $ErrorActionPreference = $ErrorActionPreference_saved
         $exitCode = $LASTEXITCODE
         $agencyOutput = ""  # Can't capture without pipes — but that's OK
         # Display output after completion

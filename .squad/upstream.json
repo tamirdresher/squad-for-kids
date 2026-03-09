@@ -1,19 +1,11 @@
 {
   "upstreams": [
     {
-      "name": "bradygaster-squad",
-      "type": "git",
-      "source": "https://github.com/bradygaster/squad.git",
-      "added_at": "2026-03-09T06:23:11.478Z",
-      "last_synced": "2026-03-09T06:23:16.106Z",
-      "ref": "main"
-    },
-    {
       "name": "dk8s-platform-squad",
       "type": "git",
       "source": "https://github.com/tamirdresher_microsoft/dk8s-platform-squad.git",
       "added_at": "2026-03-09T06:42:00.000Z",
-      "last_synced": null,
+      "last_synced": "2026-03-09T09:55:57.917Z",
       "ref": "main"
     }
   ]

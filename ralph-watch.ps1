@@ -315,6 +315,32 @@ while ($true) {
         }
     }
     
+    # Daily RP Briefing at 9:00 AM (workdays only)
+    $currentHour = (Get-Date).Hour
+    $currentMinute = (Get-Date).Minute
+    $dayOfWeek = (Get-Date).DayOfWeek
+    $briefingTime = ($currentHour -eq 9 -and $currentMinute -lt $intervalMinutes)
+    $isWeekday = ($dayOfWeek -ne 'Saturday' -and $dayOfWeek -ne 'Sunday')
+    
+    if ($briefingTime -and $isWeekday) {
+        Write-Host "[$timestamp] Running daily BasePlatformRP briefing..." -ForegroundColor Cyan
+        $briefingScriptPath = Join-Path (Get-Location) "scripts/daily-rp-briefing.ps1"
+        if (Test-Path $briefingScriptPath) {
+            try {
+                & $briefingScriptPath -SkipWeekends
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "[$timestamp] Daily briefing sent successfully" -ForegroundColor Green
+                } else {
+                    Write-Host "[$timestamp] Warning: Daily briefing failed with exit code $LASTEXITCODE" -ForegroundColor Yellow
+                }
+            } catch {
+                Write-Host "[$timestamp] Warning: Daily briefing error: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "[$timestamp] Warning: Daily briefing script not found at $briefingScriptPath" -ForegroundColor Yellow
+        }
+    }
+    
     # Step 1: Update the repo to ensure we have the latest code
     Write-Host "[$timestamp] Pulling latest changes..." -ForegroundColor Yellow
     try {

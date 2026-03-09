@@ -11556,3 +11556,254 @@ The specification reads like an infrastructure document, not a platform security
 
 *"In security, silence is not strength — it is vulnerability."* — Worf
 
+# Decision: Office 365 MCP Integration Strategy (Issue #183)
+
+**Date:** 2026-03-09  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Context:** Issue #183 — Office Automation (Email/Calendar/Teams)  
+**Status:** ⏳ Pending Tamir's decision
+
+---
+
+## Problem Statement
+
+Team needs Office 365 automation capabilities (Email, Calendar, Teams) for agent workflows. Previous research identified multiple MCP server options, but Tamir has two critical constraints:
+
+1. **ONLY Microsoft-official MCPs are acceptable** (no third-party like @softeria, @pnp, or community solutions)
+2. **Cannot create Azure AD app registrations** (corporate restrictions)
+
+This eliminates most previously researched options and requires finding Microsoft-official solutions that work without app registration.
+
+---
+
+## Research Findings
+
+### Microsoft-Official Options That Work Without User App Registration
+
+**Option 1: WorkIQ MCP (✅ Already Available)**
+- **Status:** Already configured in environment
+- **Tool:** `workiq-ask_work_iq`
+- **Capabilities:**
+  - ✅ Read and search emails
+  - ✅ Read calendar events
+  - ✅ Create/update/cancel calendar events
+  - ✅ Find meeting times
+  - ✅ Accept/decline invitations
+  - ✅ Read Teams messages
+  - ✅ Query SharePoint/OneDrive documents
+  - ❌ Cannot send emails directly
+- **Authentication:** Uses M365 Copilot license + org Entra ID permissions (no new app registration)
+- **Reference:** https://learn.microsoft.com/en-us/microsoft-365-copilot/extensibility/workiq-overview
+
+**Option 2: Microsoft MCP Server for Enterprise**
+- **Status:** Requires IT admin to enable organization-wide
+- **How it works:** Uses predefined OAuth clients (VS Code, GitHub Copilot CLI) already registered by Microsoft
+- **IT Admin Action Required:**
+  \\\powershell
+  Grant-EntraMCPServerPermission -ServicePrincipalId <GitHub-Copilot-CLI-SPN> -Permission "MCP.Device.Read.All"
+  \\\
+- **Capabilities:** Full access to Mail (read/send), Calendar, Teams, Files
+- **Reference:** https://learn.microsoft.com/en-us/graph/mcp-server/get-started
+
+**Option 3: Microsoft Agent 365 / Copilot Studio**
+- **Status:** Requires M365 Copilot + Copilot Studio licensing (unknown if org has this)
+- **Capabilities:** Enterprise-grade Office 365 automation with Entra ID governance
+- **Reference:** https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/introducing-model-context-protocol-mcp-in-copilot-studio-simplified-integration-with-ai-apps-and-agents/
+
+---
+
+## What's Blocked
+
+These Microsoft-official options exist but **require** Azure AD app registration:
+- `@microsoft/m365agentstoolkit-mcp` — Official toolkit, but needs app registration for OAuth
+- Direct Microsoft Graph MCP implementations — All require client ID/secret from app registration
+
+**Why:** Microsoft Graph API security model mandates authentication. No credential-less or anonymous access exists. Even device code flow requires a client ID from an app registration (either custom or predefined).
+
+---
+
+## Decision Paths
+
+### Path A: Use WorkIQ As-Is (Recommended for 90% of use cases)
+- **Pros:**
+  - ✅ Already available, no setup needed
+  - ✅ Covers read-heavy workflows (emails, calendar, Teams, documents)
+  - ✅ Can create calendar events
+  - ✅ Zero risk, zero dependencies
+- **Cons:**
+  - ❌ Cannot send emails directly
+- **Workaround:** Continue using Teams webhook (`~/.squad/teams-webhook.url`) for notifications
+- **Timeline:** Immediate
+- **Risk:** Low
+
+### Path B: Request IT Admin to Enable MCP Server for Enterprise
+- **Pros:**
+  - ✅ Full Office 365 automation (send emails, full calendar, Teams posting)
+  - ✅ Uses predefined clients (no per-user app registration)
+  - ✅ Microsoft-official and enterprise-supported
+- **Cons:**
+  - ⚠️ Requires IT admin action
+  - ⚠️ May take 1-2 weeks to get approval/enablement
+- **IT Admin Action:**
+  \\\powershell
+  Grant-EntraMCPServerPermission -ServicePrincipalId <GitHub-Copilot-CLI-SPN> -Permission "MCP.Device.Read.All"
+  \\\
+- **Timeline:** 1-2 weeks
+- **Risk:** Medium (depends on IT responsiveness)
+
+### Path C: Request IT Admin to Create Shared App Registration
+- **Pros:**
+  - ✅ Full Office 365 automation
+  - ✅ Team shares one app registration (not per-user)
+  - ✅ Works with any Microsoft-official MCP
+- **Cons:**
+  - ⚠️ Requires IT admin to create app and manage credentials
+  - ⚠️ Credentials must be stored securely (GitHub org secrets or Azure Key Vault)
+- **IT Admin Action:**
+  - Create Azure AD app registration
+  - Set permissions: Mail.Read, Mail.Send, Calendars.Read, Calendars.ReadWrite, User.Read
+  - Generate client secret
+  - Provide: Tenant ID, Client ID, Client Secret
+- **Timeline:** 1-2 weeks
+- **Risk:** Medium (credential management overhead)
+
+### Path D: Accept Current Limitations + Workarounds
+- **Pros:**
+  - ✅ No external dependencies
+  - ✅ Immediate
+- **Cons:**
+  - ❌ No email sending capability
+  - ❌ Limited to WorkIQ capabilities
+- **Workarounds:**
+  - Teams webhook for notifications (already configured)
+  - Power Automate flows triggered by GitHub webhooks
+  - Manual email sending when needed
+- **Timeline:** Immediate
+- **Risk:** Low (but limited functionality)
+
+---
+
+## Capability Comparison
+
+| Capability | WorkIQ (Current) | MCP Enterprise | Shared App Reg | Workarounds |
+|------------|-----------------|----------------|----------------|-------------|
+| Read Emails | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| Send Emails | ❌ No | ✅ Yes | ✅ Yes | ⚠️ Via Power Automate |
+| Read Calendar | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| Create Calendar Events | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| Read Teams | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| Post to Teams | ⚠️ Via webhook | ✅ Yes | ✅ Yes | ✅ Via webhook |
+| Requires Setup | ✅ Done | ⚠️ Admin enable | ⚠️ Admin setup | ✅ Done |
+| Risk | 🟢 Low | 🟡 Medium | 🟡 Medium | 🟢 Low |
+
+---
+
+## Recommendation
+
+**Primary Recommendation:** **Path A (WorkIQ as-is)** for immediate productivity, then evaluate **Path B (MCP Enterprise)** if email sending becomes a critical blocker.
+
+**Rationale:**
+1. WorkIQ already provides 90% of needed capabilities
+2. Zero setup time, zero risk
+3. Teams webhook covers notification use case
+4. Can revisit email sending gap later if it becomes critical
+
+**If email sending is critical:** Pursue **Path B (MCP Enterprise)** as it's the most enterprise-appropriate solution with no per-user app registration burden.
+
+---
+
+## Next Action Required from Tamir
+
+**Please confirm which path to pursue:**
+1. ✅ **Path A:** Use WorkIQ as-is (recommended)
+2. 🔄 **Path B:** Request IT admin to enable MCP Enterprise
+3. 🔄 **Path C:** Request IT admin to create shared app registration
+4. ⏸️ **Path D:** Accept current limitations
+
+Once confirmed, I will proceed with implementation/documentation accordingly.
+
+---
+
+## References
+
+- [WorkIQ MCP Documentation](https://learn.microsoft.com/en-us/microsoft-365-copilot/extensibility/workiq-overview)
+- [Microsoft MCP Server for Enterprise](https://learn.microsoft.com/en-us/graph/mcp-server/get-started)
+- [Manage MCP Server Permissions](https://learn.microsoft.com/en-us/powershell/entra-powershell/how-to-manage-mcp-server-permissions)
+- [Copilot Studio MCP Integration](https://www.microsoft.com/en-us/microsoft-copilot/blog/copilot-studio/introducing-model-context-protocol-mcp-in-copilot-studio-simplified-integration-with-ai-apps-and-agents/)
+
+---
+
+**Decision Status:** ⏳ Awaiting Tamir's path selection  
+**Issue:** #183  
+**Labels:** `status:pending-user`
+### 2026-03-09T05:55:00Z: User directive
+**By:** Tamir Dresher (via Copilot)
+**What:** Use only Microsoft-official MCP servers for Office 365 integration. No third-party MCP servers.
+**Why:** User request — captured for team memory
+# Decision: Platform Adapter Architecture Philosophy
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead), responding as Tamir  
+**Status:** Proposed  
+**Scope:** Architecture & Team Strategy
+
+## Context
+
+External community member raised important question in bradygaster/squad#294: Do the PlatformAdapter (#191) and CommunicationAdapter (#263) PRs represent a shift from the "prompt-level, not code-level" abstraction vision articulated in issue #8?
+
+## Decision
+
+**Platform adapters are infrastructure that ENABLES prompt-level abstraction, not a departure from it.**
+
+Key architectural principles:
+
+1. **Adapters are thin wrappers** — They call CLI tools (az, gh), not replace them
+2. **Interface contracts over implementations** — Agents use unified methods (listWorkItems, createPR) regardless of platform
+3. **Platform quirks stay isolated** — Error handling, output normalization, WIQL escaping happen in adapters, not agent prompts
+4. **Capability negotiation per provider** — Each adapter declares what it supports; agents degrade gracefully
+
+## Rationale
+
+### Without Adapters (❌ Not Scalable)
+Agent prompts have to handle platform detection and CLI differences:
+```
+if GitHub: run gh issue list | jq ...
+if ADO: run az boards work-item list --wiql '...' | ConvertFrom-Json ...
+if Jira: run jira issue list --jql '...' | parse custom format ...
+```
+
+### With Adapters (✅ Prompt-Level Abstraction)
+Agent prompts stay clean:
+```
+const workItems = await platform.listWorkItems({ state: 'open', label: 'bug' });
+```
+
+The adapter translates to the right CLI call for the platform.
+
+## Enterprise Requirements Enabled
+
+The adapter pattern specifically supports:
+- **Cross-project work items** (code in one ADO project, work items in another)
+- **WIQL scoping** (epics, area paths) to prevent "running rampant" over orgs
+- **Configurable work item types** per team (Task, User Story, Bug, etc.)
+- **Multi-cloud authentication** (Entra ID, dSTS, GitHub Apps)
+
+## Roadmap
+
+1. **Short term:** Merge #191, validate ADO workflows in production repos (including tamresearch1)
+2. **Medium term:** Wire CommunicationAdapter (ADO Discussions, Teams, GitHub Discussions)
+3. **Long term:** Additional adapters (Jira, GitLab, Planner) following same interface
+
+## Impact
+
+- ✅ Clarifies architectural direction for community
+- ✅ Validates Tamir's ADO research investment (WIQL patterns, concept mapping)
+- ✅ Establishes pattern for future platform integrations
+- ✅ Maintains prompt-level philosophy while enabling enterprise use cases
+
+## Related
+
+- Issue #8: Original ADO support request and "prompt-level" vision
+- PR #191: PlatformAdapter implementation (GitHub + ADO)
+- PR #263: CommunicationAdapter implementation
+- External Issue bradygaster/squad#294: Community question that prompted this clarification

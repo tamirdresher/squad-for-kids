@@ -3135,3 +3135,65 @@ Ready to accept connections for tunnel: cli-tunnel.euw
 - Raised operational concerns before broader team adoption decision
 - Provided DK8s-specific context from 159KB history knowledge base
 
+
+### 2026-03-09: Office 365 MCP Research — Issue #183 (Microsoft-Official Options Without App Registration)
+
+**Assignment:** Research Microsoft-official MCP servers for Office 365 automation (Email/Calendar/Teams) that work WITHOUT creating Azure AD app registrations.
+
+**Critical Constraint:** User cannot create Azure AD app registrations due to corporate restrictions.
+
+**Key Findings:**
+
+1. **WorkIQ MCP (Already Available!) ✅**
+   - Microsoft-official MCP for M365 data access
+   - Already configured in this environment (workiq-ask_work_iq tool)
+   - Capabilities: Read/search emails, read/create/update calendar events, read Teams, query documents
+   - Uses M365 Copilot license + org Entra ID permissions (no new app registration!)
+   - **Gap:** Cannot send emails directly (only read)
+   - Reference: https://learn.microsoft.com/en-us/microsoft-365-copilot/extensibility/workiq-overview
+
+2. **Microsoft MCP Server for Enterprise (Admin-Enabled)**
+   - Uses predefined OAuth clients (VS Code, GitHub Copilot CLI, etc.)
+   - IT admin grants permissions org-wide via Entra PowerShell
+   - No per-user app registration once enabled by admin
+   - Provides full Mail/Calendar/Teams/Files access
+   - Reference: https://learn.microsoft.com/en-us/graph/mcp-server/get-started
+
+3. **Microsoft Agent 365 / Copilot Studio**
+   - Official Copilot Studio integration with Entra ID governance
+   - Requires M365 Copilot + Copilot Studio licensing
+   - Enterprise-grade with built-in compliance
+
+**What's Blocked:**
+- Direct Microsoft Graph MCP implementations — ALL require app registration for OAuth
+- `@microsoft/m365agentstoolkit-mcp` — Official but needs app registration
+- Third-party solutions (`@softeria`, `@pnp`) — Not Microsoft-official
+
+**Why App Registration is Required:**
+Microsoft Graph API security model mandates authentication for programmatic access. No credential-less or anonymous access exists. Device code flow, delegated permissions, and all OAuth flows require at minimum a client ID from an app registration (either custom or predefined by Microsoft).
+
+**Recommended Path:**
+1. **Phase 1 (Immediate):** Maximize WorkIQ capabilities (read emails/calendar/Teams, create calendar events)
+2. **Phase 2 (1-2 weeks):** Request IT admin to enable MCP Server for Enterprise org-wide OR create shared app registration for team
+3. **Phase 3 (Alternative):** Use Teams webhook workarounds, Power Automate flows, or existing service principals
+
+**Team Impact:**
+- WorkIQ covers ~90% of read-heavy use cases without any setup
+- Email sending gap can be worked around with Teams webhooks (already configured)
+- Full automation requires either IT admin action or accepting current limitations
+
+**Deliverable:** Posted comprehensive research findings to issue #183 with decision matrix and next action options for Tamir.
+
+**Learnings:**
+1. **Predefined clients are the workaround:** Microsoft's MCP Enterprise uses pre-registered OAuth clients (VS Code, Copilot CLI) to avoid per-user app registrations
+2. **WorkIQ is underutilized:** Already have powerful M365 MCP integration that covers most read/query scenarios
+3. **All roads lead to app registration:** No production-grade Microsoft Graph access exists without authentication (security by design)
+4. **Device code flow ≠ no app registration:** Device code flow still requires a client ID/app registration (either custom or predefined)
+5. **IT admin enablement is key:** Enterprise MCP deployment shifts app registration burden from individual users to central IT governance
+
+**Decision Points:**
+- Which path to pursue: WorkIQ-only, MCP Enterprise, or shared app registration
+- Whether to accept email sending gap or push for full automation
+- Risk tolerance for using non-Microsoft-official MCPs (rejected per requirement)
+
+---

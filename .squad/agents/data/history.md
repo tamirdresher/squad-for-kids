@@ -2742,3 +2742,39 @@ Applied consistently across all workflows that parse team.md:
 3. **Consistency across workflows matters**: When multiple workflows parse the same data source (team.md), they must use identical normalization logic or label/name mismatches will cause silent failures.
 4. **Name normalization should be total**: Regex `[^a-z0-9]` strips everything non-alphanumeric, not just apostrophes. This future-proofs against other special characters (hyphens, accents, unicode).
 
+
+---
+
+### 2026-03-09: Squad CLI upstream command availability and configuration (Issue #1)
+
+**Task:** Investigate availability of `upstream` command in squad-cli and complete upstream connection to bradygaster/squad.
+
+**Root Cause:** The `upstream` command was not available in v0.8.23 (the version initially tested) because PR #225 was merged AFTER the v0.8.23 release tag. However, it was subsequently published in v0.8.25.
+
+**Solution:**
+1. Confirmed `upstream` command is available in squad-cli v0.8.25
+2. Updated global squad-cli installation from v0.8.20 to v0.8.25
+3. Configured upstream connection using: `npx @bradygaster/squad-cli@0.8.25 upstream add https://github.com/bradygaster/squad.git --name bradygaster-squad`
+4. Verified configuration in `.squad/upstream.json`
+
+**Upstream Configuration:**
+- Source: https://github.com/bradygaster/squad.git
+- Name: bradygaster-squad
+- Branch: main
+- Last synced: 2026-03-09
+
+**Available Commands:**
+- `squad upstream list` - Show configured upstreams
+- `squad upstream sync [name]` - Pull updates from upstream
+- `squad upstream add <source> [--name <n>] [--ref <branch>]` - Add new upstream
+- `squad upstream remove <name>` - Remove an upstream
+
+**Key Learning:**
+- Always check the latest published npm version when investigating command availability
+- The `upstream` command enables tracking multiple upstream Squad sources (git repos, local paths, or exported JSON)
+- Upstream configuration is stored in `.squad/upstream.json` and clones repos to `.squad/_upstream_repos/`
+- PR #186 provided documentation (docs/UPSTREAM_INHERITANCE.md) but didn't configure the CLI tooling since the command wasn't available yet
+- Git remote `upstream` (configured in PR #186) is separate from squad-cli's `upstream` feature - both are now in place
+
+**Status:** Issue #1 closed and marked as Done on project board.
+

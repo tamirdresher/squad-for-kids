@@ -18,6 +18,79 @@
 
 ## Learnings
 
+### 2026-03-09: Squad Scheduler Design — Issue #199 (DESIGN PROPOSAL, PENDING USER DECISION)
+
+**Assignment:** Design generic, provider-agnostic scheduling system for Squad autonomous task execution.
+
+**Problem Statement:** Squad currently uses ad-hoc scheduling scattered across multiple providers:
+- GitHub Actions: Hardcoded cron schedules (squad-daily-digest.yml, squad-heartbeat.yml)
+- PowerShell: ralph-watch.ps1 with fixed 5-minute polling intervals
+- Manual triggers: workflow_dispatch for on-demand runs
+- **Result:** Squad can forget scheduled tasks; no unified view of what should run regularly
+
+**Design Deliverable:** `.squad/implementations/squad-scheduler-design.md` (18 KB)
+
+**Key Design Decisions:**
+
+1. **Single Source of Truth**: All schedules defined in `.squad/schedule.json` (declarative manifest)
+   - Triggers: cron, interval, event-based, startup, webhooks
+   - Tasks: workflow dispatch, scripts, Copilot agents, HTTP calls
+   - Providers: local-polling, github-actions, windows-scheduler, http-webhook, copilot-agent (pluggable)
+
+2. **Provider Abstraction Layer**:
+   - Clean interface: `canExecute()`, `execute()`, `getStatus()`
+   - Platform-agnostic design—can swap local polling ↔ GitHub Actions ↔ Windows Task Scheduler without changing task definitions
+   - Enables persistence (Windows Task Scheduler survives reboots) while maintaining cloud scalability (GitHub Actions)
+
+3. **Ralph Watch Integration**:
+   - ralph-watch.ps1 loads `.squad/schedule.json` on each heartbeat
+   - Evaluates ALL schedules; executes local tasks immediately; dispatches remote tasks
+   - Maintains `.squad/scheduler-state.json` for execution history and de-duplication
+   - Logs to `.squad/scheduler.log` (structured JSON lines for observability)
+
+4. **Migration Path** (6 phases over 6-7 weeks):
+   - Phase 1: Define all known schedules in manifest
+   - Phase 2: Implement core scheduler engine
+   - Phase 3: Integrate with ralph-watch.ps1
+   - Phase 4: Migrate GitHub Actions workflows
+   - Phase 5: Add optional providers (Windows Task Scheduler, webhooks, Copilot)
+   - Phase 6: Dashboards and observability
+
+**Architecture Highlights**:
+- **Error Handling**: Exponential backoff (60s, 120s, 240s), max 3 retries, consecutive failure alerts
+- **Concurrency**: Lock file prevents duplicate scheduler instances; de-duplication by schedule ID
+- **Security**: No secrets in repo; sensitive data via environment variables; execution audit trail
+- **State Management**: Persists last execution timestamps to prevent duplicates on restart
+
+**Decision Points Pending Tamir**:
+1. Primary provider strategy (GA primary + local fallback? Local primary + GA scale? Windows Task primary + GA cloud?)
+2. MVP vs. full-featured (cron + interval only? All trigger types?)
+3. Persistence requirement (survive reboots? Multi-agent support?)
+4. Notification channels (Teams alerts? PagerDuty? Issue comments?)
+5. Timeline (MVP in 1 week? Full in 6 weeks? Phased rollout?)
+
+**Architectural Insights**:
+- Provider abstraction enables **infrastructure flexibility**: same schedule definition works with different execution backends
+- Declarative scheduling improves **observability**: single file shows all scheduled work (no hidden cron jobs)
+- Integration with ralph-watch enables **local-first reliability**: critical tasks run even if GitHub Actions is unavailable
+- Structured logging + state management enables **idempotency and recovery**: schedules survive partial failures
+
+**Current Status**:
+- ✅ Design complete and documented
+- ✅ Issue #199 commented with summary and decision questions
+- ✅ Awaiting Tamir's decisions on providers, scope, and timeline before implementation begins
+- ✅ Project board updated (Pending User status)
+- ✅ Label added: `status:pending-user`
+
+**Deliverables**:
+- Design document: `.squad/implementations/squad-scheduler-design.md`
+- Issue comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/199#issuecomment-4021572965
+- Project board updated to Pending User
+
+**Impact:** Establishes foundation for autonomous Squad task management. Once Tamir decides on providers/timeline, Phase 1-2 can launch immediately (week 1).
+
+---
+
 ### 2026-03-15: Cross-Squad Orchestration Architecture Design — Issue #197 (COMPLETED)
 
 **Assignment:** Design solution for orchestrating work across squads, incorporating dynamic squad discovery and inter-squad activation patterns.

@@ -12285,3 +12285,213 @@ Cleaned upstream configuration by removing unused bradygaster-squad connection a
 
 ### Status
 dk8s-platform-squad verified and synced. Audit trail established.
+
+---
+
+# Decision: Simplified Squad Issue Template Design
+
+**Date:** 2026-03-15  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Implemented  
+**Scope:** Squad Issue Template UX
+
+## Context
+
+Squad issue template previously required:
+- **Type** dropdown (Feature/Bug/Research/Documentation/Chore) — REQUIRED
+- **What needs to be done?** textarea — REQUIRED
+- **Priority** dropdown (P0/P1/P2/Backlog) — optional
+- **Additional context** textarea — optional
+
+User feedback (Tamir, Issue #204): "i like the squad issue template, but tere are too many things to fill there, i want it to be like the blank issue only with the label set to squad automatically"
+
+## Problem
+
+Template friction was preventing quick task capture:
+- Users had to classify tasks upfront (Type dropdown)
+- Forced description entry even when title is sufficient
+- Cognitive overhead slowed squad task creation
+- Users defaulting to blank issues to avoid form
+
+## Decision
+
+**Simplify template to single optional field:**
+
+1. **Remove All Dropdowns**:
+   - Delete Type dropdown (was required) → classification happens at triage
+   - Delete Priority dropdown (was optional) → lead assigns during triage
+
+2. **Consolidate Text Fields**:
+   - Remove "Additional context" (was optional)
+   - Keep single "Description" textarea (made optional, NOT required)
+   - Title alone is sufficient for task creation
+
+3. **Enable Blank Issue Coexistence**:
+   - Create `.github/ISSUE_TEMPLATE/config.yml`
+   - Set `blank_issues_enabled: true`
+   - Users choose: Squad Task OR blank issue in UI
+
+## Rationale
+
+**Task Capture Speed > Upfront Structure:**
+- Squad triage workflow = capture fast, classify later
+- Lead adds structure (Type, Priority) during triage
+- Title-only issues are valid for simple tasks
+- Reduced friction encourages squad adoption
+
+**Preserve Auto-Labeling Value:**
+- `squad` label still auto-applied
+- Distinguishes squad tasks from general issues
+- Enables squad-specific automation (triage, assignment)
+
+**User Choice:**
+- Some users want blank canvas → blank issues enabled
+- Some users want minimal guidance → simplified squad template
+- Both patterns supported without conflict
+
+## Implementation
+
+- **Files Modified**: `.github/ISSUE_TEMPLATE/squad-task.yml`
+- **Files Created**: `.github/ISSUE_TEMPLATE/config.yml`
+- **Branch**: `squad/204-simplify-issue-template`
+- **PR**: #205
+- **Status**: Merged
+
+## Consequences
+
+**Positive:**
+- ✅ Faster squad task creation (1 field vs. 4)
+- ✅ Lower cognitive overhead for users
+- ✅ Title-only issues now possible
+- ✅ Blank issue option preserved for power users
+- ✅ Squad label still auto-applied
+
+**Negative:**
+- ⚠️ Less structured data at creation time
+- ⚠️ Lead must classify during triage (was done upfront)
+- ⚠️ No Type/Priority history in issue creation audit
+
+**Mitigation:**
+- Lead triage adds labels for Type/Priority after creation
+- Template simplicity encourages more squad task creation
+- Trade classification overhead for capture volume
+
+## Related
+
+- Issue #204: User request for simplified template
+- Squad triage workflow: Lead classification phase
+- GitHub issue template best practices: minimize friction for participation
+
+## Impact
+
+**UX Improvement:** Reduces issue creation time from ~30 seconds (4 fields) to ~10 seconds (title + optional description)
+
+**Adoption:** Lower friction increases squad issue template usage vs. blank issues with manual labeling
+
+---
+
+# Decision: Auto-Archive Done Items via GitHub Actions
+
+**Date:** 2026-03-09  
+**Decider:** Picard (Lead)  
+**Issue:** #203  
+**Status:** Implemented (PR #206)
+
+## Context
+
+User requested that Done items older than 3 days be hidden from the project board, without deleting the underlying issues. This is a common need for keeping project boards clean and focused on active work.
+
+## Problem
+
+GitHub Projects V2 has a built-in "Auto-archive items" feature, but it has critical limitations:
+- Only supports `is:`, `reason:`, and `updated:` qualifiers
+- Does NOT support filtering by custom status fields (e.g., `status:Done`)
+- Cannot combine "Done status" + "age > 3 days" using native features
+
+## Options Evaluated
+
+### Option 1: GitHub Projects V2 Native Auto-Archive
+- **Pros:** Built-in, no maintenance
+- **Cons:** Cannot filter by custom status fields
+- **Verdict:** ❌ Not viable for this use case
+
+### Option 2: Custom Filtered Board View
+- **Pros:** No automation needed
+- **Cons:** Doesn't actually hide items, requires manual filtering
+- **Verdict:** ❌ Doesn't meet requirement
+
+### Option 3: GitHub Actions Workflow (CHOSEN)
+- **Pros:** 
+  - Full control over logic (status + date filtering)
+  - Runs automatically on schedule
+  - Uses GitHub GraphQL API
+  - Can be manually triggered for testing
+  - Configurable threshold
+- **Cons:** 
+  - Requires workflow maintenance
+  - Uses API quota
+- **Verdict:** ✅ **Selected** — Best fit for requirements
+
+## Decision
+
+Implement automated archiving via GitHub Actions workflow that:
+1. Runs daily at 2:00 AM UTC
+2. Queries project board using GraphQL
+3. Identifies items in "Done" status
+4. Checks `updatedAt` timestamp
+5. Archives items older than 3 days
+
+## Implementation Details
+
+**File:** `.github/workflows/squad-archive-done.yml`
+
+**Key Features:**
+- Cron schedule: `0 2 * * *` (daily at 2 AM UTC)
+- Manual trigger: `workflow_dispatch`
+- Configurable threshold: `DAYS_THRESHOLD` environment variable
+- GraphQL mutation: `archiveProjectV2Item`
+- Detailed logging of archived items
+
+**Permissions:**
+- `contents: read`
+- `issues: write`
+- `repository-projects: write`
+
+## Consequences
+
+### Positive
+- ✅ Done items automatically archived after 3 days
+- ✅ Board stays clean and focused
+- ✅ Issues preserved (not deleted)
+- ✅ Archived items can be restored
+- ✅ Configurable threshold
+- ✅ Manual testing capability
+
+### Negative
+- ⚠️ Workflow must be maintained
+- ⚠️ Uses GitHub API quota (minimal impact)
+- ⚠️ Uses `updatedAt` not "moved to Done" timestamp (not easily accessible)
+
+### Neutral
+- 🔄 Pattern can be reused for other status-based automations
+- 🔄 Archived items retain all custom field data
+
+## Alternatives Considered
+
+**Manual archiving:** User could manually archive items via board UI, but this defeats the purpose of automation.
+
+**External service:** Could use external cron service + GitHub API, but GitHub Actions is more integrated and maintainable.
+
+## References
+
+- [GitHub Docs: Auto-archive limitations](https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/archiving-items-automatically)
+- [GitHub Community Discussion: Status-based archive](https://github.com/orgs/community/discussions/36466)
+- [GitHub GraphQL API: archiveProjectV2Item](https://docs.github.com/en/graphql/reference/mutations#archiveprojectv2item)
+
+## Follow-Up Actions
+
+- [ ] Monitor first few runs for issues
+- [ ] Adjust threshold if 3 days is too short/long
+- [ ] Consider adding metrics/reporting of archived items
+- [ ] Document pattern for other status-based automations
+

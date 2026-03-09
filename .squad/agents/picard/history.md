@@ -2157,3 +2157,44 @@ From squad's DK8s research:
 
 ### Cross-Agent Context
 All agents must respect ADR read-only policy. Scheduling pattern reused from parallel issue #200 work.
+
+---
+
+## Issue #203: Auto-Archive Done Items (2026-03-09)
+
+### Problem
+User requested hiding Done items older than 3 days from project board without deleting them.
+
+### Research & Decision
+**Evaluated 3 approaches:**
+1. **GitHub Projects V2 auto-archive** (built-in feature)
+   - ❌ Does NOT support custom status field filters (only is:, reason:, updated:)
+   - Cannot target "Done" status specifically
+   
+2. **Custom filtered view** (board UI)
+   - ❌ Would require manual filtering, doesn't hide items automatically
+   
+3. **GitHub Actions workflow** (automated solution)
+   - ✅ CHOSEN: Full control over logic
+   - Can query by status field + date
+   - Runs on schedule
+   - Uses GraphQL API for archiving
+
+### Implementation
+- Created `.github/workflows/squad-archive-done.yml`
+- Runs daily at 2 AM UTC (cron schedule)
+- GraphQL query for project items with Done status
+- Checks `updatedAt` timestamp against 3-day threshold
+- Archives matching items via `archiveProjectV2Item` mutation
+- Configurable threshold via environment variable
+- Manual trigger available (workflow_dispatch)
+
+### Key Learnings
+- GitHub Projects V2 auto-archive limitations are a known pain point (community discussions)
+- GraphQL API provides flexible alternative for custom archive logic
+- Archived items retain all custom field data and can be restored
+- Using `updatedAt` instead of "moved to Done" timestamp (latter not easily accessible)
+
+### Cross-Team Impact
+Pattern can be reused for other status-based automation needs (e.g., auto-close stale items in specific columns).
+

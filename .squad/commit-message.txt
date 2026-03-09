@@ -1,27 +1,28 @@
-squad(scribe): process B'Elanna orchestration research + manifest tasks
+chore(squad): Ralph round 1 — #198 ADR monitoring, #199 scheduler suggestion, #103 devbox tunnel
 
-Tasks completed:
-1. Orchestration log: 2026-03-09T06-30-00Z-belanna.md
-   - Documents B'Elanna's Squad Federation Protocol research
-   - 6 core components for cross-squad collaboration
-   - 5-phase implementation roadmap (12-17 weeks)
-   - Posted RFC to issue #197 for community feedback
+## Summary
+Three background agents completed infrastructure work:
+- Picard: Issue #198 — Daily ADR monitoring at 07:00 UTC weekdays, live ADR detected
+- B'Elanna: Issue #199 — Scheduler upstream suggestion (bradygaster/squad#296), Issue #103 — DevBox tunnel auth pattern
+- Data: Issue #1 — Upstream repo management cleanup and verification
 
-2. Session log: 2026-03-09T06-30-00Z-ralph-round2.md
-   - Ralph round 2 summary and coordination work
-   - B'Elanna deliverable processing
+## Decisions Merged
+- Daily ADR Channel Monitoring (Issue #198) — read-only constraints established for all agents
+- Upstream Scheduler Suggestion (Issue #199) — filed upstream, local experimentation independent
+- DevBox Tunnel Access Pattern (Issue #103) — anonymous tunnels, time-boxed exposure
+- Daily BasePlatformRP Briefing (Issue #200) — ralph-watch integration at 9 AM weekdays
+- Upstream Repository Management — verification + cleanup patterns documented
 
-3. Decision inbox merge: belanna-cross-squad-orchestration.md
-   - Merged into decisions.md (new decision 2026-03-15)
-   - Deleted from inbox to prevent duplication
-   - Comprehensive Squad Federation Protocol specification
+## Files
+- Orchestration logs: .squad/orchestration-log/2026-03-09T08-21-31Z-*.md
+- Session log: .squad/log/2026-03-09T08-21-31Z-ralph-round1.md
+- Decisions: merged inbox to .squad/decisions.md, deleted inbox files
+- Histories: updated .squad/agents/belanna/history.md, .squad/agents/picard/history.md
 
-4. Git commit: Staging .squad/ changes with this message
-
-Impact:
-- Squad Federation Protocol now part of team decisions
-- Enables multi-squad collaboration through peer-to-peer task delegation
-- Maintains compatibility with existing features (upstreams, subsquads)
-- Ready for community review and phase 1 prototyping
+## Board Status
+- Issue #198: In Progress
+- Issue #199: In Progress
+- Issue #103: Pending User (awaiting Azure AD auth)
+- Issue #200: Implemented (awaiting execution)
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

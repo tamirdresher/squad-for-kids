@@ -1,20 +1,81 @@
-chore: Scribe round 1 — orchestration and decision inbox merge
+## Live Agent Activity Panel for Squad Monitor
 
-- Created orchestration log for Data agent (Issue #1 closed)
-  * Upgraded squad-cli to v0.8.25
-  * Configured upstream connection to bradygaster/squad
-  * Documented available commands
+### Problem
+The monitor currently only shows **historical orchestration log entries** — what agents wrote after completing work. It does NOT show what's happening **right now** during an active Ralph round or agency session.
 
-- Created session log for Ralph round 1
-  * Added 6 missing issues to project board (#183, #185, #193-196)
-  * Coordinated Data agent work
-  * Merged decision inbox items
+### Requirements
 
-- Merged 3 decision inbox files into decisions.md
-  * belanna-office365-mcp: WorkIQ vs MCP Enterprise decision paths
-  * copilot-directive: Microsoft-official MCP requirement
-  * picard-platform-adapter: Architecture philosophy clarification
+#### 1. Raw Live Log View
+- Tail the active agency session log from `~/.agency/logs/session_*/`
+- Auto-detect the most recent session directory
+- Stream new lines as they appear (like `tail -f`)
+- Color-code by severity (errors in red, agent spawns in cyan, tool calls in yellow)
+- Toggle-able with a keypress (e.g., `'l'` for live log)
 
-- Inbox files deleted after merge
+#### 2. Processed Activity View (DEFAULT)
+This is the **primary view** — a structured, human-readable summary of what's happening right now:
 
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+**Active Round Summary Bar:**
+```
+Round 67 | Running 4m 23s | 3 agents spawned | 2 issues touched | 1 PR created
+```
+
+**Agent Activity Table:**
+```
+Agent      | Status      | Current Task                        | Duration
+-----------+-------------+-------------------------------------+---------
+Picard     | ✅ Done     | Triaged #198, #199                  | 45s
+Data       | 🔄 Running  | Implementing #200 (daily briefing)  | 2m 10s
+B'Elanna   | 🔄 Running  | Researching #197 (cross-squad orch) | 1m 30s
+Worf       | ⏳ Queued   | Waiting for Data to finish          | -
+```
+
+**Actions Log (processed):**
+```
+10:31:19  Ralph started round 67
+10:31:25  Spawned Picard (triage 3 new issues)
+10:31:45  Picard assigned #198 → Picard, #199 → B'Elanna
+10:32:01  Spawned Data (implement #200)
+10:32:15  Spawned B'Elanna (research #197)
+10:33:40  Picard completed (45s)
+10:34:02  Data created branch feat/daily-briefing
+10:35:10  Data opened PR #201
+```
+
+#### 3. Detection Logic
+Parse agency session logs for patterns:
+- `Spawning agent` / `agent completed` → agent lifecycle
+- `gh issue` / `gh pr` → GitHub actions
+- `edit` / `create` → file operations  
+- `Running tool` → tool invocations
+- `Error` / `failed` → failures
+- Agent name extraction from prompts/responses
+
+#### 4. UI Integration
+- New panel in the monitor dashboard (alongside Ralph Watch Loop, Issues, PRs)
+- Keypress `'a'` to toggle between Processed View (default) and Raw Log View
+- When no round is active, show: "Idle — next round in Xm Ys" with last round summary
+- Auto-scroll with option to pause (`'p'` key)
+
+#### 5. Data Flow
+```
+agency session log (raw text)
+    ↓ parse
+Structured events (agent spawn, tool call, completion, error)
+    ↓ aggregate
+Live dashboard (agent table + actions log + summary bar)
+```
+
+### Non-Goals
+- Don't modify ralph-watch.ps1 — read-only from the monitor side
+- Don't interfere with the running agency process
+- Don't persist processed data (ephemeral, live-only)
+
+### Acceptance Criteria
+- [ ] Monitor shows real-time agent activity during active rounds
+- [ ] Processed view shows agent table with status, task, duration
+- [ ] Actions log shows timestamped, human-readable event stream
+- [ ] Raw log view available as toggle
+- [ ] Graceful fallback when no session is active
+
+-- Filed by Squad Coordinator

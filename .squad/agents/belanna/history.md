@@ -3424,3 +3424,54 @@ Microsoft Graph API security model mandates authentication for programmatic acce
 
 ### Cross-Agent Context
 ADR monitoring (Picard) established read-only constraints for all agents. Infrastructure patterns reused from scheduler/briefing scheduling decisions.
+
+---
+
+### 2026-03-09: Simplified Squad Issue Template — Issue #204
+
+**Task:** Simplify squad issue template from structured form to blank-like format while preserving auto-labeling.
+
+**User Request:** Tamir wanted template "like the blank issue only with the label set to squad automatically" — too many required fields creating friction.
+
+**Original Template Problems:**
+- Required "Type" dropdown (Feature/Bug/Research/Documentation/Chore)
+- Required "What needs to be done?" textarea
+- Optional Priority dropdown
+- Optional Additional context textarea
+- Too much structure for quick task creation
+
+**Changes Implemented:**
+1. **Removed Required Fields**:
+   - Deleted Type dropdown (eliminated classification friction)
+   - Deleted Priority dropdown (let lead triage)
+   - Deleted Additional context textarea (consolidated)
+   
+2. **Simplified Description**:
+   - Single optional "Description" textarea
+   - Changed label from "What needs to be done?" to "Description"
+   - Updated placeholder: "Add details here if needed..."
+   - Made NOT required (title alone can suffice)
+
+3. **Created config.yml**:
+   - Enabled `blank_issues_enabled: true`
+   - Users now choose: Squad Task template OR standard blank issue
+   - Both options visible in issue creation UI
+
+**Result:**
+- Template now minimal like blank issue
+- Auto-assigns `squad` label (preserved)
+- Single optional field reduces friction
+- Users can create squad issues with title only
+
+**Technical Details:**
+- Branch: `squad/204-simplify-issue-template`
+- PR: #205
+- Files: `.github/ISSUE_TEMPLATE/squad-task.yml` (simplified), `.github/ISSUE_TEMPLATE/config.yml` (new)
+- Commit: 8c5301a
+
+**Project Board:**
+- Issue #204 set to "In Progress" (238ff87a)
+
+**Architectural Insight:**
+Template friction matters — required fields force users to think before capturing tasks. For squad triage workflow, task capture speed > upfront classification. Lead can add structure during triage.
+

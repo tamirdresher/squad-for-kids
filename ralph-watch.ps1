@@ -48,7 +48,22 @@ $maxLogBytes = 1048576  # 1MB
 $maxLogBytes = 1MB
 $maxLogEntries = 500
 
-$prompt = 'Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round. CRITICAL: Read .squad/skills/github-project-board/SKILL.md BEFORE starting — you MUST update the GitHub Project board status for every issue you touch (use gh project item-add and gh project item-edit commands from the skill). BOARD WORKFLOW: BEFORE spawning an agent for an issue, FIRST move that issue to "In Progress" (option 238ff87a) on the board. When the agent completes and PR is merged, move to "Done" (4830e3e3). When blocked, move to "Blocked" (c6316ca6). The board must reflect what is CURRENTLY being worked on in real-time. IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.'
+$prompt = @'
+Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round.
+
+CRITICAL: Read .squad/skills/github-project-board/SKILL.md BEFORE starting — you MUST update the GitHub Project board status for every issue you touch (use gh project item-add and gh project item-edit commands from the skill). BOARD WORKFLOW: BEFORE spawning an agent for an issue, FIRST move that issue to "In Progress" (option 238ff87a) on the board. When the agent completes and PR is merged, move to "Done" (4830e3e3). When blocked, move to "Blocked" (c6316ca6). The board must reflect what is CURRENTLY being worked on in real-time.
+
+TEAMS & EMAIL MONITORING (do this EVERY round):
+1. Use the workiq-ask_work_iq tool to check: "What Teams messages in the last 30 minutes mention Tamir, squad, DK8S, reviews, action items, or urgent requests?"
+2. Use workiq-ask_work_iq to check: "Any emails sent to Tamir in the last hour that need a response or contain action items?"
+3. For each actionable item found: decide if Tamir needs to act. If yes — create a GitHub issue with label "teams-bridge" and a short summary, OR comment on an existing related issue. If it is just informational — skip it silently.
+4. Do NOT create duplicate issues for things already tracked. Check existing open issues first.
+5. Do NOT spam — only surface items that genuinely need Tamir's attention.
+
+DONE ITEMS ARCHIVING: Check the project board for items in "Done" status that have been done for more than 3 days. Close the GitHub issue if still open and add a comment summarizing what was accomplished.
+
+IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
+'@
 
 # Initialize observability paths
 $squadDir = Join-Path $env:USERPROFILE ".squad"

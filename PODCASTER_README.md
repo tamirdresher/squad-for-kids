@@ -102,10 +102,78 @@ pip install edge-tts
 6. **Integration** - API endpoint for on-demand conversion
 7. **Caching** - Store generated audio to avoid regeneration
 
+## Storage - Audio Files in Cloud (Issue #236)
+
+**Important:** Generated MP3/WAV audio files should NOT be committed to the Git repository. They are stored in OneDrive or Azure Blob Storage instead.
+
+### Why Cloud Storage?
+
+Audio files are large (2-56 MB per file) and bloat the repository:
+- Git history grows rapidly with binary files
+- Clone/pull times increase significantly
+- Repository size becomes unmanageable
+- Audio files change frequently during iteration
+
+### Uploading Audio Files
+
+Use the provided upload scripts to store audio in the cloud:
+
+**PowerShell (Windows):**
+```powershell
+.\scripts\upload-podcast.ps1 -FilePath "RESEARCH_REPORT-audio.mp3"
+```
+
+**Python (Cross-platform):**
+```bash
+python scripts/upload-podcast.py RESEARCH_REPORT-audio.mp3
+```
+
+### Upload Methods
+
+Three upload methods are supported (in order of simplicity):
+
+1. **OneDrive Sync Folder** (Default, Simplest)
+   - Copies file to `~/OneDrive/Squad/Podcasts/`
+   - Works immediately if OneDrive is installed and syncing
+   - Get shareable link: Right-click file in OneDrive → Share
+   - No authentication setup required
+
+2. **Microsoft Graph API** (Proper API Integration)
+   - Direct upload via Graph API with automatic sharing link
+   - Requires Azure AD app registration
+   - Set environment variables: `GRAPH_CLIENT_ID`, `GRAPH_CLIENT_SECRET`, `GRAPH_TENANT_ID`
+   - Usage: `.\upload-podcast.ps1 -FilePath "audio.mp3" -Method GraphAPI`
+
+3. **Azure Blob Storage** (Azure-Native)
+   - Upload to Azure Storage account
+   - Requires Azure CLI installed and logged in (`az login`)
+   - Generates SAS URL valid for 90 days
+   - Usage: `.\upload-podcast.ps1 -FilePath "audio.mp3" -Method AzureBlob -StorageAccount "mystorage"`
+
+### .gitignore Configuration
+
+Audio files are automatically ignored by Git:
+```
+# Generated audio files — stored in OneDrive/cloud, not Git
+*-audio.mp3
+*-audio.wav
+*.mp3
+*.wav
+```
+
+### Workflow
+
+1. Generate podcast: `python scripts/podcaster-prototype.py DOCUMENT.md`
+2. Upload to cloud: `.\scripts\upload-podcast.ps1 -FilePath "DOCUMENT-audio.mp3"`
+3. Share link with stakeholders (OneDrive link or Azure Blob SAS URL)
+4. File remains local for playback but is NOT committed to Git
+
 ## Files
 
 - `scripts/podcaster-prototype.py` - Main prototype script
 - `scripts/podcaster-prototype.js` - Initial Node.js attempt (has TypeScript compatibility issues with edge-tts npm package)
+- `scripts/upload-podcast.ps1` - PowerShell script to upload audio to cloud storage
+- `scripts/upload-podcast.py` - Python script to upload audio to cloud storage (cross-platform)
 - `test-podcaster.md` - Small test document
 - `PODCASTER_README.md` - This file
 

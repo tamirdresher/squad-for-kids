@@ -4535,3 +4535,58 @@ Evaluated office automation options and found we're in **stronger position than 
 **Result:** Podcaster agent successfully integrated into squad. Ready for stakeholder audio quality review.
 
 ---
+
+### 2025-01-21: B'Elanna — Cloud Audio Storage for Podcaster — Issue #236 (COMPLETED)
+
+**Assignment:** Move podcast audio files (MP3/WAV) out of Git repository to cloud storage (OneDrive/Azure Blob) to prevent repository bloat.
+
+**Problem Context:**
+- Audio files are 2-56 MB per file
+- Git history grows rapidly with binary files
+- Clone/pull times increase significantly
+- Repository size becomes unmanageable
+- Audio files change frequently during iteration
+
+**Implementation Delivered:**
+
+1. **Git Configuration:**
+   - Added `.gitignore` patterns to exclude `*.mp3`, `*.wav`, `*-audio.mp3`, `*-audio.wav`
+   - Removed existing audio files from Git tracking (kept on disk)
+   - Files no longer committed to repository
+
+2. **Upload Scripts Created:**
+   - `scripts/upload-podcast.ps1` — PowerShell upload script (Windows-native)
+   - `scripts/upload-podcast.py` — Python upload script (cross-platform)
+   - Both scripts support 3 upload methods with fallback
+
+3. **Upload Methods (Priority Order):**
+   - **OneDrive Sync Folder** (Default) — Copies to `~/OneDrive/Squad/Podcasts/`, no auth required, simplest path
+   - **Microsoft Graph API** — Direct upload with automatic sharing link, requires Azure AD app registration
+   - **Azure Blob Storage** — Azure-native with SAS URLs, requires Azure CLI
+
+4. **Documentation:**
+   - Updated `PODCASTER_README.md` with cloud storage workflow
+   - Clear instructions for each upload method
+   - Troubleshooting guidance included
+
+**Technical Decisions:**
+- **Prioritized simplicity:** OneDrive Sync as default (works immediately, no setup)
+- **Included proper solutions:** Graph API and Azure Blob for production-grade workflows
+- **Cross-platform support:** Both PowerShell and Python implementations
+- **Graceful degradation:** Each script suggests fallback methods on failure
+
+**Files Delivered:**
+- `.gitignore` — Audio file exclusion patterns
+- `scripts/upload-podcast.ps1` — PowerShell upload script (357 lines)
+- `scripts/upload-podcast.py` — Python upload script (413 lines)
+- `PODCASTER_README.md` — Updated with storage workflow
+
+**Branch/PR:**
+- Branch: `squad/236-cloud-audio-storage`
+- Commit: `f3974ca` - "feat: Store podcast audio in OneDrive/cloud, not Git repo (#236)"
+- PR: To be created manually (GitHub CLI auth issue)
+  - URL: https://github.com/tamirdresher_microsoft/tamresearch1/pull/new/squad/236-cloud-audio-storage
+  - Title: "feat: Store podcast audio in OneDrive/cloud, not Git repo"
+  - References: #236
+
+**Impact:** Repository will no longer bloat with audio files. Users can generate podcasts locally, upload to cloud, and share links. Existing podcaster functionality preserved. Immediate usability with OneDrive Sync, enterprise-grade options available for production.

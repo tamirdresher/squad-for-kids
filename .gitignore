@@ -24,3 +24,9 @@ node_modules/
 # .NET build artifacts
 bin/
 obj/
+
+# Generated audio files — stored in OneDrive/cloud, not Git
+*-audio.mp3
+*-audio.wav
+*.mp3
+*.wav

@@ -341,6 +341,30 @@ while ($true) {
         }
     }
     
+    # Daily ADR Channel Check at 10:00 AM Israel time (~07:00 UTC on weekdays)
+    # Issue #198 — Read-only monitoring of IDP ADR Notifications channel
+    $adrCheckHourUTC = 7  # 07:00 UTC ≈ 10:00 AM Israel
+    $adrCheckTime = ($currentHour -eq $adrCheckHourUTC -and $currentMinute -lt $intervalMinutes)
+    
+    if ($adrCheckTime -and $isWeekday) {
+        Write-Host "[$timestamp] Running daily ADR channel check (Issue #198)..." -ForegroundColor Cyan
+        $adrCheckScript = Join-Path (Get-Location) ".squad\scripts\daily-adr-check.ps1"
+        if (Test-Path $adrCheckScript) {
+            try {
+                & $adrCheckScript -SkipWeekends
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "[$timestamp] ADR channel check completed" -ForegroundColor Green
+                } else {
+                    Write-Host "[$timestamp] Warning: ADR check exited with code $LASTEXITCODE" -ForegroundColor Yellow
+                }
+            } catch {
+                Write-Host "[$timestamp] Warning: ADR check error: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "[$timestamp] Warning: ADR check script not found at $adrCheckScript" -ForegroundColor Yellow
+        }
+    }
+    
     # Step 1: Update the repo to ensure we have the latest code
     Write-Host "[$timestamp] Pulling latest changes..." -ForegroundColor Yellow
     try {

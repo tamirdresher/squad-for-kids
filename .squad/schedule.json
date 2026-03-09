@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "schedules": [
+    {
+      "id": "ralph-heartbeat",
+      "name": "Ralph Heartbeat",
+      "description": "Run Squad triage every 5 minutes",
+      "enabled": true,
+      "trigger": {
+        "type": "interval",
+        "intervalSeconds": 300
+      },
+      "task": {
+        "type": "workflow",
+        "ref": ".github/workflows/squad-heartbeat.yml",
+        "event": "workflow_dispatch"
+      },
+      "providers": ["local-polling", "github-actions"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 30
+      },
+      "timeout": 600,
+      "notifyOnFailure": ["teams"],
+      "tags": ["triage", "ralph"]
+    },
+    {
+      "id": "daily-digest",
+      "name": "Daily Digest",
+      "description": "Send team digest of yesterday's activity",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 8 * * *",
+        "timezone": "UTC"
+      },
+      "task": {
+        "type": "workflow",
+        "ref": ".github/workflows/squad-daily-digest.yml",
+        "event": "workflow_dispatch"
+      },
+      "providers": ["github-actions", "local-fallback"],
+      "retry": {
+        "maxAttempts": 3,
+        "backoffSeconds": 60
+      },
+      "timeout": 1800,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "digest"]
+    },
+    {
+      "id": "daily-rp-briefing",
+      "name": "Daily BasePlatformRP Briefing",
+      "description": "Generate and send comprehensive RP status report at 9 AM (local)",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 7 * * 1-5",
+        "timezone": "Asia/Jerusalem"
+      },
+      "task": {
+        "type": "script",
+        "command": ".squad/scripts/daily-rp-briefing.ps1 -SkipWeekends",
+        "shell": "powershell"
+      },
+      "providers": ["local-polling"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 60
+      },
+      "timeout": 600,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "briefing", "rp"]
+    },
+    {
+      "id": "daily-adr-check",
+      "name": "Daily ADR Channel Monitor",
+      "description": "Monitor IDP ADR Notifications Teams channel for new/updated ADRs. Read-only — NEVER post to the channel. Report actionable items to Tamir via Teams webhook.",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 7 * * 1-5",
+        "timezone": "UTC"
+      },
+      "task": {
+        "type": "copilot",
+        "instruction": "Run the daily ADR channel check: Query IDP ADR Notifications channel via WorkIQ for new/updated ADRs in the last 24h. Identify items needing Tamir's attention (pending reviews, decisions, blockers). Send summary to Teams webhook. NEVER comment on the ADR channel or any ADR.",
+        "scriptRef": ".squad/scripts/daily-adr-check.ps1"
+      },
+      "providers": ["local-polling", "copilot-agent"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 120
+      },
+      "timeout": 900,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "adr", "idp"],
+      "metadata": {
+        "issue": "#198",
+        "owner": "picard",
+        "channelUrl": "https://teams.microsoft.com/l/channel/19%3A6d7865cdcaab4446a800c51dfc76cbb0%40thread.tacv2/IDP%20ADR%20Notifications?groupId=25cc215a-8287-4155-a51d-833837db2864&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47",
+        "readOnly": true,
+        "neverComment": true
+      }
+    },
+    {
+      "id": "weekly-upstream-sync",
+      "name": "Weekly Upstream Sync",
+      "description": "Sync upstream repos every Monday at 2 AM UTC",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 2 * * 1",
+        "timezone": "UTC"
+      },
+      "task": {
+        "type": "copilot",
+        "instruction": "Sync all upstream repos: check for new issues, PRs, discussions"
+      },
+      "providers": ["copilot-agent"],
+      "retry": {
+        "maxAttempts": 1,
+        "backoffSeconds": 0
+      },
+      "timeout": 3600,
+      "notifyOnFailure": ["teams", "issue-comment"],
+      "tags": ["sync", "upstream"]
+    }
+  ],
+  "defaults": {
+    "retryMaxAttempts": 2,
+    "retryBackoffSeconds": 60,
+    "timeout": 1800,
+    "notifyOnFailure": ["teams"]
+  },
+  "notificationChannels": {
+    "teams": {
+      "webhookUrl": "${TEAMS_WEBHOOK_URL}",
+      "format": "adaptive-card"
+    },
+    "issue-comment": {
+      "repo": "tamirdresher_microsoft/tamresearch1",
+      "labels": ["squad:ralph", "automation"]
+    }
+  }
+}

@@ -18,6 +18,23 @@
 
 ## Learnings
 
+### 2026-03-09: Daily ADR Channel Monitoring — Issue #198
+
+**Assignment:** Set up automated daily monitoring of the IDP ADR Notifications Teams channel. Read-only — never comment on the channel or ADRs.
+
+**What was implemented:**
+1. **`.squad/schedule.json`** — Created the Squad scheduler manifest with `daily-adr-check` entry (07:00 UTC / 10:00 AM Israel, weekdays)
+2. **`.squad/scripts/workiq-queries/idp-adr-notifications.md`** — WorkIQ query template with 3 targeted queries (new ADRs, pending reviews, blockers)
+3. **`.squad/scripts/daily-adr-check.ps1`** — Full monitoring script with Teams Adaptive Card output and state tracking
+4. **`ralph-watch.ps1` integration** — Added time-based trigger at 07:00 UTC in the polling loop, following the same pattern as the daily RP briefing
+5. **`.squad/monitoring/adr-check-state.json`** — State tracking to avoid duplicate notifications
+
+**First run findings:** 1 new ADR in review — "Regional AMW vs Tenant-Level AMW" (PR 14971229 in MTP.Infra.ManagedPrometheus, by Krishna Chaitanya). Summary sent to Tamir via Teams webhook.
+
+**Key constraint:** Squad must NEVER post to the ADR channel or comment on ADRs. This is enforced at the query template level, script level, and schedule metadata level.
+
+**Integration pattern:** Uses the same WorkIQ → Teams webhook pipeline as the daily RP briefing. The channel-scan.md digest pipeline could absorb this channel in the future.
+
 ### 2026-03-09: Kubernetes Platform Adoption Spec Review — Issue #195 (Cross-Agent Assessment)
 
 **Assignment:** Lead architect providing strategic and framework assessment of functional specification for "Standardized Microservices Platform on Kubernetes" (Issue #195).

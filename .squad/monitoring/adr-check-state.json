@@ -1,0 +1,18 @@
+{
+  "scanTo": "2026-03-09 10:17",
+  "firstRun": true,
+  "hasActionableItems": true,
+  "scanFrom": "2026-03-08 10:17",
+  "queriesRun": 3,
+  "lastCheck": "2026-03-09T10:17:42",
+  "findings": {
+    "newADRs": [
+      "ADR: Regional AMW vs Tenant-Level AMW (PR 14971229 in MTP.Infra.ManagedPrometheus, by Krishna Chaitanya)"
+    ],
+    "decisions": [],
+    "blockers": [],
+    "reviewRequests": [
+      "Reviewer list updated for PR 14971229"
+    ]
+  }
+}

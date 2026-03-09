@@ -10989,3 +10989,570 @@ These actions align precisely with Tier 1/2 mitigation objectives (prevention + 
 2. Archive Issue #46 in decision log for future reference if pattern repeats
 3. Review squad project for similar overlap patterns (optimize future intake)
 
+
+
+---
+
+# Decision: Functional Spec Review Framework for K8s Platform Adoption
+
+**Date:** 2026-03-09  
+**Decision Maker:** Picard (Lead/Architect)  
+**Context:** Issue #195 — Review of Standardized Microservices Platform on Kubernetes functional specification  
+**Status:** APPROVED (Conditional approval framework applied)
+
+---
+
+## Decision
+
+Established a **Conditional Approval Framework** for platform functional specification reviews. Instead of binary approve/reject decisions, provide structured assessment with:
+
+1. **Verdict with Conditions** (e.g., "CONDITIONAL APPROVAL — requires 8 sections before adoption")
+2. **Prioritized Gap List** (CRITICAL/HIGH/MEDIUM/LOW with effort estimates)
+3. **Clear Acceptance Criteria** (what must be added/changed for full approval)
+4. **Risk-Benefit Analysis** (what's good, what's missing, what's at risk)
+5. **Actionable Next Steps** (with timelines and effort estimates)
+
+This enables stakeholders to make informed go/no-go decisions while acknowledging partial completeness.
+
+---
+
+## Rationale
+
+**Problem:** Binary approval creates false dichotomy:
+- **Approve:** Signals spec is complete (sets unrealistic expectations)
+- **Reject:** Discourages good work that needs expansion (demotivates teams)
+
+**Solution:** Conditional approval acknowledges:
+- Strategic approach is sound (approve the direction)
+- Implementation detail is incomplete (require expansion)
+- Risk tolerance varies by stakeholder (prioritize gaps so stakeholders can decide)
+
+**Issue #195 Example:**
+- **Strategic approach:** ✅ Sound (standardization benefits are real, DK8s is proven)
+- **Implementation detail:** ⚠️ 40% complete (8 critical sections missing)
+- **Risk:** 🔴 Cannot adopt without security architecture and operational model
+- **Verdict:** CONDITIONAL APPROVAL — expand spec with 8 sections (8-12 weeks) before adoption
+
+---
+
+## Application to Issue #195
+
+### What Was Approved
+1. ✅ **Strategic Direction:** Kubernetes-based platform standardization
+2. ✅ **Platform Choice:** DK8s (validated through squad's production research)
+3. ✅ **Architecture Patterns:** Stamp-based regional isolation, multi-tenancy
+4. ✅ **Pilot Validation:** UPA/Correlation migrations demonstrate feasibility
+
+### What Was Conditionally Approved (Requires Expansion)
+
+**🔴 CRITICAL (Must Add Before Adoption):**
+1. Security & Compliance Architecture (2-3 weeks)
+2. Operational Model & Ownership (1-2 weeks)
+
+**🟡 HIGH (Should Add Before Broad Rollout):**
+3. Migration Strategy & Rollout Plan (1-2 weeks)
+4. Cost Model & Economics (1 week)
+5. Risk Register (2-3 days)
+
+**🟡 MEDIUM (Can Iterate Post-Initial Adoption):**
+6. Disaster Recovery & Resilience Testing (1 week)
+7. Developer Experience & Workflows (1 week)
+8. Platform Governance & Change Management (1 week)
+
+**Total Effort:** 8-12 weeks (parallelizable)
+
+### What Was Clarified (Architecture Details)
+- Cross-region traffic management (failover logic, capacity planning)
+- Service mesh strategy (Istio usage, mutual TLS, S2S auth)
+- Data persistence architecture (regional data strategies)
+- Known DK8s limitations (security gaps, STG-EUS2-28 stability)
+
+---
+
+## Framework Components
+
+### 1. Verdict Categories
+- **APPROVED:** Complete and ready for execution
+- **CONDITIONAL APPROVAL:** Sound direction but requires expansion (THIS CASE)
+- **NEEDS MAJOR REVISION:** Core approach requires rethinking
+- **REJECTED:** Fundamentally flawed or misaligned
+
+### 2. Gap Prioritization
+- **🔴 CRITICAL:** Cannot proceed without these (adoption blockers)
+- **🟡 HIGH:** Should address before broad rollout (risk reduction)
+- **🟡 MEDIUM:** Can iterate post-adoption (continuous improvement)
+- **🟢 LOW:** Nice-to-have for completeness (not blocking)
+
+### 3. Effort Estimation
+- Provide time estimates for each gap (enables resource planning)
+- Note parallelization opportunities (8-12 weeks total ≠ 8-12 weeks per section)
+- Suggest owners for each section (Security team, FinOps, Platform team, etc.)
+
+### 4. Acceptance Criteria
+- Explicit list of what must be added for full approval
+- Measurable (e.g., "8 sections must be added" not "improve the spec")
+- Prioritized (stakeholders can decide to proceed without LOW priority items)
+
+### 5. Risk-Benefit Analysis
+- **What's Good:** Acknowledge strengths (strategic approach, platform choice, architecture patterns)
+- **What's Missing:** Enumerate gaps without judgment (just facts)
+- **What's at Risk:** Connect gaps to real consequences (e.g., "cannot adopt without security architecture")
+
+---
+
+## Benefits of This Framework
+
+### 1. Enables Informed Decisions
+- Stakeholders can assess: "Is 8-12 weeks of additional spec work acceptable for this timeline?"
+- Alternative: "Can we proceed with CRITICAL sections only and iterate on MEDIUM items post-adoption?"
+- No false dichotomy of approve/reject
+
+### 2. Reduces Review Friction
+- Reviewers don't feel pressured to approve incomplete work
+- Authors don't feel demotivated by binary rejection
+- Conditional approval acknowledges good work while requiring expansion
+
+### 3. Provides Clear Roadmap
+- Prioritized gap list becomes spec expansion backlog
+- Effort estimates enable resource planning
+- Acceptance criteria = definition of done
+
+### 4. Builds Trust Through Transparency
+- Honest assessment of gaps (not overselling capabilities)
+- Risk transparency (e.g., DK8s known limitations surfaced from squad research)
+- Realistic expectations for early adopters
+
+### 5. Accelerates Good Decisions
+- Stakeholders have data to decide: Go? No-go? Go with conditions?
+- No need for multiple review rounds (all gaps surfaced upfront)
+- Clear next steps reduce decision paralysis
+
+---
+
+## When to Apply This Framework
+
+**Use Conditional Approval For:**
+- ✅ Platform/architecture functional specifications (like Issue #195)
+- ✅ Complex multi-team initiatives requiring cross-functional input
+- ✅ Early-stage proposals that need expansion before execution
+- ✅ Cases where strategic direction is sound but implementation detail is incomplete
+
+**Don't Use For:**
+- ❌ Code reviews (use standard approve/request changes)
+- ❌ Fully-formed specs that are either complete or fundamentally flawed
+- ❌ Time-sensitive decisions requiring immediate yes/no (conditional approval requires expansion time)
+
+---
+
+## Template for Future Reviews
+
+```markdown
+## Executive Summary
+
+**RECOMMENDATION: [APPROVED | CONDITIONAL APPROVAL | NEEDS MAJOR REVISION | REJECTED]**
+
+[2-3 sentence summary of findings]
+
+**Key Findings:**
+- ✅ **What's Good:** [List strengths]
+- ⚠️ **What's Missing:** [List gaps with priority]
+- ❌ **What's at Risk:** [List blockers]
+
+---
+
+## [Detailed Assessment Sections]
+
+[Architecture, Security, Operations, etc.]
+
+---
+
+## Recommendations Summary
+
+### MUST ADD (Before Adoption)
+
+| Section | Priority | Estimated Effort | Owner |
+|---------|----------|------------------|-------|
+| [Section 1] | 🔴 CRITICAL | [Time] | [Team] |
+| [Section 2] | 🟡 HIGH | [Time] | [Team] |
+
+**Total Estimated Effort:** [X-Y weeks]
+
+### SHOULD CLARIFY (Architecture Details)
+
+1. [Detail 1]
+2. [Detail 2]
+
+---
+
+## Final Verdict
+
+**Before Adoption:**
+1. [Action 1]
+2. [Action 2]
+
+**After Adoption:**
+1. [Action 1]
+2. [Action 2]
+```
+
+---
+
+## Related Decisions
+
+- **Issue #127 (FedRAMP Dashboard Migration):** Applied similar structured approach with phased migration plan, ownership matrix, and timeline estimation
+- **Issue #46 (STG-EUS2-28 Analysis):** Used evidence-based assessment to recommend closure vs. continuation
+- **PR #101/#102 Reviews:** Applied "approve with explicit merge conditions" pattern (precursor to conditional approval)
+
+---
+
+## Success Metrics
+
+This framework is successful if:
+1. ✅ Stakeholders can make informed go/no-go decisions (not blocked by binary approve/reject)
+2. ✅ Spec authors have clear roadmap for expansion (prioritized gaps + effort estimates)
+3. ✅ Review feedback is actionable (not vague "needs improvement")
+4. ✅ Risk transparency builds trust (honest assessment vs. overselling)
+5. ✅ Review velocity improves (fewer back-and-forth rounds)
+
+---
+
+## Owner & Maintenance
+
+**Owner:** Picard (Lead/Architect)  
+**Applies To:** Platform/architecture functional specification reviews  
+**Review Cadence:** After each major spec review, validate framework effectiveness  
+**Next Review:** After 3-5 spec reviews using this framework (assess if adjustments needed)
+
+
+---
+
+# Decision: K8s Functional Specs Require Operational Depth
+
+**Date:** 2026-03-09  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** 🔄 Proposed (Team Review)  
+**Scope:** Platform Adoption & Technical Specifications  
+**Context:** Issue #195 DK8s functional spec review
+
+---
+
+## Decision Statement
+
+When evaluating or creating functional specifications for Kubernetes platform adoption, **operational depth is mandatory**—not optional. Strategic vision without cluster lifecycle, Day 2 operations, and incident response details creates false confidence and underestimates implementation complexity.
+
+---
+
+## Context
+
+Reviewed functional spec for "Standardized Microservices Platform on Kubernetes" (Issue #195) proposing DK8s as standard platform. Spec provided strong strategic rationale (multi-zone/region, stamp-based, accelerate development) but lacked critical operational detail:
+- No cluster provisioning strategy or lifecycle management
+- No node pool definitions (system vs. user)
+- No network architecture (CNI, DNS, service mesh)
+- No Day 2 operations (upgrades, incident response, monitoring)
+- Missing critical tooling (ArgoCD, EV2, OPA/Gatekeeper)
+
+**Real-world impact:** DK8s has **5 documented Sev2 incidents** (Nov 2025–Feb 2026) driven by networking issues. Spec had **zero network resilience detail** despite networking being #1 outage driver.
+
+---
+
+## Decision
+
+Platform adoption functional specs **must include** these sections before team commitment:
+
+### Mandatory Sections:
+
+1. **Cluster Lifecycle Management**
+   - Provisioning strategy and timing expectations
+   - Approval/request workflow
+   - Upgrade strategy (in-place vs. blue-green)
+   - Rollback procedures
+   - Configuration versioning (e.g., ConfigGen, Helm)
+
+2. **Node Pool Architecture**
+   - System vs. User pool separation
+   - Minimum node sizes and rationale
+   - Autoscaling boundaries (HPA, cluster-autoscaler, VPA limits)
+   - Quota management strategy
+
+3. **Network Architecture & Resilience**
+   - CNI plugin choice and rationale
+   - DNS architecture (CoreDNS sizing, caching)
+   - Service mesh requirements (if any) with stability assessment
+   - NAT Gateway / egress strategy
+   - Known networking failure modes and mitigations
+
+4. **Deployment & GitOps Tooling**
+   - CI/CD pipeline integration (ADO, GitHub Actions, EV2)
+   - GitOps tools (ArgoCD, Flux) with app-of-apps patterns
+   - Progressive rollout strategy (canary, blue-green)
+   - Health gates and auto-rollback triggers
+
+5. **Day 2 Operations**
+   - Incident response procedures
+   - Monitoring and alerting strategy
+   - Capacity planning and scaling
+   - Configuration drift prevention
+   - Operational runbooks
+
+6. **Security Posture**
+   - Defense-in-depth layers (WAF, NetworkPolicy, admission control, CI/CD validation)
+   - Compliance requirements (FedRAMP, SOC2, etc.)
+   - Secret management strategy
+   - RBAC and identity integration
+
+### Assessment Criteria:
+
+Functional specs should address:
+- ✅ **What** (strategic goals, business value)
+- ✅ **How** (architecture patterns, tooling choices)
+- ✅ **When** (realistic timeline with hidden complexity accounting)
+- ✅ **Who** (ownership model for platform operations)
+- ✅ **Fallback** (contingency plan if primary approach fails)
+
+---
+
+## Rationale
+
+1. **Strategic vision alone underestimates complexity:**
+   - Issue #195 proposed 6-month adoption but didn't account for:
+     - DK8s stabilization time (4-6 weeks for Tier 1 mitigations)
+     - ConfigGen versioning issues (no protocol yet)
+     - Operational guardrails missing (manual operations bypass policy)
+     - 4-week sovereign cloud feedback latency
+   - **Result:** Timeline optimistic without operational context
+
+2. **Networking failures are #1 outage driver:**
+   - 5 Sev2 incidents in DK8s (NAT Gateway, DNS cascades, Istio ztunnel)
+   - Spec had zero network architecture detail
+   - **Result:** High-risk adoption without resilience planning
+
+3. **Day 2 operations often exceed Day 1 effort:**
+   - Cluster upgrades, incident response, capacity planning, drift detection
+   - Spec focused on "accelerate development" but no upgrade strategy
+   - **Result:** Operational burden shifted to service teams unprepared for K8s complexity
+
+4. **Hidden tooling dependencies surface late:**
+   - DK8s requires EV2 for cluster provisioning (not mentioned)
+   - ArgoCD critical for GitOps (not mentioned)
+   - OPA/Gatekeeper mandatory for FedRAMP (not mentioned)
+   - **Result:** Tooling gaps discovered during implementation, delaying timeline
+
+---
+
+## Consequences
+
+### ✅ Benefits:
+- De-risks platform adoption with realistic complexity assessment
+- Enables informed timeline and resource planning
+- Surfaces operational concerns before team commitment
+- Creates accountability for Day 2 operations ownership
+- Provides audit trail for architectural decisions
+
+### ⚠️ Costs:
+- Requires deeper upfront analysis (2-3 weeks architecture deep-dive)
+- May extend approval timelines (trade-off: avoids false starts)
+- Demands infrastructure expertise during spec creation
+- Can reveal platform maturity issues blocking adoption
+
+### 🔄 Mitigations:
+- Use phased approach: Strategic vision → Architecture deep-dive → Operational plan
+- Engage platform team early (DK8s, AKS, networking SMEs)
+- Document known gaps with mitigation plans vs. blocking on perfection
+- Define success metrics beyond "onboard N services" (MTTR, deployment velocity, incident reduction)
+
+---
+
+## Alternatives Considered
+
+1. **"Pitch Deck" Approach (Current Issue #195 State):**
+   - ❌ Provides strategic vision without operational depth
+   - ❌ Underestimates implementation complexity
+   - ❌ Creates false confidence in timelines
+   - ✅ Faster to produce (2-3 days vs. 2-3 weeks)
+
+2. **"Full Design Doc" Approach:**
+   - ✅ Comprehensive operational detail
+   - ✅ De-risks implementation
+   - ❌ May over-specify before learning from pilots
+   - ❌ High upfront cost (4-6 weeks)
+
+3. **"Phased Specification" Approach (RECOMMENDED):**
+   - Phase 1: Strategic vision (pitch deck) — 2-3 days
+   - Phase 2: Architecture deep-dive with platform team — 2 weeks
+   - Phase 3: Operational plan with runbooks — 2-3 weeks
+   - ✅ Balances speed with depth
+   - ✅ Allows learning from pilot phase
+   - ✅ Surfaces blockers early without over-specifying
+
+---
+
+## Applies To:
+- Platform adoption decisions (Kubernetes, serverless, PaaS)
+- Multi-team infrastructure standards
+- Production service migrations to new runtime
+- Strategic technology evaluations with organizational impact
+
+## Does NOT Apply To:
+- Proof-of-concept evaluations (intentionally lightweight)
+- Single-team greenfield projects with low blast radius
+- Iterative feature development within existing platform
+- Vendor comparisons (operational depth comes after selection)
+
+---
+
+## Validation Checklist
+
+Before approving a platform adoption functional spec, verify:
+
+- [ ] **Cluster Lifecycle:** Provisioning, upgrades, rollback defined
+- [ ] **Node Pools:** System/user separation, autoscaling boundaries
+- [ ] **Networking:** CNI, DNS, service mesh, failure modes addressed
+- [ ] **Deployment Tooling:** CI/CD, GitOps, progressive rollout specified
+- [ ] **Day 2 Operations:** Incident response, monitoring, drift prevention
+- [ ] **Security Posture:** Defense-in-depth layers, compliance requirements
+- [ ] **Timeline Realism:** Hidden complexities accounted for
+- [ ] **Ownership Model:** Platform operations accountability defined
+- [ ] **Fallback Plan:** Contingency if primary approach fails
+- [ ] **Success Metrics:** Beyond "onboard N services" — MTTR, velocity, reliability
+
+---
+
+## Related Decisions:
+- **Gap Analysis When Blocked (Decision 1):** Applies when primary data unavailable
+- **Explanatory Comments for pending-user (Decision 1.1):** Communication principle
+
+## Related Work:
+- Issue #195: DK8s functional spec review (triggered this decision)
+- Issue #71: DK8S Stability Runbook (operational reference example)
+- Issue #25: Tier 2 Stability Improvements (network resilience mitigations)
+
+---
+
+## Recommendation for Issue #195:
+
+**Action:** Request **2-week architecture deep-dive** with DK8s platform team before broader socialization. Deliverable: Updated spec addressing 4 critical gaps + 6 operational sections.
+
+**Rationale:** Current spec is strategically sound but operationally incomplete. 6-month timeline achievable IF DK8s stabilization completes + dedicated 2-3 engineer team, but requires depth in cluster lifecycle, networking, Day 2 operations.
+
+**Success Criteria:**
+- Cluster provisioning strategy defined with realistic timing
+- Network resilience plan addressing #1 outage driver category
+- Day 2 operations ownership model established
+- Progressive rollout strategy with health gates specified
+- Fallback plan if DK8s stability issues persist beyond Month 2
+
+
+
+---
+
+# Decision: DK8s Platform Adoption Security Requirements
+
+**Date:** 2026-03-09  
+**Author:** Worf (Security & Cloud)  
+**Status:** 🔴 BLOCKING  
+**Impact:** Critical  
+**Related:** Issue #195, functional_spec_k8s_195.md
+
+---
+
+## Context
+
+The Tartrus team has proposed adopting DK8s as the standard Kubernetes-based microservices platform based on successful pilots with UPA and Correlation services. A functional specification (functional_spec_k8s_195.md) was submitted for review.
+
+## Security Assessment
+
+After comprehensive security review, the functional specification has **10 critical/high security gaps** that represent fundamental missing requirements, not minor oversights.
+
+**Security Risk Rating: HIGH**
+
+## Decision
+
+**The specification in its current form is NOT READY for production adoption.**
+
+The following security requirements are **MANDATORY** before platform adoption can proceed:
+
+### Immediate Blockers (Must Address Before Adoption)
+
+1. **Security Architecture Document** — Develop comprehensive security architecture addressing:
+   - Workload identity (Azure Workload Identity + Entra ID integration)
+   - Secrets management (Key Vault + CSI Secret Store + dSMS for sovereign clouds)
+   - Network security (Network Policies + service mesh mTLS)
+   - Pod security (Pod Security Standards "Restricted" profile)
+   - Data encryption (TLS 1.2+, etcd encryption, PV encryption)
+
+2. **Threat Modeling** — Conduct STRIDE threat modeling for the platform
+
+3. **Security Baseline** — Create security baseline document with MUST/SHOULD/MAY requirements
+
+4. **Formal Security Review** — Obtain approval from Microsoft Security team
+
+### Pre-Production Requirements
+
+5. **Pod Security Standards** — Deploy and enforce "Restricted" profile
+6. **Network Policies** — Implement deny-by-default with documented opt-in
+7. **Key Vault Integration** — Complete integration with automated secret rotation
+8. **Defender for Containers** — Deploy and integrate with SOC
+9. **Compliance Mapping** — Map controls to FedRAMP/SOC2/ISO27001
+
+## Rationale
+
+The specification reads like an infrastructure document, not a platform security architecture. Security is almost entirely absent. This could lead to:
+- Data breaches
+- Compliance violations (FedRAMP, SOC2)
+- Failed audits
+- Regulatory fines
+- Customer data exposure
+
+**A platform that handles customer data cannot be deployed without addressing these fundamental security requirements.**
+
+## Positive Observations
+
+- Regional isolation architecture is sound (stamp-based deployments)
+- DK8s maintained by Microsoft Security organization provides baseline confidence
+- Azure Policy integration mentioned
+- S2S authorization mentioned in appendix (though underspecified)
+
+## Recommended Actions
+
+1. Engage DK8s Security team to provide security architecture documentation
+2. Determine if security requirements are covered by DK8s platform documentation (and should be referenced)
+3. Clarify target compliance posture (FedRAMP High/Moderate, SOC2 Type II)
+4. Assess current security posture of pilot services (UPA, Correlation)
+5. Develop remediation plan with timeline
+
+## Stakeholders to Engage
+
+- DK8s Security team
+- Azure Security organization
+- Tartrus platform team
+- Pilot service teams (UPA, Correlation)
+
+## Consequences
+
+**If Adopted as Written:**
+- ❌ Services deploy without proper security controls
+- ❌ Compliance failures in audits
+- ❌ No defense against lateral movement
+- ❌ Secret sprawl and credential theft risk
+- ❌ Regulatory exposure
+
+**If Security Requirements Addressed:**
+- ✅ Secure-by-default platform
+- ✅ Compliance-ready foundation
+- ✅ Defense-in-depth posture
+- ✅ Audit-ready controls
+- ✅ Customer trust maintained
+
+## References
+
+- Security review: Issue #195 comment #4021321567
+- Functional specification: functional_spec_k8s_195.md
+- Related: Decision 3 (idk8s-infrastructure security findings)
+
+---
+
+**Status:** Awaiting response from spec authors and DK8s Security team.  
+**Blocker:** Do NOT proceed with production service onboarding until security architecture is developed and reviewed.
+
+*"In security, silence is not strength — it is vulnerability."* — Worf
+

@@ -18,6 +18,36 @@
 
 ## Learnings
 
+### 2026-03-09: Kubernetes Platform Adoption Spec Review — Issue #195 (Cross-Agent Assessment)
+
+**Assignment:** Infrastructure expert providing operational depth assessment of functional specification for "Standardized Microservices Platform on Kubernetes" (Issue #195).
+
+**Co-Agents:** Picard (lead architect), Worf (security review)
+
+**Key Contributions:**
+1. **Operational Depth Assessment** — Evaluated cluster lifecycle, node pools, networking, Day 2 operations
+   - Identified 4 CRITICAL gaps: Lifecycle management, Network architecture, Deployment tooling, Day 2 operations
+   - Identified 6 operational concerns: DK8s stabilization time, ConfigGen versioning, guardrails, feedback latency, tooling dependencies, upgrade strategy
+2. **Risk Analysis** — Connected gaps to real consequences:
+   - Timeline optimism (6 months assumes stabilization complete — NOT confirmed)
+   - Networking risk (5 Sev2 incidents vs. zero spec coverage)
+   - Operational burden shifted to unprepared teams
+3. **Validation Checklist** — Created comprehensive pre-approval assessment tool
+4. **Phased Specification Recommendation** — Proposed 3-phase approach balancing speed with rigor
+
+**Cross-Agent Findings:**
+- ✅ Strategic direction + pilot validation (Picard)
+- ⚠️ Operational depth critically incomplete (this review)
+- 🔴 Security architecture absent (Worf: 10 blocking requirements)
+
+**Outcome:** Unanimous recommendation: 2-week architecture deep-dive with platform team before broader socialization. Current 6-month timeline optimistic without operational context.
+
+**Deliverable:** `.squad/decisions/inbox/belanna-k8s-spec-review.md` → merged to `decisions.md`
+
+**Impact:** De-risks adoption with realistic complexity assessment; surfaces operational concerns before team commitment.
+
+---
+
 ### 2026-03-09: ConfigGen Support Skill Creation (Issue #181)
 
 **Activation:** Tamir requested creation of Squad skill for ConfigGen support integration  
@@ -2962,3 +2992,146 @@ Ready to accept connections for tunnel: cli-tunnel.euw
 - Detached processes exit immediately if there's no persistent work (tunnel with no ports has nothing to serve)
 
 **Status:** ✅ COMPLETE — Clean tunnel created, full output delivered to issue #168
+
+---
+
+### 2026-03-09 : Email Notification Noise Issues (#193, #194)
+
+**Activation:** Coordinator assigned investigation of GitHub Actions notification email noise  
+**Task:** Address user reports of excessive workflow failure emails and issue-triggered notification spam  
+**Status:** COMPLETED
+
+**Issues Addressed:**
+1. **Issue #193:** Squad Release workflow failures generating email noise
+2. **Issue #194:** Multiple issue-triggered workflows generating per-issue-event emails
+
+**Root Cause Analysis:**
+
+**Issue #193 - Squad Release:**
+- Squad Release workflow had 9 consecutive failures before PR #192 fix (merged 2026-03-08T23:47:41Z)
+- Failure cause: PowerShell syntax error in release creation step
+- Current status: ✅ ALL GREEN — fix working, latest runs succeeding
+- Secondary noise: Squad Protected Branch Guard failures on PRs with .squad files (by design — protective, not broken)
+
+**Issue #194 - Issue Workflow Storm:**
+- Identified 4 issue-triggered workflows ALL firing on EVERY issue event:
+  - squad-triage.yml
+  - squad-label-enforce.yml
+  - squad-issue-assign.yml
+  - squad-issue-notify.yml
+- Each generates notification email → 4x multiplier on issue activity emails
+- Combined with Squad Release failures (now fixed) and Protected Branch Guard (expected)
+
+**Solutions Provided:**
+
+**Immediate (Quickest Win):**
+- Repository notification settings adjustment: Watch → Custom → uncheck "Workflows"
+- OR: Settings → Notifications → GitHub Actions → "Only failures and errors"
+- Impact: Stops ALL workflow notification emails immediately
+
+**Future Option (Root Cause):**
+- Consolidate 4 issue-triggered workflows into 1-2 workflows
+- Reduces per-issue-event email multiplier from 4x to 1-2x
+- Requires code changes but addresses source of noise
+
+**Actions Taken:**
+1. ✅ Commented on #193 explaining Squad Release fix + Protected Branch Guard design + noise reduction tips
+2. ✅ Commented on #194 with detailed noise analysis + ranked solutions + decision request
+3. ✅ Updated labels: Added status:pending-user, removed go:needs-research on both issues
+4. ✅ Added both issues to project board (Project 1) with "Pending User" status
+5. ✅ Complied with Decision 1.1: Both comments explain WHAT decision is needed and WHY issues are pending-user
+
+**Pending User Decisions:**
+- #193: Keep Squad Release workflow enabled, or disable it?
+- #194: Adjust notification settings only, or also consolidate issue workflows?
+
+**Key Learning:**
+- Email noise often has multiple contributing sources — Squad Release failures (now fixed) masked underlying issue-workflow-storm pattern
+- Notification setting changes provide immediate relief while workflow consolidation addresses root cause
+- Protected Branch Guard failures are security features, not bugs — need clear communication to users
+
+**Related:**
+- Decision 1.1: Explanatory comments when setting pending-user (followed)
+- Squad Release PR #192: PowerShell syntax fix
+- Issue workflow architecture: 4 separate workflows for issue events (design choice, now reconsidered)
+
+
+---
+
+### 2026-03-09: Issue #195 — DK8s Functional Spec Infrastructure Review
+
+**Activation:** Tamir requested infrastructure expert review of functional specification for "Standardized Microservices Platform on Kubernetes" proposing DK8s adoption
+
+**Task:** Review functional spec at `functional_spec_k8s_195.md` from infrastructure perspective focusing on: K8s architecture, operational gaps, tooling assessment, DK8s-specific capabilities, implementation timeline realism
+
+**Status:** COMPLETED
+
+**Deliverable:** 12.8KB infrastructure review posted to Issue #195 (comment #4021327262)
+
+**Assessment Summary:**
+- **Strategic Direction:** ✅ SOLID — Kubernetes + DK8s is proven path
+- **Operational Depth:** ⚠️ NEEDS WORK — Reads like pitch deck, not implementation plan
+- **Timeline:** ⚠️ OPTIMISTIC — 6 months requires clean DK8s stabilization + dedicated team
+
+**Critical Gaps Identified (4):**
+1. **Cluster Lifecycle Undefined:** No provisioning strategy, approval process, or timing expectations (DK8s real timing: 45-90 min/cluster)
+2. **Node Pool Strategy Missing:** System vs. User pools not defined, no autoscaling boundaries (DK8s enforces D8 minimum to prevent daemonset starvation)
+3. **Stamp Architecture Vague:** "Stamp-based" mentioned but not defined in K8s context (DK8s pattern: each cluster = separate EV2 stamp with progressive deployment)
+4. **Network Resilience Absent:** Networking is #1 outage driver (5 Sev2 incidents documented) but spec has zero detail on CNI, DNS, service mesh
+
+**Operational Concerns (6):**
+1. **Cluster Upgrades Not Addressed:** ConfigGen breaking changes, quota exhaustion, manual deletion alert storms
+2. **Autoscaling Strategy Vague:** HPA/cluster-autoscaler mentioned but no operational detail (VPA scale limits at >1k pods)
+3. **Configuration Drift & Feedback Loops:** DK8s suffers 4-week sovereign cloud latency; no validation pipeline specified
+4. **Missing Day 2 Operations:** Incident response, monitoring integration, rollback procedures
+5. **Tooling Gaps:** ArgoCD (critical GitOps tool) not mentioned, EV2 (mandatory for DK8s) not mentioned, OPA/Gatekeeper missing
+6. **Monitoring Ambiguity:** Prometheus vs. Azure Monitor Prometheus unclear, no federation strategy for multi-region
+
+**Architectural Recommendations (3):**
+1. Add "Cluster Lifecycle Management" section covering provisioning, upgrades, rollback
+2. Add "Network Architecture & Resilience" section covering CNI, DNS architecture, service mesh considerations
+3. Add "Security Posture" section covering DK8s 4-layer defense-in-depth (WAF → NetworkPolicy → OPA → CI/CD validation)
+
+**DK8s Capabilities Missed:**
+- **FedRAMP Compliance Dashboard:** Phase 1 operational (9 NIST controls, <2s query latency)
+- **Defense-in-Depth Security:** 4-layer architecture already implemented
+- **Progressive Rollout Safety:** Argo Rollouts with health gates and auto-rollback
+- **Sovereign Cloud Patterns:** Helm mirrors, registry pre-caching, performance adjustments
+- **7-Cloud Support:** Public Azure, Fairfax, Mooncake, BlackForest, USNat, USSec
+
+**Timeline Realism Analysis:**
+- **6 months achievable IF:** DK8s Tier 1 stabilization completes Month 1, dedicated 2-3 engineer team, pilot limited to non-critical workloads
+- **Add 2-3 months IF:** Production-critical services in scope, sovereign clouds required, custom networking beyond defaults
+- **Known blockers:** 5 Sev2 incidents (Nov 2025–Feb 2026), ConfigGen versioning issues (leadership KPI), operational guardrails missing
+
+**Key Recommendations:**
+1. **2-week architecture deep-dive** with DK8s platform team before broader socialization
+2. Address 4 critical gaps (cluster lifecycle, node pools, networking, deployment tooling)
+3. Add operational sections (Day 2 ops, incident response, monitoring)
+4. Define success metrics beyond "onboard N services" — measure MTTR, deployment velocity, Sev2 reduction
+
+**Learnings:**
+1. **Functional specs need operational depth:** Strategic vision alone doesn't de-risk adoption; must include cluster lifecycle, Day 2 operations, incident response
+2. **Network resilience is critical:** Networking drove 5 Sev2 incidents in DK8s; any K8s adoption spec must address CNI, DNS, service mesh upfront
+3. **Hidden complexities compound timelines:** ConfigGen versioning, operational guardrails, feedback loop latency, VPA scale limits each add weeks
+4. **Platform maturity matters:** DK8s stability issues (Tier 1 mitigations underway) must be resolved before aggressive adoption timeline
+5. **Progressive rollout ≠ simple rolling updates:** Argo Rollouts, health gates, auto-rollback, canary strategies require explicit design
+6. **Sovereign clouds are different:** 4-week feedback latency, performance adjustments, registry mirrors — not just "deploy to more regions"
+
+**Infrastructure Decision Points:**
+- Cluster provisioning ownership model (new team vs. DK8s team vs. service teams)
+- Fallback plan if DK8s stability issues persist beyond Month 2
+- FedRAMP compliance requirement scope (determines tooling investment)
+- Sovereign cloud scope (determines timeline + complexity)
+
+**Follow-Up Questions Raised:**
+- Is FedRAMP compliance a requirement?
+- Are sovereign clouds in scope beyond Fairfax?
+- Who will own platform operations?
+- What are pilot phase success metrics?
+
+**GitHub Impact:**
+- Issue #195 received comprehensive infrastructure review (12.8KB)
+- Raised operational concerns before broader team adoption decision
+- Provided DK8s-specific context from 159KB history knowledge base
+

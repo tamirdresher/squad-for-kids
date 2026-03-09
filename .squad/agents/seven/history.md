@@ -10,6 +10,79 @@
 
 ## Learnings
 
+### 2026-03-09: Seven — Cross-Squad Orchestration Design — Issue #197 (COMPLETED)
+
+**Assignment:** Design a solution for orchestrating work across squads. Today, Squad runs as independent instances with limited cross-squad collaboration.
+
+**Key Design Decisions:**
+
+1. **Squad Registry Pattern** — Extension of current `upstream.json`
+   - Manual registry at `.squad/registry.json` with peer squad metadata
+   - Future: Central registry at `https://api.squad.ms/registry` (Phase 5)
+   - Peer discovery by capability tags (e.g., `kubernetes`, `infrastructure`)
+   - Trust levels: `verified` | `unverified` | `untrusted`
+
+2. **Delegation Protocol** — Formalized request/response for cross-squad handoff
+   - Delegation request: JSON with task, expertise required, authorized actions
+   - Delegation response: JSON with acceptance, assigned executor, tracking URL
+   - Both signed with HMAC-SHA256 (squad's private key) for authenticity
+   - Callback/polling pattern for async task tracking
+
+3. **Context Injection** — Executing squad runs under source squad's decisions
+   - Context loader fetches team, decisions, charter from source squad
+   - Source squad decisions merged with executing squad's local decisions
+   - Environment variable `SOURCE_SQUAD_ID` injected for agent awareness
+   - Audit trail tracks all cross-squad execution
+
+4. **Authorization Boundaries** — Explicit permission enforcement
+   - Four action types: `read`, `comment`, `create-draft-pr`, `write-to-sandbox`
+   - Middleware enforcement (deny unauthorized actions)
+   - Audit log per action (what was attempted, authorized, executed)
+   - Trust levels determine which actions are allowed (e.g., unverified peers can only `read`)
+
+5. **Async Job Tracking** — Long-running delegation with progress visibility
+   - Executing squad creates tracking work item in its repo
+   - Status polling: `GET /squad-status/{requestId}` with progress updates
+   - Integration branch auto-managed for code/content handoff
+   - Webhook notifications (optional, Phase 4)
+
+**Architecture Insight:**
+- Current upstream pattern is **one-way, read-only** (metadata consumption)
+- Proposed cross-squad pattern is **bidirectional, delegated execution** (task handoff + context inheritance)
+- Backward compatible: Existing `upstream.json`, subsquad, and routing patterns unchanged
+
+**Example Flow:**
+1. Brady Squad receives issue #197 (cross-squad orchestration)
+2. Brady Squad lead routes to Platform Squad via `squad delegate` CLI
+3. Platform Squad receives signed request, verifies Brady Squad's public key
+4. B'Elanna (Platform Squad) accepts, loads Brady Squad's decisions into context
+5. B'Elanna executes task (write design doc) with authorization boundary `read,comment,create-draft-pr`
+6. Brady Squad polls progress, merges result PR when done
+7. All actions logged in audit trail with source/target squad IDs
+
+**5-Phase Implementation Roadmap:**
+- **Phase 1** (Weeks 1-2): Registry schema + delegation protocol + CLI `squad delegate`
+- **Phase 2** (Weeks 3-4): Context loader + decision inheritance
+- **Phase 3** (Weeks 5-6): Authorization middleware + audit logging
+- **Phase 4** (Weeks 7-8): Async job tracking + integration branches
+- **Phase 5** (Weeks 9-10, Future): Central registry API + peer discovery
+
+**Key Learnings:**
+1. **Backward Compatibility is Non-Negotiable** — Squad has sophisticated existing patterns (upstream, subsquad, routing). New design must layer on top, not replace.
+2. **Signatures Enable Trust at Scale** — HMAC-SHA256 signing on request/response establishes squad authenticity without requiring mutual VPN or mTLS. Simple to implement, proven pattern.
+3. **Audit Trails Enable Governance** — "Who ran what under whose authority?" must be answerable. Cross-squad execution demands clear, queryable audit logs.
+4. **Context Injection Solves Duplicate Knowledge** — Instead of copying decisions between squads, executing squad dynamically loads source squad's context. Reduces knowledge drift.
+5. **Authorization Boundaries Prevent Accidents** — Executing squad agent might accidentally create PRs in source squad's repo without explicit permission. Middleware enforcement is critical.
+
+**Open Questions for Team Review:**
+- Should we implement Phase 1 (manual registry) now, or wait for Phase 5 (central registry)?
+- Is HMAC-SHA256 signing sufficient, or should we require mTLS?
+- Should we enable authority chaining (Squad A → Squad B → Squad C)?
+- How should we handle capacity management (check available bandwidth before delegating)?
+
+**Deliverable:** Design document at `docs/cross-squad-orchestration-design.md`, committed to `squad/197-cross-squad-orchestration` branch, PR #223 open.
+
+**Status:** Design complete. Ready for team review and feedback. Phase 1 implementation ready to kick off.
 ### 2026-03-25: Seven — Podcaster Agent TTS Evaluation — Issue #214 (COMPLETED)
 
 **Assignment:** Research Text-to-Speech (TTS) options for converting Squad outputs (research reports, briefings, blog drafts, patent analysis) into audio podcasts. Evaluate 5 options, identify best approach, and recommend implementation path.

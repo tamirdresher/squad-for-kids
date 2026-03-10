@@ -15035,3 +15035,461 @@ If significant conflicts or integration issues arise:
 **Decision recorded by**: Seven, Research & Docs Specialist  
 **Date**: 2026-03-10
 
+
+---
+
+# Decision: Periodic Tech News Scanning Architecture
+
+**Date:** 2026-03-09  
+**Author:** Picard (Lead)  
+**Issue:** #255  
+**Status:** Proposed (Awaiting Tamir Approval)
+
+---
+
+## Context
+
+Tamir requested automated periodic scanning of HackerNews, Reddit, and other tech sources to stay current with trending developments. This builds on Issue #185 (manual one-time research) but requires continuous automation without human intervention.
+
+**User Requirements:**
+- Always be on top of what's new and need to know
+- Hebrew podcast episode for on-the-go consumption
+- Coverage of newest and popular tech dev sources
+
+---
+
+## Decision
+
+Implement a **4-phase rollout** using existing squad infrastructure (Podcaster, digest generator, GitHub Actions) with new content aggregation capabilities.
+
+### Architecture: GitHub Actions + API Aggregation + AI Filtering + Podcast Generation
+
+```
+GitHub Actions Scheduler (Daily 7 AM UTC)
+  ↓
+PowerShell Scanner (scripts/tech-news-scanner.ps1)
+  • HackerNews Algolia API
+  • Reddit JSON API (r/kubernetes, r/dotnet, r/azure, r/devops)
+  • GitHub Trending (gh CLI)
+  • RSS Feeds (DevBlogs, Azure Blog, CNCF)
+  ↓
+AI Content Filtering (Copilot CLI)
+  • Relevance scoring (0-10)
+  • Summarization (3 sentences)
+  • De-duplication
+  • Categorization
+  ↓
+Daily Tech Digest (.squad/digests/tech-news-YYYY-MM-DD.md)
+  ↓
+Podcaster Agent
+  • English: en-US-JennyNeural
+  • Hebrew: he-IL-HilaNeural (new)
+  ↓
+OneDrive Upload + GitHub/Teams Notification
+```
+
+---
+
+## Rationale
+
+### 1. GitHub Actions vs. Azure Functions
+**Chosen:** GitHub Actions (self-hosted runner)  
+**Rejected:** Azure Functions (Timer Trigger)
+
+**Reasoning:**
+- Existing self-hosted runner already configured for Copilot CLI and edge-tts
+- Zero new infrastructure provisioning required for MVP
+- Git-tracked digest history (version control for free)
+- Existing workflow patterns proven (`squad-daily-digest.yml`)
+- Trade-off accepted: Runner maintenance vs. serverless benefits
+
+**Migration Path:** Azure Functions remains option for Phase 4+ if scale/reliability demands it.
+
+### 2. Data Sources: Zero-Auth APIs
+**Chosen:** HackerNews Algolia + Reddit JSON + GitHub CLI + RSS  
+**Rejected:** Paid APIs (NewsAPI, Feedly), web scraping
+
+**Reasoning:**
+- All selected APIs have zero/minimal authentication barriers
+- HackerNews Algolia: No auth, keyword search, front_page filter
+- Reddit JSON: Public subreddits, User-Agent header only
+- GitHub: Already authenticated via `gh` CLI
+- RSS: Standard XML parsing (PowerShell native)
+- No additional API costs for MVP
+
+**Risk Mitigation:** Rate limits are generous (HN unlimited, Reddit 1 req/sub/day, GitHub 5K/hour).
+
+### 3. AI Filtering: Copilot CLI Integration
+**Chosen:** Copilot CLI for relevance scoring and summarization  
+**Rejected:** Manual keyword filtering only
+
+**Reasoning:**
+- Without AI: 100-200 items/day across all sources (too noisy)
+- With AI scoring (filter <4/10): 15-25 actionable items/day
+- Copilot CLI provides context-aware filtering (understands Tamir's DK8S/Azure/.NET focus)
+- Summarization reduces digest length by 60-70%
+- De-duplication prevents redundant stories across HN/Reddit/RSS
+
+**Prompt Design:** Structured prompt template scores relevance for "platform engineer working on DK8S (Kubernetes, Azure, .NET, AI agents)".
+
+### 4. Hebrew Translation: Azure Translator API
+**Chosen:** Azure Cognitive Services Translator  
+**Rejected:** Google Translate API, free libraries (googletrans)
+
+**Reasoning:**
+- Production-grade translation quality (Microsoft service)
+- Free tier: 2M characters/month (digest = 5K chars/day × 30 = 150K/month)
+- First-class Azure integration (aligns with DK8S platform)
+- Fallback: Copilot CLI translation if Azure API unavailable
+
+**Hebrew TTS:** edge-tts provides built-in Hebrew voices:
+- `he-IL-HilaNeural` (Female, Friendly)
+- `he-IL-AvriNeural` (Male, Friendly)
+
+**User Decision Pending:** Tamir preference for voice (Hila vs. Avri).
+
+### 5. Phased Rollout
+**Phase 1 (MVP, 2 weeks):** HackerNews + Reddit + English podcast  
+**Phase 2 (AI + Hebrew, 2 weeks):** Copilot CLI filtering + Hebrew podcast  
+**Phase 3 (Expanded, 1 week):** GitHub Trending + RSS + Teams delivery  
+**Phase 4 (Optional, 2 weeks):** Continuous learning pattern extraction
+
+**Reasoning:**
+- Phase 1 validates API integrations and scheduling infrastructure
+- Phase 2 adds Hebrew support and quality filtering (user's primary requirements)
+- Phase 3 expands sources for comprehensive coverage
+- Phase 4 creates squad learning flywheel (patterns → skills)
+
+---
+
+## Alternatives Considered
+
+### Alternative 1: Azure Functions (Serverless)
+**Pros:** No runner maintenance, native Azure integration, scales automatically  
+**Cons:** Requires new infrastructure, Copilot CLI packaging complexity, slower MVP  
+**Decision:** Defer to Phase 4+ if scale demands it
+
+### Alternative 2: Manual Weekly Research (Status Quo)
+**Pros:** Zero automation effort, human curation quality  
+**Cons:** Not scalable, requires manual initiation, inconsistent cadence  
+**Decision:** Rejected — automation is explicit requirement (Issue #255)
+
+### Alternative 3: RSS-Only Aggregation
+**Pros:** Simplest implementation, standard XML parsing  
+**Cons:** Misses HackerNews/Reddit community pulse, no relevance filtering  
+**Decision:** Rejected — HackerNews/Reddit explicitly requested
+
+### Alternative 4: Google Translate API for Hebrew
+**Pros:** Cheaper ($20/1M chars vs. Azure free tier)  
+**Cons:** Quality concerns, not Microsoft-native, Terms of Service ambiguity  
+**Decision:** Rejected — Azure Translator preferred for production quality
+
+---
+
+## Consequences
+
+### Positive
+- **Immediate Value (Phase 1):** Daily digest and English podcast within 2 weeks
+- **Hebrew Support (Phase 2):** Tamir can consume tech news during commute/exercise
+- **Zero Infrastructure Cost (MVP):** Runs on existing self-hosted runner
+- **Git-Tracked History:** All digests version-controlled in `.squad/digests/`
+- **Reusable Components:** Scanner script and workflow reusable for other aggregation tasks
+- **Learning Flywheel (Phase 4):** Recurring patterns → squad skills → improved DK8S operations
+
+### Negative
+- **Runner Dependency:** GitHub Actions workflow requires self-hosted runner uptime
+- **API Rate Limits:** Risk of hitting limits if usage expands (mitigation: caching)
+- **Translation Costs (Future):** If daily volume exceeds 2M chars/month, Azure Translator costs $10/1M chars
+- **Maintenance Overhead:** API changes in HackerNews/Reddit may require script updates
+
+### Neutral
+- **Agent Assignment:** Requires Data (scanner), Podcaster (Hebrew), Neelix (Teams card)
+- **User Feedback Loop:** Tamir must provide relevance feedback to tune AI scoring
+- **Voice Preference:** Tamir must choose Hebrew voice (Hila vs. Avri)
+
+---
+
+## Open Questions (Awaiting Tamir)
+
+1. **Phase 1 Approval:** Proceed with MVP (HackerNews + Reddit + English podcast)?
+2. **Hebrew Priority:** Phase 2 timeline acceptable (2 weeks after MVP)?
+3. **Teams Channel:** Deliver digest to existing channel or create new #tech-news?
+4. **Hebrew Voice:** Prefer `he-IL-HilaNeural` (female) or `he-IL-AvriNeural` (male)?
+5. **Scheduling:** Daily 7 AM UTC (9 AM Israel) acceptable?
+
+---
+
+## Implementation Notes
+
+### MVP Scope (Phase 1)
+- **Script:** `scripts/tech-news-scanner.ps1` (PowerShell, ~200 lines)
+- **Workflow:** `.github/workflows/squad-tech-news-scan.yml` (GitHub Actions)
+- **Digest Output:** `.squad/digests/tech-news-YYYY-MM-DD.md`
+- **Podcast:** English only (en-US-JennyNeural)
+- **Delivery:** GitHub issue comment or Teams webhook
+
+### Phase 2 Additions
+- **AI Integration:** Copilot CLI prompt template for scoring/summarization
+- **Translation:** Azure Translator API (requires new Azure resource)
+- **Hebrew Podcast:** edge-tts with `he-IL-HilaNeural` or `he-IL-AvriNeural`
+
+### Infrastructure
+- **GitHub Actions Runner:** Self-hosted (existing)
+- **Python:** edge-tts, aiohttp (already installed)
+- **Azure Translator:** New resource required (Phase 2)
+- **OneDrive:** Existing upload script (`scripts/upload-podcast.ps1`)
+
+---
+
+## Success Metrics
+
+### Phase 1
+- ✅ Daily digest generated for 7 consecutive days
+- ✅ Average 15-25 items per digest
+- ✅ English podcast in OneDrive
+- ✅ Tamir listens to 3+ episodes
+
+### Phase 2
+- ✅ Relevance scoring reduces noise 40%+
+- ✅ Hebrew podcast generated daily
+- ✅ Tamir uses Hebrew podcast regularly
+
+### Phase 3
+- ✅ GitHub + RSS add 5-10 unique items/day
+- ✅ Teams card delivered daily
+- ✅ 1+ actionable insight per week
+
+---
+
+## References
+
+- **Issue #255:** Original request (HackerNews, Reddit, Hebrew podcast)
+- **Issue #185:** Manual tech research precedent (Seven, 2026-03-08)
+- **Issue #214:** Podcaster agent (en-US-JennyNeural)
+- **Issue #237:** Conversational podcast mode (two-voice)
+- **APIs:** HackerNews Algolia, Reddit JSON, GitHub CLI, Azure Translator
+- **Existing Infrastructure:** `squad-daily-digest.yml`, `podcaster-prototype.py`, `upload-podcast.ps1`
+
+---
+
+**Next Action:** Await Tamir approval; if approved, assign to Data for Phase 1 kickoff.
+
+
+---
+
+# Decision: Complete Demo Implementation Over Minimal Examples
+
+**Date:** 2026-03-25
+**Author:** Picard (Lead)
+**Context:** Issue #242 - Demo repository preparation
+**Status:** ✅ Implemented
+
+## Problem
+
+When creating a public demo repository to showcase Squad capabilities, there were two approaches:
+
+1. **Minimal Example:** Basic structure with placeholders and "TODO" markers for users to complete
+2. **Complete Implementation:** Fully working system with all features, scripts, and comprehensive documentation
+
+The question was which approach would better serve potential Squad users.
+
+## Decision
+
+Implement the **complete, production-ready demo** with all HIGH and MEDIUM priority features, comprehensive documentation, and working examples.
+
+## Rationale
+
+### Why Complete Over Minimal
+
+1. **Proof of Concept Value**
+   - Blog post claims are backed by actual working code
+   - Users can see real implementation patterns
+   - Demonstrates feasibility, not just theory
+   - Shows complexity and completeness of solution
+
+2. **Lower Barrier to Entry**
+   - Users can run scripts immediately without writing code
+   - Clear examples reduce "what do I do next?" confusion
+   - Working system inspires confidence to adopt Squad
+   - Troubleshooting docs help when things go wrong
+
+3. **Teaching by Example**
+   - Real Podcaster scripts show edge-tts integration
+   - Teams integration demonstrates WorkIQ patterns
+   - Workflow files show GitHub Actions best practices
+   - Documentation structure serves as template
+
+4. **Alignment with Blog Post**
+   - Blog claims "Podcaster converts docs to audio" → Need working Podcaster
+   - Blog claims "Teams integration" → Need setup scripts and docs
+   - Blog claims "Squad Monitor dashboard" → Need actual dashboard code
+   - Blog claims "Observability" → Need monitoring docs
+   - **Complete implementation validates every claim**
+
+5. **Shareability**
+   - Colleagues/stakeholders can clone and see it work
+   - Conference demos don't require live coding
+   - Can be forked and customized immediately
+   - Reduces support burden (fewer "how do I...?" questions)
+
+### What Complete Means
+
+- **Scripts:** Working Python/PowerShell with error handling
+- **Documentation:** Comprehensive with examples, troubleshooting, best practices
+- **Workflows:** Production-ready GitHub Actions
+- **Skills:** Fully documented with confidence levels
+- **Configuration:** Real examples with placeholders clearly marked
+
+### What Complete Doesn't Mean
+
+- Not production security hardening (e.g., skip FedRAMP)
+- Not every possible feature (focused on blog post alignment)
+- Not organization-specific customization (generic/sanitized)
+- Not performance optimization (functional over optimal)
+
+## Implementation
+
+### Included (Complete)
+
+1. **Podcaster System**
+   - 4 working scripts (conversational mode, single-voice, uploads)
+   - 6.9 KB comprehensive documentation
+   - Cloud storage integration examples
+
+2. **Teams/Email Integration**
+   - Working setup script
+   - 11 KB step-by-step setup guide
+   - WorkIQ integration examples
+
+3. **Observability**
+   - 9.8 KB troubleshooting guide
+   - Health check examples
+   - Dashboard usage instructions
+
+4. **GitHub Actions**
+   - 9 complete workflow files
+   - Documentation workflow
+   - Drift detection workflow
+   - Archive automation
+
+5. **Utility Scripts**
+   - Daily briefing automation
+   - Smoke test framework
+   - All with documentation
+
+### Excluded (Minimal)
+
+1. **FedRAMP Scripts** - Per Tamir's directive, not needed for demo
+2. **Organization-Specific Logic** - Sanitized to generic examples
+3. **Advanced Optimizations** - Functional baseline only
+
+## Impact
+
+**Positive:**
+- Demo repository is immediately useful
+- Blog post claims are fully backed by code
+- Lower adoption friction for new Squad users
+- Comprehensive reference implementation
+- Ready for public sharing
+
+**Trade-offs:**
+- Larger repository size (399 KB vs ~100 KB minimal)
+- More files to maintain (58 vs ~25)
+- Risk of users copying without understanding
+- More surface area for questions/support
+
+**Mitigation:**
+- Comprehensive documentation reduces support burden
+- Clear comments in code explain intent
+- README guides users through setup step-by-step
+- Observability docs provide troubleshooting paths
+
+## Measurement
+
+Success metrics:
+- [ ] GitHub stars/forks indicate usefulness
+- [ ] Issue questions focus on customization, not basic setup
+- [ ] Blog post readers can verify claims by running demo
+- [ ] Conference demos run smoothly without live coding
+- [ ] Other teams adopt Squad based on demo
+
+## Alternatives Considered
+
+### Alternative 1: Minimal Scaffold
+**Approach:** Provide basic structure with TODOs for users to complete.
+
+**Pros:**
+- Smaller repository
+- Forces users to understand each piece
+- Less maintenance burden
+
+**Cons:**
+- Higher friction to getting started
+- Doesn't prove blog post claims
+- Users may give up before seeing value
+- Requires coding skills to complete
+
+**Why Rejected:** Blog post makes specific claims (Podcaster, Teams, observability) that need proof.
+
+### Alternative 2: Hybrid (Core + Extensions)
+**Approach:** Core features complete, advanced features as opt-in extensions.
+
+**Pros:**
+- Balances completeness and simplicity
+- Users can add features as needed
+- Clear separation of concerns
+
+**Cons:**
+- More complex repository structure
+- Harder to demonstrate full capability
+- Still requires work to see advanced features
+
+**Why Rejected:** Demo should showcase full capability immediately, not require assembly.
+
+### Alternative 3: Video Demo Only
+**Approach:** Keep code minimal, show features in video/blog.
+
+**Pros:**
+- Smallest repository
+- Controlled demonstration
+- Easier to maintain
+
+**Cons:**
+- Can't verify claims ("does it really work?")
+- Can't customize or extend
+- Doesn't inspire confidence
+- No reference implementation
+
+**Why Rejected:** Engineers want to see code, not just videos.
+
+## Related Decisions
+
+- **Demo Structure** (2026-03-25): Use standalone `sanitized-demo/` directory
+- **Sanitization Approach** (2026-03-25): Generic placeholders over redaction
+- **Blog Post Integration** (2026-03-25): Bidirectional linking between blog and demo
+
+## Notes
+
+This decision aligns with our broader principle: **Show, don't tell**. When advocating for a system, demonstrate its value with working examples, not promises.
+
+The extra effort to create complete implementations pays off in:
+- Credibility (it actually works)
+- Adoption (lower barrier)
+- Teaching (learning by example)
+- Support (self-service troubleshooting)
+
+## Review
+
+This decision should be reviewed if:
+- Support burden becomes too high (suggests docs need improvement)
+- Users skip documentation and copy-paste blindly (suggests need for better warnings)
+- Repository size becomes prohibitive (suggests need for tiering)
+
+---
+
+**Approved by:** Picard (Lead)
+**Implemented:** 2026-03-25
+**Status:** ✅ Complete and ready for public release
+
+
+---

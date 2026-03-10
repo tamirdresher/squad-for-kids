@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "schedules": [
+    {
+      "id": "ralph-heartbeat",
+      "name": "Ralph Heartbeat",
+      "description": "Run Squad triage every 5 minutes",
+      "enabled": true,
+      "trigger": {
+        "type": "interval",
+        "intervalSeconds": 300
+      },
+      "task": {
+        "type": "workflow",
+        "ref": ".github/workflows/squad-heartbeat.yml",
+        "event": "workflow_dispatch"
+      },
+      "providers": ["local-polling", "github-actions"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 30
+      },
+      "timeout": 600,
+      "notifyOnFailure": ["teams"],
+      "tags": ["triage", "ralph"]
+    },
+    {
+      "id": "daily-digest",
+      "name": "Daily Digest",
+      "description": "Send team digest of yesterday's activity",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 8 * * *",
+        "timezone": "UTC"
+      },
+      "task": {
+        "type": "workflow",
+        "ref": ".github/workflows/squad-daily-digest.yml",
+        "event": "workflow_dispatch"
+      },
+      "providers": ["github-actions", "local-fallback"],
+      "retry": {
+        "maxAttempts": 3,
+        "backoffSeconds": 60
+      },
+      "timeout": 1800,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "digest"]
+    },
+    {
+      "id": "daily-rp-briefing",
+      "name": "Daily YourService Briefing",
+      "description": "Generate and send comprehensive RP status report at 9 AM (local)",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 7 * * 1-5",
+        "timezone": "America/New_York"
+      },
+      "task": {
+        "type": "script",
+        "command": ".squad/scripts/daily-rp-briefing.ps1 -SkipWeekends",
+        "shell": "powershell"
+      },
+      "providers": ["local-polling"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 60
+      },
+      "timeout": 600,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "briefing", "rp"]
+    },
+    {
+      "id": "daily-adr-check",
+      "name": "Daily ADR Channel Monitor",
+      "description": "Monitor YourChannel Notifications Teams channel for new/updated ADRs. Read-only — NEVER post to the channel. Report actionable items to YourName via Teams webhook.",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 7 * * 1-5",
+        "timezone": "UTC"
+      },
+      "task": {
+        "type": "copilot",
+        "instruction": "Run the daily ADR channel check: Query YourChannel Notifications channel via WorkIQ for new/updated ADRs in the last 24h. Identify items needing YourName's attention (pending reviews, decisions, blockers). Send summary to Teams webhook. NEVER comment on the ADR channel or any ADR.",
+        "scriptRef": ".squad/scripts/daily-adr-check.ps1"
+      },
+      "providers": ["local-polling", "copilot-agent"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 120
+      },
+      "timeout": 900,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "adr", "idp"],
+      "metadata": {
+        "issue": "#198",
+        "owner": "picard",
+        "channelUrl": "https://teams.microsoft.com/l/channel/YOUR_TEAMS_CHANNEL_ID/IDP%20ADR%20Notifications?groupId=YOUR_GROUP_ID&tenantId=YOUR_TENANT_ID",
+        "readOnly": true,
+        "neverComment": true
+      }
+    },
+    {
+      "id": "weekly-upstream-sync",
+      "name": "Weekly Upstream Sync",
+      "description": "Sync upstream repos every Monday at 2 AM UTC",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 2 * * 1",
+        "timezone": "UTC"
+      },
+      "task": {
+        "type": "copilot",
+        "instruction": "Sync all upstream repos: check for new issues, PRs, discussions"
+      },
+      "providers": ["copilot-agent"],
+      "retry": {
+        "maxAttempts": 1,
+        "backoffSeconds": 0
+      },
+      "timeout": 3600,
+      "notifyOnFailure": ["teams", "issue-comment"],
+      "tags": ["sync", "upstream"]
+    },
+    {
+      "id": "teams-message-monitor",
+      "name": "Teams Message Monitor",
+      "description": "Monitor Teams channels for actionable messages directed at the squad. Silent review with smart filtering - only surface items requiring YourName's attention.",
+      "enabled": true,
+      "trigger": {
+        "type": "interval",
+        "intervalSeconds": 1200
+      },
+      "task": {
+        "type": "copilot",
+        "instruction": "Use WorkIQ (workiq-ask_work_iq tool) to scan recent Teams messages from the last 30 minutes. Focus on: direct mentions of YourName or the squad, review requests, action items, urgent items, decisions needing input. Silently evaluate each item - only create a GitHub issue or notification if YourName specifically needs to act. Use teams-monitor skill workflow for filtering and issue creation. Avoid spam - be selective.",
+        "scriptRef": ".squad/scripts/teams-monitor-check.ps1"
+      },
+      "providers": ["local-polling"],
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 60
+      },
+      "timeout": 600,
+      "notifyOnFailure": ["teams"],
+      "tags": ["monitoring", "teams", "communication"],
+      "metadata": {
+        "issue": "#215",
+        "owner": "belanna",
+        "checkInterval": "20 minutes",
+        "smartFiltering": true,
+        "silentReview": true
+      }
+    }
+  ],
+  "defaults": {
+    "retryMaxAttempts": 2,
+    "retryBackoffSeconds": 60,
+    "timeout": 1800,
+    "notifyOnFailure": ["teams"]
+  },
+  "notificationChannels": {
+    "teams": {
+      "webhookUrl": "${TEAMS_WEBHOOK_URL}",
+      "format": "adaptive-card"
+    },
+    "issue-comment": {
+      "repo": "your-org/your-repo",
+      "labels": ["squad:ralph", "automation"]
+    }
+  }
+}
+

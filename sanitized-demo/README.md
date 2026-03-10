@@ -4,6 +4,10 @@
 
 This repository showcases [Squad](https://github.com/bradygaster/squad) - an advanced AI agent orchestration framework that runs autonomous teams of specialized agents to handle software development tasks.
 
+📖 **Read the story:** [How an AI Squad Changed My Productivity](blog-draft.md) - A personal account of building and running an autonomous AI team.
+
+🎯 **Live Demo:** This repository itself is the demo - see [GETTING_STARTED.md](GETTING_STARTED.md) to set up your own Squad.
+
 ## 🎯 What is Squad?
 
 Squad is a next-generation AI agent framework that goes beyond single-agent assistants. It creates a **persistent team of specialized agents** that:
@@ -34,34 +38,64 @@ The `ralph-watch.ps1` script runs Squad autonomously:
 - Sends Teams notifications on important changes
 - Handles multiple issues in parallel
 
-### 3. **Shared Knowledge Base**
+### 3. **Podcaster - Audio Content Generation**
+The Podcaster system converts documentation into audio summaries:
+- **Single-voice mode** - Direct narration
+- **Conversational mode** - NotebookLM-style two-voice dialogue
+- Uses Microsoft Edge TTS (no API keys required)
+- See `docs/PODCASTER.md` for usage guide
+
+### 4. **Shared Knowledge Base**
 - **Decisions** (`.squad/decisions.md`) - Team-wide architectural decisions
 - **Skills** (`.squad/skills/*/SKILL.md`) - Reusable patterns and procedures
 - **Routing** (`.squad/routing.md`) - Work assignment rules
 - **Team Context** (`.squad/team.md`) - Role definitions
 
-### 4. **Intelligent Routing**
+### 5. **Teams & Email Integration**
+Bridge workplace communications to GitHub:
+- Monitor Teams channels for squad requests
+- Extract action items from emails
+- Use Microsoft 365 Copilot WorkIQ skill
+- Automatic issue creation from Teams messages
+- See `docs/TEAMS_EMAIL_INTEGRATION.md` for setup
+
+### 6. **Intelligent Routing**
 Issues are automatically routed to the right specialist based on:
 - Work type (feature-dev, bug-fix, docs, security)
 - Keywords and labels
 - Agent expertise and current workload
 - Dependencies and blocked status
 
-### 5. **GitHub Project Integration**
+### 7. **GitHub Project Integration**
 Full integration with GitHub Projects V2:
 - Auto-move issues between columns (Todo → In Progress → Done)
 - Track agent assignments and status
 - Visual workflow management
 - See `.squad/skills/github-project-board/SKILL.md`
 
-### 6. **Continuous Learning**
+### 8. **Continuous Learning**
 Agents extract and document reusable patterns as Skills:
 - **GitHub Project Board** - Project automation patterns
 - **Teams Monitor** - Bridge Teams messages to GitHub issues
 - **TTS Conversion** - Text-to-speech for podcasting outputs
-- **DevBox Provisioning** - Cloud development environment setup
+- **CLI Tunnel** - Remote terminal access for demos
+- **Image Generation** - AI-generated diagrams and screenshots
 
-### 7. **Upstream Inheritance**
+### 9. **Squad Monitor Dashboard**
+Real-time monitoring dashboard built in C# (.NET 8+):
+- Live agent activity visualization
+- Automation loop health monitoring
+- GitHub integration (issues, PRs, workflows)
+- See `squad-monitor-standalone/README.md`
+
+### 10. **Observability & Troubleshooting**
+Comprehensive monitoring and debugging:
+- Structured logging with timestamps
+- Heartbeat file for health checks
+- Metrics collection and dashboards
+- See `docs/OBSERVABILITY.md`
+
+### 11. **Upstream Inheritance**
 Squad supports multi-repo hierarchies where subsquads inherit from parent squads:
 - Share decisions across repositories
 - Synchronize team structure
@@ -143,17 +177,46 @@ Squad supports multi-repo hierarchies where subsquads inherit from parent squads
     github-project-board/
     tts-conversion/
     teams-monitor/
-    ... (skills)
+    cli-tunnel/
+    image-generation/
 
 .github/
+  ISSUE_TEMPLATE/      # Custom issue templates
+    squad-task.yml     # Squad task template
   workflows/           # Squad automation workflows
     squad-triage.yml   # Auto-triage new issues
+    squad-heartbeat.yml # Ralph heartbeat (every 5 min)
+    squad-daily-digest.yml # Daily activity summary
+    squad-docs.yml     # Auto-documentation updates
+    drift-detection.yml # Configuration consistency checks
+    squad-archive-done.yml # Auto-archive old issues
     squad-heartbeat.yml # Daily health check
     squad-docs.yml     # Auto-update documentation
     ... (workflows)
 
+scripts/                 # Utility scripts
+  podcaster-conversational.py # Two-voice podcast generator
+  podcaster-prototype.py # Single-voice narrator
+  upload-podcast.ps1   # Upload audio to cloud storage
+  upload-podcast.py    # Cross-platform upload script
+  daily-rp-briefing.ps1 # Automated daily status reports
+  setup-github-teams.ps1 # Teams integration setup
+  smoke-tests/         # Automated testing framework
+
+squad-monitor-standalone/ # Real-time monitoring dashboard
+  src/SquadMonitor/
+    Program.cs         # C# dashboard application
+
+docs/                  # Comprehensive documentation
+  WORKFLOWS.md         # GitHub Actions workflows guide
+  SCHEDULING.md        # Scheduling system deep dive
+  PODCASTER.md         # Podcaster usage guide
+  OBSERVABILITY.md     # Monitoring and troubleshooting
+  TEAMS_EMAIL_INTEGRATION.md # Teams/email bridge setup
+
 ralph-watch.ps1        # Autonomous operation script
 squad.config.ts        # Squad configuration
+schedule.json          # Scheduled tasks configuration
 ```
 
 ## 🎓 Key Concepts
@@ -231,11 +294,21 @@ Ralph Watch includes built-in observability:
 - **Heartbeat file** at `~/.squad/ralph-heartbeat.json`
 - **Teams alerts** on consecutive failures (>3)
 - **Lock file** prevents duplicate instances
+- **Squad Monitor Dashboard** - Real-time visualization (C#/.NET)
 
 View logs:
 ```powershell
 Get-Content $env:USERPROFILE\.squad\ralph-watch.log -Tail 50
 ```
+
+Start monitoring dashboard:
+```bash
+cd squad-monitor-standalone/src/SquadMonitor
+dotnet run
+# Open http://localhost:5000
+```
+
+See `docs/OBSERVABILITY.md` for detailed troubleshooting guide.
 
 ## 🤝 Integration Points
 
@@ -246,9 +319,17 @@ Get-Content $env:USERPROFILE\.squad\ralph-watch.log -Tail 50
 - Workflows (automation)
 - GitHub CLI (`gh`)
 
-### Microsoft Teams
+### Microsoft Teams & Email
 - Incoming Webhooks (notifications)
-- WorkIQ MCP server (read Teams messages)
+- WorkIQ skill (read Teams messages & emails)
+- Microsoft 365 Copilot integration
+- Automatic issue creation from Teams messages
+- See `docs/TEAMS_EMAIL_INTEGRATION.md`
+
+### Podcaster
+- Microsoft Edge TTS (text-to-speech)
+- OneDrive / Azure Blob Storage (audio hosting)
+- See `docs/PODCASTER.md`
 
 ### Development Tools
 - GitHub Copilot CLI (agent execution)
@@ -257,9 +338,15 @@ Get-Content $env:USERPROFILE\.squad\ralph-watch.log -Tail 50
 
 ## 📚 Learn More
 
+- **Blog Post**: [How an AI Squad Changed My Productivity](blog-draft.md) - The story behind this demo
 - **Squad Framework**: https://github.com/bradygaster/squad
+- **Documentation**: 
+  - [Workflows Guide](docs/WORKFLOWS.md)
+  - [Scheduling System](docs/SCHEDULING.md)
+  - [Podcaster Usage](docs/PODCASTER.md)
+  - [Observability](docs/OBSERVABILITY.md)
+  - [Teams/Email Integration](docs/TEAMS_EMAIL_INTEGRATION.md)
 - **Skills Library**: Browse `.squad/skills/*/SKILL.md`
-- **Blog Post**: See `blog-draft.md` for a personal story about using Squad
 
 ## 🔐 Security Notes
 

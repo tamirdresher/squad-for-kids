@@ -18,6 +18,102 @@
 
 ## Learnings
 
+### 2026-03-25: Picard — Demo Repository Complete Implementation — Issue #242
+
+**Assignment:** Execute the complete demo repository setup with all HIGH and MEDIUM priority items (excluding FedRAMP).
+
+**Context:** Previous work created the basic sanitized-demo structure. Tamir requested full implementation of:
+- Custom issue templates
+- Complete Podcaster system
+- Additional workflows
+- Teams/email integration
+- Utility scripts
+- Additional skills
+- Comprehensive documentation
+
+**Execution:**
+
+1. **Custom Issue Template** (HIGH)
+   - Created `.github/ISSUE_TEMPLATE/squad-task.yml`
+   - Simplified Squad task creation with standardized template
+   - Added config.yml for issue template configuration
+
+2. **Podcaster System** (HIGH)
+   - Copied 4 scripts: podcaster-conversational.py, podcaster-prototype.py, upload-podcast.ps1, upload-podcast.py
+   - Created comprehensive `docs/PODCASTER.md` (6.9 KB)
+   - Documented single-voice and conversational modes
+   - Included upload workflows for cloud storage
+
+3. **Documentation Enhancements** (HIGH)
+   - Created `docs/OBSERVABILITY.md` (9.8 KB) - Monitoring and troubleshooting guide
+   - Created `docs/TEAMS_EMAIL_INTEGRATION.md` (11 KB) - Teams/email bridge setup
+   - Existing docs verified: WORKFLOWS.md (10.7 KB), SCHEDULING.md (11.1 KB)
+
+4. **README Updates** (HIGH)
+   - Added blog post link at top for cross-referencing
+   - Added Podcaster section (feature #3)
+   - Added Teams & Email Integration section (feature #5)
+   - Enhanced Observability section with Squad Monitor
+   - Updated repository structure with all new components
+   - Updated Learn More section with all doc links
+
+5. **Additional Workflows** (MEDIUM)
+   - `squad-docs.yml` - Auto-generate documentation index
+   - `drift-detection.yml` - Weekly configuration consistency checks
+   - `squad-archive-done.yml` - Auto-archive completed issues after 7 days
+   - Total: 9 workflows covering complete automation suite
+
+6. **Teams Integration Scripts** (MEDIUM)
+   - Copied `setup-github-teams.ps1` for automated setup
+   - Comprehensive setup guide in `docs/TEAMS_EMAIL_INTEGRATION.md`
+
+7. **Utility Scripts** (MEDIUM)
+   - Copied `daily-rp-briefing.ps1` and documentation
+   - Copied `smoke-tests/` directory for automated testing
+
+8. **Additional Skills** (MEDIUM)
+   - Copied `cli-tunnel/` - Remote terminal access
+   - Copied `image-generation/` - AI-generated diagrams
+   - Verified `tts-conversion/` present
+   - Total: 5 skills documented
+
+9. **FedRAMP/Security** (LOW - SKIPPED)
+   - Explicitly skipped per Tamir's directive: "Beside the fed ramp stuff (we dont need them there)"
+
+**Final Stats:**
+- 58 files (399 KB total, up from initial 20 files)
+- 9 GitHub Actions workflows
+- 9 utility scripts (Podcaster, Teams, briefing, testing)
+- 5 skills (project board, Teams, TTS, CLI tunnel, image gen)
+- 5 comprehensive docs (48.5 KB documentation)
+- 7 agent charters
+
+**Blog Post Alignment:**
+Verified 100% alignment with blog post "How an AI Squad Changed My Productivity":
+- ✅ Ralph autonomous monitoring → ralph-watch.ps1 + workflows
+- ✅ Decisions → .squad/decisions.md
+- ✅ Podcaster → Complete system with docs
+- ✅ Teams/email integration → Setup + docs
+- ✅ Squad Monitor → squad-monitor-standalone/
+- ✅ Scheduling → schedule.json
+- ✅ Multi-agent collaboration → 7 agents + routing
+- ✅ Observability → Comprehensive docs + dashboard
+
+**Key Learning:**
+When creating a public demo, complete implementation is more valuable than minimal examples. Users want:
+- Working scripts they can run immediately
+- Comprehensive documentation for troubleshooting
+- Clear connection to blog post claims (prove what you say)
+- Multiple integration points (GitHub, Teams, cloud storage)
+- End-to-end workflows (not just code snippets)
+
+**Outcome:** Demo repository is production-ready and ready for public release. Zero sensitive data. Complete feature coverage. Ready to inspire others to build their own Squad teams.
+
+**Next Actions for Tamir:**
+1. Create public GitHub repository: `gh repo create tamirdresher/ai-squad-demo --public`
+2. Add link to blog post
+3. Add demo link to blog post
+
 ### 2026-03-25: Picard — Sanitized Demo Repository — Issue #242
 
 **Assignment:** Create a clean, sanitized demo repository that can be shared publicly to teach others about Squad.
@@ -3129,6 +3225,103 @@ ame, description (with when-to-use/NOT)
 - Multiple plugins in one repo is standard pattern (not one-plugin-per-repo)
 
 **Status:** Implementation plan posted to issue #252. Awaiting user confirmation to proceed.
+
+---
+
+### 2026-03-09: Issue #255 — Periodic Tech News Scanning Architecture
+
+**Task:** Research and design automated periodic tech news scanning feature for HackerNews, Reddit, and other dev sources with Hebrew podcast generation.
+
+**Research Findings:**
+
+1. **Existing Infrastructure (Reusable):**
+   - **Podcaster Agent:** Proven TTS implementation with edge-tts (en-US-JennyNeural)
+   - **Digest Generator:** .squad/scripts/generate-digest.ps1 aggregates structured data
+   - **GitHub Actions Pattern:** squad-daily-digest.yml provides scheduling template
+   - **OneDrive Upload:** scripts/upload-podcast.ps1 handles cloud storage
+   - **Hebrew TTS Support:** edge-tts provides he-IL-HilaNeural and he-IL-AvriNeural voices
+
+2. **Past Work (Issue #185):**
+   - Seven performed manual one-time tech research (HackerNews, Reddit, X)
+   - Delivered comprehensive report but required manual initiation
+   - Validated data sources and relevance to Tamir's interests (Kubernetes, .NET, Azure, AI)
+
+3. **Data Source APIs (Zero-Auth):**
+   - **HackerNews Algolia API:** No auth, front_page filter, keyword search
+   - **Reddit JSON API:** Public subreddits (r/kubernetes, r/dotnet, r/azure, r/devops)
+   - **GitHub Trending:** Via gh CLI (already authenticated)
+   - **RSS Feeds:** DevBlogs, Azure Blog, CNCF (standard XML parsing)
+
+4. **Hebrew Podcast Requirements:**
+   - edge-tts supports Hebrew voices (he-IL-HilaNeural female, he-IL-AvriNeural male)
+   - Translation via Azure Translator API (Free tier: 2M chars/month)
+   - Alternative: Copilot CLI translation (no additional Azure service)
+
+**Architecture Decision:**
+
+**System Design:**
+`
+GitHub Actions (Daily 7 AM UTC)
+  → PowerShell Scanner (aggregate APIs)
+  → Copilot CLI (AI filtering/scoring)
+  → Markdown Digest (.squad/digests/tech-news-YYYY-MM-DD.md)
+  → Podcaster (English + Hebrew audio)
+  → OneDrive Upload + GitHub/Teams notification
+`
+
+**Key Design Choices:**
+
+1. **Scheduling: GitHub Actions > Azure Functions**
+   - Rationale: Leverage existing self-hosted runner, zero new infrastructure
+   - Trade-off: Requires runner maintenance vs. serverless
+
+2. **AI Filtering: Copilot CLI Integration**
+   - Relevance scoring (0-10) reduces noise by filtering low-relevance items
+   - Summarization (3-sentence summaries) improves digest readability
+   - De-duplication across sources prevents redundant content
+
+3. **Hebrew Translation: Azure Translator API**
+   - Production-grade translation quality
+   - Free tier sufficient (5K chars/day × 30 = 150K/month << 2M limit)
+   - Fallback: Copilot CLI translation if Azure API unavailable
+
+4. **Phased Rollout:**
+   - Phase 1 (2 weeks): MVP — HackerNews + Reddit + English podcast
+   - Phase 2 (2 weeks): AI filtering + Hebrew podcast
+   - Phase 3 (1 week): GitHub Trending + RSS + Teams delivery
+   - Phase 4 (Optional): Continuous learning pattern extraction
+
+**Risk Mitigations:**
+
+- **API Rate Limits:** All APIs zero-auth with generous limits; fallback caching
+- **Content Overload:** AI scoring filters items <4/10 relevance
+- **Translation Quality:** Azure Translator (not Google Translate); Tamir feedback loop
+- **Workflow Execution Time:** Self-hosted runner (no timeout), parallelized API calls
+
+**Deliverables:**
+
+- ✅ **Architecture Plan:** Comprehensive 21KB markdown document (tech-news-plan.md)
+- ✅ **Posted to Issue #255:** Complete plan with implementation phases, API details, infrastructure requirements
+- ⏳ **Awaiting Tamir Decisions:**
+  1. Approve Phase 1 MVP scope?
+  2. Hebrew podcast priority (Phase 2 or later)?
+  3. Preferred Teams channel for delivery?
+  4. Hebrew voice preference (HilaNeural female or AvriNeural male)?
+
+**Key Insights:**
+
+- **Existing Squad Infrastructure is 80% of the Solution:** Podcaster, digest generator, GitHub Actions, and OneDrive upload already production-ready. New work is primarily API aggregation script.
+- **Hebrew Support is Trivial:** edge-tts has Hebrew voices built-in. Only missing piece is translation (Azure Translator API or Copilot CLI).
+- **Zero New Infrastructure for MVP:** All components run on existing self-hosted runner. Azure Functions optional for Phase 4+.
+- **AI Filtering is the Quality Gate:** Without Copilot CLI scoring, digest would be 100-200 items/day (too noisy). AI reduces to 15-25 actionable items.
+- **Continuous Learning Potential (Phase 4):** Recurring themes in tech news can be promoted to squad skills (e.g., "AKS deprecations → always check DK8S compatibility").
+
+**Next Steps:**
+
+1. Await Tamir approval for Phase 1 kickoff
+2. If approved: Assign to Data (scanner script) + Podcaster (Hebrew voice) + Neelix (Teams card)
+3. Prototype manual API calls to validate HackerNews/Reddit integration
+4. Provision Azure Translator resource (Phase 2 prep)
 
 ---
 

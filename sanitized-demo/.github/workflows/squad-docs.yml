@@ -1,0 +1,65 @@
+name: Squad Documentation Update
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.squad/**'
+      - 'docs/**'
+      - 'README.md'
+  workflow_dispatch:
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate documentation index
+        run: |
+          echo "# Squad Documentation Index" > docs/INDEX.md
+          echo "" >> docs/INDEX.md
+          echo "Auto-generated documentation index." >> docs/INDEX.md
+          echo "" >> docs/INDEX.md
+          
+          echo "## Agent Charters" >> docs/INDEX.md
+          for file in .squad/agents/*/charter.md; do
+            agent=$(basename $(dirname "$file"))
+            echo "- [$agent]($file)" >> docs/INDEX.md
+          done
+          
+          echo "" >> docs/INDEX.md
+          echo "## Skills" >> docs/INDEX.md
+          for file in .squad/skills/*/SKILL.md; do
+            skill=$(basename $(dirname "$file"))
+            echo "- [$skill]($file)" >> docs/INDEX.md
+          done
+          
+          echo "" >> docs/INDEX.md
+          echo "## Documentation" >> docs/INDEX.md
+          for file in docs/*.md; do
+            if [ "$file" != "docs/INDEX.md" ]; then
+              doc=$(basename "$file" .md)
+              echo "- [$doc]($file)" >> docs/INDEX.md
+            fi
+          done
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit documentation updates
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/INDEX.md
+          git commit -m "docs: Update documentation index [skip ci]"
+          git push

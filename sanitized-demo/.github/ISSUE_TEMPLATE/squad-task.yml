@@ -1,0 +1,16 @@
+name: Squad Task
+description: Create a task for the Squad AI team
+labels: ["squad"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue will be triaged by the Squad lead and assigned to the appropriate team member.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Optional - describe the task or leave blank if the title is sufficient.
+      placeholder: Add details here if needed...
+    validations:
+      required: false

@@ -1,0 +1,70 @@
+name: Squad Archive Done
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  archive-done:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Archive completed issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find issues with squad label that are closed
+            const closedIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              labels: 'squad',
+              per_page: 100
+            });
+            
+            console.log(`Found ${closedIssues.data.length} closed Squad issues`);
+            
+            // Check if they've been closed for more than 7 days
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            
+            for (const issue of closedIssues.data) {
+              const closedAt = new Date(issue.closed_at);
+              
+              if (closedAt < sevenDaysAgo) {
+                // Check if already archived
+                const hasArchiveLabel = issue.labels.some(l => l.name === 'archived');
+                
+                if (!hasArchiveLabel) {
+                  console.log(`Archiving issue #${issue.number}: ${issue.title}`);
+                  
+                  // Add archived label
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: ['archived']
+                  });
+                  
+                  // Add archive comment
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: '📦 This issue has been automatically archived after being closed for 7+ days.'
+                  });
+                  
+                  // Lock the issue
+                  await github.rest.issues.lock({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    lock_reason: 'resolved'
+                  });
+                }
+              }
+            }

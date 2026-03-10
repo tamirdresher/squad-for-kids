@@ -1,0 +1,122 @@
+name: Drift Detection
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+  workflow_dispatch:
+
+jobs:
+  detect-drift:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check agent charter consistency
+        id: check_charters
+        run: |
+          echo "Checking agent charters for required sections..."
+          drift_found=false
+          
+          for charter in .squad/agents/*/charter.md; do
+            agent=$(basename $(dirname "$charter"))
+            
+            # Check for required sections
+            if ! grep -q "## Role" "$charter"; then
+              echo "::warning::$agent charter missing Role section"
+              drift_found=true
+            fi
+            
+            if ! grep -q "## Style" "$charter"; then
+              echo "::warning::$agent charter missing Style section"
+              drift_found=true
+            fi
+          done
+          
+          echo "drift_found=$drift_found" >> $GITHUB_OUTPUT
+      
+      - name: Check skill documentation
+        id: check_skills
+        run: |
+          echo "Checking skill documentation..."
+          drift_found=false
+          
+          for skill in .squad/skills/*; do
+            if [ -d "$skill" ]; then
+              skillname=$(basename "$skill")
+              if [ ! -f "$skill/SKILL.md" ]; then
+                echo "::warning::Skill $skillname missing SKILL.md"
+                drift_found=true
+              fi
+            fi
+          done
+          
+          echo "drift_found=$drift_found" >> $GITHUB_OUTPUT
+      
+      - name: Check workflow configuration
+        id: check_workflows
+        run: |
+          echo "Checking workflow configuration..."
+          drift_found=false
+          
+          # Check if schedule.json exists
+          if [ ! -f ".squad/schedule.json" ]; then
+            echo "::warning::schedule.json missing"
+            drift_found=true
+          fi
+          
+          # Check if team.md exists
+          if [ ! -f ".squad/team.md" ]; then
+            echo "::warning::team.md missing"
+            drift_found=true
+          fi
+          
+          echo "drift_found=$drift_found" >> $GITHUB_OUTPUT
+      
+      - name: Create drift detection issue
+        if: steps.check_charters.outputs.drift_found == 'true' || steps.check_skills.outputs.drift_found == 'true' || steps.check_workflows.outputs.drift_found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔍 Configuration Drift Detected';
+            const body = `## Configuration Drift Report
+            
+            Automated drift detection found inconsistencies in Squad configuration.
+            
+            **Detected Issues:**
+            - Agent charter inconsistencies
+            - Missing skill documentation
+            - Configuration file issues
+            
+            **Action Required:**
+            Review the workflow run logs for details and update the configuration accordingly.
+            
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            `;
+            
+            // Check if drift issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'drift-detection'
+            });
+            
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['drift-detection', 'squad', 'squad:picard']
+              });
+            } else {
+              // Update existing issue with new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues.data[0].number,
+                body: `## New Drift Detected\n\n${body}`
+              });
+            }

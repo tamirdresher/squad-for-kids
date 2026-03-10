@@ -2898,3 +2898,98 @@ Also filed: .squad/decisions/inbox/picard-cross-squad-design.md (decision record
 
 ---
 
+
+### 2026-03-09: Picard — Demo Repository Planning — Issue #242 (ROUND 2)
+
+**Assignment:** Plan what should go into the standalone demo repository, synchronize with blog post (Issue #41), and inventory all utilities and procedures built during the project.
+
+**Context:**
+- Initial sanitized-demo/ directory was created but Tamir wants a separate repo
+- Need to sync with blog post about Squad productivity system
+- Missing several key components: custom issue template, Podcaster system, additional utilities
+
+**Comprehensive Inventory Completed:**
+
+1. **Core Squad Infrastructure** (✅ Complete in sanitized-demo/)
+   - All agent charters, decisions, routing, team configuration
+   - Ralph watch script for autonomous operation
+   - Squad Monitor dashboard (C# + .NET 8)
+   - Scheduling system (schedule.json)
+
+2. **GitHub Actions Workflows** (⚠️ 6 of 10 present)
+   - Have: triage, heartbeat, daily digest, issue notify, label sync, label enforce
+   - Missing: docs automation, drift detection, FedRAMP validation, archive automation
+
+3. **Custom Issue Template** (❌ Missing from demo)
+   - Source: .github/ISSUE_TEMPLATE/squad-task.yml
+   - Simplifies task creation for AI team
+   - Mentioned in blog post
+
+4. **Podcaster System** (❌ Missing from demo - HIGH PRIORITY)
+   - podcaster-conversational.py (two-voice NotebookLM-style)
+   - podcaster-prototype.py (single narrator)
+   - upload-podcast.ps1/py (cloud storage integration)
+   - PODCASTER_README.md (complete docs)
+   - Explicitly mentioned in blog: "Podcaster agent converts research documents into audio summaries"
+
+5. **Teams & Email Integration** (⚠️ Partial)
+   - Have: teams-monitor skill documentation
+   - Missing: setup-github-teams-integration.ps1
+   - Missing: WorkIQ integration documentation
+
+6. **Additional Utilities & Procedures:**
+   - daily-rp-briefing.ps1 (automated status reports)
+   - smoke-tests/ (testing framework)
+   - fedramp-baseline/ scripts (security compliance)
+   - cli-tunnel skill (remote terminal access)
+   - image-generation skill (AI diagrams)
+
+**Blog Post Synchronization:**
+Mapped blog sections to demo components:
+- "Ralph: Continuous Autonomous Observation" → ralph-watch.ps1 ✅
+- "Podcaster Agent" → podcaster scripts ❌ MISSING
+- "Teams & Email Integration" → setup scripts ⚠️ PARTIAL
+- "Squad Monitor" → squad-monitor-standalone/ ✅
+- "Security & Compliance" → FedRAMP scripts ❌ MISSING
+
+**Deliverable:**
+Comprehensive plan posted to Issue #242 with:
+- Complete file structure for demo repo
+- Status matrix of all components (Complete/Partial/Missing)
+- Three-phase rollout plan (High/Medium/Low priority)
+- Explicit connections to blog post content
+
+**Decision Needed:**
+Approval to proceed with Phase 1 additions:
+- Custom issue template
+- Complete Podcaster system with documentation
+- Enhanced documentation (workflows, scheduling, podcaster guides)
+- Updated README with blog post connections
+
+**Key Learning:**
+Demo repositories need to be comprehensive showcases, not minimal examples. The Podcaster system, Teams integration, and utility scripts are differentiators that make this Squad implementation unique. They must be included to match blog post claims.
+
+**Status:** Awaiting Tamir's approval on Phase 1 scope before implementation.
+
+---
+
+
+### 2026-03-09: Picard — Demo Repository Planning — Issue #242 (COMPLETED)
+
+**Assignment:** Create comprehensive plan for demo repository to accompany blog post #41. Demo must showcase the complete Squad automation system.
+
+**Outcome:** SUCCESS — Comprehensive 10-category, 3-phase plan posted to Decision 16.
+
+**Plan Structure:**
+- **Tier 1 (Essential):** Core Squad framework, agent charters, Ralph watch script, GitHub Actions (6), custom issue template, Squad Monitor
+- **Tier 2 (High Value):** Podcaster system (conversational + single-voice), Teams/email integration, additional workflows, scheduling docs
+- **Tier 3 (Advanced):** Daily briefing, smoke tests, FedRAMP tools (sanitized), CLI tunnel, advanced troubleshooting
+
+**Phase 1 (Week 1):** Custom template, Podcaster docs, comprehensive guides, README alignment  
+**Phase 2 (Week 2):** Remaining workflows, Teams setup, utility scripts, additional skills  
+**Phase 3 (Post-Release):** Security tools, video walkthrough, advanced guides  
+
+**Key Insight:** Three-tier structure allows progressive adoption — users start with Tier 1, then adopt Tier 2/3 as needed. Credibility of blog tied to demo completeness.
+
+**Next:** Awaiting Tamir approval for Phase 1 implementation.
+

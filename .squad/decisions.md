@@ -14296,3 +14296,156 @@ The initial sanitized demo only included agent charters and basic .squad/ struct
 - ✅ Ready for public release / blog post / demo video
 
 ---
+
+---
+
+## Decision 16: Demo Repository Content Strategy
+
+**Date:** 2026-03-09
+**Author:** Picard (Lead)
+**Status:** 📋 Proposed
+**Scope:** Documentation & Demo
+**Related Issues:** #242, #41
+
+## Context
+
+Tamir requested a standalone, sanitized demo repository to accompany the blog post "How an AI Squad Changed My Productivity" (Issue #41). The demo must showcase the complete Squad automation system including all utilities, procedures, and integrations built during the project.
+
+Initial sanitized-demo/ directory exists but is incomplete. Missing key components that are explicitly mentioned in the blog post (Podcaster, Teams integration, various utilities).
+
+## Problem
+
+**Completeness vs. Simplicity Tradeoff:**
+- A minimal demo is easy to understand but doesn't showcase the full system capabilities
+- A comprehensive demo better represents the actual productivity gains but risks overwhelming new users
+- Blog post makes specific claims about features that must be demonstrated
+
+**Synchronization Challenge:**
+- Blog post explicitly mentions: Podcaster, Teams/email monitoring, scheduled tasks, Squad Monitor, security/compliance tools
+- Demo must back up every claim in the blog with working code/documentation
+- Missing components create credibility gap
+
+## Decision
+
+**Build a comprehensive, three-tier demo repository:**
+
+### Tier 1: Core Squad Framework (ESSENTIAL)
+- All agent charters and configurations
+- Ralph watch script for autonomous operation
+- GitHub Actions workflows (core 6)
+- Custom issue template
+- Basic skills (github-project-board, teams-monitor)
+- Squad Monitor dashboard
+- Complete documentation
+
+### Tier 2: Differentiating Features (HIGH VALUE)
+- **Podcaster system** (conversational + single-voice modes)
+  - Rationale: Unique capability mentioned in blog, demonstrates AI-generated content
+- **Teams & email integration scripts**
+  - Rationale: Blog emphasizes async communication bridge
+- **Additional workflows** (docs automation, drift detection)
+  - Rationale: Shows enterprise-grade automation
+- **Scheduling system documentation**
+  - Rationale: Explains how autonomous operation works
+
+### Tier 3: Advanced Utilities (OPTIONAL)
+- Daily briefing scripts
+- Smoke test framework
+- FedRAMP/security baseline tools (sanitized)
+- CLI tunnel and image generation skills
+- Advanced troubleshooting guides
+
+## Rationale
+
+**Why Comprehensive Over Minimal:**
+
+1. **Credibility:** Blog makes specific feature claims. Demo must deliver evidence.
+
+2. **Differentiation:** Basic Squad setup is in bradygaster/squad docs. Our demo shows what you can BUILD with Squad, not just how to use it.
+
+3. **Learning Value:** Developers learn more from complete working examples than toy demonstrations.
+
+4. **Blog Alignment:** Demo repository is referenced in blog post. Mismatch between claims and reality undermines both.
+
+5. **Reusability:** Users can fork specific utilities (Podcaster, Teams bridge) even if they don't use the full Squad system.
+
+**Why Three-Tier Structure:**
+
+- **Tier 1** ensures basic functionality works out of the box
+- **Tier 2** demonstrates unique value propositions
+- **Tier 3** provides depth without overwhelming initial setup
+
+Users can start with Tier 1, then progressively adopt Tier 2/3 features as needed.
+
+## Implementation
+
+**Phase 1 (Week 1):**
+- Add custom issue template
+- Complete Podcaster system with documentation
+- Create comprehensive docs (WORKFLOWS.md, SCHEDULING.md, PODCASTER.md)
+- Update README with blog post cross-references
+
+**Phase 2 (Week 2):**
+- Add remaining GitHub Actions workflows
+- Add Teams integration setup scripts
+- Add utility scripts (daily briefing, smoke tests)
+- Add additional skills (cli-tunnel, image-generation)
+
+**Phase 3 (Post-Release):**
+- Add sanitized FedRAMP/security scripts
+- Create video walkthrough
+- Advanced troubleshooting guides
+
+## Consequences
+
+**Positive:**
+- ✅ Demo fully backs up blog post claims
+- ✅ Users get production-quality examples, not toys
+- ✅ Showcases unique innovations (Podcaster, Teams bridge, scheduler)
+- ✅ Provides reusable components for forking
+- ✅ Establishes credibility for blog content
+
+**Negative:**
+- ⚠️ More complex initial setup (mitigated by GETTING_STARTED.md)
+- ⚠️ More code to sanitize (one-time cost)
+- ⚠️ Larger repository size (still manageable, ~2-3 MB)
+
+**Trade-offs Accepted:**
+- Complexity for completeness
+- Setup time for capability demonstration
+- Repository size for feature richness
+
+## Alternatives Considered
+
+**Alternative 1: Minimal Demo (Core Only)**
+- Pros: Simple, easy to understand
+- Cons: Doesn't showcase innovations, contradicts blog claims
+- **Rejected:** Credibility gap with blog post
+
+**Alternative 2: Multiple Demo Repos**
+- Pros: Separation of concerns, optional complexity
+- Cons: Fragmentation, harder to maintain, confusing for users
+- **Rejected:** Adds organizational overhead
+
+**Alternative 3: Main Repo as Demo**
+- Pros: No duplication, always up-to-date
+- Cons: Contains sensitive data, not shareable publicly
+- **Rejected:** Security and privacy concerns
+
+## Related Decisions
+
+- Decision 15: Sanitized Demo Infrastructure Completion (already adopted)
+- Blog post content strategy (Issue #41)
+
+## Approval Needed
+
+Awaiting Tamir's approval to proceed with Phase 1 implementation:
+- [ ] Custom issue template addition
+- [ ] Podcaster system integration
+- [ ] Documentation enhancements
+- [ ] README blog post alignment
+
+---
+
+**Next Step:** Implement Phase 1 upon approval, then create new public GitHub repository.
+

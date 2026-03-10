@@ -78,5 +78,13 @@
       "universe": "Star Trek TNG/Voyager",
       "status": "active"
     }
+  },
+  "kes": {
+    "role": "Communications & Scheduling",
+    "legacy_named": false,
+    "created_at": "2026-03-10T13:14:43.1704439+02:00",
+    "persistent_name": "Kes",
+    "universe": "Star Trek Voyager",
+    "status": "active"
   }
 }

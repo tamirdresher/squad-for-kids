@@ -66,3 +66,5 @@ When triaging, the Lead should ask:
 | Audio content generation, TTS, markdown to audio | Podcaster | — |
 | News, briefings, status reports, Teams updates | Neelix | Seven |
 
+
+| Meetings, calendar, email, scheduling, invites, attendees, communications | Kes | Playwright + Outlook web |

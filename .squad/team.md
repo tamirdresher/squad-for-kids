@@ -14,6 +14,7 @@
 | Podcaster | Audio Content Generator | `.squad/agents/podcaster/charter.md` | ✅ Active |
 | Tamir Dresher | 👤 Human — Project Owner | — | 👤 Human |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
+| Kes | Communications & Scheduling | `.squad/agents/kes/charter.md` | ✅ Active |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 | Neelix | News Reporter | `.squad/agents/neelix/charter.md` | ✅ Active |
 
@@ -30,4 +31,5 @@
 | Repository | `tamirdresher_microsoft/tamresearch1` |
 | Connected | 2026-03-06 |
 | Filters | All open issues |
+
 

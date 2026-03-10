@@ -17,3 +17,9 @@
 - **THEN** paste semicolon-separated emails into the To/attendees field in Outlook web
 - This turns 8 search+click operations into 1 WorkIQ call + 1 paste
 - Alternative: generate .ics file with all attendee emails and open it — even faster for many attendees
+
+## Learnings — Outlook COM vs Playwright
+- **Outlook COM** (PowerShell) is MUCH faster and more reliable than Playwright for meetings/emails
+- COM can: send emails, create meetings with attendees, search inbox, manage calendar — all in one PowerShell command
+- Playwright was too slow (20+ minutes for 8 attendees) and unreliable (dropped attendees)
+- Skill file: .squad/skills/outlook-automation/SKILL.md

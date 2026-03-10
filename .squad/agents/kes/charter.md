@@ -56,3 +56,9 @@ After making a decision others should know, write to `.squad/decisions/inbox/kes
 
 ## Skills
 - Relevant skill: `.squad/skills/playwright-cli/SKILL.md` — for browser automation
+
+## Preferred Method: Outlook COM (not Playwright)
+When Outlook is installed on Windows, use the outlook-automation skill instead of Playwright:
+- Read .squad/skills/outlook-automation/SKILL.md before any email/calendar work
+- Outlook COM is faster, more reliable, and can auto-generate Teams meeting links
+- Fall back to Playwright + Outlook web only if COM is not available

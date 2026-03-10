@@ -17,9 +17,11 @@
 $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
 
-# Set window title so you know this is Ralph
-$Host.UI.RawUI.WindowTitle = "🔄 Ralph Watch — tamresearch1"
-[Console]::Title = "🔄 Ralph Watch — tamresearch1"
+# Set window/tab title (works in Windows Terminal, cmd, and pwsh)
+$ralphTitle = "Ralph Watch - tamresearch1"
+$Host.UI.RawUI.WindowTitle = $ralphTitle
+[Console]::Title = $ralphTitle
+Write-Host "`e]0;$ralphTitle`a" -NoNewline  # OSC escape sequence for Windows Terminal tabs
 
 # --- Single-instance guard (mutex + lockfile + process scan) ---
 
@@ -337,7 +339,7 @@ while ($true) {
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Cyan
     Write-Host "[$displayTime] Ralph Round $round started" -ForegroundColor Cyan
-    try { $Host.UI.RawUI.WindowTitle = "🔄 Ralph Watch — Round $round — tamresearch1" } catch {}
+    try { $Host.UI.RawUI.WindowTitle = "Ralph Watch - Round $round"; Write-Host "`e]0;Ralph Watch - Round $round`a" -NoNewline } catch {}
     Write-Host "============================================" -ForegroundColor Cyan
     
     # Write heartbeat BEFORE round (status: running)

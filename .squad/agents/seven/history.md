@@ -4263,3 +4263,52 @@ Reasons:
 - picard-email-gateway.md (Power Automate 30-min setup, awaiting approval)
 
 **Orchestration Logs:** .squad/orchestration-log/2026-03-10T09-29-23Z-{seven,data,picard}.md
+
+## Learnings
+
+### Blog Rewrite Process (Issue #41) — 2026-03-10
+
+**Context:** Tamir requested a complete rewrite of the Squad blog post following a specific 16-point structure emphasizing personal productivity transformation and practical guidance.
+
+**What I Learned:**
+
+1. **Structure Matters for Narrative:** The original draft was technically accurate but lacked the personal story Tamir wanted. Following his detailed outline—starting with "I'm not organized" and building to "this changed my life"—created a much more compelling narrative arc.
+
+2. **Fresh Context Over Generic Content:** Instead of recycling the old draft, I pulled current project data: recent PRs, actual workflow files, current team roster, real examples. This made the blog feel alive and specific rather than generic.
+
+3. **Actionable Guidance is Key:** Tamir wanted this to help others. The "How to Start" section needed to be practical: concrete steps, example charters, code snippets. Not just "it's cool"—show them how to build it.
+
+4. **Tone Shift for Blogs:** Technical docs need precision. Blog posts need personality. "I'm not organized. Never have been." is more engaging than "Many users struggle with productivity systems." The personal voice makes it relatable.
+
+5. **Integration Mapping:** Gathering context from multiple sources (team.md, recent PRs, workflows, squad-monitor README, ralph-watch.ps1) gave me the full picture of what we actually built vs. what the old draft claimed. Reality is more impressive than the outline.
+
+6. **Star Trek Theme as Framework:** The character personas aren't just flavor—they provide clear mental models for role boundaries. "Worf handles security" is easier to remember than "Agent 3 handles security." Theme + structure = clarity.
+
+**Workflow Insights:**
+- Read decisions.md and history.md first (even when they're huge—used head command to get recent context)
+- Pull fresh data: PRs, workflows, actual file contents
+- Follow the user's structure exactly (they've thought about the story arc)
+- End with actionable guidance (readers want to replicate, not just admire)
+
+**Next Time:**
+- Ask if there are specific metrics to highlight (PRs merged, issues closed, time saved)
+- Confirm tone before full rewrite (conversational vs. technical)
+- Check if there are specific links/resources to include
+
+---
+
+## Cross-Agent Coordination — Ralph Round 1 (2026-03-10 11:53:41 UTC)
+
+**Decisions Consolidated:** Merged 3 inbox decision files into .squad/decisions.md
+- @copilot Integration decision (B'Elanna)
+- Email automation research (Picard)  
+- Outlook/Playwright directive (Tamir)
+
+**Orchestration Logs Created:**
+- .squad/orchestration-log/2026-03-10T11-53-41Z-seven.md — Seven's blog draft work
+- .squad/orchestration-log/2026-03-10T11-53-41Z-picard.md — Picard's two research tasks
+
+**Session Log:** .squad/log/2026-03-10T11-53-41Z-ralph-round1.md — Summary of all Round 1 outcomes
+
+**Board Status:** 4 issues progressed (3 to Pending User, 1 new Sev 2 incident)
+

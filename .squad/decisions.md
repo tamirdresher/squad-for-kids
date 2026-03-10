@@ -16449,3 +16449,349 @@ If we reach 4+ repos, revisit multi-repo config. At that point:
 **Option B (separate instance)** — kept as fallback if squad-monitor workload becomes so high it overshadows tamresearch1. Low likelihood given squad-monitor issue count (3 vs. ongoing tamresearch1 stream).
 
 
+
+---
+# Decision: @copilot Integration into Squad
+
+**Date:** 2026-03-10  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Context:** Issue #269  
+**Status:** ✅ Implemented (PR #270)
+
+## Decision
+
+Integrated @copilot as a Coding Agent member of the Squad with:
+1. Capability-based routing (🟢/🟡/🔴 rating system)
+2. Auto-assignment for `squad:copilot` labeled issues
+3. Scheduled PR health monitoring every 15 minutes
+4. Guidance documentation for @copilot operations
+
+## Rationale
+
+**Why now:**
+- Squad has well-defined tasks suitable for autonomous agent work (bug fixes, tests, small features)
+- PR review overhead can be reduced with automated monitoring and reviews
+- @copilot routing infrastructure already exists in `.squad/routing.md`
+
+**Why this approach:**
+- **Capability profile** allows Lead to triage appropriately (🟢 = good fit, 🟡 = needs review, 🔴 = not suitable)
+- **Auto-assign flag** enables autonomous pickup without manual assignment
+- **Schedule.json entry** ensures PR health is monitored consistently
+- **Copilot-instructions.md** provides clear boundaries and escalation paths
+
+## Implementation Details
+
+### 1. Team Roster Changes (`.squad/team.md`)
+```markdown
+| @copilot | Coding Agent | — | 🤖 Active |
+
+<!-- copilot-auto-assign: true -->
+
+## @copilot Capability Profile
+| Category | Rating | Notes |
+|----------|--------|-------|
+| Bug fixes, test additions | 🟢 Good fit | Well-defined, bounded scope |
+| Small features with specs | 🟡 Needs review | PR review required |
+| Architecture, security | 🔴 Not suitable | Keep with squad members |
+```
+
+### 2. Scheduled Monitoring (`schedule.json`)
+```json
+{
+  "name": "pr-health-check",
+  "interval": "15m",
+  "description": "Check open PRs for review feedback, CI failures, stale PRs, auto-merge approved"
+}
+```
+
+### 3. Guidance Documentation (`.github/copilot-instructions.md`)
+- Context reading (team.md, routing.md, decisions.md)
+- Project conventions (branch naming: `squad/{issue}-{description}`)
+- Capability boundaries (when to escalate to squad members)
+- PR guidelines (review behavior, testing requirements)
+- Escalation procedures (tag @picard for unclear requirements, @worf for security, @belanna for infrastructure)
+
+## Routing Workflow
+
+1. **Issue gets `squad` label** → Lead (Picard) triages
+2. **Lead evaluates @copilot capability fit:**
+   - 🟢 Good fit → Apply `squad:copilot` label
+   - 🟡 Needs review → Apply `squad:copilot` + note "PR review required"
+   - 🔴 Not suitable → Route to appropriate squad member
+3. **`squad:copilot` label applied + auto-assign enabled** → @copilot is assigned automatically
+4. **@copilot works on issue** → Creates PR with `Closes #<issue-number>`
+5. **PR health check (every 15 min)** → Monitors reviews, CI, staleness, auto-merge approved PRs
+
+## Constraints & Boundaries
+
+**@copilot should handle:**
+- Bug fixes with clear reproduction steps
+- Test additions for existing features
+- Dependency updates
+- Documentation updates (non-architectural)
+- Small features with complete specifications
+
+**@copilot should NOT handle:**
+- Architecture decisions or design changes
+- Security-sensitive code (auth, encryption, access control)
+- API design or breaking changes
+- Complex refactoring without tests
+- Work requiring domain expertise or judgment calls
+
+**Escalation triggers:**
+- Unclear or incomplete requirements
+- Security concerns discovered during work
+- Architecture questions
+- Infrastructure/deployment issues
+
+## Branch Protection (Deferred)
+
+Requiring reviews before merge requires GitHub repo admin access. Configuration steps:
+1. Settings → Branches → Branch protection rules
+2. Add rule for `main` branch
+3. Require pull request reviews before merging (1 approver minimum)
+4. Require status checks to pass before merging
+
+**Decision:** Defer to Tamir (repo admin) or configure after PR #270 merges.
+
+## Success Metrics
+
+- **Issue throughput:** Number of `squad:copilot` issues completed per week
+- **PR quality:** Review approval rate, CI pass rate
+- **Escalation rate:** % of issues @copilot escalates to squad members
+- **Lead triage time:** Time spent evaluating capability fit per issue
+- **PR staleness:** % of PRs that become stale (no activity for 7+ days)
+
+## Alternatives Considered
+
+1. **Manual @copilot assignment (no auto-assign)**
+   - Rejected: Adds friction; Lead would need to manually assign every time
+   
+2. **No capability profile (route everything)**
+   - Rejected: @copilot would receive inappropriate tasks (security, architecture)
+   
+3. **No scheduled PR monitoring**
+   - Rejected: PRs could go stale; CI failures unnoticed
+   
+4. **External PR monitoring tool**
+   - Rejected: Squad already has schedule.json + Ralph infrastructure
+
+## Rollback Plan
+
+If @copilot integration causes issues:
+1. Remove `squad:copilot` routing from `.squad/routing.md`
+2. Set auto-assign flag to `false` in `team.md`
+3. Remove `pr-health-check` from `schedule.json`
+4. Re-route open `squad:copilot` issues to squad members
+
+## Future Enhancements
+
+- **PR auto-merge:** If CI passes + approved → auto-merge (requires branch protection + repo settings)
+- **Review comment resolution:** @copilot responds to review feedback autonomously
+- **Capability learning:** Track which issue types succeed/fail → refine capability profile
+- **Multi-agent coordination:** @copilot + squad member pair programming for 🟡 complexity work
+
+## References
+
+- Issue: #269
+- PR: #270
+- Related routing: `.squad/routing.md` (lines 16, 25)
+- Team charter: `.squad/team.md`
+- Schedule manifest: `schedule.json` (repo root)
+
+
+---
+# Decision: Email-to-Action Automation System Research
+
+**Date:** 2026-03-10  
+**Decider:** Picard (Lead)  
+**Issue:** tamresearch1#259  
+**Status:** RESEARCH COMPLETE → PENDING USER CHOICE
+
+## Context
+
+User requested email-based interface for wife to send automation requests:
+- Print documents (forward to HP ePrint address)
+- Add calendar events  
+- Create reminders/tasks
+
+## Options Evaluated
+
+### 1. Power Automate (RECOMMENDED)
+- **Feasibility:** HIGH | **Complexity:** LOW | **Squad Integration:** MODERATE
+- Native M365 integration, 30-minute setup
+- Handles all three use cases with sender filtering security
+- **Trade-off:** Limited to Microsoft connectors, may need license
+
+### 2. Azure Logic Apps  
+- **Feasibility:** HIGH | **Complexity:** MEDIUM | **Squad Integration:** HIGH
+- More developer-friendly, can create GitHub issues for Squad
+- Managed Identity support, better for complex logic
+- **Trade-off:** Azure subscription required, steeper learning curve
+
+### 3. Email-to-GitHub-Issues Bridge
+- **Feasibility:** MEDIUM | **Complexity:** LOW-MEDIUM | **Squad Integration:** HIGH  
+- Services: HubDesk, GitHub Tasks for Outlook, custom PA flow
+- Leverages existing Squad workflow, full audit trail
+- **Trade-off:** Still needs action execution layer, attachment handling limited
+
+### 4. Custom Graph API Solution
+- **Feasibility:** HIGH | **Complexity:** HIGH | **Squad Integration:** HIGH
+- Azure Function + Graph API webhooks, real-time processing
+- Full control, can integrate into Squad TypeScript codebase  
+- **Trade-off:** Development effort, hosting/maintenance overhead
+
+## Recommendation
+
+**Phase 1:** Power Automate (quick win, operational within 30 minutes)  
+**Phase 2:** Logic Apps or custom solution if Squad integration needed
+
+## Key Considerations
+
+- **Security:** Sender filtering CRITICAL, dedicated mailbox required
+- **Simplicity:** Start simple (PA) before building custom (YAGNI principle)
+- **Ecosystem:** Already in Microsoft 365, leverage existing infrastructure
+- **Maintainability:** Less code = less maintenance burden
+
+## Next Steps
+
+1. User selects approach (issue labeled status:pending-user)
+2. Implementation guidance provided based on selection
+3. Security review before production deployment
+
+## References
+
+- Issue #259: https://github.com/tamirdresher_microsoft/tamresearch1/issues/259
+- Research comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/259#issuecomment-4030799402
+
+
+---
+### 2026-03-10T13-07-59: User directive
+**By:** Tamir Dresher (via Copilot)
+**What:** Always use Playwright + Outlook web (outlook.office.com) to send emails and schedule meetings. Never use other methods.
+**Why:** User request — captured for team memory
+
+
+---
+
+# Decision: Ralph Parallelism Architecture (Issue #272)
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Status:** Proposed (pending user decision)  
+**Scope:** Architecture — Ralph work execution model  
+**Issue:** #272
+
+## Problem Statement
+
+Ralph's current work-check cycle processes work items **serially by category** (untriaged → assigned → CI failures → review feedback → approved PRs). When a heavy task takes 5+ minutes (blog rewrite, deep research), fast operations (board updates, label changes, triage) are blocked and starve.
+
+**Current bottleneck:** Squad coordinator spawns agents one category at a time. Within each category, agents spawn serially. This creates head-of-line blocking.
+
+## Options Evaluated
+
+### Option 1: Priority Queues
+Categorize work as `fast` (board ops, labels, triage) vs `slow` (code, research). Fast items always preempt.
+
+**Pros:** Simple, centralized change, no new infrastructure  
+**Cons:** Only 2 tiers, doesn't solve slow-vs-slow contention  
+**Complexity:** Low-Medium (⭐⭐)
+
+### Option 2: Parallel Work Pools ✅ RECOMMENDED
+Spawn ALL agents across ALL categories simultaneously in one `task` tool batch. Use existing `mode: "background"` + `read_agent` infrastructure.
+
+**Pros:** True parallelism, minimal code change, reuses proven patterns, best UX  
+**Cons:** Higher LLM resource usage, need better observability  
+**Complexity:** Low (⭐)  
+**Implementation:** 1-day change to Squad.agent.md lines 1008-1012 (Step 3)
+
+### Option 3: Time-Boxing
+Set max execution time per category. If exceeded, checkpoint and resume next round.
+
+**Pros:** Guarantees no task blocks indefinitely  
+**Cons:** High complexity, fragile checkpoint protocol, poor UX (interrupted work)  
+**Complexity:** High (⭐⭐⭐⭐)  
+**Not recommended** — complexity outweighs benefits
+
+### Option 4: Dedicated Lanes
+Split into "fast lane" (sync mode, inline) and "deep lane" (background, persistent across rounds).
+
+**Pros:** Clean separation, fast work never starves  
+**Cons:** New state file (deep-lane.json), more failure modes  
+**Complexity:** Medium-High (⭐⭐⭐)
+
+## Decision
+
+**Adopt Option 2 (Parallel Work Pools)** as Phase 1 implementation.
+
+**Rationale:**
+1. Leverages existing `mode: "background"` infrastructure (Squad.agent.md lines 520-540 already document parallel fan-out)
+2. Solves root problem: all work runs in parallel, no category blocks another
+3. Lowest implementation cost: 1-day change
+4. No new failure modes
+5. Best user experience: all work starts immediately, fast items complete in <1 min
+
+**Migration path:**
+- **Phase 1 (now):** Implement Option 2 (parallel work pools)
+- **Phase 2 (optional):** Add Option 1 priority tiers if we need finer control within the parallel batch
+
+## Implementation
+
+**File changes:**
+- `.github/agents/squad.agent.md` lines 1008-1012 (Step 3 logic)
+
+**Before (serial):**
+```typescript
+// Process ONE category at a time
+for (const category of [untriaged, assigned, ciFailures, ...]) {
+  const agents = spawnForCategory(category);
+  await collectResults(agents);
+  // Next category waits here
+}
+```
+
+**After (parallel):**
+```typescript
+// Spawn ALL categories in one batch
+const allAgentSpawns = [
+  ...untriaged.map(issue => spawnLeadTriage(issue)),
+  ...assigned.map(issue => spawnMemberAgent(issue)),
+  ...ciFailures.map(pr => spawnFixAgent(pr)),
+  // ... all categories
+];
+
+// Spawn ALL agents simultaneously (mode: "background")
+const agentIds = await Promise.all(allAgentSpawns);
+
+// Collect all results (wait: true, timeout: 300)
+const results = await Promise.all(
+  agentIds.map(id => readAgent(id, { wait: true, timeout: 300 }))
+);
+```
+
+## Expected Outcomes
+
+**User experience:**
+- Fast tasks (triage, labels, comments) complete in <1 minute
+- Heavy tasks (code changes, research) run in parallel without blocking fast work
+- Ralph rounds complete faster overall (10 items = 1 parallel batch vs 10 serial batches)
+
+**Risks:**
+- Higher LLM resource usage (multiple parallel calls) — monitor token costs
+- Need better observability to debug parallel failures — enhance Scribe logging
+
+## Next Steps (pending user approval)
+
+1. User reviews findings on issue #272
+2. If approved: implement Option 2 in `.github/agents/squad.agent.md`
+3. Test with 1 fast + 1 heavy task, verify parallel execution
+4. Document in Squad coordinator's Ralph section
+5. Monitor token usage and failure rates for 1 week
+
+## Related
+
+- Issue #272 — original problem statement
+- Squad.agent.md lines 520-540 — existing parallel fan-out pattern
+- Squad.agent.md lines 1008-1012 — Ralph Step 3 (implementation target)
+- Ralph.charter.md — no changes needed (coordinator handles execution)
+

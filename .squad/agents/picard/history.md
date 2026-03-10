@@ -3592,3 +3592,118 @@ GitHub Actions (Daily 7 AM UTC)
 
 **Key Learning:** Simplicity beats preemptive abstraction. With 3 squad-monitor issues and ongoing tamresearch1 stream, Option A handles current workload gracefully while staying maintainable.
 
+
+### 2026-03-10: Email-to-Action Automation Research (#259)
+
+**Role:** Lead/Architect
+**Issue:** tamresearch1#259 — "create an email address for wife to send automation requests"
+**Status:** ✅ RESEARCH COMPLETE → PENDING USER DECISION
+
+**Context:**
+User needs email-based interface for wife to trigger automations:
+- Print documents (forward to HP ePrint: Dresherhome@hpeprint.com)
+- Add calendar events
+- Create reminders/tasks
+
+**Research Findings - 4 Options Evaluated:**
+
+1. **Power Automate (RECOMMENDED):**
+   - Feasibility: HIGH | Complexity: LOW | Squad Integration: MODERATE
+   - Native M365 integration, handles all use cases
+   - 30-minute setup: shared mailbox + flow with sender filtering
+   - Security via email address filtering
+   - Cons: Limited to Microsoft connectors, may need license
+
+2. **Azure Logic Apps:**
+   - Feasibility: HIGH | Complexity: MEDIUM | Squad Integration: HIGH
+   - More developer-friendly than Power Automate
+   - Can create GitHub issues for Squad processing
+   - Better for complex logic, Managed Identity support
+   - Cons: Azure subscription required, steeper learning curve
+
+3. **Email-to-GitHub-Issues Bridge:**
+   - Feasibility: MEDIUM | Complexity: LOW-MEDIUM | Squad Integration: HIGH
+   - Services: HubDesk (free for personal), GitHub Tasks for Outlook, custom PA flow
+   - Leverages existing Squad workflow
+   - Full audit trail via GitHub issues
+   - Cons: Still needs action execution layer, attachment handling limited
+
+4. **Custom Graph API Solution:**
+   - Feasibility: HIGH | Complexity: HIGH | Squad Integration: HIGH
+   - Azure Function + Graph API webhooks
+   - Full control, real-time processing
+   - Can integrate into Squad TypeScript codebase
+   - Cons: Development effort, hosting/maintenance overhead
+
+**Key Learning:**
+- Microsoft ecosystem offers mature email automation (PA/Logic Apps)
+- Graph API provides programmatic access with webhook support
+- Email-to-issue bridges exist but require execution layer
+- Security critical: sender filtering, dedicated mailbox, no personal inbox
+
+**Recommendation:** Power Automate Phase 1 (quick win) → Logic Apps Phase 2 (Squad integration if needed)
+
+**Deliverable:** Detailed analysis posted to issue #259
+**Decision Doc:** .squad/decisions/inbox/picard-email-automation-research.md
+**Next:** Awaiting user selection (labeled status:pending-user)
+
+### DevBox Ralph-Watch Deployment Research (Issue #222)
+**Date:** 2026-03-10
+
+Researched deploying ralph-watch.ps1 to a DevBox environment. Key learnings:
+
+**Ralph-watch architecture:**
+- Continuous loop script (5-min intervals) running: `agency copilot --yolo --autopilot --agent squad`
+- Single-instance guard (mutex + lockfile) to prevent duplicates
+- Structured logging to ~/.squad/ralph-watch.log with rotation (500 entries/1MB)
+- Heartbeat file at ~/.squad/ralph-heartbeat.json for monitoring
+- Teams webhook integration for alerts
+- Auto-syncs repo via git pull before each round
+
+**Critical dependencies:**
+- PowerShell 7+ (pwsh) for scripts/podcaster.ps1
+- GitHub CLI (gh) authenticated with repo access
+- Agency CLI authenticated
+- Node.js for tech-news-scanner.js
+- Git for repo sync
+- .squad/ directory structure in both ~/ and repo root
+
+**DevBox deployment challenges:**
+- DevTunnel URLs are ephemeral (time-limited), need persistent access method
+- Authentication persistence across DevBox restarts (gh auth, agency credentials)
+- Determining best persistence method (Windows service, scheduled task, or detached process)
+- Browser-based tunnel access requires interactive authentication (not automatable)
+
+**Recommended setup flow:**
+1. Connect via DevTunnel (user authenticates in browser)
+2. Clone repo + verify all CLI tools installed/authenticated
+3. Test single round execution
+4. Configure as Windows service or scheduled task for persistence
+
+**Outcome:** Posted research findings to issue #222, awaiting user input on tunnel access and persistence preferences.
+
+---
+
+## Cross-Agent Coordination — Ralph Round 1 (2026-03-10 11:53:41 UTC)
+
+**Decisions Consolidated:** Merged 3 inbox decision files into .squad/decisions.md
+- Multi-Repo Ralph Orchestration (your decision)
+- Email automation research (your work)
+- DevBox Ralph setup guide (your work)
+- @copilot Integration decision (B'Elanna)
+- Outlook/Playwright directive (Tamir)
+
+**Orchestration Logs Created:**
+- .squad/orchestration-log/2026-03-10T11-53-41Z-picard.md — Your 2 research tasks + multi-repo decision
+- .squad/orchestration-log/2026-03-10T11-53-41Z-seven.md — Seven's blog draft work
+
+**Session Log:** .squad/log/2026-03-10T11-53-41Z-ralph-round1.md — Summary of all Round 1 outcomes
+
+**Board Status:** 4 issues progressed
+- #41 (blog) → Review
+- #259 (email) → Pending User (your recommendation: Power Automate)
+- #222 (devbox) → Pending User (your setup guide posted)
+- #271 (Sev 2 IcM) → New, Pending User (Tamir to acknowledge)
+
+**Next Steps:** Await user input on email approach selection and DevBox tunnel config.
+

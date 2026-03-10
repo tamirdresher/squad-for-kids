@@ -1,25 +1,25 @@
 ---
-updated_at: 2026-03-10T00-52-00Z
-focus_area: All issues pending-user — board clear
-active_issues: []
-session_status: idle
+updated_at: 2026-03-10T12-48-00Z
+focus_area: Ralph active — B'Elanna fixing CI workflows (#276), Data's NuGet PR awaits review
+active_issues: [265, 276]
+session_status: ralph-active
 ---
 
 # What We're Focused On
 
-Ralph session scan (2026-03-10T00-52-00Z).
+Ralph Round 2 scan + decision merging (2026-03-10T12:48:00Z).
 
-**Round 1 results:**
-- 0 actionable work items — all 12 open issues are pending-user
-- 0 open PRs, 0 CI failures
-- Teams: 1 community message (informational, not actionable)
-- Email: Nothing actionable
-- Done archiving: All Done board items already closed on GitHub
-- No new issues created (nothing warranting Tamir's attention)
+**Round 2 results:**
+- 4 new issues discovered (#279, #278, #276, #277)
+- #279, #278 closed — directives captured (auto-approve, timezone)
+- #276 triaged → B'Elanna, moved to In Progress
+- #277 updated with auto-approval directive clarification
+- squad-monitor PR creation failed (EMU restriction)
 
 **Current State:**
-- **Open Issues:** 12 (all pending-user)
-- **Open PRs:** 0
-- **CI Status:** Green
-- **Board Status:** Clean — all items properly tracked
-- **Notifications:** None sent (no actionable changes requiring attention)
+- **Open Issues:** 16 + 4 new discoveries
+- **In Progress:** #276 (CI), #265 (NuGet)
+- **Open PRs:** 0 (squad-monitor blocked by EMU)
+- **CI Status:** Green (B'Elanna working #276)
+- **Board Status:** Active — Round 2 scan complete, decisions merged
+- **Active Agents:** B'Elanna (#276), Data (#265), Scribe (decisions)

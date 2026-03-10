@@ -17503,3 +17503,76 @@ Squads are isolated within repository boundaries, leading to:
 - **Related Issue:** #296
 - **PR:** #303
 
+
+---
+
+## Decision: Use pwsh for shell steps on self-hosted Windows runner
+
+**Date:** 2025-07-16
+**Author:** B'Elanna (Infrastructure)
+**Issue:** #290
+**PR:** #291
+
+### Context
+
+The `squad-heartbeat.yml` workflow runs on `self-hosted` which is a Windows runner in this org. Using `shell: bash` caused consistent failures because bash can't resolve Windows temp file paths (`C:\actions-runner\_work\_temp\...sh`).
+
+### Decision
+
+All shell steps in workflows targeting `self-hosted` must use `shell: pwsh` instead of `shell: bash`. This applies only to the active workflow (`.github/workflows/`), not the templates (`.squad-templates/`, `sanitized-demo/`) which target `ubuntu-latest`.
+
+### Convention
+
+- **Self-hosted runner = Windows** → use `shell: pwsh`
+- **ubuntu-latest** → default shell (bash) is fine
+- `actions/github-script` steps are unaffected (they use Node.js, not shell)
+- The active workflow may intentionally diverge from templates when the runner OS differs
+
+---
+
+## Decision: Cross-Repo Squad Delegation Pattern
+
+**Date:** 2026-03-10T23:14:53Z
+**Author:** Tamir Dresher (via GitHub Issue #299)
+**Issue:** #299
+
+### Context
+
+Teams may need to collaborate across multiple repositories, each with their own squad. Ad-hoc delegation needs a clear pattern.
+
+### Decision
+
+When you need to work on another repo that has a squad, spin up another agency copilot instance in that folder (similar to ralph-watch) and delegate the task to it. Communicate via the prompt you pass and read the output for the response.
+
+### Pattern
+
+1. Identify target repo with squad structure
+2. Spawn new agency copilot in that repo folder (e.g., `C:\other-squad-repo`)
+3. Write detailed prompt with task, context, and expected output
+4. Execute and capture response
+5. Report results back to originating squad
+
+---
+
+## Decision: Postponed Scheduling Workflow
+
+**Date:** 2026-03-10T23:14:53Z
+**Author:** Tamir Dresher (via GitHub Issue #300)
+**Issue:** #300
+
+### Context
+
+Some work needs to be deferred (depends on future events, blocked on external input, or scheduled for a specific time) but shouldn't clutter the active board.
+
+### Decision
+
+When you have an issue you need to track or schedule to do later, put it in the Postponed status and label. Schedule it with the scheduler. When the time comes, move it back to Todo.
+
+### Workflow
+
+1. Issue identified as deferrable → label: `status:postponed`
+2. Move to Postponed column on board
+3. Schedule with scheduler (e.g., calendar reminder, defer.md entry)
+4. Scheduler triggers: move back to `status:todo`
+5. Work proceeds normally
+

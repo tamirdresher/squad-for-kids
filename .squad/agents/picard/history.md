@@ -19,6 +19,37 @@
 
 ## Learnings
 
+### 2026-03-26: Picard — Email-Based Request Intake Architecture — Issue #259
+
+**Assignment:** Research and propose architecture for email-based intake system where Tamir's wife can send requests (print documents, calendar events, reminders) that get processed automatically.
+
+**Context:** Tamir wants a simple email address his wife can use to send family requests. Requirements: forward print jobs to HP ePrint, add calendar events, create reminders, route to appropriate services.
+
+**Research Findings:**
+
+1. **Recommended Approach: Power Automate + Shared Mailbox**
+   - Rationale: Simplest solution leveraging existing M365 infrastructure
+   - Zero code, visual designer, native connectors for Outlook/Calendar/To Do
+   - Low maintenance, included in M365 plans, built-in audit trail
+   - Flow structure: Email trigger → Keyword parsing → Route to actions (forward to printer, create calendar event, create To Do task)
+
+2. **Alternative Options Evaluated:**
+   - Azure Logic Apps: More expensive, enterprise-focused, overkill for personal use
+   - Azure Functions + Graph API: Most flexible but requires coding and operational overhead
+   - Graph API with Timer: Requires polling and hosting infrastructure, not event-driven
+
+3. **Implementation Path:**
+   - Create shared mailbox (requests@domain or familyrequests@domain)
+   - Build Power Automate flow with keyword-based routing ("print" → forward, "calendar" → create event, "remind" → create task)
+   - Optional: Enhance with Azure OpenAI for natural language parsing
+   - Test with wife's actual requests and iterate
+
+**Decision Required:** User needs to choose Power Automate (simple) vs Azure Functions (flexible/coding). Issue marked `status:pending-user` with detailed next steps.
+
+**Key Learning:** For personal/family automation in M365 environments, Power Automate with shared mailbox is the sweet spot — significantly simpler than custom code while providing enough flexibility for common request routing patterns. Azure Functions only justified if advanced LLM processing or complex business logic needed.
+
+---
+
 ### 2026-03-25: Picard — dotnet/skills Assessment & Integration Analysis — Issue #252
 
 **Assignment:** Assess Microsoft's dotnet/skills repository and determine compatibility with Squad skills system.

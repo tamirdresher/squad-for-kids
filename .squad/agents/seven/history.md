@@ -4136,3 +4136,47 @@ Reasons:
 
 ---
 
+
+---
+
+### Issue #257 Follow-up - Email/Teams MCP Clarification (2026-03-25) [COMPLETED]
+
+**Task**: Respond to Tamir's question: "didnt they say email and teams? what else did they mentioned?"
+
+**Key Clarification Provided**:
+- **Email & Teams** were **NOT** announced as standalone, first-class MCPs
+- **Work IQ MCP** is the bridge for M365 data (Teams messages, emails, meetings, files, organizational context)
+- Email/Teams access is **implicit through Work IQ**, not as dedicated servers
+
+**Full Out-of-Box MCP List Confirmed**:
+1. Bluebird (Engineering Copilot Mini) — Auto-configured per repo
+2. Azure DevOps MCP — Boards, Repos, Pipelines, Test Plans
+3. ICM MCP — Incident management
+4. Work IQ MCP — M365 workplace intelligence (Teams/email/meetings/files)
+5. GitHub MCP — Built-in repos/PRs/issues/Actions
+6. Playwright MCP — Built-in web automation
+7. Aspire MCP — Built-in .NET Aspire dashboard
+8. EngineeringHub MCP — Built-in eng.ms search
+
+**Additional Announced Capabilities**:
+- Bundled MCPs (pre-installed, no wiring)
+- Auto-configuration (repo metadata-based)
+- Native Entra ID authentication
+- One-flag Copilot CLI enablement
+- Agent-ready workflows
+
+**Team Context**:
+- Squad is **already using Work IQ** for Teams/email monitoring via Ralph workflow
+- This clarifies the architecture: Work IQ = unified M365 access layer, not separate email/Teams MCPs
+
+**Deliverable**:
+- Posted detailed clarification comment on issue #257
+- Distinguished between standalone MCPs vs. M365 data access via Work IQ
+- Confirmed full list of 8 out-of-box MCPs + additional capabilities
+
+**Key Learning**:
+- MCP design pattern: Microsoft uses **unified access layers** (Work IQ for M365, ADO for DevOps) rather than per-service MCPs
+- This reduces configuration complexity (1 Work IQ MCP >> 5+ separate MCPs for Outlook/Teams/Calendar/SharePoint/OneDrive)
+- Similar pattern: GitHub MCP = single server for repos + PRs + issues + Actions
+
+**Status**: COMPLETE — Tamir's question answered with full context and architecture clarification.

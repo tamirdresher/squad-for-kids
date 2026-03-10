@@ -15879,3 +15879,95 @@ Implement tech news scanning from HackerNews, Reddit, X/Twitter. Deliver via Git
 
 **Status:** ⏳ **PROPOSED** — awaiting user decisions
 
+
+---
+
+## Decision 7: Email-Based Request Intake Architecture
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Status:** 📋 **Proposed**  
+**Scope:** Family Automation Infrastructure  
+**Issue:** #259
+
+### Context
+
+Tamir requested an email-based intake system for family requests where his wife can send emails that trigger automated actions (printing documents, calendar events, reminders, etc.). The system needs to route requests to appropriate services like HP ePrint for printing or Outlook for calendar management.
+
+### Recommendation: Power Automate + Shared Mailbox
+
+**Architecture:**
+1. Shared mailbox (e.g., amilyrequests@domain.com) accessible to family members
+2. Power Automate flow triggered on incoming emails
+3. Keyword-based or AI-based parsing of request intent
+4. Action routing to appropriate M365 services or external endpoints
+
+**Rationale:**
+- **Simplicity:** Visual flow designer, no code required
+- **Native Integration:** Built-in connectors for all M365 services (Outlook, Calendar, To Do, OneDrive)
+- **Maintainability:** Non-technical users can update flows
+- **Cost:** Included in most M365 plans, no additional Azure subscription needed
+- **Reliability:** Microsoft-managed infrastructure with audit trail
+
+**Request Routing Examples:**
+- "Print" → Forward email (with attachments) to Dresherhome@hpeprint.com
+- "Calendar" / "Meeting" → Create Outlook calendar event with extracted date/time
+- "Remind" / "Task" → Create Microsoft To Do task
+- Unrecognized → Forward to Tamir with "Need clarification" flag
+
+### Alternatives Considered
+
+#### Azure Logic Apps
+- **Pros:** More powerful, enterprise features, better monitoring
+- **Cons:** Higher cost, requires Azure subscription management, overkill for personal use
+- **Verdict:** Not recommended for this use case
+
+#### Azure Functions + Microsoft Graph API
+- **Pros:** Maximum flexibility, can integrate LLM for advanced parsing, full control
+- **Cons:** Requires coding, deployment management, monitoring, operational overhead
+- **Verdict:** Only justified if advanced AI processing or custom business logic needed
+
+#### Microsoft Graph API with Polling
+- **Pros:** Direct API control
+- **Cons:** Need hosting infrastructure, not event-driven, more complex
+- **Verdict:** Not recommended
+
+### Implementation Phases
+
+**Phase 1: Basic Setup (1 hour)**
+1. Create shared mailbox in M365 Admin Center
+2. Grant wife "Send As" permissions
+3. Build basic Power Automate flow with keyword matching
+4. Test with sample emails
+
+**Phase 2: Enhanced Routing (Optional, 2 hours)**
+5. Add more sophisticated parsing (date extraction for calendar events)
+6. Implement confirmation replies to sender
+7. Add error handling and fallback to Tamir
+
+**Phase 3: AI Enhancement (Optional, 4 hours)**
+8. Integrate Azure OpenAI connector for natural language understanding
+9. Extract structured data from free-form requests
+10. Handle ambiguous requests with clarification prompts
+
+### Dependencies
+
+- M365 subscription with Power Automate (included in most plans)
+- Shared mailbox quota (50 GB standard)
+- Optional: Azure OpenAI if Phase 3 pursued
+
+### Next Steps
+
+1. **User Decision Required:** Confirm Power Automate approach vs. Azure Functions
+2. **Mailbox Naming:** Decide on email address naming convention
+3. **Create Implementation Task:** Break down Phase 1 into actionable steps
+4. **Test Plan:** Define test scenarios with wife's actual request patterns
+
+### Team Relevance
+
+This decision demonstrates a pattern for **personal automation with M365** that may be reusable for:
+- Other family/personal workflow automation
+- Small business request intake systems
+- Prototyping AI-assisted email processing patterns
+
+The preference for "leverage existing platform" over "custom code" aligns with Squad's pragmatic approach to infrastructure decisions.

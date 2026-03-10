@@ -3324,3 +3324,30 @@ All 4 MCPs tested and confirmed working. Findings posted to GitHub issue #257 wi
 - picard-email-gateway.md (Power Automate 30-min setup, awaiting approval)
 
 **Orchestration Logs:** .squad/orchestration-log/2026-03-10T09-29-23Z-{seven,data,picard}.md
+
+## Learnings — Issue #263: squad-monitor GitHub optional (2026-03-10)
+
+### Problem
+squad-monitor displayed error messages when gh CLI was unavailable, degrading UX even though other panels (Ralph Watch, Orchestration) worked fine.
+
+### Solution Implemented
+- **Auto-detection:** Check gh CLI availability at startup using IsGhCliAvailable()
+- **Graceful hiding:** Conditionally skip GitHub sections (Issues/PRs) when gh unavailable
+- **User control:** Added --no-github flag for explicit opt-out
+- **Clear messaging:** Display "GitHub integration: disabled (gh CLI not available)" instead of errors
+- **Dual-mode support:** Updated both live dashboard and --once mode
+
+### Code Changes
+- Added disableGitHub boolean flag (command-line + auto-detected)
+- Created IsGhCliAvailable() helper function to detect gh CLI
+- Modified BuildDashboardContent() to conditionally include GitHub sections
+- Updated runOnce mode to skip GitHub displays when disabled
+
+### Key Insights
+- **Clean separation of concerns:** GitHub integration is now truly optional; other features unaffected
+- **User-first error handling:** Missing dependencies hide features instead of showing errors
+- **Flexibility:** Users can force --no-github even when gh CLI exists (e.g., auth issues, rate limits)
+
+### Status
+Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main branch. Issue #263 commented with details.
+

@@ -2993,3 +2993,91 @@ Demo repositories need to be comprehensive showcases, not minimal examples. The 
 
 **Next:** Awaiting Tamir approval for Phase 1 implementation.
 
+
+### 2026-03-25: Picard — Agent Skills Repository Evaluation — Issue #253
+
+**Assignment:** Evaluate MicrosoftDocs/Agent-Skills repository and determine if Squad should adopt it.
+
+**Analysis:**
+- **Repository:** Microsoft's official Agent-Skills collection with 193+ Azure-focused skills
+- **Format:** Follows Agent Skills open standard (SKILL.md with YAML frontmatter)
+- **Coverage:** 19 Azure categories (Compute, AI/ML, Security, Data, Infrastructure, Networking, etc.)
+- **Integration Pattern:** Skills provide on-demand access to Microsoft Learn documentation, best practices, architecture patterns
+
+**Key Findings:**
+1. **High Relevance:** Squad already uses SKILL.md format in .squad/skills/ — direct compatibility
+2. **Domain Match:** Azure skills align with B'Elanna (Infrastructure), Worf (Security) work patterns
+3. **Proven Knowledge Base:** 193 professionally-curated skills vs. building from scratch
+4. **Concerns:** Size (193 skills may slow discovery), potential overlap with existing skills, external maintenance dependency
+
+**Recommendation:**
+- **Adopt selectively** via role-based bundles (Quick Start, Infrastructure, Security)
+- **Integration approach:** Create .squad/skills/azure/ subdirectory for external skills
+- **Assigned to Seven** (Integration & Tools) for implementation and compatibility testing
+
+**Decision Created:** .squad/decisions/inbox/picard-agent-skills-triage.md - Documented evaluation criteria and selective adoption strategy.
+
+**Key Files Referenced:**
+- https://github.com/MicrosoftDocs/Agent-Skills - External repository
+- .squad/skills/ - Squad's existing skills directory
+- Agent Skills specification: https://agentskills.io/
+
+---
+
+### 2026-03-26: Picard — dotnet/skills Repository Research — Issue #252
+
+**Assignment:** Evaluate https://github.com/dotnet/skills for adoption in Squad project
+
+**What is dotnet/skills:**
+- Microsoft's official .NET agent skills repository
+- 6 domain-specific plugins (dotnet, dotnet-data, dotnet-diag, dotnet-msbuild, dotnet-upgrade, dotnet-maui)
+- Follows agentskills.io standard
+- Includes marketplace distribution, testing framework (eval.yaml), agentic workflows
+
+**Key Patterns Identified:**
+
+1. **Skill Structure Standards:**
+   - YAML frontmatter: name, description (with when-to-use/when-NOT-to-use)
+   - Mandatory sections: Purpose, Inputs, Workflow, Validation, Common Pitfalls
+   - Kebab-case naming with action-verb-first
+
+2. **Plugin Architecture:**
+   - Skills grouped into domain plugins (vs. our flat .squad/skills/)
+   - Each plugin has plugin.json (name, version, description, skills path)
+   - Central marketplace.json for distribution
+
+3. **Testing Framework:**
+   - eval.yaml per skill with scenarios, assertions, rubrics
+   - Automated skill-validator tool
+   - CI integration for validation
+
+4. **Quality Bar:**
+   - Code ownership (CODEOWNERS) for all plugins
+   - Strict contribution guidelines
+   - When-NOT-to-use guidance mandatory
+
+**Gaps in Our Approach:**
+- No formal skill testing (manual validation only)
+- No plugin grouping (all skills flat)
+- No marketplace/versioning
+- Inconsistent frontmatter (Confidence, Domain, Last validated vs. standard YAML)
+
+**Recommendations Posted:**
+- Phase 1: Adopt skill standards (frontmatter, sections) — 2-3h, Data/Scribe
+- Phase 2: Plugin architecture (.squad/skills/ reorganization) — 4-6h, Picard
+- Phase 3: Testing framework (eval.yaml port) — 8-12h, Data + Seven
+- Phase 4: External marketplace (future, if open-sourcing)
+
+**Immediate Actions:**
+1. Create .squad/CONTRIBUTING-SKILLS.md with authoring guidelines
+2. Audit all 10 skills against dotnet/skills quality bar
+3. Pilot plugin architecture on one domain (devops)
+
+**Decision Point:** User must choose Option A (minimal), B (recommended), or C (maximal) implementation scope
+
+**Key Files Referenced:**
+- dotnet/skills: README.md, CONTRIBUTING.md, AGENTS.md, marketplace.json
+- Our structure: .squad/skills/github-project-board/SKILL.md (example)
+
+**Status:** Research complete, posted to issue #252. Labeled squad:picard, removed go:needs-research, added status:pending-user awaiting Tamir's direction choice.
+

@@ -14449,3 +14449,167 @@ Awaiting Tamir's approval to proceed with Phase 1 implementation:
 
 **Next Step:** Implement Phase 1 upon approval, then create new public GitHub repository.
 
+
+---
+
+## Decision: Selective Adoption of Microsoft Agent Skills
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Status:** 🟡 Proposed  
+**Scope:** Team Tooling & Skills
+**Issue:** #253
+
+### Context
+
+Evaluation of MicrosoftDocs/Agent-Skills repository (https://github.com/MicrosoftDocs/Agent-Skills) requested to determine if Squad should adopt the Agent Skills standard and content.
+
+- **Contents:** 193+ Azure-focused agentic skills
+- **Format:** SKILL.md files with YAML frontmatter (name, description) + markdown instructions
+- **Coverage:** 19 Azure categories
+- **Standard:** Follows agentskills.io open standard
+
+### Decision
+
+**Adopt selectively** — Install curated Azure skills based on current squad work patterns, not all 193 skills.
+
+### Rationale
+
+**Why Adopt:**
+1. Format Compatibility — Identical to Squad's SKILL.md format
+2. Domain Alignment — Directly supports B'Elanna and Worf domains
+3. Proven Quality — Microsoft-curated with official documentation links
+4. Effort Reduction — 193 pre-built skills available
+5. Standard Compliance — Follows agentskills.io
+
+**Why Selective:**
+1. Size Management — 193 skills may slow discovery/loading
+2. Relevance Filtering — Not all Azure services relevant to Squad
+3. Overlap Prevention — Potential conflicts with internal patterns
+4. Maintenance Burden — External dependency on Microsoft's update cycle
+
+### Implementation Plan
+
+**Phase 1: Curated Bundles**
+- Quick Start Bundle (7 core Azure services)
+- Infrastructure Bundle (for B'Elanna)
+- Security Bundle (for Worf)
+
+**Phase 2: Integration**
+- Location: .squad/skills/azure/
+- Testing: Validate no conflicts
+- Documentation: Update .squad/skills/README.md
+
+**Phase 3: Evaluation**
+- Monitor skill invocation patterns
+- Iterate based on usage
+- Document compatibility issues
+
+### Assignment
+
+**Seven** (Integration & Tools) to install external skills, test compatibility, and document integration patterns.
+
+**Alternative:** Data if Seven unavailable.
+
+### Related
+
+- Issue: #253
+- Repository: https://github.com/MicrosoftDocs/Agent-Skills
+- Orchestration Log: .squad/orchestration-log/2026-03-10T06-04-52Z-picard-253.md
+
+---
+
+## Decision: Skill Structure Standards for Squad (dotnet/skills Evaluation)
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Status:** 🟡 Proposed  
+**Scope:** Team Standards & Architecture  
+**Issue:** #252
+
+### Context
+
+Evaluation of Microsoft's dotnet/skills repository (https://github.com/dotnet/skills) as requested by Tamir. The repo is the official .NET agent skills collection following the agentskills.io standard, with 6 domain plugins, marketplace distribution, and automated testing framework.
+
+### Current Squad State
+
+- 10 skills in flat directory (no domain grouping)
+- Inconsistent frontmatter (Confidence, Domain, Last validated)
+- No formal testing framework
+- No versioning or marketplace
+- Mixed quality — some skills have validation steps, others don't
+
+### Findings from dotnet/skills
+
+1. **Standardized Structure** — YAML frontmatter with mandatory sections, quality bar enforced
+2. **Plugin Architecture** — Domain-specific plugins with plugin.json, central marketplace.json
+3. **Testing Framework** — eval.yaml per skill, automated validator, CI integration
+4. **Naming Convention** — Kebab-case, action-verb-first (optimizes for intent matching)
+
+### Squad's Gaps
+
+1. No formal skill testing
+2. No plugin/domain grouping
+3. No versioning or marketplace
+4. Inconsistent frontmatter
+5. Missing "when NOT to use" guidance
+6. Vague validation steps
+
+### Recommendation
+
+**Three-Phase Adoption Path** with **Option B (Phase 1 + Phase 2) as recommended sweet spot**
+
+**Phase 1: Adopt Skill Standards (LOW Effort, HIGH Value)**
+- Owner: Data or Scribe | Effort: 2-3 hours | Priority: HIGH
+- Standardize SKILL.md frontmatter
+- Add mandatory sections (When to use/not use, Validation, Common Pitfalls)
+- Create CONTRIBUTING-SKILLS.md with naming conventions and quality checklist
+
+**Phase 2: Introduce Plugin Architecture (Medium Effort)**
+- Owner: Picard | Effort: 4-6 hours | Priority: MEDIUM
+- Reorganize into domain plugins: devops/, dk8s/, configgen/, infrastructure/, utilities/
+- Add plugin.json to each plugin
+- Create marketplace.json
+
+**Phase 3: Add Skill Testing (High Effort)**
+- Owner: Data + Seven | Effort: 8-12 hours | Priority: LOW
+- Port eval.yaml format
+- Build validation runner
+- Add CI checks
+
+### Decision Options
+
+- **Option A (Minimal):** Phase 1 only
+- **Option B (Recommended):** Phase 1 + Phase 2 — 80% benefit for 40% effort
+- **Option C (Maximal):** All three phases
+
+### Impact (Option B)
+
+**Pros:**
+- ✅ Higher quality and consistency
+- ✅ Easier onboarding
+- ✅ Scalable architecture
+- ✅ Industry standard alignment
+- ✅ Future-ready for plugin sharing
+
+**Cons:**
+- ⚠️ One-time refactoring (6-9 hours)
+- ⚠️ Existing references need updating
+- ⚠️ Learning curve for contributors
+
+### Next Steps
+
+1. User decision — Choose Option A, B, or C
+2. Phase execution begins per chosen option
+3. Agent charters and squad.config.ts updated with new paths
+
+### Related
+
+- Issue: #252
+- Repository: https://github.com/dotnet/skills
+- Standard: https://agentskills.io/
+- Orchestration Log: .squad/orchestration-log/2026-03-10T06-04-52Z-picard-252.md
+
+---
+
+**Awaiting:** Tamir's decision on Option A/B/C for skill structure adoption

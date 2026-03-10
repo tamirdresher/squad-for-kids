@@ -4845,3 +4845,68 @@ Evaluated office automation options and found we're in **stronger position than 
 
 ---
 
+### 2026-03-10: DevBox Web Terminal Setup Attempt — Issue #222 (BLOCKED)
+
+**Assignment:** Set up ralph-watch.ps1 on Tamir's DevBox via devtunnel web terminal (https://vvtr6k1l-57583.euw.devtunnels.ms)
+
+**Progress:**
+- ✅ Successfully accessed devtunnel URL (required accepting security warning)
+- ✅ Web terminal (PTY Mirror) connected - PowerShell session established
+- ✅ Verified prerequisites: PowerShell 7.5.0, Node v24.14.0, git 2.53.0.vfs.0.0
+- ⚠️ GitHub CLI (`gh`) not authenticated (not critical for public repo clone)
+- ⚠️ Git clone initiated but web terminal display synchronization issues prevented verification
+
+**Technical Challenge:**
+The web terminal (PTY Mirror interface) experienced display synchronization problems:
+- Commands sent via playwright browser automation
+- Terminal input box accepted commands
+- Display did not update consistently to show command results
+- Multiple "Cloning into 'tamresearch1'..." messages visible but no completion status
+- Unable to verify if clone succeeded or if commands are executing
+
+**Attempted Mitigations:**
+- Tried Ctrl+C to get fresh prompt (partial success)
+- Attempted scrolling and navigation (End key)
+- Tried multiple command submissions with various wait times
+- Screenshot captures show stuck/corrupted terminal state
+
+**Root Cause (Hypothesis):**
+Web-based terminal emulators (xterm.js-based PTY Mirror) may have latency/buffering issues when controlled via browser automation tools like Playwright, especially over devtunnel connection which adds another network hop.
+
+**Recommendation for Tamir:**
+1. **Manual verification:** Open devtunnel URL in browser, check if tamresearch1 directory exists
+2. **Alternative approach:** Use VS Code Remote SSH or native RDP to DevBox for more reliable terminal access
+3. **Quick manual setup:** If repo doesn't exist:
+   ```powershell
+   cd ~
+   git clone https://github.com/tamirdresher_microsoft/tamresearch1.git
+   cd tamresearch1
+   # Test run:
+   pwsh .\ralph-watch.ps1
+   # For persistent execution, use Windows Task Scheduler or:
+   Start-Process pwsh -ArgumentList "-File $PWD\ralph-watch.ps1" -WindowStyle Hidden
+   ```
+
+**Learnings:**
+- Web terminals accessed via browser automation have reliability issues for multi-step setup tasks
+- Devtunnel + PTY Mirror + Playwright = 3 layers of potential latency/sync issues
+- For production DevBox setup, prefer native tools (VS Code Remote, RDP) over web terminals
+- Web terminals good for quick checks, not ideal for automated setup workflows
+
+---
+
+
+### 2026-03-10: Fix Squad Heartbeat Workflow for Windows Runner — Issue #290 (PR #291)
+
+**Problem:** `squad-heartbeat.yml` used `shell: bash` but runs on a `self-hosted` Windows runner. Bash can't resolve Windows temp file paths, causing consistent failures.
+
+**Fix applied:**
+- Changed `shell: bash` → `shell: pwsh` in both shell steps (Check triage script, Ralph — Smart triage)
+- Converted bash syntax to PowerShell equivalents (Test-Path, Out-File, backtick line continuation)
+- Left `actions/github-script` steps (JS) and `self-hosted` runner unchanged
+
+**Key patterns:**
+- Self-hosted runner in this org is Windows — always use `shell: pwsh` for shell steps
+- Template copies (`.squad-templates/`, `sanitized-demo/`) use `ubuntu-latest` and don't need this fix
+- The SYNC comment in the workflow header lists 4 locations; active workflow may diverge from templates when runner differs
+

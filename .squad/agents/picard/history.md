@@ -3755,3 +3755,37 @@ const results = await Promise.all(agentIds.map(id => readAgent(id, {wait: true, 
 **Risks:** Higher LLM resource usage (monitor token costs), need better observability for parallel failures
 
 **Expected outcome:** Ralph rounds complete faster, fast tasks never starve, heavy tasks run in parallel
+
+### 2026-03-10: PR #49 Cleanup — mtp-microsoft/Infra.K8s.BasePlatformRP
+
+**Task:** Clean up PR #49 based on Meir Blachman's review feedback indicating 30+ extraneous files.
+
+**Analysis:**
+- PR branch `feat/add-dk8s-upstream-squad` included 7 commits from main
+- 5 commits were squad internal state (history logs, PRD files, decisions) 
+- These added 30+ files that shouldn't be in the feature PR
+- Only 2 commits were relevant to the feature:
+  1. `feat: Add DK8S global upstream squad as upstream source`
+  2. `fix: Update upstream source to dk8s-platform-squad repo`
+
+**Action Taken:**
+- Confirmed push access to mtp-microsoft/Infra.K8s.BasePlatformRP (maintain: true)
+- Cloned the repository
+- Cherry-picked the 2 relevant commits onto latest main
+- Force-pushed to `feat/add-dk8s-upstream-squad` to replace the PR branch
+
+**Result:**
+✅ PR cleaned to only 2 files:
+- `.gitignore` (+3 lines: adds `.squad/_upstream_repos/` ignore pattern)
+- `.squad/upstream.json` (new file: upstream squad configuration)
+
+**Root Cause:**
+The feature branch accumulated squad work session commits (agent history updates, PRD generations, decision logs) that should have stayed in the local repository.
+
+**Prevention Strategy:**
+- Squad work sessions should use separate local tracking branches
+- Feature branches should be created fresh from main with only feature-related commits
+- Pre-push review of `git diff origin/main..HEAD --name-status` before creating PRs
+
+**Learning:** This demonstrates the importance of branch hygiene when working with AI agents that track their own state. Agent state commits are valuable for local continuity but pollute feature PRs.
+

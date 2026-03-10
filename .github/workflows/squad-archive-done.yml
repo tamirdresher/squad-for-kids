@@ -25,6 +25,8 @@ jobs:
           DONE_STATUS_ID: '4830e3e3'
           DAYS_THRESHOLD: 3
         with:
+          retries: 3
+          retry-exempt-status-codes: 400,401,403,404,422
           script: |
             const projectId = process.env.PROJECT_ID;
             const doneStatusId = process.env.DONE_STATUS_ID;

@@ -23,3 +23,13 @@
 - COM can: send emails, create meetings with attendees, search inbox, manage calendar — all in one PowerShell command
 - Playwright was too slow (20+ minutes for 8 attendees) and unreliable (dropped attendees)
 - Skill file: .squad/skills/outlook-automation/SKILL.md
+
+## Learnings — Email Gateway (#259)
+- Power Automate + Shared Mailbox is the best approach for email-to-action gateways (no-code, included in M365)
+- Shared mailbox triggers in Power Automate can have 1-5 min delay — set expectations accordingly
+- For calendar event creation from natural language, start simple (Option C: create event, user adjusts time) before investing in AI parsing
+- Keyword-based routing in email subjects is simple but effective for family use
+- Always set up a sender whitelist (From filter) on shared mailbox flows — security matters even for personal tools
+- Exchange Online PowerShell module (ExchangeOnlineManagement) is not installed on this machine; shared mailboxes must be created via Admin Center UI
+- GitHub connector in Power Automate needs periodic re-authorization; HTTP+PAT is an alternative but has token rotation overhead
+- Guides created: docs/email-gateway-setup-guide.md (admin), docs/email-gateway-user-guide.md (end-user)

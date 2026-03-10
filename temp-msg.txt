@@ -1,10 +1,7 @@
-docs(squad): Ralph Round 1 - research spawns for #260, #259, #257
-
-- Seven: IcM Copilot Newsletter research (Issue #260)
-- Data: email→GitHub integration research (Issue #259)  
-- Picard: Agency MCPs evaluation (Issue #257)
-- Board updates: #260, #259, #257 → In Progress
-- Fixed #258, #250 to Pending User
-- Created #261 for Azure subscription approval (WorkIQ action item)
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+{
+  "type": "message",
+  "attachments": [{
+    "contentType": "application/vnd.microsoft.card.adaptive",
+    "content": "{\"$schema\":\"http://adaptivecards.io/schemas/adaptive-card.json\",\"type\":\"AdaptiveCard\",\"version\":\"1.4\",\"body\":[{\"type\":\"TextBlock\",\"text\":\"cli-tunnel - Persistent Shell for AI Agents\",\"weight\":\"Bolder\",\"size\":\"Medium\",\"wrap\":true},{\"type\":\"TextBlock\",\"text\":\"Hey! I built something that fits this exactly - **cli-tunnel**.\",\"wrap\":true},{\"type\":\"TextBlock\",\"text\":\"The simplest mode: it runs **fully local** - opens a persistent terminal session on your machine that you can control from a browser. Copilot CLI (or any AI agent) can start it, then use Playwright to interact with that shell. Initialize corext once, then every subsequent command runs in the **same environment** - no re-initialization needed.\",\"wrap\":true},{\"type\":\"TextBlock\",\"text\":\"For remote access: expose that session over a secure tunnel to your phone, another machine, or any browser - zero servers, token-based private access.\",\"wrap\":true},{\"type\":\"TextBlock\",\"text\":\"**Your use case:** 1) Start cli-tunnel 2) Run corext init once 3) Every subsequent command keeps the environment 4) AI agents automate via Playwright 5) Or interact manually\",\"wrap\":true},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.OpenUrl\",\"title\":\"Hackathon Demo Blog Post\",\"url\":\"https://www.tamirdresher.com/let-ai-produce-hackathon-demo-video\"},{\"type\":\"Action.OpenUrl\",\"title\":\"Remote Control Blog Post\",\"url\":\"https://www.tamirdresher.com/blog/2026/02/26/squad-remote-control\"},{\"type\":\"Action.OpenUrl\",\"title\":\"GitHub Repo\",\"url\":\"https://github.com/tamirdresher/cli-tunnel\"}]}]}"
+  }]
+}

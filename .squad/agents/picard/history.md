@@ -19,7 +19,24 @@
 
 ## Learnings
 
-### 2026-03-26: Picard — Email-Based Request Intake Architecture — Issue #259
+### 2026-03-10: Ralph Multi-Repo Orchestration — Issue #262
+
+**Assignment:** Design approach for Ralph to watch and work on issues across multiple repositories (tamresearch1 + tamirdresher/squad-monitor).
+
+**Options Evaluated:**
+1. **Option A (Prompt):** Add multi-repo instruction to Ralph's prompt — minimal change, leverages existing agency infrastructure
+2. **Option B (Separate Instance):** Run second ralph-watch.ps1 loop — introduces mutex complexity, code duplication, operational burden
+3. **Option C (Multi-Repo Config):** Add repos list to squad.config.ts — clean but over-engineered for 2 repos
+
+**Decision:** ✅ **Implemented Option A**
+- Ralph's prompt in ralph-watch.ps1 now includes: "Also scan tamirdresher/squad-monitor for actionable issues"
+- Squad agent uses `gh issue list -R tamirdresher/squad-monitor` to discover work
+- Squad-monitor issues use label-based tracking (no project board)
+- **Implementation time:** 15 minutes vs 2+ hours for Option C
+
+**Architectural Insight:** At 2 repos, prompt instruction is sufficient. At 4+ repos, graduate to Option C (multi-repo config). The key is recognizing when abstraction becomes necessary vs. premature. With 3 squad-monitor issues and ongoing tamresearch1 stream, Option A handles workload gracefully while keeping codebase simple.
+
+**Decision doc:** .squad/decisions/inbox/picard-262-ralph-multi-repo.md
 
 **Assignment:** Research and propose architecture for email-based intake system where Tamir's wife can send requests (print documents, calendar events, reminders) that get processed automatically.
 
@@ -3549,3 +3566,29 @@ GitHub Actions (Daily 7 AM UTC)
 - picard-email-gateway.md (Power Automate 30-min setup, awaiting approval)
 
 **Orchestration Logs:** .squad/orchestration-log/2026-03-10T09-29-23Z-{seven,data,picard}.md
+
+---
+
+### 2026-03-10: Ralph Round 2 — Multi-Repo Orchestration Design Completed (#262)
+
+**Role:** Lead/Architect
+**Issue:** tamresearch1#262 — "Ralph should work on squad-monitor issues too"
+**Status:** ✅ COMPLETED
+
+**Design Decision:**
+- **Option Selected:** Option A (Modify Prompt)
+- Ralph's prompt in ralph-watch.ps1 now includes: "Also scan tamirdresher/squad-monitor for actionable issues"
+- Squad agent uses 'gh issue list -R tamirdresher/squad-monitor' to discover work
+- Implementation time: 15 minutes vs 2+ hours for full config approach
+
+**Options Evaluated & Trade-offs:**
+1. **Option A (Prompt - SELECTED):** Minimal code change, leverages proven agency infrastructure
+2. **Option B (Separate Instance):** Introduces mutex complexity, code duplication, operational burden
+3. **Option C (Multi-Repo Config):** Clean but over-engineered for 2 repos; defer until 4+ repos
+
+**Architectural Principle:** At 2 repos, prompt instructions are sufficient. Recognizing when abstraction becomes necessary vs. premature is key to maintaining codebase simplicity. Graduation path to Option C planned for future scaling.
+
+**Decision Doc:** .squad/decisions/inbox/picard-262-ralph-multi-repo.md
+
+**Key Learning:** Simplicity beats preemptive abstraction. With 3 squad-monitor issues and ongoing tamresearch1 stream, Option A handles current workload gracefully while staying maintainable.
+

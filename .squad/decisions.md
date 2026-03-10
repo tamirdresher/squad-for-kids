@@ -16287,3 +16287,165 @@ If Power Automate proves insufficient (licensing issue or advanced requirements)
 - ✅ Default emails notify Tamir via Teams within 1 minute
 - ✅ Wife can use system without technical support after initial setup
 
+
+
+---
+
+# Decision: squad-monitor GitHub Integration Should Be Optional
+
+**Date:** 2026-03-10  
+**Agent:** Data (Code Expert)  
+**Context:** Issue #263  
+**Status:** Implemented
+
+## Decision
+Make GitHub integration in squad-monitor optional with graceful degradation when gh CLI is unavailable.
+
+## Rationale
+- **Robustness:** squad-monitor should work in environments without gh CLI or GitHub access
+- **User Experience:** Missing dependencies should hide features, not show error messages
+- **Separation of Concerns:** GitHub features are just one component; Ralph Watch and Orchestration monitoring are core
+- **Flexibility:** Users may want to disable GitHub even when available (auth issues, rate limits, preference)
+
+## Implementation
+1. **Auto-detection:** Check gh CLI availability at startup using `gh --version`
+2. **Conditional rendering:** Skip GitHub sections (Issues/PRs/Merged PRs) when disabled
+3. **User control:** Added `--no-github` flag for explicit opt-out
+4. **Clear messaging:** Display "GitHub integration: disabled (gh CLI not available)" in startup messages
+5. **Dual-mode support:** Works in both live dashboard and `--once` modes
+
+## Benefits
+- ✅ No more error messages when gh CLI unavailable
+- ✅ Clean user experience regardless of environment
+- ✅ Other panels (Ralph Watch, Orchestration) work normally
+- ✅ Users can explicitly disable GitHub if needed
+- ✅ Minimal code changes (added 64 lines, modified 13)
+
+## Trade-offs
+- Adds one more command-line flag (acceptable given the value)
+- Startup adds ~3ms for gh CLI detection (negligible)
+
+## Future Considerations
+- Could extend this pattern to other optional integrations (ADO, Jira, etc.)
+- Consider adding runtime detection/retry if gh CLI becomes available later
+- May want config file to set default GitHub behavior
+
+## References
+- Issue: #263
+- Commit: [52c9360](https://github.com/tamirdresher/squad-monitor/commit/52c9360)
+- Repo: tamirdresher/squad-monitor
+
+
+---
+
+# Decision: GitHub Issue #262 — Ralph Multi-Repo Orchestration
+
+**Date:** 2026-03-10  
+**Lead:** Picard  
+**Issue:** tamirdresher/tamresearch1#262 — "Ralph should watch and work on issues in tamirdresher/squad-monitor repo too"  
+
+## Problem Summary
+
+Ralph currently watches only `tamresearch1` for work. Public repo `tamirdresher/squad-monitor` has 3 open issues (#1 token usage, #2 NuGet publish, #3 multi-session) with no active work.
+
+## Architectural Analysis
+
+### Current Ralph Architecture
+- **ralph-watch.ps1** runs a 5-minute loop
+- Spawns `agency copilot --yolo --autopilot --agent squad` with a fixed prompt
+- Runs `git fetch && git pull` to sync **current repo** only (line 371-398)
+- Updates GitHub project board on **current repo** only
+- Single instance per machine via mutex lock (prevents duplicates)
+
+### Proposed Solutions Evaluated
+
+#### Option A: Add to Ralph's Prompt ✅ RECOMMENDED
+**Approach:** Modify ralph-watch.ps1 to add instruction: "Also check issues in tamirdresher/squad-monitor and work on them."
+
+**Pros:**
+- ✅ Minimal code change (one line in prompt at line 74-91)
+- ✅ Uses existing agency infrastructure — no new processes
+- ✅ Ralph already spawns agents; agent can clone/navigate to other repos
+- ✅ Works today — agency has `gh` CLI access to any public repo
+- ✅ Maintainable — single instance, single codebase, single prompt
+- ✅ Observable — heartbeat and logging already capture all activity
+
+**Cons:**
+- ❌ No automatic context switching — requires agent to manage repos manually
+- ❌ Slightly longer prompt per round (negligible)
+- ❌ No native project board sync for tamirdresher/squad-monitor (OK for now — that repo has no board)
+
+**Reliability:** **HIGH** — builds on proven architecture. Ralph's Squad agent can work across repos; this just adds visibility to the second repo.
+
+---
+
+#### Option B: Separate Ralph Instance ⚠️ NOT RECOMMENDED
+**Approach:** Run a second ralph-watch.ps1 loop in a separate process watching squad-monitor.
+
+**Pros:**
+- ✅ Independent scaling — could run different intervals
+- ✅ Isolated logs/heartbeats per repo
+
+**Cons:**
+- ❌ **Mutex conflict** — ralph-watch.ps1 uses a Global mutex per instance. Second instance would need a different mutex name. Manual plumbing.
+- ❌ **Code duplication** — entire script copied with one line changed
+- ❌ **Operational burden** — now manage 2 processes, 2 health monitors, 2 restart procedures
+- ❌ **Fragmented intelligence** — Ralph becomes split-brained about priorities across repos
+- ❌ **Resource waste** — runs on 5-min cycle even if squad-monitor has no work
+- ❌ **Maintenance debt** — bug fix in one script doesn't apply to the other
+
+**Reliability:** **MEDIUM** — increases failure surface. If either process crashes, some work goes unwatched.
+
+---
+
+#### Option C: Multi-Repo Config ⚠️ OVER-ENGINEERED (For Now)
+**Approach:** Add repos list to squad config; Ralph iterates through them.
+
+**Pros:**
+- ✅ Declarative and clean
+- ✅ Scales to 5+ repos naturally
+- ✅ Future-proof for cross-repo orchestration
+
+**Cons:**
+- ❌ **Requires Config schema change** — squad.config.ts has no repos field; would need new version
+- ❌ **Requires ralph-watch.ps1 refactoring** — git pull logic (lines 371-398) needs loop for each repo
+- ❌ **Upstream coupling** — any change to squad config format breaks all deployed scripts
+- ❌ **Over-engineered for current need** — we have 2 repos (one primary, one secondary). Multi-repo becomes valuable at 4+ repos.
+- ❌ **Timing:** Implementation 2-3 hours vs. Option A 15 minutes.
+
+**Reliability:** **LOWER** — introduces new layers of abstraction; more to test.
+
+---
+
+## Recommendation: Option A (Modify Prompt)
+
+**Rationale:**
+1. **Immediate value** — Ralph can start watching squad-monitor issues within 15 minutes
+2. **Low risk** — one-line addition to proven prompt architecture
+3. **No maintenance debt** — uses existing Ralph infrastructure
+4. **Aligns with squad philosophy** — agents are flexible orchestrators, not hard-coded runners
+5. **Correctness** — Squad agent can `cd` into other repos, run `gh`, create PRs; no architectural blocker
+
+**Implementation:**
+- Modify ralph-watch.ps1 line 74-91 prompt to add: "Also scan tamirdresher/squad-monitor for open issues and work on them using the same triage rules."
+- No config change needed
+- No new scripts
+- No process management complexity
+
+**Success Criteria:**
+- Ralph's next round picks up tamirdresher/squad-monitor issues in its triage
+- Agent spawns for actionable issues in that repo
+- At least one PR created in squad-monitor within 2 rounds
+
+**Graduation Path to Option C:**
+If we reach 4+ repos, revisit multi-repo config. At that point:
+- We'll have data on cross-repo triage patterns
+- Can design config cleanly with real requirements
+- Won't be speculative architecture
+
+---
+
+## Deferred Decision
+**Option B (separate instance)** — kept as fallback if squad-monitor workload becomes so high it overshadows tamresearch1. Low likelihood given squad-monitor issue count (3 vs. ongoing tamresearch1 stream).
+
+

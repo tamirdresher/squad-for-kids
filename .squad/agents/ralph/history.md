@@ -8,7 +8,24 @@
 
 ## Learnings
 
-<!-- Append learnings below -->
+### 2026-03-10: Multi-Repo Orchestration Decision (Issue #262)
+
+**Request:** Ralph should watch issues in tamirdresher/squad-monitor too (3 open issues: token usage, NuGet publish, multi-session).
+
+**Analysis:** Picard evaluated three architectural options:
+- **Option A (Prompt):** Add "also scan squad-monitor" to Ralph's prompt — minimal, low-risk, uses existing agency infrastructure
+- **Option B (Separate Instance):** Run second ralph-watch.ps1 in different process — introduces mutex complexity, code duplication, operational burden
+- **Option C (Multi-Repo Config):** Add repos list to squad.config.ts — over-engineered for 2 repos; valuable at 4+
+
+**Decision:** ✅ **Option A implemented**
+- Modified ralph-watch.ps1 prompt (line 74-91) to include: "Also scan tamirdresher/squad-monitor for open issues and work on them"
+- No config changes; no new scripts; no process management
+- Squad agent can use `gh issue list -R tamirdresher/squad-monitor` to discover work
+- Squad-monitor lacks project board → use issue labels for tracking instead
+
+**Rationale:** Option A is proven, minimal, and immediately deployable. Graduation path to Option C at 4+ repos is clear.
+
+**Decision doc:** .squad/decisions/inbox/picard-262-ralph-multi-repo.md
 
 ### 2026-03-08: Ralph Round 1 Work-Check Cycle
 

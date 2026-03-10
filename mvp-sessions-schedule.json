@@ -1,0 +1,162 @@
+[
+  {
+    "id": "DTECH-037",
+    "title": "Improving the foundations of .NET tooling with `dotnetup`",
+    "date": "2026-03-24",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Wednesday, March 25, 2026 | 1:00 AM - 2:00 AM Jerusalem Standard time"
+  },
+  {
+    "id": "DTECH-032",
+    "title": "AI investments in Azure DevOps",
+    "date": "2026-03-25",
+    "startTime": "14:30",
+    "endTime": "15:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Wednesday, March 25, 2026 | 11:30 PM - 12:30 AM Jerusalem Standard time"
+  },
+  {
+    "id": "DTECH-045",
+    "title": "GitHub & Azure DevOps Unplugged",
+    "date": "2026-03-25",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 1:00 AM - 2:00 AM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-081",
+    "title": "AKS Automatic: the fastest path to production-ready Kubernetes",
+    "date": "2026-03-25",
+    "startTime": "14:30",
+    "endTime": "15:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Wednesday, March 25, 2026 | 11:30 PM - 12:30 AM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-082",
+    "title": "Azure Linux Unleashed!",
+    "date": "2026-03-25",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 1:00 AM - 2:00 AM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-022",
+    "title": "Large Scale Cost Efficient Observability with Azure Monitor",
+    "date": "2026-03-26",
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 5:00 PM - 6:00 PM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-018",
+    "title": "AKS Automatic: What Are We Getting Right—and What Are We Missing?",
+    "date": "2026-03-26",
+    "startTime": "09:30",
+    "endTime": "10:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 6:30 PM - 7:30 PM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-084",
+    "title": "Shaping the Future - Network Security, Application delivery and container networking",
+    "date": "2026-03-26",
+    "startTime": "09:30",
+    "endTime": "10:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 6:30 PM - 7:30 PM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-009",
+    "title": "Unplugged with MarkRuss, followed by Azure Incubations Project Update",
+    "date": "2026-03-26",
+    "startTime": "13:30",
+    "endTime": "15:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 10:30 PM - 12:30 AM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-060",
+    "title": "Accelerating Cloud-Native Delivery for Developers: Hands-on deep dive with Radius",
+    "date": "2026-03-27",
+    "startTime": "11:30",
+    "endTime": "12:15",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Friday, March 27, 2026 | 9:30 PM - 10:15 PM Jerusalem Daylight time"
+  },
+  {
+    "id": "AZR-074",
+    "title": "What's New with Azure DNS & Traffic Manager",
+    "date": "2026-03-27",
+    "startTime": "11:30",
+    "endTime": "12:15",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Friday, March 27, 2026 | 9:30 PM - 10:15 PM Jerusalem Daylight time"
+  },
+  {
+    "id": "AZR-066",
+    "title": "Simplifying and scaling hybrid cluster management with Azure Arc enabled Kubernetes",
+    "date": "2026-03-23",
+    "startTime": "10:45",
+    "endTime": "11:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Monday, March 23, 2026 | 7:45 PM - 8:30 PM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-044",
+    "title": "AKS Cost Optimization Best Practices, Roadmap and Demos",
+    "date": "2026-03-23",
+    "startTime": "11:30",
+    "endTime": "12:15",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Monday, March 23, 2026 | 8:30 PM - 9:15 PM Jerusalem Standard time"
+  },
+  {
+    "id": "AZR-057",
+    "title": "What's New with Container Networking, Observability and Security for AKS and Open-source workloads",
+    "date": "2026-03-23",
+    "startTime": "14:20",
+    "endTime": "15:05",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Monday, March 23, 2026 | 11:20 PM - 12:05 AM Jerusalem Standard time"
+  },
+  {
+    "id": "SEC-005",
+    "title": "Securing Agentic AI with Microsoft Entra Agent ID – An Identity-First Approach",
+    "date": "2026-03-26",
+    "startTime": "14:30",
+    "endTime": "15:30",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Thursday, March 26, 2026 | 11:30 PM - 12:30 AM Jerusalem Standard time"
+  },
+  {
+    "id": "RD-005",
+    "title": "Azure's Next Big Infrastructure Bets for the AI Era",
+    "date": "2026-03-27",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "timezone": "PDT",
+    "location": "Microsoft Teams Meeting",
+    "rawSiteTime": "Friday, March 27, 2026 | 9:00 PM - 10:00 PM Jerusalem Daylight time"
+  }
+]

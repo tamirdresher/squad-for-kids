@@ -1,0 +1,7 @@
+[
+  {
+    "name": "pr-health-check",
+    "interval": "15m",
+    "description": "Check open PRs for review feedback, CI failures, stale PRs, auto-merge approved"
+  }
+]

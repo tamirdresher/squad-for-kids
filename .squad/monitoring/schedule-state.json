@@ -1,12 +1,14 @@
 {
   "teams-message-monitor": {
-    "lastRun": "2026-03-10T09:15:58.5282216Z",
-    "provider": "local-polling",
-    "result": "success"
+    "lastRun": "2026-03-10T11:00:26.0498652Z",
+    "result": "success",
+    "error": null,
+    "provider": "local-polling"
   },
   "ralph-heartbeat": {
-    "lastRun": "2026-03-10T09:15:58.5282216Z",
-    "provider": "local-polling",
-    "result": "success"
+    "lastRun": "2026-03-10T11:00:26.0498652Z",
+    "result": "success",
+    "error": null,
+    "provider": "local-polling"
   }
 }

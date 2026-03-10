@@ -1,0 +1,10 @@
+docs(squad): Ralph Round 1 - research spawns for #260, #259, #257
+
+- Seven: IcM Copilot Newsletter research (Issue #260)
+- Data: email→GitHub integration research (Issue #259)  
+- Picard: Agency MCPs evaluation (Issue #257)
+- Board updates: #260, #259, #257 → In Progress
+- Fixed #258, #250 to Pending User
+- Created #261 for Azure subscription approval (WorkIQ action item)
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

@@ -1,0 +1,492 @@
+- application [ref=e16]:
+  - generic [ref=e21]:
+    - link "Skip to main content" [ref=e22] [cursor=pointer]
+    - banner [ref=e26]:
+      - button "App launcher" [ref=e29] [cursor=pointer]: 
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - link "Go to Outlook" [ref=e40] [cursor=pointer]:
+            - /url: https://outlook.office.com/mail/?realm=microsoft.com&login_hint=tamirdresher@microsoft.com
+            - generic [ref=e41]: Outlook
+          - search [ref=e50]:
+            - generic [ref=e51]:
+              - status
+              - generic [ref=e56]: 
+              - combobox "Search" [ref=e59]
+        - generic [ref=e60]:
+          - button "OneNote feed" [ref=e63] [cursor=pointer]:
+            - img [ref=e64]
+          - button "My Day" [ref=e68] [cursor=pointer]:
+            - img [ref=e69]
+          - button "Notifications" [ref=e73] [cursor=pointer]:
+            - generic [ref=e74]: 
+          - button "Settings" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]: 
+      - generic [ref=e79]:
+        - button "Account manager for Tamir Dresher" [ref=e81] [cursor=pointer]:
+          - generic [ref=e89]: TD
+        - generic: 
+    - generic [ref=e92]:
+      - generic [ref=e95]:
+        - navigation "left-rail-appbar" [ref=e97]:
+          - generic "Mail" [ref=e99]:
+            - button "Mail" [ref=e100]:
+              - generic [ref=e101]:
+                - generic:
+                  - generic:
+                    - img "Mail"
+          - generic "Calendar" [ref=e103]:
+            - button "Calendar" [pressed] [ref=e104]:
+              - generic [ref=e105]:
+                - generic:
+                  - generic:
+                    - img "Calendar"
+          - generic "Copilot" [ref=e107]:
+            - button "Copilot" [ref=e108]:
+              - generic [ref=e109]:
+                - generic:
+                  - generic:
+                    - img "Copilot"
+          - generic "People" [ref=e111]:
+            - button "People" [ref=e112]:
+              - generic [ref=e113]:
+                - generic:
+                  - generic:
+                    - img "People"
+          - generic "To Do" [ref=e115]:
+            - button "To Do" [ref=e116]:
+              - generic [ref=e117]:
+                - generic:
+                  - generic:
+                    - img "To Do"
+          - generic "Newsletters" [ref=e119]:
+            - button "Newsletters" [ref=e120]:
+              - generic [ref=e121]:
+                - generic:
+                  - generic:
+                    - img "Newsletters"
+          - generic "Org Explorer" [ref=e123]:
+            - button "Org Explorer" [ref=e124]:
+              - generic [ref=e125]:
+                - generic:
+                  - generic:
+                    - img "Org Explorer"
+          - generic "OneDrive" [ref=e127]:
+            - button "OneDrive" [ref=e128]:
+              - generic [ref=e129]:
+                - generic:
+                  - generic:
+                    - img "OneDrive"
+          - status [ref=e130]
+        - button [ref=e133]:
+          - generic [ref=e134]:
+            - generic:
+              - generic:
+                - generic: 
+      - generic [ref=e137]:
+        - region "Ribbon" [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - button "Hide navigation pane" [ref=e142]:
+                - generic [ref=e144]: 
+              - generic "Ribbon tabs" [ref=e152]:
+                - tablist [ref=e153]:
+                  - tab "Home" [selected] [ref=e154]:
+                    - generic [ref=e157]: Home
+                  - tab "View" [ref=e158]:
+                    - generic [ref=e161]: View
+                  - tab "Help" [ref=e162]:
+                    - generic [ref=e165]: Help
+            - generic [ref=e166]:
+              - tabpanel "Home" [ref=e170]:
+                - generic [ref=e177]:
+                  - group "New" [ref=e181]:
+                    - generic [ref=e182]:
+                      - group [ref=e187]:
+                        - button "New event" [ref=e188]:
+                          - generic [ref=e191]: 
+                          - generic [ref=e192]: Create a new event. (Alt+N)
+                        - button "Expand to see more New options" [ref=e193]:
+                          - generic [ref=e194]:
+                            - text: New
+                            - generic [ref=e195]:
+                              - text: event
+                              - generic [ref=e198]: 
+                          - generic [ref=e199]: New event
+                      - generic [ref=e202]: New
+                  - group "Arrange" [ref=e208]:
+                    - generic [ref=e209]:
+                      - generic [ref=e213]:
+                        - group [ref=e214]:
+                          - button "Day" [pressed] [ref=e215]:
+                            - generic [ref=e218]: 
+                            - generic [ref=e219]: Toggle button on.
+                          - button "Expand to see more Day options" [ref=e220]:
+                            - generic [ref=e221]:
+                              - text: Day
+                              - generic [ref=e225]: 
+                            - generic [ref=e226]: Day
+                        - button "Work week" [ref=e228]:
+                          - generic [ref=e231]: 
+                          - generic [ref=e232]: Work week
+                          - generic [ref=e233]: Only show days in the work week. (Alt+Shift+2)
+                        - button "Week" [ref=e234]:
+                          - generic [ref=e237]: 
+                          - generic [ref=e238]: Week
+                          - generic [ref=e239]: Show the weekly view. (Alt+Shift+3)
+                        - button "Month" [ref=e240]:
+                          - generic [ref=e243]: 
+                          - generic [ref=e244]: Month
+                          - generic [ref=e245]: Show the monthly view. (Alt+Shift+4)
+                        - button "Split view" [disabled]:
+                          - generic:
+                            - generic:
+                              - generic: 
+                          - generic: Split view
+                          - generic: Show in side-by-side mode.
+                      - generic [ref=e247]: Arrange
+                  - group "Filter" [ref=e253]:
+                    - generic [ref=e254]:
+                      - button "Filter applied" [ref=e260]:
+                        - generic [ref=e263]: 
+                        - generic [ref=e264]:
+                          - text: Filter
+                          - generic [ref=e265]:
+                            - text: applied
+                            - generic [ref=e268]: 
+                        - generic [ref=e269]: Apply or remove calendar event filters.
+                      - generic [ref=e272]: Filter
+                  - group "Share" [ref=e278]:
+                    - generic [ref=e279]:
+                      - generic [ref=e283]:
+                        - button "Share calendar" [ref=e284]:
+                          - generic [ref=e287]: 
+                          - generic [ref=e288]: Share calendar
+                          - generic [ref=e289]: Share a calendar with others.
+                        - button "Print" [ref=e290]:
+                          - generic [ref=e293]: 
+                          - generic [ref=e294]: Print
+                          - generic [ref=e295]: Print a copy of your calendar. (Ctrl+P)
+                      - generic [ref=e297]: Share
+                - button "Switch layouts" [ref=e301]:
+                  - generic [ref=e305]: 
+              - button "Copilot Chat" [ref=e308]:
+                - img [ref=e310]
+                - text: Copilot
+        - generic [ref=e318]:
+          - generic [ref=e319]:
+            - navigation "date selection, Jump to date selection" [ref=e323]:
+              - generic [ref=e324]:
+                - button "Date selector" [expanded] [ref=e325] [cursor=pointer]:
+                  - generic [ref=e327]: 
+                - generic [ref=e330]:
+                  - generic [ref=e331]: Selected date March 10, 2026
+                  - generic [ref=e332]:
+                    - generic [ref=e333]:
+                      - button "March 2026, select to change the month" [ref=e334]:
+                        - generic [ref=e335]: March 2026
+                      - generic [ref=e336]:
+                        - button "Go to previous month February" [ref=e337]:
+                          - generic [ref=e338]: 
+                        - button "Go to next month April" [ref=e339]:
+                          - generic [ref=e340]: 
+                    - grid "March 2026, Selected date March 10, 2026, Today's date March 10, 2026" [ref=e342]:
+                      - rowgroup [ref=e343]:
+                        - row "Sunday Monday Tuesday Wednesday Thursday Friday Saturday" [ref=e344]:
+                          - columnheader "Sunday" [ref=e345] [cursor=pointer]: S
+                          - columnheader "Monday" [ref=e346] [cursor=pointer]: M
+                          - columnheader "Tuesday" [ref=e347] [cursor=pointer]: T
+                          - columnheader "Wednesday" [ref=e348] [cursor=pointer]: W
+                          - columnheader "Thursday" [ref=e349] [cursor=pointer]: T
+                          - columnheader "Friday" [ref=e350] [cursor=pointer]: F
+                          - columnheader "Saturday" [ref=e351] [cursor=pointer]: S
+                        - row "1, March, 2026 2, March, 2026 3, March, 2026 4, March, 2026 5, March, 2026 6, March, 2026 7, March, 2026" [ref=e352]:
+                          - gridcell "1, March, 2026" [ref=e353] [cursor=pointer]:
+                            - button "1, March, 2026" [ref=e354]: "1"
+                          - gridcell "2, March, 2026" [ref=e355] [cursor=pointer]:
+                            - button "2, March, 2026" [ref=e356]: "2"
+                          - gridcell "3, March, 2026" [ref=e357] [cursor=pointer]:
+                            - button "3, March, 2026" [ref=e358]: "3"
+                          - gridcell "4, March, 2026" [ref=e359] [cursor=pointer]:
+                            - button "4, March, 2026" [ref=e360]: "4"
+                          - gridcell "5, March, 2026" [ref=e361] [cursor=pointer]:
+                            - button "5, March, 2026" [ref=e362]: "5"
+                          - gridcell "6, March, 2026" [ref=e363] [cursor=pointer]:
+                            - button "6, March, 2026" [ref=e364]: "6"
+                          - gridcell "7, March, 2026" [ref=e365] [cursor=pointer]:
+                            - button "7, March, 2026" [ref=e366]: "7"
+                        - row "8, March, 2026 9, March, 2026 10, March, 2026 11, March, 2026 12, March, 2026 13, March, 2026 14, March, 2026" [ref=e367]:
+                          - gridcell "8, March, 2026" [ref=e368] [cursor=pointer]:
+                            - button "8, March, 2026" [ref=e369]: "8"
+                          - gridcell "9, March, 2026" [ref=e370] [cursor=pointer]:
+                            - button "9, March, 2026" [ref=e371]: "9"
+                          - gridcell "10, March, 2026" [selected] [ref=e372] [cursor=pointer]:
+                            - button "10, March, 2026" [ref=e373]:
+                              - generic [ref=e374]: "10"
+                          - gridcell "11, March, 2026" [ref=e375] [cursor=pointer]:
+                            - button "11, March, 2026" [ref=e376]: "11"
+                          - gridcell "12, March, 2026" [ref=e377] [cursor=pointer]:
+                            - button "12, March, 2026" [ref=e378]: "12"
+                          - gridcell "13, March, 2026" [ref=e379] [cursor=pointer]:
+                            - button "13, March, 2026" [ref=e380]: "13"
+                          - gridcell "14, March, 2026" [ref=e381] [cursor=pointer]:
+                            - button "14, March, 2026" [ref=e382]: "14"
+                        - row "15, March, 2026 16, March, 2026 17, March, 2026 18, March, 2026 19, March, 2026 20, March, 2026 21, March, 2026" [ref=e383]:
+                          - gridcell "15, March, 2026" [ref=e384] [cursor=pointer]:
+                            - button "15, March, 2026" [ref=e385]: "15"
+                          - gridcell "16, March, 2026" [ref=e386] [cursor=pointer]:
+                            - button "16, March, 2026" [ref=e387]: "16"
+                          - gridcell "17, March, 2026" [ref=e388] [cursor=pointer]:
+                            - button "17, March, 2026" [ref=e389]: "17"
+                          - gridcell "18, March, 2026" [ref=e390] [cursor=pointer]:
+                            - button "18, March, 2026" [ref=e391]: "18"
+                          - gridcell "19, March, 2026" [ref=e392] [cursor=pointer]:
+                            - button "19, March, 2026" [ref=e393]: "19"
+                          - gridcell "20, March, 2026" [ref=e394] [cursor=pointer]:
+                            - button "20, March, 2026" [ref=e395]: "20"
+                          - gridcell "21, March, 2026" [ref=e396] [cursor=pointer]:
+                            - button "21, March, 2026" [ref=e397]: "21"
+                        - row "22, March, 2026 23, March, 2026 24, March, 2026 25, March, 2026 26, March, 2026 27, March, 2026 28, March, 2026" [ref=e398]:
+                          - gridcell "22, March, 2026" [ref=e399] [cursor=pointer]:
+                            - button "22, March, 2026" [ref=e400]: "22"
+                          - gridcell "23, March, 2026" [ref=e401] [cursor=pointer]:
+                            - button "23, March, 2026" [ref=e402]: "23"
+                          - gridcell "24, March, 2026" [ref=e403] [cursor=pointer]:
+                            - button "24, March, 2026" [ref=e404]: "24"
+                          - gridcell "25, March, 2026" [ref=e405] [cursor=pointer]:
+                            - button "25, March, 2026" [ref=e406]: "25"
+                          - gridcell "26, March, 2026" [ref=e407] [cursor=pointer]:
+                            - button "26, March, 2026" [ref=e408]: "26"
+                          - gridcell "27, March, 2026" [ref=e409] [cursor=pointer]:
+                            - button "27, March, 2026" [ref=e410]: "27"
+                          - gridcell "28, March, 2026" [ref=e411] [cursor=pointer]:
+                            - button "28, March, 2026" [ref=e412]: "28"
+                        - row "29, March, 2026 30, March, 2026 31, March, 2026 1, April, 2026 2, April, 2026 3, April, 2026 4, April, 2026" [ref=e413]:
+                          - gridcell "29, March, 2026" [ref=e414] [cursor=pointer]:
+                            - button "29, March, 2026" [ref=e415]: "29"
+                          - gridcell "30, March, 2026" [ref=e416] [cursor=pointer]:
+                            - button "30, March, 2026" [ref=e417]: "30"
+                          - gridcell "31, March, 2026" [ref=e418] [cursor=pointer]:
+                            - button "31, March, 2026" [ref=e419]: "31"
+                          - gridcell "1, April, 2026" [ref=e420] [cursor=pointer]:
+                            - button "1, April, 2026" [ref=e421]: "1"
+                          - gridcell "2, April, 2026" [ref=e422] [cursor=pointer]:
+                            - button "2, April, 2026" [ref=e423]: "2"
+                          - gridcell "3, April, 2026" [ref=e424] [cursor=pointer]:
+                            - button "3, April, 2026" [ref=e425]: "3"
+                          - gridcell "4, April, 2026" [ref=e426] [cursor=pointer]:
+                            - button "4, April, 2026" [ref=e427]: "4"
+                        - row "5, April, 2026 6, April, 2026 7, April, 2026 8, April, 2026 9, April, 2026 10, April, 2026 11, April, 2026" [ref=e428]:
+                          - gridcell "5, April, 2026" [ref=e429] [cursor=pointer]:
+                            - button "5, April, 2026" [ref=e430]: "5"
+                          - gridcell "6, April, 2026" [ref=e431] [cursor=pointer]:
+                            - button "6, April, 2026" [ref=e432]: "6"
+                          - gridcell "7, April, 2026" [ref=e433] [cursor=pointer]:
+                            - button "7, April, 2026" [ref=e434]: "7"
+                          - gridcell "8, April, 2026" [ref=e435] [cursor=pointer]:
+                            - button "8, April, 2026" [ref=e436]: "8"
+                          - gridcell "9, April, 2026" [ref=e437] [cursor=pointer]:
+                            - button "9, April, 2026" [ref=e438]: "9"
+                          - gridcell "10, April, 2026" [ref=e439] [cursor=pointer]:
+                            - button "10, April, 2026" [ref=e440]: "10"
+                          - gridcell "11, April, 2026" [ref=e441] [cursor=pointer]:
+                            - button "11, April, 2026" [ref=e442]: "11"
+              - generic [ref=e444]:
+                - generic [ref=e445]:
+                  - button "Add calendar" [ref=e446] [cursor=pointer]:
+                    - generic [ref=e447]:
+                      - generic [ref=e448]: 
+                      - generic [ref=e449]: Add calendar
+                  - button "Go to my booking page" [ref=e450] [cursor=pointer]:
+                    - generic [ref=e451]:
+                      - img [ref=e452]
+                      - generic [ref=e456]: Go to my booking page
+                - generic [ref=e459]:
+                  - list [ref=e460]:
+                    - listitem "My calendars" [ref=e461] [cursor=pointer]:
+                      - generic [ref=e463]:
+                        - button "My calendars" [expanded] [ref=e464]:
+                          - generic [ref=e465]:
+                            - generic [ref=e467]: 
+                            - generic [ref=e468]: My calendars
+                        - button "More options":
+                          - generic [ref=e469]: 
+                      - listbox "My calendars" [ref=e470]:
+                        - generic [ref=e472]:
+                          - option "Calendar" [selected] [ref=e473]:
+                            - generic [ref=e474]:
+                              - generic [ref=e475]: 
+                              - generic [ref=e476]: Calendar
+                          - button "More options"
+                  - button "Show all" [ref=e477] [cursor=pointer]:
+                    - generic [ref=e479]: Show all
+            - generic [ref=e481]:
+              - generic [ref=e482]:
+                - toolbar [ref=e483]:
+                  - button "Go to today March 10, 2026" [ref=e486] [cursor=pointer]:
+                    - generic [ref=e487]:
+                      - generic [ref=e490]: 
+                      - generic [ref=e492]: Today
+                  - button "Go to previous day 9 March, 2026" [ref=e493]:
+                    - generic [ref=e495]: 
+                  - button "Go to next day 11 March, 2026" [ref=e496]:
+                    - generic [ref=e498]: 
+                  - button "10 March, 2026" [ref=e499]:
+                    - generic [ref=e501]: 10 March, 2026
+                    - generic [ref=e503]: 
+                - 'main "calendar view, current time: Tue 13:09" [ref=e507]':
+                  - generic [ref=e508]:
+                    - generic [ref=e509]:
+                      - button "More options" [ref=e511] [cursor=pointer]:
+                        - paragraph [ref=e514]: IL
+                      - generic [ref=e516]:
+                        - generic [ref=e520]:
+                          - time [ref=e522]:
+                            - generic [ref=e523]: "10"
+                          - generic [ref=e524]: Tuesday
+                        - generic [ref=e537]:
+                          - button "Karan - OOO (10/03/2026 - 17/03/2026), all day event, Tuesday, March 10, 2026 to Tuesday, March 17, 2026, By Karan ., Free" [ref=e539] [cursor=pointer]:
+                            - generic [ref=e540]:
+                              - generic [ref=e541]: Karan - OOO (10/03/2026 - 17/03/2026)
+                              - generic [ref=e542]: Karan .
+                            - generic [ref=e543]:
+                              - generic [ref=e544]: 17 Mar
+                              - generic [ref=e547]: 
+                          - button "OOO - RD, all day event, Tuesday, March 10, 2026 to Wednesday, March 11, 2026, By Yadin Ben Kessous, Free" [ref=e549] [cursor=pointer]:
+                            - generic [ref=e550]:
+                              - generic [ref=e551]: OOO - RD
+                              - generic [ref=e552]: Yadin Ben Kessous
+                            - generic [ref=e553]:
+                              - generic [ref=e554]: 11 Mar
+                              - generic [ref=e557]: 
+                    - generic [ref=e558]:
+                      - generic [ref=e562]:
+                        - time [ref=e587]: "0"
+                        - time [ref=e588]: "1"
+                        - time [ref=e589]: "2"
+                        - time [ref=e590]: "3"
+                        - time [ref=e591]: "4"
+                        - time [ref=e592]: "5"
+                        - time [ref=e593]: "6"
+                        - time [ref=e594]: "7"
+                        - time [ref=e595]: "8"
+                        - time [ref=e596]: "9"
+                        - time [ref=e597]: "10"
+                        - time [ref=e598]: "11"
+                        - time [ref=e599]: "12"
+                        - time [ref=e600]: "13"
+                        - time [ref=e601]: "14"
+                        - time [ref=e602]: "15"
+                        - time [ref=e603]: "16"
+                        - time [ref=e604]: "17"
+                        - time [ref=e605]: "18"
+                        - time [ref=e606]: "19"
+                        - time [ref=e607]: "20"
+                        - time [ref=e608]: "21"
+                        - time [ref=e609]: "22"
+                        - time [ref=e610]: "23"
+                      - generic [ref=e614]:
+                        - generic [ref=e639]:
+                          - button "+2 more events" [ref=e641] [cursor=pointer]:
+                            - generic [ref=e644]: "+2"
+                          - generic [ref=e645]:
+                            - button "Production Touch Safety office Hours PM edition(new Series), 1:30 to 2:00, Tuesday, March 10, 2026, By Production Touch Safety, Tentative, Recurring event" [ref=e647] [cursor=pointer]:
+                              - generic [ref=e649]:
+                                - text: Production Touch Safety office Hours PM edition(new Series)
+                                - generic [ref=e650]: Production Touch Safety
+                              - img "Repeating event" [ref=e651]:
+                                - generic [ref=e653]: 
+                            - 'button "Moshe : Tamir, 10:35 to 11:00, Tuesday, March 10, 2026, By Moshe Peretz, Busy, Recurring event" [ref=e655] [cursor=pointer]':
+                              - generic [ref=e657]:
+                                - text: "Moshe : Tamir"
+                                - generic [ref=e658]: Moshe Peretz
+                              - img "Repeating event" [ref=e659]:
+                                - generic [ref=e661]: 
+                            - button "Runtime Platform | Weekly Operational Review, 12:10 to 13:00, Tuesday, March 10, 2026, By Runtime Platform (DK8S), Busy, Exception to recurring event" [ref=e663] [cursor=pointer]:
+                              - generic [ref=e664]:
+                                - generic [ref=e665]: Runtime Platform | Weekly Operational Review
+                                - generic [ref=e666]: Runtime Platform (DK8S)
+                                - img "Repeating event that was modified" [ref=e668]:
+                                  - generic [ref=e670]: 
+                            - button "אוסף את אייל גבי בנטע, 14:00 to 16:35, Tuesday, March 10, 2026, Busy" [ref=e672] [cursor=pointer]:
+                              - generic [ref=e674]: אוסף את אייל גבי בנטע
+                            - button "DK8s & ConfigGen Customer Enablement Sessions (CIEng Platform), 15:30 to 16:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Armita Quinones, Busy, Recurring event" [ref=e676] [cursor=pointer]:
+                              - generic [ref=e678]:
+                                - text: DK8s & ConfigGen Customer Enablement Sessions (CIEng Platform)
+                                - generic [ref=e679]: Microsoft Teams Meeting Armita Quinones
+                              - img "Repeating event" [ref=e680]:
+                                - generic [ref=e682]: 
+                            - button "Let's Talk with Michal - Today at 14:30, 14:30 to 15:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Michal Braverman-Blumenstyk, Tentative" [ref=e684] [cursor=pointer]:
+                              - generic [ref=e686]:
+                                - text: Let's Talk with Michal - Today at 14:30
+                                - generic [ref=e687]: Microsoft Teams Meeting Michal Braverman-Blumenstyk
+                            - button "CG + ArgoCD Deep Dive, 16:10 to 17:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Eric Pratt, Tentative" [ref=e689] [cursor=pointer]:
+                              - generic [ref=e690]:
+                                - generic [ref=e691]: CG + ArgoCD Deep Dive
+                                - generic [ref=e692]: Microsoft Teams Meeting
+                                - generic [ref=e693]: Eric Pratt
+                            - button "drive home, 18:00 to 18:50, Tuesday, March 10, 2026, OOF, Recurring event" [ref=e695] [cursor=pointer]:
+                              - generic [ref=e696]:
+                                - generic [ref=e697]: drive home
+                                - img "Repeating event" [ref=e699]:
+                                  - generic [ref=e701]: 
+                            - button "Microsoft Digital Trust & Global Regulations Community Call - Updated Topics, 17:00 to 18:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Microsoft Global Regulations Program, Tentative, Exception to recurring event" [ref=e703] [cursor=pointer]:
+                              - generic [ref=e704]:
+                                - generic [ref=e705]: Microsoft Digital Trust & Global Regulations Community Call - Updated Topics
+                                - generic [ref=e706]: Microsoft Teams Meeting
+                                - generic [ref=e707]: Microsoft Global Regulations Program
+                                - img "Repeating event that was modified" [ref=e709]:
+                                  - generic [ref=e711]: 
+                            - 'button "Canceled: Weekly MTP Engineering Excellence Discussions, 19:10 to 20:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By MTP Eng Excellence, Free, Recurring event" [ref=e713] [cursor=pointer]':
+                              - generic [ref=e714]:
+                                - generic [ref=e715]: "Canceled: Weekly MTP Engineering Excellence Discussions"
+                                - img "Repeating event" [ref=e717]:
+                                  - generic [ref=e719]: 
+                            - button "MTP PLG -Office Hours (Bi-Weekly), 18:10 to 19:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By CESECalendar, Tentative, Recurring event" [ref=e721] [cursor=pointer]:
+                              - generic [ref=e722]:
+                                - generic [ref=e723]: MTP PLG -Office Hours (Bi-Weekly)
+                                - generic [ref=e724]: Microsoft Teams Meeting
+                                - generic [ref=e725]: CESECalendar
+                                - img "Repeating event" [ref=e727]:
+                                  - generic [ref=e729]: 
+                            - button "SCIP Weekly Livesite (Ops) Review, 18:45 to 19:15, Tuesday, March 10, 2026, Microsoft Teams Meeting, By SCIP Leadership, Tentative, Recurring event" [ref=e731] [cursor=pointer]:
+                              - generic [ref=e733]:
+                                - text: SCIP Weekly Livesite (Ops) Review
+                                - generic [ref=e734]: Microsoft Teams Meeting SCIP Leadership
+                              - img "Repeating event" [ref=e735]:
+                                - generic [ref=e737]: 
+                            - button "(nonblocking) (CY26) MTP Privacy, Security, and Audit Office Hours - Tuesday Edition, 17:05 to 18:30, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Paul Mattson, Free, Exception to recurring event" [ref=e739] [cursor=pointer]:
+                              - generic [ref=e740]:
+                                - generic [ref=e741]: (nonblocking) (CY26) MTP Privacy, Security, and Audit Office Hours - Tuesday Edition
+                                - generic [ref=e742]: Microsoft Teams Meeting
+                                - generic [ref=e743]: Paul Mattson
+                                - img "Repeating event that was modified" [ref=e745]:
+                                  - generic [ref=e747]: 
+                            - button "Resource Provider Office Hours, 20:30 to 21:00, Tuesday, March 10, 2026, By Evan Hissey, Busy, Recurring event" [ref=e749] [cursor=pointer]:
+                              - generic [ref=e751]:
+                                - text: Resource Provider Office Hours
+                                - generic [ref=e752]: Evan Hissey
+                              - img "Repeating event" [ref=e753]:
+                                - generic [ref=e755]: 
+                            - button "מפגש עם פרופ' מולי להד, מומחה בינלאומי לפסיכוטראומה, 20:00 to 21:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Israel Communications, Tentative" [ref=e757] [cursor=pointer]:
+                              - generic [ref=e758]:
+                                - generic [ref=e759]: מפגש עם פרופ' מולי להד, מומחה בינלאומי לפסיכוטראומה
+                                - generic [ref=e760]: Microsoft Teams Meeting
+                                - generic [ref=e761]: Israel Communications
+                            - button "Tamir & Trevor, 21:05 to 22:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Tamir Dresher, Busy, Recurring event" [ref=e763] [cursor=pointer]:
+                              - generic [ref=e764]:
+                                - generic [ref=e765]: Tamir & Trevor
+                                - generic [ref=e766]: Microsoft Teams Meeting
+                                - generic [ref=e767]: Tamir Dresher
+                                - img "Repeating event" [ref=e769]:
+                                  - generic [ref=e771]: 
+                            - button "Agency C2 Kickoff, 22:10 to 23:00, Tuesday, March 10, 2026, Microsoft Teams Meeting, By Mitansh Shah, Tentative" [ref=e773] [cursor=pointer]:
+                              - generic [ref=e774]:
+                                - generic [ref=e775]: Agency C2 Kickoff
+                                - generic [ref=e776]: Microsoft Teams Meeting
+                                - generic [ref=e777]: Mitansh Shah
+                          - button "+8 more events" [ref=e783] [cursor=pointer]:
+                            - generic [ref=e786]: "+8"
+                        - button "13:30 to 14:00, Tuesday, March 10, 2026, 2 events, 2 free" [active]
+              - generic: Loaded 19 events in 1 selected calendars 10 March, 2026.
+          - alert [ref=e790]

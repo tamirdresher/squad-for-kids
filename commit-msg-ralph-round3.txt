@@ -1,0 +1,3 @@
+docs: Ralph round 3 — implemented #264 multi-session, #265 NuGet tool
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

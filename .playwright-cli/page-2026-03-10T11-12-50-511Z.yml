@@ -1,0 +1,434 @@
+- application [ref=e16]:
+  - generic [ref=e21]:
+    - link [ref=e1440] [cursor=pointer]
+    - banner [ref=e26]:
+      - button [ref=e1441] [cursor=pointer]: 
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - link [ref=e1442] [cursor=pointer]:
+            - /url: https://outlook.office.com/mail/?realm=microsoft.com&login_hint=tamirdresher@microsoft.com
+            - generic [ref=e41]: Outlook
+          - search [ref=e50]:
+            - generic [ref=e51]:
+              - generic [ref=e56]: 
+              - combobox [ref=e1443]
+        - generic [ref=e60]:
+          - button [ref=e1444] [cursor=pointer]:
+            - generic [ref=e795]: 
+          - button [ref=e1445] [cursor=pointer]:
+            - img [ref=e64]
+          - button [ref=e1446] [cursor=pointer]:
+            - img [ref=e69]
+          - button [ref=e1447] [cursor=pointer]:
+            - generic [ref=e74]: 
+            - generic [ref=e1012]: "24"
+          - button [ref=e1448] [cursor=pointer]:
+            - generic [ref=e78]: 
+      - generic [ref=e79]:
+        - button [ref=e1449] [cursor=pointer]:
+          - generic [ref=e88]:
+            - generic [ref=e89]: TD
+            - img [ref=e1450]
+        - text: 
+    - generic [ref=e92]:
+      - generic [ref=e95]:
+        - navigation [ref=e1451]:
+          - button [ref=e1453]:
+            - generic [ref=e101]:
+              - generic:
+                - generic:
+                  - img
+          - button [pressed] [ref=e1455]:
+            - generic [ref=e105]:
+              - generic:
+                - generic:
+                  - img
+          - button [ref=e1457]:
+            - generic [ref=e109]:
+              - generic:
+                - generic:
+                  - img
+          - button [ref=e1459]:
+            - generic [ref=e113]:
+              - generic:
+                - generic:
+                  - img
+          - button [ref=e1461]:
+            - generic [ref=e117]:
+              - generic:
+                - generic:
+                  - img
+          - button [ref=e1463]:
+            - generic [ref=e121]:
+              - generic:
+                - generic:
+                  - img
+          - button [ref=e1465]:
+            - generic [ref=e125]:
+              - generic:
+                - generic:
+                  - img
+          - button [ref=e1467]:
+            - generic [ref=e129]:
+              - generic:
+                - generic:
+                  - img
+          - status [ref=e130]
+        - button [ref=e133]:
+          - generic [ref=e134]:
+            - generic:
+              - generic:
+                - generic: 
+      - generic [ref=e797]:
+        - generic [ref=e799]:
+          - generic [ref=e800]: New event
+          - button [ref=e1468] [cursor=pointer]:
+            - generic [ref=e805]: 
+          - button [ref=e1469] [cursor=pointer]:
+            - generic [ref=e810]: 
+        - generic [ref=e812]:
+          - generic [ref=e813]:
+            - toolbar [ref=e1470]:
+              - button [ref=e1471]:
+                - generic [ref=e819]: 
+                - text: Save
+              - separator [ref=e820]
+              - radio [checked] [ref=e1472]:
+                - generic [ref=e823]: 
+                - text: Event
+              - radio [ref=e1473]:
+                - generic [ref=e826]: 
+                - text: Series
+              - separator [ref=e827]
+              - button [ref=e1474]:
+                - generic [ref=e830]: 
+                - text: Busy
+                - generic [ref=e832]: 
+              - button [ref=e1475]:
+                - generic [ref=e835]: 
+                - generic [ref=e837]: 
+              - button [ref=e1476]:
+                - generic [ref=e840]: 
+                - generic [ref=e842]: 
+              - button [ref=e1477]:
+                - generic [ref=e845]: 
+                - generic [ref=e847]: 
+              - separator [ref=e1013]
+              - button [ref=e1478]:
+                - img [ref=e1016]
+                - text: Lobby Experience
+              - button [ref=e1479]:
+                - generic [ref=e1019]: 
+                - generic [ref=e1021]: 
+              - separator [ref=e1022]
+              - button [ref=e1480]:
+                - generic [ref=e1025]: 
+            - button [ref=e1481]:
+              - img [ref=e857]
+          - generic [ref=e864]:
+            - generic [ref=e866]:
+              - generic [ref=e868]:
+                - generic [ref=e869]:
+                  - button [ref=e1482] [cursor=pointer]:
+                    - generic [ref=e873]: 
+                  - generic [ref=e877]:
+                    - textbox [ref=e1483]:
+                      - /placeholder: Add title
+                      - text: Setting Up Your Personal AI Squad — Demo by Tamir
+                    - button [ref=e1484]:
+                      - generic [ref=e884]:
+                        - generic [ref=e886]: 
+                        - generic [ref=e888]: 
+                      - text: General
+                      - generic [ref=e890]: 
+                - generic [ref=e891]:
+                  - generic [ref=e893]: 
+                  - generic [ref=e898]:
+                    - generic [ref=e1485]: Invite required attendees
+                    - button [ref=e1486]:
+                      - generic [ref=e905]: 
+                      - generic [ref=e907]: 
+                - generic [ref=e908]:
+                  - generic [ref=e910]: 
+                  - generic [ref=e914]:
+                    - button [expanded] [ref=e1487] [cursor=pointer]:
+                      - generic [ref=e916]: Thu 12 Mar 2026 13:00 - 14:00
+                    - dialog [ref=e1488]:
+                      - generic [ref=e1492]:
+                        - generic [ref=e1493]:
+                          - generic [ref=e1495]:
+                            - generic [ref=e1496]:
+                              - generic [ref=e1497]: Start date
+                              - generic [ref=e1503]:
+                                - combobox "Start date" [ref=e1504]: 12 Mar 2026
+                                - button "Start date" [ref=e1505] [cursor=pointer]:
+                                  - generic [ref=e1507]: 
+                            - generic [ref=e1508]:
+                              - generic [ref=e1509]:
+                                - generic [ref=e1510]: Start time
+                                - generic [ref=e1515]:
+                                  - combobox "Start time" [ref=e1516]: 13:00
+                                  - button "Start time" [ref=e1517]:
+                                    - generic [ref=e1519]: 
+                              - generic [ref=e1520]:
+                                - generic [ref=e1521]: End time
+                                - generic [ref=e1526]:
+                                  - combobox "End time" [active] [ref=e1527]: 14:00
+                                  - button "End time" [ref=e1528]:
+                                    - generic [ref=e1530]: 
+                          - generic [ref=e1531]:
+                            - button "Time zone" [ref=e1532] [cursor=pointer]:
+                              - generic [ref=e1536]: 
+                            - generic: Time zone options are expanded on the left
+                        - generic [ref=e1538]:
+                          - generic [ref=e1539] [cursor=pointer]:
+                            - checkbox "All day" [ref=e1540]
+                            - generic [ref=e1541]: All day
+                          - button "Make recurring" [ref=e1542]:
+                            - generic [ref=e1544]: 
+                            - text: Recurring
+                      - generic [ref=e1545]:
+                        - generic [ref=e1546]:
+                          - generic [ref=e1547]: 󰊄
+                          - generic [ref=e1549]: Time suggestions
+                          - generic "The best options in a 5-day window" [ref=e2041]:
+                            - generic [ref=e2042]: 
+                        - listbox "Time suggestions" [ref=e2043]:
+                          - option "Sun 3/15 12:30 - 13:30(1 hour) 1 Available" [ref=e2044]:
+                            - generic [ref=e2045]:
+                              - generic [ref=e2046]:
+                                - generic [ref=e2047]: Sun 3/15
+                                - generic [ref=e2048]:
+                                  - text: 12:30 - 13:30
+                                  - generic [ref=e2049]: (1 hour)
+                              - generic "1 Available" [ref=e2050]:
+                                - generic "Tamir Dresher Available" [ref=e2051]:
+                                  - generic [ref=e2052]:
+                                    - generic [ref=e2053]: 
+                                    - text: "1"
+                          - option "Sun 3/15 13:30 - 14:30(1 hour) 1 Available" [ref=e2054]:
+                            - generic [ref=e2055]:
+                              - generic [ref=e2056]:
+                                - generic [ref=e2057]: Sun 3/15
+                                - generic [ref=e2058]:
+                                  - text: 13:30 - 14:30
+                                  - generic [ref=e2059]: (1 hour)
+                              - generic "1 Available" [ref=e2060]:
+                                - generic "Tamir Dresher Available" [ref=e2061]:
+                                  - generic [ref=e2062]:
+                                    - generic [ref=e2063]: 
+                                    - text: "1"
+                          - option "Sun 3/15 14:30 - 15:30(1 hour) 1 Available" [ref=e2064]:
+                            - generic [ref=e2065]:
+                              - generic [ref=e2066]:
+                                - generic [ref=e2067]: Sun 3/15
+                                - generic [ref=e2068]:
+                                  - text: 14:30 - 15:30
+                                  - generic [ref=e2069]: (1 hour)
+                              - generic "1 Available" [ref=e2070]:
+                                - generic "Tamir Dresher Available" [ref=e2071]:
+                                  - generic [ref=e2072]:
+                                    - generic [ref=e2073]: 
+                                    - text: "1"
+                          - option "Sun 3/15 15:30 - 16:30(1 hour) 1 Available" [ref=e2074]:
+                            - generic [ref=e2075]:
+                              - generic [ref=e2076]:
+                                - generic [ref=e2077]: Sun 3/15
+                                - generic [ref=e2078]:
+                                  - text: 15:30 - 16:30
+                                  - generic [ref=e2079]: (1 hour)
+                              - generic "1 Available" [ref=e2080]:
+                                - generic "Tamir Dresher Available" [ref=e2081]:
+                                  - generic [ref=e2082]:
+                                    - generic [ref=e2083]: 
+                                    - text: "1"
+                          - option "Mon 3/16 8:30 - 9:30(1 hour) 1 Available" [ref=e2084]:
+                            - generic [ref=e2085]:
+                              - generic [ref=e2086]:
+                                - generic [ref=e2087]: Mon 3/16
+                                - generic [ref=e2088]:
+                                  - text: 8:30 - 9:30
+                                  - generic [ref=e2089]: (1 hour)
+                              - generic "1 Available" [ref=e2090]:
+                                - generic "Tamir Dresher Available" [ref=e2091]:
+                                  - generic [ref=e2092]:
+                                    - generic [ref=e2093]: 
+                                    - text: "1"
+                    - generic [ref=e918]:
+                      - button [disabled] [ref=e1604]:
+                        - generic [ref=e922]: 
+                      - button [ref=e1605]:
+                        - generic [ref=e926]: 
+                        - text: Scheduler
+                - generic [ref=e1606]:
+                  - generic [ref=e1608]: 󰔀
+                  - generic [ref=e1614]:
+                    - generic [ref=e1615]:
+                      - switch [ref=e1616] [cursor=pointer]
+                      - generic:
+                        - generic: 
+                      - generic [ref=e1617] [cursor=pointer]: If conflicts arise, let Copilot reschedule this event.
+                    - button [ref=e1618] [cursor=pointer]:
+                      - generic [ref=e1619]: Acceptable times
+                      - generic [ref=e1620]: 
+                - generic [ref=e942]:
+                  - generic [ref=e944]: 
+                  - generic [ref=e950]:
+                    - generic [ref=e951]:
+                      - button [ref=e1621] [cursor=pointer]: Add a room with Copilot
+                      - combobox [ref=e1622]
+                    - button [ref=e1623]:
+                      - generic [ref=e963]: 󰡠
+                      - generic [ref=e965]: 
+                - generic [ref=e966]:
+                  - generic [ref=e968]: 
+                  - generic [ref=e1030]:
+                    - switch [ref=e1624] [cursor=pointer]
+                    - generic:
+                      - generic: 
+                    - generic [ref=e1032] [cursor=pointer]: Teams meeting
+              - generic [ref=e981]:
+                - generic [ref=e983]: 
+                - generic [ref=e989]:
+                  - generic [ref=e990]:
+                    - textbox [ref=e1625]
+                    - group [ref=e1035]:
+                      - generic [ref=e1036]:
+                        - button [disabled] [ref=e1626]:
+                          - generic [ref=e1039]: 󰈧
+                          - text: Draft an agenda for me (Alt+i)
+                        - img [ref=e1627]:
+                          - generic [ref=e1042]: 
+                  - generic [ref=e993]:
+                    - button [ref=e1628]
+                    - button [ref=e1629]
+                    - button [ref=e1630]:
+                      - generic [ref=e998]: 
+                    - button [ref=e1631]
+                    - button [ref=e1632]
+                    - button [ref=e1634]
+                    - button [ref=e1635]:
+                      - generic [ref=e1005]: 
+            - generic [ref=e1044]:
+              - generic [ref=e1045]:
+                - button [ref=e1636] [cursor=pointer]:
+                  - generic [ref=e1050]: 
+                - button [ref=e1637] [cursor=pointer]:
+                  - generic [ref=e1054]: 
+                - button [ref=e1638] [cursor=pointer]:
+                  - generic [ref=e1059]: 
+                - button [ref=e1639] [cursor=pointer]:
+                  - generic [ref=e1062]:
+                    - generic [ref=e1063]: Thu, 12 Mar, 2026
+                    - generic [ref=e1066]: 
+                - text: 12 March, 2026
+                - button [ref=e1640] [cursor=pointer]:
+                  - generic [ref=e1070]: 
+              - generic [ref=e1072]:
+                - generic [ref=e1085]:
+                  - generic [ref=e2021]:
+                    - generic [ref=e2022]:
+                      - generic [ref=e2025]: 
+                      - generic [ref=e2026]: 9 Mar
+                    - generic [ref=e2028]: Karan - OOO (10/03/2026 - 17/03/2026)
+                    - generic [ref=e2029]:
+                      - generic [ref=e2030]: 17 Mar
+                      - generic [ref=e2033]: 
+                  - generic [ref=e2035]:
+                    - generic [ref=e2037]: OOO - Ibrahim
+                    - img [ref=e2038]:
+                      - generic [ref=e2040]: 
+                - generic [ref=e1106]:
+                  - generic [ref=e1110]:
+                    - time [ref=e1135]: "0"
+                    - time [ref=e1136]: "1"
+                    - time [ref=e1137]: "2"
+                    - time [ref=e1138]: "3"
+                    - time [ref=e1139]: "4"
+                    - time [ref=e1140]: "5"
+                    - time [ref=e1141]: "6"
+                    - time [ref=e1142]: "7"
+                    - time [ref=e1143]: "8"
+                    - time [ref=e1144]: "9"
+                    - time [ref=e1145]: "10"
+                    - time [ref=e1146]: "11"
+                    - time [ref=e1147]: "12"
+                    - time [ref=e1148]: "13"
+                    - time [ref=e1149]: "14"
+                    - time [ref=e1150]: "15"
+                    - time [ref=e1151]: "16"
+                    - time [ref=e1152]: "17"
+                    - time [ref=e1153]: "18"
+                    - time [ref=e1154]: "19"
+                    - time [ref=e1155]: "20"
+                    - time [ref=e1156]: "21"
+                    - time [ref=e1157]: "22"
+                    - time [ref=e1158]: "23"
+                  - generic [ref=e1162]:
+                    - generic [ref=e1188]:
+                      - generic [ref=e1787]: בר מצווה יונתן
+                      - generic [ref=e1790]:
+                        - generic [ref=e1791]: Eyal
+                        - img [ref=e1793]:
+                          - generic [ref=e1795]: 
+                      - generic [ref=e1798]:
+                        - generic [ref=e1799]: Eyal
+                        - img [ref=e1801]:
+                          - generic [ref=e1803]: 
+                      - generic [ref=e1805]:
+                        - generic [ref=e1807]:
+                          - text: לא לשכוח סיבוס
+                          - generic [ref=e1808]: Microsoft Teams Meeting
+                        - img [ref=e1809]:
+                          - generic [ref=e1811]: 
+                      - generic [ref=e1813]:
+                        - generic [ref=e1815]: Resource Provider Office Hours
+                        - img [ref=e1816]:
+                          - generic [ref=e1818]: 
+                      - generic [ref=e1821]:
+                        - generic [ref=e1822]: Hadar's Team Spec Review Slot (Weekly)
+                        - generic [ref=e1823]: Microsoft Teams Meeting
+                        - img [ref=e1825]:
+                          - generic [ref=e1827]: 
+                      - generic [ref=e1830]:
+                        - generic [ref=e1831]: Defender K8s PIR Review
+                        - generic [ref=e1832]: Microsoft Teams Meeting
+                        - img [ref=e1834]:
+                          - generic [ref=e1836]: 
+                      - generic [ref=e1839]:
+                        - generic [ref=e1840]: Agency C2 Next Cycle Goals
+                        - generic [ref=e1841]: Microsoft Teams Meeting
+                      - generic [ref=e1843]:
+                        - generic [ref=e1845]:
+                          - text: Weekly sync on dk8s and ConfigGen migrations
+                          - generic [ref=e1846]: Microsoft Teams Meeting
+                        - img [ref=e1847]:
+                          - generic [ref=e1849]: 
+                      - generic [ref=e1851]:
+                        - generic [ref=e1853]: RPaaS IST Office Hours
+                        - img [ref=e1854]:
+                          - generic [ref=e1856]: 
+                      - generic [ref=e1859]:
+                        - generic [ref=e1860]: "Canceled: Hadar's Team Spec Review Slot (Weekly)"
+                        - generic [ref=e1861]: Microsoft Teams Meeting
+                        - img [ref=e1863]:
+                          - generic [ref=e1865]: 
+                      - generic [ref=e1868]:
+                        - generic [ref=e1869]: Agency Cycle 1 Demos
+                        - generic [ref=e1870]: Microsoft Teams Meeting
+                    - generic [ref=e1410]: 13:00 - 14:00
+        - alert [ref=e1010]
+  - generic [ref=e1412]:
+    - generic [ref=e1413]:
+      - generic [ref=e1414]: Reminders
+      - generic [ref=e1415]:
+        - button [ref=e1689]: Dismiss all
+        - button [ref=e1690]:
+          - generic [ref=e1419]: 
+    - button [ref=e1691]:
+      - generic [ref=e1429]: 
+      - generic [ref=e1430]:
+        - generic [ref=e1432]: Karan - OOO (10/03/2026 - 17/03/2026)
+        - generic [ref=e1434]: 20:30
+      - generic [ref=e1435]: 17 hrs ago
+  - text:        

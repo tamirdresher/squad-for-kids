@@ -194,9 +194,69 @@ function Invoke-SquadScheduler {
             $results.firedTasks += $task.id
             
             if (-not $DryRun) {
+                # ============================================================
+                # EXECUTE THE TASK
+                # ============================================================
+                $taskResult = "success"
+                $taskError = $null
+                
+                try {
+                    switch ($task.task.type) {
+                        "script" {
+                            # Run a PowerShell script directly
+                            $cmd = $task.task.command
+                            Write-Host "  Executing script: $cmd" -ForegroundColor Yellow
+                            $scriptOutput = Invoke-Expression $cmd 2>&1
+                            if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $null) {
+                                $taskResult = "failed"
+                                $taskError = "Exit code $LASTEXITCODE"
+                            }
+                            Write-Host "  Script completed ($taskResult)" -ForegroundColor $(if ($taskResult -eq "success") { "Green" } else { "Red" })
+                        }
+                        "workflow" {
+                            # Trigger a GitHub Actions workflow
+                            $ref = $task.task.ref
+                            Write-Host "  Triggering workflow: $ref" -ForegroundColor Yellow
+                            gh workflow run (Split-Path $ref -Leaf) 2>&1 | Out-Null
+                            if ($LASTEXITCODE -ne 0) {
+                                $taskResult = "failed"
+                                $taskError = "Workflow trigger failed"
+                            }
+                        }
+                        "copilot" {
+                            # Run via copilot agent (needs to be inside a copilot session)
+                            # When called from ralph-watch, this runs inside the agency session
+                            # so WorkIQ and MCP tools are available
+                            $scriptRef = $task.task.scriptRef
+                            if ($scriptRef -and (Test-Path $scriptRef)) {
+                                Write-Host "  Executing copilot script: $scriptRef" -ForegroundColor Yellow
+                                & $scriptRef 2>&1 | Out-Null
+                                if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $null) {
+                                    $taskResult = "failed"
+                                    $taskError = "Script exit code $LASTEXITCODE"
+                                }
+                            } else {
+                                # No script ref — log the instruction for the copilot session to pick up
+                                Write-Host "  Copilot task queued: $($task.task.instruction.Substring(0, [Math]::Min(80, $task.task.instruction.Length)))..." -ForegroundColor Cyan
+                            }
+                        }
+                        default {
+                            Write-Host "  Unknown task type: $($task.task.type)" -ForegroundColor Yellow
+                            $taskResult = "skipped"
+                        }
+                    }
+                } catch {
+                    $taskResult = "failed"
+                    $taskError = $_.Exception.Message
+                    Write-Host "  Task failed: $taskError" -ForegroundColor Red
+                    $results.tasksFailed++
+                    $results.errors += "$($task.id): $taskError"
+                }
+                
                 $newState[$task.id] = @{
                     lastRun = $currentTime.ToUniversalTime().ToString("o")
-                    result = "success"
+                    result = $taskResult
+                    error = $taskError
                     provider = $Provider
                 }
             }

@@ -1,27 +1,25 @@
 ---
-updated_at: 2026-03-10T12-34-00Z
-focus_area: Ralph active — Data working on #265, 13 issues pending-user
-active_issues: [265]
+updated_at: 2026-03-10T12-48-00Z
+focus_area: Ralph active — B'Elanna fixing CI workflows (#276), Data's NuGet PR awaits review
+active_issues: [265, 276]
 session_status: ralph-active
 ---
 
 # What We're Focused On
 
-Ralph Round 1 work-check cycle (2026-03-10T12:34:00Z).
+Ralph Round 2 scan + decision merging (2026-03-10T12:48:00Z).
 
-**Round 1 results:**
-- 16 open issues (13 pending-user, 3 actionable)
-- All squad-monitor issues closed (3/3)
-- 0 open PRs, CI green
-- #273 closed (Tech News Digest complete)
-- #265 moved to In Progress (Data spawned for NuGet publish)
-- #277 created (Shivam Chaudhary access approval)
-- Email: 3 action items (access approvals, Teams membership)
-- Teams: No actionable items last 30 min
+**Round 2 results:**
+- 4 new issues discovered (#279, #278, #276, #277)
+- #279, #278 closed — directives captured (auto-approve, timezone)
+- #276 triaged → B'Elanna, moved to In Progress
+- #277 updated with auto-approval directive clarification
+- squad-monitor PR creation failed (EMU restriction)
 
 **Current State:**
-- **Open Issues:** 16 (13 pending-user, 3 actionable)
-- **Open PRs:** 0
-- **CI Status:** Green
-- **Board Status:** Active — Ralph Round 1 scan complete
-- **Active Agents:** Data (#265), Neelix (Teams notification), Coordinator (#277)
+- **Open Issues:** 16 + 4 new discoveries
+- **In Progress:** #276 (CI), #265 (NuGet)
+- **Open PRs:** 0 (squad-monitor blocked by EMU)
+- **CI Status:** Green (B'Elanna working #276)
+- **Board Status:** Active — Round 2 scan complete, decisions merged
+- **Active Agents:** B'Elanna (#276), Data (#265), Scribe (decisions)

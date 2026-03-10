@@ -91,6 +91,8 @@ NEWS REPORTER (Neelix): When you find important updates worth reporting (PRs mer
 
 PODCASTER: After any agent completes a significant deliverable (research report, blog draft, design doc, architecture proposal, or any document >500 words), run the podcaster to generate an audio version. Use: pwsh scripts/podcaster.ps1 -InputFile <path-to-deliverable>. The audio file will be saved next to the source file with -audio.wav suffix. Mention the audio file in the Teams notification so Tamir knows it's available to listen to. Read .squad/agents/podcaster/charter.md for details.
 
+TECH NEWS SCANNING (once per day, morning round only): On the first round after 7:00 AM local time, run: node scripts/tech-news-scanner.js. It scans HackerNews and Reddit for AI, .NET, Kubernetes, and developer tools news. If it finds relevant stories, create a GitHub issue titled "Tech News Digest: {date}" with label "squad,squad:seven" summarizing the top stories. Include links. Neelix should then send a Teams notification with the highlights.
+
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
 '@
 

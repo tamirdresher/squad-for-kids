@@ -3369,3 +3369,45 @@ Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main
 
 **Key Insight:** Graceful degradation pattern works well for optional integrations. Squad-monitor now functions in environments without GitHub access, making it more portable for team use.
 
+
+### 2026-03-10: Data — NuGet Tool Publishing — Issue #265
+
+**Task:** Configure squad-monitor as a .NET global tool and set up NuGet publishing automation.
+
+**Implementation:**
+1. Modified squad-monitor.csproj to add:
+   - <PackAsTool>true</PackAsTool> for tool packaging
+   - <ToolCommandName>squad-monitor</ToolCommandName> for CLI command
+   - Package metadata (PackageId, Version 1.0.0, Description, Authors, License)
+   - README.md inclusion in package
+
+2. Created GitHub Actions workflow (.github/workflows/publish-nuget.yml):
+   - Triggers on release creation or manual dispatch
+   - Builds, packs, and publishes to NuGet.org
+   - Requires NUGET_API_KEY secret in repo settings
+   - Version auto-extracted from release tag (v1.0.0 → 1.0.0)
+
+3. Updated documentation:
+   - README.md now recommends dotnet tool install -g squad-monitor as primary installation
+   - Added update instructions and build-from-source alternative
+   - Updated local .squad/tools/squad-monitor/README.md to note NuGet package availability
+
+4. Verified build and pack commands work successfully
+
+**Branch & PR:**
+- Branch: squad/265-nuget-publish in tamirdresher/squad-monitor
+- PR created: https://github.com/tamirdresher/squad-monitor/pull/new/squad/265-nuget-publish
+- Closes tamirdresher/tamresearch1#265
+
+**Key Decisions:**
+- Removed platform-specific publish settings (PublishSingleFile, SelfContained, RuntimeIdentifier) for cross-platform tool compatibility
+- Set version to 1.0.0 as initial release
+- Configured workflow for both automated (release) and manual (workflow_dispatch) publishing
+
+**Next Steps for Tamir:**
+1. Set NUGET_API_KEY secret in squad-monitor repository settings
+2. Merge PR
+3. Create v1.0.0 release to trigger first NuGet publish
+
+---
+

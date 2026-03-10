@@ -3707,3 +3707,51 @@ Researched deploying ralph-watch.ps1 to a DevBox environment. Key learnings:
 
 **Next Steps:** Await user input on email approach selection and DevBox tunnel config.
 
+
+### 2026-03-10: Ralph Parallelism Architecture Research (Issue #272)
+
+**Problem:** Sequential work processing causes starvation — heavy tasks (5+ min blog rewrites, research) block fast operations (board updates, labels, comments).
+
+**Research Scope:** Four architectural approaches analyzed:
+1. Priority queues (fast vs slow tiers)
+2. Parallel work pools (spawn all agents simultaneously)
+3. Time-boxing (checkpoint and resume)
+4. Dedicated lanes (fast lane sync, deep lane background)
+
+**Key Findings:**
+
+**Approach 2 (Parallel Work Pools) — Recommended:**
+- Leverage existing `mode: "background"` infrastructure (Squad.agent.md lines 520-540)
+- Spawn ALL agents across ALL categories in ONE batch via multiple `task` calls
+- True parallelism: fast work completes in <1 min, heavy work runs concurrently
+- Lowest implementation cost: 1-day change to Squad coordinator Step 3 (lines 1008-1012)
+- No new failure modes, reuses proven spawn + collect pattern
+
+**Implementation sketch:**
+```typescript
+// Spawn all work items in one batch (mode: "background")
+const allAgentSpawns = [
+  ...untriaged.map(spawnLeadTriage),
+  ...assigned.map(spawnMemberAgent),
+  ...ciFailures.map(spawnFixAgent)
+];
+const agentIds = await Promise.all(allAgentSpawns);
+const results = await Promise.all(agentIds.map(id => readAgent(id, {wait: true, timeout: 300})));
+```
+
+**Why NOT other approaches:**
+- Approach 1 (Priority queues): Only 2 tiers, doesn't solve slow-vs-slow
+- Approach 3 (Time-boxing): Too complex, fragile checkpoint protocol, poor UX
+- Approach 4 (Dedicated lanes): More state management, higher risk
+
+**Migration path:**
+- Phase 1: Implement Approach 2 (parallel work pools)
+- Phase 2 (optional): Add Approach 1 priority tiers for finer control within parallel batch
+
+**Files impacted:**
+- `.github/agents/squad.agent.md` (Step 3 logic, lines 1008-1012)
+- `.squad/decisions/inbox/picard-ralph-parallelism.md` (decision doc)
+
+**Risks:** Higher LLM resource usage (monitor token costs), need better observability for parallel failures
+
+**Expected outcome:** Ralph rounds complete faster, fast tasks never starve, heavy tasks run in parallel

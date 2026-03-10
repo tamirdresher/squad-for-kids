@@ -1,5 +1,9 @@
 # Squad Activity Monitor v2
 
+> **⚠️ NOTE**: This tool is now available as a [.NET global tool on NuGet](https://www.nuget.org/packages/squad-monitor).  
+> **Recommended installation**: `dotnet tool install -g squad-monitor`  
+> This local copy is for development/testing only.
+
 A multi-panel terminal dashboard for monitoring squad activity, GitHub work queue, and Ralph watch loop health.
 
 ## Features

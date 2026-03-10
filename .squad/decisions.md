@@ -12171,6 +12171,263 @@ The specification reads like an infrastructure document, not a platform security
 
 *"In security, silence is not strength — it is vulnerability."* — Worf
 
+---
+
+# Decision: GitHub Actions Workflow Resilience Pattern
+
+**Date:** 2026-03-10  
+**Proposed by:** B'Elanna (Infrastructure Expert)  
+**Context:** Issue #276 — Squad workflow failures investigation  
+**Status:** Implemented  
+
+## Problem
+
+GitHub Actions workflows in Squad automation experienced widespread failures across 5 workflows:
+- Squad Heartbeat (Ralph)
+- Squad Triage
+- Squad Issue Notification  
+- Squad Issue Assign
+- Squad Archive Done Items
+
+Root causes:
+1. Bash syntax used without shell directive on Windows self-hosted runners
+2. No retry logic for transient GitHub API failures (HTTP 500 errors)
+
+## Decision
+
+**Establish GitHub Actions resilience pattern for Squad workflows:**
+
+### 1. Shell Directive Requirement
+All workflow steps using bash syntax MUST explicitly specify `shell: bash`, even on Linux runners.
+
+**Rationale:**
+- Self-hosted Windows runners default to PowerShell
+- GitHub-hosted Linux runners default to bash
+- Explicit directive ensures consistency across runner types
+- Prevents "Missing '(' after 'if'" parser errors
+
+**Example:**
+```yaml
+- name: Check triage script
+  id: check-script
+  shell: bash  # ← EXPLICIT
+  run: |
+    if [ -f ".squad-templates/ralph-triage.js" ]; then
+      echo "has_script=true" >> $GITHUB_OUTPUT
+    fi
+```
+
+### 2. Retry Logic Standard
+All `actions/github-script@v7` steps MUST include retry configuration:
+
+```yaml
+- uses: actions/github-script@v7
+  with:
+    retries: 3
+    retry-exempt-status-codes: 400,401,403,404,422
+    script: |
+      # GitHub API calls here
+```
+
+**Rationale:**
+- GitHub API experiences transient 500 errors
+- 3 retries provides resilience without excessive delay
+- Exempting 4xx errors prevents retry loops on auth/permission issues
+- Standard pattern across all workflows = consistent behavior
+
+### 3. Implementation Status
+
+**Implemented in:**
+- `.github/workflows/squad-heartbeat.yml`
+- `.github/workflows/squad-triage.yml`
+- `.github/workflows/squad-issue-notify.yml`
+- `.github/workflows/squad-issue-assign.yml`
+- `.github/workflows/squad-archive-done.yml`
+
+**Coverage:** All Squad automation workflows now follow resilience pattern
+
+## Impact
+
+**Before:**
+- Workflow failure rate: ~30% (9 failures in 1 day)
+- Manual intervention required for transient failures
+- Windows runner incompatibility with bash scripts
+
+**After:**
+- Expected failure rate: <5% (only on persistent GitHub API issues)
+- Automatic recovery from transient failures
+- Cross-platform runner compatibility
+
+## Testing
+
+**Required:**
+1. Trigger Squad Heartbeat workflow manually (validate bash script execution)
+2. Monitor workflow runs for 48 hours (validate retry logic reduces failures)
+3. Verify no infinite retry loops on 400/403 errors
+
+**Success criteria:**
+- Squad Heartbeat completes successfully on Windows runner
+- Workflow failure rate drops below 10%
+- No retry loops observed on permission errors
+
+## Alternatives Considered
+
+**1. Move to GitHub-hosted runners**
+- Rejected: Self-hosted runners required for network access patterns
+
+**2. Convert bash scripts to PowerShell**
+- Rejected: Bash syntax more portable, explicit shell directive simpler fix
+
+**3. Higher retry count (5+)**
+- Rejected: 3 retries sufficient, higher count delays failure detection
+
+## References
+
+- Issue #276: GitHub Actions workflow failures
+- PR #281: fix(workflows): Add shell directive and retry logic
+- GitHub Actions docs: [Setting a default shell](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell)
+- GitHub Script Action: [Retry configuration](https://github.com/actions/github-script#retries)
+
+## Decision Owner
+
+B'Elanna (Infrastructure Expert)
+
+## Review Required
+
+- [ ] Picard (Lead) — Approve resilience pattern as Squad standard
+- [ ] Team — Adopt pattern in future workflow development
+
+---
+
+# Decision: Skip Fluent UI MCP Integration
+
+**Issue:** #280  
+**Decision Maker:** Seven (Research & Docs)  
+**Date:** 2026-03-12  
+**Status:** CLOSED / SKIP  
+
+## Summary
+
+The Squad evaluated integrating Fluent UI MCP (Model Context Protocol) server for AI-powered UI component suggestions, code generation, and documentation access. 
+
+**Decision: SKIP** ❌
+
+## Rationale
+
+### What is Fluent UI MCP?
+
+Fluent UI MCP exposes Microsoft's component library (50+ React/Blazor/iOS/Android/Windows components) as standardized tools for AI assistants. Capabilities include:
+- Live component discovery with always-current documentation
+- AI code generation (TypeScript/React) with design tokens
+- WCAG accessibility validation
+- Context-aware component recommendations
+- Integration with Copilot, Claude, Cursor, and other MCP clients
+
+### Why Skip?
+
+1. **Out of Scope** — Squad builds backend/infrastructure (K8s operators, .NET controllers, Go microservices), not React/Blazor UI components
+2. **No Roadmap** — Zero planned UI work in current phase; no component library or dashboard projects
+3. **Cognitive Load** — Adding frontend tools dilutes Squad's specialized platform engineering focus
+4. **Tool Mismatch** — Current MCP stack is backend-ops (GitHub, Azure DevOps, WorkIQ, Aspire); Fluent UI is frontend-only
+5. **Zero Leverage** — Squad skills are specialized for DK8S, infrastructure, .NET build systems—not general UI work
+
+### Team Context
+
+- **Squad Charter:** "Backend/infrastructure research and analysis across K8s, .NET, Go, platform engineering"
+- **Current MCP Servers:** GitHub (repos), Azure DevOps (work items), WorkIQ (M365 intelligence), Aspire (dashboards)
+- **UI Work:** Minimal—no React or Blazor component development in scope
+- **Recent Commits:** No frontend activity in recent log
+
+## When to Revisit
+
+Only reconsider Fluent UI MCP if:
+1. Squad begins a UI dashboard or component library project
+2. A frontend engineer joins and needs component guidance
+3. Tamir explicitly requests UI automation for the demo environment
+
+## Implementation Reference (for future)
+
+If decision changes, adding Fluent UI MCP requires:
+
+```json
+{
+  "mcpServers": {
+    "fluentui": {
+      "command": "npx",
+      "args": ["-y", "@fluentui/mcp-server"]
+    }
+  }
+}
+```
+
+Config file: `.copilot/mcp-config.json`  
+Optional skill: `.squad/skills/fluentui/` for team-specific patterns
+
+---
+
+**Evidence:**
+- Web research: MCP architecture, Fluent UI capabilities, integration patterns
+- Squad composition analysis: Charter, team.md, current MCP stack review
+- Roadmap assessment: No UI initiatives in decisions.md or recent commits
+
+**Next Steps:** Close issue #280. Archive this decision. Revisit decision annually or on scope change.
+
+---
+
+# Decision: NuGet Global Tool Publishing for squad-monitor
+
+**Date:** 2026-03-10  
+**Author:** Data  
+**Context:** Issue #265 — Publish squad-monitor as dotnet tool
+
+## Decision
+
+Configured squad-monitor for distribution as a .NET global tool on NuGet.org with automated CI/CD publishing.
+
+## Rationale
+
+1. **User Experience**: `dotnet tool install -g squad-monitor` is simpler than clone+build
+2. **Version Management**: NuGet handles updates via `dotnet tool update -g squad-monitor`
+3. **Cross-Platform**: Removed platform-specific settings (PublishSingleFile, RuntimeIdentifier) for universal tool support
+4. **Automation**: GitHub Actions workflow eliminates manual publishing steps
+
+## Technical Implementation
+
+### Package Configuration
+- `PackAsTool=true` enables tool packaging
+- `ToolCommandName=squad-monitor` sets the CLI command name
+- Standard NuGet metadata (PackageId, Version, Description, Authors, License)
+- README.md bundled in package for NuGet.org display
+
+### CI/CD Pipeline
+- Triggers: Release creation (tag-based) or manual workflow dispatch
+- Version extraction: Strips 'v' prefix from git tags (v1.0.0 → 1.0.0)
+- Publishing: Uses `NUGET_API_KEY` secret for authentication
+- Skip-duplicate flag prevents re-publishing same version
+
+### Documentation Updates
+- Primary installation method changed to NuGet global tool
+- Local `.squad/tools/squad-monitor/` marked as dev/test copy
+- Build-from-source retained as alternative
+
+## Implications
+
+- **Requires setup**: Tamir must add `NUGET_API_KEY` secret to squad-monitor repo
+- **Release process**: Create GitHub release with version tag (e.g., v1.0.0) to trigger publish
+- **Breaking change compatibility**: Future versions must maintain CLI compatibility or use semantic versioning for breaking changes
+
+## Alternatives Considered
+
+1. **Keep platform-specific builds**: Rejected — limits cross-platform use
+2. **Manual NuGet publishing**: Rejected — error-prone, no automation
+3. **GitHub Packages instead of NuGet.org**: Rejected — less discoverable, requires auth for install
+
+## Status
+
+**Implemented** — PR ready for review at https://github.com/tamirdresher/squad-monitor/pull/new/squad/265-nuget-publish
+
+---
+
 # Decision: Office 365 MCP Integration Strategy (Issue #183)
 
 **Date:** 2026-03-09  

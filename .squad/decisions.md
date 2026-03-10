@@ -17232,3 +17232,274 @@ When working on repositories in public GitHub, use Tamir's personal GitHub accou
 
 **Status:** ✅ In effect as of 2026-03-10
 
+
+---
+
+# Decision: Cross-Repo Squad A2A Communication Architecture
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Status:** Proposed  
+**Context:** Issue #296 — Enable squads to communicate across repositories
+
+---
+
+## Decision
+
+Squad CLI will integrate the A2A (Agent-to-Agent) protocol to enable cross-repo squad discovery and communication, with a phased rollout starting with local file-based discovery.
+
+---
+
+## Rationale
+
+### Problem
+Squads are isolated within repository boundaries, leading to:
+- Manual coordination overhead for multi-repo projects
+- Duplicate research and decision-making
+- Delayed propagation of breaking changes
+- Fragmented knowledge across repos
+
+### Why A2A Protocol?
+1. **Industry Standard:** Linux Foundation-hosted, backed by 150+ organizations
+2. **Interoperability:** Works with Google ADK, AWS, Azure, and other A2A-compliant agents
+3. **Proven Spec:** JSON-RPC 2.0 over HTTP, well-documented (v0.3.0)
+4. **Future-Proof:** Aligned with broader agent ecosystem evolution
+
+### Why Not Alternatives?
+- **Shared Database:** Requires infrastructure, single point of failure
+- **Git-Based Sync:** Too slow, not suitable for real-time coordination
+- **Message Queue:** Overkill for local use case, complex setup
+- **Custom Protocol:** Reinventing wheel, no ecosystem compatibility
+
+---
+
+## Architecture
+
+### Phase 1: Local Discovery (MVP — 6 weeks)
+- **Discovery:** File-based registry at `~/.squad/registry/active-squads.json`
+- **Protocol:** JSON-RPC 2.0 over HTTP (port auto-assigned)
+- **Security:** Local-only binding (127.0.0.1), process-level trust
+- **Capabilities:** decision-query, task-delegation, research-sharing
+- **Zero-Config:** Auto-registration on `squad` startup
+
+### Phase 2: Network Discovery (4 weeks)
+- **Discovery:** mDNS/Bonjour for LAN, optional organizational registry
+- **Security:** TLS 1.3 + mutual TLS or OAuth2
+- **Opt-In:** `squad serve --network` flag required
+
+### Phase 3: Advanced Features (8 weeks)
+- **Persistent Connections:** WebSocket for real-time updates
+- **Federation:** Cross-org communication with consent
+- **Dashboard:** Web UI to visualize squad mesh
+- **Analytics:** Inter-squad communication patterns
+
+---
+
+## Key Technical Choices
+
+### 1. Discovery Registry Format
+**Decision:** JSON file at `~/.squad/registry/active-squads.json`
+
+**Structure:**
+```json
+{
+  "squads": [
+    {
+      "id": "squad-12345",
+      "repoPath": "/path/to/repo",
+      "port": 3001,
+      "pid": 45678,
+      "agentCard": { /* Agent Card JSON */ },
+      "lastSeen": "2026-03-08T10:29:55Z"
+    }
+  ]
+}
+```
+
+**Why:**
+- No infrastructure required (works offline)
+- Fast lookup (<50ms for 100 squads)
+- Per-user isolation (file permissions)
+- Easy debugging (human-readable)
+
+**Tradeoffs:**
+- Requires file locking for concurrent writes
+- Limited to single machine (Phase 1)
+- Manual cleanup if squads crash (mitigated by PID checks)
+
+### 2. Agent Card Schema
+**Decision:** Follow A2A v0.3.0 spec with minimal extensions
+
+**Example:**
+```json
+{
+  "id": "squad://github.com/org/repo",
+  "capabilities": ["decision-query", "task-delegation", "research-sharing"],
+  "endpoints": {
+    "base": "http://localhost:3001",
+    "decisions": "/a2a/decisions",
+    "tasks": "/a2a/tasks"
+  },
+  "metadata": {
+    "techStack": ["TypeScript", "Node.js"],
+    "domain": "backend-services"
+  }
+}
+```
+
+**Why:**
+- Spec compliance ensures interoperability
+- Minimal metadata prevents privacy leaks
+- Extensible for future capabilities
+
+### 3. Security Model
+**Decision:** Progressive security model based on deployment scope
+
+**Phase 1 (Local):**
+- Bind to 127.0.0.1 only
+- Process-level trust (same user)
+- No authentication required
+
+**Phase 2 (Network):**
+- TLS 1.3 mandatory
+- Mutual TLS (preferred) or OAuth2/OIDC
+- Request signing (HMAC) for integrity
+
+**Why:**
+- Local-first minimizes attack surface
+- Don't add complexity until needed
+- Network security aligns with enterprise standards
+
+### 4. CLI Command Design
+**Decision:** New command namespace for A2A features
+
+**Commands:**
+- `squad serve` — Start A2A server
+- `squad discover` — List available squads
+- `squad ask [squad] [query]` — Query another squad
+- `squad delegate [squad] [task]` — Delegate task
+- `squad broadcast [message]` — Broadcast to all
+
+**Why:**
+- Intuitive verb-based commands
+- Follows established CLI patterns (kubectl, gh)
+- Progressive disclosure (simple → advanced)
+
+---
+
+## Use Cases Enabled
+
+1. **Breaking Change Coordination**
+   - Backend squad broadcasts API v2 release
+   - Frontend squads auto-notified, query migration guide
+
+2. **Shared Research**
+   - Infrastructure squad researches Kubernetes ingress
+   - Other squads query cached research, save hours
+
+3. **Cross-Repo Dependency Sync**
+   - Frontend queries backend for stable library version
+   - Auto-update package.json with referenced decision
+
+4. **Multi-Repo Initiatives**
+   - Security squad delegates audit task to all repos
+   - Parallel execution, aggregated results
+
+5. **Architecture Decision Propagation**
+   - Architecture squad updates auth strategy decision
+   - All squads notified in real-time, create alignment tasks
+
+---
+
+## Risks and Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Port conflicts | Auto-assign from range (3000-3100), fallback to random |
+| Stale registry entries | Heartbeat + PID check every 30s, auto-cleanup |
+| Network security | Local-only Phase 1, TLS mandatory Phase 2 |
+| Performance (100+ squads) | Lazy discovery, cache agent cards, rate limiting |
+| Privacy leaks | Minimal Agent Cards, .squadignore, no code in metadata |
+
+---
+
+## Success Metrics
+
+### Phase 1 (MVP)
+- 30% of multi-repo teams enable A2A within 3 months
+- Average 10 cross-repo queries per day per team
+- P95 query latency <500ms
+- Zero security incidents
+
+### Phase 2 (Network)
+- 10% of teams enable network mode
+- Support 100+ squads per organization
+- Discovery time <5 seconds for LAN
+
+### Phase 3 (Advanced)
+- Real-time notifications <1 second latency
+- 5+ organizations using cross-org federation
+- 3rd-party integrations (IDEs, dashboards)
+
+---
+
+## Implementation Plan
+
+**Issues Created in bradygaster/squad:**
+- #332: Core A2A/ACP Protocol Implementation (3 weeks)
+- #333: Discovery Mechanism - Local + Network (4 weeks)
+- #334: CLI Integration (serve, discover, connect, ask, delegate) (3 weeks)
+- #335: Security and Authentication (4 weeks)
+- #336: Multi-Repo Coordination Patterns and Best Practices (4 weeks)
+
+**Timeline:** 18 weeks (~4.5 months) for full rollout
+
+**Dependencies:**
+- A2A Protocol libraries (Linux Foundation SDK)
+- mDNS library (bonjour-service)
+- TLS certificate management
+
+---
+
+## Open Questions
+
+1. **Naming:** "A2A", "Squad Connect", or "Squad Link"?
+   - **Recommendation:** Use "A2A" internally, "Squad Connect" for marketing
+
+2. **Offline Handling:** How to handle temporarily offline squads?
+   - **Proposal:** Cache last-known agent card, retry with exponential backoff
+
+3. **Multi-Tenant:** Multiple users on same machine?
+   - **Proposal:** Per-user registry (`~/.squad/registry/`), file permissions
+
+4. **Language SDKs:** Support Python, Go, C# clients?
+   - **Proposal:** Phase 3 — start with JS/TS, expand based on demand
+
+---
+
+## Review and Approval
+
+**Stakeholders:**
+- Tamir Dresher (Project Owner) — Originator of idea
+- Brady Gaster (Squad Product Owner) — Implementation owner
+- Squad Team — Technical reviewers
+
+**Status:** Awaiting review
+
+**Next Steps:**
+1. Review PRD: `.squad/research/cross-repo-a2a-prd.md`
+2. Approve architecture decisions
+3. Assign implementation issues (#332-#336)
+4. Begin technical spike for A2A SDK integration
+
+---
+
+## References
+
+- **A2A Protocol Spec:** https://a2a-protocol.org/latest/
+- **A2A GitHub:** https://github.com/a2aproject/A2A
+- **JSON-RPC 2.0:** https://www.jsonrpc.org/specification
+- **PRD:** `.squad/research/cross-repo-a2a-prd.md`
+- **Related Issue:** #296
+- **PR:** #303
+

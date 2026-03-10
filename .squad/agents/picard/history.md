@@ -3817,3 +3817,87 @@ The feature branch accumulated squad work session commits (agent history updates
 **Decision:** No team-level decision needed—this is agent personality tuning, not architecture.
 
 **Related Pattern:** Agent personality tuning belongs in charter files, not in agent instantiation code. This enables rapid iteration without rebuilding infrastructure.
+---
+
+## 2026-03-10: Cross-Repo Squad A2A Communication Design — Issue #296
+
+**Context:** Tamir's idea: Squad CLI should support A2A/ACP (Agent-to-Agent protocol) for cross-repo squad discovery and communication. Initially local, later optionally network-aware.
+
+**Research Conducted:**
+- Investigated Google's A2A protocol (Agent-to-Agent, now under Linux Foundation)
+- A2A v0.3.0: Industry standard backed by 150+ orgs (Google, AWS, Microsoft, Cisco, Salesforce, SAP)
+- Key concepts: Agent Cards (JSON capability advertisement), JSON-RPC 2.0 over HTTP, discovery registries
+- Aligned with existing A2A spec ensures future interoperability with broader agent ecosystem
+
+**PRD Created:** .squad/research/cross-repo-a2a-prd.md (22KB comprehensive document)
+
+**Architecture Decisions:**
+
+1. **Protocol Choice:** A2A (JSON-RPC 2.0 over HTTP)
+   - Industry standard vs. custom protocol
+   - Future-proof: works with Google ADK, AWS, Azure agents
+   - Simpler than gRPC for debugging, aligned with spec
+
+2. **Discovery Mechanism:**
+   - Phase 1: File-based registry at ~/.squad/registry/active-squads.json
+   - Heartbeat every 30s, auto-cleanup stale entries (PID check + lastSeen)
+   - Phase 2: mDNS/Bonjour for LAN, optional org registry server
+   - **Why file-based first:** Zero-config, works offline, no infrastructure needed
+
+3. **Security Model:**
+   - Phase 1: Local-only (bind 127.0.0.1), process-level trust
+   - Phase 2: TLS 1.3 + mTLS/OAuth2 for network
+   - Privacy: Minimal Agent Cards, .squadignore for sensitive data
+   - **Why local-first:** Minimize attack surface, progressive disclosure of complexity
+
+4. **CLI Design:**
+   - New commands: serve, discover, connect, sk, delegate, roadcast, health
+   - Zero-config for local (auto-discovery)
+   - Opt-in for network (--network flag)
+   - **Pattern:** Make simple things simple, advanced things possible
+
+5. **Core Capabilities:**
+   - squad.queryDecisions — Search .squad/decisions/ across repos
+   - squad.delegateTask — Create GitHub issue in another repo
+   - squad.shareResearch — Share research docs to avoid duplicate work
+
+**Use Cases Identified:**
+1. Breaking change coordination (backend → frontend auto-notify)
+2. Shared research repository (eliminate duplicate effort)
+3. Cross-repo dependency sync (auto-update package versions)
+4. Multi-repo initiatives (parallel security audits)
+5. Architecture decision propagation (single source of truth)
+
+**Implementation Plan:**
+Created 5 issues in bradygaster/squad repo:
+- #332: Core A2A/ACP Protocol Implementation (3 weeks)
+- #333: Discovery Mechanism - Local + Network (4 weeks)
+- #334: CLI Integration - serve, discover, connect, ask, delegate (3 weeks)
+- #335: Security and Authentication (4 weeks)
+- #336: Multi-Repo Coordination Patterns and Best Practices (4 weeks)
+
+**Timeline:** 18 weeks (~4.5 months) for full rollout, 6 weeks for MVP
+
+**Deliverables:**
+- ✅ PRD written
+- ✅ Branch created: squad/296-cross-repo-a2a
+- ✅ PR #303 created
+- ✅ 5 implementation issues in squad repo
+- ✅ Issue #296 commented with summary + links
+
+**Key Files:**
+- .squad/research/cross-repo-a2a-prd.md — Complete spec (22KB)
+- Future: src/a2a/server.ts, src/a2a/client.ts, src/discovery/registry.ts
+
+**Strategic Impact:**
+- Transforms Squad from single-repo tool to distributed intelligence platform
+- Aligns with industry standards (Linux Foundation A2A)
+- Enables multi-repo coordination at zero manual cost
+- Positions Squad as part of broader agent ecosystem
+
+**Lessons Learned:**
+- Industry protocols (A2A) provide faster adoption path than custom solutions
+- Zero-config local use case must work before adding network complexity
+- File-based registries sufficient for MVP, scale later
+- Progressive security model: local trust → TLS → federation
+- PRD structure: Problem → Solution → Architecture → Use Cases → Risks → Timeline

@@ -14,3 +14,9 @@
 - Primary delivery channel: Microsoft Teams
 - Tamir prefers: witty, styled, with graphics and visual elements
 - News formats: Daily Briefing, Breaking News, Weekly Recap, Status Flash
+
+### 2026-03-10: Humor Guidance Update
+- Updated charter with humor tone and witty delivery guidance (PR #301)
+- Humor guidelines: Balance professionalism with personality
+- Visual elements: Encourage styled, graphical updates
+- Cross-team communication: Use humor to increase engagement

@@ -16671,3 +16671,127 @@ User requested email-based interface for wife to send automation requests:
 **What:** Always use Playwright + Outlook web (outlook.office.com) to send emails and schedule meetings. Never use other methods.
 **Why:** User request — captured for team memory
 
+
+---
+
+# Decision: Ralph Parallelism Architecture (Issue #272)
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Status:** Proposed (pending user decision)  
+**Scope:** Architecture — Ralph work execution model  
+**Issue:** #272
+
+## Problem Statement
+
+Ralph's current work-check cycle processes work items **serially by category** (untriaged → assigned → CI failures → review feedback → approved PRs). When a heavy task takes 5+ minutes (blog rewrite, deep research), fast operations (board updates, label changes, triage) are blocked and starve.
+
+**Current bottleneck:** Squad coordinator spawns agents one category at a time. Within each category, agents spawn serially. This creates head-of-line blocking.
+
+## Options Evaluated
+
+### Option 1: Priority Queues
+Categorize work as `fast` (board ops, labels, triage) vs `slow` (code, research). Fast items always preempt.
+
+**Pros:** Simple, centralized change, no new infrastructure  
+**Cons:** Only 2 tiers, doesn't solve slow-vs-slow contention  
+**Complexity:** Low-Medium (⭐⭐)
+
+### Option 2: Parallel Work Pools ✅ RECOMMENDED
+Spawn ALL agents across ALL categories simultaneously in one `task` tool batch. Use existing `mode: "background"` + `read_agent` infrastructure.
+
+**Pros:** True parallelism, minimal code change, reuses proven patterns, best UX  
+**Cons:** Higher LLM resource usage, need better observability  
+**Complexity:** Low (⭐)  
+**Implementation:** 1-day change to Squad.agent.md lines 1008-1012 (Step 3)
+
+### Option 3: Time-Boxing
+Set max execution time per category. If exceeded, checkpoint and resume next round.
+
+**Pros:** Guarantees no task blocks indefinitely  
+**Cons:** High complexity, fragile checkpoint protocol, poor UX (interrupted work)  
+**Complexity:** High (⭐⭐⭐⭐)  
+**Not recommended** — complexity outweighs benefits
+
+### Option 4: Dedicated Lanes
+Split into "fast lane" (sync mode, inline) and "deep lane" (background, persistent across rounds).
+
+**Pros:** Clean separation, fast work never starves  
+**Cons:** New state file (deep-lane.json), more failure modes  
+**Complexity:** Medium-High (⭐⭐⭐)
+
+## Decision
+
+**Adopt Option 2 (Parallel Work Pools)** as Phase 1 implementation.
+
+**Rationale:**
+1. Leverages existing `mode: "background"` infrastructure (Squad.agent.md lines 520-540 already document parallel fan-out)
+2. Solves root problem: all work runs in parallel, no category blocks another
+3. Lowest implementation cost: 1-day change
+4. No new failure modes
+5. Best user experience: all work starts immediately, fast items complete in <1 min
+
+**Migration path:**
+- **Phase 1 (now):** Implement Option 2 (parallel work pools)
+- **Phase 2 (optional):** Add Option 1 priority tiers if we need finer control within the parallel batch
+
+## Implementation
+
+**File changes:**
+- `.github/agents/squad.agent.md` lines 1008-1012 (Step 3 logic)
+
+**Before (serial):**
+```typescript
+// Process ONE category at a time
+for (const category of [untriaged, assigned, ciFailures, ...]) {
+  const agents = spawnForCategory(category);
+  await collectResults(agents);
+  // Next category waits here
+}
+```
+
+**After (parallel):**
+```typescript
+// Spawn ALL categories in one batch
+const allAgentSpawns = [
+  ...untriaged.map(issue => spawnLeadTriage(issue)),
+  ...assigned.map(issue => spawnMemberAgent(issue)),
+  ...ciFailures.map(pr => spawnFixAgent(pr)),
+  // ... all categories
+];
+
+// Spawn ALL agents simultaneously (mode: "background")
+const agentIds = await Promise.all(allAgentSpawns);
+
+// Collect all results (wait: true, timeout: 300)
+const results = await Promise.all(
+  agentIds.map(id => readAgent(id, { wait: true, timeout: 300 }))
+);
+```
+
+## Expected Outcomes
+
+**User experience:**
+- Fast tasks (triage, labels, comments) complete in <1 minute
+- Heavy tasks (code changes, research) run in parallel without blocking fast work
+- Ralph rounds complete faster overall (10 items = 1 parallel batch vs 10 serial batches)
+
+**Risks:**
+- Higher LLM resource usage (multiple parallel calls) — monitor token costs
+- Need better observability to debug parallel failures — enhance Scribe logging
+
+## Next Steps (pending user approval)
+
+1. User reviews findings on issue #272
+2. If approved: implement Option 2 in `.github/agents/squad.agent.md`
+3. Test with 1 fast + 1 heavy task, verify parallel execution
+4. Document in Squad coordinator's Ralph section
+5. Monitor token usage and failure rates for 1 week
+
+## Related
+
+- Issue #272 — original problem statement
+- Squad.agent.md lines 520-540 — existing parallel fan-out pattern
+- Squad.agent.md lines 1008-1012 — Ralph Step 3 (implementation target)
+- Ralph.charter.md — no changes needed (coordinator handles execution)
+

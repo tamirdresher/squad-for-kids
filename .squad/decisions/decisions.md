@@ -403,6 +403,119 @@ Three extensions to existing infrastructure:
 
 ---
 
+### 2026-03-10: Seven — Vapor Squad Skill Addition
+
+**Date:** 2026-03-10  
+**Agent:** Seven (Research & Docs)  
+**Issue:** #288 — Research spboyer/vapor-squad repository  
+**Status:** Proposed (Pending Tamir's Review)
+
+**Summary:** Added the "Vapor Squad" technique as a new skill in `.squad/skills/vapor-squad/SKILL.md`. Pattern uses `.git/info/exclude` for local-only Squad setup (zero repository changes, cross-platform compatible).
+
+**Use Cases:**
+- Third-party repos: Using Squad on open-source projects
+- Corporate restrictions: Projects where PRs for Squad files aren't welcome
+- Evaluation: Testing Squad before permanent commitment
+
+**Skill Details:**
+- Location: `.squad/skills/vapor-squad/SKILL.md`
+- Confidence: Low (first observation)
+- Format: Follows established SKILL.md format with use cases, troubleshooting, command reference
+- Reversibility: High
+
+**Next Steps:** Tamir reviews skill for accuracy. If approved, consider testing on sample repo and updating confidence after practical use.
+
+---
+
+### 2026-03-10: Data — Squad-Monitor Dashboard Architecture Pattern
+
+**Date:** 2026-03-10  
+**Author:** Data (Code Expert)  
+**Issue:** #1 (Token Usage Panel), #3 (Multi-Session View)  
+**Status:** Implemented  
+**Branch:** feat/token-usage-multi-session
+
+**Decision:** Squad-monitor uses a **dual-mode rendering pattern** where every dashboard feature supports both direct rendering (--once mode) and live updates (continuous mode).
+
+**Architecture:**
+- **Display* functions** (e.g., DisplayTokenStats) — Used in --once mode, call AnsiConsole.Write() directly
+- **Build*Section functions** (e.g., BuildTokenStatsSection) — Return IRenderable for live mode Layout composition
+
+**Implementation Guidelines:**
+1. Parse log files with FileShare.ReadWrite (allows concurrent writes)
+2. Graceful degradation (check directory, return empty state if no data)
+3. Visual hierarchy (Live Agent Feed → Token Stats → Ralph heartbeat → Logs → GitHub → Orchestration)
+4. Token formatting helper for K/M suffixes with color-coding
+
+**Rationale:** Dual mode enables both quick snapshots and continuous monitoring. Clean separation of concerns follows Spectre.Console best practices and scales easily for future panels.
+
+**Impact:** Token usage visibility helps track cost; multi-session view enables monitoring Ralph + multiple Copilot sessions simultaneously.
+
+---
+
+### 2026-03-10: Picard — Copilot CLI Repository Settings Analysis
+
+**Date:** 2026-03-10  
+**Prepared by:** Picard (Lead)  
+**Requested by:** Tamir  
+**Status:** Proposed
+
+**Finding:** No `.github/copilot/settings.json` exists in tamresearch1. Repository settings cascade with precedence: User level < Repository level < Local level < CLI flags/environment variables.
+
+**Supported Repository Settings:**
+- `companyAnnouncements` (string[]) — Custom startup messages
+- `enabledPlugins` (Record<string, boolean>) — Declarative plugin auto-install
+- `marketplaces` (Record<string, {...}>) — Custom plugin marketplace config
+
+**Settings That CANNOT Be Enforced at Repository Level:**
+- model, allowed_urls/denied_urls, experimental, reasoning_effort, stream mode, logging, theming
+- (These must be user-level, CLI args, or environment variables)
+
+**Recommendation for tamresearch1:** CREATE `.github/copilot/settings.json` with announcements and empty enabledPlugins object.
+
+**Recommended Content:**
+```json
+{
+  "companyAnnouncements": [
+    "Welcome to tamresearch1! 🚀 Use the 'squad' agent for specialized support.",
+    "First time? Run '/init' to load custom instructions.",
+    "See AGENTS.md for squad capabilities and .squad/skills/ for extended tools."
+  ],
+  "enabledPlugins": {}
+}
+```
+
+**Additional Steps:** Document in README.md under "Copilot CLI Setup"; link from AGENTS.md.
+
+---
+
+### 2026-03-10: Picard — Squad Work Session Branch Hygiene
+
+**Date:** 2026-03-10  
+**Author:** Picard (Lead)  
+**Issue:** #285, PR #49 cleanup  
+**Status:** Proposed  
+**Context:** PR #49 had 30+ extraneous squad work files (agent history, PRD, decision logs)
+
+**Decision:** Establish branch hygiene rules for squad work sessions:
+1. **Local tracking branches:** Use dedicated local branches (squad/work-session-YYYY-MM-DD), never push
+2. **Feature branch creation:** Create fresh from main with `git checkout -b feature/name origin/main`
+3. **Pre-push review:** Run `git diff origin/main..HEAD --name-status` to verify only feature files
+4. **Agent state location:** Consider `.gitignore` by default (except intentional squad updates)
+
+**Rationale:** Agent state commits preserve continuity locally. They create noise in feature PRs. External reviewers shouldn't see internal squad bookkeeping.
+
+**Alternatives Considered:**
+- Don't track agent state — loses continuity
+- Separate repo for squad state — over-engineered
+- Post-hoc cleanup — wastes reviewer time
+
+**Implementation:** Update `.squad/team.md` with guidelines; add pre-push checklist to Copilot instructions; consider git hook warning about .squad/ in feature branches.
+
+**Impact:** Cleaner PRs, better git history, reduced force-push operations, minimal workflow impact.
+
+---
+
 ## Archive
 
 (None yet)

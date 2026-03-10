@@ -2,6 +2,134 @@
 
 ## Active Decisions
 
+### 2026-03-12: Seven — IcM Copilot Evaluation & Potential Integration
+
+**Date:** 2026-03-12  
+**Agent:** Seven (Research & Docs)  
+**Issue:** #260 — "IcM Copilot Newsletter - What's New, March 2026"  
+**Status:** AWAITING TAMIR DECISION  
+
+**Summary:** IcM Copilot (Microsoft's AI-powered Incident and Change Management tool) received major March 2026 update with agentic multi-step workflows, M365 embedding, and enhanced governance. Potential benefits for DK8S include automating incident triage, drafting change communications, and Azure DevOps integration.
+
+**Key Findings:**
+- 6 major features: Multi-step workflows, context awareness, M365 embedding, personalized Work IQ, governance controls, Agent 365 platform
+- **Relevance:** ⭐⭐⭐⭐ (Problem fit: incident triage & change management are core DK8S workflows)
+- **Integration:** ⭐⭐⭐ (Medium complexity: requires entitlements, CLI setup, Azure DevOps integration)
+- **Cost:** ⭐⭐⭐⭐⭐ (Included with existing Microsoft tooling)
+
+**Recommendation:** Option A — Proceed with 2-week pilot
+1. Tamir requests IcM Copilot entitlements for 1-2 team members
+2. Test on low-risk incident (measure triage time + documentation quality)
+3. Owner: Tamir (entitlements) + B'Elanna (infrastructure integration)
+4. Timeline: Complete by end of March 2026
+
+**Next Steps for Tamir:**
+1. Decide: Proceed with pilot? (Y/N)
+2. If yes: Assign pilot owner (B'Elanna or Picard)
+3. If yes: Request entitlements from team onboarding
+4. Define success criteria (time saved? documentation quality? adoption rate?)
+
+---
+
+### 2026-03-10: Data — Email-to-GitHub Integration Options
+
+**Date:** 2026-03-10  
+**Agent:** Data  
+**Issue:** #259 — "Create an email address for wife to send requests"  
+**Status:** Pending Tamir's decision on approach
+
+**Problem:** Tamir's wife needs to send emails that automatically create GitHub issues. GitHub doesn't support this natively.
+
+**Options Researched:**
+
+| Approach | Cost | Setup | AI Parsing | Maintenance | Verdict |
+|----------|------|-------|-----------|-------------|---------|
+| **HubDesk** (Recommended) | Free* | 5 min | ❌ | None | Best for immediate adoption |
+| **Zapier** | $19-50+/mo | 15 min | ✅ | Low | Good if AI parsing needed |
+| **Power Automate** | ✅ M365 | 30 min | ✅ | Medium | Best for M365 environment |
+| **Issuefy** | ? | 5 min | Limited | None | Alternative quick launch |
+| **Azure Function** | $0-5/mo | 1-2 hrs | ✅ | High | Overkill now; good foundation |
+
+*Free for personal GitHub accounts; paid for organizations
+
+**Recommendation:** HubDesk (5 minutes, one-click GitHub OAuth, preserves attachments)
+
+**Decision Pending:** Tamir chooses based on priorities:
+1. Need it ASAP? → HubDesk
+2. Want AI to parse requests? → Zapier or Power Automate
+3. Have M365 team? → Power Automate
+4. Plan future squad automation? → Azure Function
+
+---
+
+### 2026-03-26: Picard — Agent 365 MCPs for Squad Integration
+
+**Date:** 2026-03-26  
+**Lead:** Picard  
+**Issue:** #257 — Check Agency new MCPs  
+**Status:** PENDING USER DECISION
+
+**Summary:** GitHub/Microsoft announced Agent 365 with built-in MCPs. Squad currently uses 6 (GitHub, Playwright, Aspire, Azure DevOps, WorkIQ, EngineeringHub). Two NEW MCPs relevant: Outlook MCP (email automation) and Teams MCP (Teams messaging).
+
+**MCPs Announced (8 Total):**
+| MCP | Scope | Status |
+|-----|-------|--------|
+| GitHub | Repos, PRs, Issues | ✅ Active |
+| Playwright | Web automation, screenshots | ✅ Active |
+| Aspire | .NET monitoring, resources | ✅ Active |
+| Azure DevOps | Work items, pipelines, test plans | ✅ Active |
+| WorkIQ | M365 workplace intelligence | ✅ Active |
+| EngineeringHub | eng.ms documentation search | ✅ Active |
+| **Outlook** | Email sending, inbox management | 🔴 NEW — Not integrated |
+| **Teams** | Teams messaging, scheduling | 🔴 NEW — Not integrated |
+
+**New MCPs Analysis:**
+
+**Outlook MCP:**
+- Capabilities: Send emails, read/manage inbox, auto-respond, trigger on email events
+- Squad Use Cases: Email-driven task intake, briefings, inbox triage, completion notifications
+- Integration: MEDIUM (OAuth setup, MCP config, test workflows)
+- Risk: None (auditable, DLP-governed)
+- **Recommendation:** 🔴 EVALUATE — Test with one workflow before committing
+
+**Teams MCP:**
+- Capabilities: Send messages in channels/DMs, schedule meetings, react to events
+- Squad Use Cases: Ralph alerts → Teams channel, completion notifications, daily briefing, escalation
+- Integration: MEDIUM (Teams app registration, MCP config, test workflows)
+- Risk: None (Teams access controlled by org policies)
+- **Recommendation:** 🟡 NICE-TO-HAVE — Complements existing Ralph workflows
+
+**Decision Options:**
+
+**Option A: Adopt Both (Outlook + Teams)**
+- ✅ Multi-channel automation, richer notifications, enable issue #259, full M365 coverage
+- ❌ Additional OAuth complexity, more moving parts
+- **Effort:** 2-3 days
+
+**Option B: Teams MCP Only**
+- ✅ Lower overhead, enhances Ralph with Teams notifications
+- ❌ Email workflows still need Power Automate, can't solve #259 cleanly
+- **Effort:** 1-2 days
+
+**Option C: Skip Both (Status Quo)**
+- ✅ No new complexity
+- ❌ Miss email automation, Ralph still Teams-blind
+- **Effort:** None
+
+**Implementation Timeline (if approved):**
+1. Days 1-2: Setup OAuth, configure .copilot/mcp-config.json
+2. Days 2-3: Write test workflows (send email, post Teams message)
+3. Day 3: Update .squad/mcp-config.md
+4. Day 4: Integrate with Ralph or email workflows
+5. Day 5: Documentation, walkthrough
+
+**Recommendation:** 
+- **Primary:** Test Outlook MCP (enables email-driven automation for #259)
+- **Secondary:** Integrate Teams MCP (enhances Ralph observability)
+- **Authority:** Tamir decides based on adoption priorities
+
+---
+
 ### 2026-03-25: Seven — MCP Out-of-the-Box Capabilities Research
 
 **Date**: 2026-03-25  

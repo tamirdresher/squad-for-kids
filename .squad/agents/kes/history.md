@@ -33,3 +33,39 @@
 - Exchange Online PowerShell module (ExchangeOnlineManagement) is not installed on this machine; shared mailboxes must be created via Admin Center UI
 - GitHub connector in Power Automate needs periodic re-authorization; HTTP+PAT is an alternative but has token rotation overhead
 - Guides created: docs/email-gateway-setup-guide.md (admin), docs/email-gateway-user-guide.md (end-user)
+
+## 2026-03-10 — Email Gateway Implementation Guide — Issue #259 (COMPLETED)
+
+**Spawned:** Background async, coordinated by Ralph  
+**Assignment:** Create implementation guide for email gateway system (Issue #259)  
+**Deliverables:**
+- Setup guide: `docs/email-gateway-setup-guide.md` (administrator)
+- User guide: `docs/email-gateway-user-guide.md` (end-user/wife)
+- Decision documented: `.squad/decisions/inbox/kes-email-gateway.md`
+
+**Architecture Designed:**
+- **Primary:** Power Automate + Shared Mailbox (no-code, M365 included, maintainable)
+- **Rejected Alternatives:** Logic Apps (overkill), Azure Functions (maintenance), Microsoft Forms (workflow change), Outlook Rules (limited)
+- **Routing:** 4 keyword-based flows (print, calendar, reminders, catch-all → GitHub issue)
+- **Security:** Sender whitelist (wife's email only)
+
+**Guides Created:**
+1. **Setup Guide** — Step-by-step for Tamir:
+   - Prerequisites and M365 permissions
+   - Power Automate flow templates (copy-paste)
+   - Shared mailbox configuration
+   - GitHub connector authentication
+   - Testing procedures
+
+2. **User Guide** — For wife:
+   - Email format guidelines
+   - Supported actions with examples
+   - Troubleshooting (delays, keywords, auth)
+   - User-friendly, no technical jargon
+
+**Key Decisions:**
+- Keyword routing in subject: simple, effective, easy to extend
+- Catch-all flow creates GitHub issues for unmatched requests (Squad can triage)
+- 1-5 min delay expectation documented (Power Automate limitation)
+
+**Status:** ✅ DELIVERED — Decision merged to decisions.md, orchestration log at `.squad/orchestration-log/2026-03-10T15-02-14Z-kes.md`

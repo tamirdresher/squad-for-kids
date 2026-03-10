@@ -18,6 +18,27 @@
 - Orchestration logs created in `.squad/orchestration-log/`
 - Session log at `.squad/log/2026-03-10T07-03-37Z-ralph-round1.md`
 
+**2026-03-10 (Subsequent Round) — Blog Podcast Research & Generation — Issue #41 (COMPLETED)**
+
+**Spawned:** Background async, coordinated by Ralph  
+**Deliverables:**
+- 6-minute conversational podcast: `blog-draft-ai-squad-productivity-podcast.mp3`
+- Research posted to GitHub issue #41
+- Decision documented: `.squad/decisions/inbox/seven-podcast-research.md`
+
+**Work Summary:**
+- Analyzed 5 podcast generation approaches (NotebookLM, Podcastfy, edge-tts, Meta NotebookLlama, custom)
+- Generated conversational audio using edge-tts with interpolation scripting
+- Recommended Google NotebookLM for manual blog work + Podcastfy for future automation
+- Documented rationale, alternatives, risks, and consequences in decision log
+
+**Key Finding:**
+- NotebookLM (manual) delivers highest quality for blog/demo output
+- Podcastfy integration would enable fully automated podcast pipeline with API keys
+- Edge-tts conversational approach provides repeatable fallback without manual intervention
+
+**Status:** ✅ DELIVERED — Decision merged to decisions.md, orchestration log at `.squad/orchestration-log/2026-03-10T15-02-14Z-seven.md`
+
 ## Learnings
 
 ### 2026-03-11: Seven — Agent-Skills Research & Comparison — Issue #253 (COMPLETED)
@@ -4345,3 +4366,64 @@ Reasons:
 **Deliverable:** 
 - Comment posted to issue #280 (https://github.com/tamirdresher_microsoft/tamresearch1/issues/280#issuecomment-4031229874)
 - Issue closed with rationale
+
+---
+**Date:** 2026-03-10 16:36
+**Issue:** #283 - Azure AI Marketplace monitoring
+
+**Task:** Research Azure AI Marketplace for tools relevant to DK8S team operations
+
+**Key Findings:**
+- KAITO (Kubernetes AI Toolchain Operator) - AI workload management for K8s
+- Agentic DevOps with GitHub Copilot - automated DevOps lifecycle
+- Azure AI Foundry - central hub for AI development
+- .NET Aspire enhancements for distributed systems
+- AKS Fleet Manager with GitOps support
+
+**Action Items Recommended:**
+1. Evaluate KAITO for DK8S AI workload support
+2. Test Copilot Agent Mode in development workflows
+3. Assess AKS-Ready Templates for deployment automation
+4. Set up GitHub Actions workflow for weekly marketplace monitoring
+
+**Patterns Learned:**
+- aka.ms redirect links may require authentication; use alternative sources
+- Azure Marketplace blog (techcommunity.microsoft.com/blog/marketplace-blog/) is primary source
+- Microsoft Build announcements are key for major platform updates
+- web_search tool effective for gathering current Azure ecosystem info
+
+**Decision:** Proposed GitHub Actions scheduled workflow for recurring weekly checks instead of manual calendar reminders
+
+
+---
+
+### 2026-03-11: Seven — Conversational Podcast & Video Research — Issue #41 (COMPLETED)
+
+**Assignment:** Tamir requested research on creating a NotebookLM-style conversational podcast from the blog draft, and video creation options. Blog is public-facing.
+
+**What I Did:**
+1. Read the full blog draft (blog-draft-ai-squad-productivity.md, ~14KB)
+2. Analyzed our existing podcaster scripts (podcaster-conversational.py, podcaster-prototype.py)
+3. Researched NotebookLM-style podcast generation landscape:
+   - Google NotebookLM (manual, highest quality)
+   - Podcastfy (open-source Python, best programmatic option)
+   - Meta NotebookLlama (self-hosted, heavy GPU)
+   - Open NotebookLM (Hugging Face, Gradio-based)
+4. Researched video creation tools: Synthesia, Kapwing, Revid.ai, Descript, SendShort, Flixier, InVideo
+5. Created new script scripts/blog-podcast-conversation.py with hand-crafted natural two-person dialogue (34 turns)
+6. Generated log-draft-ai-squad-productivity-podcast.mp3 (~2.1 MB, ~6 min, Alex + Jamie voices)
+7. Posted comprehensive findings and recommendations to issue #41
+
+**Key Learnings:**
+- Google NotebookLM is the best one-off solution — paste content, click generate, download. No code needed.
+- Podcastfy (pip install podcastfy) is the best programmatic/automated alternative but needs LLM API keys for dialogue generation
+- edge-tts with hand-crafted dialogue produces decent results without any API keys or cloud services
+- For video: Synthesia and Kapwing free tiers can convert blog URLs to video in minutes
+- Binary MP3 concatenation works as fallback when ffmpeg is not available (pydub needs ffmpeg)
+- Two distinct Neural voices (GuyNeural + JennyNeural) create clear speaker differentiation
+
+**Deliverables:**
+- Comment posted to issue #41
+- Script: scripts/blog-podcast-conversation.py
+- Audio: blog-draft-ai-squad-productivity-podcast.mp3
+- Decision document: .squad/decisions/inbox/seven-podcast-research.md

@@ -1,8 +1,0 @@
-docs: Update Seven agent history after issue #254 summit research
-
-- Documented partial completion of MVP Summit message research
-- Noted auth-wall limitation on Summit URLs
-- Updated context for next cycle
-- Agent Seven ready for follow-up work
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

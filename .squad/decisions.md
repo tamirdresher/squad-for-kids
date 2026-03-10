@@ -17052,3 +17052,183 @@ const results = await Promise.all(
 - Squad.agent.md lines 1008-1012 — Ralph Step 3 (implementation target)
 - Ralph.charter.md — no changes needed (coordinator handles execution)
 
+---
+
+## Decision: Conversational Podcast Approach for Public Blog
+
+**Date:** 2026-03-10
+**Author:** Seven (Research & Docs)
+**Status:** ✅ Approved
+**Scope:** Content Production
+**Issue:** #41
+
+### Problem
+
+Tamir requested a NotebookLM-style conversational podcast from the AI Squad blog post. The existing audio uses basic single/dual-voice TTS that reads content directly — not a natural two-person discussion.
+
+### Research Summary
+
+| Option | Quality | Effort | Cost | Automated? |
+|--------|---------|--------|------|------------|
+| Google NotebookLM | ⭐⭐⭐⭐⭐ | 5 min | Free | No |
+| Podcastfy (open-source) | ⭐⭐⭐⭐ | 30 min setup | API keys | Yes |
+| Custom edge-tts script | ⭐⭐⭐ | 1 hr | Free | Yes |
+| Meta NotebookLlama | ⭐⭐⭐ | 2+ hrs | Free (GPU) | Yes |
+
+### Decision
+
+**For this blog post:** Use Google NotebookLM (manual, highest quality) as primary output. The edge-tts conversational podcast serves as a fallback/demo.
+
+**For future automation:** Evaluate Podcastfy when we have OpenAI/Gemini API keys available. It can integrate into the Podcaster agent's workflow for automated podcast generation from any markdown content.
+
+### Video Recommendation
+
+For converting the blog to video: Use Synthesia or Kapwing free tiers for quick auto-generated video. For authenticity, consider a screen recording walkthrough of the repo + dashboard using OBS Studio with the podcast audio overlay.
+
+### Consequence
+
+- Blog audio quality improves significantly over basic TTS
+- Manual NotebookLM approach is fast but not repeatable without human intervention
+- Future Podcastfy integration would enable fully automated podcast pipeline
+- Video creation remains a manual step for now
+
+### Related
+
+- Issue #41 (blog post)
+- PR #237 (conversational format podcaster)
+- scripts/blog-podcast-conversation.py (new script)
+- scripts/podcaster-conversational.py (existing generic podcaster)
+
+---
+
+## Decision: Email Gateway Architecture
+
+**Date:** 2026-03-10
+**Author:** Kes (Communications & Scheduling)
+**Issue:** #259
+**Status:** ✅ Approved by Tamir
+
+### Decision
+
+Use **Power Automate + Shared Mailbox** to create an email-to-action gateway for Tamir's wife.
+
+### Architecture
+
+- **Shared Mailbox** in Exchange Online as the single entry point
+- **4 Power Automate flows** watching the mailbox, routing by keyword:
+  - print → forward to HP ePrint (Dresherhome@hpeprint.com)
+  - calendar/meeting/schedule/event → create Outlook calendar event
+  - emind/todo/task/remember → create Microsoft To Do task
+  - Catch-all (no keyword match) → create GitHub issue with squad + mail-gateway labels
+- **Sender whitelist** restricts processing to wife's email only
+
+### Alternatives Considered
+
+1. **Azure Logic Apps** — More powerful but overkill and costs more
+2. **Custom code (Azure Functions)** — Too much maintenance for a personal tool
+3. **Microsoft Forms** — Not email-based, changes wife's workflow
+4. **Direct Outlook rules** — Can't create To Do tasks or GitHub issues
+
+### Why Power Automate
+
+- Included in M365 license (no extra cost)
+- Low-code, easy to maintain and extend
+- Native connectors for Outlook, To Do, GitHub
+- Shared mailbox trigger is reliable
+- Tamir can modify flows without coding
+
+### Team Impact
+
+- Catch-all flow creates GitHub issues labeled mail-gateway — Squad should watch for these
+- Issues are labeled squad so they appear in normal triage
+- No infrastructure to maintain (fully SaaS)
+
+### Risks
+
+- Power Automate shared mailbox triggers can have 1-5 min delay
+- Date parsing for calendar events is imperfect — may need manual adjustment
+- GitHub connector requires auth renewal periodically
+
+---
+
+## Decision: Azure AI Marketplace Weekly Monitoring
+
+**Date:** 2026-03-10
+**Proposed by:** Seven (Research & Docs)
+**Context:** Issue #283 - Need recurring check of Azure AI Marketplace for DK8S-relevant tools
+
+### Problem
+
+Team needs to stay current with Azure AI Marketplace offerings that could benefit:
+- Kubernetes operations (DK8S platform)
+- .NET and Go development workflows
+- DevOps/CI/CD automation
+- Security and observability
+
+### Proposed Solution
+
+Implement GitHub Actions scheduled workflow that:
+- Runs every Monday at 9 AM UTC
+- Auto-creates tracking issue labeled squad:research and squad:copilot
+- Assigns to Seven for investigation
+- Provides structured checklist and search queries
+
+### Alternative Considered
+
+Manual calendar reminder - rejected due to:
+- No audit trail
+- Easy to miss or postpone
+- No automatic issue creation for tracking
+
+### Benefits
+
+1. **Automation:** No manual setup required each week
+2. **Tracking:** Every check creates a GitHub issue
+3. **Flexibility:** Can be manually triggered anytime
+4. **Low overhead:** Minimal maintenance once set up
+
+### Implementation
+
+Create .github/workflows/ai-marketplace-check.yml with scheduled trigger.
+
+### Risks
+
+- May create noise if nothing relevant found weekly
+- Requires team discipline to close issues promptly
+
+### Recommendation
+
+**Approve** - Start with weekly cadence, adjust frequency based on signal/noise ratio after 1 month.
+
+### Status
+
+**Approved** by Picard (Lead)
+
+### Follow-up Actions
+
+1. Create workflow file
+2. Test manual trigger
+3. Monitor for 4 weeks and adjust cadence if needed
+
+---
+
+## Decision: User Directive - Personal GitHub Account for Public Repos
+
+**Date:** 2026-03-10  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Active  
+**Scope:** GitHub Operations  
+
+When working on repositories in public GitHub, use Tamir's personal GitHub account (**tamirdresher**) instead of the organization account. This is a user-requested preference for all public repository interactions going forward.
+
+**Applies to:** All agent operations on public GitHub repositories  
+**Does NOT apply when:** Working on private/internal repos (unless explicitly stated)  
+
+**Rationale:**  
+- User preference for public repository attribution  
+- Simplified identity management for public-facing work  
+
+**Action:** All agents switch to personal account context for public GitHub work.  
+
+**Status:** ✅ In effect as of 2026-03-10
+

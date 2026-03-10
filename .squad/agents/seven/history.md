@@ -3869,3 +3869,19 @@ Documented What NOT to adopt (GUI, generic clones, cloud execution, project frag
 
 **Next:** Monitor #242 for demo repo Phase 1 completion; coordinate metric gathering for quantified claims.
 
+
+## Learnings
+
+### Issue #254 - MVP Summit Session Research (2026-03-10)
+**Task**: Research 16 MVP Summit sessions and compose a Teams message for DK8S colleagues.
+
+**Finding**: All MVP Summit session URLs (summit.microsoft.com/en-us/sessions/*) require Microsoft authentication (login.microsoftonline.com redirect). Session details—titles, speakers, descriptions—are behind an authentication wall and not accessible via public web scraping.
+
+**Key Themes**:
+- Enterprise conference platforms often use SSO authentication gates
+- Public session catalogs may exist separately from authenticated platforms
+- Web scraping tools cannot bypass authentication without proper credentials
+- Alternative approaches needed: manual export, authenticated API access, or user-provided data
+
+**Resolution**: Posted comment to issue #254 recommending user provide session details manually or export from authenticated session.
+

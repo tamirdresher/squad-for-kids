@@ -4085,3 +4085,54 @@ Reasons:
 **Status:** Research and proposal COMPLETE. Awaiting user approval to proceed with Phase 1 implementation.
 
 ---
+
+
+### Issue #257 - MCP Out-of-the-Box Research (2026-03-25) [COMPLETED]
+
+**Task**: Research and test new out-of-the-box MCP servers mentioned in Agency announcement.
+
+**Investigation Summary**:
+- Verified 6 MCP servers working in current environment
+- 5 built-in MCPs require NO configuration (GitHub, Playwright, Aspire, WorkIQ, EngineeringHub)
+- 1 configured MCP working (Azure DevOps for msazure org)
+
+**Key Findings**:
+1. **GitHub MCP Server** — Full GitHub automation (repos, PRs, issues, Actions, code search) — built-in ✅
+2. **Playwright MCP Server** — Web automation, testing, screenshots — built-in ✅
+3. **Aspire MCP Server** — .NET Aspire dashboard integration — built-in ✅
+4. **WorkIQ MCP** — Microsoft 365 Copilot workplace intelligence — built-in ✅
+5. **EngineeringHub MCP** — eng.ms documentation search (Microsoft internal) — built-in ✅
+6. **Azure DevOps MCP** — Configured in .copilot/mcp-config.json, working with msazure org ✅
+
+**Architecture Insights**:
+- Built-in MCPs no longer require package installation or configuration
+- Community MCP servers (like @modelcontextprotocol/server-github) are obsolete — built-in versions preferred
+- MCP configuration file (.copilot/mcp-config.json) only needed for org-specific servers (Azure DevOps) or third-party services (Trello)
+- Tool prefixes indicate MCP source: github-mcp-server-*, playwright-*, azure-devops-*, etc.
+
+**Documentation Gaps Identified**:
+- .squad/mcp-config.md documents community MCP setup but doesn't reflect new built-in capabilities
+- No examples showing out-of-the-box MCP usage patterns
+- Team may not be aware that GitHub/Playwright/Aspire work immediately without configuration
+
+**Recommendations Provided**:
+1. Update .squad/mcp-config.md to document 6 built-in MCPs
+2. Create .squad/examples/mcp-usage/ with common workflows
+3. Clean up EXAMPLE-trello in configuration
+4. Share team enablement message about immediate MCP availability
+
+**Deliverables**:
+- Comprehensive analysis posted to issue #257 (comment with findings)
+- Issue labeled "status:pending-user" for Tamir's review
+- Verified Agency announcement accuracy (6 MCPs confirmed working)
+
+**Key Learnings**:
+- MCP ecosystem shifted from "install everything" to "built-in + extend" model
+- Testing MCP availability: Check tool function prefixes in session context
+- Configuration priority: repo (.copilot/mcp-config.json) > workspace > user-level
+- GitHub Copilot CLI can introspect available tools without external API calls
+
+**Status**: COMPLETE — Research verified, findings documented, issue updated with recommendations.
+
+---
+

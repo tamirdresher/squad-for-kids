@@ -2,6 +2,59 @@
 
 ## Active Decisions
 
+### 2026-03-25: Seven — MCP Out-of-the-Box Capabilities Research
+
+**Date**: 2026-03-25  
+**Decision Maker**: Seven (Research & Docs)  
+**Issue:** #257  
+**Status**: Research Complete, Pending Team Review
+
+**Background:** GitHub announced that Copilot CLI now ships with several default MCP servers that work WITHOUT configuration. Investigation verified 6 MCPs working out-of-the-box.
+
+**Verified Working MCP Servers (6 Total):**
+1. **GitHub MCP Server** (github-mcp-server-*) — Built-in: YES ✅
+2. **Playwright MCP Server** (playwright-*) — Built-in: YES ✅
+3. **Aspire MCP Server** (aspire-*) — Built-in: YES ✅
+4. **Azure DevOps MCP** (azure-devops-*) — Built-in: NO (org-specific config) ✅
+5. **WorkIQ MCP** (workiq-*) — Built-in: YES (EULA required) ✅
+6. **EngineeringHub MCP** (enghub-*) — Built-in: YES (Microsoft internal) ✅
+
+**Key Architecture Insights:**
+- Shift from "install everything" (pre-Agency) to "built-in + extend" (post-Agency)
+- Configuration Priority: Repo-level > workspace-level > user-level > CLI override
+- Tool Naming: Consistent `{mcp-server-name}-{tool-name}` pattern
+
+**Documentation Gaps Identified:**
+1. `.squad/mcp-config.md` references outdated community MCP setup
+2. No usage examples for common workflows
+3. Configuration clutter in `.copilot/mcp-config.json`
+
+**Recommendations (Immediate Actions):**
+1. Update `.squad/mcp-config.md` with built-in vs configured MCPs
+2. Cleanup `.copilot/mcp-config.json` (clarify Azure DevOps, review EXAMPLE-trello)
+3. Create usage examples: GitHub automation, Playwright testing, Aspire monitoring
+
+**Future Enhancements:**
+- Team enablement session on 6 MCPs
+- MCP discovery and introspection patterns
+- Third-party MCP evaluation
+
+**Positive Outcomes:**
+- Reduced configuration burden (5 MCPs work without setup)
+- Immediate capability access (GitHub automation, web testing, Aspire monitoring)
+- Clearer separation: built-in vs configured MCPs
+- Verified accuracy of Agency announcement
+
+**Next Steps:**
+1. ✅ Posted findings to issue #257
+2. ✅ Labeled issue "status:pending-user"
+3. ⏳ Await approval to update documentation
+4. ⏳ Create MCP usage examples if approved
+
+**Document:** `.squad/decisions/inbox/seven-mcp-out-of-box-research.md` (merged into Active Decisions)
+
+---
+
 ### 2026-03-09: B'Elanna — Squad Scheduler Architecture
 
 **Issue:** #199  

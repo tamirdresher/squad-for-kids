@@ -2,6 +2,30 @@
 
 ## Active Decisions
 
+### 2026-03-10: Data — NuGet Publishing for squad-monitor
+
+**Date:** 2026-03-10  
+**Author:** Data (Code Expert)  
+**Issue:** #265 — NuGet Tool Publishing  
+**Status:** ✅ Implementation Complete, Awaiting API Key  
+
+**Summary:** squad-monitor is a .NET CLI tool for monitoring AI agent orchestration. PR #4 merged with NuGet tool configuration and automated GitHub Actions publishing workflow.
+
+**Implementation:**
+- squad-monitor.csproj configured with `<PackAsTool>true</PackAsTool>` and metadata
+- .github/workflows/publish-nuget.yml created for release-triggered publishing
+- Version extracted from release tags (v1.0.0 → 1.0.0)
+
+**Next Steps for Tamir:**
+1. Set `NUGET_API_KEY` secret in repo settings (https://github.com/tamirdresher/squad-monitor/settings/secrets/actions)
+2. Create release v1.0.0 (auto-publishes) or manually trigger workflow
+3. Verify at https://www.nuget.org/packages/squad-monitor/
+4. Test: `dotnet tool install -g squad-monitor`
+
+**Impact:** Users can install via single command. Updates via `dotnet tool update -g squad-monitor`.
+
+---
+
 ### 2026-03-12: Seven — IcM Copilot Evaluation & Potential Integration
 
 **Date:** 2026-03-12  

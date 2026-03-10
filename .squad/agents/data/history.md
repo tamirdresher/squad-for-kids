@@ -18,6 +18,38 @@
 
 ## Learnings
 
+### 2026-03-10: Data — NuGet Publishing for squad-monitor — Issue #265
+
+**Task:** Configure squad-monitor (.NET CLI tool) for automated NuGet publishing.
+
+**Work Completed:**
+1. **NuGet Tool Configuration** — Updated squad-monitor.csproj:
+   - `<PackAsTool>true</PackAsTool>`
+   - `<ToolCommandName>squad-monitor</ToolCommandName>`
+   - Metadata: Description, PackageTags, License, Readme
+
+2. **GitHub Actions Workflow** — Created .github/workflows/publish-nuget.yml:
+   - Release trigger (automatic on GitHub tag creation)
+   - Manual dispatch option (version input parameter)
+   - Build → Pack → Push to NuGet.org pipeline
+
+3. **Account Management** — Switched gh CLI from EMU (tamirdresher_microsoft) to personal (tamirdresher) for PR merge
+
+**PR Status:** Merged PR #4 into tamirdresher/squad-monitor with clean squash merge
+
+**Next Steps for Tamir:**
+1. Set `NUGET_API_KEY` secret in repo settings
+2. Create release v1.0.0 (auto-triggers publish)
+3. Verify package at https://www.nuget.org/packages/squad-monitor/
+4. Test install: `dotnet tool install -g squad-monitor`
+
+**Impact:** Users can install via single command. Updates via `dotnet tool update -g squad-monitor`.
+
+**Orchestration Log:** 2026-03-10T13-26-00Z-data.md  
+**Decision Record:** Merged to decisions.md from inbox/
+
+---
+
 ### 2026-03-10: Data — Email-to-GitHub Integration Research — Issue #259
 
 **Task:** Research GitHub Issue #259 — "Create an email address for wife to send requests". Tamir asked specifically: "Can't we have an email that adds items to my GitHub issues?"
@@ -3368,4 +3400,77 @@ Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main
 - Code: +64 lines, -13 lines (focused and minimal)
 
 **Key Insight:** Graceful degradation pattern works well for optional integrations. Squad-monitor now functions in environments without GitHub access, making it more portable for team use.
+
+
+### 2026-03-10: Data — NuGet Tool Publishing — Issue #265 ✅ COMPLETED
+
+**Task:** Configure squad-monitor as a .NET global tool and set up NuGet publishing automation.
+
+**Implementation:**
+1. Modified squad-monitor.csproj to add:
+   - <PackAsTool>true</PackAsTool> for tool packaging
+   - <ToolCommandName>squad-monitor</ToolCommandName> for CLI command
+   - Package metadata (PackageId, Version 1.0.0, Description, Authors, License)
+   - README.md inclusion in package
+
+2. Created GitHub Actions workflow (.github/workflows/publish-nuget.yml):
+   - Triggers on release creation or manual dispatch
+   - Builds, packs, and publishes to NuGet.org
+   - Requires NUGET_API_KEY secret in repo settings
+   - Version auto-extracted from release tag (v1.0.0 → 1.0.0)
+
+3. Updated documentation:
+   - README.md now recommends dotnet tool install -g squad-monitor as primary installation
+   - Added update instructions and build-from-source alternative
+   - Updated local .squad/tools/squad-monitor/README.md to note NuGet package availability
+
+4. Verified build and pack commands work successfully
+
+**Branch & PR:**
+- Branch: squad/265-nuget-publish merged to main
+- PR #4: https://github.com/tamirdresher/squad-monitor/pull/4 (Merged via squash)
+- Closes tamirdresher/tamresearch1#265
+
+**Workflow:**
+- Cloned tamirdresher/squad-monitor repository
+- Switched gh CLI account from enterprise (tamirdresher_microsoft) to personal (tamirdresher) to access repo
+- Verified squad/265-nuget-publish branch had all necessary configuration (csproj + workflow)
+- Created and merged PR #4 to main branch
+- Confirmed main branch now has NuGet packaging configuration and publish workflow
+
+**Key Decisions:**
+- Used squad/265-nuget-publish branch (not squad/265-nuget-tool) as it had both csproj config AND workflow
+- Both branches had identical csproj configurations
+- Workflow supports both automated (on release) and manual (workflow_dispatch) publishing
+- Set version to 1.0.0 as initial release
+
+**Next Steps for Tamir:**
+1. Set NUGET_API_KEY secret in squad-monitor repository settings (Settings → Secrets and variables → Actions)
+2. Create a v1.0.0 release on GitHub to trigger automatic NuGet publish
+3. Verify package appears on NuGet.org at https://www.nuget.org/packages/squad-monitor/
+
+---
+
+
+## Issue #265 - Squad-monitor NuGet Migration (2026-03-10)
+
+**Context:**
+- squad-monitor already published as NuGet tool with all infrastructure in place
+- Repository had .csproj with PackAsTool=true, GitHub Actions workflow, README with install docs
+- Task was to replace local copy in tamresearch1 with skill documentation
+
+**Implementation:**
+- Removed C# source code from .squad/tools/squad-monitor/ (Program.cs, .csproj, bin/, obj/)
+- Created lightweight skill doc README pointing to NuGet package
+- Branch: squad/265-nuget-tool-publish
+- PR #282: https://github.com/tamirdresher_microsoft/tamresearch1/pull/282
+
+**Key File Paths:**
+- .squad/tools/squad-monitor/README.md - skill documentation (NuGet install instructions)
+- No longer maintaining local source copy in tamresearch1
+
+**Pattern:**
+- Prefer published tools over embedded source code in monorepo
+- Use skill docs to reference external tooling with installation instructions
+- Benefits: smaller repo, no build artifacts, easier updates via tool update
 

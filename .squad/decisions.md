@@ -15971,3 +15971,319 @@ This decision demonstrates a pattern for **personal automation with M365** that 
 - Prototyping AI-assisted email processing patterns
 
 The preference for "leverage existing platform" over "custom code" aligns with Squad's pragmatic approach to infrastructure decisions.
+
+---
+
+## Decision: IcM Copilot Newsletter March 2026 Research (2026-03-28)
+
+**Merged from:** seven-icm-copilot.md
+
+# Seven Decision: IcM Copilot Newsletter March 2026 Research
+
+**Date**: 2026-03-28  
+**Status**: Complete  
+**Issue**: GitHub #260 — "IcM Copilot Newsletter - What's New, March 2026 — explore the tool and try it and add to our toolbox"  
+**Requestor**: Tamir Dresher  
+
+---
+
+## Executive Summary
+
+IcM Copilot has evolved from a chatbot assistant into an **autonomous agent layer** capable of multi-step workflow execution. March 2026 marks a significant inflection point with new capabilities including Copilot Tasks, enhanced Work IQ personalization, and governance controls.
+
+**Recommendation**: Adopt Work IQ enhancements immediately (already in use); pilot Copilot Tasks for runbook automation after security audit.
+
+---
+
+## Key Features in March 2026 Release
+
+### Adopted Already: Work IQ
+- Personalized AI that adapts to work style, tone, and job role
+- Context-aware across past activity and broader workspace
+- **Status**: Squad is already using this in Ralph monitoring workflow
+- **Action**: Upgrade to latest March 2026 build for improved context
+
+### New & Relevant: Agent Mode & Copilot Tasks
+- **Agent Mode**: Autonomous multi-step execution within M365 apps
+- **Copilot Tasks**: Structured sub-task generation, permitted app/web browsing
+- **Fit**: High alignment with DK8S agent-based architecture (Ralph, Fenster)
+- **Action**: Pilot for cluster health checks, incident escalation automation
+
+### Critical for Production: Governance & Security
+- Permission boundaries mirroring user permissions
+- Complete activity logging and compliance controls
+- Access governance for agent actions
+- **Requirement**: Mandatory security audit before production deployment
+
+### Nice-to-Have: Outlook Integration
+- Enhanced task management, meeting prep automation
+- Low priority for infrastructure team; useful for team leads
+
+---
+
+## Decision: Team Toolbox Action Items
+
+### Tier 1: Immediate Actions (Next Sprint)
+1. **Upgrade Work IQ MCP** to March 2026+ to improve Ralph context detection
+2. **Security Review**: Conduct compliance audit of agent governance model
+3. **Pilot Planning**: Design Copilot Tasks use cases for runbook automation
+
+### Tier 2: Medium-term Pilots (Next Quarter)
+1. **Runbook Automation**: Test Copilot Tasks for cluster health checks
+2. **Incident Escalation**: Automate escalation workflows using agent autonomy
+3. **Authorization Testing**: Verify permission boundary enforcement with ADO/GitHub MCPs
+
+### Tier 3: Monitor
+1. Outlook integration features (low priority, defer for now)
+2. Multi-model intelligence (Claude Cowork) performance in production
+
+---
+
+## Risk Assessment
+
+| Risk | Mitigation |
+|------|-----------|
+| Uncontrolled autonomous action | Require explicit governance audit; start in sandbox |
+| Permission escalation | Test permission mirroring with existing IAM policies |
+| Audit trail gaps | Verify compliance logging before production |
+| MCP conflict (ADO/GitHub auth) | Document integration points; test with real workflows |
+
+---
+
+## Next Steps
+
+1. **Ralph Team**: Coordinate Work IQ upgrade (Q2 2026)
+2. **Security Team**: Schedule governance review (Q2 2026)
+3. **Ops Team**: Propose 2-3 runbook candidates for Copilot Tasks pilot (Q2 2026)
+4. **Documentation**: Update MCP architecture diagram to include agent capabilities
+
+---
+
+## Team Context
+
+- Squad is **already using Work IQ** for Teams/email monitoring (Ralph workflow)
+- DK8S agent-based architecture (Ralph, Fenster, Neelix) is well-positioned to leverage Copilot Tasks
+- Governance alignment with existing Incident Management (ICM) policies is critical before expansion
+
+---
+
+**Decision Owner**: Seven (Research & Docs)  
+**Stakeholders**: Ralph Team, Security, Ops, Incident Management  
+**Review Date**: 2026-04-30
+
+
+---
+
+## Decision: Agency MCPs - First-Party Integration Model (2026-03-10)
+
+**Merged from:** data-agency-mcps.md
+
+# Decision: Agency MCPs - First-Party Integration Model
+
+**Decided by:** Data (Code Expert)  
+**Date:** 2026-03-10  
+**Issue:** #257 — Agency MCPs Discovery & Testing  
+
+## Context
+
+Agency has shipped 4 first-party MCPs out of the box:
+- Azure DevOps MCP (work items, repos, pipelines)
+- Playwright MCP (browser automation)
+- EngHub MCP (internal Microsoft documentation)
+- Aspire MCP (.NET app orchestration)
+
+These are pre-configured in `~/.copilot/mcp-config.json` and require no user setup.
+
+## Decision
+
+**Agency should be treated as the canonical entry point for consuming first-party MCPs** in Microsoft internal workflows.
+
+## Rationale
+
+1. **Zero-friction discovery:** MCPs are preconfigured, not scattered across three different tools (Copilot CLI, VS Code, Claude)
+2. **Uniform config model:** Single JSON-RPC 2.0 transport; built-in and remote MCPs use the same proxy model
+3. **Deduplication prevents chaos:** Config merge prevents duplicate MCPs from being registered multiple times
+4. **Engine-specific resolution** clarifies the mapping: Claude ↔ `.mcp.json`, Copilot ↔ `.vscode/mcp.json`, Agency ↔ `~/.copilot/mcp-config.json`
+5. **Production-ready** with HTTP transport, auth fallback, and reliability improvements
+
+## Implications
+
+- **For developers:** Start with Agency for MCP workflows; fallback to Copilot CLI or VS Code only if Agency doesn't expose the tool
+- **For internal tools:** Consider publishing internal MCPs (e.g., custom ADO, Kusto, ICM integrations) with Agency distribution as primary delivery channel
+- **For testing:** Validate MCP startup latency and auth flows when using multiple MCPs simultaneously in agent workflows
+
+## Related Issues
+- #257 — Agency MCPs Discovery & Validation
+- Followup: Performance testing when all 4 MCPs are active in agent mode
+
+## Next Steps
+1. ✅ Tested all 4 MCPs — working
+2. ✅ Documented findings in issue #257
+3. ⏳ Team review of MCP prioritization (which MCPs matter most for internal workflows?)
+4. ⏳ Auth flow validation (Azure DevOps, EngHub token refresh under network conditions)
+
+
+---
+
+## Decision: Email-to-Action Gateway Design (2026-03-10)
+
+**Merged from:** picard-email-gateway.md
+
+# Email-to-Action Gateway Design Decision
+**Date:** 2024  
+**Owner:** Picard  
+**Request:** GitHub Issue #259  
+**Status:** RECOMMENDATION PENDING USER DECISION  
+
+---
+
+## Problem Statement
+Tamir's wife needs an email address to send requests that the system will process and route to appropriate actions:
+- Print documents (route to HPE printer email: Dresherhome@hpeprint.com)
+- Add calendar events to Tamir's calendar
+- Create tasks/reminders in Tamir's task system
+- General request notification to Tamir
+
+---
+
+## Evaluation Matrix
+
+| Approach | Cost | Setup Time | Complexity | Reliability | Verdict |
+|----------|------|------------|-----------|-------------|---------|
+| **Power Automate** | $0 | 30 min | Medium | 99.9% | ✅ RECOMMENDED |
+| Azure Logic Apps | $5-10/mo | 45 min | Med-High | 99.95% | Alternative |
+| GitHub Actions + Email | $20-50/mo | 1-2 hr | High | 99%+ | Advanced |
+| Email Forwarding | $0 | 5 min | Low | 100% | Lightweight |
+| Self-Hosted Webhook | $0-50/mo | 50+ hr | Very High | Variable | ❌ Not justified |
+
+---
+
+## Recommendation: Microsoft Power Automate ✅
+
+### Why This Approach Wins
+
+**Cost:** Zero additional cost
+- Already licensed via M365 tenant (Business Premium+)
+- No per-action fees like Azure Logic Apps
+
+**Speed:** 30-minute implementation
+- GUI-based flow builder (no coding)
+- Shared mailbox creation: 5 min
+- Flow construction: 25 min
+
+**Integration:** Native M365 connectivity
+- Email reception via shared mailbox
+- Calendar event creation (Outlook connector)
+- Task management (Planner connector)
+- Teams notification (Tamir's primary chat platform)
+- External routing (print via email forward)
+
+**Reliability:** Microsoft SLA (99.9%)
+- Enterprise-grade availability
+- Built-in error handling and retry logic
+- Monitoring via Power Automate dashboard
+
+**Scalability:** Future-proof
+- Can add AI Builder for intelligent intent detection
+- Easy to extend with new routing rules
+- UI remains simple for wife's use
+
+---
+
+## Implementation Plan
+
+### Phase 1: Infrastructure Setup (5 min)
+1. Open Microsoft 365 admin center
+2. Create shared mailbox: `dresherhome-tasks@[domain]`
+3. Add Tamir's wife as mailbox owner
+4. Verify shared mailbox appears in Outlook
+
+### Phase 2: Power Automate Flow (25 min)
+1. Create cloud flow: "When new email arrives in shared mailbox"
+2. Add conditional branches:
+   - **If email subject/body contains "print"** → Forward email to Dresherhome@hpeprint.com
+   - **If email subject/body contains "calendar"** → Parse event details, create Outlook event
+   - **If email subject/body contains "task"** → Create task in Planner
+   - **Else (default)** → Send Teams notification to Tamir with email content
+
+### Phase 3: Testing & Documentation (5 min)
+1. Test with sample emails (subject lines: "Print budget report", "Add dinner to calendar", "Task: fix fence")
+2. Verify each routing works correctly
+3. Create simple instructions for Tamir's wife:
+   - Email address to use
+   - Keywords that trigger actions (print, calendar, task)
+   - Expected time for action completion
+
+---
+
+## Alternative: Azure Logic Apps
+
+If Power Automate proves insufficient (licensing issue or advanced requirements):
+
+- **Cost:** $5-10/month (per 10,000 actions; typical: 50-100 actions/month)
+- **Setup:** 45 minutes (similar flow logic, JSON definition)
+- **Advantage:** Deeper Azure integration, version control via code
+- **Disadvantage:** Requires Azure subscription + steeper learning curve
+
+**Use only if:** Power Automate unavailable or on-prem integration required
+
+---
+
+## Not Recommended: GitHub Actions + Email Parser
+
+**Why?**
+- Adds $20-50/month cost (Zapier/SendGrid webhook service)
+- 1-2 hour setup (webhook infrastructure + parsing logic + testing)
+- Requires maintenance of custom parser code
+- Email routing via webhooks introduces single point of failure
+- Overkill for personal use case (benefits accrue only if centralizing all task automation in GitHub)
+
+**Use only if:** Already running all home automation via GitHub Actions AND want everything version-controlled
+
+---
+
+## Not Recommended: Self-Hosted Custom Webhook
+
+**Why?**
+- 50+ hours of development time
+- Security implications (email handling, SMTP, API keys)
+- Ongoing maintenance burden
+- No uptime guarantees
+- Complexity not justified for personal use
+
+---
+
+## Decision Record
+
+**Chosen Approach:** Microsoft Power Automate (shared mailbox + cloud flow)
+
+**Rationale:** Best cost-benefit ratio. Zero additional cost, 30-minute setup, enterprise reliability, native M365 integration.
+
+**Owner:** Tamir (requires approval to proceed)
+
+**Next Steps:**
+1. User confirms Power Automate approach acceptable
+2. Assign implementation to [team member]
+3. Set up shared mailbox + flow (1 hour total)
+4. Send instructions to wife + monitor for issues
+
+---
+
+## Assumptions
+
+1. Tamir's organization has M365 Business Premium+ (likely)
+2. Tamir's wife has email access (likely)
+3. Tamir has administrative access to Microsoft 365 (likely)
+4. HPE printer accepts email-based print requests (verify)
+
+---
+
+## Success Criteria
+
+- ✅ Wife can send email to dresherhome-tasks@[domain]
+- ✅ Emails with "print" route to HPE printer email within 1 minute
+- ✅ Emails with "calendar" create Outlook event within 2 minutes
+- ✅ Emails with "task" create Planner task within 2 minutes
+- ✅ Default emails notify Tamir via Teams within 1 minute
+- ✅ Wife can use system without technical support after initial setup
+

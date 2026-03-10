@@ -2545,6 +2545,64 @@ From squad's DK8s research:
    - **Implication:** Services adopting TODAY won't have these protections. Spec must document current security posture, enhancement timeline, and compensating controls.
 
 2. **Operational Maturity (STG-EUS2-28 Incident):**
+
+---
+
+### 2026-03-26: Picard — Agency MCP Research & Teams/Email Capabilities — Issue #257
+
+**Assignment:** Research GitHub Agency announcement about new MCPs, specifically verify if Teams and email sending are supported.
+
+**Context:** Tamir received email about Agency adding new MCPs out-of-box. Squad needed to evaluate: (1) what MCPs were announced, (2) test them, (3) check if Teams & email sending is supported, (4) recommend which should be added to squad toolbox.
+
+**Research Findings:**
+
+1. **What is "Agency"?** 
+   - Refers to **Agent 365** — Microsoft's new control plane for managing AI agents at scale
+   - Agents can have their own identities (email, OneDrive, Teams accounts)
+   - Integrate directly into M365 workflows including Teams, Outlook, SharePoint, Viva
+
+2. **Teams & Email Sending — CONFIRMED ✅**
+   - **Outlook MCP Server**: Send emails, read/manage inbox, respond to messages, extract attachments
+   - **Teams MCP Server**: Send Teams messages, schedule meetings, post to channels
+   - **Key capability**: Agents can **programmatically SEND emails** on behalf of users through Outlook MCP
+   - All actions are auditable, subject to DLP policies, governed through Microsoft Entra
+   - No public standalone "email MCP" or "Teams MCP" as separate out-of-box servers — they're part of Agent 365 tooling infrastructure
+
+3. **Complete MCP List Announced (8 total)**
+   - Bluebird (auto-configured per repo context)
+   - Azure DevOps MCP (already integrated in our repo ✅)
+   - ICM MCP (incident management)
+   - Work IQ MCP (M365 workplace intelligence — already using in Ralph ✅)
+   - GitHub MCP (repos, PRs, code search — already using ✅)
+   - Playwright MCP (web automation — already using ✅)
+   - Aspire MCP (.NET dashboard — already using ✅)
+   - EngineeringHub MCP (eng.ms docs — already using ✅)
+
+4. **MCPs Worth Integrating**
+   - **Outlook MCP**: 🔴 EVALUATE — potential for email-driven automation (inbox triage, task processing)
+   - **Teams MCP**: 🔴 EVALUATE — Ralph workflow could use Teams integration for alerts/notifications
+   - **Bluebird**: 🟡 NICE-TO-HAVE — auto-repo context detection, simplifies agent setup
+   - **ICM MCP**: 🟢 SKIP — incident management outside squad scope
+
+5. **Authority & Sources**
+   - Microsoft Agent 365 documentation (learn.microsoft.com/microsoft-agent-365/)
+   - Agent 365 MCP Servers Overview (official Microsoft Learn)
+   - GitHub Copilot Teams integration announcements (github.blog/changelog)
+   - Agent 365 tooling servers for Copilot Studio
+
+**Key Learning:**
+Agency/Agent 365 is NOT just about out-of-box discovery — it's about identity and governance at scale. MCPs (Model Context Protocol) are the standardized "tools" agents use. Outlook and Teams MCPs exist but are part of enterprise Agent 365 tooling, not standalone "discovery" servers. The distinction matters: Work IQ reads M365 data; Outlook/Teams MCPs allow agents to **act** (send, modify, create) on M365 data.
+
+**Recommendation for Squad:**
+1. Test Outlook MCP with simple email automation workflow (daily digest, inbox triage)
+2. Test Teams MCP with Ralph workflow (alert scheduling, channel notifications)
+3. Document in .squad/mcp-config.md once validated
+4. Decide: Adopt both as core squad capabilities or keep as opt-in extensions?
+5. Issue marked `status:pending-user` — awaiting Tamir's direction
+
+**Posted:** Issue #257 comment with full findings, recommendations table, and next steps.
+
+**Decision Required:** Should Squad adopt Outlook/Teams MCPs as production capabilities?
    - Node drain failures, Karpenter >20% unhealthy nodes, Istio ztunnel startup failures
    - **Implication:** Platform is NOT yet "hands-off." Service teams need monitoring/alerting for platform health and clear escalation paths.
 
@@ -3449,3 +3507,45 @@ GitHub Actions (Daily 7 AM UTC)
 
 ---
 
+
+### Issue #259 - Email-to-Action Gateway Design
+**Status:** ✅ ANALYSIS COMPLETE - Research, comparative evaluation, and recommendation posted to issue.
+
+**Request:** Create an email address Tamir's wife can send requests to (print documents, add calendar events, create tasks).
+
+**Approaches Evaluated:**
+1. **Power Automate (RECOMMENDED)** — , 30 min setup, 99.9% reliability
+2. Azure Logic Apps — -10/month, 45 min setup, 99.95% reliability
+3. GitHub Actions + Email Parser — -50/month, 1-2 hr setup, 99%+ reliability
+4. Simple Email Forwarding — , 5 min setup, 100% reliability (limited intelligence)
+5. Self-Hosted Custom Webhook — -50/month, 50+ hr setup, variable reliability
+
+**Key Insights:**
+- Power Automate wins decisively: zero cost (M365 already licensed), minimal setup time (30 min), native M365 integration
+- Azure Logic Apps is enterprise alternative if Power Automate unavailable
+- GitHub Actions + webhooks useful for version control of routing logic but adds monthly cost + complexity
+- Simple email forwarding works but requires wife to remember multiple email addresses
+- Custom self-hosted solutions not justified for personal use case
+
+**Deliverable:** Comprehensive analysis posted to issue #259 with TLDR, comparison table, implementation plan, and recommendation.
+
+**Status:** Awaiting Tamir's decision on approach (labeled status:pending-user).
+
+
+## Ralph Round 1 Cross-Team Update (2026-03-10T09:29:23Z)
+
+**Session Scope:** Agency research & design sprint (Seven, Data, Picard)
+
+**Relevant to this agent:**
+- Seven: IcM Copilot March 2026 research completed; Work IQ upgrade recommended for Q2 2026
+- Data: Agency MCPs validated (4/4 working); canonical entry point established
+- Picard: Email-to-action gateway design submitted for user approval (Power Automate recommended)
+
+**Board Updates:** #260→Done, #257→Done, #259→Pending User, #251→Pending User, #240→Pending User
+
+**Decisions Merged to decisions.md:**
+- seven-icm-copilot.md (Tier-1 adoption: WIQ upgrade, governance, Copilot Tasks pilot)
+- data-agency-mcps.md (Agency canonical MCP entry, validation complete)
+- picard-email-gateway.md (Power Automate 30-min setup, awaiting approval)
+
+**Orchestration Logs:** .squad/orchestration-log/2026-03-10T09-29-23Z-{seven,data,picard}.md

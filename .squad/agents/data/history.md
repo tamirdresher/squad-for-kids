@@ -18,6 +18,33 @@
 
 ## Learnings
 
+### 2026-03-10: Data — Email-to-GitHub Integration Research — Issue #259
+
+**Task:** Research GitHub Issue #259 — "Create an email address for wife to send requests". Tamir asked specifically: "Can't we have an email that adds items to my GitHub issues?"
+
+**Research Performed:**
+1. Investigated GitHub's native email capabilities
+2. Evaluated 5 third-party solutions (HubDesk, Issuefy, Zapier, Power Automate, custom Azure Functions)
+3. Created cost/complexity/reliability comparison matrix
+4. Assessed natural language parsing capabilities for each option
+
+**Key Findings:**
+- **GitHub does NOT natively support email→issue creation** (email replies only work for existing issues)
+- **HubDesk** (recommended for simplicity): Converts forwarded emails to issues, free for personal use, one-click GitHub OAuth, ~5 min setup
+- **Zapier**: Highly flexible, AI parsing available, costs $19+/month, ~15 min setup
+- **Power Automate**: M365-native (no extra cost if using Office 365), integrates with Outlook + Azure OpenAI, ~30 min setup
+- **Issuefy.dev**: Alternative no-code solution, custom email-per-repo, newer service
+- **Azure Functions**: Maximum control for squad automation, ~2 hours setup, lowest long-term cost
+
+**Outcome:**
+- Posted comprehensive research comment on issue #259 with 5 options, comparison table, and Tamir's use-case ranking
+- Added `status:pending-user` label (awaiting Tamir's decision on approach)
+- Provided example Power Automate flow for routing wife's casual requests (print → label, calendar → label, etc.)
+
+**Key Learning:** Email-to-issue integration is a solved problem via multiple established services. Recommendation depends on stack: HubDesk for speed, Power Automate for M365 users, custom Azure Function if future squad automation needed.
+
+---
+
 ### 2026-03-09: Data — K8s Spec Review — Issue #195 (COMPLETED, ROUND 3)
 
 **Assignment:** Review functional spec for "Standardized Microservices Platform on Kubernetes" proposing DK8s adoption. Keep review short and direct.
@@ -3257,3 +3284,43 @@ Applied consistently across all workflows that parse team.md:
 - Schedule system: Interval/cron triggers, multiple providers (local-polling, github-actions, copilot-agent)
 - Teams integration: Incoming Webhooks (notifications) + WorkIQ MCP (read messages/emails)
 - Sanitization pattern: Remove personal data but keep all structure/logic
+## Learnings — Issue #257: Agency MCPs (2026-03-10)
+
+### What We Found
+Agency has introduced **4 first-party MCPs** available out of the box:
+1. **Azure DevOps MCP** — Work item/repo/pipeline integration via @azure-devops/mcp
+2. **Playwright MCP** — Browser automation via @playwright/mcp@latest  
+3. **EngHub MCP** — Internal Microsoft documentation/service catalog access
+4. **Aspire MCP** — .NET Aspire orchestration and app lifecycle
+
+### Key Insights
+- **Uniform config model:** All MCPs configured via ~/.copilot/mcp-config.json using JSON-RPC 2.0
+- **Discovery:** MCPs are pre-registered in Agency; no user setup needed (unlike Copilot CLI)
+- **Engine-specific resolution:** Different agents read different config files (Claude .mcp.json, Copilot .vscode/mcp.json, Agency ~/.copilot/mcp-config.json)
+- **Deduplication:** Config merge prevents duplicate MCP registration
+- **Transport uniformity:** Built-in MCPs can now be proxied over HTTP like remote MCPs
+- **UX improvement:** Interactive config editor (gency config edit --interactive) with MCP discovery tab coming soon
+
+### What This Means
+Agency is positioning itself as the **canonical entry point** for consuming first-party MCPs internally. MCPs are no longer an afterthought—they're baked into the product with discovery, deduplication, and engine-specific resolution all built in.
+
+### Status
+All 4 MCPs tested and confirmed working. Findings posted to GitHub issue #257 with recommendations for auth flow validation and production latency monitoring.
+
+## Ralph Round 1 Cross-Team Update (2026-03-10T09:29:23Z)
+
+**Session Scope:** Agency research & design sprint (Seven, Data, Picard)
+
+**Relevant to this agent:**
+- Seven: IcM Copilot March 2026 research completed; Work IQ upgrade recommended for Q2 2026
+- Data: Agency MCPs validated (4/4 working); canonical entry point established
+- Picard: Email-to-action gateway design submitted for user approval (Power Automate recommended)
+
+**Board Updates:** #260→Done, #257→Done, #259→Pending User, #251→Pending User, #240→Pending User
+
+**Decisions Merged to decisions.md:**
+- seven-icm-copilot.md (Tier-1 adoption: WIQ upgrade, governance, Copilot Tasks pilot)
+- data-agency-mcps.md (Agency canonical MCP entry, validation complete)
+- picard-email-gateway.md (Power Automate 30-min setup, awaiting approval)
+
+**Orchestration Logs:** .squad/orchestration-log/2026-03-10T09-29-23Z-{seven,data,picard}.md

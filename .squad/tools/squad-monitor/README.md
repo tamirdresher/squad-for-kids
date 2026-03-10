@@ -1,92 +1,52 @@
-# Squad Activity Monitor v2
+# squad-monitor
 
-> **⚠️ NOTE**: This tool is now available as a [.NET global tool on NuGet](https://www.nuget.org/packages/squad-monitor).  
-> **Recommended installation**: `dotnet tool install -g squad-monitor`  
-> This local copy is for development/testing only.
+**Status:** Published as .NET Global Tool  
+**NuGet:** https://www.nuget.org/packages/squad-monitor  
+**Source:** https://github.com/tamirdresher/squad-monitor
 
-A multi-panel terminal dashboard for monitoring squad activity, GitHub work queue, and Ralph watch loop health.
+## Installation
 
-## Features
-
-- 🎨 Beautiful terminal UI with Spectre.Console
-- 🔄 Auto-refresh every 5 seconds (configurable)
-- 📊 Color-coded status indicators (green/yellow/red)
-- 🔀 **Orchestration-only view** — Press 'o' to toggle detailed orchestration activity view
-- 💚 **Ralph heartbeat panel** — shows watch loop status, round count, staleness
-- 📜 **Ralph log panel** — recent round summaries from `ralph-watch.log`
-- 📋 **GitHub Issues panel** — open issues with `squad` label, assignees, status
-- 🔀 **GitHub PRs panel** — open PRs with review status, CI rollup
-- 🎯 **Orchestration log panel** — agent activity from `.squad/orchestration-log/`
-
-## Keyboard Controls
-
-- **Press 'o' or 'O'** — Toggle between full dashboard and orchestration-only view
-- **Ctrl+C** — Exit the monitor
-
-## Data Sources
-
-| Panel | Source | Requirement |
-|-------|--------|-------------|
-| Ralph Heartbeat | `~/.squad/ralph-heartbeat.json` | ralph-watch.ps1 v7+ |
-| Ralph Log | `~/.squad/ralph-watch.log` | ralph-watch.ps1 v7+ |
-| GitHub Issues | `gh issue list --label squad` | `gh` CLI authenticated |
-| GitHub PRs | `gh pr list` | `gh` CLI authenticated |
-| Orchestration Log | `.squad/orchestration-log/*.md` | Squad orchestration |
+```bash
+dotnet tool install -g squad-monitor
+```
 
 ## Usage
 
+Run from anywhere after installation:
+
 ```bash
-# Run with auto-refresh (default 5s)
-dotnet run
+# Default: refresh every 5 seconds
+squad-monitor
 
 # Custom refresh interval
-dotnet run -- --interval 10
+squad-monitor --interval 10
 
-# Run once without refresh loop
-dotnet run -- --once
+# Run once and exit
+squad-monitor --once
 ```
 
-## Build & Publish
+## What It Does
 
-```bash
-# Build
-dotnet build
+Live terminal dashboard for monitoring AI agent orchestration:
 
-# Publish as single-file executable
-dotnet publish -c Release -r win-x64 --self-contained
-```
-
-The published executable will be at: `bin\Release\net10.0\win-x64\publish\squad-monitor.exe`
-
-## Panels
-
-### Ralph Watch Loop
-Reads `~/.squad/ralph-heartbeat.json` (written by ralph-watch.ps1) to show:
-- Running/idle/crashed status
-- Current round number
-- Time since last run (green <10m, yellow <30m, red >30m)
-- Consecutive failure count
-
-### Ralph Recent Rounds
-Tails `~/.squad/ralph-watch.log` for the last 5 log lines, color-coded by severity (ERROR=red, WARN=yellow, SUCCESS=green).
-
-### GitHub Issues
-Runs `gh issue list --state open --label squad --json ...` to show open squad issues with labels, assignees, and last-updated age.
-
-### GitHub Pull Requests
-Runs `gh pr list --state open --json ...` to show open PRs with review decision (approved/changes/pending) and CI check rollup.
-
-### Orchestration Log
-Parses `.squad/orchestration-log/*.md` files (top 10 most recent) showing agent, status, age, task, and outcome.
-
-**Press 'o' or 'O' to toggle orchestration-only view**, which displays:
-- Detailed statistics (active agents, activities in last 24h, status breakdown)
-- Up to 25 most recent activities with full details
-- Expanded task descriptions and outcomes
-- Agent name, timestamp, status, task, and outcome for each activity
+- **Ralph Watch Loop** — heartbeat, round status, failure tracking
+- **GitHub Integration** — issues, PRs with CI status, recently merged PRs
+- **Orchestration Activity** — agent assignments and progress
+- **Live Refresh** — auto-updates with flicker-free rendering
+- **Dual View Mode** — press `O` to toggle orchestration-only view
 
 ## Requirements
 
-- .NET 10.0 SDK
-- `gh` CLI (GitHub CLI) — installed and authenticated for GitHub panels
-- ralph-watch.ps1 v7+ — for heartbeat/log panels (gracefully skipped if absent)
+- .NET 10 SDK
+- GitHub CLI (`gh`) authenticated via `gh auth login`
+- `.squad/` directory in your repo (created by Squad orchestrator)
+
+## Updating
+
+```bash
+dotnet tool update -g squad-monitor
+```
+
+## Development
+
+For local development or contributing, see the [source repository](https://github.com/tamirdresher/squad-monitor).

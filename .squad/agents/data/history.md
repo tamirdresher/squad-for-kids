@@ -3451,3 +3451,26 @@ Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main
 
 ---
 
+
+## Issue #265 - Squad-monitor NuGet Migration (2026-03-10)
+
+**Context:**
+- squad-monitor already published as NuGet tool with all infrastructure in place
+- Repository had .csproj with PackAsTool=true, GitHub Actions workflow, README with install docs
+- Task was to replace local copy in tamresearch1 with skill documentation
+
+**Implementation:**
+- Removed C# source code from .squad/tools/squad-monitor/ (Program.cs, .csproj, bin/, obj/)
+- Created lightweight skill doc README pointing to NuGet package
+- Branch: squad/265-nuget-tool-publish
+- PR #282: https://github.com/tamirdresher_microsoft/tamresearch1/pull/282
+
+**Key File Paths:**
+- .squad/tools/squad-monitor/README.md - skill documentation (NuGet install instructions)
+- No longer maintaining local source copy in tamresearch1
+
+**Pattern:**
+- Prefer published tools over embedded source code in monorepo
+- Use skill docs to reference external tooling with installation instructions
+- Benefits: smaller repo, no build artifacts, easier updates via tool update
+

@@ -17,6 +17,17 @@
 | Kes | Communications & Scheduling | `.squad/agents/kes/charter.md` | ✅ Active |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 | Neelix | News Reporter | `.squad/agents/neelix/charter.md` | ✅ Active |
+| @copilot | Coding Agent | — | 🤖 Active |
+
+<!-- copilot-auto-assign: true -->
+
+## @copilot Capability Profile
+
+| Category | Rating | Notes |
+|----------|--------|-------|
+| Bug fixes, test additions | 🟢 Good fit | Well-defined, bounded scope |
+| Small features with specs | 🟡 Needs review | PR review required |
+| Architecture, security | 🔴 Not suitable | Keep with squad members |
 
 ## Human Members
 

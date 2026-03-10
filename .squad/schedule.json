@@ -15,14 +15,22 @@
         "ref": ".github/workflows/squad-heartbeat.yml",
         "event": "workflow_dispatch"
       },
-      "providers": ["local-polling", "github-actions"],
+      "providers": [
+        "local-polling",
+        "github-actions"
+      ],
       "retry": {
         "maxAttempts": 2,
         "backoffSeconds": 30
       },
       "timeout": 600,
-      "notifyOnFailure": ["teams"],
-      "tags": ["triage", "ralph"]
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "triage",
+        "ralph"
+      ]
     },
     {
       "id": "daily-digest",
@@ -39,14 +47,22 @@
         "ref": ".github/workflows/squad-daily-digest.yml",
         "event": "workflow_dispatch"
       },
-      "providers": ["github-actions", "local-fallback"],
+      "providers": [
+        "github-actions",
+        "local-fallback"
+      ],
       "retry": {
         "maxAttempts": 3,
         "backoffSeconds": 60
       },
       "timeout": 1800,
-      "notifyOnFailure": ["teams"],
-      "tags": ["monitoring", "digest"]
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "monitoring",
+        "digest"
+      ]
     },
     {
       "id": "daily-rp-briefing",
@@ -63,14 +79,22 @@
         "command": ".squad/scripts/daily-rp-briefing.ps1 -SkipWeekends",
         "shell": "powershell"
       },
-      "providers": ["local-polling"],
+      "providers": [
+        "local-polling"
+      ],
       "retry": {
         "maxAttempts": 2,
         "backoffSeconds": 60
       },
       "timeout": 600,
-      "notifyOnFailure": ["teams"],
-      "tags": ["monitoring", "briefing", "rp"]
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "monitoring",
+        "briefing",
+        "rp"
+      ]
     },
     {
       "id": "daily-adr-check",
@@ -87,14 +111,23 @@
         "instruction": "Run the daily ADR channel check: Query IDP ADR Notifications channel via WorkIQ for new/updated ADRs in the last 24h. Identify items needing Tamir's attention (pending reviews, decisions, blockers). Send summary to Teams webhook. NEVER comment on the ADR channel or any ADR.",
         "scriptRef": ".squad/scripts/daily-adr-check.ps1"
       },
-      "providers": ["local-polling", "copilot-agent"],
+      "providers": [
+        "local-polling",
+        "copilot-agent"
+      ],
       "retry": {
         "maxAttempts": 2,
         "backoffSeconds": 120
       },
       "timeout": 900,
-      "notifyOnFailure": ["teams"],
-      "tags": ["monitoring", "adr", "idp"],
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "monitoring",
+        "adr",
+        "idp"
+      ],
       "metadata": {
         "issue": "#198",
         "owner": "picard",
@@ -117,14 +150,22 @@
         "type": "copilot",
         "instruction": "Sync all upstream repos: check for new issues, PRs, discussions"
       },
-      "providers": ["copilot-agent"],
+      "providers": [
+        "copilot-agent"
+      ],
       "retry": {
         "maxAttempts": 1,
         "backoffSeconds": 0
       },
       "timeout": 3600,
-      "notifyOnFailure": ["teams", "issue-comment"],
-      "tags": ["sync", "upstream"]
+      "notifyOnFailure": [
+        "teams",
+        "issue-comment"
+      ],
+      "tags": [
+        "sync",
+        "upstream"
+      ]
     },
     {
       "id": "teams-message-monitor",
@@ -140,14 +181,22 @@
         "instruction": "Use WorkIQ (workiq-ask_work_iq tool) to scan recent Teams messages from the last 30 minutes. Focus on: direct mentions of Tamir or the squad, review requests, action items, urgent items, decisions needing input. Silently evaluate each item - only create a GitHub issue or notification if Tamir specifically needs to act. Use teams-monitor skill workflow for filtering and issue creation. Avoid spam - be selective.",
         "scriptRef": ".squad/scripts/teams-monitor-check.ps1"
       },
-      "providers": ["local-polling"],
+      "providers": [
+        "local-polling"
+      ],
       "retry": {
         "maxAttempts": 2,
         "backoffSeconds": 60
       },
       "timeout": 600,
-      "notifyOnFailure": ["teams"],
-      "tags": ["monitoring", "teams", "communication"],
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "monitoring",
+        "teams",
+        "communication"
+      ],
       "metadata": {
         "issue": "#215",
         "owner": "belanna",
@@ -155,13 +204,46 @@
         "smartFiltering": true,
         "silentReview": true
       }
+    },
+    {
+      "enabled": true,
+      "retry": {
+        "backoffSeconds": 0,
+        "maxAttempts": 1
+      },
+      "tags": [
+        "monitoring",
+        "news",
+        "research"
+      ],
+      "description": "Scan HackerNews and Reddit for relevant AI, .NET, Kubernetes, and developer tools news",
+      "timeout": 300,
+      "providers": [
+        "local-polling"
+      ],
+      "name": "Tech News Scanner",
+      "id": "tech-news-scan",
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "task": {
+        "command": "node scripts/tech-news-scanner.js",
+        "type": "script"
+      },
+      "trigger": {
+        "timezone": "Asia/Jerusalem",
+        "type": "cron",
+        "expression": "0 7 * * 1-5"
+      }
     }
   ],
   "defaults": {
     "retryMaxAttempts": 2,
     "retryBackoffSeconds": 60,
     "timeout": 1800,
-    "notifyOnFailure": ["teams"]
+    "notifyOnFailure": [
+      "teams"
+    ]
   },
   "notificationChannels": {
     "teams": {
@@ -170,7 +252,10 @@
     },
     "issue-comment": {
       "repo": "tamirdresher_microsoft/tamresearch1",
-      "labels": ["squad:ralph", "automation"]
+      "labels": [
+        "squad:ralph",
+        "automation"
+      ]
     }
   }
 }

@@ -1,0 +1,47 @@
+name: Tech News Scanner
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC (1 AM PT, 4 AM ET)
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  scan-tech-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Run tech news scanner
+        id: scan
+        run: |
+          node scripts/tech-news-scanner.js > digest.md 2>&1
+          echo "digest_file=digest.md" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Issue with Digest
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const digest = fs.readFileSync('digest.md', 'utf8');
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Tech News Digest - ${new Date().toISOString().split('T')[0]}`,
+              body: digest,
+              labels: ['tech-news', 'automated', 'digest']
+            });
+            
+            console.log(`Created issue #${issue.data.number}`);

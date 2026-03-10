@@ -1,0 +1,954 @@
+- application [ref=e14]:
+  - generic [ref=e18]:
+    - link "Skip to main content" [ref=e1798] [cursor=pointer]
+    - banner [ref=e620]:
+      - button "App launcher" [ref=e1799] [cursor=pointer]: 
+      - generic [ref=e629]:
+        - generic [ref=e630]:
+          - link "Go to Outlook" [ref=e1800] [cursor=pointer]:
+            - /url: https://outlook.office.com/mail/?realm=microsoft.com&login_hint=tamirdresher@microsoft.com
+            - generic [ref=e635]: Outlook
+          - search [ref=e644]:
+            - generic [ref=e645]:
+              - status
+              - generic [ref=e650]: 
+              - combobox "Search for email, meetings, files and more." [ref=e1801]
+        - generic [ref=e654]:
+          - button "Chat" [ref=e1802] [cursor=pointer]:
+            - generic [ref=e1540]: 
+          - button "OneNote feed" [ref=e1803] [cursor=pointer]:
+            - img [ref=e658]
+          - button "My Day" [ref=e1804] [cursor=pointer]:
+            - img [ref=e663]
+          - 'button "New notifications: 24" [ref=e1805] [cursor=pointer]':
+            - generic [ref=e668]: 
+            - generic [ref=e1544]: "24"
+          - button "Settings" [ref=e1806] [cursor=pointer]:
+            - generic [ref=e672]: 
+      - generic [ref=e673]:
+        - button "Account manager for Tamir Dresher" [ref=e1807] [cursor=pointer]:
+          - generic [ref=e682]:
+            - generic [ref=e683]: TD
+            - img "TD" [ref=e1808]
+        - generic: 
+    - generic [ref=e24]:
+      - generic [ref=e27]:
+        - navigation "left-rail-appbar" [ref=e1809]:
+          - generic "Mail" [ref=e1810]:
+            - button "Mail" [pressed] [ref=e1811]:
+              - generic [ref=e690]:
+                - generic:
+                  - generic:
+                    - img "Mail"
+          - generic "Calendar" [ref=e1812]:
+            - button "Calendar" [ref=e1813]:
+              - generic [ref=e694]:
+                - generic:
+                  - generic:
+                    - img "Calendar"
+          - generic "Copilot" [ref=e1814]:
+            - button "Copilot" [ref=e1815]:
+              - generic [ref=e698]:
+                - generic:
+                  - generic:
+                    - img "Copilot"
+          - generic "People" [ref=e1816]:
+            - button "People" [ref=e1817]:
+              - generic [ref=e702]:
+                - generic:
+                  - generic:
+                    - img "People"
+          - generic "To Do" [ref=e1818]:
+            - button "To Do" [ref=e1819]:
+              - generic [ref=e706]:
+                - generic:
+                  - generic:
+                    - img "To Do"
+          - generic "Newsletters" [ref=e1820]:
+            - button "Newsletters" [ref=e1821]:
+              - generic [ref=e710]:
+                - generic:
+                  - generic:
+                    - img "Newsletters"
+          - generic "Org Explorer" [ref=e1822]:
+            - button "Org Explorer" [ref=e1823]:
+              - generic [ref=e714]:
+                - generic:
+                  - generic:
+                    - img "Org Explorer"
+          - generic "OneDrive" [ref=e1824]:
+            - button "OneDrive" [ref=e1825]:
+              - generic [ref=e718]:
+                - generic:
+                  - generic:
+                    - img "OneDrive"
+          - status [ref=e719]
+        - button [ref=e30]:
+          - generic [ref=e31]:
+            - generic:
+              - generic:
+                - generic: 
+      - generic [ref=e32]:
+        - region "Ribbon" [ref=e1826]:
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - button "Hide navigation pane" [ref=e1827]:
+                - generic [ref=e39]: 
+              - button "File" [ref=e1828]
+              - generic "Ribbon tabs" [ref=e1829]:
+                - tablist [ref=e729]:
+                  - tab "Home" [ref=e1830]:
+                    - generic [ref=e733]: Home
+                  - tab "View" [ref=e1831]:
+                    - generic [ref=e737]: View
+                  - tab "Help" [ref=e1832]:
+                    - generic [ref=e741]: Help
+                  - tab "Message" [selected] [ref=e1833]:
+                    - generic [ref=e1034]: Message
+                  - tab "Insert" [ref=e1834]:
+                    - generic [ref=e1038]: Insert
+                  - tab "Format text" [ref=e1835]:
+                    - generic [ref=e1042]: Format text
+                  - tab "Draw" [ref=e1836]:
+                    - generic [ref=e1046]: Draw
+                  - tab "Options" [ref=e1837]:
+                    - generic [ref=e1050]: Options
+              - menuitem "Production Touch Safety office Hours PM edition(new Series), 1:30 to 2:00, Tuesday, March 10, 2026, Teams meeting, By Production Touch Safety, Tentative, Recurring event" [ref=e1838] [cursor=pointer]:
+                - generic [ref=e1841]:
+                  - generic [ref=e1844]: 
+                  - generic [ref=e1845]:
+                    - generic [ref=e1846]: Production Touch Safety office Hours PM edition(new Series)
+                    - generic [ref=e1847]:
+                      - generic [ref=e1848]: Tomorrow 1:30
+                      - generic [ref=e1849]: Teams meeting
+            - generic [ref=e42]:
+              - tabpanel "Message" [ref=e1850]:
+                - generic [ref=e1054]:
+                  - generic [ref=e1059]:
+                    - group "Clipboard" [ref=e1851]:
+                      - generic [ref=e1064]:
+                        - generic [ref=e1068]:
+                          - group [ref=e1069]:
+                            - button "Paste" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic: 
+                              - generic: Add content on the Clipboard to your message. (Ctrl+V)
+                            - button "Paste" [disabled]:
+                              - generic:
+                                - text: Paste
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                              - generic: More paste options
+                          - generic [ref=e1071]:
+                            - button "Cut" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Remove the selection and put it on the Clipboard so you can paste it somewhere else. (Ctrl+X)
+                            - button "Copy" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Put a copy of the selection on the Clipboard so you can paste it somewhere else. (Ctrl+C)
+                            - button "Format painter" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Select the content with the formatting you want to copy and click on Format painter. Select the other content you want apply the formatting to.
+                          - generic [ref=e1072]:
+                            - button "Undo" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Undo (Ctrl+Z)
+                            - button "Redo" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Redo (Ctrl+Y)
+                        - generic [ref=e1074]: Clipboard
+                    - group "Basic Text" [ref=e1852]:
+                      - generic [ref=e1081]:
+                        - generic [ref=e1084]:
+                          - generic [ref=e1085]:
+                            - generic [ref=e1087]:
+                              - combobox "Font" [disabled]
+                              - button "Open Font" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                            - generic [ref=e1089]:
+                              - combobox "Font size" [disabled]
+                              - button "Open Font size" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                            - generic [ref=e1090]:
+                              - button "Change case" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                                - generic: Change case
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                            - button "Clear formatting" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Clear formatting (Ctrl+Space)
+                          - generic [ref=e1091]:
+                            - button "Bold" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Bold (Ctrl+B)
+                            - button "Italic" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Italic (Ctrl+I)
+                            - button "Underline" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Underline (Ctrl+U)
+                            - button "Strikethrough" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                            - group [ref=e1092]:
+                              - button "Text highlight color" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:  
+                                - generic: Text highlight color
+                              - button "Text highlight color" [disabled]:
+                                - generic: Text highlight color
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                            - group [ref=e1093]:
+                              - button "Font color" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:  
+                                - generic: Font color
+                              - button "Font color" [disabled]:
+                                - generic: Font color
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                            - button "Subscript" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:  
+                            - button "Superscript" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:  
+                        - generic [ref=e1095]: Basic Text
+                    - group "Paragraph" [ref=e1853]:
+                      - generic [ref=e1102]:
+                        - generic [ref=e1105]:
+                          - generic [ref=e1106]:
+                            - button "Bullets" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:  
+                              - generic: Bullets (Ctrl+.)
+                            - button "Numbering" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:  
+                              - generic: Numbering (Ctrl+/)
+                            - button "Decrease indent" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:  
+                            - button "Increase indent" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:  
+                            - generic [ref=e1107]:
+                              - button "Styles" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                                - generic: Styles
+                                - generic: Styles give your message a consistent, polished look.
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                          - generic [ref=e1108]:
+                            - generic [ref=e1109]:
+                              - button "Align" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                                - generic: Align
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                            - generic [ref=e1110]:
+                              - button "Spacing" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                            - button "Left-to-right" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                            - button "Right-to-left" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                        - generic [ref=e1112]: Paragraph
+                    - group "Names" [ref=e1854]:
+                      - generic [ref=e1119]:
+                        - button "Address book" [ref=e1855]:
+                          - generic [ref=e1127]: 
+                          - generic [ref=e1128]: Address book
+                          - generic [ref=e1129]: Open the address book to add recipients.
+                        - generic [ref=e1131]: Names
+                    - group "Insert" [ref=e1856]:
+                      - generic [ref=e1138]:
+                        - generic [ref=e1142]:
+                          - generic [ref=e1143]:
+                            - button "Attach file" [ref=e1857]:
+                              - generic [ref=e1149]: 
+                              - generic [ref=e1150]: Attach file
+                              - generic [ref=e1151]: Attach a file to this item.
+                              - generic [ref=e1155]: 
+                            - group [ref=e1156]:
+                              - button "Link" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                                - generic: Link
+                                - generic: Insert a hyperlink. (Ctrl+K)
+                              - button "Link" [disabled]:
+                                - generic: Link
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                            - button "Signature" [ref=e1858]:
+                              - generic [ref=e1162]: 
+                              - generic [ref=e1163]: Signature
+                              - generic [ref=e1164]: Attach one of your email signatures to this message.
+                              - generic [ref=e1168]: 
+                          - generic [ref=e1169]:
+                            - button "Pictures" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Pictures
+                              - generic: Insert pictures from your computer.
+                            - button "Record" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Record
+                              - generic: Record a video to insert into your message.
+                            - button "Scheduling poll" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Scheduling poll
+                              - generic: Create a scheduling poll
+                          - generic [ref=e1170]:
+                            - button "Emoji" [disabled]:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic: 
+                              - generic: Emoji
+                              - generic: Insert emojis.
+                            - generic [ref=e1171]:
+                              - button "Table" [disabled]:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                                - generic: Table
+                                - generic: A table is a great way to organize information within your document.
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - generic: 
+                        - generic [ref=e1173]: Insert
+                    - group "Collaborate" [ref=e1859]:
+                      - generic [ref=e1180]:
+                        - generic [ref=e1184]:
+                          - button "Loop components" [disabled]:
+                            - generic:
+                              - generic:
+                                - generic: 
+                            - generic: Loop components
+                            - generic: Send a component that everyone in the mail can edit inline.
+                        - generic [ref=e1186]: Collaborate
+                    - group "Voice" [ref=e1860]:
+                      - generic [ref=e1193]:
+                        - generic [ref=e1197]:
+                          - button "Dictate" [disabled]:
+                            - generic:
+                              - generic:
+                                - generic: 
+                            - generic: Dictate
+                            - generic: "Speak into the microphone to insert text. (Alt+`)"
+                        - generic [ref=e1199]: Voice
+                    - group "Proofing" [ref=e1861]:
+                      - generic [ref=e1206]:
+                        - button "Editor" [ref=e1862]:
+                          - generic [ref=e1215]: 
+                          - generic [ref=e1216]:
+                            - text: Editor
+                            - generic [ref=e1220]: 
+                          - generic [ref=e1221]: Customize your editor
+                        - generic [ref=e1224]: Proofing
+                    - group "Add-ins" [ref=e1863]:
+                      - generic [ref=e1231]:
+                        - generic [ref=e1235]:
+                          - button "Apps" [ref=e1864]:
+                            - generic [ref=e1239]: 
+                            - generic [ref=e1240]: Apps
+                            - generic [ref=e1241]: Enhance Outlook with apps.
+                          - button "Polls" [disabled]:
+                            - generic:
+                              - generic:
+                                - generic: 
+                            - generic: Polls
+                            - generic: Collect quick responses in real time with polls, to engage and drive consensus.
+                          - button "Power BI (MSIT)" [ref=e1866]:
+                            - generic [ref=e1871]: Power BI (MSIT)
+                            - generic [ref=e1872]: Power BI (MSIT) Collaborate better with your data.
+                          - button "Viva Insights" [ref=e1874]:
+                            - generic [ref=e1879]: Viva Insights
+                            - generic [ref=e1880]: Viva Insights Insights. This version applies to Office 365 Enterprise E5, Office 365 A5, Office 365 Nonprofit E5, and MyAnalytics add-on.
+                          - button "Group Check" [ref=e1882]:
+                            - generic [ref=e1887]: Group Check
+                            - generic [ref=e1888]: Group Check Check email and meeting recipients' group membership
+                        - generic [ref=e1243]: Add-ins
+                    - group "Tags" [ref=e1889]:
+                      - generic [ref=e1250]:
+                        - generic [ref=e1254]:
+                          - generic [ref=e1255]:
+                            - button "High importance" [ref=e1890]:
+                              - generic [ref=e1260]: 
+                              - generic [ref=e1261]: High importance
+                              - generic [ref=e1262]: Set this item as high priority.
+                            - button "Low importance" [ref=e1891]:
+                              - generic [ref=e1267]: 
+                              - generic [ref=e1268]: Low importance
+                              - generic [ref=e1269]: Set this item as low priority.
+                          - generic [ref=e1270]:
+                            - button "Sensitivity" [ref=e1892]:
+                              - generic [ref=e1276]: 
+                              - generic [ref=e1277]: Sensitivity
+                              - generic [ref=e1278]: Apply a sensitivity tag to your content to keep it compliant with your organization's information protection policies.
+                              - generic [ref=e1282]: 
+                            - button "Encrypt" [ref=e1893]:
+                              - generic [ref=e1288]: 
+                              - generic [ref=e1289]: Encrypt
+                              - generic [ref=e1290]: Restrict permission to this item.
+                              - generic [ref=e1294]: 
+                        - generic [ref=e1296]: Tags
+                    - group "Print" [ref=e1894]:
+                      - generic [ref=e1303]:
+                        - button "Print draft" [ref=e1895]:
+                          - generic [ref=e1311]: 
+                          - generic [ref=e1312]: Print draft
+                          - generic [ref=e1313]: Print draft (Ctrl+P)
+                        - generic [ref=e1315]: Print
+                    - group "Options" [ref=e1896]:
+                      - generic [ref=e1322]:
+                        - generic [ref=e1326]:
+                          - button "Check accessibility" [ref=e1897]:
+                            - generic [ref=e1330]: 
+                            - generic [ref=e1331]: Check accessibility
+                            - generic [ref=e1332]: Keep it inclusive. Let us make sure that your file follows accessibility best practices. We'll help you fix issues quickly with easy-to-follow directions or recommendations
+                          - button "Auto format options" [ref=e1898]:
+                            - generic [ref=e1336]: 
+                            - generic [ref=e1337]: Auto format options
+                            - generic [ref=e1338]: Control auto format options.
+                          - button "More options" [ref=e1899]:
+                            - generic [ref=e1342]: 
+                            - generic [ref=e1343]: More options
+                            - generic [ref=e1344]: Show the Message options dialog box so you can change advanced options.
+                          - button "Mail template" [ref=e1900]:
+                            - generic [ref=e1350]: 
+                            - generic [ref=e1351]:
+                              - text: Mail
+                              - generic [ref=e1352]:
+                                - text: template
+                                - generic [ref=e1355]: 
+                            - generic [ref=e1356]: Mail template options
+                        - generic [ref=e1359]: Options
+                  - button "Scroll ribbon right" [ref=e1901]:
+                    - generic [ref=e1366]: 
+                - button "Switch layouts" [ref=e1902]:
+                  - generic [ref=e1372]: 
+              - button "Copilot Chat" [ref=e1903]:
+                - img [ref=e973]
+                - text: Copilot
+        - generic [ref=e56]:
+          - generic [ref=e60]:
+            - region "Navigation pane" [ref=e1904]:
+              - generic [ref=e65]:
+                - tree [ref=e66]:
+                  - heading "Navigation pane" [level=2] [ref=e1905]
+                  - group "Favorites" [ref=e1906]:
+                    - treeitem "Favorites" [expanded] [level=1] [ref=e1907] [cursor=pointer]:
+                      - button [ref=e71]:
+                        - generic [ref=e73]: 
+                      - generic [ref=e74]: Favorites
+                    - generic [ref=e76]:
+                      - treeitem "Inbox 7451 unread" [level=2] [ref=e1908] [cursor=pointer]:
+                        - generic [ref=e81]: 
+                        - generic [ref=e82]: Inbox
+                        - generic [ref=e84]:
+                          - text: "7451"
+                          - generic [ref=e85]: unread
+                      - treeitem "Sent Items" [level=2] [ref=e1909] [cursor=pointer]:
+                        - generic [ref=e90]: 
+                        - generic [ref=e91]: Sent Items
+                      - treeitem "Drafts 73 items" [level=2] [ref=e1910] [cursor=pointer]:
+                        - generic [ref=e96]: 
+                        - generic [ref=e97]: Drafts
+                        - generic [ref=e99]:
+                          - text: "73"
+                          - generic [ref=e100]: items
+                      - treeitem "Deleted Items 1013 unread" [level=2] [ref=e1911] [cursor=pointer]:
+                        - generic [ref=e105]: 
+                        - generic [ref=e106]: Deleted Items
+                        - generic [ref=e108]:
+                          - text: "1013"
+                          - generic [ref=e109]: unread
+                  - group [ref=e112]:
+                    - treeitem "tamirdresher@microsoft.com" [expanded] [level=1] [ref=e1912] [cursor=pointer]:
+                      - button [ref=e115]:
+                        - generic [ref=e117]: 
+                      - generic [ref=e118]: tamirdresher@microsoft.com
+                    - group "tamirdresher@microsoft.com" [ref=e1913]:
+                      - treeitem "Inbox selected 7451 unread" [level=2] [selected] [ref=e1914] [cursor=pointer]:
+                        - generic [ref=e124]:
+                          - button [ref=e125]:
+                            - generic [ref=e127]: 
+                          - generic [ref=e129]: 
+                        - generic [ref=e130]: Inbox
+                        - generic [ref=e131]: selected
+                        - generic [ref=e133]:
+                          - text: "7451"
+                          - generic [ref=e134]: unread
+                      - treeitem "Drafts 73 items" [level=2] [ref=e1915] [cursor=pointer]:
+                        - generic [ref=e139]: 
+                        - generic [ref=e140]: Drafts
+                        - generic [ref=e142]:
+                          - text: "73"
+                          - generic [ref=e143]: items
+                      - treeitem "Sent Items" [level=2] [ref=e1916] [cursor=pointer]:
+                        - generic [ref=e148]: 
+                        - generic [ref=e149]: Sent Items
+                      - treeitem "Snoozed" [level=2] [ref=e1917] [cursor=pointer]:
+                        - generic [ref=e154]: 
+                        - generic [ref=e155]: Snoozed
+                      - treeitem "Deleted Items 1013 unread" [level=2] [ref=e1918] [cursor=pointer]:
+                        - generic [ref=e160]: 
+                        - generic [ref=e161]: Deleted Items
+                        - generic [ref=e163]:
+                          - text: "1013"
+                          - generic [ref=e164]: unread
+                      - treeitem "Junk Email 144 items" [level=2] [ref=e1919] [cursor=pointer]:
+                        - generic [ref=e169]: 
+                        - generic [ref=e170]: Junk Email
+                        - generic [ref=e172]:
+                          - text: "144"
+                          - generic [ref=e173]: items
+                      - treeitem "Notes" [level=2] [ref=e1920] [cursor=pointer]:
+                        - generic [ref=e178]: 
+                        - generic [ref=e179]: Notes
+                      - treeitem "Archive 80 unread" [level=2] [ref=e1921] [cursor=pointer]:
+                        - generic [ref=e184]: 
+                        - generic [ref=e185]: Archive
+                        - generic [ref=e187]:
+                          - text: "80"
+                          - generic [ref=e188]: unread
+                      - treeitem "ConfigGen ADO 9620 unread" [level=2] [ref=e1922] [cursor=pointer]:
+                        - generic [ref=e193]: 
+                        - generic [ref=e194]: ConfigGen ADO
+                        - generic [ref=e196]:
+                          - text: "9620"
+                          - generic [ref=e197]: unread
+                      - treeitem "Conversation History" [level=2] [ref=e1923] [cursor=pointer]:
+                        - generic [ref=e202]: 
+                        - generic [ref=e203]: Conversation History
+                      - treeitem "github squad fail 1 unread" [level=2] [ref=e1924] [cursor=pointer]:
+                        - generic [ref=e208]: 
+                        - generic [ref=e209]: github squad fail
+                        - generic [ref=e211]:
+                          - text: "1"
+                          - generic [ref=e212]: unread
+                      - treeitem "IcM 1 unread" [level=2] [ref=e1925] [cursor=pointer]:
+                        - generic [ref=e217]: 
+                        - generic [ref=e218]: IcM
+                        - generic [ref=e220]:
+                          - text: "1"
+                          - generic [ref=e221]: unread
+                      - treeitem "onboarding 9 unread" [level=2] [ref=e1926] [cursor=pointer]:
+                        - generic [ref=e226]: 
+                        - generic [ref=e227]: onboarding
+                        - generic [ref=e229]:
+                          - text: "9"
+                          - generic [ref=e230]: unread
+                      - treeitem "Promotions 5 unread" [level=2] [ref=e1927] [cursor=pointer]:
+                        - generic [ref=e235]: 
+                        - generic [ref=e236]: Promotions
+                        - generic [ref=e238]:
+                          - text: "5"
+                          - generic [ref=e239]: unread
+                      - treeitem "Promotions (1) 10 unread" [level=2] [ref=e1928] [cursor=pointer]:
+                        - generic [ref=e244]: 
+                        - generic [ref=e245]: Promotions (1)
+                        - generic [ref=e247]:
+                          - text: "10"
+                          - generic [ref=e248]: unread
+                      - treeitem "Promotions (10) 16 unread" [level=2] [ref=e1929] [cursor=pointer]:
+                        - generic [ref=e253]: 
+                        - generic [ref=e254]: Promotions (10)
+                        - generic [ref=e256]:
+                          - text: "16"
+                          - generic [ref=e257]: unread
+                      - treeitem "Promotions (11) 366 unread" [level=2] [ref=e1930] [cursor=pointer]:
+                        - generic [ref=e262]: 
+                        - generic [ref=e263]: Promotions (11)
+                        - generic [ref=e265]:
+                          - text: "366"
+                          - generic [ref=e266]: unread
+                      - treeitem "Promotions (2) 42 unread" [level=2] [ref=e1931] [cursor=pointer]:
+                        - generic [ref=e271]: 
+                        - generic [ref=e272]: Promotions (2)
+                        - generic [ref=e274]:
+                          - text: "42"
+                          - generic [ref=e275]: unread
+                      - treeitem "Promotions (3) 34 unread" [level=2] [ref=e1932] [cursor=pointer]:
+                        - generic [ref=e280]: 
+                        - generic [ref=e281]: Promotions (3)
+                        - generic [ref=e283]:
+                          - text: "34"
+                          - generic [ref=e284]: unread
+                      - treeitem "Promotions (4) 15 unread" [level=2] [ref=e1933] [cursor=pointer]:
+                        - generic [ref=e289]: 
+                        - generic [ref=e290]: Promotions (4)
+                        - generic [ref=e292]:
+                          - text: "15"
+                          - generic [ref=e293]: unread
+                      - treeitem "Promotions (5) 10 unread" [level=2] [ref=e1934] [cursor=pointer]:
+                        - generic [ref=e298]: 
+                        - generic [ref=e299]: Promotions (5)
+                        - generic [ref=e301]:
+                          - text: "10"
+                          - generic [ref=e302]: unread
+                      - treeitem "Promotions (6) 3 unread" [level=2] [ref=e1935] [cursor=pointer]:
+                        - generic [ref=e307]: 
+                        - generic [ref=e308]: Promotions (6)
+                        - generic [ref=e310]:
+                          - text: "3"
+                          - generic [ref=e311]: unread
+                      - treeitem "Promotions (7) 5 unread" [level=2] [ref=e1936] [cursor=pointer]:
+                        - generic [ref=e316]: 
+                        - generic [ref=e317]: Promotions (7)
+                        - generic [ref=e319]:
+                          - text: "5"
+                          - generic [ref=e320]: unread
+                      - treeitem "Promotions (8) 22 unread" [level=2] [ref=e1937] [cursor=pointer]:
+                        - generic [ref=e325]: 
+                        - generic [ref=e326]: Promotions (8)
+                        - generic [ref=e328]:
+                          - text: "22"
+                          - generic [ref=e329]: unread
+                      - treeitem "Promotions (9) 13 unread" [level=2] [ref=e1938] [cursor=pointer]:
+                        - generic [ref=e334]: 
+                        - generic [ref=e335]: Promotions (9)
+                        - generic [ref=e337]:
+                          - text: "13"
+                          - generic [ref=e338]: unread
+                      - treeitem "RSS Feeds" [level=2] [ref=e1939] [cursor=pointer]:
+                        - generic [ref=e343]: 
+                        - generic [ref=e344]: RSS Feeds
+                      - treeitem "Search Folders" [level=2] [ref=e1940] [cursor=pointer]:
+                        - generic [ref=e1447]: 
+                        - generic [ref=e1448]: Search Folders
+                    - treeitem "Go to Groups" [level=1] [ref=e1941] [cursor=pointer]:
+                      - generic [ref=e983]: 
+                      - generic [ref=e984]: Go to Groups
+                - status
+            - generic [ref=e347]:
+              - complementary "Message list" [ref=e1942]:
+                - generic [ref=e350]:
+                  - generic [ref=e352]:
+                    - generic [ref=e355]:
+                      - tablist [ref=e356]:
+                        - tab "Focused" [selected] [ref=e1943] [cursor=pointer]:
+                          - generic [ref=e362]: Focused
+                        - tab "Other" [ref=e1944] [cursor=pointer]:
+                          - generic [ref=e368]: Other
+                      - tabpanel "Focused"
+                    - generic [ref=e369]:
+                      - button "Select" [ref=e1945] [cursor=pointer]:
+                        - generic [ref=e375]: 
+                      - button "Jump to" [ref=e1946]:
+                        - generic [ref=e378]: 
+                      - button "Filter" [ref=e1947] [cursor=pointer]:
+                        - generic [ref=e381]: 
+                      - 'button "Sorted: By Date" [ref=e1948] [cursor=pointer]':
+                        - generic [ref=e384]: 
+                  - generic [ref=e987]:
+                    - generic [ref=e989]: 
+                    - button "Other Emails (90) O'Reilly; github-actions[bot]; Dabble me.; Microsoft Power BI; Tamir Dresher; GitHub; Dmitry Kunn; IcM Incident Management; DJ Seeds; Karan . Click to switch to Other" [ref=e1949] [cursor=pointer]:
+                      - generic "Other Emails (90)" [ref=e1950]
+                      - generic "O'Reilly; github-actions[bot]; Dabble me.; Microsoft Power BI; Tamir Dresher; GitHub; Dmitry Kunn; IcM Incident Management; DJ Seeds; Karan ." [ref=e1951]
+                - region [ref=e387]:
+                  - listbox "Message list No conversations selected" [ref=e1952]:
+                    - generic [ref=e393]:
+                      - generic [ref=e395]:
+                        - button "Today" [expanded] [ref=e1953]:
+                          - generic "Today" [ref=e1954]
+                        - option "Unread Israel Communications Security Update | 9.3.26 | עדכון בעקבות המצב הבטחוני 20:50 עדכון בעקבות המצב הבטחוני For English, please scroll down שלום לכולם, ‌אנחנו מקווים שאתם שומרים על עצמכם, נשמעים להנחיות ודואגים להיות קרובים ליקרים לכם. גם בשלב זה אנו מבקשים להמשיך לפעול בהתאם להנחיות פיקוד העורף, וממשיכים לעקוב באופן שוטף אחר No conversations selected" [ref=e1955]:
+                          - group [ref=e401]:
+                            - generic [ref=e402]:
+                              - button "Mark as read" [ref=e1956] [cursor=pointer]
+                              - generic [ref=e405]:
+                                - checkbox "Select a conversation" [ref=e1957] [cursor=pointer]:
+                                  - img "Israel Communications" [ref=e1958]:
+                                    - generic [ref=e994]: IC
+                                - generic [ref=e408]:
+                                  - generic [ref=e410]: Israel Communications
+                                  - generic [ref=e411]:
+                                    - generic [ref=e413]: Security Update | 9.3.26 | עדכון בעקבות המצב הבטחוני
+                                    - generic "Mon 9 Mar 2026 20:50" [ref=e1959]: 20:50
+                                  - generic [ref=e418]: עדכון בעקבות המצב הבטחוני For English, please scroll down שלום לכולם, ‌אנחנו מקווים שאתם שומרים על עצמכם, נשמעים להנחיות ודואגים להיות קרובים ליקרים לכם. גם בשלב זה אנו מבקשים להמשיך לפעול בהתאם להנחיות פיקוד העורף, וממשיכים לעקוב באופן שוטף אחר
+                      - 'option "Unread Tamir Dresher [tamirdresher_microsoft/tamresearch1] Run failed: Squad Issue Notification - main (940fd9a) 20:35 [tamirdresher_microsoft/tamresearch1] Squad Issue Notification workflow run Squad Issue Notification: All jobs have failed View workflow run Status Job Annotations Squad Issue Notification / notify-teams Failed in 1 minute and" [ref=e1960]':
+                        - group [ref=e425]:
+                          - generic [ref=e426]:
+                            - button "Mark as read" [ref=e1961] [cursor=pointer]
+                            - generic [ref=e429]:
+                              - checkbox "Select a conversation" [ref=e1962] [cursor=pointer]:
+                                - img "Tamir Dresher" [ref=e1963]:
+                                  - generic [ref=e997]: TD
+                              - generic [ref=e432]:
+                                - generic [ref=e434]: Tamir Dresher
+                                - generic [ref=e435]:
+                                  - generic [ref=e437]: "[tamirdresher_microsoft/tamresearch1] Run failed: Squad Issue Notification - main (940fd9a)"
+                                  - generic "Mon 9 Mar 2026 20:35" [ref=e1964]: 20:35
+                                - generic [ref=e442]: "[tamirdresher_microsoft/tamresearch1] Squad Issue Notification workflow run Squad Issue Notification: All jobs have failed View workflow run Status Job Annotations Squad Issue Notification / notify-teams Failed in 1 minute and"
+                      - 'option "Unread Collapsed github-actions[bot] [tamirdresher_microsoft/tamresearch1] Podcaster: conversational two-voice style like NotebookLM (Issue #237) 20:25 github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#237) 📋 Assigned to Data (Code Expert) Issue: #237 — Podcaster: conversational two-voice style like NotebookLM Data will pick this up in the next Copilot session. For Copilo" [ref=e1965]':
+                        - group [ref=e449]:
+                          - generic [ref=e450]:
+                            - button "Mark as read" [ref=e1966] [cursor=pointer]
+                            - generic [ref=e453]:
+                              - generic [ref=e454]:
+                                - button "Expand conversation" [ref=e1967] [cursor=pointer]:
+                                  - generic [ref=e460]: 
+                                - checkbox "Select a conversation" [ref=e1968] [cursor=pointer]:
+                                  - img "github-actions[bot]" [ref=e1969]:
+                                    - generic [ref=e1000]: G
+                              - generic [ref=e462]:
+                                - generic [ref=e464]: github-actions[bot]
+                                - generic [ref=e465]:
+                                  - generic [ref=e467]: "[tamirdresher_microsoft/tamresearch1] Podcaster: conversational two-voice style like NotebookLM (Issue #237)"
+                                  - generic [ref=e468]: (2)
+                                  - generic "Mon 9 Mar 2026 20:25" [ref=e1970]: 20:25
+                                - generic [ref=e473]: "github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#237) 📋 Assigned to Data (Code Expert) Issue: #237 — Podcaster: conversational two-voice style like NotebookLM Data will pick this up in the next Copilot session. For Copilo"
+                      - 'option "Unread Collapsed github-actions[bot] [tamirdresher_microsoft/tamresearch1] Podcaster: store audio in OneDrive/cloud, not GitHub repo (Issue #236) 20:20 github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#236) 📋 Assigned to B''Elanna (Infrastructure Expert) Issue: #236 — Podcaster: store audio in OneDrive/cloud, not GitHub repo B''Elanna will pick this up in the next Copilot sess" [ref=e1971]':
+                        - group [ref=e480]:
+                          - generic [ref=e481]:
+                            - button "Mark as read" [ref=e1972] [cursor=pointer]
+                            - generic [ref=e484]:
+                              - generic [ref=e485]:
+                                - button "Expand conversation" [ref=e1973] [cursor=pointer]:
+                                  - generic [ref=e491]: 
+                                - checkbox "Select a conversation" [ref=e1974] [cursor=pointer]:
+                                  - img "github-actions[bot]" [ref=e1975]:
+                                    - generic [ref=e1003]: G
+                              - generic [ref=e493]:
+                                - generic [ref=e495]: github-actions[bot]
+                                - generic [ref=e496]:
+                                  - generic [ref=e498]: "[tamirdresher_microsoft/tamresearch1] Podcaster: store audio in OneDrive/cloud, not GitHub repo (Issue #236)"
+                                  - generic [ref=e499]: (2)
+                                  - generic "Mon 9 Mar 2026 20:20" [ref=e1976]: 20:20
+                                - generic [ref=e504]: "github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#236) 📋 Assigned to B'Elanna (Infrastructure Expert) Issue: #236 — Podcaster: store audio in OneDrive/cloud, not GitHub repo B'Elanna will pick this up in the next Copilot sess"
+                      - 'option "Unread Collapsed github-actions[bot] [tamirdresher_microsoft/tamresearch1] Create standalone squad-monitor repo — shareable observability tool for Copilot agents (Issue #229) 19:28 github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#229) 📋 Assigned to Picard (Lead) Issue: #229 — Create standalone squad-monitor repo — shareable observability tool for Copilot agents Picard will pick this up in the next Copi" [ref=e1977]':
+                        - group [ref=e511]:
+                          - generic [ref=e512]:
+                            - button "Mark as read" [ref=e1978] [cursor=pointer]
+                            - generic [ref=e515]:
+                              - generic [ref=e516]:
+                                - button "Expand conversation" [ref=e1979] [cursor=pointer]:
+                                  - generic [ref=e522]: 
+                                - checkbox "Select a conversation" [ref=e1980] [cursor=pointer]:
+                                  - img "github-actions[bot]" [ref=e1981]:
+                                    - generic [ref=e1006]: G
+                              - generic [ref=e524]:
+                                - generic [ref=e526]: github-actions[bot]
+                                - generic [ref=e527]:
+                                  - generic [ref=e529]: "[tamirdresher_microsoft/tamresearch1] Create standalone squad-monitor repo — shareable observability tool for Copilot agents (Issue #229)"
+                                  - generic [ref=e530]: (2)
+                                  - generic "Mon 9 Mar 2026 19:28" [ref=e1982]: 19:28
+                                - generic [ref=e535]: "github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#229) 📋 Assigned to Picard (Lead) Issue: #229 — Create standalone squad-monitor repo — shareable observability tool for Copilot agents Picard will pick this up in the next Copi"
+                      - option "S.E.E You THE DAILY BREATHER | 10.03 19:04 רגעים קטנים של הבדל גדול אנחנו איתכם עד שנחזור לשגרה, פעילויות קצרות וקלילות של הפוגה לכם, לילדים, או לכל המשפחה יחד. לא נפתור את כל הבעיות, אבל אולי נרגיע, נקל, ואפילו נסגור איזו פינה 😊 למי? מתי? מה? להתחברות גילאי 2-5 09:30-1" [ref=e1983]:
+                        - group [ref=e542]:
+                          - generic [ref=e543]:
+                            - button "Mark as unread" [ref=e1984] [cursor=pointer]
+                            - generic [ref=e546]:
+                              - checkbox "Select a conversation" [ref=e1985] [cursor=pointer]:
+                                - img "S.E.E You" [ref=e1986]:
+                                  - generic [ref=e1009]: SY
+                              - generic [ref=e549]:
+                                - generic [ref=e551]: S.E.E You
+                                - generic [ref=e552]:
+                                  - generic [ref=e554]: THE DAILY BREATHER | 10.03
+                                  - generic "Mon 9 Mar 2026 19:04" [ref=e1987]: 19:04
+                                - generic [ref=e559]: רגעים קטנים של הבדל גדול אנחנו איתכם עד שנחזור לשגרה, פעילויות קצרות וקלילות של הפוגה לכם, לילדים, או לכל המשפחה יחד. לא נפתור את כל הבעיות, אבל אולי נרגיע, נקל, ואפילו נסגור איזו פינה 😊 למי? מתי? מה? להתחברות גילאי 2-5 09:30-1
+                      - 'option "Collapsed github-actions[bot] [tamirdresher_microsoft/tamresearch1] Create clean demo repository for Squad showcase (sanitized) (Issue #225) 18:57 github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#225) 📋 Assigned to Picard (Lead) Issue: #225 — Create clean demo repository for Squad showcase (sanitized) Picard will pick this up in the next Copilot session. For Copilot" [ref=e1988]':
+                        - group [ref=e566]:
+                          - generic [ref=e567]:
+                            - button "Mark as unread" [ref=e1989] [cursor=pointer]
+                            - generic [ref=e570]:
+                              - generic [ref=e571]:
+                                - button "Expand conversation" [ref=e1990] [cursor=pointer]:
+                                  - generic [ref=e577]: 
+                                - checkbox "Select a conversation" [ref=e1991] [cursor=pointer]:
+                                  - img "github-actions[bot]" [ref=e1992]:
+                                    - generic [ref=e1012]: G
+                              - generic [ref=e579]:
+                                - generic [ref=e581]: github-actions[bot]
+                                - generic [ref=e582]:
+                                  - generic [ref=e584]: "[tamirdresher_microsoft/tamresearch1] Create clean demo repository for Squad showcase (sanitized) (Issue #225)"
+                                  - generic "Mon 9 Mar 2026 18:57" [ref=e1993]: 18:57
+                                - generic [ref=e589]: "github-actions[bot] left a comment (tamirdresher_microsoft/tamresearch1#225) 📋 Assigned to Picard (Lead) Issue: #225 — Create clean demo repository for Squad showcase (sanitized) Picard will pick this up in the next Copilot session. For Copilot"
+                      - option "Viva Engage You have been added on Microsoft to Work IQ 18:15 You’ve been added to a community. Work IQ Work IQ is the intelligence layer that connects customer's data, user's preferences and memory, and provides inferencing for a rich agent ecosystem. GO TO COMMUNITY Microsoft Corporation | One Microsoft Way," [ref=e1994]:
+                        - group [ref=e596]:
+                          - generic [ref=e597]:
+                            - button "Mark as unread" [ref=e1995] [cursor=pointer]
+                            - generic [ref=e600]:
+                              - checkbox "Select a conversation" [ref=e1996] [cursor=pointer]:
+                                - img "Viva Engage" [ref=e1997]:
+                                  - generic [ref=e1015]: VE
+                              - generic [ref=e603]:
+                                - generic [ref=e605]: Viva Engage
+                                - generic [ref=e606]:
+                                  - generic [ref=e608]: You have been added on Microsoft to Work IQ
+                                  - generic "Mon 9 Mar 2026 18:15" [ref=e1998]: 18:15
+                                - generic [ref=e613]: You’ve been added to a community. Work IQ Work IQ is the intelligence layer that connects customer's data, user's preferences and memory, and provides inferencing for a rich agent ecosystem. GO TO COMMUNITY Microsoft Corporation | One Microsoft Way,
+                - alert [ref=e1017]
+              - main "Reading Pane" [ref=e1999]:
+                - generic [ref=e1375]:
+                  - generic [ref=e1376]:
+                    - generic [ref=e1377]:
+                      - button "Send" [ref=e2000]:
+                        - generic [ref=e1380]: 
+                        - text: Send
+                      - button "More send options" [ref=e2001]:
+                        - generic [ref=e1383]: 
+                    - generic [ref=e1384]:
+                      - button "Set your sensitivity" [ref=e2002]:
+                        - generic [ref=e1388]:
+                          - generic [ref=e1389]: 
+                          - generic [ref=e1390]: 
+                        - generic [ref=e1392]: 
+                      - button "Discard" [ref=e2003]:
+                        - generic [ref=e1395]: 
+                      - button "Pop Out" [ref=e2004]:
+                        - generic [ref=e1398]: 
+                  - generic [ref=e1399]:
+                    - generic [ref=e1401]:
+                      - button "To" [active] [ref=e2005]
+                      - button "Cc" [ref=e2006]
+                      - generic [ref=e1408]:
+                        - button "Bcc" [ref=e2007]
+                        - generic [ref=e1413]:
+                          - generic "To" [ref=e2008]
+                          - status:
+                            - generic [ref=e1415]: Nada Jasikova - nada.jasikova@microsoft.com 1 of 5
+                      - generic [ref=e1420]:
+                        - generic "Cc" [ref=e2009]
+                        - status
+                    - generic [ref=e1424]:
+                      - textbox "Subject" [ref=e2010]:
+                        - /placeholder: Add a subject
+                      - generic [ref=e2013]: Draft saved at 20:56
+                  - generic [ref=e1427]:
+                    - textbox "Message body" [ref=e2014]
+                    - group
+                    - group [ref=e1451]:
+                      - button "Open Copilot" [ref=e2015]:
+                        - generic [ref=e1454]: 
+                    - group [ref=e1455]:
+                      - generic [ref=e1457]:
+                        - generic [ref=e1458]: Start Typing or
+                        - generic [ref=e1459] [cursor=pointer]: Help me write
+                  - alert [ref=e1431]
+                - tablist [ref=e1432]:
+                  - generic [ref=e1433]:
+                    - text: 🠟
+                    - tab "Select an item to read" [ref=e2016]:
+                      - generic [ref=e1435]: Select an item to read
+                  - generic [ref=e1436]:
+                    - text: 🠟
+                    - tab "Editing (No subject)" [expanded] [selected] [ref=e2017]:
+                      - generic [ref=e1439]: 
+                      - generic [ref=e1440]: (No subject)
+                    - button "Editing (No subject) Close" [ref=e2018]:
+                      - generic [ref=e1442]: 
+          - generic:
+            - status
+  - generic:
+    - generic:
+      - dialog "Viva Insights"
+  - generic [ref=e1771]:
+    - generic [ref=e1772]:
+      - generic [ref=e1773]: Reminders
+      - generic [ref=e1774]:
+        - button "Dismiss all" [ref=e2019]
+        - button "Close" [ref=e2020]:
+          - generic [ref=e1778]: 
+    - button "Karan - OOO (10/03/2026 - 17/03/2026) 20:30 27 min ago" [ref=e2021]:
+      - generic [ref=e1788]: 
+      - generic [ref=e1789]:
+        - generic [ref=e1791]: Karan - OOO (10/03/2026 - 17/03/2026)
+        - generic [ref=e1793]: 20:30
+      - generic [ref=e1794]: 27 min ago
+  - generic:        

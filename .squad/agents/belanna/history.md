@@ -4895,3 +4895,18 @@ Web-based terminal emulators (xterm.js-based PTY Mirror) may have latency/buffer
 
 ---
 
+
+### 2026-03-10: Fix Squad Heartbeat Workflow for Windows Runner — Issue #290 (PR #291)
+
+**Problem:** `squad-heartbeat.yml` used `shell: bash` but runs on a `self-hosted` Windows runner. Bash can't resolve Windows temp file paths, causing consistent failures.
+
+**Fix applied:**
+- Changed `shell: bash` → `shell: pwsh` in both shell steps (Check triage script, Ralph — Smart triage)
+- Converted bash syntax to PowerShell equivalents (Test-Path, Out-File, backtick line continuation)
+- Left `actions/github-script` steps (JS) and `self-hosted` runner unchanged
+
+**Key patterns:**
+- Self-hosted runner in this org is Windows — always use `shell: pwsh` for shell steps
+- Template copies (`.squad-templates/`, `sanitized-demo/`) use `ubuntu-latest` and don't need this fix
+- The SYNC comment in the workflow header lists 4 locations; active workflow may diverge from templates when runner differs
+

@@ -22,23 +22,23 @@ jobs:
 
       - name: Check triage script
         id: check-script
-        shell: bash
+        shell: pwsh
         run: |
-          if [ -f ".squad-templates/ralph-triage.js" ]; then
-            echo "has_script=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_script=false" >> $GITHUB_OUTPUT
-            echo "⚠️ ralph-triage.js not found — run 'squad upgrade' to install"
-          fi
+          if (Test-Path ".squad-templates/ralph-triage.js") {
+            "has_script=true" | Out-File -Append $env:GITHUB_OUTPUT
+          } else {
+            "has_script=false" | Out-File -Append $env:GITHUB_OUTPUT
+            Write-Host "⚠️ ralph-triage.js not found — run 'squad upgrade' to install"
+          }
 
       - name: Ralph — Smart triage
         if: steps.check-script.outputs.has_script == 'true'
-        shell: bash
+        shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node .squad-templates/ralph-triage.js \
-            --squad-dir .squad \
+          node .squad-templates/ralph-triage.js `
+            --squad-dir .squad `
             --output triage-results.json
 
       - name: Ralph — Apply triage decisions

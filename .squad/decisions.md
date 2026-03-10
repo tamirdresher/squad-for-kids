@@ -14613,3 +14613,425 @@ Evaluation of Microsoft's dotnet/skills repository (https://github.com/dotnet/sk
 ---
 
 **Awaiting:** Tamir's decision on Option A/B/C for skill structure adoption
+
+---
+
+# Decision: Azure RBAC Architecture Strategy for DK8S
+
+**Date:** 2026-03-10  
+**Context:** Issue #251 - DK8S Staging subscription hit 4,000 RBAC role assignment limit  
+**Decider:** B'Elanna (Infrastructure Expert)  
+**Status:** Proposed for team review
+
+## Problem
+
+DK8S staging cluster provisioning failed due to `RoleAssignmentLimitExceeded` on subscription `c5d1c552-a815-4fc8-b12d-ab444e3225b1`. Azure enforces a hard limit of 4,000 role assignments per subscription, which includes orphaned assignments from deleted principals.
+
+## Decision
+
+**Continue using the subscription** with the following mandatory practices:
+
+### Immediate Actions (Complete within 48 hours)
+1. Clean up orphaned role assignments (expected 10-30% quota recovery)
+2. Remove temporary/test assignments
+3. Document current assignment count and trends
+
+### Medium-Term Changes (Complete within 2 weeks)
+1. **Switch to group-based assignments:** Assign RBAC to Entra ID groups, not individual users/service principals
+2. **Implement automated hygiene:** Monthly Azure Automation runbook to detect and report orphaned assignments
+3. **Consolidate resource-level assignments:** Move to resource group level where appropriate
+
+### Long-Term Architecture (Complete within 1 quarter)
+1. **Adopt management group hierarchy:** Role assignments at MG level do NOT count toward subscription limits
+2. **Use PIM for elevated access:** Eligible assignments don't count toward limit
+3. **Consider multi-subscription strategy:** If workloads continue to scale, split into multiple subscriptions
+
+## Rationale
+
+- **Not a blocker:** This is an operational hygiene issue with clear remediation path
+- **Management groups are key:** MG-level assignments bypass subscription quota
+- **Common at scale:** Many Azure organizations hit this limit; best practices are well-established
+- **Cost-effective:** Cleanup and process changes more efficient than subscription restructuring
+
+## Alternatives Considered
+
+1. **Stop using subscription and migrate:** Too disruptive, unnecessary given remediation options
+2. **Immediate multi-subscription split:** Premature; solve hygiene first, scale architecture only if needed
+3. **Manual quarterly cleanups:** Insufficient; automation required for sustainability
+
+## Impact
+
+- **DK8S Team:** Must adopt group-based RBAC patterns for all new cluster provisioning
+- **Platform Team:** Needs to design and implement management group hierarchy
+- **Security Team:** Should review and approve MG-level role assignments
+- **Automation Team:** Must create and schedule cleanup runbooks
+
+## Success Criteria
+
+- [ ] Current assignment count reduced by 20-30% within 48 hours
+- [ ] All new role assignments use groups by end of sprint
+- [ ] Automated cleanup job running monthly within 2 weeks
+- [ ] Management group design documented and approved within 1 month
+- [ ] Zero RBAC limit incidents in next 6 months
+
+## References
+
+- Issue: #251
+- [Azure RBAC Limits Documentation](https://learn.microsoft.com/en-us/azure/role-based-access-control/troubleshoot-limits)
+- [Azure RBAC Best Practices](https://learn.microsoft.com/en-us/azure/role-based-access-control/best-practices)
+- [Management Groups Overview](https://learn.microsoft.com/en-us/azure/governance/management-groups/overview)
+
+## Next Steps
+
+1. Tamir or DK8S team to run audit commands and execute cleanup
+2. Schedule team review of management group architecture design
+3. B'Elanna to create Azure Automation runbook template for RBAC hygiene
+4. Platform team to document standard RBAC assignment patterns using groups
+
+
+---
+
+# Decision: Adopt dotnet/skills Standards and Architecture
+
+**Date:** 2026-03-10  
+**Author:** Picard  
+**Status:** Proposed  
+**Issue:** #252  
+
+## Context
+
+The Squad project has 10 custom skills organized in a flat `.squad/skills/` directory with inconsistent structure. Microsoft's dotnet/skills repository provides a standardized approach to skill authoring, testing, and distribution following the agentskills.io specification.
+
+**Current State:**
+- 10 skills with varying frontmatter formats (Confidence, Domain, Last validated)
+- Flat directory structure (no domain grouping)
+- No automated testing or validation
+- Skills embedded in project (not installable externally)
+- Inconsistent section structure across skills
+
+**dotnet/skills Offers:**
+- Standard YAML frontmatter (name, description with when-to-use/NOT)
+- Plugin-based organization (6 domain plugins)
+- eval.yaml testing framework with CI integration
+- Marketplace distribution model
+- Quality bar: mandatory sections, CODEOWNERS, validation checklists
+
+## Decision
+
+**Adopt dotnet/skills patterns maximally** (Option C):
+1. Standardize all skill frontmatter and structure to agentskills.io spec
+2. Reorganize into domain-specific plugins with plugin.json descriptors
+3. Implement eval.yaml testing framework with automated validation
+4. Enable global installation for Copilot CLI (machine-wide access)
+
+## Rationale
+
+**Why Maximal vs. Minimal:**
+- User explicitly chose "maximal and do it also for the machine global copilot cli skills folder"
+- Testing framework prevents regression as skills evolve
+- Plugin architecture enables selective skill loading (performance)
+- Global installation makes skills reusable across projects
+- Aligns with Microsoft's own .NET team standards
+
+**Why Plugin Architecture:**
+- 10 skills is already enough to justify domain grouping
+- Plugins enable versioning and independent updates
+- Follows established pattern from dotnet/skills (not invented-here)
+- Prepares for future skill additions (clear categorization)
+
+**Why Testing Framework:**
+- Skills are operational code, not just documentation
+- eval.yaml provides reproducible validation
+- CI prevents breaking changes from merging
+- Rubric-based evaluation catches quality issues
+
+## Implementation Strategy
+
+### Phase 1: Skill Standardization (4-6 hours)
+- Migrate frontmatter to YAML with standardized fields
+- Add missing sections: When to Use/Not, Inputs, Validation, Common Pitfalls
+- Create CONTRIBUTING-SKILLS.md authoring guide
+- **Owner:** Data (refactoring) + Seven (documentation)
+
+### Phase 2: Plugin Architecture (3-4 hours)
+- Create 6 domain plugins: devops, infrastructure, dk8s, configgen, utilities, squad
+- Add plugin.json to each plugin (name, version, description, skills path)
+- Create marketplace.json for plugin discovery
+- Migrate existing skills to plugin structure
+- **Owner:** Picard (architecture) + Data (migration)
+
+### Phase 3: Testing Framework (10-15 hours)
+- Study dotnet/skills validator implementation
+- Create eval.yaml for each skill (scenarios, assertions, rubrics)
+- Build validation runner (TypeScript or port .NET tool)
+- Add CI workflow for skill validation
+- **Owner:** Data (runner) + Seven (test scenarios)
+
+### Phase 4: Global Installation (3-4 hours)
+- Research Copilot CLI plugin paths (Windows/Unix)
+- Create installation script (PowerShell + Bash)
+- Support install/update/remove operations
+- Test skills load outside project context
+- **Owner:** B'Elanna (infrastructure) + Picard (validation)
+
+**Total Estimated Effort:** 20-29 hours across team
+
+## Plugin Organization
+
+Proposed plugin mapping based on current skills:
+
+```
+.squad/plugins/
+  devops/
+    github-project-board/
+    teams-monitor/
+  infrastructure/
+    devbox-provisioning/
+    cli-tunnel/
+  dk8s/
+    dk8s-support-patterns/
+  configgen/
+    configgen-support-patterns/
+  utilities/
+    image-generation/
+    tts-conversion/
+    dotnet-build-diagnosis/
+  squad/
+    squad-conventions/
+```
+
+## Quality Standards
+
+All skills must comply with:
+
+**Frontmatter (YAML):**
+```yaml
+---
+name: skill-name
+description: What it does, when to use, when NOT to use
+---
+```
+
+**Required Sections:**
+- Purpose (one paragraph outcome statement)
+- When to Use / When Not to Use (detailed)
+- Inputs (table of required/optional inputs)
+- Workflow (numbered steps with checkpoints)
+- Validation (checklist of success criteria)
+- Common Pitfalls (table of traps + solutions)
+
+**Naming Convention:**
+- Kebab-case, action-verb-first
+- Examples: `add-aspnet-auth`, `configure-jwt-auth`, `setup-identity-server`
+
+**Testing:**
+- eval.yaml with at least 1 scenario per skill
+- Assertions: output_contains, output_matches, file_exists, etc.
+- Rubric: human-readable success criteria
+
+## Success Criteria
+
+- ✅ All 10 skills follow agentskills.io standard
+- ✅ 6 plugins with valid plugin.json descriptors
+- ✅ At least 5 skills have eval.yaml tests passing in CI
+- ✅ Skills loadable via `/plugin install` from machine-global location
+- ✅ CONTRIBUTING-SKILLS.md documents authoring process
+- ✅ CI validates skill changes automatically
+
+## Risks and Mitigations
+
+**Risk:** Testing framework takes longer than estimated  
+**Mitigation:** Start with pilot skill eval.yaml before building full runner. Can use dotnet/skills validator directly in interim.
+
+**Risk:** Plugin reorganization breaks existing references  
+**Mitigation:** Update all internal references in same commit. Skills loaded by path, not hardcoded locations.
+
+**Risk:** Global installation conflicts with other Copilot plugins  
+**Mitigation:** Use namespace prefix `squad-` for all plugin names.
+
+## Alternatives Considered
+
+**Option A (Minimal):** Standardize frontmatter only  
+**Rejected:** No organizational or testing benefits. Half-measure.
+
+**Option B (Recommended - in research):** Phases 1+2 only  
+**Rejected:** User explicitly chose maximal approach.
+
+**Option C (Maximal):** All phases including testing + global install  
+**SELECTED:** User directive + aligns with Microsoft standards.
+
+## References
+
+- https://github.com/dotnet/skills — Official .NET agent skills
+- https://agentskills.io — Agent Skills specification
+- dotnet/skills CONTRIBUTING.md — Authoring guidelines
+- dotnet/skills eval.yaml format — Testing standard
+
+## Next Steps
+
+1. Picard creates implementation issues for each phase
+2. Data starts Phase 1 with pilot skill (github-project-board)
+3. Seven drafts CONTRIBUTING-SKILLS.md
+4. Team reviews after Phase 1 pilot before full migration
+
+## Notes
+
+This decision represents a strategic investment in skill quality and reusability. The 20-29 hour effort is justified by:
+- Preventing future technical debt from ad-hoc skill authoring
+- Enabling skill sharing across Microsoft teams (global install)
+- Establishing Squad as a reference implementation for agent skills
+- Aligning with dotnet/skills patterns makes future contributions easier
+
+
+---
+
+# Decision: Integrate Microsoft Agent-Skills into Squad
+
+**Date**: 2026-03-10  
+**Owner**: Seven (Research & Docs)  
+**Issue**: #253 — Look at this and see if we need and then use what needed  
+**Status**: APPROVED FOR IMPLEMENTATION  
+
+## Summary
+
+Adopt **selective integration** of MicrosoftDocs/Agent-Skills repository into our Squad system. Do NOT import all 193 skills — instead, curate ~25-30 core + infrastructure + security skills organized in `.squad/skills/azure/`.
+
+## What We're Adopting
+
+Microsoft's Agent-Skills repository: 193+ Azure-focused agentic skills following the open Agent Skills standard (agentskills.io).
+
+- **Format**: SKILL.md files with YAML frontmatter (matches our existing pattern)
+- **Categories**: 19 Azure domains (Compute, Networking, Security, AI/ML, Data, etc.)
+- **Bundles**: Pre-grouped by role (Quick Start, Infrastructure Pro, Security & Compliance, etc.)
+- **Network-enabled**: Skills fetch latest Microsoft Learn documentation on-demand
+- **License**: Dual (CC-BY 4.0 for docs, MIT for code) — permissive, no conflicts
+
+## Why Adopt Selectively?
+
+1. **Scale**: 193 skills is large; importing all could clutter Copilot skill discovery
+2. **Team Fit**: Our squad members work with specific Azure domains, not all 193
+3. **Alignment**: Squad uses SKILL.md format — perfect compatibility
+4. **Risk-Low**: No breaking conflicts identified with existing patterns
+5. **Maintainability**: Easier to manage 25-30 skills than 193
+
+## Phased Adoption Plan
+
+### Phase 1 (Immediate): Quick Start Bundle (7 skills)
+- `azure-app-service`
+- `azure-functions`
+- `azure-kubernetes-service`
+- `azure-storage-accounts`
+- `azure-sql-database`
+- `azure-container-apps`
+- `azure-container-registry`
+
+### Phase 2 (This Sprint): Infrastructure Pro Bundle for B'Elanna (5-7 skills)
+- `azure-networking` (VNets, gateways, DDoS, ExpressRoute)
+- `azure-backup-recovery`
+- `azure-resource-management`
+- `azure-cost-management`
+- `azure-load-balancer`
+
+### Phase 3 (This Sprint): Security & Compliance Bundle for Worf (5 skills)
+- `azure-key-vault`
+- `azure-rbac`
+- `azure-policy`
+- `azure-security-center`
+- `azure-managed-identity`
+
+### Phase 4 (Optional, Spring): AI/ML Bundle if work emerges
+- `azure-openai`
+- `azure-cognitive-services`
+- `azure-machine-learning`
+- `azure-ai-services`
+
+**Total planned: ~25-30 skills** (not all 193)
+
+## Installation & Location
+
+### Directory Structure
+
+```
+.squad/skills/
+├── cli-tunnel/
+├── configgen-support-patterns/
+├── devbox-provisioning/
+├── [existing skills...]
+├── azure/                          ← New subdirectory for external Azure skills
+│   ├── azure-functions/
+│   ├── azure-kubernetes-service/
+│   ├── azure-app-service/
+│   ├── [... Phase 1, 2, 3 skills ...]
+```
+
+### Rationale for `.squad/skills/azure/` subdirectory
+
+1. **Separation of Concerns**: External (Microsoft) skills vs. internal (Squad) skills
+2. **Dependency Clarity**: Makes it obvious these come from external source
+3. **Maintenance**: Bulk updates easier when Microsoft re-crawls Agent-Skills
+4. **Organization**: Prevents `.squad/skills/` root directory from becoming cluttered
+5. **Rollback**: Easy to remove entire `azure/` subdirectory if conflicts arise
+
+## Implementation Steps
+
+1. **Clone** `https://github.com/MicrosoftDocs/Agent-Skills` to temp location
+2. **Curate** Phase 1 + 2 + 3 skills (~25-30 total)
+3. **Copy** selected skill folders to `.squad/skills/azure/`
+4. **Test** with GitHub Copilot to verify skill discovery works
+5. **Document** in `.squad/skills/README.md` with reference to Agent-Skills repo
+6. **Record** this decision in `.squad/decisions/` for team awareness
+
+## Overlap Analysis
+
+| Our Existing Skill | Potential Azure Conflict | Assessment |
+|-------------------|--------------------------|-----------|
+| configgen-support-patterns | None (internal .NET pattern) | ✅ No conflict |
+| devbox-provisioning | Possible azure-container-apps overlap | ✅ Different scope; coexist |
+| github-project-board | None (GitHub, not Azure) | ✅ No conflict |
+| squad-conventions | None (meta-skill) | ✅ No conflict |
+
+**Conclusion**: No breaking conflicts. Safe to coexist.
+
+## Timeline & Rollout
+
+- **This Session**: Curate Phase 1 + 2 + 3 skills, copy to `.squad/skills/azure/`, test
+- **Today**: Evaluate and document any issues found during testing
+- **3-5 Days**: Monitor for conflicts, gather feedback from B'Elanna and Worf
+- **Spring**: Reassess Phase 4 (AI/ML) based on project scope evolution
+
+## Fallback Plan
+
+If significant conflicts or integration issues arise:
+
+1. **Remove** entire `.squad/skills/azure/` subdirectory
+2. **Keep** internal Squad skills (no dependencies on external skills)
+3. **Document** blockers and revisit adoption in Q3 2026
+
+## Success Criteria
+
+✅ Phase 1 + 2 + 3 skills copied and organized in `.squad/skills/azure/`  
+✅ GitHub Copilot discovers and loads skills correctly  
+✅ No conflicts with existing `.squad/skills/` patterns  
+✅ Documentation updated in `.squad/skills/README.md`  
+✅ Team can invoke skills naturally ("help me set up Azure Functions")  
+✅ No offline/proxy issues reported in first 3-5 days  
+
+## Owner & Accountability
+
+- **Implementation**: Seven (Research & Docs)
+- **Testing/Verification**: Seven + squad members (B'Elanna, Worf as primary)
+- **Documentation**: Seven
+- **Long-term Maintenance**: TBD (review in 90 days)
+
+## References
+
+- **Microsoft Agent-Skills Repo**: https://github.com/MicrosoftDocs/Agent-Skills
+- **Agent Skills Open Standard**: https://agentskills.io/
+- **GitHub Copilot Skills Documentation**: https://docs.github.com/en/copilot/concepts/agents/about-agent-skills
+- **Issue**: tamirdresher_microsoft/tamresearch1#253
+
+---
+
+**Decision recorded by**: Seven, Research & Docs Specialist  
+**Date**: 2026-03-10
+

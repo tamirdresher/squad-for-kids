@@ -3081,3 +3081,54 @@ Demo repositories need to be comprehensive showcases, not minimal examples. The 
 
 **Status:** Research complete, posted to issue #252. Labeled squad:picard, removed go:needs-research, added status:pending-user awaiting Tamir's direction choice.
 
+
+### 2026-03-10: Picard — dotnet/skills Integration — Issue #252 (COMPLETED)
+
+**Assignment:** Evaluate dotnet/skills repository and create implementation plan for maximal adoption.
+
+**Key Findings:**
+- **dotnet/skills** is Microsoft's official .NET agent skills collection following agentskills.io specification
+- 6 plugins: dotnet, dotnet-data, dotnet-diag, dotnet-msbuild, dotnet-upgrade, dotnet-maui
+- Critical patterns: plugin architecture, standardized frontmatter, eval.yaml testing, marketplace distribution
+
+**Analysis:**
+- **Directly Applicable:** Skill structure (YAML frontmatter with when-to-use/when-NOT-to-use), plugin organization, testing framework
+- **Our Gaps:** No formal testing, flat skill directory (no plugins), inconsistent frontmatter, no versioning
+- **Their Quality Bar:** Mandatory sections (Purpose, Inputs, Workflow, Validation, Common Pitfalls), CODEOWNERS requirement, CI validation
+
+**Decision Made:** User chose Option C (Maximal) — all phases plus machine-global installation
+
+**Implementation Plan Created:**
+- **Phase 1:** Standardize 10 existing skills to agentskills.io format (4-6h, Data + Seven)
+- **Phase 2:** Reorganize into 6 domain plugins with plugin.json (3-4h, Picard)
+- **Phase 3:** Build eval.yaml testing framework + CI (10-15h, Data + Seven)
+- **Phase 4:** Global Copilot CLI installation script (3-4h, B'Elanna + Picard)
+
+**Plugin Architecture Designed:**
+```
+.squad/plugins/
+  devops/         — github-project-board, teams-monitor
+  infrastructure/ — devbox-provisioning, cli-tunnel
+  dk8s/           — dk8s-support-patterns
+  configgen/      — configgen-support-patterns
+  utilities/      — image-generation, tts-conversion, dotnet-build-diagnosis
+  squad/          — squad-conventions
+```
+
+**Quality Standards Established:**
+- Kebab-case naming with action-verb-first (e.g., dd-aspnet-auth)
+- Frontmatter: 
+ame, description (with when-to-use/NOT)
+- Body sections: Purpose, When to Use/Not, Inputs, Workflow, Validation, Common Pitfalls
+- eval.yaml tests with scenarios, assertions, rubrics
+
+**Architectural Insight:**
+- dotnet/skills uses skill-validator (.NET tool) with GitHub Actions integration
+- Tests run on PR, results posted as comment + artifact upload
+- Marketplace.json enables plugin discovery and versioning
+- Multiple plugins in one repo is standard pattern (not one-plugin-per-repo)
+
+**Status:** Implementation plan posted to issue #252. Awaiting user confirmation to proceed.
+
+---
+

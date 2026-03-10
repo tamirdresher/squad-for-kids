@@ -4590,3 +4590,50 @@ Evaluated office automation options and found we're in **stronger position than 
   - References: #236
 
 **Impact:** Repository will no longer bloat with audio files. Users can generate podcasts locally, upload to cloud, and share links. Existing podcaster functionality preserved. Immediate usability with OneDrive Sync, enterprise-grade options available for production.
+---
+
+### Issue #251 - Azure RBAC 4,000 Role Assignment Limit Research (2026-03-10)
+
+**Context:** DK8S staging cluster provisioning blocked due to hitting Azure's 4,000 RBAC role assignment limit on subscription c5d1c552-a815-4fc8-b12d-ab444e3225b1.
+
+**Key Learnings:**
+
+1. **Azure RBAC Limit Details:**
+   - Hard limit: 4,000 role assignments per subscription
+   - Counts: All assignments at subscription/resource group/resource levels
+   - **Orphaned assignments count toward limit** (deleted principals with lingering assignments)
+   - **Management group assignments do NOT count** toward subscription limit
+   - PIM eligible assignments do NOT count
+
+2. **Detection Strategy:**
+   - List all assignments: `az role assignment list --subscription <id> --all`
+   - Orphaned assignments have `principalName` empty/null
+   - Must verify principal deletion by querying Entra ID (users, groups, service principals)
+   - Group by role type and scope to identify concentration areas
+
+3. **Remediation Approach:**
+   - **Short-term:** Clean up orphaned and redundant assignments (10-30% quota recovery)
+   - **Medium-term:** Switch to group-based assignments, automate hygiene checks
+   - **Long-term:** Leverage management groups for broad permissions, use PIM, consider multi-subscription
+
+4. **Architectural Pattern:**
+   - Management group hierarchy for centralized governance
+   - Role assignments at MG level don't consume subscription quota
+   - Use groups instead of individual user/SP assignments (1 assignment vs hundreds)
+   - Managed identities auto-cleanup when resource deleted
+
+5. **DK8S Staging Decision:**
+   - Subscription can continue to be used
+   - Not a blocker - operational issue with clear remediation path
+   - Requires commitment to RBAC hygiene practices
+   - Monthly automated cleanup recommended
+
+**Files/Commands Referenced:**
+- Azure CLI commands for listing, filtering, and deleting role assignments
+- PowerShell scripts for orphaned assignment verification
+- Management group architecture patterns
+
+**Team Impact:** This is a common Azure operational issue at scale. Establishing RBAC hygiene practices and leveraging management groups will prevent future limits across DK8S infrastructure.
+
+**Decision:** Documented in .squad/decisions/inbox/belanna-rbac-limits.md (if team-relevant architecture choices made).
+

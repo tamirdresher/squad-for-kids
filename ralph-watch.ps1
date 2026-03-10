@@ -19,27 +19,45 @@ chcp 65001 | Out-Null
 
 # Set window title so you know this is Ralph
 $Host.UI.RawUI.WindowTitle = "🔄 Ralph Watch — tamresearch1"
+[Console]::Title = "🔄 Ralph Watch — tamresearch1"
 
-# --- Single-instance lockfile ---
+# --- Single-instance guard (mutex + lockfile + process scan) ---
+
+# 1. System-wide named mutex — prevents ANY duplicate across the machine
+$mutexName = "Global\RalphWatch_tamresearch1"
+$mutex = New-Object System.Threading.Mutex($false, $mutexName)
+$acquired = $false
+try { $acquired = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $acquired = $true }
+if (-not $acquired) {
+    Write-Host "ERROR: Another Ralph instance is already running on this machine (mutex: $mutexName)" -ForegroundColor Red
+    Write-Host "Use Get-CimInstance Win32_Process | Where-Object { `$_.CommandLine -match 'ralph-watch' } to find it" -ForegroundColor Yellow
+    exit 1
+}
+
+# 2. Process scan — kill any stale ralph-watch processes (not us)
+$staleRalphs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'ralph-watch' -and $_.ProcessId -ne $PID }
+foreach ($stale in $staleRalphs) {
+    Write-Host "WARNING: Killing stale Ralph instance PID $($stale.ProcessId)" -ForegroundColor Yellow
+    Stop-Process -Id $stale.ProcessId -Force -ErrorAction SilentlyContinue
+}
+
+# 3. Lockfile (for external tools like the monitor to read)
 $lockFile = Join-Path (Get-Location) ".ralph-watch.lock"
 if (Test-Path $lockFile) {
-    $lockContent = Get-Content $lockFile -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-    if ($lockContent -and $lockContent.pid) {
-        $existing = Get-Process -Id $lockContent.pid -ErrorAction SilentlyContinue
-        if ($existing) {
-            Write-Host "ERROR: Ralph watch is already running in this directory (PID $($lockContent.pid), started $($lockContent.started))" -ForegroundColor Red
-            Write-Host "Kill it first: Stop-Process -Id $($lockContent.pid) -Force" -ForegroundColor Yellow
-            exit 1
-        }
-    }
-    # Stale lock — previous process died without cleanup
     Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
 }
-# Write lock
 [ordered]@{ pid = $PID; started = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss'); directory = (Get-Location).Path } | ConvertTo-Json | Out-File $lockFile -Encoding utf8 -Force
-# Clean up lock on exit
-Register-EngineEvent PowerShell.Exiting -Action { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue } | Out-Null
-trap { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue; break }
+
+# Clean up on exit
+Register-EngineEvent PowerShell.Exiting -Action { 
+    Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+    if ($mutex) { $mutex.ReleaseMutex(); $mutex.Dispose() }
+} | Out-Null
+trap { 
+    Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+    if ($mutex) { try { $mutex.ReleaseMutex() } catch {} ; $mutex.Dispose() }
+    break 
+}
 
 $intervalMinutes = 5
 $round = 0
@@ -319,6 +337,7 @@ while ($true) {
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Cyan
     Write-Host "[$displayTime] Ralph Round $round started" -ForegroundColor Cyan
+    try { $Host.UI.RawUI.WindowTitle = "🔄 Ralph Watch — Round $round — tamresearch1" } catch {}
     Write-Host "============================================" -ForegroundColor Cyan
     
     # Write heartbeat BEFORE round (status: running)

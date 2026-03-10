@@ -15773,3 +15773,109 @@ Our Markdown + tool mapping is sufficient.
 ---
 
 
+
+---
+
+## Decision 2.1: TLDR Directive for GitHub Comments >50 Words
+
+**Date:** 2026-03-10  
+**Author:** Tamir Dresher (User Directive)  
+**Issue:** #256  
+**Status:** ✅ Adopted  
+**Scope:** Communication Standards
+
+Every comment written in GitHub issue comments that has more than 50 words must include a **TLDR at the beginning**.
+
+**Applies to:** All squad agents, all GitHub issue comments, PR reviews, and decision documentation  
+**Does NOT apply when:** Comment is ≤50 words, TLDR would be redundant
+
+**Rationale:**  
+- User preference to ensure long comments are scannable
+- Improves communication clarity and reduces comment reading burden
+- Promotes concise summarization before detailed explanation
+
+**Implementation:**
+- Agents count words before posting comment
+- If >50 words, add **TLDR:** [one-sentence summary] at the top
+- Include full detailed explanation below TLDR
+
+---
+
+## Decision 3: DK8S Staging RBAC Limit Strategy — Issue #251
+
+**Date:** 2026-03-10  
+**Analyst:** B'Elanna (Infrastructure Expert)  
+**Issue:** #251  
+**Status:** ✅ Documented & Awaiting User Decision  
+**Scope:** Infrastructure Strategy  
+**Priority:** URGENT
+
+DK8S staging cluster provisioning blocked due to Azure's hard 4,000 RBAC limit.
+
+**Current:** Subscription at/near 4,000 assignments; new provisioning fails with RoleAssignmentLimitExceeded
+
+**Phase 1:** Audit & clean orphaned assignments (500-800 reductions, 2-3 days, LOW risk)
+
+**Phase 2:** Five strategic options (Entra Groups, Subscription Split, Managed Identity, ABAC, Hybrid)
+
+**Status:** ⏳ Awaiting Tamir's Phase 1 approval + Phase 2 strategy selection
+
+---
+
+## Decision 4: dotnet/skills Repository Integration — Issue #252
+
+**Date:** 2026-03-10  
+**Assessor:** Picard (Lead)  
+**Issue:** #252  
+**Status:** ✅ Documented & Awaiting User Decision  
+**Scope:** Squad Skills Architecture
+
+Selectively translate 3 adoptable skills from dotnet/skills (dotnet-msbuild, dotnet-upgrade, dotnet-diag) into Squad format.
+
+**Recommendation:** Option 1 (Selective Translation)
+- Owner: Picard + domain experts
+- Timeline: 3-5 business days
+- Outcome: 3-4 new Squad skills in our format
+
+**Status:** ⏳ Awaiting Tamir's approval on selective translation approach
+
+---
+
+## Decision 5: Agent-Skills Repository & Metadata Standardization — Issue #253
+
+**Date:** 2026-03-10  
+**Contributor:** Seven (Research & Docs)  
+**Issue:** #253  
+**Status:** ✅ Adopted (Metadata adoption only)  
+**Scope:** Squad Skills Architecture
+
+**DO:** Adopt Agent-Skills metadata standardization for SKILL.md files  
+**DO NOT:** Port 191 skills into our squad
+
+Adopt standardized YAML headers (name, description, allowed-tools, tags, version).
+
+**Timeline:** Q2 2026 incremental implementation
+
+**Status:** ✅ **ADOPTED** — Framework ready
+
+---
+
+## Decision 6: Tech News Scanning Pipeline Architecture — Issue #255
+
+**Date:** 2026-03-10  
+**Author:** Seven (Research & Docs)  
+**Issue:** #255  
+**Status:** 📋 **Proposed** (awaiting user approval)  
+**Scope:** Squad Tooling & Automation
+
+Implement tech news scanning from HackerNews, Reddit, X/Twitter. Deliver via GitHub + Teams + Hebrew podcast.
+
+**Phase 1:** MVP news scanner (15 hours)  
+**Phase 2:** Hebrew podcast + multi-source (12 hours)  
+**Phase 3:** Advanced features (8-10 hours)  
+**Total:** 30-35 hours
+
+**User Decision Points:** Sources, schedule, digest size, podcast priority, channels, archival, filtering threshold
+
+**Status:** ⏳ **PROPOSED** — awaiting user decisions
+

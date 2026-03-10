@@ -17,6 +17,9 @@
 $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
 
+# Set window title so you know this is Ralph
+$Host.UI.RawUI.WindowTitle = "🔄 Ralph Watch — tamresearch1"
+
 # --- Single-instance lockfile ---
 $lockFile = Join-Path (Get-Location) ".ralph-watch.lock"
 if (Test-Path $lockFile) {

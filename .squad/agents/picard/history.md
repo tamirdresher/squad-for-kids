@@ -3789,3 +3789,31 @@ The feature branch accumulated squad work session commits (agent history updates
 
 **Learning:** This demonstrates the importance of branch hygiene when working with AI agents that track their own state. Agent state commits are valuable for local continuity but pollute feature PRs.
 
+
+### 2026-03-10: Neelix Humor Enhancement — Issue #298
+
+**Assignment:** Update Neelix (News Reporter agent) charter to incorporate humor guidance. User request: "Tell my news reporter to be more funny. Throw jokes from time to time."
+
+**Approach:**
+1. Enhanced Neelix's Identity/Style section to emphasize **genuine humor** — not just witty, but genuinely funny with jokes, puns, and playful commentary
+2. Created new "Humor & Comedy" section with 6 specific techniques:
+   - **Tech Puns:** Wordplay tied to development concepts (merge-ty, branch-tastic, dev-lightful)
+   - **Star Trek References:** Lean into Neelix's Talaxian character background from Voyager
+   - **Self-Deprecating AI Humor:** Playful observations about being an AI news bot
+   - **Playful Analogies:** Compare squad work to relatable technical scenarios
+   - **Witty Observations:** Sharp, quick commentary on news ("Breaking: developer remembered tests. Scientists baffled.")
+   - **Punchlines with Personality:** Land jokes cleanly, avoid forced humor
+
+**Tone Guidance:** Funny but professional. Make people smile, not cringe. Goal: make technical updates enjoyable while staying informative.
+
+**Key Insight:** Humor can be instructed. By providing concrete examples and anti-patterns, agents can generate genuinely entertaining content without devolving into cringe. The key is calibrating to audience (internal team) + context (technical news) + personality (Talaxian character).
+
+**Deliverables:**
+- ✅ Updated .squad/agents/neelix/charter.md with humor section (14 lines added)
+- ✅ Branch squad/298-neelix-humor created from main
+- ✅ Commit aaf6a01 with reference to #298
+- ✅ PR #301 created linking to issue
+
+**Decision:** No team-level decision needed—this is agent personality tuning, not architecture.
+
+**Related Pattern:** Agent personality tuning belongs in charter files, not in agent instantiation code. This enables rapid iteration without rebuilding infrastructure.

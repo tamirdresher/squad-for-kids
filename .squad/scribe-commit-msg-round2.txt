@@ -1,0 +1,27 @@
+docs: Ralph round 2 — fixed #263 squad-monitor, designed #262 multi-repo Ralph
+
+## Summary
+
+**Data (Code Expert):** Fixed squad-monitor GitHub graceful degradation (#263)
+- Implemented optional GitHub integration with --no-github flag
+- Auto-detects gh CLI; skips GitHub sections when unavailable
+- Commit: 52c9360 (tamirdresher/squad-monitor)
+
+**Picard (Lead):** Designed multi-repo Ralph orchestration (#262)
+- Evaluated 3 architectural options; selected Option A (modify prompt)
+- Ralph can scan tamirdresher/squad-monitor issues without code changes
+- Ready for next Ralph round implementation
+
+## Updates
+
+- Added orchestration logs for Data and Picard (2026-03-10T09-40-46Z)
+- Added session log for Ralph round 2 (2026-03-10T09-40-46Z)
+- Merged decisions from inbox into decisions.md
+- Updated agent histories with Ralph round 2 outcomes
+
+## Board Updates
+
+- #263 → Done ✅
+- #262 → Done ✅
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

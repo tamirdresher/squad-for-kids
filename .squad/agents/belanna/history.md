@@ -8,13 +8,15 @@
 - **Joined:** 2026-03-02T15:01:26Z
 - **Note:** Recast from Trinity (The Matrix) to B'Elanna (Star Trek TNG/Voyager)
 
-## Core Context
+## Cross-Agent Updates (Ralph Round 1)
 
-- **Project:** Cross-repo research and analysis team covering infrastructure, security, cloud native, and development across Azure DevOps and GitHub repositories
-- **User:** Tamir Dresher
-- **Role:** Infrastructure Expert
-- **Joined:** 2026-03-02T15:01:26Z
-- **Note:** Recast from Trinity (The Matrix) to B'Elanna (Star Trek TNG/Voyager)
+**2026-03-10 Coordination:**
+- Completed analysis of #251 (DK8S Staging RBAC): Comprehensive 2-phase strategy with 5 options for Phase 2
+- Phase 1 (immediate): Low-risk orphaned assignment cleanup (500-800 assignments, days 1-3)
+- Phase 2 options: Entra Groups, Subscription Splitting, Managed Identity Consolidation, ABAC, Hybrid
+- Collaborated with: Seven (team updates), Picard (lead coordination)
+- All decisions consolidated to `.squad/decisions.md`
+- Awaiting user decision on Phase 1 approval + Phase 2 strategy selection
 
 ## Learnings
 
@@ -248,6 +250,58 @@ New: Scheduler detects missed 7 AM task, runs immediately with `catchUp=true` fl
 
 **Next Steps:**
 - B'Elanna: Create office-intelligence skill + meeting-to-issue PoC (Week 1)
+
+### 2026-03-10: B'Elanna — Azure RBAC 4k Limit Analysis & Mitigation Strategy — Issue #251 (COMPLETED)
+
+**Assignment:** Analyze DK8S staging cluster provisioning failure (RoleAssignmentLimitExceeded) caused by hitting Azure's 4,000 RBAC role assignment limit. Provide detailed remediation guidance and subscription strategy recommendations.
+
+**Key Findings:**
+
+1. **4,000 is a Hard Azure Platform Limit**
+   - Non-negotiable (cannot be increased via support or quota requests)
+   - Applies per subscription across all scopes (subscription, resource group, individual resources)
+   - Covers: user/group assignments, service principals, managed identities, AKS role bindings
+   - Management groups are exempt but subscriptions are not
+
+2. **Root Causes of Orphaned Assignments (AKS/K8s Environments)**
+   - Decommissioned service principals (old operators, monitoring agents, CI/CD) never removed
+   - Per-namespace Entra ID groups: 100+ namespaces = 100+ assignments at subscription level
+   - Version duplication: app v1.0 and v2.0 both assigned (v1 never cleaned)
+   - Managed identity proliferation: each addon/cluster creates unique identities with separate assignments
+   - No lifecycle automation for role assignment cleanup
+
+3. **Detection & Cleanup Tools**
+   - Azure CLI: `az role assignment list/delete` with filtering
+   - Azure Resource Graph (ARG): Kusto queries to find unused roles, duplicates, orphaned SPNs
+   - PowerShell: `Get-AzRoleAssignment`, `Remove-AzRoleAssignment` with pattern matching
+   - Activity logs: Identify assignments with zero recent access (Azure Monitor)
+
+4. **Remediation Strategies (Prioritized)**
+   - **Phase 1 (Immediate):** Cleanup orphaned assignments (ARG + CLI) — target 500-800 removals to unblock provisioning
+   - **Phase 2A:** Consolidation via Entra ID groups (90% reduction for user access)
+   - **Phase 2B:** Subscription splitting (dev, staging, prod each get 4k budget)
+   - **Phase 2C:** Managed identity consolidation (share across clusters)
+   - **Phase 2D:** Azure ABAC (custom security attributes, 70% reduction, requires Premium)
+
+**Deliverables:**
+- Issue #251 comment: Comprehensive analysis (TLDR, root causes, audit/cleanup commands, 4-option decision matrix)
+- Decision file: `.squad/decisions/inbox/belanna-rbac-limit-strategy.md` (awaiting user choice)
+- Artifact: `C:\temp\issue-251-comment.md` (full analysis, reference queries, phase-by-phase roadmap)
+
+**Decision Points Required from Tamir:**
+1. Approve Phase 1 cleanup (48 hours, low-risk)?
+2. Which Phase 2 strategy: Groups consolidation vs. Subscription split vs. Hybrid?
+3. Should DK8S staging move to dedicated subscription after cleanup?
+4. Create weekly cleanup/monitoring automation script?
+
+**Technical Learnings:**
+- Azure subscriptions have immutable limits (not quotas) — some limits are hard stops
+- Role assignment bloat is common in multi-tenant K8s with per-namespace security models
+- Azure Resource Graph (ARG) with AuthorizationResources table is the most efficient audit tool
+- Managed identity consolidation (via workload identity federation) reduces footprint significantly
+- Azure ABAC + custom attributes represents the modern scalable approach for complex access scenarios
+
+**Status:** Analysis complete, comment prepared for issue #251. Awaiting user decision on subscription strategy (Phase 2 path selection) to proceed with implementation.
 - Tamir: Share design with IT admin; request MCP Server for Enterprise
 - Admin: Evaluate and provision credentials (Week 2)
 

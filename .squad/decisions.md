@@ -15491,5 +15491,285 @@ This decision should be reviewed if:
 **Implemented:** 2026-03-25
 **Status:** ✅ Complete and ready for public release
 
+---
+
+## Decision: User Directive — TLDR for Comments >50 Words
+
+**Date:** 2026-03-10T06-56-30Z (consolidated from duplicate directive)  
+**Source:** Tamir Dresher via GitHub Issue #256  
+**Status:** ✅ Adopted  
+
+**What:** Every comment written in issue comments that has more than 50 words must include a TLDR at the beginning.
+
+**Why:** Ensure long comments are scannable; user preference for readability.
+
+**Applies To:** All squad agents writing issue comments.
+
+**Note:** Duplicate entry exists (2026-03-10T08-57-05Z); both consolidated to single decision.
 
 ---
+
+## Decision: DK8S Staging RBAC Limit Strategy — Issue #251
+
+**Date:** 2026-03-10  
+**Analyst:** B'Elanna (Infrastructure Expert)  
+**Issue:** #251 "[URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked"  
+**Subscription:** c5d1c552-a815-4fc8-b12d-ab444e3225b1  
+**Status:** AWAITING USER DECISION  
+
+### Problem
+Azure hard limit of 4,000 RBAC role assignments per subscription reached. Cluster provisioning blocked. Limit cannot be increased.
+
+### Root Causes
+1. Decommissioned service principals not removed
+2. Per-namespace role bindings (100+ namespaces = 100+ assignments)
+3. Duplicate assignments from version migration (v1 → v2)
+4. Managed identity proliferation across addons/clusters
+
+### Phase 1 Mitigation (Immediate, Low Risk)
+- Audit orphaned assignments via Azure Resource Graph
+- Target: Remove 500-800 assignments
+- Timeline: Days 1-3
+- Risk: LOW (read-only audit first, validation before deletion)
+- Expected: Unblock provisioning immediately
+
+**Decision Required:** Approve Phase 1 cleanup? (Recommended: ✅ YES)
+
+### Phase 2 Long-Term Options (Choose One)
+
+**Option A: Entra ID Groups** ⭐ For team access  
+- 90% reduction (50 assignments → 5)  
+- Timeline: 2-3 weeks  
+
+**Option B: Subscription Splitting** ⭐ Recommended for sustainable growth  
+- Dev/Staging/Prod split (3 × 4k independent budgets)  
+- Timeline: 3-4 weeks  
+
+**Option C: Managed Identity Consolidation**  
+- 60-70% reduction for AKS addon assignments  
+- Timeline: 1-2 weeks  
+
+**Option D: Azure ABAC (Attribute-Based Access Control)**  
+- 70-80% reduction, most scalable  
+- Timeline: 2-3 weeks (requires Azure AD Premium)  
+
+**Option E: Hybrid (Recommended long-term)**  
+- Combine all above strategies  
+- Timeline: 6-8 weeks  
+
+**Questions Pending User Response:**
+- Q1: Approve Phase 1 cleanup?
+- Q2: Which Phase 2 strategy aligns with DK8S philosophy?
+- Q3: Stay in current subscription post-Phase 1, or plan subscription split?
+- Q4: Enable weekly automated cleanup script + 80% alert?
+
+**Reference:** Issue #251 with detailed Azure CLI and PowerShell commands
+
+---
+
+## Decision: dotnet/skills Repository Assessment — Issue #252
+
+**Date:** 2026-03-10  
+**Lead:** Picard  
+**Issue:** #252 "Take a look and use this: https://github.com/dotnet/skills"  
+**Status:** ASSESSMENT COMPLETE | AWAITING USER DECISION  
+
+### What dotnet/skills Provides
+- 6 plugin packages (dotnet, dotnet-data, dotnet-diag, dotnet-msbuild, dotnet-upgrade, dotnet-maui)
+- Plugin-based architecture with standardized `plugin.json` + skill folders
+- Each skill follows standard SKILL.md (markdown-based documentation)
+- Targets: Copilot CLI, Claude Code, VS Code Chat
+
+### Key Difference from Squad Skills
+| Aspect | dotnet/skills | Our Squad Skills |
+|--------|---|---|
+| Purpose | Agent capabilities | Team-learned patterns |
+| Scope | .NET coding tasks (broad) | Project-specific research (narrow) |
+| Audience | Any .NET developer | Our team agents |
+| Format | plugin.json + SKILL.md | SKILL.md only |
+
+### Adoptable Skills (Selective Translation)
+1. **dotnet-msbuild** — Build diagnosis, MSBuild performance optimization
+2. **dotnet-diag** — Performance investigations, debugging workflows
+3. **dotnet-upgrade** — Framework version migrations, breaking change patterns
+
+### Recommendation: Option 1 (Selective Translation)
+- Review dotnet-msbuild, dotnet-upgrade, dotnet-diag SKILL.md files
+- Create new `.squad/skills/{name}/` directories with translated SKILL.md files
+- Owner: Picard (Lead) + relevant domain experts
+- Timeline: 3-5 business days
+- Outcome: 3-4 new Squad skills in our format with team attribution
+
+### Alternative Options (Not Recommended)
+- **Option 2:** Direct plugin marketplace integration → Breaks squad routing system
+- **Option 3:** Reference & link only → Minimal overhead but less value
+
+**Approval Needed:** Tamir sign-off on selective translation approach → Phase 1 kickoff
+
+---
+
+## Decision: Issue #252 & #242 Status Verification
+
+**Date:** 2026-03-10  
+**Lead:** Picard  
+**Issues Verified:** #252 (dotnet/skills), #242 (demo repo location)  
+
+### Issue #252: dotnet/skills
+- **Current Status:** ✅ OPEN (assessment complete, awaiting team execution)
+- **User Decision:** Maximal implementation approved (Option C with 4 phases)
+- **Approval Quote:** "proceed and finish, dont ask me more questions"
+
+### Implementation Plan (4 Phases)
+| Phase | Objective | Owner | Effort | Status |
+|-------|-----------|-------|--------|--------|
+| 1 | Standardize skill frontmatter to agentskills.io spec | Data + Seven | 4-6h | Pending |
+| 2 | Plugin architecture (domain grouping) | Picard | 3-4h | Pending |
+| 3 | Testing framework (eval.yaml pattern) | Data + Seven | 10-15h | Pending |
+| 4 | Global Copilot CLI installation | B'Elanna + Picard | 3-4h | Pending |
+
+### Issue #242: Blog Demo Report
+- **Status:** ✅ CLOSED (user satisfied)
+- **Deliverable:** `blog-draft-ai-squad-productivity.md` + `sanitized-demo/` directory
+- **Demo Contents:** 6 agent charters, .squad/ infrastructure, Ralph watch script, GitHub Actions workflows, Squad Monitor config (all sanitized)
+
+---
+
+## Decision: Tech News Scanning Pipeline — Issue #255
+
+**Date:** 2026-03-10  
+**Author:** Seven (Research & Docs)  
+**Status:** ⏳ PROPOSED (awaiting user approval on Issue #255)  
+
+### Decision Statement
+Implement periodic tech news scanning pipeline monitoring HackerNews, Reddit, X/Twitter for trending developer topics. Deliver via GitHub issue comments, Teams alerts, and optional Hebrew audio podcasts.
+
+### Architecture: 3-Phase Implementation
+
+**Phase 1: MVP News Scanner (Weeks 1-2)**  
+- Sources: HackerNews (top 30), Reddit (r/programming, r/devops, r/kubernetes), X trending
+- Filter: Min 50+ upvotes, keyword matching (kubernetes, cloud, security, AI/ML, DevOps)
+- Output: GitHub issue comments + Teams Adaptive Cards (10-15 stories daily)
+- Scheduling: GitHub Actions cron (0 6 * * *) + ralph-watch.ps1 fallback
+- Effort: ~15 hours
+
+**Phase 2: Hebrew Podcast + Multi-Source (Weeks 3-4)**  
+- Audio: podcaster.ps1 → 5-7 min Hebrew MP3 (he-IL-HilaNeural voice)
+- Expanded sources: Dev.to, Product Hunt, InfoQ/DZone, Lobsters
+- Features: Duplicate detection, category tagging
+- Distribution: GitHub Releases + RSS for podcast syndication
+- Effort: ~12 hours
+
+**Phase 3: Advanced Features (Weeks 5-6)**  
+- AI summaries: Claude/GPT 2-3 sentence synopsis per story
+- Security filter: Highlight CVEs, breach notifications
+- Trend analysis: Weekly summary of top 5 emerging topics
+- Metrics: Dashboard tracking topic velocity over time
+- Personalization: Config file for source priority weights
+- Effort: ~8-10 hours
+
+**Total Estimated Effort:** 30-35 hours (all three phases)
+
+### Tech Stack
+- Scripting: PowerShell Core (consistency with squad tooling)
+- HackerNews: Algolia API
+- Reddit: REST API
+- X/Twitter: Twitter API v2
+- TTS: Existing podcaster.ps1
+- Scheduling: GitHub Actions + ralph-watch.ps1
+- Storage: GitHub Releases + history file
+
+### Decision Points for User
+
+1. **News Sources** — Approve HN + Reddit + X, or prefer others?
+2. **Schedule** — Daily 6:00 AM UTC, or different timing?
+3. **Digest Size** — 10-15 stories optimal, or adjust?
+4. **Hebrew Podcast Priority** — Start Phase 2 immediately?
+5. **Publishing Channels** — GitHub + Teams only?
+6. **Archival Window** — 30-day rolling history or longer?
+7. **Filtering Aggressiveness** — Min 50 upvotes threshold acceptable?
+
+### Success Criteria
+✅ Phase 1: Daily digest every weekday morning, 10-15 relevant stories, zero errors × 5 days  
+✅ Phase 2: Hebrew MP3 generated, RSS working, duplicate detection tested  
+✅ Phase 3: AI summaries present, security filter active, weekly trends dashboard  
+
+### File Structure
+```
+scripts/
+├── tech-news-scanner.ps1
+├── lib/
+│   ├── hn-scraper.ps1
+│   ├── reddit-scraper.ps1
+│   ├── twitter-scraper.ps1
+│   └── news-formatter.ps1
+.github/workflows/
+├── tech-news-daily.yml
+docs/
+├── tech-news-archive.md
+.squad/logs/
+├── tech-news-scanner.log
+```
+
+---
+
+## Decision: Agent-Skills Standardization — Issue #253
+
+**Date:** 2026-03-10  
+**Contributor:** Seven (Research & Docs)  
+**Issue:** #253  
+**Status:** ✅ COMPLETE (assessment & adoption decision finalized)  
+
+### Assessment Summary
+**Repository:** MicrosoftDocs/Agent-Skills (191 production-ready Azure skills)  
+**Recommendation:** DO NOT ADOPT skills wholesale | DO ADOPT metadata format  
+
+### Key Finding: Different Niches
+- **Agent-Skills:** Horizontal (broad Azure service coverage)
+- **Our Squad Skills:** Vertical (deep platform engineering expertise)
+- These are complementary, not competitive
+
+### Current Squad Skills (10 Total)
+1. cli-tunnel — Remote terminal access & recording
+2. dk8s-support-patterns — DK8S platform workflows
+3. devbox-provisioning — Natural language DevBox provisioning
+4. configgen-support-patterns — ConfigGen NuGet guidance
+5. dotnet-build-diagnosis — .NET build issue diagnosis
+6. github-project-board — GitHub Projects automation
+7. image-generation — DALL-E image generation
+8. squad-conventions — Squad coding standards
+9. teams-monitor — Teams message monitoring
+10. tts-conversion — Text-to-speech conversion
+
+### Recommendations
+
+✅ **DO: Adopt Metadata Standardization**  
+Update all SKILL.md files to include Agent-Skills-style headers:
+```yaml
+---
+name: <skill-name>
+description: <one-liner>
+allowed-tools: [list]
+tags: [domain, automation-type, scope]
+version: <semantic>
+---
+```
+Timeline: Q2 2026 (incremental)
+
+✅ **DO: Review Authentication & Error Patterns**  
+Audit Agent-Skills examples for credential handling, rate limiting, error standardization.
+
+❌ **DO NOT: Port Agent-Skills' Skills**  
+Porting would create maintenance burden without solving current problems.
+
+❌ **DO NOT: Migrate to Their Tool Format**  
+Our Markdown + tool mapping is sufficient.
+
+### Success Metrics
+- [ ] All SKILL.md files have standardized YAML headers by Q2 2026
+- [ ] No external skills ported into squad (maintain specialization)
+- [ ] Agent-Skills referenced in skill creation guide as metadata example
+- [ ] Team feedback: "Our skills are clearly focused on platform engineering"
+
+---
+
+

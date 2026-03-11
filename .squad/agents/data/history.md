@@ -242,3 +242,33 @@ TBD - Q2 work incoming
 - Project board updated to "Pending User"
 
 **Key Insight:** The solution is purely configuration. Each MCP server instance gets a unique name prefix (e.g., `ado-microsoft`, `ado-msazure`), and tools are automatically namespaced by MCP. Adding a new org = 5 lines of JSON config.
+
+### Issue #10: Session Display Enhancement - Separate Columns (2026-06-24)
+
+**Context:** Revisited issue #10 with new approach. Previous implementation embedded CWD and Resume ID in session name string. New approach uses dedicated table columns for better scanability.
+
+**Implementation Changes:**
+- Modified session table to add **CWD** and **Resume ID** columns
+- Session column width reduced from 45 to 25 chars (cleaner names)
+- CWD column: 20 chars width, yellow color for visibility
+- Resume ID column: 10 chars width, cyan color
+- Total columns: 8 (Session, CWD, Resume ID, Agents, MCPs, Age, Last Write, Type)
+
+**DeriveSessionName() Simplification:**
+- Removed embedded CWD/Resume ID logic from session name string
+- Session name now shows only: `"MMM dd HH:mm (shortId)"` for Agency/Copilot sessions
+- Copilot sessions: just `shortId` without metadata
+- CWD and Resume ID now populated directly from SessionInfo.Cwd and SessionInfo.ResumeId properties
+
+**Table Rendering Changes:**
+- SessionInfo class already had Cwd and ResumeId properties (from previous work)
+- Updated sessionTable.AddRow() to include `session.Cwd` and `session.ResumeId` columns
+- Removed string manipulation to extract metadata from Name field
+
+**Build & Deploy:**
+- Branch: `squad/10-session-display-improvements` (new branch name)
+- Build: ✅ Success (23.8s, 0 warnings)
+- PR: #12 created and linked to issue #10
+- Comment added to issue
+
+**Key Learning:** Separate columns are clearer than embedded metadata in strings. SessionInfo already had the properties populated by ExtractSessionMetadataFromEventsFile() from previous work, so this was a pure display layer change.

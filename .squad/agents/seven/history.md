@@ -4543,3 +4543,83 @@ Future evangelism initiatives should resolve all 3 before launch to reduce start
 
 **Status**: ✅ COMPLETE — Plan posted, labels applied, decision documented
 
+
+### 2026-03-11: Issue #313 — Blog Post Refresh (COMPLETED)
+
+**Assignment:** Refresh and rewrite blog post at tamirdresher.github.io Part 1 ("Resistance is Futile — Your First AI Engineering Team"). Tamir's feedback: current draft "starts like we haven't introduced squad in the past" — needed to be a natural continuation of the series.
+
+**Context:**
+- Part 0 already published: "Organized by AI — How Squad Changed My Daily Workflow" (personal productivity story)
+- Part 1 was written as if Squad was brand new, not building on Part 0
+- Needed to show **personal → professional** workflow transition
+- Required: Borg "resistance is futile" image, Brady Gaster GitHub link, match Part 0's tone
+
+**Execution:**
+1. Read Part 0 in full to understand tone, voice, and what was already covered
+2. Cloned blog repo (tamirdresher.github.io) to C:\temp\blog-repo-temp
+3. Created branch: squad/313-blog-refresh
+4. Completely rewrote post with:
+   - Opening that explicitly references Part 0 as foundation
+   - Focus on bringing Squad from personal repo to work repo with human team
+   - Emphasis on **human team members** as enterprise differentiator
+   - Maintained Tamir's conversational, authentic voice
+   - Included requested Borg cube image
+   - Linked to Brady Gaster's GitHub profile
+5. Committed, pushed, created PR in blog repo
+6. Posted to Teams via webhook
+7. Commented on issue #313
+
+**Outcome:**
+✅ Blog post rewritten as natural series continuation
+✅ PR created: https://github.com/tamirdresher/tamirdresher.github.io/pull/new/squad/313-blog-refresh
+✅ Teams notification sent
+✅ Issue #313 updated with status
+
+**Key Learnings:**
+
+1. **Series Continuity Is Critical**
+   - Blog posts in a series MUST acknowledge what came before
+   - Part 1 can't read like it's introducing Squad for the first time when Part 0 already did that
+   - Opening with "In Part 0, I told you..." immediately establishes continuity
+   - Readers expect each part to build on the previous one, not restart from zero
+
+2. **Tone Consistency Matters**
+   - Part 0 had a very specific voice: conversational, confessional ("I'm not an organized person"), humor
+   - Part 1 needed to match that voice, not shift to corporate/technical
+   - Tamir's authentic voice is what makes the blog engaging — preserve it
+   - Personal experiences > generic statements
+
+3. **Personal → Professional Is a Narrative Arc**
+   - Part 0: "How I use Squad in my personal repo"
+   - Part 1: "What changes when I bring it to work"
+   - The transition itself is the story — not just "here's how Squad works"
+   - Focus on what's *different* about work repos: human reviewers, branch policies, enterprise concerns
+
+4. **Human Team Members = Enterprise Signal**
+   - In personal repos, AI can auto-approve and merge
+   - In work repos, humans must review
+   - This isn't a limitation — it's the feature that makes Squad viable for real teams
+   - Emphasizing human-in-the-loop workflow addresses enterprise adoption concerns
+
+5. **Image Requests Are Content Requirements**
+   - When user specifies an image (Borg cube), it's not decoration — it's part of the narrative
+   - "Resistance is futile" ties to Borg/Star Trek theme Squad uses
+   - Visual elements reinforce the tone (humor, sci-fi references)
+
+**File Locations:**
+- Blog repo: C:\temp\blog-repo-temp
+- Blog post: _posts/2026-03-04-scaling-ai-part1-first-team.md
+- Branch: squad/313-blog-refresh
+- Issue: tamirdresher_microsoft/tamresearch1#313
+
+**Workflow Pattern:**
+For multi-repo deliverables:
+1. Clone external repo to temp directory
+2. Create feature branch
+3. Make changes
+4. Commit with Co-authored-by trailer
+5. Push branch
+6. Create PR (or provide PR creation URL)
+7. Notify via Teams webhook
+8. Comment on originating issue with PR link
+

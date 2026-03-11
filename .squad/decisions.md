@@ -17974,3 +17974,31 @@ Awaiting team review on PoC. Phase 2 (multi-window interactivity) deferred pendi
 
 Beta branch ready for team review on GitHub. Architecture validated; implementation ready for Phase 2 planning.
 
+
+---
+
+## Decision: Autonomy Over Dependency (Tamir Directive, 2026-03-11)
+
+**Date:** 2026-03-11T06:43Z
+**Author:** Tamir Dresher (User Directive)
+**Status:** Adopted
+**Scope:** Team Process & Issue Management
+
+### Rule
+
+When an issue has sufficient context to make a reasonable decision, agents MUST decide and act. Only block on Tamir for:
+- Budget/cost decisions exceeding \/month
+- Strategic direction changes
+- External communication on Tamir's behalf
+- Access/permission requests
+
+---
+
+## Decision: Blog Series Continuity Pattern (Issue #313, 2026-03-11)
+
+**Date:** 2026-03-11
+**Author:** Seven (Research & Docs)
+**Status:** Adopted
+**Scope:** Documentation & Content
+
+Blog posts in numbered series MUST open with continuity to previous post, assume reader context, and focus on new ground.

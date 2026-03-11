@@ -18112,3 +18112,70 @@ When editing future blog posts in a series:
 - blog-part2-refresh.md (this decision was applied here)
 - tamirdresher.github.io/_posts/ (original blog series)
 
+
+
+---
+
+## Decision 5: Podcast Delivery Synchronization
+
+### 2026-03-11T07:30Z: User directive
+**By:** Tamir (via Copilot)
+**What:** Podcast delivery workflow MUST be synchronous: upload audio to cloud storage FIRST, wait for shareable link to be ready, THEN send notification with clickable link. Never send a podcast notification without a working playable URL. If the upload is async or the link isn't ready yet, set a reminder and keep checking until it's ready, then send.
+**Why:** Broken links are worse than no notification. The chain must be: generate → upload → verify link works → notify.
+
+---
+
+## Decision 6: Blog Series Continuity Standards
+
+# Decision: Blog Series Continuity Standards
+
+**Date:** 2025-01-29  
+**Decider:** Picard (AI Lead)  
+**Context:** GitHub Issue #313 - Blog part 2 refresh
+
+## Problem
+
+The blog post "From Personal Repo to Work Team" (blog-part2-refresh.md) started as if Squad hadn't been introduced yet, when readers had already read Parts 0 and 1 of the series. This broke narrative continuity and made the post feel disconnected from the series.
+
+## Decision
+
+**Establish continuity standards for blog series posts:**
+
+1. **Opening Hook**: Always reference previous posts explicitly in the opening paragraphs. Assume readers have read prior parts. Example: "By now you know the story. In Part 0... In Part 1... Then came the question..."
+
+2. **Terminology Consistency**: When a concept is central to the post's argument, use consistent phrasing throughout. In this case, "human squad members" vs "humans" reinforced that the team is unified (AI + humans together), not hierarchical (AI working *for* humans).
+
+3. **Visual Callbacks**: When using images or metaphors (like "resistance is futile"), use them as bookends (opening + closing) to create thematic unity.
+
+4. **Series Navigation**: Every post should clearly state where it sits in the series and what comes next, helping readers understand the progression.
+
+## Consequences
+
+**Positive:**
+- Blog posts feel like a cohesive series rather than standalone articles
+- Readers can jump in at any point and understand the narrative arc
+- Consistent terminology reinforces key concepts (like "human squad members")
+
+**Negative:**
+- Requires more upfront reading of previous posts before writing/editing
+- Can't treat each post as fully standalone (but that's OK for a series)
+
+## Alternatives Considered
+
+1. **Standalone Posts**: Make each post self-contained with full introductions. Rejected because it would be repetitive and break the narrative flow for series readers.
+
+2. **Minimal References**: Just add "see Part 1 for more" links. Rejected because it doesn't create the "continuing story" feeling.
+
+## Implementation Notes
+
+When editing future blog posts in a series:
+1. Read all previous posts first to understand voice, tone, and narrative arc
+2. Reference specific moments/quotes from previous posts in the opening
+3. Maintain consistent terminology for key concepts throughout
+4. Use visual/thematic callbacks when appropriate
+5. End with a clear preview of the next post
+
+## Related Documents
+
+- blog-part2-refresh.md (this decision was applied here)
+- tamirdresher.github.io/_posts/ (original blog series)

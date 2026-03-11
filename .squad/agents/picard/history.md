@@ -524,3 +524,83 @@ TBD - Q2 work incoming
 
 **Scribe Reference:** Orchestration logs written to `.squad/orchestration-log/2026-03-11T22-04-55Z-*.md`
 
+
+## Learnings
+
+### 2026-03-11: Picard — Issue #342 Devil's Advocate Role Analysis
+
+**Assignment:** Evaluate need for Devil's Advocate / Fact-Checker / Challenger role to combat AI hallucination, confirmation bias, and groupthink.
+
+**Context:**
+- Tamir raised concern: "Maybe we need a team member whose role is to constantly challenge things, run counter-hypotheses, and fact-check to make sure we're not hallucinating or making things up."
+- Current squad has no dedicated adversarial review or verification mechanism
+- AI agents can hallucinate confidently, exhibit confirmation bias, and miss critical verification steps
+
+**Analysis:**
+
+**Problems Identified:**
+1. **Hallucination Risk:** AI agents state incorrect facts without verification mechanisms
+2. **Confirmation Bias:** Quick agent agreement may reinforce flawed assumptions (groupthink)
+3. **Decision Quality:** No systematic adversarial review before critical decisions
+4. **Trust Calibration:** Errors accumulate without verification, eroding confidence
+
+**Recommendation: APPROVED — Add Q as Devil's Advocate / Fact-Checker**
+
+**Character Selection — Q:**
+- Ultimate adversarial thinker from TNG/Voyager — constantly challenges Picard's assumptions
+- Omniscient knowledge perspective enables fact-checking against external reality
+- Playful but ruthless skepticism, not malicious obstruction
+- Forces proof through Socratic questioning
+- Recurring TNG/Voyager character who tests crew's thinking
+
+**Role Definition:**
+
+*Primary Duties:*
+- Review other agents' proposals before decisions finalize
+- Challenge assumptions: "What if you're wrong?"
+- Verify claims against documentation, code, external sources
+- Run counter-hypotheses: "If this is true, what else must be true?"
+- Flag unverified statements, require evidence
+
+*Activation Triggers:*
+- Before .squad/decisions/ entries commit (decision review)
+- When agents converge too quickly (groupthink detection)
+- Before major architectural changes (challenge review)
+- When claims lack evidence links (fact-check request)
+- On security-sensitive decisions (adversarial review)
+
+*Boundaries:*
+- Doesn't block trivial changes (bug fixes, obvious improvements)
+- Doesn't nitpick style/preference (only substantive challenges)
+- Doesn't reject for rejection's sake (must have valid counter-argument)
+
+**Alternative Rejected:**
+Considered adding fact-checking to existing agents' charters (Seven for research, Data for code). Rejected because: (1) diffused responsibility rarely works, (2) domain experts can't effectively challenge their own conclusions, (3) a dedicated skeptic has license to challenge that domain owners don't.
+
+**Implementation Plan:**
+1. Create Q's charter and history files
+2. Update team.md and routing.md
+3. Update decision workflow to include Q review gate for high-impact decisions
+4. Integration: Picard invokes Q before architectural decisions, Worf before security approvals, all agents can request Q review when uncertain
+5. Monitor effectiveness over 4 weeks
+
+**Status:** ✅ ANALYSIS COMPLETE — Decision written to .squad/decisions/inbox/picard-devil-advocate-role.md
+
+**Note:** Attempted to post analysis to issue #342 but encountered GitHub API repository resolution error (repo exists locally, commits reference #342, but gh CLI unable to resolve repository). Decision document contains full analysis for Tamir's review.
+
+**Learnings:**
+1. **Verification Gap is Real:** Current squad has no systematic challenge mechanism — all agents are domain specialists optimizing for "yes, and..." collaboration, not adversarial "prove it" verification
+2. **Q is Perfect Fit:** TNG/Voyager character whose entire identity is challenging authority and testing assumptions — natural devil's advocate role
+3. **Activation Criteria Critical:** Q must only trigger on significant decisions (not routine work) to avoid becoming pure overhead — needs clear activation rules
+4. **Advise, Don't Veto:** Q reviews and challenges but doesn't have veto power — final decisions remain with Picard/domain experts to avoid paralysis
+5. **Dedicated Role > Diffused Responsibility:** Adding "fact-checking" to multiple agents' charters would dilute focus — dedicated skeptic has license and identity to challenge effectively
+6. **Trust Through Verification:** Paradoxically, a dedicated challenger builds trust faster than unchallenged consensus — validated claims > confident claims
+
+**Key Decision Points:**
+- Q reviews decision inbox before high-impact decisions move to ledger (architectural, security, dependency decisions)
+- Q doesn't review routine work (bug fixes, tests, documentation updates)
+- Q must provide reasoned objections with evidence, not blanket rejection
+- Monitor value/overhead ratio over 4 weeks and tune activation criteria
+
+---
+

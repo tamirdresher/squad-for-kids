@@ -3901,3 +3901,30 @@ Created 5 issues in bradygaster/squad repo:
 - File-based registries sufficient for MVP, scale later
 - Progressive security model: local trust → TLS → federation
 - PRD structure: Problem → Solution → Architecture → Use Cases → Risks → Timeline
+
+## 2025-01-29: Blog Refresh - Part 2 "From Personal Repo to Work Team"
+
+**Context:** GitHub issue #313 requested a refresh of blog-part2-refresh.md to flow naturally from the previous blog posts in Tamir's series.
+
+**Key Changes Made:**
+1. **Opening Hook**: Changed from re-introducing Squad to acknowledging readers already know the story from Parts 0 and 1. Added reference to "the question I'd been avoiding" to create narrative tension.
+
+2. **Human Squad Members Emphasis**: Consistently reinforced throughout the post that humans are "human squad members" not just "humans" or "reviewers" — this makes the point that the team is unified, not AI working *for* humans but AI working *with* humans as one Squad.
+
+3. **Borg Imagery**: Added the "resistance is futile" image twice (opening and closing) to match the tone from Part 1 and add humor.
+
+4. **Voice Consistency**: Matched Tamir's conversational, technical-but-accessible style with humor. Used phrases like "Resistance? Mostly futile. 🟩⬛" and "The assimilation continues" to keep the Star Trek theme alive.
+
+5. **Series Flow**: Made explicit references to Parts 0 and 1 in the opening, showing progression from personal repo → personal AI team → work team with humans and AI together → organizational scale (Part 3 preview).
+
+**Learnings:**
+- Blog series require careful attention to narrative continuity — readers expect each post to build on the previous one
+- Repeating a key phrase ("human squad members" vs "humans") throughout reinforces the conceptual shift
+- Humor and pop culture references (Borg, Star Trek) can make technical content more engaging when done consistently
+- The "resistance is futile" image works as both an opening hook and closing callback
+
+**Decisions Made:**
+- Every mention of team roles now explicitly uses "human squad member" or "AI squad member" to reinforce the unified team concept
+- Added two uses of the resistance-is-futile image for bookend effect
+- Kept the technical depth (metrics, FedRAMP audit, routing rules) while making the narrative flow conversational
+

@@ -10,6 +10,55 @@ TBD - Q2 work incoming
 
 ## Learnings
 
+### 2026-03-11: Picard — Issue #340 MDE.ServiceModernization.CopilotCliAssets Investigation
+
+**Assignment:** Investigate Azure DevOps repository for interesting Copilot CLI assets and report findings.
+
+**Context:**
+- Repository: https://dev.azure.com/microsoft/DefenderCommon/_git/MDE.ServiceModernization.CopilotCliAssets
+- Created by MDE (Microsoft Defender for Endpoint) Service Modernization team
+- Repository created Jan 29, 2026 (very recent, 458KB)
+
+**Key Findings:**
+1. **PR Review Orchestrator Plugin** - Multi-agent orchestration pattern with parallel specialized sub-agents:
+   - security-posture-analyzer, icm-pattern-analyzer, kusto-validator
+   - cross-repo-breaking-change-analyser, cross-repo-navigator
+   - Git pre-push hooks for automatic review
+   
+2. **Newsletter Reporter Plugin** - Automated monthly report generation from Azure DevOps + M365 data
+   - Agents: monthly-service-report
+   - Skills: srs-member-deep-dive, srs-report-manager, srs-newsletter-html
+
+3. **Developer Collections** - Personal plugin collections:
+   - moaguirre: OpenTelemetry migration + Aspire telemetry validation
+   - rimuri: "reflect" skill - Learning capture system (HIGH/MED/LOW confidence patterns)
+
+**Repository Structure:**
+```
+plugins/{plugin-name}/
+├── .claude-plugin/plugin.json  # Metadata
+├── agents/*.agent.md            # Specialized agents
+├── skills/SKILL.md              # Agent skills
+├── commands/                    # Slash commands
+└── hooks/                       # Event handlers
+```
+
+**Value for Squad:**
+- **Agent Architecture Patterns:** Their PR orchestrator is similar to Squad's multi-agent coordination needs
+- **Skill System Examples:** Real-world skill definitions following .agent.md and SKILL.md conventions
+- **Git Hook Integration:** Pre-push automation pattern for quality gates
+- **Potentially Reusable:** security-posture-analyzer agent, reflect skill (pattern extraction)
+
+**Technical Approach:**
+- Used Azure DevOps MCP server tools (azure-devops-search_code, azure-devops-repo_*) to explore repository
+- Search terms: "agent", "copilot", "prompt", "skill", "tool", "instruction", "system"
+- Found 8+ agents, 6+ skills across 4 plugin directories
+- Unable to use web_fetch (auth required), but search results included full README.md content in API response
+
+**Key Learning:** Microsoft Defender team is solving similar multi-agent coordination problems with production-ready assets. Their PR Review Orchestrator pattern with parallel specialized sub-agents directly parallels Squad's architecture. Worth studying their orchestration patterns and potentially collaborating.
+
+**Status:** ✅ COMPLETED — Findings posted to issue #340
+
 ### 2026-03-11: Picard — Issue #341 Research Squad Repository Created
 
 **Assignment:** Create research squad repository and initialize fully after Tamir's approval.

@@ -18112,3 +18112,194 @@ When editing future blog posts in a series:
 - blog-part2-refresh.md (this decision was applied here)
 - tamirdresher.github.io/_posts/ (original blog series)
 
+
+
+---
+
+## Decision 5: Podcast Delivery Synchronization
+
+### 2026-03-11T07:30Z: User directive
+**By:** Tamir (via Copilot)
+**What:** Podcast delivery workflow MUST be synchronous: upload audio to cloud storage FIRST, wait for shareable link to be ready, THEN send notification with clickable link. Never send a podcast notification without a working playable URL. If the upload is async or the link isn't ready yet, set a reminder and keep checking until it's ready, then send.
+**Why:** Broken links are worse than no notification. The chain must be: generate → upload → verify link works → notify.
+
+---
+
+## Decision 6: Blog Series Continuity Standards
+
+# Decision: Blog Series Continuity Standards
+
+**Date:** 2025-01-29  
+**Decider:** Picard (AI Lead)  
+**Context:** GitHub Issue #313 - Blog part 2 refresh
+
+## Problem
+
+The blog post "From Personal Repo to Work Team" (blog-part2-refresh.md) started as if Squad hadn't been introduced yet, when readers had already read Parts 0 and 1 of the series. This broke narrative continuity and made the post feel disconnected from the series.
+
+## Decision
+
+**Establish continuity standards for blog series posts:**
+
+1. **Opening Hook**: Always reference previous posts explicitly in the opening paragraphs. Assume readers have read prior parts. Example: "By now you know the story. In Part 0... In Part 1... Then came the question..."
+
+2. **Terminology Consistency**: When a concept is central to the post's argument, use consistent phrasing throughout. In this case, "human squad members" vs "humans" reinforced that the team is unified (AI + humans together), not hierarchical (AI working *for* humans).
+
+3. **Visual Callbacks**: When using images or metaphors (like "resistance is futile"), use them as bookends (opening + closing) to create thematic unity.
+
+4. **Series Navigation**: Every post should clearly state where it sits in the series and what comes next, helping readers understand the progression.
+
+## Consequences
+
+**Positive:**
+- Blog posts feel like a cohesive series rather than standalone articles
+- Readers can jump in at any point and understand the narrative arc
+- Consistent terminology reinforces key concepts (like "human squad members")
+
+**Negative:**
+- Requires more upfront reading of previous posts before writing/editing
+- Can't treat each post as fully standalone (but that's OK for a series)
+
+## Alternatives Considered
+
+1. **Standalone Posts**: Make each post self-contained with full introductions. Rejected because it would be repetitive and break the narrative flow for series readers.
+
+2. **Minimal References**: Just add "see Part 1 for more" links. Rejected because it doesn't create the "continuing story" feeling.
+
+## Implementation Notes
+
+When editing future blog posts in a series:
+1. Read all previous posts first to understand voice, tone, and narrative arc
+2. Reference specific moments/quotes from previous posts in the opening
+3. Maintain consistent terminology for key concepts throughout
+4. Use visual/thematic callbacks when appropriate
+5. End with a clear preview of the next post
+
+## Related Documents
+
+- blog-part2-refresh.md (this decision was applied here)
+- tamirdresher.github.io/_posts/ (original blog series)
+
+---
+
+## Decision 4: Blog Publishing via Playwright — Browser Session Isolation Blocker
+
+**Date:** 2026-03-11  
+**Author:** Picard  
+**Issue:** #310  
+**Status:** Blocked — Technical constraint (not a design choice)  
+
+**Summary:**  
+Attempted autonomous blog publishing for issue #310 using Playwright CLI browser automation. Failed due to browser security model preventing automation from accessing user's real login sessions. Playwright's --persistent flag creates isolated profiles, not user's actual Edge profile.
+
+**Problem:**  
+Browsers intentionally isolate automation contexts from daily browsing for security. Edge profile locks when running; Playwright cannot open locked profiles. Alternative: --persistent flag creates fresh isolated profile requiring re-login on all platforms.
+
+**Outcome:**  
+Task cannot be completed autonomously. Provided decision document with 3 options for future:
+1. **Option A (Recommended):** playwright-cli open --extension — user launches Edge manually; Playwright connects to running instance with real sessions
+2. **Option B:** Session state export/import for repeatability after manual login
+3. **Option C:** API-based publishing (eliminates browser entirely)
+
+**Related:** .squad/decisions/inbox/picard-310-blog-publishing.md (full technical analysis)
+
+
+---
+
+# Decision: BasePlatformRP Code Quality Standards
+
+**Date:** 2026-03-10  
+**Context:** Issue #316 - Ofek's PR review feedback on BasePlatformRP  
+**Decision Maker:** Picard (Lead)
+
+## Decision
+
+Establish code quality standards for BasePlatformRP project based on Ofek's review:
+
+1. **JSON Serialization:** Ban Newtonsoft.Json, mandate System.Text.Json
+   - Even Cosmos SDK supports System.Text.Json
+   - Apply across all new and refactored code
+
+2. **Dependency Injection:** Require DI pattern for service instantiation
+   - No direct `new` instantiation of services
+   - Follow ASP.NET Core DI conventions
+
+3. **Dependency Hygiene:** Remove redundant package references
+   - Many packages included in Microsoft.AspNetCore.App metapackage
+   - Audit and clean up .csproj files
+
+## Rationale
+
+- Modern .NET best practices favor System.Text.Json
+- DI improves testability and maintainability
+- Reducing dependencies improves build times and security posture
+
+## Affected Work
+
+- PR #59 requires immediate refactoring
+- Future PRs should follow these standards
+- Consider adding linting rules to enforce
+
+## Status
+
+Active - needs team acknowledgment and enforcement mechanism
+
+
+---
+
+# Decision: Industry Validation of Squad Architecture — Tech News Digest #315
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** 📋 Recommendation (pending team review)  
+**Scope:** Architecture & Governance  
+
+---
+
+## Executive Summary
+
+Tech News Digest #315 validates three core pillars of our squad's architecture. The industry is moving in directions we've already chosen. This is a signal to **double down on our current direction** with confidence.
+
+---
+
+## Key Validations
+
+### 1. Amazon AI Code Review Gate ⭐⭐⭐ CRITICAL
+**Industry Precedent:** Amazon now mandates senior engineer sign-off on AI-generated code changes (post-outage policy).  
+**Our Decision:** We already require this (Squad reviewer gate pattern).  
+**Consequence:** This is industry-leading governance—validate our approach publicly and document it as a best practice decision.
+
+### 2. Go for AI Agents ⭐⭐⭐ ARCHITECTURAL
+**Industry Signal:** Armin Ronacher (Flask creator) argues Go's concurrency model is better for agent workloads than Python.  
+**Our Decision:** We chose Go for DK8S operators and agentic patterns.  
+**Consequence:** Confirms Go architecture choice for future agent/operator work.
+
+### 3. Agentic CLI as Market Frontier ⭐⭐⭐ STRATEGIC
+**Industry Trend:** "The Agentic CLI Takeover—Why Your Terminal is the New IDE Frontier"  
+**Our Direction:** Copilot CLI, agent routing, terminal-first UX.  
+**Consequence:** Market validation for our approach. Suggests this is a high-leverage area.
+
+---
+
+## Action Items
+
+| Item | Owner | Priority | Rationale |
+|------|-------|----------|-----------|
+| Read "Agentic CLI Takeover" article | Research team | HIGH | Direct relevance to our terminal-first strategy |
+| Document Amazon policy as precedent | Picard | MEDIUM | Strengthens our governance decision rationale |
+| Review Go concurrency article | Architecture team | MEDIUM | Informs operator design patterns |
+| Monitor .NET 11 unions for stable release | C# track | LOW | Beneficial for DK8S operator code |
+
+---
+
+## Recommendation
+
+**Adopt:** Continue current architectural direction with increased confidence. The industry is validating our choices on governance, technology, and UX.
+
+**Escalate to:** Picard (strategy validation), B'Elanna (Go/operator architecture)
+
+---
+
+*Decision created as part of tech news digest analysis workflow.*
+
+

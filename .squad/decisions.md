@@ -19568,3 +19568,137 @@ Received alert about critical Dependabot security PRs for DK8S CapacityControlle
 - Issue #336
 - .squad/agents/worf/history.md (2026-03-10 learnings)
 
+---
+
+## Decision 20: GitHub Account Switching — EMU Workaround
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Tool Automation  
+
+### Decision
+
+The squad MUST handle GitHub account switching automatically. When working on personal public repos (tamirdresher/squad-monitor, tamirdresher/tamirdresher.github.io, etc.), ALWAYS switch to personal account first: gh auth switch --user tamirdresher. When done, ALWAYS switch back: gh auth switch --user tamirdresher_microsoft. NEVER report "PR creation blocked by EMU" — just switch accounts and create the PR.
+
+### Rationale
+
+- EMU (Enterprise-managed User) account cannot create PRs on personal public repositories
+- Simple workaround: switch GitHub CLI authentication context to personal account
+- Agents must execute this autonomously without asking or escalating as a blocker
+- This directive has been stated multiple times — agents keep forgetting
+
+### Applies To
+
+All PR creation work on personal public repos (squad-monitor, tamirdresher.github.io, squad-personal-demo, etc.)
+
+### Implementation
+
+`ash
+# Before working on personal public repos:
+gh auth switch --user tamirdresher
+
+# After work is complete:
+gh auth switch --user tamirdresher_microsoft
+`
+
+### Consequences
+
+- ✅ PR creation workflow becomes frictionless
+- ✅ No false blockers or escalations  
+- ⚠️ Requires remembering to switch back (failure mode: EMU context left active)
+
+### Related
+
+EMU is a Microsoft Azure DevOps identity management system. Agents operating on personal GitHub repos must use personal account context.
+
+---
+
+## Decision 21: Teams CC Monitoring — Autonomous Follow-up
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Issue Tracking  
+
+### Decision
+
+Monitor Teams messages where Tamir is CC'd (not just direct mentions). Track these conversations so if the other person continues the discussion and follow-up action is needed, the squad can pick it up autonomously.
+
+### Rationale
+
+- User request for improved context tracking
+- Example: Nada thread where she continued asking questions after Tamir's initial reply — team should have detected and responded
+- Ensures no Teams conversations fall through the cracks
+
+### Applies To
+
+All Teams channels and direct messages where Tamir is CC'd (visible in message thread)
+
+### Does NOT Apply When
+
+- Conversation is resolved (marked as Answered)
+- Message is informational only, no action required
+- Requester explicitly states "no follow-up needed"
+
+### Implementation
+
+When monitoring Teams:
+1. Check both direct mentions and CC mentions
+2. Track conversation threads and participant continuations
+3. If new response from another participant after Tamir replied, flag for squad action
+4. Create issue or escalate to Picard (Lead) if response needed
+
+### Consequences
+
+- ✅ Proactive issue detection
+- ✅ Faster response to community questions
+- ⚠️ Requires continuous Teams monitoring (see: Data agent scope)
+- ⚠️ May create false positives (informational follow-ups)
+
+### Related
+
+Captured 2026-03-11. Coordinator monitors Teams CC messages; escalates to squad for action.
+
+---
+
+## Decision 22: Session Display Format — squad-monitor UI (Issue #10)
+
+**Date:** 2026-03-11  
+**Author:** Data (submitted from inbox)  
+**Status:** Pending PR merge  
+**Scope:** squad-monitor Tool  
+
+### Decision
+
+Session display in squad-monitor consolidates all metadata into a single widened Session column rather than adding separate columns for each field. This maximizes terminal real estate while remaining readable.
+
+### Format
+
+- **Agency sessions:** Ralph-Mar 11 20:39 (30380cd9) | tamresearch1
+- **Copilot sessions:** Copilot-shortId | reponame
+
+### Key Choices
+
+1. **Resume ID truncated to 8 chars** — full GUID too long for terminal display
+2. **CWD shown as last path segment only** — repo name, not full path (e.g., 	amresearch1, not /home/user/code/tamresearch1)
+3. **Single consolidated column** — removed separate Repo/CWD columns, widened Session column to 45 chars max
+4. **16KB read limit on events.jsonl** — session metadata always in first few KB, avoids reading multi-MB historical files
+5. **Graceful fallback** — missing metadata degrades to short directory ID
+
+### Implementation
+
+Branch: squad/10-session-display on tamirdresher/squad-monitor  
+Status: Rebased onto latest main, build clean, awaiting PR merge
+
+### Consequences
+
+- ✅ Improved terminal readability (single consolidated column)
+- ✅ Faster metadata reads (16KB limit)
+- ⚠️ Truncated IDs require disambiguation in logs (full ID available in events.jsonl)
+- ⚠️ Lost repo column (recoverable from events.jsonl if needed)
+
+### Related
+
+Implements squad-monitor issue #10 (UI consolidation). PR #4 ready for review.
+

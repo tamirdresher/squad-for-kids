@@ -10,6 +10,66 @@ TBD - Q2 work incoming
 
 ## Learnings
 
+### 2026-03-11: Picard — Issue #335 Inventory-as-Code Onboarding Investigation
+
+**Assignment:** Review and merge ADOCopilot Inventory-as-Code compliance PRs across Tamir's repositories.
+
+**Context:** 
+- ADOCopilot (Microsoft Azure DevOps automation system) sent email about Inventory-as-Code onboarding
+- Issue says "Multiple PRs were created across Tamir's repositories"
+- Risk: Failure to merge results in repositories being disabled
+- Tamir said: "do the PR approval for these repos i own"
+
+**Investigation Findings:**
+1. **No open PRs found** in tamresearch1 or visible across Tamir's GitHub repos
+2. **No recent merges** with inventory/YAML compliance changes on 2026-03-11
+3. **ADOCopilot context**: This refers to Microsoft's Inventory-as-Code compliance system for Azure DevOps repositories
+   - Typically requires YAML files at repo root (format: `.areapath` or similar)
+   - Defines: service ownership, area path, repository criticality, compliance inheritance
+   - Repositories without these fail compliance audits and may be disabled
+
+**Likely Scenarios:**
+- Scenario A: PRs were created in different repos Tamir owns (cli-tunnel, squad-monitor, squad-personal-demo, etc.)
+- Scenario B: PRs exist in Azure DevOps repos, not GitHub
+- Scenario C: Email was a heads-up notification that PRs *should be* created, not that they already exist
+
+**Action Taken:**
+- Posted analysis and findings to issue #335 as comment
+- Recommended: Review ADOCopilot email directly for specific repo list and PR links
+- Recommended: Check Azure DevOps portal for pending compliance notifications
+- Stated readiness to review and approve PRs once specifically identified
+
+**Status:** ⏸️ **Awaiting clarification** from Tamir on which specific PRs or repos need action
+
+**Key Learning:** When an issue references "Multiple PRs" but context is incomplete, the PR discovery step (not review) is the blocker. Direct communication with requester (Tamir) to provide specific PR links, repo list, or ADOCopilot email body is essential before proceeding with review/approval.
+
+---
+
+### 2026-03-11: Picard — Issue #328 ADO PR Review (Round 2)
+
+**Assignment:** Review ADO PR #15000967 (Keel MCP) again—Tamir explicitly requested Picard review after B'Elanna's high-level pass.
+
+**Context:** Same PR as Q1 review but Tamir wants actionable bullets focusing on CUE logic detection, template auto-discovery, and configgen-cli integration.
+
+**Execution:**
+1. Confirmed ADO MCP still broken (known issue #329)
+2. Retrieved Q1 review findings from history-2026-Q1.md
+3. Confirmed prior analysis covers Tamir's concerns
+4. Posted concise bullet-point review to issue #328
+
+**Findings Posted:**
+- **CRITICAL:** CUE semantic analysis gap (conditionals, computed values, constraints)
+- **HIGH:** Template auto-discovery missing from MCP
+- **MEDIUM:** configgen-cli integration needed
+- Pre-merge testing checklist for CUE logic validation
+- Approval recommendation: conditional on documenting limitations
+
+**Key Difference from Q1 Review:** Reformatted as short bullets per Tamir's request, added pre-merge testing checklist, made approval recommendation explicit.
+
+**Outcome:** Review complete. Waiting on Tamir for ADO access or Abhishek discussion context.
+
+**Learning:** When re-reviewing the same item, check if context/requirements changed (Q1: exploratory analysis, Q2: actionable bullets + approval decision).
+
 *Learnings will accumulate here during Q2.*
 
 ---
@@ -177,4 +237,30 @@ TBD - Q2 work incoming
 1. Teams message monitoring must track not just mentions but also thread continuations — a 5-day silence + new reply = Squad-relevant event
 2. Communications features often fall between "code" and "infrastructure" — routing to Kes (communications owner) rather than infrastructure specialist was the right call
 3. Multi-squad architecture needs both technical depth (for implementers) AND elevator pitch (for community validation) — having both artifacts lets Tamir socialize the model efficiently
+
+
+
+### 2026-03-11 Completed: Two Parallel Investigations (Issue #328, #335)
+
+**Round 1 Context:** Picard spawned twice in parallel:
+- **Agent-0 (Sonnet):** Reviewed ADO PR #15000967 for Keel MCP Server (issue #328)
+- **Agent-1 (Haiku):** Investigated Inventory-as-Code compliance PRs (issue #335)
+
+**Agent-0 Findings (Issue #328):**
+- CUE logic detection gaps identified in PR #15000967
+- Template auto-discovery needs documented  
+- configgen-cli integration opportunities proposed
+- Findings posted as detailed comment to issue #328
+- **Status:** Board moved to Review state
+
+**Agent-1 Findings (Issue #335):**
+- No visible Inventory-as-Code PRs found on GitHub or in tamresearch1
+- Proposed three scenarios: cross-repo PRs, Azure DevOps PRs, or forward heads-up notification
+- Recommended Tamir provide specific PR links or ADOCopilot email body
+- Findings posted to issue #335
+- **Status:** Board moved to Pending User state (awaiting Tamir clarification)
+
+**Key Learning:** When issue references "Multiple PRs" but lacks specifics, the discovery step is the blocker. Direct communication with Tamir required before proceeding to review/approval phase.
+
+**Orchestration Log:** 2026-03-11T20-52-48Z-agent-0-picard.md, 2026-03-11T20-52-48Z-agent-1-picard.md
 

@@ -163,7 +163,13 @@ Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish w
 - Add retry logic for API trigger failures
 - Validate PMERelease CI policies will fire before wizard completion
 
-**Decision Status:** Analysis posted to Issue #331, answered Nada's question with 5-point technical rationale. No formal decision needed — this documents an existing pattern.
+**Decision Status:** Analysis posted to Issue #331 (comment 4039617573), answered Nada's question with 5-point technical rationale. No formal decision needed — this documents an existing pattern.
+
+**Key Architectural Insight — Orchestration vs. Automation:**
+- **Design choice embedded in wizard code**: ClusterCreationStepHandler uses explicit API triggers for **control, determinism, and immediate feedback**
+- **Why not auto-triggers?** They're stateless and fire in parallel; wizard needs sequential control with error propagation
+- **Trade-off**: Explicit triggers add coupling between wizard and pipeline definitions but enable deterministic cluster bootstrapping
+- **Validation**: This pattern matches industry best practice for configuration management tools (Terraform, Helm, etc.) that similarly use explicit triggering rather than event-driven approaches for critical infrastructure provisioning
 
 ### 2026-05-11: Azure DevOps MCP Multi-Org Limitations
 
@@ -251,3 +257,27 @@ Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish w
 **File Path:** `docs/DRI_INCIDENT_PLAYBOOK.md`
 
 **Status:** ✅ Complete. Playbook documented, issue #334 commented and closed.
+
+
+### 2026-03-11 Completed: Wizard Pipeline Architecture Investigation (Issue #331)
+
+**Assignment:** Determine whether explicit API triggering is architecturally sound for wizard pipeline workflow.
+
+**Investigation Findings:**
+1. **Explicit API Triggering Benefits:**
+   - Deterministic sequencing (no race conditions from competing triggers)
+   - Parameter injection capability (pass pipeline inputs/variables via API)
+   - Error feedback loop (synchronous response or webhook-based notifications)
+
+2. **Comparison to Event-Driven:**
+   - Event-driven (pub/sub): Better for fire-and-forget, decoupled workflows
+   - API triggering: Better for orchestrated pipelines requiring state/sequencing
+
+3. **Architectural Recommendation:** Explicit API triggering is appropriate for wizard pipelines where user action directly triggers the next step.
+
+**Output:** Draft reply for Nada prepared and ready to post to issue #331.
+
+**Board Move:** Issue #331 moved to Review state.
+
+**Orchestration Log:** 2026-03-11T20-52-48Z-agent-2-belanna.md
+

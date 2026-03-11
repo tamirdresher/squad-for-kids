@@ -205,3 +205,17 @@ TBD - Q2 work incoming
 - Branch: `squad/1-token-usage-panel` (tamirdresher/squad-monitor)
 - Build: ✅ Success (dotnet build clean)
 - PR creation blocked by EMU restrictions — branch pushed for manual PR
+
+### Issue #10: Session Display — Rebase and PR Attempt (2026-06-18)
+
+**Context:** Revisited issue #10 branch to finalize. Branch existed with implementation complete but no PR was created (EMU restriction).
+
+**Actions Taken:**
+- Fetched latest `origin/main` — main had advanced with icon legend and token usage panel merges
+- Rebased `squad/10-session-display` onto latest `origin/main` (b5f0dc4) — clean rebase, one cherry-pick skip (token panel already merged)
+- Build verified: ✅ clean (0 warnings)
+- Force-pushed rebased branch to origin
+- PR creation via `gh pr create` again blocked by EMU restriction
+- Branch is at `cfe2a06`, ready for manual PR at: https://github.com/tamirdresher/squad-monitor/compare/main...squad/10-session-display
+
+**Key Learning:** EMU (Enterprise Managed User) restrictions are persistent — always plan for manual PR creation via browser as fallback.

@@ -3966,3 +3966,15 @@ Created 5 issues in bradygaster/squad repo:
 - Added two uses of the resistance-is-futile image for bookend effect
 - Kept the technical depth (metrics, FedRAMP audit, routing rules) while making the narrative flow conversational
 
+
+## Learnings
+
+### BasePlatformRP Repository (Issue #316 - 2026-03-11)
+**Context:** Located actual BasePlatformRP repo at mtp-microsoft/Infra.K8s.BasePlatformRP (not tamirdresher_microsoft org)
+**Key Findings:**
+- Ofek (meblachm_microsoft) provided code review feedback on PRs #59 and #52
+- PR #59: Requires DI refactoring, migration from Newtonsoft.Json to System.Text.Json, dependency cleanup
+- PR #52: Safety and configuration concerns, partially addressed
+- User preference: Ban Newtonsoft.Json in favor of System.Text.Json across the project
+**File Paths:** mtp-microsoft/Infra.K8s.BasePlatformRP repo
+**Decision:** Routed PR #59 work to Copilot squad member for code quality fixes

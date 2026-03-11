@@ -18202,3 +18202,104 @@ Task cannot be completed autonomously. Provided decision document with 3 options
 3. **Option C:** API-based publishing (eliminates browser entirely)
 
 **Related:** .squad/decisions/inbox/picard-310-blog-publishing.md (full technical analysis)
+
+
+---
+
+# Decision: BasePlatformRP Code Quality Standards
+
+**Date:** 2026-03-10  
+**Context:** Issue #316 - Ofek's PR review feedback on BasePlatformRP  
+**Decision Maker:** Picard (Lead)
+
+## Decision
+
+Establish code quality standards for BasePlatformRP project based on Ofek's review:
+
+1. **JSON Serialization:** Ban Newtonsoft.Json, mandate System.Text.Json
+   - Even Cosmos SDK supports System.Text.Json
+   - Apply across all new and refactored code
+
+2. **Dependency Injection:** Require DI pattern for service instantiation
+   - No direct `new` instantiation of services
+   - Follow ASP.NET Core DI conventions
+
+3. **Dependency Hygiene:** Remove redundant package references
+   - Many packages included in Microsoft.AspNetCore.App metapackage
+   - Audit and clean up .csproj files
+
+## Rationale
+
+- Modern .NET best practices favor System.Text.Json
+- DI improves testability and maintainability
+- Reducing dependencies improves build times and security posture
+
+## Affected Work
+
+- PR #59 requires immediate refactoring
+- Future PRs should follow these standards
+- Consider adding linting rules to enforce
+
+## Status
+
+Active - needs team acknowledgment and enforcement mechanism
+
+
+---
+
+# Decision: Industry Validation of Squad Architecture — Tech News Digest #315
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** 📋 Recommendation (pending team review)  
+**Scope:** Architecture & Governance  
+
+---
+
+## Executive Summary
+
+Tech News Digest #315 validates three core pillars of our squad's architecture. The industry is moving in directions we've already chosen. This is a signal to **double down on our current direction** with confidence.
+
+---
+
+## Key Validations
+
+### 1. Amazon AI Code Review Gate ⭐⭐⭐ CRITICAL
+**Industry Precedent:** Amazon now mandates senior engineer sign-off on AI-generated code changes (post-outage policy).  
+**Our Decision:** We already require this (Squad reviewer gate pattern).  
+**Consequence:** This is industry-leading governance—validate our approach publicly and document it as a best practice decision.
+
+### 2. Go for AI Agents ⭐⭐⭐ ARCHITECTURAL
+**Industry Signal:** Armin Ronacher (Flask creator) argues Go's concurrency model is better for agent workloads than Python.  
+**Our Decision:** We chose Go for DK8S operators and agentic patterns.  
+**Consequence:** Confirms Go architecture choice for future agent/operator work.
+
+### 3. Agentic CLI as Market Frontier ⭐⭐⭐ STRATEGIC
+**Industry Trend:** "The Agentic CLI Takeover—Why Your Terminal is the New IDE Frontier"  
+**Our Direction:** Copilot CLI, agent routing, terminal-first UX.  
+**Consequence:** Market validation for our approach. Suggests this is a high-leverage area.
+
+---
+
+## Action Items
+
+| Item | Owner | Priority | Rationale |
+|------|-------|----------|-----------|
+| Read "Agentic CLI Takeover" article | Research team | HIGH | Direct relevance to our terminal-first strategy |
+| Document Amazon policy as precedent | Picard | MEDIUM | Strengthens our governance decision rationale |
+| Review Go concurrency article | Architecture team | MEDIUM | Informs operator design patterns |
+| Monitor .NET 11 unions for stable release | C# track | LOW | Beneficial for DK8S operator code |
+
+---
+
+## Recommendation
+
+**Adopt:** Continue current architectural direction with increased confidence. The industry is validating our choices on governance, technology, and UX.
+
+**Escalate to:** Picard (strategy validation), B'Elanna (Go/operator architecture)
+
+---
+
+*Decision created as part of tech news digest analysis workflow.*
+
+

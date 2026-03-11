@@ -4,9 +4,17 @@
  * Tech News Scanner
  * Scans HackerNews and Reddit for relevant tech stories
  * Filters by topics: AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools
+ * 
+ * Deduplication:
+ * - Checks if a Tech News Digest issue already exists for today before creating
+ * - Tracks reported URLs in .squad/monitoring/tech-news-state.json to avoid reposting
  */
 
 import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const KEYWORDS = [
   'ai', 'artificial intelligence', 'machine learning', 'ml', 'llm', 'gpt', 'copilot',
@@ -16,6 +24,62 @@ const KEYWORDS = [
   'kubernetes', 'k8s', 'cloud native', 'cncf',
   'developer tools', 'devtools', 'ide', 'vscode', 'github'
 ];
+
+// Setup state file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const stateDir = path.join(__dirname, '..', '.squad', 'monitoring');
+const stateFile = path.join(stateDir, 'tech-news-state.json');
+
+// Ensure state directory exists
+function ensureStateDir() {
+  if (!fs.existsSync(stateDir)) {
+    fs.mkdirSync(stateDir, { recursive: true });
+  }
+}
+
+// Load state from file
+function loadState() {
+  try {
+    if (fs.existsSync(stateFile)) {
+      const data = fs.readFileSync(stateFile, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error(`Warning: Could not load state file: ${e.message}`);
+  }
+  return { lastScanDate: null, reportedUrls: {} };
+}
+
+// Save state to file
+function saveState(state) {
+  try {
+    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');
+  } catch (e) {
+    console.error(`Warning: Could not save state file: ${e.message}`);
+  }
+}
+
+// Get today's date in YYYY-MM-DD format
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// Check if an issue already exists for today
+function issueExistsForToday(date) {
+  try {
+    const searchTerm = `Tech News Digest: ${date}`;
+    const output = execSync(
+      `gh issue list --state all --search "${searchTerm}" --json number --jq length`,
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
+    ).trim();
+    const count = parseInt(output, 10);
+    return count > 0;
+  } catch (e) {
+    console.error(`Warning: Could not check for existing issues: ${e.message}`);
+    return false;
+  }
+}
 
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
@@ -133,10 +197,43 @@ function formatDigest(stories) {
 
 async function main() {
   try {
+    ensureStateDir();
+    const state = loadState();
+    const todayDate = getTodayDate();
+    
     console.error('Starting tech news scan...');
+    
+    // Check if issue already exists for today
+    if (issueExistsForToday(todayDate)) {
+      console.error(`Tech news digest already exists for today (${todayDate}), skipping.`);
+      console.error('To force creation, manually delete the existing issue.');
+      process.exit(0);
+    }
+    
     const stories = await scanAllSources();
-    const digest = formatDigest(stories);
+    
+    // Filter out URLs that have already been reported
+    const reportedUrlsForDate = state.reportedUrls[todayDate] || {};
+    const newStories = stories.filter(story => !reportedUrlsForDate[story.url]);
+    
+    if (newStories.length === 0 && stories.length > 0) {
+      console.error('All stories have already been reported. Skipping digest creation.');
+      process.exit(0);
+    }
+    
+    const digest = formatDigest(newStories);
     console.log(digest);
+    
+    // Update state with new URLs
+    if (!state.reportedUrls[todayDate]) {
+      state.reportedUrls[todayDate] = {};
+    }
+    newStories.forEach(story => {
+      state.reportedUrls[todayDate][story.url] = true;
+    });
+    state.lastScanDate = todayDate;
+    saveState(state);
+    
     console.error('Tech news scan completed successfully!');
   } catch (error) {
     console.error('Error during scan:', error);

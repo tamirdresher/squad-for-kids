@@ -143,3 +143,28 @@ TBD - Q2 work incoming
 - Not designed for interactive DevBox access — using it this way would be a security anti-pattern
 
 **Decision Status:** Analysis posted to Issue #330. Awaiting Tamir's approval to implement.
+
+### 2026-05-28: Issue #334 — DRI Incident Playbook Documentation
+
+**Context:** Tamir flagged a playbook Ravid shared (from Joshua) in the IDP LT Weekly Staff meeting chat as "priceless and handy" for when he's DRI manager during incidents.
+
+**Action Taken:**
+- Used WorkIQ to retrieve the full playbook content from the Teams meeting chat
+- Created `docs/DRI_INCIDENT_PLAYBOOK.md` with the complete playbook
+- Cross-referenced with Issue #333 (Azure Status check during incidents)
+
+**Key Content — Joshua's Four Mitigation Actions (strict order):**
+1. **Rollback** — always first, should take minutes
+2. **Add Capacity** — no new code, just more resources
+3. **Fail Over** — move traffic away from unhealthy region/cluster
+4. **Fix Forward** — last resort, requires PR approval and senior eyes
+
+**Key Patterns:**
+- Always confirm customer impact first; declare outage early even if uncertain
+- Incident Manager's job: keep DRI focused on one of the four actions, track SLAs, handle comms
+- Never chase root cause during an active incident
+- Encourage DRI breaks after hours of investigation
+
+**File Path:** `docs/DRI_INCIDENT_PLAYBOOK.md`
+
+**Status:** ✅ Complete. Playbook documented, issue #334 commented and closed.

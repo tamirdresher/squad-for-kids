@@ -3485,3 +3485,30 @@ Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main
 - GitHub Actions workflow runs Monday mornings, creates issues for Seven to triage
 - Tech: Node.js, curl, GitHub CLI, cron scheduling
 
+
+### Issue #266: Token Usage and Cost Stats Panel (squad-monitor)
+
+**Context:**
+- Issue requested adding token usage dashboard panel to squad-monitor
+- Data source: ssistant_usage events in ~/.copilot/logs/*.log files
+- Requirements: model name, tokens (prompt/completion/cached), cache hit %, cost, premium count
+
+**Findings:**
+- Functionality was already implemented in BuildTokenStatsSection method (lines 485-673 of Program.cs)
+- Method parses assistant_usage events, aggregates by model, calculates costs
+- Missing piece: section wasn't being added to dashboard display
+
+**Implementation:**
+- Added BuildTokenStatsSection(userProfile) call to BuildDashboardContent method
+- Positioned after Live Agent Feed section for logical grouping
+- Minimal change: 3 lines added to integrate existing functionality
+
+**Branch:** squad/266-token-usage-panel
+**Commit:** 25a2afc
+**Result:** Build succeeded. Ready for PR (couldn't create due to EMU permissions)
+
+**Pattern Learned:**
+- Before implementing features, scan entire codebase for existing implementations
+- Sometimes "adding a feature" is just wiring up existing code
+- Use grep/search to find method definitions before writing new code
+

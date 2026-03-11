@@ -17630,3 +17630,208 @@ Implemented a fallback strategy for marketplace monitoring:
 
 ✅ Implemented and tested
 
+
+---
+
+# Data: squad-monitor Development Session (2026-03-11)
+
+## Context
+Assigned three issues from squad-monitor repo:
+- Issue #265 (NuGet publish): Already completed
+- Issue #264 (Multi-session view): Already completed  
+- Issue #266 (Token stats panel): Implemented today
+
+## Decision: Code Reuse Over Reimplementation
+
+**Situation:**
+Issue #266 requested a token usage dashboard panel. Initial instinct might be to start coding a new feature from scratch.
+
+**Discovery:**
+Full implementation already existed in `BuildTokenStatsSection()` method:
+- Parses `assistant_usage` events from copilot logs
+- Aggregates metrics by model (calls, tokens, cost)
+- Calculates cache hit percentages
+- Formats display with color coding
+
+**Action Taken:**
+- Added single method call to dashboard content builder
+- 3 lines of code vs potential 200+ line reimplementation
+- Build succeeded immediately
+
+## Principle: Search Before Coding
+
+**Rule for future work:**
+1. `grep` or search for relevant method names/keywords first
+2. Check if functionality exists but is just not wired up
+3. Review entire file structure before assuming something is missing
+4. Prefer integration over duplication
+
+**Why This Matters:**
+- Saves development time (minutes vs hours)
+- Avoids duplicate logic and maintenance burden
+- Preserves existing patterns and code quality
+- Reduces bug introduction risk
+
+## Technical Notes
+
+**Implementation Details:**
+```csharp
+// Added to BuildDashboardContent() at line 145-148:
+sections.Add(BuildLiveAgentFeedSection(userProfile));
+
+// Token Usage & Cost Stats  
+sections.Add(BuildTokenStatsSection(userProfile));
+```
+
+**Data Source:**
+- `~/.copilot/logs/*.log` files
+- Parses `assistant_usage` JSON events
+- Aggregates last 5 log files for session view
+
+**Metrics Displayed:**
+- Model name (shortened for display)
+- Call count
+- Prompt/completion/cached tokens (formatted as K/M)
+- Cache hit % (color coded: green >50%, yellow >20%)
+- Cost per model and total
+- Premium request count
+
+## Branch & Commit
+- Branch: `squad/266-token-usage-panel`
+- Commit: `25a2afc` - feat: Add token usage and cost stats panel to dashboard
+- Status: Pushed to origin, ready for PR (blocked by EMU permissions)
+
+## Recommendation
+When creating PRs from squad-monitor development:
+- Have Picard or Tamir create the PR from the pushed branch
+- Include tamresearch1 issue number in PR body: `Closes tamirdresher_microsoft/tamresearch1#266`
+- Cross-reference between repos for tracking
+
+---
+
+# Decision: Agency C2 Evangelism Initiative — Planning & Routing
+
+**Date**: 2026-03-28  
+**Researcher**: Seven (Research & Docs)  
+**Issue**: #308 — "[Agency C2] Drive demo video collection & fix SharePoint access for success stories"  
+**Status**: Decision finalized | Action plan posted to issue
+
+---
+
+## Context
+
+Agency C2 Kickoff Meeting (March 10, 2026) identified 4 evangelism tasks:
+1. Collect demo videos from squads
+2. Fix SharePoint permissions for success stories page
+3. Secure additional resourcing for evangelism + tools
+4. Establish bi-weekly newsletter cadence + content pipeline
+
+---
+
+## Decision: Routing & Ownership
+
+### ✅ Picard (Lead) — Primary Owner
+**Responsibility**: Coordination, strategy, leadership decisions
+
+- **Video Collection**: Identify squad contacts, set deadline, define specs, launch "Call for Demos"
+- **Resource Resourcing**: Define scope (what does "additional" mean?), identify budget owner, propose business case
+- **Newsletter Strategy**: Choose platform, create editorial calendar, assign content leads, set approval workflow
+- **Timeline**: All decisions needed within 1 week for momentum
+
+**Why Picard?** These are strategic, cross-functional tasks requiring leadership authority and squad coordination.
+
+---
+
+### ✅ B'Elanna (Infrastructure) — Secondary Owner
+**Responsibility**: SharePoint administration & access management
+
+- **SharePoint Fix**: Confirm admin access, audit current permissions, determine target audience, update access tiers
+- **Technical Setup**: Help configure newsletter platform (if Teams/SharePoint-based)
+- **Verification**: Test access with sample users post-fix
+
+**Why B'Elanna?** Requires infrastructure/admin credentials and system configuration expertise.
+
+---
+
+### 📍 Seven (Docs) — Support Role
+**Responsibility**: Content templates, narrative support (no execution authority)
+
+- Prepare success story narrative template (waiting on content strategy)
+- Draft newsletter content outline
+- Assist with story curation from demo videos (once videos arrive)
+
+**Why Seven?** Docs expertise supports content pipeline but doesn't own strategy.
+
+---
+
+## AI Squad Involvement
+
+### ✅ High-Value AI Contributions
+- **Ralph** (monitoring): Track video submissions, monitor SharePoint access logs, aggregate squad updates for newsletter
+- **Data** (analysis): Cost-benefit analysis for tool/resource proposals, evangelism ROI framework, vendor comparison
+- **Seven** (templates): Success story narratives, newsletter content structure
+
+### ❌ Out of Scope
+- Video production (squad owners provide)
+- SharePoint admin changes (B'Elanna owns)
+- Budget approval (leadership decision)
+- Squad outreach emails (Picard sends)
+
+---
+
+## Blockers Identified
+
+| Blocker | Impact | Severity | Resolution |
+|---------|--------|----------|-----------|
+| No squad contact list | Cannot start video collection | HIGH | Picard creates immediately |
+| SharePoint admin access unknown | Cannot fix permissions | HIGH | B'Elanna confirms this week |
+| "Additional resourcing" undefined | Cannot proceed with Task 3 | MEDIUM | Picard + leadership clarify scope |
+| Newsletter platform undefined | Cannot establish cadence | MEDIUM | Picard selects tool |
+| No evangelism strategy | Newsletter won't sustain | MEDIUM | Picard defines content themes |
+
+---
+
+## Timeline
+
+**This Week (Actions)**:
+- Picard: Squad lead huddle + resource conversation with leadership
+- B'Elanna: SharePoint audit + admin access confirmation
+- Seven: Prepare narrative template
+
+**Next Week (Reviews)**:
+- Picard reviews squad responses on video availability & content themes
+- B'Elanna confirms SharePoint fix complete
+- Plan newsletter pilot (first edition target: 2 weeks)
+
+**3-4 Weeks Out**:
+- Video collection underway
+- Newsletter cadence established
+- Additional resources allocated (pending decision)
+
+---
+
+## Key Learning: From Meeting to Action
+
+**Pattern Observed**: Agency C2 tasks cluster around 3 themes:
+1. **Content Collection** (videos, success stories) → Squad coordination challenge
+2. **Infrastructure Setup** (SharePoint, newsletter platform) → Admin + tooling
+3. **Strategy/Process** (evangelism cadence, resource planning) → Leadership decision
+
+**For Future**: When evangelism initiatives launch, establish **before** kickoff:
+- Squad contact roster
+- Tool/platform selections
+- Budget owner + approval process
+- Content strategy + calendar
+
+This reduces startup friction and clarifies ownership immediately.
+
+---
+
+## Recommendation
+
+**Status**: Action plan complete ✅  
+**Confidence**: HIGH — Plan addresses all 4 tasks with clear ownership & blockers  
+**Next Checkpoint**: 1 week (after Picard's squad huddle + B'Elanna's SharePoint audit)  
+
+If blockers remain unresolved after 1 week, escalate to Picard for leadership intervention.
+

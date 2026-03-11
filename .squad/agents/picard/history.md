@@ -220,6 +220,69 @@ TBD - Q2 work incoming
 
 **Learning:** When re-reviewing the same item, check if context/requirements changed (Q1: exploratory analysis, Q2: actionable bullets + approval decision).
 
+### 2026-03-11: Picard — Issue #340 MDE CopilotCliAssets Integration
+
+**Assignment:** Evaluate https://dev.azure.com/microsoft/DefenderCommon/_git/MDE.ServiceModernization.CopilotCliAssets and integrate valuable patterns into Squad.
+
+**Context:**
+- Research identified: pr-review-orchestrator, reflect skill, monthly-service-report, plugin packaging
+- Tamir directive: "Use what you think we need"
+
+**Execution:**
+
+1. **Accessed MDE Repo via ADO Search**
+   - Used azure-devops-search_code to browse pr-review-orchestrator, reflect skill, marketplace.json
+   - Retrieved reflect skill SKILL.md (21KB, comprehensive learning capture system)
+   - Analyzed pr-review-orchestrator plugin.json (parallel sub-agent dispatch)
+   - Reviewed monthly-service-report agents and skills
+
+2. **Integration Analysis**
+   - **Reflect skill:** HIGH value — complements history.md/decisions.md with structured in-flight learning capture
+   - **PR orchestrator:** LOW value — duplicates Ralph's monitoring + agent routing (B'Elanna handles reviews)
+   - **Monthly reports:** LOW value — solves problem Squad doesn't have yet, Neelix handles ad-hoc reporting
+   - **Plugin packaging:** LOW value — Squad is single-repo Git-based, no marketplace need
+
+3. **Created Reflect Skill**
+   - Path: `.squad/skills/reflect/SKILL.md`
+   - Adapted storage paths to `.squad/` structure (no Serena MCP dependency)
+   - Routes team learnings → `.squad/decisions/inbox/` for Scribe review
+   - Agent learnings → `.squad/agents/{agent}/history.md` appends
+   - Preserves HIGH/MED/LOW confidence classification from original
+   - Attribution: Richard Murillo (rimuri), MDE.ServiceModernization.CopilotCliAssets
+
+4. **Decision Document**
+   - Created: `.squad/decisions/inbox/picard-mde-integration.md`
+   - Documented integration rationale, what was adopted, what was skipped, consequences
+   - Ready for merge to `.squad/decisions.md` after Tamir review
+
+5. **Issue #340 Comment Attempt**
+   - Attempted to comment on issue #340 with integration summary
+   - Issue not found in Azure DevOps work items
+   - Context mentioned issue #340 but it doesn't exist in ADO or GitHub
+   - Deliverables remain accessible (reflect skill + decision document)
+
+**Deliverables:**
+- ✅ `.squad/skills/reflect/SKILL.md` (learning capture system adapted for Squad)
+- ✅ `.squad/decisions/inbox/picard-mde-integration.md` (integration decision documentation)
+- ⚠️ Issue #340 comment (issue not found, summary in decision document instead)
+
+**Key Decisions:**
+1. Adopted reflect skill because it enhances existing knowledge management without duplication
+2. Skipped pr-review-orchestrator because Ralph + agent routing already handles PR reviews
+3. Skipped monthly-service-report because Squad doesn't have that requirement yet
+4. Skipped plugin packaging because Squad is single-repo Git-based architecture
+
+**Status:** ✅ COMPLETED — Reflect skill integrated, decision documented, ready for Tamir review
+
+**Learnings:**
+1. MDE team's reflect skill pattern (HIGH/MED/LOW confidence) is excellent for structured learning capture — complements Squad's history.md pattern
+2. Not every pattern from external repos should be adopted — filter for Squad's actual needs (reflect YES, PR orchestrator NO)
+3. Adaptation matters more than adoption — reflect skill required storage path changes to fit Squad's Git-based structure
+4. Issue context can reference non-existent issues — deliver value (reflect skill) even when expected issue doesn't exist
+5. Credit preservation important — always attribute external patterns to original authors (Richard Murillo for reflect)
+
+---
+
 *Learnings will accumulate here during Q2.*
 
 ---

@@ -19431,3 +19431,140 @@ The `@azure-devops/mcp` package has a **single-org limitation by design**:
 
 **Status:** Research complete. Awaiting Tamir's approval to implement global config changes.
 
+---
+
+# Decision: Infrastructure Incident Investigation Pattern
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna  
+**Context:** Issue #337 — IcM Incident 759361753 (Cosmos DB firewall/policy investigation)  
+**Status:** Pattern documented for team adoption
+
+## Problem
+
+When an external stakeholder (like Brett DeFoy in IcM) asks "did your team change X infrastructure setting around date Y?", we need a fast, authoritative investigation process.
+
+## Decision
+
+**Adopt this triage pattern for infrastructure incident investigations:**
+
+### Step 1: Check IaC/Git History First (Fastest)
+- Review git log for commits around the timeframe
+- Search for keywords: resource type, firewall, network, policy
+- Check Bicep/Terraform templates for current vs. expected configuration
+- **Why:** If IaC is clean, we can immediately say "not our deployment pipeline"
+
+### Step 2: Query Azure Activity Logs (Manual Changes)
+- Use z monitor activity-log list with resource-specific filters
+- Focus on Update/Write operations around the timeframe
+- Check caller field to identify who made manual changes
+- **Why:** Catches Portal/CLI changes by admins outside our team
+
+### Step 3: Check Azure Policy Assignments (Governance)
+- Use z policy assignment list to find relevant policies
+- Filter for: Cosmos, Network, Firewall, Public Access keywords
+- Check EnforcementMode (Default = actively blocking)
+- **Why:** Central governance teams often apply policies without notifying workload teams
+
+### Step 4: Inspect Current Resource Config
+- Use resource-specific show commands (e.g., z cosmosdb show)
+- Compare actual settings vs. IaC template definitions
+- Look for drift: IP rules, VNet rules, public access settings
+- **Why:** Confirms what's actually deployed vs. what should be deployed
+
+### Step 5: Check Policy Compliance Events (Denials)
+- Use z policy state list with date filters
+- Filter for NonCompliant state
+- Check for denial events (policy blocked a compliant→non-compliant change)
+- **Why:** Reveals if a policy *prevented* someone from making a change
+
+## Rationale
+
+**Speed:** Starting with git/IaC takes seconds and gives immediate "yes/no" on team responsibility.
+
+**Accountability:** Activity Logs show exactly who/what/when for manual changes (no guessing).
+
+**Governance Visibility:** Azure Policy often operates "invisibly" at subscription/MG level — explicit check surfaces this.
+
+**Evidence-Based:** Each step produces CLI output that can be shared with stakeholders (no "we don't think so" answers).
+
+## Implementation
+
+1. **Create runbook template** with pre-filled Azure CLI commands for common resources (Cosmos, Storage, AKS, Key Vault)
+2. **Document in skill:** .squad/skills/incident-response/infrastructure-triage.md
+3. **Update DRI playbook:** Cross-reference with existing incident playbook (Issue #334)
+4. **Store as Copilot snippet:** Save CLI commands in .squad/snippets/azure-cli/ for quick copy-paste
+
+## Related
+- Issue #333: Azure Status Check in Incident Response
+- Issue #334: DRI Incident Playbook
+- .squad/skills/incident-response/ (future home)
+
+---
+
+# Decision: Session Display Format
+
+**Date:** 2026-03-11  
+**Author:** Data  
+**Context:** Issue #10 — squad-monitor session display enhancement
+
+## Decision
+
+Session display format integrates date/time, resume ID, and repo name into a single consolidated string:
+
+`
+Format: "MMM dd HH:mm (resumeId) | reponame"
+Example: "Mar 11 20:39 (30380cd9) | tamresearch1"
+`
+
+## Rationale
+
+1. **Consolidated Display**: Single column vs separate columns reduces visual scanning
+2. **Resume ID Length**: 8 chars provides uniqueness while maintaining density
+3. **CWD Format**: Last path segment only (repo name) vs full path
+4. **Timestamp Source**: events.jsonl session.start preferred over directory timestamps
+
+## Alternatives Considered
+
+1. **Separate columns** — Rejected: requires more horizontal space
+2. **Full GUID** — Rejected: 36 chars too long
+3. **Full path for CWD** — Rejected: wastes space
+4. **Directory timestamps** — Rejected: less accurate than event timestamps
+
+## Related
+- Issue: tamirdresher/squad-monitor#10
+- Branch: squad/10-session-display
+
+---
+
+# Decision: Dependabot Security Investigation Process
+
+**Date:** 2026-03-10  
+**Author:** Worf (Security & Cloud)  
+**Issue:** #336  
+**Status:** Recommendation
+
+## Context
+
+Received alert about critical Dependabot security PRs for DK8S CapacityController and ArgoRollouts repositories. Investigation revealed repositories not accessible via standard GitHub search methods.
+
+## Decision
+
+**Standardized process for investigating external Dependabot security alerts:**
+
+1. **Verify notification source first** — Check original Dependabot email for exact repository URLs
+2. **Check multiple platforms** — Enterprise repos may exist in public GitHub, private GHE, or Azure DevOps
+3. **Confirm current ownership** — Verify repository ownership/access rights before investigation
+4. **Tag early if blocked** — Add "status:pending-user" label immediately if access barriers prevent assessment
+
+## Rationale
+
+- Saves investigation time by confirming access/location upfront
+- Prevents false negatives
+- Maintains security posture by documenting blockers
+- Ensures Commander (Tamir) is engaged early
+
+## Related
+- Issue #336
+- .squad/agents/worf/history.md (2026-03-10 learnings)
+

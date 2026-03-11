@@ -23,6 +23,54 @@ Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish w
 
 ## Learnings
 
+### 2026-03-12: Issue #337 — IcM Incident 759361753 Cosmos DB Firewall Investigation
+
+**Context:** Brett DeFoy asked via IcM incident whether our team or CI/CD changed Cosmos DB network/firewall settings around Feb 1, 2026, or if Azure Policies could be blocking access.
+
+**Investigation Completed:**
+1. **Git Log Analysis (Jan 20 - Feb 15, 2026):**
+   - ✅ Confirmed: No commits modifying Cosmos DB, firewall, network settings, or Azure Policy
+   - Repository changes during this period were only docs/features, no infrastructure
+
+2. **Bicep Template Review (`infrastructure/phase1-data-pipeline.bicep`):**
+   - Cosmos DB config unchanged:
+     - `publicNetworkAccess: 'Enabled'` (line 118)
+     - `networkAclBypass: 'AzureServices'` (line 119)
+     - **No IP firewall rules or VNet rules defined in IaC**
+   - **Key Finding:** If firewall rules exist, they were applied manually (Portal/CLI) or via Azure Policy, not through our deployment pipeline
+
+3. **Azure CLI Commands Provided:**
+   - Activity Log queries to check for manual Cosmos DB network changes around Feb 1
+   - Current network config inspection (IP rules, VNet rules, public access setting)
+   - Azure Policy assignment review (subscription-level policies that could block Cosmos access)
+   - Policy compliance event checks (denial events around Feb 1)
+
+**Investigation Pattern — Infrastructure Change Triage:**
+- **Step 1:** Check IaC/git history first (fastest, authoritative for automated deployments)
+- **Step 2:** Query Azure Activity Logs for manual changes (who, what, when)
+- **Step 3:** Check Azure Policy assignments (governance/compliance enforcement)
+- **Step 4:** Inspect current resource config vs. expected IaC state
+- **Step 5:** Look for policy compliance denials (non-compliant resource blocks)
+
+**Common Causes of "Surprise" Network Restrictions:**
+1. Manual Portal changes by ops/admin teams (Activity Logs will show caller)
+2. Azure Policy enforcement applied at subscription/management group level (often by central governance)
+3. Private Endpoint misconfiguration (VNet filter enabled without proper setup)
+4. Service Tag updates breaking existing firewall rules
+
+**Draft Response Template Created:**
+- Provided Tamir with complete email template for Brett
+- Included all Azure CLI commands with placeholder replacement instructions
+- Structured for inserting actual findings after running commands
+
+**Status:** Investigation complete. Issue #337 commented with findings and CLI commands. Added `status:pending-user` label since Tamir needs to run Azure CLI commands and reply to Brett with actual results.
+
+**File Artifacts:**
+- Investigation report: `icm-759361753-investigation.md` (full details)
+- Issue comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/337#issuecomment-4041401542
+
+**Key Insight:** Infrastructure incident triage should always start with "did we deploy a change?" (git/IaC check) before diving into Azure Activity Logs. This saves time and establishes team accountability quickly. If IaC is clean, the problem is external (manual changes, policy enforcement, or platform issue).
+
 ### 2026-06-20: Issue #2 — squad-monitor NuGet Tool Packaging (Verified Complete)
 
 **Context:** Tamir requested NuGet global tool packaging for squad-monitor so users can `dotnet tool install -g squad-monitor`.

@@ -6,6 +6,36 @@
 
 ## Active Context
 
+### 2026-03-11 Completion: squad-monitor Issue #10 — Session Display Enhancement
+
+**Context:** Session display showed truncated IDs like "49_58236" which lacked context. Users needed to see session start time, working directory/repo name, and Copilot resume ID for meaningful session identification.
+
+**Implementation:**
+- Created `ExtractSessionMetadataFromEventsFile()` to parse events.jsonl files:
+  - Extracts session start time from `session.start` event timestamp
+  - Extracts resume ID from `session.start` sessionId field (first 8 chars of GUID)
+  - Extracts working directory from `session.resume` context.cwd field
+- Updated `DeriveSessionName()` to accept and integrate metadata into session display name
+- Removed separate Repo/CWD column from session table
+- Widened Session column to 45 chars to accommodate rich format
+- Applied to both Agency and Copilot session scanning paths
+
+**Display Format:**
+- Agency sessions: `Ralph-Mar 11 20:39 (30380cd9) | tamresearch1`
+- Copilot sessions: `Copilot-shortId | reponame` or `Copilot-Mar 11 20:39 (resumeId) | reponame`
+
+**Architecture Decisions:**
+- Resume ID truncated to 8 chars for display density (full GUID too long)
+- Session start time from events.jsonl preferred over directory name parsing
+- CWD extracted as last path segment only (repo name, not full path)
+- Metadata extraction reads first 16KB of events.jsonl (increased from 8KB)
+- Handles missing metadata gracefully with fallbacks
+
+**Key File Paths:**
+- `C:\temp\squad-monitor\Program.cs` — ~2500 lines, single-file app
+- Branch: `squad/10-session-display`
+- Build: ✅ Success (0 warnings)
+
 TBD - Q2 work incoming
 
 ### 2026-03-11 Completion: squad-monitor Issues #1 & #3
@@ -26,6 +56,48 @@ TBD - Q2 work incoming
 **Status:** Both PRs merged. Decisions documented and deduplicated in decisions.md.
 
 ## Learnings
+
+### Issue #10: Session Display Enhancement (2026-03-11)
+
+**Context:** squad-monitor issue #10 required showing full session context instead of truncated IDs. Sessions needed to display date/time, working directory/repo name, and Copilot resume ID.
+
+**events.jsonl Structure:**
+- `session.start` event contains `sessionId` (full GUID) and `timestamp`
+- `session.resume` event contains `context.cwd`, `context.repository`, `context.branch`
+- Both events appear in first ~2-3KB of file
+- Files use UTF-8 encoding with one JSON object per line
+
+**Implementation Approach:**
+1. Created `ExtractSessionMetadataFromEventsFile()` returning tuple `(Cwd, ResumeId, StartTime)`
+2. Reads first 16KB of events.jsonl with FileShare.ReadWrite (concurrent access safe)
+3. Uses regex patterns via `ExtractString()` helper for targeted extraction
+4. Resume ID truncated to first 8 chars (e.g., "30380cd9" from full GUID)
+5. Start time parsed with DateTimeStyles.RoundtripKind and converted to local time
+6. CWD extracted as last path segment for display density
+
+**DeriveSessionName() Enhancement:**
+- Old signature: `(string dirOrFileName, DateTime? creationTime = null)`
+- New signature: `(string dirOrFileName, DateTime? creationTime = null, string cwd = "", string resumeId = "")`
+- Builds format: `"MMM dd HH:mm (resumeId) | reponame"` with fallbacks for missing parts
+- Copilot sessions: `"shortId | reponame"` (simpler format)
+- Graceful degradation: missing CWD → show short ID, missing resumeId → show short ID
+
+**Session Table Layout Change:**
+- Removed separate "Repo/CWD" column (18 chars)
+- Widened "Session" column from 25 to 45 chars
+- All metadata now in single consolidated display name
+- Cleaner visual presentation, less column scanning
+
+**Key Patterns:**
+- Tuple returns for multi-value extraction functions
+- FileShare.ReadWrite for safe concurrent log file access
+- Fallback chains: events.jsonl → directory name parsing → directory timestamps
+- Partial read optimization: 16KB vs full file (some events.jsonl files are MB+)
+
+**Testing Notes:**
+- Build: ✅ clean (0 warnings after removing unused ExtractCwdFromEventsFile)
+- EMU restriction prevents PR creation via gh CLI (must use browser)
+- Branch pushed successfully to origin
 
 ### Issue #3: Multi-Session View Enhancement (2026-03-11)
 

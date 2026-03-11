@@ -3474,3 +3474,14 @@ Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main
 - Use skill docs to reference external tooling with installation instructions
 - Benefits: smaller repo, no build artifacts, easier updates via tool update
 
+
+## Learnings - 2026-03-11
+
+### Issue #283: AI Marketplace Monitoring
+- Created automated weekly scanner for AI marketplace tools
+- Original URL (https://aka.ms/ai/marketplace) requires SSO authentication
+- Implemented fallback to GitHub Marketplace API searching AI/ML/Copilot categories
+- Scanner uses content hashing and caching to detect changes
+- GitHub Actions workflow runs Monday mornings, creates issues for Seven to triage
+- Tech: Node.js, curl, GitHub CLI, cron scheduling
+

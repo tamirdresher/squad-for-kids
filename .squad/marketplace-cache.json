@@ -1,0 +1,288 @@
+{
+  "timestamp": "2026-03-11T02:20:18.392Z",
+  "url": "GitHub Marketplace (AI/ML tools)",
+  "itemCount": 35,
+  "listings": [
+    {
+      "type": "repo",
+      "text": "claude-code-plugins-plus-skills",
+      "description": "340 plugins + 1367 agent skills for Claude Code. Open-source marketplace with CCPI package manager, interactive tutorials, and production orchestration patterns.",
+      "href": "https://github.com/jeremylongshore/claude-code-plugins-plus-skills",
+      "stars": 1571,
+      "updated": "2026-03-11T02:14:37Z"
+    },
+    {
+      "type": "repo",
+      "text": "productivity-skills",
+      "description": "Provide reusable Codex skills to automate productivity workflows, maintain operational hygiene, and create speech-output tasks for efficient work management.",
+      "href": "https://github.com/JAGDEV1008/productivity-skills",
+      "stars": 0,
+      "updated": "2026-03-11T00:51:34Z"
+    },
+    {
+      "type": "repo",
+      "text": "claw-market",
+      "description": "Enable autonomous agents to create, trade, and scale digital products and services across decentralized marketplaces efficiently.",
+      "href": "https://github.com/Harshil-fx/claw-market",
+      "stars": 0,
+      "updated": "2026-03-11T00:47:11Z"
+    },
+    {
+      "type": "repo",
+      "text": "ralph-claude-code",
+      "description": "",
+      "href": "https://github.com/Atharvasalvi/ralph-claude-code",
+      "stars": 1,
+      "updated": "2026-03-11T00:24:46Z"
+    },
+    {
+      "type": "repo",
+      "text": "MkulimaLink",
+      "description": "🌾 Transform agriculture in East Africa with MkulimaLink, a super-app that integrates marketplace, finance, logistics, and farm management for farmers.",
+      "href": "https://github.com/mathias-bellec/MkulimaLink",
+      "stars": 0,
+      "updated": "2026-03-11T00:24:17Z"
+    },
+    {
+      "type": "repo",
+      "text": "custom-plugin-devops",
+      "description": "🚀 Master DevOps skills with this comprehensive plugin featuring 7 agents, covering all key domains in a structured learning path.",
+      "href": "https://github.com/Yawnspe/custom-plugin-devops",
+      "stars": 0,
+      "updated": "2026-03-10T23:55:36Z"
+    },
+    {
+      "type": "repo",
+      "text": "claude-skills-marketplace",
+      "description": "🛠️ Transform Claude into a System Architect, generating detailed project documentation for AI-assisted software development with clear boundaries and traceable requirements.",
+      "href": "https://github.com/428alexander9/claude-skills-marketplace",
+      "stars": 0,
+      "updated": "2026-03-10T23:42:40Z"
+    },
+    {
+      "type": "repo",
+      "text": "claude-marketplace",
+      "description": "LAP skills marketplace for Claude Code - 1,500+ auto-generated API skills",
+      "href": "https://github.com/Lap-Platform/claude-marketplace",
+      "stars": 0,
+      "updated": "2026-03-10T16:47:46Z"
+    },
+    {
+      "type": "repo",
+      "text": "Datachain-Frontend",
+      "description": "",
+      "href": "https://github.com/itsored/Datachain-Frontend",
+      "stars": 0,
+      "updated": "2026-03-10T15:42:02Z"
+    },
+    {
+      "type": "repo",
+      "text": "skills",
+      "description": "Collection of Claude Code plugins for enhanced development workflows.",
+      "href": "https://github.com/artemnovichkov/skills",
+      "stars": 11,
+      "updated": "2026-03-10T17:52:26Z"
+    },
+    {
+      "type": "repo",
+      "text": "KrushiSetu",
+      "description": "🌱 India's smart farm-to-market platform — AI crop diagnosis, live mandi prices, expert advisory & direct marketplace for 140M+ farmers",
+      "href": "https://github.com/Harsh-1165/KrushiSetu",
+      "stars": 0,
+      "updated": "2026-02-25T12:22:35Z"
+    },
+    {
+      "type": "repo",
+      "text": "pazz-ml",
+      "description": "ML-powered leasing marketplace analytics and predictions",
+      "href": "https://github.com/dgonzap30/pazz-ml",
+      "stars": 0,
+      "updated": "2026-01-31T17:06:31Z"
+    },
+    {
+      "type": "repo",
+      "text": "bun-app",
+      "description": "Chrome web app shortcut for bun.com",
+      "href": "https://github.com/brendadeeznuts1111/bun-app",
+      "stars": 0,
+      "updated": "2026-01-19T21:11:06Z"
+    },
+    {
+      "type": "repo",
+      "text": "worthlyy",
+      "description": "AI-powered device valuation platform that analyzes photos to assess condition and provides real-time market pricing from live listings",
+      "href": "https://github.com/adamaaaa-stack/worthlyy",
+      "stars": 0,
+      "updated": "2025-12-04T09:10:30Z"
+    },
+    {
+      "type": "repo",
+      "text": "Kisan-DSS",
+      "description": "Kisan DSS is an AI-powered multilingual platform that helps Indian farmers make smarter decisions with real-time market prices, crop and market recommendations, weather-soil insights, voice-enabled chatbot support, and a direct crop selling marketplace.",
+      "href": "https://github.com/ovuiproduction/Kisan-DSS",
+      "stars": 0,
+      "updated": "2025-11-07T04:56:52Z"
+    },
+    {
+      "type": "repo",
+      "text": "maybind-sdk",
+      "description": "Official SDK for the Maybind Digital Twin Platform — interact with AI twins via a powerful API.",
+      "href": "https://github.com/MayBind/maybind-sdk",
+      "stars": 15,
+      "updated": "2025-10-04T15:51:05Z"
+    },
+    {
+      "type": "repo",
+      "text": "Neural-Nexus",
+      "description": "Neural Nexus : A comprehensive AI model hub for uploading , sharing, selling, and deploying machine learning models. Features Secure authentication, Stripe/Crypto Payments, model ownership transfer via blockchain, and a vibrant community. Build with Next.js, Tailwind CSS, React, and Framer Motion",
+      "href": "https://github.com/Drago-03/Neural-Nexus",
+      "stars": 15,
+      "updated": "2025-08-06T00:55:17Z"
+    },
+    {
+      "type": "repo",
+      "text": "ZAROORAT-ReactNative-Firebase-App",
+      "description": "ZAROORAT is a react native app where users can buy and sell stuff.",
+      "href": "https://github.com/wajahati/ZAROORAT-ReactNative-Firebase-App",
+      "stars": 0,
+      "updated": "2025-06-06T16:38:43Z"
+    },
+    {
+      "type": "repo",
+      "text": "dillidash-marketplace-platform",
+      "description": "Platform connecting local shops for ultra fast cheap delivery... Created at https://coslynx.com",
+      "href": "https://github.com/coslynx/dillidash-marketplace-platform",
+      "stars": 1,
+      "updated": "2025-04-08T18:13:22Z"
+    },
+    {
+      "type": "repo",
+      "text": "ai-coding-tools",
+      "description": "Claude Code plugin marketplace for Shopware development. Provides MCP servers, skills, agents, hooks, and commands to integrate development tools directly into your AI coding workflow.",
+      "href": "https://github.com/shopwareLabs/ai-coding-tools",
+      "stars": 10,
+      "updated": "2026-03-05T21:45:18Z"
+    },
+    {
+      "type": "repo",
+      "text": "comment-annotator",
+      "description": "GitHub Action for turning code comments into annotations",
+      "href": "https://github.com/joonashak/comment-annotator",
+      "stars": 1,
+      "updated": "2025-08-27T12:35:17Z"
+    },
+    {
+      "type": "repo",
+      "text": "Marketing",
+      "description": "The marketing site for Typo CI",
+      "href": "https://github.com/TypoCI/Marketing",
+      "stars": 2,
+      "updated": "2025-08-27T12:23:24Z"
+    },
+    {
+      "type": "repo",
+      "text": "licitaciones-espana",
+      "description": "📊 Access comprehensive datasets of public procurement in Spain, including national and regional data, to enhance transparency and analysis.",
+      "href": "https://github.com/Hikaru17zx/licitaciones-espana",
+      "stars": 0,
+      "updated": "2026-03-11T00:33:40Z"
+    },
+    {
+      "type": "repo",
+      "text": "DoonKart",
+      "description": "A local-first marketplace for Dehradun made for the Youva Hackathon 2026.",
+      "href": "https://github.com/sohmxdd/DoonKart",
+      "stars": 0,
+      "updated": "2026-03-03T03:39:26Z"
+    },
+    {
+      "type": "repo",
+      "text": "user-feedback",
+      "description": "For sharing feedback and asking questions about Copilot Extensions to builders, clients, and GitHub during public preview..",
+      "href": "https://github.com/copilot-extensions/user-feedback",
+      "stars": 15,
+      "updated": "2026-01-12T06:04:46Z"
+    },
+    {
+      "type": "action",
+      "text": "CICDSmartdata1003",
+      "description": "Repositorio para el despliegue CICD entre Databricks y GitHub Actions",
+      "href": "https://github.com/miguelhg37/CICDSmartdata1003",
+      "stars": 0,
+      "updated": "2026-03-11T02:20:24Z"
+    },
+    {
+      "type": "action",
+      "text": "Actions-ImmortalWrt_Stable",
+      "description": "A template for building ImmortalWrtwith GitHub Actions | 使用 GitHub Actions 云编译 ImmortalWrt",
+      "href": "https://github.com/LemonCrab666/Actions-ImmortalWrt_Stable",
+      "stars": 21,
+      "updated": "2026-03-11T02:20:14Z"
+    },
+    {
+      "type": "action",
+      "text": "github-actions-practice",
+      "description": "",
+      "href": "https://github.com/fahadjaseem2/github-actions-practice",
+      "stars": 0,
+      "updated": "2026-03-11T02:19:37Z"
+    },
+    {
+      "type": "action",
+      "text": "auto-commit",
+      "description": "🌳 Making green your Github stats, powered by Github Actions",
+      "href": "https://github.com/bugbounted/auto-commit",
+      "stars": 13,
+      "updated": "2026-03-11T02:20:10Z"
+    },
+    {
+      "type": "action",
+      "text": "keirin-ai-complete",
+      "description": "🏁 競輪AI予想システム - 機械学習による完全自動予想・最適化（XGBoost + GitHub Actions）",
+      "href": "https://github.com/Kobayasidaigon/keirin-ai-complete",
+      "stars": 0,
+      "updated": "2026-03-11T02:19:13Z"
+    },
+    {
+      "type": "action",
+      "text": "awesome-ai-discoveries",
+      "description": "🤖 An automated bot that discovers and archives trending AI repositories daily using GitHub Actions.",
+      "href": "https://github.com/siddharthsbhadauria/awesome-ai-discoveries",
+      "stars": 1,
+      "updated": "2026-03-11T02:17:40Z"
+    },
+    {
+      "type": "action",
+      "text": "uk.thechels",
+      "description": "thechels.uk - The official thechelsuk website, built using Jekyll, Python, and GitHub Actions. Hosted on GitHub Pages.",
+      "href": "https://github.com/thechelsuk/uk.thechels",
+      "stars": 3,
+      "updated": "2026-03-11T02:17:29Z"
+    },
+    {
+      "type": "action",
+      "text": "robosystems",
+      "description": "RoboSystems is a financial knowledge graph platform that transforms complex financial data into actionable intelligence through graph-based analytics and AI-powered insights. Fork-ready with full GitHub Actions CI/CD for deploying CloudFormation infrastructure to your AWS account.",
+      "href": "https://github.com/RoboFinSystems/robosystems",
+      "stars": 7,
+      "updated": "2026-03-11T02:17:27Z"
+    },
+    {
+      "type": "action",
+      "text": "ChaTop",
+      "description": "🏠 Manage rental properties efficiently with ChâTop, a robust backend API that streamlines listings, user authentication, and messaging for tourist areas.",
+      "href": "https://github.com/Jeffer2006/ChaTop",
+      "stars": 0,
+      "updated": "2026-03-11T02:17:09Z"
+    },
+    {
+      "type": "action",
+      "text": "Github-Actions-my-first-action-workflow-repo",
+      "description": "This is my first repo for action workflow",
+      "href": "https://github.com/harsh-sahu28/Github-Actions-my-first-action-workflow-repo",
+      "stars": 0,
+      "updated": "2026-03-11T02:16:55Z"
+    }
+  ],
+  "contentHash": "kkq1sp"
+}

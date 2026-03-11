@@ -18179,3 +18179,26 @@ When editing future blog posts in a series:
 
 - blog-part2-refresh.md (this decision was applied here)
 - tamirdresher.github.io/_posts/ (original blog series)
+
+---
+
+## Decision 4: Blog Publishing via Playwright — Browser Session Isolation Blocker
+
+**Date:** 2026-03-11  
+**Author:** Picard  
+**Issue:** #310  
+**Status:** Blocked — Technical constraint (not a design choice)  
+
+**Summary:**  
+Attempted autonomous blog publishing for issue #310 using Playwright CLI browser automation. Failed due to browser security model preventing automation from accessing user's real login sessions. Playwright's --persistent flag creates isolated profiles, not user's actual Edge profile.
+
+**Problem:**  
+Browsers intentionally isolate automation contexts from daily browsing for security. Edge profile locks when running; Playwright cannot open locked profiles. Alternative: --persistent flag creates fresh isolated profile requiring re-login on all platforms.
+
+**Outcome:**  
+Task cannot be completed autonomously. Provided decision document with 3 options for future:
+1. **Option A (Recommended):** playwright-cli open --extension — user launches Edge manually; Playwright connects to running instance with real sessions
+2. **Option B:** Session state export/import for repeatability after manual login
+3. **Option C:** API-based publishing (eliminates browser entirely)
+
+**Related:** .squad/decisions/inbox/picard-310-blog-publishing.md (full technical analysis)

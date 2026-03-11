@@ -3572,3 +3572,37 @@ Fixed in squad-monitor commit 52c9360. Pushed to tamirdresher/squad-monitor main
 - Sometimes "adding a feature" is just wiring up existing code
 - Use grep/search to find method definitions before writing new code
 
+
+## Learnings
+
+### SharpConsoleUI Integration (Issue #311) - 2026-03-11
+
+**Context:** Integrated SharpConsoleUI v2.4.40 into squad-monitor as a beta branch to explore modern compositor-based TUI architecture.
+
+**Technical Details:**
+- SharpConsoleUI is a multi-threaded compositor framework (unlike single-threaded Terminal.Gui)
+- Requires Spectre.Console >= 0.54.0 (upgraded from 0.49.1)
+- Uses WindowBuilder API for creating multi-window layouts
+- Per-window async update threads enable real-time independent panel updates
+- Compositor effects: blur, animations, Z-ordering, occlusion culling
+
+**Integration Approach:**
+1. Added NuGet package via \`dotnet add package SharpConsoleUI\`
+2. Created \`SharpUI.cs\` module with \`RunAsync()\` entry point
+3. Added \`--sharp-ui\` / \`--beta\` command-line flags to Program.cs
+4. Maintained backward compatibility - original mode remains default
+
+**Challenges:**
+- Initial API exploration needed - documentation is still evolving
+- Some namespaces/methods differ from early examples (e.g., no Components namespace)
+- Created proof-of-concept placeholder to validate integration, full implementation deferred
+
+**Branch:** \`squad/311-sharpconsole-ui-beta\`
+**Repo:** https://github.com/tamirdresher/squad-monitor
+
+**Key Learnings:**
+- SharpConsoleUI's compositor model is fundamentally different from Spectre.Console
+- Multi-window async updates ideal for real-time monitoring dashboards
+- Can embed Spectre.Console widgets inside SharpConsoleUI windows
+- Framework is newer, less documentation than Terminal.Gui but more powerful
+

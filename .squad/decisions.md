@@ -17933,3 +17933,44 @@ The .github/agents/squad.agent.md file went missing on the squad/3-multi-session
 - **Implementation timeline:** This sprint
 - **Owner:** Picard (create .squad/branch-protocol.md + cleanup orphaned branches)
 
+
+---
+
+## Decision 19: SharpConsoleUI Beta Integration — Completed PoC
+
+**Date:** 2026-03-11  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Delivered (PR in Review)  
+**Scope:** squad-monitor TUI Framework  
+**Related Issue:** #311
+
+### Outcome
+
+Phase 1 PoC completed successfully. SharpConsoleUI v2.4.40 integrated into squad-monitor with opt-in `--sharp-ui` / `--beta` flags.
+
+**Branch:** `squad/311-sharpconsole-ui-beta`  
+**Repository:** https://github.com/tamirdresher/squad-monitor
+
+### Implementation
+
+- Added SharpConsoleUI v2.4.40 NuGet package
+- Upgraded Spectre.Console: 0.49.1 → 0.54.0
+- Created SharpUI.cs module with async entry point
+- Modified Program.cs for beta flag handling
+- Added BETA-SHARPCONSOLEUI.md documentation
+- Multi-panel PoC validates integration approach
+
+### Backward Compatibility
+
+✅ Original mode unchanged (default behavior preserved)  
+✅ Beta is opt-in only  
+✅ Spectre.Console upgrade tested (builds successfully)
+
+### Next Steps
+
+Awaiting team review on PoC. Phase 2 (multi-window interactivity) deferred pending feedback.
+
+### Decision: Proceed to Code Review
+
+Beta branch ready for team review on GitHub. Architecture validated; implementation ready for Phase 2 planning.
+

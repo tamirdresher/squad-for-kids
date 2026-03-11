@@ -40,3 +40,28 @@ TBD - Q2 work incoming
 - Issue comment: #330 with full analysis and implementation plan
 
 **Key Insight:** cli-tunnel is excellent for its designed purpose (interactive terminal, demos, recording, phone access), but SSH is purpose-built for remote command automation.
+
+### Issue #311: SharpConsoleUI Beta Testing (2026-03-11)
+
+**Context:** Test SharpConsoleUI v2.4.40 integration in squad-monitor beta branch.
+
+**Test Results:**
+- **Branch:** `squad/311-sharpconsole-ui-beta` (tamirdresher/squad-monitor)
+- **Build:** ✅ Success (1 minor warning: unused local function)
+- **Runtime:** ✅ Working correctly with `--beta` flag
+- **Package:** SharpConsoleUI v2.4.40 integrated successfully
+
+**Runtime Behavior:**
+- Displays beta mode splash screen with framework info
+- Shows version confirmation (2.4.40)
+- Lists planned features: multi-window compositor, agent status panel, session log panel, decisions panel
+- Clean exit with any key press
+
+**Key Insights:**
+- squad-monitor requires `.squad` directory (must run from team root)
+- Beta flag (`--beta` or `--sharp-ui`) triggers SharpConsoleUI mode
+- Framework initializes cleanly, proof-of-concept working as intended
+
+**Deliverables:**
+- Test results comment on issue #311
+- Verified build and runtime functionality

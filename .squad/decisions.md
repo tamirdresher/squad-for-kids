@@ -4,6 +4,50 @@
 
 ---
 
+## Decision 17: Blog Anonymization — Public Content Policy
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Public Communications & Security
+
+### Decision
+
+**NEVER mention the real team name (DK8S, Distributed Kubernetes) or what the team does specifically in PUBLIC blog posts. Also don't mention FedRAMP. Keep it generic — "my team at Microsoft", "infrastructure platform team", etc.**
+
+### Rationale
+
+- Public blog should not expose internal team names or compliance programs
+- Security through obscurity — prevents external actors from directly targeting known team
+- Compliance requirement — FedRAMP status is sensitive information
+- Best practice for internal Microsoft teams publishing externally
+
+### Applies To
+
+All blog posts, public talks, conference presentations, social media posts authored by squad members or using squad resources.
+
+### Does NOT Apply When
+
+- Content is internal-only (Teams, internal wiki, employee intranet)
+- Disclosure is explicitly authorized by security/compliance teams
+- Content is posted to internal Microsoft forums or communities
+
+### Consequences
+
+- ✅ Reduced attack surface for public-facing content
+- ✅ Compliance with FedRAMP disclosure requirements
+- ⚠️ Requires conscious effort during writing — must remember to anonymize
+- ⚠️ May reduce impact of technical deep-dives (can't cite specific architecture)
+
+### Implementation
+
+When reviewing or drafting public content:
+1. Search for "DK8S", "Distributed Kubernetes", "FedRAMP", team member names
+2. Replace with generic terms: "my team", "infrastructure platform", "government compliance"
+3. Keep technical depth but remove Microsoft/team-specific context
+
+---
+
 ## Decision 1: Gap Analysis When Repository Access Blocked
 
 **Date:** 2026-03-02  

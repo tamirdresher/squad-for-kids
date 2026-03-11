@@ -141,3 +141,70 @@
 5. **ARM correlation IDs** are the key artifact for ARM Extensibility Office Hours follow-ups
 
 **Status:** Both issues researched, commented, labeled, and moved to Pending User on project board.
+
+---
+
+### 2026-Q2: DK8S Wizard CodeQL Issue Deep Dive (Issue #339 Follow-up)
+
+**Assignment:** Investigate Ramaprakash's statement about a DK8S wizard-related CodeQL issue.
+
+**What I Did:**
+1. Searched Teams messages via WorkIQ for Ramaprakash's statements about DK8S wizard + CodeQL
+2. Searched Azure DevOps for wizard-related CodeQL work items and code
+3. Analyzed Teams channel messages from Runtime Platform (DK8S)
+4. Synthesized findings into actionable summary
+5. Posted comprehensive research to Issue #339 and labeled `status:pending-user`
+
+**Key Findings:**
+
+**Direct CodeQL Request:**
+- Ramaprakash explicitly asked Tamir to review a CodeQL compliance item for the DK8S Provisioning Wizard
+- Shared the same Liquid compliance link from Issue #339 (PRD-14079533, Microsoft.Security.CodeQL.10000)
+- This was a direct action request, not general discussion
+
+**Wizard Operational Issues (Distinct from CodeQL):**
+1. **1ES Permissions Migration:**
+   - Org onboarded to 1ES Permissions Service
+   - Broke wizard-initiated PRs, branch creation, and pipeline triggers
+   - Non-human identities (MI/SP) must now follow 1ES processes
+   
+2. **Managed Identity Attribution:**
+   - Wizard uses Managed Identity for ADO operations
+   - ADO doesn't support On-Behalf-Of flow
+   - Wizard actions appear as MI, not initiating user → audit/compliance issues
+   
+3. **Security Architecture Guidance:**
+   - Ramaprakash emphasized clusters should be scoped to single service tree leaf nodes
+   - Rationale: smaller blast radius, granular security boundaries, resilience to re-orgs
+   - Current DK8S recommendation (not optional)
+
+**ADO Search Results:**
+- Found multiple CodeQL work items for **Microsoft.MDOS.Wizard.V2** (OEM/Fulfillment wizard)
+  - Work items: 60154518, 60218652, 57449597, 60106755
+  - Issues: JsonWebTokenHandler validation disabled, obsolete crypto algorithms
+- **Important:** These are for OEM wizard, NOT DK8S wizard
+- No specific CodeQL work items found for DK8S provisioning wizard
+
+**The Two Distinct Problems:**
+1. **CodeQL Compliance (Issue #339):** DK8S wizard repository needs CodeQL scanning enabled per MS security requirements
+2. **Operational Failures:** Wizard PR/pipeline operations broken due to 1ES migration + MI permission model
+
+**Action Owners:**
+- **CodeQL Setup:** Infrastructure team (Belanna)
+- **Wizard Fixes:** DK8S team (Ramaprakash) + Infrastructure (Belanna)
+- **Architecture Review:** Already provided by Ramaprakash
+
+**Technical Learnings:**
+1. **Teams message search via WorkIQ is powerful** — Found exact context about wizard issues, 1ES migration, MI behavior
+2. **CodeQL.10000 applies to multiple products** — Same requirement exists for different wizard implementations (OEM vs DK8S)
+3. **1ES migration causes cascading permission failures** — MI/SP access patterns break when org onboards to 1ES Permissions Service
+4. **Service tree scoping is a security posture decision** — Not just organizational convenience, directly impacts blast radius
+5. **Azure DevOps search finds similar-named projects** — Microsoft.MDOS.Wizard.V2 is unrelated to DK8S wizard, but shares naming pattern
+
+**Deliverables:**
+- Posted comprehensive research findings to Issue #339
+- Distinguished between CodeQL compliance requirement and operational wizard issues
+- Identified action owners for each problem domain
+- Added `status:pending-user` label for Tamir's review
+
+**Status:** Research complete. Clarified that Ramaprakash's request was about enabling CodeQL scanning on DK8S wizard (compliance), while separate operational issues exist due to 1ES migration.

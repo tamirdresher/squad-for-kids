@@ -235,6 +235,44 @@
         "type": "cron",
         "expression": "0 7 * * 1-5"
       }
+    },
+    {
+      "id": "weekly-retro",
+      "description": "Review all work done this week, read issue comments and discussions, identify what Tamir liked/disliked, retrospect on squad behavior, improve rules/directives/tooling proactively",
+      "trigger": {
+        "description": "Every Friday at 14:00 UTC (4 PM Israel)",
+        "cron": "0 14 * * 5",
+        "type": "cron"
+      },
+      "providers": [
+        "local-polling"
+      ],
+      "task": {
+        "action": "retrospective",
+        "agent": "picard",
+        "type": "agent"
+      },
+      "name": "Weekly Squad Retrospective",
+      "enabled": true
+    },
+    {
+      "id": "whatsapp-check",
+      "description": "Open WhatsApp Web via Playwright, check for messages from wife, report via Teams if she needs something. READ ONLY - never send messages.",
+      "trigger": {
+        "description": "Every 2 hours on weekdays",
+        "intervalSeconds": 7200,
+        "type": "interval"
+      },
+      "providers": [
+        "local-polling"
+      ],
+      "task": {
+        "action": "whatsapp-monitor",
+        "agent": "kes",
+        "type": "agent"
+      },
+      "name": "WhatsApp Family Check",
+      "enabled": true
     }
   ],
   "defaults": {

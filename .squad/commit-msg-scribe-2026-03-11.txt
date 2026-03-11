@@ -1,0 +1,17 @@
+scribe: orchestration log + session log + decision merge
+
+- Added orchestration log for B'Elanna PR review session (2026-03-11T12-38-00Z)
+  * Partial success: decision record created, ADO auth blocked
+  * Files: .squad/orchestration-log/2026-03-11T12-38-00Z-belanna.md
+
+- Added session log for Ralph round 1 monitoring
+  * File: .squad/log/2026-03-11T12-38-00Z-ralph-round1.md
+
+- Merged 3 inbox decisions into .squad/decisions.md
+  * belanna-pr-review-328: Keel MCP tooling enhancement (3-layer recommendation)
+  * picard-multi-squad-architecture: Federation model + Tier 3 delegation design
+  * seven-tech-trends-validation: 2026 tech ecosystem alignment validation
+
+- Deleted processed inbox files
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

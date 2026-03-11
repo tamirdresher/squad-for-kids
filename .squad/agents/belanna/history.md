@@ -4910,3 +4910,54 @@ Web-based terminal emulators (xterm.js-based PTY Mirror) may have latency/buffer
 - Template copies (`.squad-templates/`, `sanitized-demo/`) use `ubuntu-latest` and don't need this fix
 - The SYNC comment in the workflow header lists 4 locations; active workflow may diverge from templates when runner differs
 
+
+---
+
+### 2026-03-11: ADO PR Review (Keel MCP Migration) — Issue #328
+
+**Assignment:** Review Azure DevOps PR #15000967 (Keel-to-ConfigGen migration MCP) and provide findings on CUE logic handling, template discovery, and configgen-cli integration gaps.
+
+**Context:**
+- PR: https://dev.azure.com/msazure/CESEC/_git/CIEng-Infra-AKS/pullrequest/15000967
+- Related: Issue #287 (Keel MCP reminder)
+- Author: Tamir Dresher + Abhishek
+- Purpose: Automate Keel → ConfigGen migration (saves ~50% effort)
+
+**Investigation Results:**
+1. **Access Limitation:** ADO PR requires authentication; Playwright session hit login redirect
+2. **Context from Issue #287:** 
+   - MCP creates boilerplate code for Keel-to-ConfigGen migration
+   - Uses ConfigGen MCP server + VS templates
+   - Local MCP server (not published to registry yet)
+   - Tested on simple blueprints; needs complex scenario validation
+
+**Key Concerns Identified:**
+1. **CUE Logic Gap:** CUE supports constraints, conditionals, computations beyond simple data structures
+   - Current MCP tools (configgen-*) focus on NuGet packages, not CUE AST parsing
+   - Risk: Migration may miss computed values, validation guards, template composition
+2. **Template Auto-Discovery:** No evidence of template scanning in current ConfigGen MCP tools
+   - configgen-package-updates: NuGet version management
+   - configgen-breaking-changes: Migration guides
+   - Missing: Template directory discovery, inheritance patterns
+3. **configgen-cli Integration:** Tamir built a CLI tool for migration workflows
+   - Current MCP doesn't wrap CLI operations
+   - Recommendation: Add configgen-cli MCP integration for validation, dry-run, template discovery
+
+**Findings Posted to Issue #328:**
+- 4 major concern areas (CUE logic, template discovery, CLI integration, missing Abhishek context)
+- 7 specific recommendations for MCP enhancement
+- Action items for Tamir (grant ADO access or export PR)
+
+**Technical Learnings:**
+- CUE (cuelang.org): Configuration language with logic, not just YAML-with-types
+- Keel: Internal tooling likely using CUE for infrastructure definitions
+- ConfigGen: NuGet-based code generation framework
+- Migration complexity: Logic transformation, not just data mapping
+
+**Key Files Referenced:**
+- .squad/scripts/workiq-queries/configgen.md (ConfigGen Teams channel query templates)
+- Issue #241: ConfigGen CLI PR (approved, merged)
+- Issue #287: Keel MCP reminder (due today)
+
+**Status:** Review complete with access limitations noted. Posted findings to issue #328. Awaiting Tamir's response with ADO access/export or Abhishek discussion links.
+

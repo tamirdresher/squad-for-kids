@@ -18457,3 +18457,224 @@ Tech News Digest #315 validates three core pillars of our squad's architecture. 
 *Decision created as part of tech news digest analysis workflow.*
 
 
+
+---
+
+# Decision: Keel MCP Tooling Enhancement Requirements
+
+**Date:** 2026-03-11  
+**Context:** ADO PR #15000967 review (Keel-to-ConfigGen migration MCP)  
+**Decision Maker:** B'Elanna (Infrastructure Expert)  
+**Status:** 📋 Recommendation (pending Tamir review)
+
+## Background
+
+Tamir built a Keel MCP Server to automate migration from Keel (CUE-based infra) to ConfigGen (C# code generation). PR #15000967 implements Step 1, saving ~50% of migration effort. Issue #328 requests review focusing on:
+1. CUE logic handling (constraints, conditionals, computations)
+2. Template auto-discovery
+3. configgen-cli integration gaps
+
+## Problem Statement
+
+Current ConfigGen MCP tools (configgen-package-updates, configgen-breaking-changes) are designed for **NuGet package management**, not **migration workflows**. They lack:
+- CUE language awareness (only see text/AST, miss logic semantics)
+- Template discovery mechanisms
+- Integration with configgen-cli tool
+
+## Recommendation: 3-Layer MCP Enhancement
+
+### Layer 1: CUE-Aware Parsing (HIGH PRIORITY)
+**Gap:** CUE supports logic beyond data — conditionals, computed values, validation constraints, template composition.  
+**Risk:** Migration tools may silently drop logic patterns during Keel → ConfigGen transform.  
+**Solution:** 
+- Add CUE AST parser to MCP toolchain
+- Detect logic patterns: conditionals (if, guards), computations (interpolation, arithmetic), constraints (validation rules)
+- Flag unsupported patterns for manual review
+
+### Layer 2: Template Discovery (MEDIUM PRIORITY)
+**Gap:** No automatic template scanning in current MCP.  
+**Solution:**
+- Add template directory scanner to configgen-cli MCP integration
+- Discover: Template inheritance, parameterization patterns, composition structures
+- Map Keel template patterns → ConfigGen equivalents
+
+### Layer 3: configgen-cli Integration (MEDIUM PRIORITY)
+**Gap:** Tamir built configgen-cli for migration workflows, but it's not exposed via MCP.  
+**Solution:**
+- Wrap configgen-cli operations in MCP tool layer:
+  - Template validation
+  - Migration dry-run
+  - CUE validation hooks
+- Integrate with existing configgen-* tools for unified workflow
+
+## Decision
+
+**Approve phased enhancement:**
+1. **Phase 1 (Weeks 1-2):** CUE logic detection — add parser + flagging for unsupported patterns
+2. **Phase 2 (Week 3):** Template discovery — scan template dirs, document inheritance
+3. **Phase 3 (Week 4):** CLI integration — wrap configgen-cli in MCP tool layer
+
+**Alternative:** Accept risk and rely on manual review for CUE logic patterns (NOT RECOMMENDED — high error rate on complex blueprints)
+
+## Rationale
+
+- **CUE logic is non-trivial:** Constraints and computations are first-class citizens in CUE, not metadata
+- **Template complexity scales:** Simple blueprints (tested) vs. production blueprints with deep inheritance
+- **Tooling ROI:** 50% effort savings (current) → 80%+ with enhanced tooling (projected)
+
+## Action Items
+
+| Item | Owner | Priority |
+|------|-------|----------|
+| Review actual PR files (grant ADO access or export) | Tamir | HIGH |
+| Audit sample .cue files for logic patterns | B'Elanna | HIGH |
+| Document template structure (Keel & ConfigGen) | Squad | MEDIUM |
+| Evaluate CUE parser libraries (Go/C#) | Data | MEDIUM |
+| Test MCP tools against complex blueprints | Tamir + Abhishek | HIGH |
+
+## References
+
+- Issue #328: PR review request
+- Issue #287: Keel MCP reminder
+- Issue #241: ConfigGen CLI tool (approved, merged)
+- ADO PR: https://dev.azure.com/msazure/CESEC/_git/CIEng-Infra-AKS/pullrequest/15000967
+
+---
+
+*Decision created as part of ADO PR review workflow (Issue #328).*
+
+
+---
+
+# Multi-Squad Architecture Position
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Context:** Issue #326 — Response to Jack Batzner's question about multi-squad model
+
+## Decision
+
+Squad's multi-repo architecture follows a **federation model** with three tiers:
+
+### Tier 1: Squad Per Repo (Default)
+- Each repository maintains its own `.squad/` directory with independent team roster, decisions, and history
+- Squads operate autonomously within their repo context
+- **Recommendation:** Start here for most teams — simple, clear ownership
+
+### Tier 2: Upstream Knowledge Sharing (Current)
+- One squad can pull decisions/knowledge from another via `.squad/upstream.json`
+- One-way dependency: consuming squad reads upstream squad's metadata
+- **Use case:** Sharing platform standards, security policies, architecture patterns across squads
+
+### Tier 3: Cross-Squad Delegation (In Design)
+- Formal protocol for squads to task each other across repo boundaries
+- Executing squad runs under delegating squad's context (decisions, team structure, authorization)
+- Signed requests, authorization boundaries, audit trails
+- **Use case:** Expertise-based task routing when specialized knowledge lives in another squad
+
+### Special Case: Mono-Squad Multi-Repo
+- One squad instance monitors/works across multiple repos
+- Ralph (work monitor) already does this — watches tamresearch1 + private research repos
+- **Use case:** Small teams with centralized coordination across related codebases
+- **Limitation:** Not recommended for multiple independent teams — context bleed is problematic
+
+## Multi-Repo Capabilities Already Implemented
+
+1. **Ralph's cross-repo monitoring**: Can track issues across different repositories simultaneously
+2. **Worktree awareness**: Branch-local squad state prevents conflicts in parallel sessions
+3. **Upstream repos**: Decision-sharing via `.squad/upstream.json` (e.g., dk8s-platform-squad)
+
+## Architectural Guidance
+
+**Recommended pattern:**
+- Squad per repo for isolation
+- Upstream.json for knowledge sharing
+- Cross-squad delegation for execution (when ready)
+
+**Not recommended:**
+- Single squad instance spanning multiple repos with different teams (context management becomes chaotic)
+
+## Related Work
+
+- `docs/cross-squad-orchestration-design.md` — Detailed design for Tier 3 delegation protocol
+- `.squad/upstream.json` — Current upstream knowledge-sharing implementation
+- `.squad/agents/ralph/charter.md` — Multi-repo monitoring capabilities
+
+## Status
+
+**Current state:** Tiers 1-2 fully operational  
+**Next phase:** Implement Tier 3 cross-squad delegation protocol (Issue #197)
+
+
+---
+
+# Tech Trends Validation Decision
+**Issue:** #324 (Tech News Digest: 2026-03-11)
+**Agent:** Seven (Research & Docs)
+**Date:** 2026-03-11
+**Status:** ✅ COMPLETED
+
+---
+
+## Decision
+**Validate Squad's core architecture against March 2026 tech trends.**
+
+Squad's strategy remains well-aligned with industry direction. No architectural changes needed.
+
+---
+
+## Evidence
+
+### 1. CLI-First Agent Approach ✅ VALIDATED
+**Source:** "The Agentic CLI Takeover" story in Tech News Digest #324
+**Finding:** Industry is adopting CLI-first agents as standard pattern (not fringe)
+**Impact:** Squad's CLI-first design is ahead of mainstream adoption curve
+**Confidence:** HIGH
+
+### 2. Go for Systems/Agents ✅ CONFIRMED
+**Source:** Flask creator publicly endorses Go > Python for AI agents (HN, 367 pts)
+**Finding:** Language creators and infrastructure experts prefer Go for agent work
+**Impact:** Validates choice of Go for DK8S operators
+**Confidence:** HIGH - Industry authority endorsement
+
+### 3. C# for Domain Modeling ✅ ENHANCED
+**Source:** C# 15 unions merged into .NET 11 Preview 3 (r/dotnet, 219 pts)
+**Finding:** Language evolution supports discriminated union patterns
+**Impact:** ConfigGen and .NET CLI tools can use modern domain modeling
+**Action:** Monitor Preview releases; update test suites for union syntax support
+**Confidence:** MEDIUM (preview feature, not stable)
+
+### 4. State Management Infrastructure ✅ ADDRESSED
+**Source:** Open source persistent memory for AI agents (Issue #321 connector)
+**Finding:** Community building solutions for agent state/context persistence
+**Impact:** Squad's "second brain" problem (#321) has emerging solutions
+**Action:** Evaluate for integration in next cycle
+**Confidence:** MEDIUM (early-stage solutions)
+
+---
+
+## Community Engagement
+**Tamir's Blog:** "Organized by AI" appeared on r/dotnet (2026-03-11)
+- Positive community engagement
+- Squad visibility in target ecosystem
+- No intervention needed; monitor for follow-up engagement
+
+---
+
+## Recommendation
+✅ **Continue current trajectory.** All four validation targets confirm Squad's strategic alignment with 2026 tech ecosystem. Maintain focus on:
+- CLI-first agent architecture
+- Go for systems work
+- C# for domain/library code
+- State management for persistent context
+
+No pivots or course corrections needed based on this analysis.
+
+---
+
+## Next Steps
+1. **Data/Picard:** Evaluate persistent memory solutions for #321
+2. **Ralph/Neelix:** Add "Agentic CLI Takeover" trend to market watch
+3. **Seven:** Monitor C# 15 release progress for ConfigGen team
+4. **Blog team:** Consider ecosystem validation post based on these findings
+

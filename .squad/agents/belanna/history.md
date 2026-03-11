@@ -35,4 +35,4 @@ TBD - Q2 work incoming
 
 **Recommendation:** Always use multi-instance MCP setup for any cross-org ADO work. Document org routing in Squad skills.
 
-**Related:** See `.squad/decisions/inbox/belanna-ado-multiorg.md` for team decision record.
+**Decision Status:** ✅ Merged to `.squad/decisions.md` (Decision 14) on 2026-03-11. Multi-instance MCP pattern approved for team adoption.

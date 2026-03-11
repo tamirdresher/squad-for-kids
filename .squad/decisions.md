@@ -430,6 +430,229 @@ Consolidated all existing DK8S platform knowledge from 10+ analysis files, 2 loc
 **Author:** Picard (Lead)  
 **Status:** Needs Team Review  
 **Scope:** Communication & Integration  
+
+---
+
+## Decision 14: Azure DevOps Multi-Org MCP Configuration
+
+**Date:** 2026-03-11  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Approved by Scribe for Team Adoption  
+**Scope:** Team Tools & Multi-Org Access  
+**Related Issue:** #329
+
+### Context
+
+Squad agents need to access Azure DevOps repos, PRs, and work items across multiple organizations:
+- `microsoft` org (primary)
+- `msazure` org (CESEC project and other Azure infrastructure repos)
+
+The `@azure-devops/mcp` package is single-org by design and cannot switch orgs at runtime.
+
+### Problem
+
+When Picard tried to review a PR in `msazure/CESEC/CIEng-Infra-AKS` (PR #15000967), the MCP tools failed because they were connected to the `microsoft` org. This blocked cross-org work.
+
+**Root Causes:**
+1. Org name is a required startup argument for `@azure-devops/mcp`
+2. No runtime reconfiguration capability
+3. Repo-level MCP config doesn't override global server instances
+4. Only one active connection per MCP instance
+
+### Decision
+
+**Adopt a multi-instance MCP pattern** where we run separate named MCP server instances for each Azure DevOps org.
+
+#### Global Config (~/.copilot/mcp-config.json)
+
+```json
+{
+  "mcpServers": {
+    "ado-microsoft": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "microsoft"],
+      "tools": ["*"]
+    },
+    "ado-msazure": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "msazure"],
+      "tools": ["*"]
+    }
+  }
+}
+```
+
+#### Tool Naming Convention
+
+Tools will be prefixed with the instance name:
+- `ado-microsoft-core_list_projects` → microsoft org
+- `ado-msazure-repo_get_pull_request_by_id` → msazure org
+
+### Alternatives Considered & Rejected
+
+1. **Az CLI Fallback Skill** ❌
+   - Rejected: Slower than native MCP, less structured output, Azure CLI failing in test environment
+   
+2. **Dynamic Config Swapping** ❌
+   - Rejected: MCP servers don't support runtime reload without full session restart
+
+### Implementation Plan
+
+**Phase 1: Configuration Update** ✅
+1. Update `~/.copilot/mcp-config.json` with multi-instance setup
+2. Remove single `azure-devops` instance
+3. Restart Copilot session to activate both instances
+
+**Phase 2: Validation** ⏳
+1. Test `ado-microsoft-core_list_projects` returns microsoft org projects
+2. Test `ado-msazure-core_list_projects` returns msazure org projects
+3. Test PR access: `ado-msazure-repo_get_pull_request_by_id` for PR #15000967
+4. Verify both instances authenticate independently
+
+**Phase 3: Documentation** 📝
+1. Update `.squad/routing.md` with org-detection rules
+2. Document tool prefixes in agent history
+3. Add examples of cross-org work to Squad docs
+
+### Trade-offs
+
+**Pros:**
+- ✅ Both orgs accessible simultaneously
+- ✅ No context switching needed
+- ✅ Clean separation of concerns
+- ✅ Scales to additional orgs (just add more instances)
+
+**Cons:**
+- ⚠️ Runs multiple MCP processes (higher memory)
+- ⚠️ Tool names are longer with prefixes
+- ⚠️ Agents need to know which instance to use (until auto-detection skill is built)
+
+### Success Metrics
+
+- [x] Multi-instance MCP pattern documented
+- [ ] Both `ado-microsoft-*` and `ado-msazure-*` tools available and functional
+- [ ] Successfully review PR #15000967 in msazure/CESEC
+- [ ] No manual config changes needed for cross-org work
+- [ ] All Squad agents can access both orgs seamlessly
+
+---
+
+## Decision 15: Squad Production Approval Framework
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** ✅ Approved by Scribe for Team Adoption  
+**Scope:** Team / External Guidance  
+**Related Issue:** #294
+
+### Decision
+
+Establish a comprehensive **production approval framework for Squad** that:
+
+1. Maps all compliance domains required for AI agent deployment in production
+2. Identifies stakeholders (security, compliance, IAM, platform, product)
+3. Provides actionable evidence checklists for each stakeholder
+4. Recommends realistic timeline (4-12 weeks depending on org maturity)
+5. Clarifies Squad-specific concerns (MCP tool access, agent autonomy, data residency)
+
+This framework is documented in `prod-approval-path.md` (15K words) and posted to issue #294 for Brady's immediate use.
+
+### Rationale
+
+**Why now:**
+- Brady is actively seeking production approval guidance
+- Squad team needs clarity on what approvals are required vs. optional
+- Future operators (not just Brady) will benefit from a documented path
+
+**Why this approach:**
+- **Organization by stakeholder** (not phase) allows Brady to parallelize reviews
+- **Evidence checklists** make it specific and non-negotiable (reduces ambiguity)
+- **Squad-specific section** addresses AI agent risks head-on (not generic)
+- **Timeline expectations** (4-12 weeks) prevent unrealistic "next week" promises
+
+### Key Findings for Squad Team
+
+1. **Security clearance is not binary** — Multiple approval layers: AI security, access control, data handling, secrets
+2. **MCP tool inventory is critical** — Document what each agent can do with each tool
+3. **Agent autonomy boundaries must be explicit** — Define what agents never decide alone (e.g., "merge to main")
+4. **Data residency is often overlooked** — Existing `.squad/decisions.md` and agent history must be audited for sensitive data
+
+### Implementation
+
+1. ✅ **Completed:** `prod-approval-path.md` created (15K comprehensive guide)
+2. ✅ **Completed:** Posted to issue #294 with executive summary
+3. **Recommended:** Brady uses this as starting point for conversations with approvers
+4. **Recommended:** Squad team reviews and updates based on Brady's feedback
+
+### Consequences
+
+**Benefits:**
+- Brady (and future operators) have clear, structured guidance
+- Squad team has framework for future deployments
+- Reduces back-and-forth with approvers
+- Document can be tailored per organization
+
+**Risks:**
+- Document is generic; Brady's org may have different frameworks
+- Some approvers may not follow outlined timeline
+- Assumes standard org structure (may not apply to startups)
+
+---
+
+## Decision 16: Knowledge Management Phase 1 Implementation
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** ✅ Approved by Scribe for Team Adoption  
+**Scope:** Knowledge Management  
+**Related Issue:** #321
+
+### Decision
+
+Implement Phase 1 of the knowledge management system to establish quarterly history rotation, cleanup process, and documentation for sustainable squad knowledge management.
+
+### Implementation Completed
+
+1. **Quarterly History Rotation**
+   - Rotated all 10 agent history files to quarterly archives (history-2026-Q1.md)
+   - Created fresh history.md files for Q2 active work tracking
+   - Established pattern: rotate at quarter boundary, keep fresh file per agent
+
+2. **Gitignore Cleanup**
+   - Updated `.squad/.gitignore` to exclude build artifacts and future vector DB indices
+   - Saved ~29.5 MB from repo size
+
+3. **Documentation Created**
+   - **KNOWLEDGE_MANAGEMENT.md** (6.7 KB): Quarterly rotation strategy, search patterns, Phase 2 roadmap
+   - Created INDEX.md in `agents/` and `decisions/` directories for navigation
+
+4. **Knowledge Capture**
+   - All rotations and new files properly tracked in git
+   - Full history preserved and recoverable via `git log --follow`
+
+### Outcomes
+
+**Metrics:**
+- ✅ Repository remains pure GitHub (no binaries, git-friendly)
+- ✅ Knowledge base is queryable via GitHub search + local ripgrep
+- ✅ Active history files now < 50 KB (stays performant)
+- ✅ Full history preserved in dated archives
+- ✅ Team has clear documentation on how the system works
+
+**Technical Learnings:**
+1. Quarterly rotation is manual but simple — one-line file rename per agent per quarter
+2. Gitignore must explicitly exclude build dirs — saves significant space
+3. INDEX.md files are valuable for navigation in large directories
+4. Git history is the real backup — `git log --follow` shows all rotations
+5. Markdown + GitHub search beats custom tools for current scale
+
+### Next Steps
+
+1. Monitor `.squad/` size monthly (alert if > 50 MB)
+2. Rotate Q1 → Q2 histories when Q2 ends (~June 2026)
+3. Consider Phase 2 (vector DB) planning for Q3 or Q4
 **Related Issues:** #18, #19, #33
 
 ### Context

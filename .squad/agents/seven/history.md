@@ -49,3 +49,5 @@
 - Monitor .squad/ size monthly (alert if > 50 MB)
 - Rotate Q1 → Q2 histories when Q2 ends (~June 2026)
 - If semantic search becomes valuable, implement Phase 2 (ChromaDB vector index)
+
+**Decision Status:** ✅ Merged to `.squad/decisions.md` (Decision 16) on 2026-03-11 by Scribe. Phase 1 knowledge management implementation approved for team adoption.

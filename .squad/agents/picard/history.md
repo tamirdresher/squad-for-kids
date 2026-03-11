@@ -74,5 +74,5 @@ TBD - Q2 work incoming
 4. Many orgs don't have Workload Identity Federation set up yet; may need to propose as infrastructure work alongside agent deployment
 5. Data residency and secrets management compliance often get overlooked until late-stage; recommend addressing in Phase 1 self-assessment
 
-**Related Decision:** picard-prod-approval.md (written to inbox for Scribe consolidation)
+**Related Decision:** Merged to `.squad/decisions.md` (Decision 15) on 2026-03-11 by Scribe. Production approval framework approved for team adoption.
 

@@ -30,3 +30,11 @@ obj/
 *-audio.wav
 *.mp3
 *.wav
+
+# Squad build artifacts — regenerated on clone
+.squad/tools/**/bin/
+.squad/tools/**/obj/
+
+# Squad vector DB index — regenerated from markdown source
+.squad/.db/
+.squad/chroma/

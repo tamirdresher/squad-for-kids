@@ -1,15 +1,23 @@
 {
-  "timestamp": "2026-03-11T02:20:18.392Z",
+  "timestamp": "2026-03-11T02:44:01.018Z",
   "url": "GitHub Marketplace (AI/ML tools)",
   "itemCount": 35,
   "listings": [
+    {
+      "type": "repo",
+      "text": "claude-skills-marketplace",
+      "description": "🛠️ Transform Claude into a System Architect, generating detailed project documentation for AI-assisted software development with clear boundaries and traceable requirements.",
+      "href": "https://github.com/428alexander9/claude-skills-marketplace",
+      "stars": 0,
+      "updated": "2026-03-11T02:39:11Z"
+    },
     {
       "type": "repo",
       "text": "claude-code-plugins-plus-skills",
       "description": "340 plugins + 1367 agent skills for Claude Code. Open-source marketplace with CCPI package manager, interactive tutorials, and production orchestration patterns.",
       "href": "https://github.com/jeremylongshore/claude-code-plugins-plus-skills",
       "stars": 1571,
-      "updated": "2026-03-11T02:14:37Z"
+      "updated": "2026-03-11T02:25:17Z"
     },
     {
       "type": "repo",
@@ -50,14 +58,6 @@
       "href": "https://github.com/Yawnspe/custom-plugin-devops",
       "stars": 0,
       "updated": "2026-03-10T23:55:36Z"
-    },
-    {
-      "type": "repo",
-      "text": "claude-skills-marketplace",
-      "description": "🛠️ Transform Claude into a System Architect, generating detailed project documentation for AI-assisted software development with clear boundaries and traceable requirements.",
-      "href": "https://github.com/428alexander9/claude-skills-marketplace",
-      "stars": 0,
-      "updated": "2026-03-10T23:42:40Z"
     },
     {
       "type": "repo",
@@ -205,84 +205,84 @@
     },
     {
       "type": "action",
-      "text": "CICDSmartdata1003",
-      "description": "Repositorio para el despliegue CICD entre Databricks y GitHub Actions",
-      "href": "https://github.com/miguelhg37/CICDSmartdata1003",
-      "stars": 0,
-      "updated": "2026-03-11T02:20:24Z"
-    },
-    {
-      "type": "action",
-      "text": "Actions-ImmortalWrt_Stable",
-      "description": "A template for building ImmortalWrtwith GitHub Actions | 使用 GitHub Actions 云编译 ImmortalWrt",
-      "href": "https://github.com/LemonCrab666/Actions-ImmortalWrt_Stable",
-      "stars": 21,
-      "updated": "2026-03-11T02:20:14Z"
-    },
-    {
-      "type": "action",
-      "text": "github-actions-practice",
-      "description": "",
-      "href": "https://github.com/fahadjaseem2/github-actions-practice",
-      "stars": 0,
-      "updated": "2026-03-11T02:19:37Z"
-    },
-    {
-      "type": "action",
       "text": "auto-commit",
       "description": "🌳 Making green your Github stats, powered by Github Actions",
       "href": "https://github.com/bugbounted/auto-commit",
       "stars": 13,
-      "updated": "2026-03-11T02:20:10Z"
+      "updated": "2026-03-11T02:43:53Z"
     },
     {
       "type": "action",
-      "text": "keirin-ai-complete",
-      "description": "🏁 競輪AI予想システム - 機械学習による完全自動予想・最適化（XGBoost + GitHub Actions）",
-      "href": "https://github.com/Kobayasidaigon/keirin-ai-complete",
+      "text": "github-actions-dashboard",
+      "description": "",
+      "href": "https://github.com/pfichtner/github-actions-dashboard",
       "stars": 0,
-      "updated": "2026-03-11T02:19:13Z"
+      "updated": "2026-03-11T02:43:52Z"
     },
     {
       "type": "action",
-      "text": "awesome-ai-discoveries",
-      "description": "🤖 An automated bot that discovers and archives trending AI repositories daily using GitHub Actions.",
-      "href": "https://github.com/siddharthsbhadauria/awesome-ai-discoveries",
+      "text": "planner_auto",
+      "description": "基于GitHub Actions的智能日程管理系统",
+      "href": "https://github.com/QIanKin/planner_auto",
       "stars": 1,
-      "updated": "2026-03-11T02:17:40Z"
+      "updated": "2026-03-11T02:43:52Z"
     },
     {
       "type": "action",
-      "text": "uk.thechels",
-      "description": "thechels.uk - The official thechelsuk website, built using Jekyll, Python, and GitHub Actions. Hosted on GitHub Pages.",
-      "href": "https://github.com/thechelsuk/uk.thechels",
-      "stars": 3,
-      "updated": "2026-03-11T02:17:29Z"
-    },
-    {
-      "type": "action",
-      "text": "robosystems",
-      "description": "RoboSystems is a financial knowledge graph platform that transforms complex financial data into actionable intelligence through graph-based analytics and AI-powered insights. Fork-ready with full GitHub Actions CI/CD for deploying CloudFormation infrastructure to your AWS account.",
-      "href": "https://github.com/RoboFinSystems/robosystems",
-      "stars": 7,
-      "updated": "2026-03-11T02:17:27Z"
-    },
-    {
-      "type": "action",
-      "text": "ChaTop",
-      "description": "🏠 Manage rental properties efficiently with ChâTop, a robust backend API that streamlines listings, user authentication, and messaging for tourist areas.",
-      "href": "https://github.com/Jeffer2006/ChaTop",
+      "text": "work-calendar",
+      "description": "GitHub Action for syncing static work calendar ",
+      "href": "https://github.com/arnoldhoogerwerf/work-calendar",
       "stars": 0,
-      "updated": "2026-03-11T02:17:09Z"
+      "updated": "2026-03-11T02:43:47Z"
     },
     {
       "type": "action",
-      "text": "Github-Actions-my-first-action-workflow-repo",
-      "description": "This is my first repo for action workflow",
-      "href": "https://github.com/harsh-sahu28/Github-Actions-my-first-action-workflow-repo",
+      "text": "github-action-shellcheck",
+      "description": "GitHub Actions for shellcheck",
+      "href": "https://github.com/suzuki-shunsuke/github-action-shellcheck",
+      "stars": 2,
+      "updated": "2026-03-11T02:43:41Z"
+    },
+    {
+      "type": "action",
+      "text": "GitHubAction-Nvidia-News",
+      "description": "",
+      "href": "https://github.com/ljh4770/GitHubAction-Nvidia-News",
+      "stars": 1,
+      "updated": "2026-03-11T02:43:28Z"
+    },
+    {
+      "type": "action",
+      "text": "GitHub-Actions-Demo",
+      "description": "",
+      "href": "https://github.com/DhruviPatel157/GitHub-Actions-Demo",
       "stars": 0,
-      "updated": "2026-03-11T02:16:55Z"
+      "updated": "2026-03-11T02:43:26Z"
+    },
+    {
+      "type": "action",
+      "text": "eddtries",
+      "description": "I wrote a GitHub action to give me lots of commits here lol ",
+      "href": "https://github.com/eddtries/eddtries",
+      "stars": 0,
+      "updated": "2026-03-11T02:43:25Z"
+    },
+    {
+      "type": "action",
+      "text": "npm-auto-build",
+      "description": "🚀 Automate your npm project builds and commits with ease, keeping your source code clean while managing compiled assets for deployment.",
+      "href": "https://github.com/Ikbenproz/npm-auto-build",
+      "stars": 0,
+      "updated": "2026-03-11T02:43:14Z"
+    },
+    {
+      "type": "action",
+      "text": "pre-commit-action",
+      "description": "a GitHub action to run `pre-commit`",
+      "href": "https://github.com/andrewaylett/pre-commit-action",
+      "stars": 4,
+      "updated": "2026-03-11T02:43:11Z"
     }
   ],
-  "contentHash": "kkq1sp"
+  "contentHash": "-xk3rwc"
 }

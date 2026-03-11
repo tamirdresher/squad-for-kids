@@ -19101,3 +19101,235 @@ No pivots or course corrections needed based on this analysis.
 3. **Seven:** Monitor C# 15 release progress for ConfigGen team
 4. **Blog team:** Consider ecosystem validation post based on these findings
 
+---
+
+# Teams CC Message Monitoring Decision
+
+**Issue:** #332 (Teams message monitoring enhancement)  
+**Author:** Picard (Lead)  
+**Date:** 2026-03-11  
+**Status:** ✅ COMPLETED - ROUTED
+
+## Decision
+
+Routed issue #332 (Teams CC message tracking) to **Kes (Communications & Scheduling)** instead of infrastructure/code specialists.
+
+## Rationale
+
+This is a **communications/integration layer** request, not a code or infrastructure problem:
+- **Enhancement:** Track Squad's ability to detect and respond to CC'd messages in Teams and follow discussion thread continuations
+- **Current gap:** Ralph's monitoring only catches direct mentions; misses:
+  - Messages where Tamir is CC'd but not explicitly mentioned
+  - Discussion threads that continue after Squad's initial action (e.g., Nada's follow-up in #331)
+
+## Domain Ownership
+
+Kes owns Squad's Teams integration and communications automation (Outlook, Teams, scheduling). This naturally belongs in her domain:
+- Evaluate whether enhancement lives in Ralph's monitoring logic or Kes's Teams bridge
+- Define message patterns for "CC'd message" vs. "thread continuation"
+- Coordinate escalation rules to surface relevant communications
+
+## Consequences
+
+**Positive:**
+- ✅ Establishes clear pattern: communications features route to Kes, not to infrastructure
+- ✅ Clarifies boundaries for future similar requests
+- ✅ Prevents unnecessary spike in infrastructure team
+
+**Next Steps (for Kes):**
+1. Review Issue #331 (Nada's unanswered follow-up) as concrete use case
+2. Determine if this requires:
+   - Ralph enhancement (watch for reply depth, not just mentions)
+   - New Teams bridge patterns
+   - Or orchestration with communication workflows
+3. Propose implementation (or spike) with effort estimate
+
+---
+
+# DK8S Wizard Pipeline Triggering Pattern Documentation
+
+**Issue:** #331 (DK8S onboarding pipeline triggering)  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-11  
+**Status:** 📝 DOCUMENTED (Not a new decision — documents existing pattern)
+
+## Analysis
+
+The DK8S onboarding wizard explicitly triggers Buddy and Official pipelines via API after creating a new cluster repository, rather than relying on automatic CI trigger policies. This prompted a question from Nada: "why does the wizard explicitly trigger these?"
+
+### Why Explicit Triggering for Orchestrated Workflows
+
+1. **Bootstrapping Problem** — Initial commits may not satisfy pre-configured trigger filters; explicit triggering ensures pipelines run regardless
+2. **Deterministic Sequencing** — Wizard requires Buddy → Official execution order; auto-triggers fire asynchronously with no guaranteed order
+3. **Branch Constraint Mismatches** — CI policies typically fire on main/release/* branches; wizard setup commits target setup/* or feature/* branches
+4. **Parameter Injection** — Buddy/Official pipelines require cluster-specific parameters; auto-triggers use defaults from commit context
+5. **Synchronous User Feedback** — Wizard UI needs real-time pipeline status; auto-triggers require polling
+
+## Pattern Classification
+
+**Event-Driven Automation (Auto-Triggers):**
+- ✅ Best for: Routine commits, stateless pipelines, independent stages
+- ✅ Use when: Repository structure is stable, trigger conditions well-defined
+
+**Orchestrated Workflows (Explicit Triggers):**
+- ✅ Best for: Setup wizards, multi-stage deployments, parameter-driven pipelines
+- ✅ Use when: Sequencing matters, synchronous feedback required, dynamic parameters needed
+
+## Decision
+
+✅ **Keep explicit triggering for Buddy/Official pipelines in onboarding wizard** — this is sound engineering practice for orchestrated workflows where determinism and control are critical.
+
+## Team Knowledge
+
+Wizards and setup automation should use **explicit pipeline triggering for bootstrapping workflows**. Auto-triggers are appropriate for routine post-commit CI/CD on established repositories.
+
+---
+
+# DevBox Persistent Access Decision
+
+**Issue:** #330 (DevBox autonomous access)  
+**Author:** Data (Code Expert) / B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-11  
+**Status:** ✅ APPROVED
+
+## Problem
+
+Squad requires autonomous DevBox access to:
+- Check Ralph status without manual tunnel opening
+- Install tools and run commands remotely
+- Survive DevBox restarts without re-authentication
+
+Current blocker: Manual dev tunnel management by Tamir.
+
+## Decision
+
+**Use SSH with key-based authentication as the standard for Squad's autonomous DevBox access.**
+
+## Analysis
+
+Evaluated 5 solutions across security, reliability, autonomy, and simplicity:
+
+| Solution | Security | Reliability | Autonomy | Simplicity | Score |
+|----------|----------|-------------|----------|------------|-------|
+| **SSH + Keys** | 🟢 Excellent | 🟢 Auto-starts | 🟢 Zero manual | 🟢 Native | **10/10** ⭐ |
+| Auto-start DevTunnel | 🟡 Auth required | 🟢 Persistent | 🟢 Zero manual | 🟡 Setup needed | 7/10 |
+| cli-tunnel auto-start | 🟡 Auth required | 🟢 Persistent | 🟢 Zero manual | 🟡 npm dependency | 6/10 |
+| Run Command API | 🟢 Azure IAM | 🟢 API-based | 🟢 Zero manual | 🔴 Complex API | 6/10 |
+| Self-Hosted Runner | 🔴 High risk | 🟢 Auto-starts | 🟢 Zero manual | 🔴 Complex | 4/10 |
+
+## Why SSH Wins
+
+1. **Security** — Industry-standard key-based auth, no secrets in URLs/tokens
+2. **Reliability** — Native Windows OpenSSH service, auto-starts on boot
+3. **Autonomy** — Zero manual intervention after one-time key setup
+4. **Simplicity** — Built into Windows, PowerShell remoting works natively
+5. **Auditability** — SSH logs all access attempts
+
+## Implementation Plan
+
+1. **One-Time Setup (Tamir):**
+   - Install OpenSSH Server on DevBox
+   - Generate SSH key pair on local machine
+   - Configure authorized_keys on DevBox
+   - Test: `Enter-PSSession -HostName <devbox> -UserName <user> -SSHTransport`
+
+2. **Squad Integration:**
+   - Update Playwright DevBox skill to use SSH instead of dev tunnels
+   - Store DevBox hostname/IP in `.squad/config` or environment variable
+   - Test autonomous Ralph status check
+
+3. **Keep cli-tunnel for Monitoring:**
+   - cli-tunnel remains for terminal recording, demos, and hub mode
+   - Not used for Squad automation
+
+## Consequences
+
+**Positive:**
+- ✅ Squad can autonomously check Ralph, install tools, run commands
+- ✅ No manual tunnel opening required
+- ✅ Strong security with key-based auth
+- ✅ Works across reboots
+
+**Considerations:**
+- Initial SSH key setup required (one-time)
+- DevBox must be network-reachable (standard practice)
+
+---
+
+# Multi-Org ADO/MCP Configuration Decision
+
+**Issue:** #329 (Multi-org Azure DevOps access)  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-11  
+**Status:** ✅ APPROVED (Pending Implementation)
+
+## Problem
+
+The ADO MCP server is configured with a single org ("microsoft"). When Squad needs to access repos in other orgs (e.g., "msazure/CESEC"), it fails silently. This blocked PR review on issue #328.
+
+## Root Cause
+
+The `@azure-devops/mcp` package has a **single-org limitation by design**:
+- Org name is required startup argument: `npx @azure-devops/mcp <org-name>`
+- No runtime reconfiguration possible — requires server restart to change orgs
+- Global MCP server instances take precedence over repo-level configs
+
+**Current Configuration Conflict:**
+- Global config (`~/.copilot/mcp-config.json`): "microsoft" org
+- Repo config (`./.copilot/mcp-config.json`): "msazure" org
+- Global server overrides repo config, blocking msazure access
+
+## Decision
+
+**Implement multi-instance MCP pattern** — Run separate MCP server instances per org with unique names:
+
+```json
+{
+  "mcpServers": {
+    "ado-microsoft": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "microsoft"],
+      "tools": ["*"]
+    },
+    "ado-msazure": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "msazure"],
+      "tools": ["*"]
+    }
+  }
+}
+```
+
+## Benefits
+
+- ✅ Both orgs accessible simultaneously
+- ✅ Uses official Microsoft package (no third-party risk)
+- ✅ Clean tool namespacing: `ado-microsoft-*` vs `ado-msazure-*`
+- ✅ Zero context switching required
+- ✅ No breaking changes to existing Squad workflows
+
+## Consequences
+
+**Positive:**
+- ✅ Solves cross-org access issue permanently
+- ✅ Uses official Microsoft tooling
+- ✅ Enables autonomous Squad operations across orgs
+- ✅ Clear tool namespacing prevents conflicts
+
+**Considerations:**
+- Tool names change from `azure-devops-*` to `ado-{org}-*`
+- Skills may need updates for org-aware routing
+- Slightly more verbose tool names
+
+## Implementation Plan
+
+1. **Update global config** (`~/.copilot/mcp-config.json`) with both org instances
+2. **Test both org access** from Copilot CLI
+3. **Verify tools are properly namespaced:** `ado-microsoft-core_list_projects` etc.
+4. **Update Squad skills** to detect org context and route accordingly
+5. **Document multi-org routing patterns** in `.squad/skills/`
+
+**Status:** Research complete. Awaiting Tamir's approval to implement global config changes.
+

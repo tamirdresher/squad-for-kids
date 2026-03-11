@@ -10,6 +10,78 @@ TBD - Q2 work incoming
 
 ## Learnings
 
+### 2026-03-12: Issue #333 — Azure Status Check in Incident Response
+
+**Context:** Tamir noted that during an incident, Joshua used Azure Status (https://azure.status.microsoft/en-us/status) to prove other services were affected — proving it wasn't their fault.
+
+**Pattern Documented:**
+- **When:** During any incident or ICM, check Azure Status first
+- **Why:** Distinguish "our problem" from "Azure-wide outage" quickly
+- **How:** Navigate to the status page, check for active incidents in relevant services (AKS, Key Vault, Networking, Storage, ACR)
+- **Impact:** Reduces blame, redirects focus, provides rapid root-cause direction
+
+**Skill Created:** `.squad/skills/incident-response/SKILL.md` with full documentation and real-world example.
+
+**Status:** ✅ Complete. Skill documented and issue closed. This is now a standard incident response procedure for the squad.
+
+### 2026-03-11: Issue #329 — Multi-Org ADO/MCP Research
+
+**Context:** Squad couldn't access PRs in different Azure DevOps orgs (microsoft vs msazure).
+
+**Root Cause:** The `@azure-devops/mcp` package has single-org design limitation:
+- Org name is required startup argument: `npx @azure-devops/mcp <org-name>`
+- No runtime reconfiguration capability — requires server restart to change orgs
+- Global MCP config takes precedence over repo-level configs
+
+**Current State Analysis:**
+- Global config: `~/.copilot/mcp-config.json` has "microsoft" org
+- Repo config: `./.copilot/mcp-config.json` has "msazure" org
+- Global server instance overrides repo config, blocking msazure access
+
+**Solutions Evaluated:**
+1. **Multi-Instance MCP Pattern (RECOMMENDED):** Run separate named instances per org
+2. **Community Fork:** `nikydobrev/mcp-server-azure-devops-multi` with dynamic org routing
+3. **Az CLI Fallback:** Use `gh repo`/`az repos` with `--organization` flags
+
+**Recommendation:** Multi-instance pattern using official Microsoft package:
+```json
+{
+  "mcpServers": {
+    "ado-microsoft": { "args": ["-y", "@azure-devops/mcp", "microsoft"] },
+    "ado-msazure": { "args": ["-y", "@azure-devops/mcp", "msazure"] }
+  }
+}
+```
+- Tools become namespaced: `ado-microsoft-*` vs `ado-msazure-*`
+- Simultaneous access without context switching
+- Uses official Microsoft package (no third-party risk)
+
+**Status:** Analysis posted to Issue #329. Awaiting Tamir's approval for global config update.
+
+### 2026-03-11: DK8S Wizard Explicit Pipeline Triggering Pattern
+
+**Context:** Issue #331 — Nada asked why the DK8S onboarding wizard explicitly triggers Buddy/Official pipelines via API instead of relying on automatic CI triggers.
+
+**Key Findings:**
+1. **Bootstrapping Problem**: Initial repository commits may not match pre-configured CI trigger filters (path filters, branch conditions)
+2. **Deterministic Sequencing**: Wizard needs Buddy → Official ordering with synchronous error handling; auto-triggers fire asynchronously with no guaranteed order
+3. **Branch Constraints**: CI policies typically only fire on specific branches (main, release/*); wizard setup commits may target different branches (setup/*)
+4. **Parameter Injection**: Buddy/Official pipelines may require cluster-specific parameters that wizard needs to provide explicitly
+5. **User Experience**: Explicit triggering enables real-time status updates in wizard UI vs. polling/webhook complexity
+
+**Engineering Pattern — Orchestrated Workflow vs. Event-Driven Automation:**
+- **Event-driven (auto-triggers)**: Best for routine commits, stateless pipelines, independent stages
+- **Orchestrated (explicit triggers)**: Required for multi-stage wizards, parameter injection, deterministic sequencing, synchronous error handling
+
+**Recommendation:** Keep explicit triggering for critical bootstrapping pipelines. This is sound engineering practice for setup/onboarding workflows where control and determinism are required.
+
+**Improvements Suggested:**
+- Document trigger logic in wizard code with rationale comments
+- Add retry logic for API trigger failures
+- Validate PMERelease CI policies will fire before wizard completion
+
+**Decision Status:** Analysis posted to Issue #331, answered Nada's question with 5-point technical rationale. No formal decision needed — this documents an existing pattern.
+
 ### 2026-05-11: Azure DevOps MCP Multi-Org Limitations
 
 **Context:** Issue #329 — Squad couldn't access PRs in different Azure DevOps orgs (microsoft vs msazure).

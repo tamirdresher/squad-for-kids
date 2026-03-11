@@ -14,6 +14,27 @@ TBD - Q2 work incoming
 
 ---
 
+### 2026-03-27: Picard — Issue #294 Follow-Up Check
+
+**Assignment:** Verify completion status of Issue #294 (Brady's production approval path question).
+
+**Context:** Tasked to work on Issue #294, but found it was already completed in a previous session (2026-03-26).
+
+**Findings:**
+- Comprehensive `prod-approval-path.md` already exists in repo root (15K guide)
+- Full analysis already posted as issue comment by Tamir
+- Previous work documented in my history (2026-03-26 entry)
+- Issue labeled `squad:picard` but no `status:pending-user` label currently
+
+**Action Taken:**
+- Posted status summary comment to issue #294
+- Confirmed deliverables are complete and accessible to Brady
+- No additional work required
+
+**Status:** ✅ VERIFIED COMPLETE
+
+---
+
 ### 2026-03-26: Picard — Issue #294 Production Approval Path for Brady
 
 **Assignment:** Draft comprehensive production approval path for Brady's question: "With whom should I speak to make sure I've checked all these boxes?" (referring to Squad production deployment).
@@ -48,6 +69,43 @@ TBD - Q2 work incoming
 
 4. **Structured Evidence Checklists**
    - Created comprehensive evidence requirements for each approval domain
+   - Mapped explicit approval paths
+   - Documented compliance mapping
+
+**Deliverable:** 15K comprehensive framework posted to Issue #294. Successfully answered Brady's question with clear, structured guidance.
+
+**Status:** ✅ COMPLETED
+
+### 2026-03-11: Picard — Issue #332 Triage & Multi-Squad Coordination
+
+**Assignment:** Triage issue #332 and draft multi-squad architecture response for Jack Batzner's question on #326.
+
+**Context:** 
+- Issue #332: Teams CC message monitoring request from Ralph
+- Issue #326: Jack Batzner asking about cross-squad coordination patterns
+
+**Execution:**
+
+1. **Issue #332 Triage**
+   - Analyzed Teams CC monitoring request
+   - Identified as communications/integration layer feature, not infrastructure
+   - Routed to Kes (Communications & Scheduling domain owner)
+   - Documented routing decision in inbox
+
+2. **Issue #326 Multi-Squad Architecture**
+   - Drafted comprehensive response on cross-squad coordination patterns
+   - Addressed Jack Batzner's architectural questions
+   - Established decision: Squads per repo with upstream knowledge-sharing
+   - Tier 1-2 coordination fully operational
+
+**Deliverables:**
+- Issue #332: Routing decision documented, assigned to Kes
+- Issue #326: Multi-squad architecture response posted
+- Decision written to inbox: `picard-multi-squad-326.md`
+
+**Key Pattern Established:** Communications features route to Kes, not infrastructure team
+
+**Status:** ✅ COMPLETED
    - Mapped Squad-specific concerns (MCP tool inventory, agent autonomy boundaries, data residency)
    - Documented decision boundaries (what agents never decide alone)
 
@@ -75,4 +133,48 @@ TBD - Q2 work incoming
 5. Data residency and secrets management compliance often get overlooked until late-stage; recommend addressing in Phase 1 self-assessment
 
 **Related Decision:** Merged to `.squad/decisions.md` (Decision 15) on 2026-03-11 by Scribe. Production approval framework approved for team adoption.
+
+---
+
+### 2026-03-11: Picard — Issue Triage #332 & #326
+
+**Assignment:** Triage two strategic issues: improving Teams message monitoring (#332) and clarifying multi-squad architecture for community (#326).
+
+#### Issue #332: Teams CC Messages & Thread Follow-up Tracking
+
+**Problem:** Squad currently misses:
+1. Messages where Tamir is CC'd (not explicitly mentioned but copied)
+2. Discussion threads that continue after initial resolution (someone responds later with new context)
+3. Real example: Nada's follow-up question in issue #331 went unanswered because Squad wasn't tracking the thread continuation
+
+**Routing Decision:** Assigned to **Kes (Communications & Scheduling)**
+**Rationale:** This is a Teams/communications monitoring capability request, not a code issue. Kes owns Squad's integration with Teams and Outlook, making her the right owner to evaluate:
+- Whether to enhance Ralph's monitoring logic
+- What new Teams bridge patterns are needed
+- How to surface thread continuations to the team
+
+**Key Insight:** This revealed a gap in our async communication handling — we monitor initial mentions but not ongoing discussions. The fix likely involves:
+1. Ralph tracking "message replies" not just "new mentions"
+2. Escalation rules for when someone replies to a 48-hour-old message
+3. Maybe a "thread temperature" indicator to flag active discussions
+
+#### Issue #326: Multi-Squad Architecture — Community Explanation
+
+**Problem:** Jack Batzner asked three core questions about multi-squad design:
+1. Squad per repo? 
+2. Fanning out work across multiple squads?
+3. What's the usage model?
+
+**Outcome:** Tamir needed a brief community-friendly summary (not the 10K technical spec that was already drafted). Created TL;DR covering:
+- Core model: Squad-per-repo + upstream inheritance + cross-squad delegation
+- Usage patterns: Small orgs (squad-per-product) vs. large orgs (squad-per-team with Platform Squad hub)
+- Timeline: Available now (upstream) vs. in-progress (delegation protocol)
+- Resource pointers: Charter, decisions, roadmap
+
+**Key Decision:** Positioned upstream inheritance as available today, cross-squad delegation as in-progress (Issue #197). This manages expectations and invites community feedback on the model.
+
+**Learnings:**
+1. Teams message monitoring must track not just mentions but also thread continuations — a 5-day silence + new reply = Squad-relevant event
+2. Communications features often fall between "code" and "infrastructure" — routing to Kes (communications owner) rather than infrastructure specialist was the right call
+3. Multi-squad architecture needs both technical depth (for implementers) AND elevator pitch (for community validation) — having both artifacts lets Tamir socialize the model efficiently
 

@@ -8,7 +8,50 @@
 
 TBD - Q2 work incoming
 
+### 2026-03-11 Completion: squad-monitor Issues #1 & #3
+
+**Context:** Two squad-monitor enhancements deployed this round.
+
+**Issue #1 — Token Usage Panel (PR #9):**
+- Enhanced token panel with latency metrics, per-session cost breakdown
+- Implemented event deduplication via API call ID to prevent double-counting
+- `assistant_usage` + `cli.model_call` events deduplicated using HashSet lookups
+
+**Issue #3 — Multi-Session View (PR #8):**
+- Added `--multi-session` / `-m` flag for session-focused monitoring
+- Configurable session window: `--session-window <minutes>` (default 30)
+- Keyboard toggle `m` for view switching (mutually exclusive with `o`)
+- Expanded feed: 80 entries in multi-session mode vs 30 in dashboard
+
+**Status:** Both PRs merged. Decisions documented and deduplicated in decisions.md.
+
 ## Learnings
+
+### Issue #3: Multi-Session View Enhancement (2026-03-11)
+
+**Context:** squad-monitor needed a dedicated multi-session monitoring mode. The existing code already scanned multiple sessions but lacked a focused view and used a hardcoded 4-hour scan window.
+
+**Changes Made (PR #8):**
+- Added `--multi-session` / `-m` flag for focused session-only view
+- Added `--session-window <minutes>` parameter (default 30 min per issue spec)
+- Added `m` keyboard toggle in live mode (mutually exclusive with `o`)
+- Extended copilot log scanning to include session subdirectories with `events.jsonl`
+- Expanded feed limit: 80 entries in multi-session mode, 30 in default dashboard
+- Added `Copilot` session type with blue color coding
+
+**Architecture Decisions:**
+- `BuildMultiSessionContent` delegates to `BuildLiveAgentFeedSection` with `expandedFeed: true` — avoids duplication
+- Session window parameter flows through all scan methods via `sessionWindowMinutes` parameter
+- Keyboard toggles are mutually exclusive: pressing `m` disables `o` and vice versa
+- Copilot session dirs scanned separately from CLI process-*.log files to avoid double-counting
+
+**Key File Paths:**
+- `C:\temp\squad-monitor\Program.cs` — single-file application, ~2500 lines
+- `C:\temp\squad-monitor\SharpUI.cs` — SharpConsoleUI beta prototype (placeholder)
+- Build: `cd C:\temp\squad-monitor && dotnet build`
+- Target: net10.0, LangVersion 13.0
+
+**Pre-existing Warning:** CS8321 on `ExtractString` — it IS used but compiler flags it due to top-level program static function scoping. Do not remove.
 
 ### Issue #330: DevBox Persistent Access Research (2026-04-01)
 
@@ -65,3 +108,28 @@ TBD - Q2 work incoming
 **Deliverables:**
 - Test results comment on issue #311
 - Verified build and runtime functionality
+
+### Issue #1: Token Usage, Cost, and Model Stats Panel (2026-06-18)
+
+**Context:** Enhance squad-monitor dashboard with comprehensive token/cost/model telemetry from `~/.copilot/logs/`.
+
+**Implementation:**
+- Enhanced `BuildTokenStatsSection` in `Program.cs` to parse three event types:
+  - `assistant_usage` — model, input/output/cached tokens, cost, duration
+  - `cli.model_call` — model, prompt/completion/cached tokens, duration_ms
+  - `session_usage_info` — token_limit, current_tokens (context window)
+- Deduplicated events via `api_id` / `api_call_id` to prevent double-counting
+- Added `ModelCallStats` class for richer per-model aggregation
+- Added Avg Latency column (from duration_ms) and per-session cost tracking
+
+**Key Insights:**
+- `assistant_usage` and `cli.model_call` events often report the same API call — deduplicate via api_id
+- `cli.model_call` uses `prompt_tokens_count`/`completion_tokens_count`; `assistant_usage` uses `input_tokens`/`output_tokens`
+- Cost data only appears in `assistant_usage` events, not `cli.model_call`
+- Log files opened with `FileShare.ReadWrite` to avoid conflicts with running Copilot processes
+- Target framework: net10.0, LangVersion 13.0
+
+**Deliverables:**
+- Branch: `squad/1-token-usage-panel` (tamirdresher/squad-monitor)
+- Build: ✅ Success (dotnet build clean)
+- PR creation blocked by EMU restrictions — branch pushed for manual PR

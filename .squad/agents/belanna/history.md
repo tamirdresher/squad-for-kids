@@ -6,9 +6,44 @@
 
 ## Active Context
 
-TBD - Q2 work incoming
+Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish when Tamir creates a GitHub release.
+
+### 2026-03-11 Completion: squad-monitor Issue #2 NuGet Publish (PR #4)
+
+**Status:** Confirmed merged in prior session. Work complete.
+
+**Details:**
+- `.csproj` configured with `PackAsTool=true`, `ToolCommandName=squad-monitor`
+- GitHub Actions workflow `.github/workflows/publish-nuget.yml` ready
+- Local build/pack verified: produces `squad-monitor.1.0.0.nupkg` (794KB)
+- Package includes README with install instructions
+- Issue #2 closed
+
+**Next step:** Tamir creates GitHub Release tag `v1.0.0` → workflow fires automatically and publishes to NuGet.
 
 ## Learnings
+
+### 2026-06-20: Issue #2 — squad-monitor NuGet Tool Packaging (Verified Complete)
+
+**Context:** Tamir requested NuGet global tool packaging for squad-monitor so users can `dotnet tool install -g squad-monitor`.
+
+**Status:** ✅ Already implemented and merged to main. Branch `squad/2-nuget-publish` was merged. Issue #2 closed.
+
+**What's in place:**
+1. **`.csproj` packaging**: `PackAsTool=true`, `ToolCommandName=squad-monitor`, `PackageId=squad-monitor`, MIT license, README included in package
+2. **GitHub Actions workflow**: `.github/workflows/publish-nuget.yml` — triggers on release publish or manual dispatch, builds/packs/pushes to NuGet using `secrets.NUGET_API_KEY`, attaches `.nupkg` to GitHub Release
+3. **README**: Full install/update/uninstall instructions with "Option 1: Global Tool" as recommended path
+4. **Local verification**: `dotnet build && dotnet pack` succeeds, produces `squad-monitor.1.0.0.nupkg` (794KB)
+
+**To actually publish:**
+- Add `NUGET_API_KEY` secret to GitHub repo settings
+- Create a GitHub Release with tag `v1.0.0` → workflow fires automatically
+- Or use manual dispatch with version input
+
+**Key file paths:**
+- Repo: `C:\temp\squad-monitor`
+- Workflow: `.github/workflows/publish-nuget.yml`
+- Package output: `nupkg/squad-monitor.1.0.0.nupkg`
 
 ### 2026-03-12: Issue #333 — Azure Status Check in Incident Response
 

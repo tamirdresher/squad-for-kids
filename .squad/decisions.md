@@ -13883,6 +13883,60 @@ No code changes required in tamresearch1 until factories are wired in bradygaste
 
 ---
 
+## Decision: Token Usage Panel — Event Deduplication Strategy
+
+**Date:** 2026-06-18
+**Author:** Data (Code Expert)
+**Issue:** squad-monitor #1
+**Status:** ✅ IMPLEMENTED (PR #9 merged)
+**Scope:** Code — Token Usage Analytics
+
+### Problem
+
+Token Usage & Model Stats panel was inflating token counts and call counts due to duplicate event processing.
+
+### Solution
+
+Deduplicate `assistant_usage` and `cli.model_call` events using API call ID. Process whichever event appears first, skip duplicates.
+
+### Rationale
+
+- Both event types report the same LLM invocation with different field names
+- `assistant_usage` has cost data; `cli.model_call` has duration/feature flags
+- Without deduplication, counts inflated ~2x
+
+### Impact
+
+- No breaking changes
+- Uses `HashSet<string>` for O(1) dedup lookups in `BuildTokenStatsSection`
+
+---
+
+## Decision: Multi-Session View Mode for squad-monitor
+
+**Date:** 2026-03-11
+**Author:** Data (Code Expert)
+**Issue:** squad-monitor #3
+**PR:** #8
+**Status:** ✅ IMPLEMENTED (PR #8 merged)
+**Scope:** Features — Dashboard Views
+
+### Problem
+
+Full dashboard is information-dense. When debugging agent sessions, need only session data. Default session scan window was hardcoded to 4 hours — too wide for real-time monitoring.
+
+### Solution
+
+Added `--multi-session` (`-m`) mode showing only session overview + merged feed. Made scan window configurable (default 30 minutes). Added keyboard toggle (`m` key) for view switching.
+
+### Impact
+
+- No breaking changes — existing behavior preserved
+- Default session window: 30 minutes (configurable via `--session-window`)
+- Keyboard shortcut `m` for view toggle
+
+---
+
 ## Decision 5: Watch Command Strategy — squad-cli vs ralph-watch.ps1
 
 **Date:** 2026-03-09

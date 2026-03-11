@@ -48,6 +48,66 @@
 **Orchestration Log:** 2026-03-10T13-26-00Z-data.md  
 **Decision Record:** Merged to decisions.md from inbox/
 
+### 2026-03-11: Data — SharpConsoleUI TUI Framework Research — Issue #311
+
+**Task:** Research .NET Terminal UI framework (SharpConsoleUI) from Reddit post and assess integration with squad-monitor.
+
+**Work Completed:**
+1. **Framework Identification** — SharpConsoleUI (nickprotop/ConsoleEx):
+   - NuGet: SharpConsoleUI package
+   - License: MIT
+   - Created: 2025-02-11 (< 1 month old)
+   - Stars: 145, Forks: 1
+   - Active development (last push: 2026-03-11)
+
+2. **Key Features Analysis:**
+   - Retained-mode GUI with WPF-style Measure → Arrange → Paint pipeline
+   - True overlapping windows with per-window async threads
+   - 30+ controls (lists, trees, tables, buttons, prompts, canvas, etc.)
+   - Double-buffered compositing with occlusion culling
+   - Full Spectre.Console integration (any IRenderable as control)
+   - Compositor effects (PreBufferPaint/PostBufferPaint hooks)
+
+3. **squad-monitor Codebase Analysis:**
+   - Current: Single-file (~2,000 lines), Spectre.Console-based
+   - Targets .NET 10.0, published as global tool
+   - Monitors: Ralph heartbeat, GitHub data, orchestration logs, live agent feed
+   - Limitations: Single view, no drill-down, synchronized refresh
+
+4. **Integration Assessment:**
+   - ✅ Good fit: Multi-panel dashboard, per-window threads, interactive controls
+   - ⚠️ Risks: Early-stage library, breaking API changes possible, small community
+   - 🔧 Migration: Complete rewrite from Layouts → WindowSystem
+
+**Comparison with Alternatives:**
+- **vs Terminal.Gui:** SharpConsoleUI has better Spectre integration, per-window threads, but less mature
+- **vs Spectre.Console:** SharpConsoleUI adds multi-window and retained-mode GUI, but more complex
+
+**Recommendation:** Beta branch experimentation approved with clear maturity warnings. Incremental migration strategy defined (Phase 1-4). Keep current Spectre.Console as stable version.
+
+**Deliverable:** Posted comprehensive research summary to issue #311 with:
+- Framework features and maturity assessment
+- Comparison matrix (SharpConsoleUI vs. Terminal.Gui vs. Spectre.Console)
+- Integration assessment with squad-monitor
+- 4-phase incremental migration plan
+- Beta versioning strategy
+- Success criteria and go/no-go decision framework
+
+**Impact:** Enables informed decision on TUI framework adoption while managing risk.
+
+**Key Learnings:**
+- SharpConsoleUI uniquely offers overlapping windows + per-window threads (neither Terminal.Gui nor Spectre.Console have both)
+- Per-window threads are ideal for squad-monitor's real-time monitoring (independent refresh rates)
+- Early adoption risk: Project is < 1 month old (145 stars, 1 fork)
+- Best path: Beta branch with proof-of-concept, preserve Spectre.Console mainline
+
+**File Paths:**
+- squad-monitor: C:\temp\squad-monitor\
+- squad-monitor.csproj: .NET 10.0, Spectre.Console 0.49.1, published as global tool
+- Program.cs: ~2,000 lines, Layout-based dashboard with Live updates
+
+**Decision Record:** Will create inbox/data-tui-framework-311.md
+
 ---
 
 ### 2026-03-10: Data — Email-to-GitHub Integration Research — Issue #259

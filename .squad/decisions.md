@@ -17835,3 +17835,101 @@ This reduces startup friction and clarifies ownership immediately.
 
 If blockers remain unresolved after 1 week, escalate to Picard for leadership intervention.
 
+
+---
+
+## Decision 19: Worktree Lifecycle Policy — Background Agent Isolation
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Development Process & Squad Operations  
+
+### Policy
+
+1. **Background agent work happens in dev worktree** — agents spawned for long-running tasks work in isolated worktrees, not the main folder
+2. **Main folder (C:\temp\tamresearch1) is always stable** — Ralph and user-facing work operates from here as the fallback
+3. **Worktree cleanup mandatory** — when work in a worktree is done, delete the worktree folder. No garbage left behind
+4. **Ralph fetches latest on main** — merged work from worktrees flows in naturally via git pull
+5. **Agents are self-sustaining** — diagnose issues, add safety measures, recover without user intervention
+
+### Rationale
+
+Keep the workspace clean and main always up to date with all merged work. Prevents workspace pollution, ensures reproducibility, and makes stale worktrees visible immediately.
+
+### Implementation
+
+- All background agents check if they need a worktree (long-running, experimental, or isolated work)
+- If yes: Create worktree with pattern git worktree add --detach /path/dev-{agent-name}-{timestamp}
+- Work in worktree, commit, push to branch, create PR
+- After merge: git worktree remove /path (cleans up entire worktree directory)
+- Ralph pulls latest on main before each cycle: git fetch && git pull origin main
+
+### Consequences
+
+- ✅ Main folder stays clean and stable
+- ✅ Clear separation between experimental and production work
+- ✅ Easier to spot orphaned worktrees
+- ✅ Prevents merge conflicts from multiple agents in same folder
+- ⚠️ Requires discipline about cleanup
+- ⚠️ Worktree creation takes ~5 sec per agent
+
+### Related
+
+- Ralph activation loop (daily work monitor)
+- Squad agent spawning model
+
+---
+
+## Decision 20: Squad Agent File Disappearance — Prevention & Branch Policy
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** Proposed  
+**Scope:** Repository Hygiene & Branch Management  
+
+### Executive Summary
+
+The .github/agents/squad.agent.md file went missing on the squad/3-multi-session-view branch because the branch originated from commit 4e56fed (squad-monitor v2 initial release), which predates the file creation by 21 commits. The branch is 392 commits behind main.
+
+### Root Cause Analysis
+
+- **File first appears:** Commit a70504 ("feat: Azure DevOps platform adapter — Squad for enterprise #191")
+- **Current status on main:** ✅ Present at HEAD
+- **Current status on squad/3-multi-session-view:** ❌ Absent at tip
+- **Branch timeline:** Orphaned from main; branch never rebased onto the commit containing the file
+
+### Prevention Strategy: Strict Branching Protocol
+
+**Implement a .squad/branch-protocol.md guide requiring:**
+
+1. **All feature branches must derive from main:**
+   `
+   git fetch origin main
+   git checkout -b squad/[issue]-[name] origin/main
+   `
+
+2. **Pre-push validation hook** (.git/hooks/pre-push):
+   - Verify .github/agents/squad.agent.md exists before push
+
+3. **CI guardrail in .github/workflows/squad-agent-check.yml:**
+   - Test for squad agent file on every PR
+
+4. **Squad branch naming convention:**
+   - Prefix all squad work: squad/[issue]-[description]
+   - Tag orphaned branches as squad/orphan-* for cleanup
+
+### Consequences
+
+- ✅ Prevents future branch orphaning
+- ✅ Clarifies branching expectations for all agents
+- ✅ Early detection of configuration drift
+- ⚠️ Pre-push hook may reject legitimate edge cases
+- ⚠️ CI guardrail adds ~5 sec to every PR validation
+
+### Status
+
+- **Decision:** Adopted
+- **Implementation timeline:** This sprint
+- **Owner:** Picard (create .squad/branch-protocol.md + cleanup orphaned branches)
+

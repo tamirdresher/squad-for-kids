@@ -219,3 +219,26 @@ TBD - Q2 work incoming
 - Branch is at `cfe2a06`, ready for manual PR at: https://github.com/tamirdresher/squad-monitor/compare/main...squad/10-session-display
 
 **Key Learning:** EMU (Enterprise Managed User) restrictions are persistent — always plan for manual PR creation via browser as fallback.
+
+### Issue #329: Multi-Org ADO/MCP Access Research (2026-06-24)
+
+**Context:** Squad can't access repos in different Azure DevOps orgs. The `@azure-devops/mcp` package takes org name as a startup argument and cannot switch at runtime. Current setup has `microsoft` in global config and `msazure` in repo config, but global overrides repo.
+
+**Research Findings:**
+- `@azure-devops/mcp` is single-org by design: `npx @azure-devops/mcp <org-name>`
+- Global config (`~/.copilot/mcp-config.json`): connected to `microsoft`
+- Repo config (`.copilot/mcp-config.json`): connected to `msazure`
+- Global instance takes precedence, so `msazure` repos are unreachable
+- Decision 14 (B'Elanna, 2026-03-11) already approved multi-instance pattern but Phase 2 validation was never completed
+
+**Three Approaches Evaluated:**
+1. **Multi-Instance MCP (Recommended):** Run separate named instances per org (`ado-microsoft`, `ado-msazure`). Config-only, zero code changes, scales to N orgs.
+2. **Proxy/Router:** Custom middleware dispatching to correct org. Over-engineered, single point of failure.
+3. **Dynamic Switching:** Restart MCP with different org. Impractical, disrupts active sessions.
+
+**Deliverables:**
+- Technical proposal with architecture diagram posted as comment on issue #329
+- Label `status:pending-user` added — waiting for Tamir to confirm approach and org list
+- Project board updated to "Pending User"
+
+**Key Insight:** The solution is purely configuration. Each MCP server instance gets a unique name prefix (e.g., `ado-microsoft`, `ado-msazure`), and tools are automatically namespaced by MCP. Adding a new org = 5 lines of JSON config.

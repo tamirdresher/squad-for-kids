@@ -257,3 +257,70 @@ The Azure Skills Plugin is a **production-ready, well-architected solution** tha
 **Recommendation:** Install the plugin and evaluate usage patterns. If the squad does meaningful Azure work, this plugin will accelerate deployment workflows and reduce Azure decision-making overhead. If Azure work is minimal, it's still valuable as a reference implementation for advanced skill architecture.
 
 **Next Action:** Assign to B'Elanna (Infrastructure) or Picard (Lead) for adoption evaluation.
+
+---
+
+## Integration Status
+
+**Date:** 2026-03-11  
+**Integrated By:** B'Elanna (Infrastructure Expert)  
+**Issue:** #343
+
+### What Was Done
+
+1. ✅ **6 Priority Azure Skills Copied** to `.squad/skills/azure/`:
+   - `azure-diagnostics.md` — Production troubleshooting and log analysis
+   - `azure-rbac.md` — Role-based access control and permissions
+   - `azure-compliance.md` — Compliance checks and policy validation
+   - `azure-cost-optimization.md` — Cost management and waste reduction
+   - `azure-resource-lookup.md` — Resource discovery across subscriptions
+   - `azure-deploy.md` — Deployment orchestration via azd
+
+2. ✅ **Skills Documentation Created:**
+   - `README.md` in `.squad/skills/azure/` with usage instructions
+   - Skill-to-squad-member mapping (who benefits from each skill)
+   - Instructions for installing full plugin if needed
+
+3. ✅ **MCP Configuration Reviewed:**
+   - Repo-level `.copilot/mcp-config.json` exists with ADO MCP configured
+   - Azure MCP Server NOT currently configured
+   - Documented how to add Azure MCP Server if team decides to enable it
+
+### Skills Selection Rationale
+
+**Prioritized for squad's work profile:**
+- **Infrastructure:** Diagnostics, deployment, cost optimization, resource lookup
+- **Security:** RBAC, compliance (relevant to Worf)
+- **Operations:** All skills support incident response and maintenance
+
+**Not yet integrated (15 skills):**
+- azure-prepare, azure-validate, azure-ai, azure-kusto, azure-storage, azure-messaging, azure-cloud-migrate, azure-compute, azure-quotas, azure-resource-visualizer, azure-aigateway, azure-hosted-copilot-sdk, microsoft-foundry, entra-app-registration, appinsights-instrumentation
+
+These can be added on-demand if squad work requires them.
+
+### Azure MCP Server Status
+
+**Not installed.** The Azure Skills Plugin includes the Azure MCP Server (200+ tools across 40+ Azure services). This requires:
+- Node.js 18+ (already available)
+- Azure CLI `az` (needs verification)
+- Azure Developer CLI `azd` (not verified)
+- Azure subscription access (available for team)
+
+**Recommendation:** Defer full plugin installation until squad has a concrete Azure deployment workflow. Current skill files provide workflow guidance that can be followed manually or with existing Az CLI commands.
+
+### Next Steps
+
+1. **Evaluate Usage:** Track which Azure skills squad members reference during actual work
+2. **Consider Full Plugin:** If Azure work becomes frequent (multiple tasks per sprint), install the full plugin for Azure MCP Server access
+3. **Expand Skill Library:** Add additional skills on-demand based on team needs
+
+### Files Modified
+
+- Created: `.squad/skills/azure/azure-diagnostics.md`
+- Created: `.squad/skills/azure/azure-rbac.md`
+- Created: `.squad/skills/azure/azure-compliance.md`
+- Created: `.squad/skills/azure/azure-cost-optimization.md`
+- Created: `.squad/skills/azure/azure-resource-lookup.md`
+- Created: `.squad/skills/azure/azure-deploy.md`
+- Created: `.squad/skills/azure/README.md`
+- Updated: `.squad/research/azure-skills-plugin-research.md` (this section)

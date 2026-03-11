@@ -20010,3 +20010,61 @@ Proposed. Awaiting B'Elanna follow-up for implementation planning.
 
 ---
 
+
+---
+
+## 2026-03-11 - Decision: Q Role (Devil's Advocate / Fact-Checker)
+
+**Date:** 2026-03-11
+**Decider:** Picard
+**Issue:** #342
+**Status:** APPROVED
+
+### Problem Statement
+
+AI agents can hallucinate, exhibit confirmation bias, and miss critical verification steps. The current squad lacks a dedicated mechanism to challenge assumptions, run counter-hypotheses, or fact-check claims before decisions finalize.
+
+### Solution: Q Role
+
+**Charter:**
+- **Role:** Devil's Advocate / Fact-Checker
+- **Style:** Skeptical, probing, adversarial reasoning
+- **Expertise:** Logic, verification, assumption validation
+- **Activation:** Before major decisions commit, on groupthink detection, on security-critical paths
+
+**Responsibilities:**
+- Review proposals before .squad/decisions/ entries commit
+- Challenge assumptions with evidence requirements
+- Run counter-hypotheses and verify claims
+- Flag unverified statements and request proof
+- Test reasoning through Socratic questioning
+
+**Boundaries:**
+- Handles: Decision review, fact-checking, assumption challenges, counter-hypotheses
+- Does not handle: Implementation, design, feature building
+- Activates only on significant decisions (not routine work)
+
+**Voice:** "Are you certain? Prove it. What if you're wrong? Show me the evidence."
+
+### Rationale
+
+- **Character:** Q (Star Trek TNG/Voyager) — ultimate adversarial thinker, omniscient, skeptical, forces reasoning rigor
+- **Why Q:** Challenges assumptions constantly, not malicious but deeply skeptical, proven record testing crew thinking
+- **Implementation:** Existing agents invoke Q review when needed; Picard/Worf invoke Q before architectural/security decisions
+
+### Outcomes
+
+- Higher decision quality through adversarial review
+- Reduced hallucination risk through verification gates
+- Better trust calibration (validated > confident claims)
+- Groupthink detection and disruption
+
+### Implementation
+
+1. Create Q charter: .squad/agents/q/charter.md and .squad/agents/q/history.md
+2. Update routing: Add Q trigger before decision commits
+3. Update team.md: Add Q role with status ✅ Active
+4. Update decision workflow: Require Q review for high-impact decisions
+5. Integrate with: Picard (architecture), Worf (security), all agents (on-demand)
+
+**Decision:** APPROVED — Add Q role as Devil's Advocate. Coordinator to implement charter and routing immediately.

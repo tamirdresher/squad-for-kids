@@ -12,146 +12,73 @@ jobs:
     permissions:
       contents: read
       issues: write
-      repository-projects: write
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Archive old Done items
-        uses: actions/github-script@v7
+        shell: pwsh
         env:
+          DAYS_THRESHOLD: '3'
+          PROJECT_OWNER: 'tamirdresher_microsoft'
+          PROJECT_NUMBER: '1'
           PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
-          DONE_STATUS_ID: '4830e3e3'
-          DAYS_THRESHOLD: 3
-        with:
-          retries: 3
-          retry-exempt-status-codes: 400,401,403,404,422
-          script: |
-            const projectId = process.env.PROJECT_ID;
-            const doneStatusId = process.env.DONE_STATUS_ID;
-            const daysThreshold = parseInt(process.env.DAYS_THRESHOLD);
-            
-            // Calculate the cutoff date
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
-            
-            console.log(`🔍 Looking for items in Done status older than ${daysThreshold} days (before ${cutoffDate.toISOString()})`);
-            
-            // Query project items using GraphQL
-            const query = `
-              query($projectId: ID!) {
-                node(id: $projectId) {
-                  ... on ProjectV2 {
-                    items(first: 100) {
-                      nodes {
-                        id
-                        fieldValues(first: 20) {
-                          nodes {
-                            ... on ProjectV2ItemFieldSingleSelectValue {
-                              name
-                              field {
-                                ... on ProjectV2SingleSelectField {
-                                  name
-                                }
-                              }
-                            }
-                            ... on ProjectV2ItemFieldDateValue {
-                              date
-                              field {
-                                ... on ProjectV2Field {
-                                  name
-                                }
-                              }
-                            }
-                          }
-                        }
-                        content {
-                          ... on Issue {
-                            number
-                            title
-                            url
-                            updatedAt
-                          }
-                          ... on PullRequest {
-                            number
-                            title
-                            url
-                            updatedAt
-                          }
-                        }
-                      }
-                      pageInfo {
-                        hasNextPage
-                        endCursor
-                      }
-                    }
-                  }
+          STATUS_FIELD_ID: 'PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc'
+        run: |
+          $daysThreshold = [int]$env:DAYS_THRESHOLD
+          $cutoffDate = (Get-Date).AddDays(-$daysThreshold)
+          Write-Host "🔍 Looking for Done items older than $daysThreshold days (before $($cutoffDate.ToString('o')))"
+
+          # List all project items using gh CLI (uses runner's gh auth, which has project access)
+          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "❌ Failed to list project items: $itemsJson"
+            exit 1
+          }
+
+          $data = $itemsJson | ConvertFrom-Json
+          $items = $data.items
+          Write-Host "📋 Found $($items.Count) total items on the project board"
+
+          $checkedCount = 0
+          $archivedCount = 0
+
+          foreach ($item in $items) {
+            if ($item.status -eq 'Done') {
+              $checkedCount++
+              $content = $item.content
+              if (-not $content -or -not $content.number) { continue }
+
+              # Check if the issue was updated before the cutoff
+              $issueJson = gh issue view $content.number --json updatedAt,state,title 2>$null
+              if ($LASTEXITCODE -ne 0) { continue }
+              $issue = $issueJson | ConvertFrom-Json
+              $updatedAt = [DateTime]::Parse($issue.updatedAt)
+
+              if ($updatedAt -lt $cutoffDate) {
+                Write-Host "📦 Archiving: #$($content.number) - $($issue.title) (updated: $($updatedAt.ToString('o')))"
+
+                # Close the issue if still open
+                if ($issue.state -eq 'OPEN') {
+                  gh issue close $content.number --comment "✅ Archived by Squad — this item was in Done status for $daysThreshold+ days." 2>$null
                 }
-              }
-            `;
-            
-            let archivedCount = 0;
-            let checkedCount = 0;
-            
-            try {
-              const result = await github.graphql(query, {
-                projectId: projectId
-              });
-              
-              const items = result.node.items.nodes;
-              console.log(`📋 Found ${items.length} total items on the project board`);
-              
-              for (const item of items) {
-                // Check if item is in Done status
-                const statusField = item.fieldValues.nodes.find(fv => 
-                  fv.field?.name === 'Status'
-                );
-                
-                if (statusField && statusField.name === 'Done') {
-                  checkedCount++;
-                  
-                  // Get the item's last update time
-                  const content = item.content;
-                  if (content && content.updatedAt) {
-                    const updatedAt = new Date(content.updatedAt);
-                    
-                    // Check if it's older than the threshold
-                    if (updatedAt < cutoffDate) {
-                      console.log(`📦 Archiving: ${content.number ? '#' + content.number : 'item'} - ${content.title || 'untitled'} (last updated: ${updatedAt.toISOString()})`);
-                      
-                      // Archive the item
-                      const archiveMutation = `
-                        mutation($projectId: ID!, $itemId: ID!) {
-                          archiveProjectV2Item(input: {projectId: $projectId, itemId: $itemId}) {
-                            item {
-                              id
-                            }
-                          }
-                        }
-                      `;
-                      
-                      try {
-                        await github.graphql(archiveMutation, {
-                          projectId: projectId,
-                          itemId: item.id
-                        });
-                        archivedCount++;
-                      } catch (error) {
-                        console.error(`❌ Failed to archive item ${item.id}: ${error.message}`);
-                      }
-                    } else {
-                      console.log(`⏳ Skipping: ${content.number ? '#' + content.number : 'item'} - ${content.title || 'untitled'} (last updated: ${updatedAt.toISOString()}) - not old enough`);
-                    }
-                  }
+
+                # Archive from the project board using GraphQL via gh api
+                $mutation = "mutation { archiveProjectV2Item(input: {projectId: \`"$($env:PROJECT_ID)\`", itemId: \`"$($item.id)\`"}) { item { id } } }"
+                gh api graphql -f query="$mutation" 2>$null
+                if ($LASTEXITCODE -eq 0) {
+                  $archivedCount++
+                } else {
+                  Write-Host "⚠️ Could not archive #$($content.number) from board (may need project token)"
                 }
+              } else {
+                Write-Host "⏳ Skipping: #$($content.number) - $($issue.title) (updated: $($updatedAt.ToString('o'))) - not old enough"
               }
-              
-              console.log(`\n✅ Summary:`);
-              console.log(`   - Checked ${checkedCount} Done items`);
-              console.log(`   - Archived ${archivedCount} items older than ${daysThreshold} days`);
-              
-            } catch (error) {
-              console.error(`❌ Error querying project: ${error.message}`);
-              throw error;
             }
+          }
+
+          Write-Host ""
+          Write-Host "✅ Summary:"
+          Write-Host "   - Checked $checkedCount Done items"
+          Write-Host "   - Archived $archivedCount items older than $daysThreshold days"

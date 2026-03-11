@@ -20068,3 +20068,181 @@ AI agents can hallucinate, exhibit confirmation bias, and miss critical verifica
 5. Integrate with: Picard (architecture), Worf (security), all agents (on-demand)
 
 **Decision:** APPROVED — Add Q role as Devil's Advocate. Coordinator to implement charter and routing immediately.
+
+---
+
+## Decision 18: Add Q as Devil's Advocate & Fact Checker
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** ✅ Adopted  
+**Issue:** #342  
+**Scope:** Team Composition & Quality Control
+
+### Decision
+
+Add Q to the squad as **Devil's Advocate & Fact Checker**. Q will continuously challenge assumptions, run counter-hypotheses, verify claims, and prevent hallucination in team deliverables.
+
+### Rationale
+
+- Tamir identified a critical gap: hallucination detection and claim verification at scale
+- Q (Star Trek TNG/Voyager — the omnipotent character who constantly tests and challenges) is the perfect archetype
+- As the squad scales and agents produce more output, systematic fact-checking becomes essential
+- Q's role complements the existing skill set: agents build/research, Q validates and challenges
+- This is a defensive mechanism — Q strengthens everything without slowing other agents
+
+### Applies To
+
+All agent deliverables. Q can be routed to:
+- Review research outputs before publication
+- Challenge architectural decisions
+- Verify external sources, URLs, and API endpoints
+- Test counter-hypotheses before decisions are locked in
+
+### Consequences
+
+✅ Reduced risk of hallucinated claims in deliverables  
+✅ Stronger decision-making through systematic challenge  
+✅ Quality gate before publishing research or architecture docs  
+⚠️ Adds a review step to some workflows  
+⚠️ Requires other agents to be receptive to challenge (cultural shift)
+
+### Implementation
+
+1. ✅ Created .squad/agents/q/charter.md and .squad/agents/q/history.md
+2. ✅ Added Q to .squad/team.md Members table
+3. ✅ Added Q to .squad/routing.md Work Type → Agent table
+4. ✅ Added Q entry to .squad/casting/registry.json
+5. ✅ Commented on issue #342 with setup summary
+6. ✅ Closed issue #342
+
+Q is ready for assignment.
+
+---
+
+## Decision 19: Azure Skills Plugin Adoption (Pending)
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** 🟡 Proposed  
+**Issue:** #343  
+**Scope:** Azure Tooling & Capability Integration
+
+### Context
+
+Microsoft announced the **Azure Skills Plugin** — a packaged solution that bundles 20+ Azure workflow skills, Azure MCP Server (200+ tools), and Foundry MCP into a single installable plugin. It provides structured Azure expertise and execution capabilities to coding agents.
+
+**Blog:** https://devblogs.microsoft.com/all-things-azure/announcing-the-azure-skills-plugin  
+**Repo:** https://github.com/microsoft/azure-skills  
+**Research:** .squad/research/azure-skills-plugin-research.md
+
+### The Decision
+
+**Should the squad adopt the Azure Skills Plugin?**
+
+### Options
+
+#### Option 1: Install Plugin as Team Capability
+- Install Azure Skills Plugin at repository level
+- Make available to all agents when working on Azure-related issues
+- B'Elanna (Infrastructure) and Worf (Security) are primary consumers
+
+**Pros:**
+- Turnkey Azure expertise without re-implementation
+- Production-proven (validated by Microsoft Defender team research)
+- Portable across Copilot CLI, VS Code, Claude Code
+- 200+ MCP tools for live Azure operations
+
+**Cons:**
+- Requires Node.js 18+, Azure CLI, Azure Developer CLI
+- Only valuable if squad does meaningful Azure work
+- Adds plugin dependency
+
+#### Option 2: Fork Selected Skills into .squad/skills/azure/
+- Cherry-pick 3-5 high-value skills (e.g., azure-deploy, azure-compliance, azure-diagnostics)
+- Customize with squad-specific context from .squad/decisions.md
+- Maintain as repository-native skills
+
+**Pros:**
+- Full control and customization
+- No external plugin dependency
+- Can integrate squad routing and conventions
+
+**Cons:**
+- Maintenance burden (upstream changes require manual sync)
+- Duplicates work Microsoft already maintains
+- Smaller skill catalog
+
+#### Option 3: No Action (Document as Reference)
+- Document Azure Skills Plugin in .squad/decisions.md as known resource
+- Reference on Azure-related issues but don't formally adopt
+- Re-evaluate if Azure work increases
+
+**Pros:**
+- No overhead
+- No dependencies
+- Keeps options open
+
+**Cons:**
+- Agents must rediscover Azure patterns each time
+- No MCP tool access for live Azure operations
+- Misses efficiency gains
+
+### Recommendation
+
+**Start with Option 1 (Install Plugin), evaluate, then decide on Option 2 if needed.**
+
+**Rationale:**
+1. **Low friction** — One-line install, no code changes
+2. **Testable** — Can evaluate value with real use cases
+3. **Reversible** — Can uninstall if not valuable
+4. **Skills validate our architecture** — Azure Skills Plugin uses same skill + MCP pattern the squad already embraced
+
+**Assignment:** B'Elanna (Infrastructure) as evaluation owner since Azure deployment/compute is her domain.
+
+### Technical Prerequisites
+
+If Option 1 or 2 is chosen:
+- Node.js 18+ (for Azure MCP Server)
+- Azure CLI (\z\) installed and authenticated
+- Azure Developer CLI (\zd\) for deployment workflows
+- Azure subscription (for live operations)
+
+**Squad impact:** Minimal. Plugin installs to user-level Copilot CLI config, not repository.
+
+### Skills to Squad Role Mapping
+
+| Azure Skill | Squad Member | Use Case |
+|-------------|--------------|----------|
+| azure-deploy | B'Elanna | Deployment orchestration |
+| azure-diagnostics | Worf | Security posture troubleshooting |
+| azure-compliance | Worf | Compliance audits |
+| azure-rbac | Worf | Permission management |
+| azure-cost-optimization | Picard | Budget oversight |
+| azure-compute | B'Elanna | Service selection/sizing |
+| azure-ai | Data | AI services integration |
+| entra-app-registration | Worf | Identity management |
+
+### Open Questions
+
+1. **How much Azure work does the squad do?** (Critical for ROI assessment)
+2. **Should Azure MCP Server be enabled globally or per-agent?**
+3. **Who installs and maintains plugin configuration?** (B'Elanna? Picard?)
+4. **Should we document Azure workflows in .squad/decisions.md if adopted?**
+
+### Next Steps
+
+1. **Tamir reviews research** (Issue #343)
+2. **Assign to B'Elanna** for evaluation if Azure work is planned
+3. **Pilot test:** Install plugin, try 2-3 real Azure tasks, assess value
+4. **Team decision:** Install permanently, fork skills, or document as reference
+5. **If adopted:** Document Azure skill usage patterns in .squad/decisions.md
+
+### Conclusion
+
+The Azure Skills Plugin is a **well-architected, production-grade solution** that validates the squad's skill-based orchestration pattern. It provides immediate Azure expertise without implementation overhead.
+
+**Proposed decision:** Install plugin for evaluation. If valuable, keep it; if not, uninstall and document as reference.
+
+**Owner:** B'Elanna (Infrastructure) or Picard (Lead)  
+**Timeline:** Evaluate within 1-2 sprints

@@ -653,3 +653,31 @@ Considered adding fact-checking to existing agents' charters (Seven for research
 
 ---
 
+
+
+---
+
+### 2026-03-11: Q Added to Team (Devil's Advocate & Fact Checker)
+
+**Context:** Picard completed onboarding of Q as the squad's newest member per issue #342.
+
+**What this means for you:**
+- Q is now available for assignment to review your research, challenge assumptions, and verify claims
+- Q brings **systematic fact-checking** to prevent hallucination in deliverables
+- You may be asked to defend proposals when Q is routing reviews — this is by design
+- Q's skepticism strengthens team decisions and increases trust in final outputs
+
+**Q's Role & Activation:**
+- Q reviews research outputs before publication
+- Q challenges architectural and technical assumptions
+- Q verifies external sources, URLs, and API endpoints
+- Q tests counter-hypotheses before decisions finalize
+- Q is activated on significant work, not routine tasks
+
+**Where to find Q:**
+- .squad/agents/q/charter.md — Q's role definition and style
+- .squad/agents/q/history.md — Q's work log
+- .squad/routing.md — Work type routing includes Q for fact-checking
+
+**Status:** ✅ Q ready for assignment. No action required from you.
+

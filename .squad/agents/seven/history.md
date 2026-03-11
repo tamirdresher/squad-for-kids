@@ -211,6 +211,73 @@
 
 ---
 
+### 2026-Q2: Azure Skills Plugin Research (Issue #343)
+
+**Assignment:** Research Microsoft's Azure Skills Plugin announcement and evaluate how the squad could use it.
+
+**What I Did:**
+1. Read blog post announcing Azure Skills Plugin (devblogs.microsoft.com)
+2. Located and analyzed GitHub repository (microsoft/azure-skills)
+3. Cataloged all 21 available Azure skills (deployment, optimization, platform, AI)
+4. Analyzed skill architecture and MCP integration pattern
+5. Mapped Azure skills to squad member roles and responsibilities
+6. Wrote comprehensive research report (11KB) to `.squad/research/azure-skills-plugin-research.md`
+7. Posted TLDR + recommendations to Issue #343, left open for team review
+
+**Key Findings:**
+
+**What Azure Skills Are:**
+- Structured workflow definitions that teach agents how Azure work gets done
+- Not prompt templates—decision trees, guardrails, orchestration logic
+- Package Azure expertise as reusable, auditable markdown files
+- Load on-demand, pair with MCP tools for execution
+
+**Architecture:**
+- **Skills = Brain** (when/how to act)
+- **MCP = Hands** (what to execute via 200+ tools)
+- **Plugin = Packaging** (keeps both aligned)
+- Works across GitHub Copilot CLI, VS Code, Claude Code
+
+**Available Skills (21 Total):**
+- Deployment: azure-prepare, azure-validate, azure-deploy, azure-diagnostics, azure-compliance
+- Optimization: azure-cost-optimization, azure-compute, azure-resource-visualizer, azure-quotas
+- Platform: azure-storage, azure-kusto, azure-messaging, azure-rbac, azure-cloud-migrate
+- AI/Specialized: azure-ai, azure-aigateway, microsoft-foundry, entra-app-registration, appinsights-instrumentation
+
+**Squad Alignment:**
+- **Validates .squad/ architecture** — Skills + MCP + multi-agent orchestration is production-proven pattern
+- Maps cleanly to squad roles:
+  * B'Elanna (Infrastructure) → azure-deploy, azure-compute
+  * Worf (Security) → azure-compliance, azure-rbac, azure-diagnostics, entra-app-registration
+  * Data (Backend) → azure-ai, azure-kusto, azure-storage
+  * Picard (Lead) → azure-cost-optimization
+
+**Integration Options:**
+1. **Install as plugin** (recommended) — `/plugin install azure@azure-skills`
+2. **Fork skills** into `.squad/skills/azure/` with squad-specific customizations
+3. **Enable Azure MCP Server** if Azure work becomes frequent
+
+**Technical Learnings:**
+1. **Skills are portable across hosts** — Same package works in Copilot CLI, VS Code, Claude Code
+2. **MCP servers use npx** — Node.js 18+ required for Azure/Foundry MCP
+3. **Skills scale expertise** — One team packages knowledge, everyone benefits
+4. **Plugin pattern is standardized** — `.github/plugins/` structure, `.mcp.json` configuration
+5. **Production validation** — Microsoft Defender team (Issue #340) uses similar plugin architecture at scale
+
+**Recommendations:**
+- **Immediate:** Install plugin if squad does Azure work, test with "Prepare this project for Azure"
+- **Medium-term:** Document Azure workflows in `.squad/decisions.md`, consider selective skill customization
+- **Long-term:** Use Azure skills structure as template for new squad skills
+
+**Deliverables:**
+- Comprehensive research report: `.squad/research/azure-skills-plugin-research.md` (11KB)
+- Posted TLDR + recommendations to Issue #343
+- Recommended assignment to B'Elanna (Infrastructure) for adoption evaluation
+
+**Status:** Research complete. Issue left open for team review and adoption decision.
+
+---
+
 ## 2026-03-11: Issue #339 — DK8S Wizard CodeQL & Operational Analysis
 
 **Assignment:** Investigate Ramaprakash's DK8S wizard statement in context of Issue #339 CodeQL compliance research.
@@ -253,4 +320,31 @@
 **Decision:** Documented as Decision 20 in `.squad/decisions.md`
 
 **Related:** Orchestration log at `.squad/orchestration-log/2026-03-11T22-04-55Z-seven.md`
+
+
+---
+
+### 2026-03-11: Q Added to Team (Devil's Advocate & Fact Checker)
+
+**Context:** Picard completed onboarding of Q as the squad's newest member per issue #342.
+
+**What this means for you:**
+- Q is now available for assignment to review your research, challenge assumptions, and verify claims
+- Q brings **systematic fact-checking** to prevent hallucination in deliverables
+- You may be asked to defend proposals when Q is routing reviews — this is by design
+- Q's skepticism strengthens team decisions and increases trust in final outputs
+
+**Q's Role & Activation:**
+- Q reviews research outputs before publication
+- Q challenges architectural and technical assumptions
+- Q verifies external sources, URLs, and API endpoints
+- Q tests counter-hypotheses before decisions finalize
+- Q is activated on significant work, not routine tasks
+
+**Where to find Q:**
+- .squad/agents/q/charter.md — Q's role definition and style
+- .squad/agents/q/history.md — Q's work log
+- .squad/routing.md — Work type routing includes Q for fact-checking
+
+**Status:** ✅ Q ready for assignment. No action required from you.
 

@@ -77,6 +77,12 @@
       "persistent_name": "Neelix",
       "universe": "Star Trek TNG/Voyager",
       "status": "active"
+    },
+    "q": {
+      "status": "active",
+      "created_at": "2026-03-11T22:42:00Z",
+      "universe": "Star Trek TNG/Voyager",
+      "persistent_name": "Q"
     }
   },
   "kes": {

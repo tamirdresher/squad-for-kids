@@ -13123,6 +13123,160 @@ Implemented daily RP status briefing via ralph-watch.ps1 integration at 9:00 AM 
 ### Implementation
 - Script: .squad/scripts/daily-rp-briefing.ps1 (standalone, reusable)
 - Integration: ralph-watch.ps1 time-check (Hour == 9, weekdays only)
+
+---
+
+## Decision: Knowledge Management Strategy for Squad Knowledge Base (Issue #321)
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** Proposed (Awaiting Team Decision)  
+**Scope:** Team Infrastructure & Knowledge Management
+
+### Context
+The `.squad/` knowledge base is growing rapidly (33MB current, 29.5MB compiled binaries, ~3.5MB markdown). Need strategy to manage growth without binary bloat or losing GitHub-native workflows.
+
+### Research Findings
+- **AI Agent Memory Patterns:** Vector databases (ChromaDB, Qdrant, FAISS) are standard for semantic search; hybrid storage recommended (Vector DB for search + structured DB for metadata)
+- **Git-Friendly Approaches:** Avoid binary DB files in git; store schema/exports instead; git-annex for large historical data; structured markdown + archival proven effective
+- **Best Practices:** LangChain uses composable memory modules; CrewAI uses hierarchical storage; AutoGPT uses SQLite; open source projects use versioned markdown + search indexing
+
+### Recommendation: Two-Phase Approach
+
+**Phase 1 (Immediate, Zero New Tooling):**
+- Rotate agent history files quarterly (e.g., `history-2026-Q1.md`)
+- Archive resolved decisions by quarter
+- Exclude build artifacts (~29.5MB savings immediately)
+- Create INDEX.md files for navigation
+- Leverage GitHub search
+
+**Phase 2 (Future, If Needed):**
+- Add ChromaDB indexing (regenerated locally, not committed)
+- Enable semantic search across knowledge base
+- Keep markdown as source of truth
+- Trigger: When markdown corpus exceeds ~50MB or semantic search becomes critical
+
+### Implementation Effort
+- Phase 1 setup: 2-4 hours
+- Ongoing maintenance: ~15 min/quarter (can be automated)
+- Phase 2 (if needed): 1-2 days for indexing infrastructure
+
+### Consequences
+- ✅ Zero new tooling dependency for Phase 1
+- ✅ GitHub-native, preserves existing workflows
+- ✅ Immediate storage savings via artifact exclusion
+- ⚠️ Manual rotation work (though automatable)
+- ⚠️ Semantic search delayed to Phase 2
+
+### Decision Points for Team
+1. Implement Phase 1 archival immediately? (Recommended: Yes)
+2. When to trigger Phase 2? (Recommended: >50MB markdown or when semantic search becomes valuable)
+3. Preferred archival frequency? (Recommended: Quarterly)
+4. Build artifacts in releases instead of repo? (Recommended: Yes)
+
+### Related
+- Research: Issue #321 with full citations and comparison matrix
+- Agent memory patterns from LangChain, AutoGPT, CrewAI
+- GitHub-native approaches leveraging existing infrastructure
+
+---
+
+## Decision: Blog Account Switching Protocol (Issue #313)
+
+**Date:** 2025-12-25 (Formalized: 2026-03-11)  
+**Author:** Seven (Research & Docs)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Publishing
+
+### Summary
+Blog content updates for Tamir's personal GitHub account (tamirdresher.github.io) follow a distinct workflow from work repositories.
+
+### Protocol
+
+**Account Management:**
+- Always switch accounts explicitly: `gh auth switch --user tamirdresher` for personal work
+- Return to EMU after completion: `gh auth switch --user tamirdresher_microsoft`
+- Never perform personal blog work while authenticated as EMU
+
+**Workflow Differences:**
+- Personal blog: Direct branch pushes acceptable (no PR required)
+- Personal blog: Less formal review process
+- Personal blog: Can commit directly to feature branches
+- Work repos: Standard PR + review + approval process
+
+**Content Requirements:**
+- Always link Brady Gaster's name: `[Brady Gaster](https://github.com/bradygaster)`
+- Incorporate feedback from issue comments into content
+- Maintain Squad writing style: direct, focused, technical
+
+### Rationale
+- Personal blog is separate from Microsoft work infrastructure
+- Different permission models and review gates apply
+- Explicit account switching prevents authentication errors
+- Personal content allows faster iteration without team gates
+
+### Team Impact
+Establishes pattern for any future personal blog work. All squad agents must:
+- Understand personal vs. work account distinctions
+- Know which workflow to use for each context
+- Remember to switch back to EMU account after personal work
+
+### Related Incidents
+- Issue #313: Original request for personal blog workflow
+- Personal account: tamirdresher (separate from tamirdresher_microsoft EMU)
+- Blog host: tamirdresher.github.io
+
+---
+
+## Decision: Blog URL Format and Validation (2026-03-11)
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Publishing & QA
+
+### Incident
+Blog post URL shared on Reddit broke. Correct format is `https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai` NOT `https://www.tamirdresher.com/2026/03/10/organized-by-ai.html`. Jekyll URLs use `/blog/` prefix and NO `.html` extension.
+
+### Rule
+**ALWAYS verify blog URLs load correctly (HTTP 200) before sharing them anywhere.**
+
+### URL Format Standard
+Correct base URL pattern: `https://www.tamirdresher.com/blog/{year}/{month}/{day}/{slug}`
+
+**Components:**
+- Base: `https://www.tamirdresher.com`
+- Prefix: `/blog/` (required, no variations)
+- Date: `{year}/{month}/{day}` (from front matter or filename)
+- Slug: `{slug}` (URL-safe lowercase with hyphens, no file extension)
+
+**Invalid patterns:**
+- ❌ Without `/blog/` prefix
+- ❌ With `.html` extension
+- ❌ Using hyphens in month/day
+- ❌ Using underscores in slug
+
+### Validation Process
+Before sharing blog URLs in any public channel:
+1. Copy full URL from browser address bar
+2. Paste into new tab and verify HTTP 200 response
+3. Confirm page loads with correct content
+4. Only then share (Slack, Teams, Reddit, social media, etc.)
+
+### Rationale
+- First impressions matter; broken links damage credibility
+- Incident: Blog post got -3 score on r/programming due to broken URL
+- Prevention: Simple HTTP check prevents embarrassment
+- Jekyll URL format is non-obvious; explicit rule prevents mistakes
+
+### Consequences
+- ✅ No more broken blog links in public channels
+- ✅ Improved brand credibility
+- ⚠️ Extra 30-second verification step required
+
+### Related Incidents
+- Reddit post to r/programming with broken URL (-3 score)
+- Issue #313 (personal blog workflow context)
 - Format: Teams Adaptive Card v1.4 with clickable links
 - Data: GitHub API via \gh\ CLI
 

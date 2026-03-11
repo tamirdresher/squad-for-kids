@@ -9,6 +9,16 @@
 - **Note:** Recast from Oracle (The Matrix) to Seven (Star Trek TNG/Voyager)
 - **Skills:** Technical research, web search, documentation synthesis, GitHub integration, team decision tracking, strategy analysis
 
+## Cross-Agent Updates (2026-03-11)
+
+**Scribe Coordination at 2026-03-11T10:00:00Z:**
+- Seven's knowledge management research (Issue #321) merged to `.squad/decisions.md` as "Decision: Knowledge Management Strategy for Squad Knowledge Base"
+- Blog personal account workflow (Issue #313) formalized in decisions.md as "Decision: Blog Account Switching Protocol"
+- Blog URL validation directive formalized as "Decision: Blog URL Format and Validation"
+- Orchestration log created: `.squad/orchestration-log/2026-03-11T10-00-00Z-seven.md`
+- All three inbox decisions (copilot-directive-blog-url-format.md, seven-blog-personal-account.md, seven-knowledge-management-research.md) merged and deduplicated
+- Inbox files scheduled for deletion after git commit
+
 ## Cross-Agent Updates (Ralph Round 1)
 
 **2026-03-10 Coordination:**
@@ -4733,4 +4743,123 @@ For multi-repo deliverables:
 - Created decision recommendation file with action items
 
 **Key Insight:** This digest validates all three pillars of our squad's architecture: governance (human review), technology (Go agents), and UX (agentic CLI). Industry is moving where we're headed.
+
+
+## Learnings
+
+### Blog Workflow with Personal Accounts (Issue #313)
+
+**Date:** 2026-03-11
+
+**Context:** Pushed refreshed blog Part 2 to Tamir's personal GitHub account (tamirdresher/tamirdresher.github.io).
+
+**Key Steps:**
+1. Switch GitHub accounts: `gh auth switch --user tamirdresher` to access personal account
+2. Clone personal repo to temp location (C:\temp)
+3. Checkout specific branch (posts/scaling-ai-part1-first-team)
+4. Replace blog content with refreshed version from work repo
+5. Add onboarding section per Tamir's feedback: repo scanning, documentation indexing, structured onboarding plans, continuous learning
+6. Ensure Brady Gaster mentions link to his GitHub profile
+7. Commit and push directly to branch (no PR needed)
+8. Switch back: `gh auth switch --user tamirdresher_microsoft`
+9. Comment on issue with completion status and links
+
+**Important:**
+- Personal account work requires explicit account switching
+- Always switch back to EMU account after personal work
+- Direct branch pushes acceptable for personal repos (differs from work repo PR workflow)
+- Blog updates often incorporate feedback from issue comments
+- Brady Gaster should always be linked: [Brady Gaster](https://github.com/bradygaster)
+
+
+### 2026-03-11: Blog Part 1 Refresh for Series Continuity — Issue #313 (COMPLETED)
+
+**Assignment:** Refresh the Part 1 blog post to feel like a continuation of the series, not a standalone introduction.
+
+**What I Did:**
+1. Read ALL existing Squad-related blog posts from Tamir's blog (tamirdresher.github.io):
+   - Part 0: "Organized by AI" (2026-03-10) — How Squad became the first productivity system that worked
+   - "Trying Squad Without Touching Your Real Repo" (2026-02-17) — Symlink pattern for work repos
+   - "Squad Remote Control" (2026-02-26) — PTY + devtunnel architecture for mobile access
+2. Read the existing Part 1 draft that needed refresh
+3. Read local Part 2 draft and original blog draft for context
+
+**Key Problem:** Part 1 started like Squad had never been introduced before. Needed to feel like a natural continuation of Part 0.
+
+**Solution Approach:**
+- Opening paragraph immediately references Part 0 ("Remember how Squad became my first productivity system that actually worked?")
+- Throughout the post, reinforced this is the **personal repo story** — just me and my AI team
+- Referenced Ralph's watch loop and decisions.md from Part 0 to create continuity
+- Emphasized the shift from "productivity hack" to "engineering team"
+- Ended with the bridge question: "What happens when you're not the only human?" → sets up Part 2
+- Positioned human squad members as the **transition feature**, not the main story (that's Part 2)
+
+**Deliverable:** log-part1-refresh.md — refreshed version that:
+- Builds on Part 0 naturally
+- References previous posts in the series
+- Maintains Tamir's blog voice (direct, technical, story-driven)
+- Sets up Part 2 as "bringing Squad to the work team"
+
+**Technical Details:**
+- Kept all the original Squad features (casting, Ralph, decisions, etc.)
+- Added forward references to Part 2 throughout
+- Made clear distinction: Part 1 = personal repo, Part 2 = work team
+- The human squad members section now ends with "That's Part 2. And it's where things get interesting."
+
+**Status:** ✅ DELIVERED
+- File: log-part1-refresh.md
+- Branch: squad/313-blog-refresh
+- PR: #319 (https://github.com/tamirdresher_microsoft/tamresearch1/pull/319)
+- Closes: #313
+
+
+## Learnings
+
+### 2026-03-31: Knowledge Management Research (Issue #321)
+
+**What I Learned:**
+- Current .squad/ size: ~33MB (655 files), with 29.5MB being compiled binaries in tools/squad-monitor/bin
+- Core markdown knowledge base is ~3.5MB and growing linearly with agent work
+- decisions.md (729KB) and my history.md (287KB) are the largest markdown files
+
+**AI Agent Memory Best Practices:**
+- Vector databases (ChromaDB/Qdrant/FAISS) are standard for semantic search in production systems
+- CrewAI uses unified memory class with composite relevance scoring (semantic + recency + importance)
+- LangChain offers pluggable memory backends from simple buffers to production vector stores
+- AutoGPT persists state in SQLite across sessions
+- Industry pattern: Keep text/markdown as "source of truth", build ephemeral search indexes
+
+**Git Storage Strategies:**
+- **Never commit binary databases** - causes bloat, poor diffs, merge conflicts (consensus from HN, design wisdom)
+- **git-annex** is the preferred LFS alternative for pointer-based storage without bloat
+- **Structured markdown + archival** is the simplest GitHub-native approach
+- Export/dump SQLite to text for version control, regenerate DB from exports
+
+**GitHub-Native Options:**
+- GitHub Wiki: Good for stable documentation, separate from main repo
+- GitHub Discussions: Archive Q&A and explorations
+- GitHub Code Search: Excellent for markdown, supports regex and path filters
+- GitHub Pages: Can add search index (Algolia, Pagefind) for static sites
+
+**Vector Database Comparison:**
+- **ChromaDB**: Embedded Python, zero-server, perfect for prototyping, ~10M vectors max
+- **Qdrant Edge**: New embedded option for edge/offline AI, production features without server
+- **FAISS**: Fastest, library-only, GPU support, requires manual metadata/persistence management
+
+**Recommended Approach:**
+1. **Phase 1 (Now)**: Rotate history quarterly, archive decisions, exclude binaries, leverage GitHub search
+2. **Phase 2 (Later)**: Add ChromaDB indexing if semantic search becomes critical (>50MB markdown)
+
+**Why This Matters:**
+- Preserves git workflows (diff, blame, PR review)
+- Prevents repository from hitting GitHub size limits (100MB/file, 1GB repo)
+- Keeps agent knowledge accessible and searchable
+- Allows gradual scaling from simple (markdown) to advanced (vector search)
+
+**Research Artifacts:**
+- Full report posted to Issue #321 with 20+ citations
+- Decision inbox: .squad/decisions/inbox/seven-knowledge-management-research.md
+- Implementation script provided for Phase 1 archival
+
+**Key Insight:** The best knowledge management system is one that doesn't require learning a new system. Start with markdown and GitHub's built-in tools, add sophistication only when necessary.
 

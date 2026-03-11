@@ -13953,6 +13953,206 @@ Designed a **provider-agnostic scheduling system** with:
 
 **Why:**
 - **Extensibility:** Easy to add new providers (Azure DevOps, K8s CronJobs, webhooks)
+
+---
+
+# Decision 29: Keel MCP Requires CUE-Aware Parsing for Migration Completeness
+
+**Date:** 2026-03-11  
+**Decider:** Picard (Lead)  
+**Context:** Issue #328 — Review of Keel-to-ConfigGen Migration MCP (ADO PR #15000967)  
+**Status:** Recommendation — Awaiting Tamir's implementation decision
+
+## Problem
+
+Tamir built a Keel MCP Server (with Abhishek) that automates ~50% of Keel→ConfigGen migration effort via boilerplate generation. His concern: "CUE itself allows certain 'logic' that I'm not sure if the MCP tools here would know and won't miss."
+
+**Key Question:** Will the migration tool capture CUE's semantic logic (conditionals, computations, constraints) or only structural syntax?
+
+## Analysis
+
+### CUE Language Characteristics
+
+CUE is a **constraint-based configuration language**, not just structured data:
+- **Conditionals:** Field guards, if statements
+- **Computations:** String interpolation, arithmetic expressions, list comprehensions
+- **Type Unification:** Constraint propagation across template hierarchy
+- **Template Composition:** Embedding, imports, inheritance
+
+### Current ConfigGen MCP Capabilities
+
+**Existing tools (configgen-package-updates, configgen-breaking-changes):**
+- ✅ NuGet package metadata
+- ✅ Breaking change documents
+- ✅ API surface changes (PublicAPI.txt)
+- ❌ CUE AST parsing
+- ❌ Template logic analysis
+- ❌ Constraint evaluation
+
+**Gap:** ConfigGen MCP operates at the **package ecosystem level**, not the **template DSL level**.
+
+### Migration Risk
+
+Without CUE-aware parsing, the keel MCP may:
+- Copy CUE file structure ✅
+- Miss conditional field generation ❌
+- Miss computed values in templates ❌
+- Miss validation constraints affecting runtime ❌
+- Miss template composition patterns ❌
+
+**Result:** Incomplete migrations requiring manual fixes — defeats the purpose of automation.
+
+## Options
+
+### Option A: Text/Regex-Based Migration
+- **Approach:** Parse CUE files as text, use regex/string manipulation
+- **Verdict:** ❌ Insufficient
+
+### Option B: Generic AST Parser
+- **Approach:** Use generic AST library to parse CUE syntax tree
+- **Verdict:** 🟡 Partial solution, but not complete
+
+### Option C: CUE Native Tooling (RECOMMENDED)
+- **Approach:** Use `cue eval` CLI or CUE Go API for semantic analysis
+- **Verdict:** ✅ Complete solution
+
+## Decision
+
+**Recommendation: Implement Option C — CUE Native Tooling Integration**
+
+### Implementation Plan
+
+1. **Phase 1: CUE Parser Integration**
+   - Add `cue eval` to keel MCP tool dependencies
+   - Or integrate CUE Go API for programmatic access
+   - Parse Keel templates semantically, not just syntactically
+
+2. **Phase 2: Template Auto-Discovery**
+   - Build `scan-templates` command in keel MCP
+   - Walk directory structure for .cue files
+   - Build dependency graph (imports, embeddings)
+
+3. **Phase 3: configgen-cli Integration**
+   - Wrap Tamir's configgen-cli as MCP tool
+   - Add validation: `configgen-cli validate` post-migration
+   - Add dry-run: `configgen-cli migrate --dry-run` before commit
+
+### Success Criteria
+
+- ✅ Migration captures 100% of Keel template logic (not just structure)
+- ✅ configgen-cli validation passes on migrated output
+- ✅ Complex templates with conditionals migrate correctly
+- ✅ No manual fixes required post-migration
+
+## Rationale
+
+**Why CUE Native Tooling is Non-Negotiable:**
+
+1. **Semantic Correctness:** Text/regex cannot capture constraint propagation or type unification
+2. **Future-Proofing:** CUE syntax may evolve; native tooling stays compatible
+3. **Error Detection:** CUE compiler catches invalid constraints that regex won't
+4. **Evaluation Capability:** Can resolve templates to final values for validation
+
+---
+
+*Decision merged from inbox on 2026-03-11T13-05-00Z by Scribe.*
+
+---
+
+# Decision 28: Multi-Squad Architecture Model
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** Approved  
+**Context:** Issue #326 — Jack Batzner's multi-squad architecture questions
+
+## Decision
+
+**Squad deployment model: One squad instance per repository, with upstream inheritance for coordination and cross-squad delegation for collaboration.**
+
+### Core Model: Squad-Per-Repo
+
+**One `.squad/` directory per repository**, containing:
+- Team roster (`.squad/team.md`)
+- Decisions (`.squad/decisions.md`)
+- Agent charters (`.squad/agents/*/charter.md`)
+- History (`.squad/agents/*/history.md`)
+- Skills (`.squad/skills/`)
+- Workflows (`.github/workflows/squad-*.yml`)
+
+**Rationale:**
+- Squad's identity tied to repository (decisions, code patterns, team memory live with code)
+- GitHub Actions integration assumes repo-local config
+- Autonomous work (Ralph monitoring, auto-assign) requires repo-local configuration
+- Clean separation of concerns: Each product team owns their squad
+
+### Coordination Mechanisms
+
+#### 1. Upstream Inheritance (Available Today)
+
+**Purpose:** Passive knowledge sharing — Squad A learns from Squad B's decisions
+
+**Use cases:**
+- Inherit architecture patterns from Platform Squad
+- Follow security policies from Security Squad
+- Learn coding standards from established projects
+- Real example: tamresearch1 reads from bradygaster/squad
+
+#### 2. Cross-Squad Delegation (Design Phase, Issue #197)
+
+**Purpose:** Active work handoff — Squad A tasks Squad B to execute work requiring Squad B's expertise
+
+**Protocol:**
+- Delegation request (JSON with requestId, context, requirements, authorizedActions)
+- Squad B accepts/declines
+- Squad B executes with Squad A's context loaded
+- Results returned via integration branch or draft PR
+- Audit trail logs all cross-squad actions
+
+### Recommended Topologies by Scale
+
+#### Small Org (1-3 teams, 1-5 repos)
+**Topology:** Squad-per-product with upstream inheritance
+
+#### Medium Org (4-10 teams, 6-20 repos)
+**Topology:** Squad-per-product + Platform Squad hub
+
+#### Large Org (10+ teams, 20+ repos)
+**Topology:** Squad-per-team + tiered upstreams
+
+### Design Principles
+
+1. **One squad instance per repo** — Decisions, team, and memory live with the code
+2. **Upstream for knowledge sharing** — Read-only inheritance of decisions and patterns
+3. **Delegation for execution** — Active collaboration when expertise is needed
+4. **Lead routing** — Lead agent decides which squad handles what based on capabilities
+5. **Autonomous by default** — Squads operate independently, coordinate only when necessary
+
+### Implementation Phases
+
+- **Phase 1 (Available Today):** Squad-per-repo model, upstream inheritance, manual coordination
+- **Phase 2 (Q1 2026):** Cross-squad delegation protocol, squad registry, authorization boundaries, audit trail
+- **Phase 3 (Future):** Central squad registry, capacity management, work marketplace
+
+### Consequences
+
+**Positive:**
+- ✅ Clear model: one squad per repo, easy to understand
+- ✅ Scalable: works for 1 repo or 100 repos
+- ✅ Preserves autonomy: squads operate independently
+- ✅ Enables coordination: upstreams + delegation cover knowledge sharing and execution
+
+**Neutral:**
+- ⚠️ Requires discipline: teams must manage upstream dependencies
+- ⚠️ Phase 2 not yet available: delegation requires Issue #197 implementation
+
+**Negative:**
+- ❌ No single-squad-multi-repo option: may disappoint teams wanting centralized config
+- ❌ Coordination overhead: larger orgs need registry management
+
+---
+
+*Decision merged from inbox on 2026-03-11T13-05-00Z by Scribe.*
 - **Testability:** Each provider can be tested independently
 - **Separation of Concerns:** Scheduler logic decoupled from execution logic
 - **Fallback Support:** Provider priority + automatic fallback

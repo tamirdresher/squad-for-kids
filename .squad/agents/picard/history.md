@@ -8,7 +8,15 @@
 - **Joined:** 2026-03-02T15:01:26Z
 - **Note:** Recast from Neo (The Matrix) to Picard (Star Trek TNG/Voyager)
 
-## Cross-Agent Updates (Ralph Round 1)
+## Cross-Agent Updates (Ralph Round 1 — 2026-03-11)
+
+**2026-03-11T13:05:00Z Session Orchestration:**
+- **Task #328:** PR review (ADO work item) — IN PROGRESS (background spawned)
+- **Decision Merged:** Multi-Squad Architecture Model (picard-multi-squad-design.md) → `.squad/decisions.md`
+- **Orchestration Log:** Created `.squad/orchestration-log/2026-03-11T13-05-00Z-picard.md`
+- **Session Log:** Created `.squad/log/2026-03-11T13-05-00Z-ralph-round1.md`
+- All decisions consolidated to `.squad/decisions.md`
+- Scribe merged inbox decision files, deleted .squad/decisions/inbox/picard-multi-squad-design.md
 
 **2026-03-10 Coordination:**
 - Completed assessment of #252 (dotnet/skills): Recommendation to adopt metadata format, selective translation of 3 skills
@@ -3978,3 +3986,125 @@ Created 5 issues in bradygaster/squad repo:
 - User preference: Ban Newtonsoft.Json in favor of System.Text.Json across the project
 **File Paths:** mtp-microsoft/Infra.K8s.BasePlatformRP repo
 **Decision:** Routed PR #59 work to Copilot squad member for code quality fixes
+
+### 2026-03-11: Multi-Squad Architecture Design — Issue #326
+
+**Assignment:** Design comprehensive multi-squad architecture answering Jack Batzner's questions about squad-per-repo model, work fan-out, and usage patterns.
+
+**Context:** Jack Batzner (via Teams) asked Tamir fundamental questions about multi-squad deployment strategy. Questions: Squad per repo? How does work fan out? What's the usage model?
+
+**Research:**
+- Reviewed existing cross-squad orchestration design (docs/cross-squad-orchestration-design.md, Issue #197)
+- Analyzed upstream inheritance pattern (.squad/upstream.json)
+- Examined current Squad architecture (squad.agent.md, team.md, routing.md)
+- Studied subsquad pattern and delegation protocol design
+
+**Architecture Designed:**
+
+**Core Model: Squad-per-repo**
+- Each repository has ONE .squad/ directory (team, decisions, history, skills, workflows)
+- Exception: Monorepos can use subsquad pattern (nested squads with parent inheritance)
+- Rationale: Squad identity tied to code, GitHub Actions integration, autonomous work patterns
+
+**Coordination Mechanisms:**
+1. **Upstream Inheritance (Available Today)**
+   - Passive knowledge sharing via .squad/upstream.json
+   - Squad A reads Squad B's decisions/patterns without B knowing
+   - One-way data flow, no execution delegation
+   - Real example: tamresearch1 reads from bradygaster/squad
+
+2. **Cross-Squad Delegation (Design Phase, Issue #197)**
+   - Active work handoff via delegation protocol
+   - Request/response JSON with signatures, audit trail
+   - Authorized actions: read, comment, create-draft-pr, write-to-sandbox
+   - CLI: squad delegate --to platform-squad --task "..."
+
+**Recommended Topologies by Scale:**
+- **Small (1-3 teams, 1-5 repos):** Squad-per-product, upstream inheritance only
+- **Medium (4-10 teams, 6-20 repos):** Squad-per-product + Platform Squad hub, upstream + delegation
+- **Large (10+ teams, 20+ repos):** Squad-per-team + tiered upstreams (Tier 0: platform/security, Tier 1: devex/data, Tier 2: products)
+
+**Real-World Scenarios:**
+- Platform team with 5 repos: Each has squad, all upstream from platform-infrastructure
+- Product with frontend/backend/infra: Infra Squad is upstream, delegates infrastructure work
+
+**Design Principles:**
+1. One squad instance per repo (decisions live with code)
+2. Upstream for knowledge sharing (read-only)
+3. Delegation for execution (active collaboration)
+4. Lead routing (Lead decides which squad handles what)
+5. Autonomous by default (coordinate only when necessary)
+
+**Deliverables:**
+- Comprehensive architecture document posted to Issue #326
+- Answered all three of Jack's questions with concrete examples
+- Provided topologies for small/medium/large orgs
+- Included FAQ covering common concerns
+- Document formatted for Tamir to forward directly to Jack
+
+**Implementation Roadmap:**
+- Phase 1 (Today): Squad-per-repo, upstream inheritance
+- Phase 2 (Q1 2026): Cross-squad delegation, registry, audit trail
+- Phase 3 (Future): Central registry, capacity management, work marketplace
+
+**Key Insight:** Multi-squad architecture balances autonomy (squads operate independently) with coordination (knowledge sharing via upstreams, execution via delegation). The design is phased: simple patterns work today, advanced coordination is in development.
+
+**Outcome:** Complete architectural answer ready for Jack. Design aligns with existing Squad patterns (upstream.json) and planned features (Issue #197 delegation protocol).
+
+**Posted:** https://github.com/tamirdresher_microsoft/tamresearch1/issues/326#issuecomment-4039150820
+
+---
+
+### 2026-03-11: Picard — Keel MCP PR Review — Issue #328
+
+**Assignment:** Review ADO PR #15000967 (Keel-to-ConfigGen Migration MCP) and address Tamir's concerns about CUE logic detection and tooling gaps.
+
+**Context:** Tamir built a Keel MCP Server (with Abhishek) that automates ~50% of Keel→ConfigGen migration effort via boilerplate generation. Key concern: CUE language allows logic (conditionals, computations, constraints) that standard MCP tools may not capture during migration.
+
+**Execution:**
+
+1. **Access Limitations:**
+   - Attempted to access ADO PR via azure-devops MCP tools → repository not found
+   - Attempted az CLI access → extension installation failed
+   - Worked from context: Issue #287 (Keel MCP reminder) + existing ConfigGen knowledge
+
+2. **Research Findings:**
+   - Explored ConfigGen MCP capabilities (configgen-package-updates, configgen-breaking-changes)
+   - Identified 78 breaking changes in ConfigGen ecosystem
+   - Confirmed ConfigGen MCP focuses on NuGet packages, not CUE parsing
+   - No keel/Abhishek references in tamresearch1 repo (migration work in CIEng-Infra-AKS repo)
+
+3. **Analysis — Three Critical Gaps:**
+
+   **Gap 1: CUE Logic Detection (CRITICAL)**
+   - CUE is constraint-based language, not just data
+   - Supports: conditionals (if guards), computations (interpolation, arithmetic), type unification, template composition
+   - Current ConfigGen MCP: operates on NuGet metadata/API surface, no CUE AST parsing
+   - **Risk:** Migration copies structure but misses conditional field generation, computed values, validation constraints
+   - **Recommendation:** Integrate CUE parser (cue eval or CUE Go API) for semantic analysis
+
+   **Gap 2: Template Auto-Discovery (HIGH)**
+   - ConfigGen MCP operates on explicit package references
+   - No template directory scanning, dependency graph analysis, or pattern recognition
+   - **Recommendation:** Add scan-templates command to keel MCP for automated discovery + Keel→ConfigGen pattern mapping
+
+   **Gap 3: configgen-cli Integration (MEDIUM)**
+   - Tamir built domain-specific configgen-cli for this workflow
+   - Current MCP doesn't wrap CLI operations (only NuGet)
+   - **Recommendation:** Add configgen-cli MCP tool for: validation, migration dry-run, template scanning
+
+4. **Deliverable:**
+   - Posted comprehensive findings to GitHub #328
+   - Provided priority matrix: CRITICAL (CUE parsing), HIGH (template discovery), MEDIUM (CLI integration)
+   - Included testing checklist for conditional templates before merge
+   - Requested Abhishek discussion context + ADO access for deeper review
+
+**Key Learning:** When reviewing migration tooling for domain-specific languages (DSLs like CUE), the critical question is: "Does the tool operate on syntax or semantics?" Text-based or AST-only tools will miss constraint logic, computed values, and validation rules that affect runtime behavior. For CUE→ConfigGen migration, semantic analysis via native CUE tooling (cue eval, Go API) is mandatory to capture the full intent of templates with conditional logic. Template auto-discovery is second priority (structural completeness), followed by CLI integration for validation workflows. This is a classic case where the domain expertise (CUE's constraint-based model) reveals gaps that generic MCP tools can't address.
+
+**Decision Required:** Tamir needs to confirm whether to:
+1. Add CUE parser to keel MCP (recommended)
+2. Provide ADO access for deeper PR file review
+3. Share Abhishek discussion context
+
+**Outcome:** Issue remains open pending Tamir's response and potential implementation of CUE-aware parsing in keel MCP.
+

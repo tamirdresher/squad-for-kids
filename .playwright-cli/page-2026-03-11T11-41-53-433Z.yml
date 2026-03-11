@@ -1,0 +1,100 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]: ●
+    - generic [ref=e5]: PTY Mirror
+    - button "Sessions" [ref=e6] [cursor=pointer]
+  - generic [ref=e25]:
+    - textbox "Terminal input" [active] [ref=e26]
+    - generic [ref=e27]:
+      - generic [ref=e319]: Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+      - generic [ref=e32]:
+        - generic [ref=e320]: PS C:\Users\tamirdresher
+        - generic [ref=e321]: ">"
+        - generic [ref=e322]: pwsh
+        - generic [ref=e323]: "--version &&"
+        - generic [ref=e324]: node
+        - generic [ref=e325]: "--version &&"
+        - generic [ref=e326]: git
+        - generic [ref=e327]: "--version &&"
+        - generic [ref=e328]: gh
+        - generic [ref=e329]: auth status
+      - generic [ref=e330]: At line:1 char:16
+      - generic [ref=e331]: + pwsh --version && node --version && git --version && gh auth status
+      - generic [ref=e332]: + ~~
+      - generic [ref=e333]: The token '&&' is not a valid statement separator in this version.
+      - generic [ref=e334]: At line:1 char:34
+      - generic [ref=e335]: + pwsh --version && node --version && git --version && gh auth status
+      - generic [ref=e336]: + ~~
+      - generic [ref=e337]: The token '&&' is not a valid statement separator in this version.
+      - generic [ref=e338]: At line:1 char:51
+      - generic [ref=e339]: + pwsh --version && node --version && git --version && gh auth status
+      - generic [ref=e340]: + ~~
+      - generic [ref=e341]: The token '&&' is not a valid statement separator in this version.
+      - generic [ref=e342]: "+ CategoryInfo : ParserError: (:) [], ParentContainsErrorRecordException"
+      - generic [ref=e343]: "+ FullyQualifiedErrorId : InvalidEndOfLine"
+      - generic [ref=e51]:
+        - generic [ref=e345]: PS C:\Users\tamirdresher>
+        - generic [ref=e346]: pwsh
+      - generic [ref=e347]: PowerShell 7.5.4
+      - generic [ref=e53]:
+        - generic [ref=e348]: PS C:\Users\tamirdresher>
+        - generic [ref=e349]: node
+        - generic [ref=e350]: "--version"
+        - generic [ref=e351]: ;
+        - generic [ref=e352]: git
+        - generic [ref=e353]: "--version"
+        - generic [ref=e354]: ;
+        - generic [ref=e355]: gh
+        - generic [ref=e356]: auth status 2>&1 |
+        - generic [ref=e357]: Select-Object
+        - generic [ref=e358]: "-First"
+        - generic [ref=e359]: "3"
+      - generic [ref=e360]: v24.14.0
+      - generic [ref=e361]: git version 2.53.0.vfs.0.0 or 'true' using your favorite shell.of telemet
+      - generic [ref=e56]:
+        - generic [ref=e362]: ry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' o
+        - generic [ref=e363]: g
+        - generic [ref=e364]: .ps1irdresher\tamresearch1
+      - generic [ref=e365]: "Read more about .NET CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry"
+      - generic [ref=e366]: "True"
+      - generic [ref=e59]:
+        - generic [ref=e367]: "----------------10.0!her\\tamresearch1>"
+        - generic [ref=e368]: dotnet
+        - generic [ref=e369]: "--version"
+        - generic [ref=e370]: ;
+        - generic [ref=e371]: dotnet
+        - generic [ref=e372]: tool
+      - generic [ref=e373]: Installed an ASP.NET Core HTTPS development certificate.
+      - generic [ref=e374]: To trust the certificate, run 'dotnet dev-certs https --trust'
+      - generic [ref=e375]: "Learn about HTTPS: https://aka.ms/dotnet-https"
+      - generic [ref=e376]: Telemetry
+      - generic [ref=e377]: "----------------"
+      - generic [ref=e378]: "Write your first app: https://aka.ms/dotnet-hello-worldmprove your experience. It is collected by Microsoft and shared w"
+      - generic [ref=e379]: "Find out what's new: https://aka.ms/dotnet-whats-new"
+      - generic [ref=e380]: "Explore documentation: https://aka.ms/dotnet-docs"
+      - generic [ref=e381]: "Report issues and find source on GitHub: https://github.com/dotnet/core"
+      - generic [ref=e382]: "Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli"
+      - generic [ref=e383]: "--------------------------------------------------------------------------------------"
+      - generic [ref=e384]: Package Id Version Commands
+      - generic [ref=e385]: "-------------------------------------"
+      - generic [ref=e73]:
+        - generic [ref=e386]: PS C:\Users\tamirdresher\tamresearch1>
+        - generic [ref=e387]: dotnet
+        - generic [ref=e388]: tool install
+        - generic [ref=e389]: "-g"
+        - generic [ref=e390]: squad-monitor 2>&1 |
+        - generic [ref=e391]: Select-Object
+        - generic [ref=e392]: "-Last"
+        - generic [ref=e393]: "3"
+  - contentinfo [ref=e8]:
+    - generic [ref=e9]:
+      - button "↑" [ref=e10] [cursor=pointer]
+      - button "↓" [ref=e11] [cursor=pointer]
+      - button "→" [ref=e12] [cursor=pointer]
+      - button "←" [ref=e13] [cursor=pointer]
+      - button "Tab" [ref=e14] [cursor=pointer]
+      - button "Enter" [ref=e15] [cursor=pointer]
+      - button "Esc" [ref=e16] [cursor=pointer]
+      - button "Ctrl+C" [ref=e17] [cursor=pointer]
+      - button "Space" [ref=e18] [cursor=pointer]
+      - button "⌫" [ref=e19] [cursor=pointer]

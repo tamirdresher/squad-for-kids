@@ -1,0 +1,12 @@
+[   12834ms] [ERROR] Failed to load resource: net::ERR_SOCKET_NOT_CONNECTED @ https://aadcdn.msauth.net/ests/2.1/content/cdnbundles/converged.v2.login.min_pzfy2abhlubh6bv_dyvwha2.css:0
+[   12916ms] /aadcdn.msauth.net/ests/2.1/content/cdnbundles/converged.v2.login.min_pzfy2abhlubh6bv_dyvwha2.css'], reloading from fallback CDN endpoint
+[   13266ms] [ERROR] Failed to load resource: net::ERR_SOCKET_NOT_CONNECTED @ https://aadcdn.msauth.net/shared/1.0/content/js/ConvergedLogin_PCore_fIflx20fIzO_dEWREEldMQ2.js:0
+[   13329ms] /aadcdn.msauth.net/shared/1.0/content/js/ConvergedLogin_PCore_fIflx20fIzO_dEWREEldMQ2.js'], reloading from fallback CDN endpoint
+[   13269ms] [ERROR] Failed to load resource: net::ERR_SOCKET_NOT_CONNECTED @ https://aadcdn.msauth.net/ests/2.1/content/cdnbundles/ux.converged.login.strings-en.min_z1-cs8y03uatlvwkyxvgja2.js:0
+[   13351ms] /aadcdn.msauth.net/ests/2.1/content/cdnbundles/ux.converged.login.strings-en.min_z1-cs8y03uatlvwkyxvgja2.js'], reloading from fallback CDN endpoint
+[   48327ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://2k23pcdp-49416.euw.devtunnels.ms/favicon.ico:0
+[   70015ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://2k23pcdp-49416.euw.devtunnels.ms/:0
+[  799869ms] ReferenceError: lastCols is not defined
+    at ws.onopen (https://2k23pcdp-49416.euw.devtunnels.ms/app.js:1011:29)
+[  920006ms] ReferenceError: lastCols is not defined
+    at ws.onopen (https://2k23pcdp-49416.euw.devtunnels.ms/app.js:1011:29)

@@ -1,0 +1,6 @@
+[  289490ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://web.whatsapp.com/api/graphql/:0
+[  298304ms] [ERROR] ErrorUtils caught an error:
+
+LID is null - fetching 1 PN records. Mapping is missing for: 1. Caller "waweb-adl-bulk-get-device-record" (lidInfraAccount-waweb-adl-bulk-get-device-record)
+
+Subsequent non-fatal errors won't be logged; see https://fburl.com/debugjs. {column: 17870, clientTime: 1773211798, extra: Object, guardList: Array(0), hash: oll4va} @ https://static.whatsapp.net/rsrc.php/v4/y0/r/UkqksEsMiUV.js:77

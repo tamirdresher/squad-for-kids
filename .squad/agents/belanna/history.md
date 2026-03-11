@@ -281,3 +281,32 @@ Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish w
 
 **Orchestration Log:** 2026-03-11T20-52-48Z-agent-2-belanna.md
 
+### 2026-07-17: Issue #337 — Cosmos DB Firewall Investigation (Follow-Up with Live Azure Data)
+
+**Context:** Follow-up on IcM Incident 759361753. Ran live Azure CLI queries this session.
+
+**Key Findings:**
+1. **9 Cosmos DB accounts found** in subscription with varying network configs:
+   - 3 accounts with `publicNetworkAccess: Enabled` (baseplatform-*, dk8splatform-us)
+   - 4 accounts with `publicNetworkAccess: Disabled` (dk8s-onboarding-cus, cosno-dk8s-test, dk8splatform-eugbl, dk8splatform-gbl)
+   - 1 account with `SecuredByPerimeter` (dk8s-onboarding-eus2)
+2. **`dk8splatform-gbl-207ddb1`** has 54 IP firewall rules but public access Disabled — IP rules effectively inactive
+3. **Azure Policy Non-Compliance**: `NSP-CDB-v1-0-En-Deny` (Deny-mode policy!), `NSP-CosmosDB-v1-0`, `ASB-Audit1-Initiative-v1`, `SecurityCenterBuiltIn` all flagging Cosmos DB accounts
+4. **IaC drift confirmed**: Bicep template says `Enabled` but live state shows `Disabled` on several accounts — manual or policy-driven changes happened
+
+**Status:** ✅ Posted investigation with live Azure data to issue #337. Labels updated, board moved to Pending User. Tamir needs to ask Brett which specific account is affected and check if NSP-CDB-v1-0-En-Deny was applied around Feb 1.
+
+### 2026-07-17: Issue #336 — Dependabot Security PRs (Access Limitation)
+
+**Context:** Critical Dependabot security PRs for DK8S CapacityController and ArgoRollouts repos.
+
+**Key Findings:**
+1. Repos `microsoft/DK8S-CapacityController` and `microsoft/ArgoRollouts` (and variations) are **not accessible** via current GitHub token — likely private/internal repos
+2. Provided Tamir with exact `gh pr list` commands to run with proper access, plus a review checklist for Dependabot PRs
+3. Suggested checking Azure DevOps as alternative hosting location
+
+**Status:** ✅ Posted investigation to issue #336. Labels updated, board moved to Pending User. Tamir needs to locate and merge the PRs with his access credentials.
+
+**Pattern Learned — Private Repo Triage:**
+When issue references repos we can't access, document the exact commands and checklist for the human to execute, rather than blocking on access issues.
+

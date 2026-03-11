@@ -1,0 +1,1256 @@
+- generic [ref=e2]:
+  - region:
+    - generic:
+      - tooltip "You are the author of this issue"
+    - generic:
+      - tooltip "You are the author of this issue"
+    - generic:
+      - tooltip "You are the author of this issue"
+    - generic:
+      - tooltip "You are the author of this issue"
+    - generic:
+      - tooltip "You are the author of this issue"
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - text: GitHub Enterprise
+        - generic "Users managed by Microsoft EMU" [ref=e14]:
+          - text: Users managed by
+          - link "Microsoft EMU" [ref=e15] [cursor=pointer]:
+            - /url: /enterprises/microsoft
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - button "Open menu" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+          - link "Homepage Enterprise (g then d)" [ref=e22] [cursor=pointer]:
+            - /url: /
+            - img [ref=e23]
+        - generic [ref=e25]:
+          - navigation "Breadcrumbs" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "tamirdresher_microsoft" [ref=e29] [cursor=pointer]:
+                  - /url: /tamirdresher_microsoft
+                  - generic [ref=e30]: tamirdresher_microsoft
+              - listitem [ref=e31]:
+                - link "tamresearch1" [ref=e32] [cursor=pointer]:
+                  - /url: /tamirdresher_microsoft/tamresearch1
+                  - generic [ref=e33]: tamresearch1
+                  - img [ref=e34]
+          - button "Search or jump to…" [ref=e38] [cursor=pointer]:
+            - generic [ref=e39]:
+              - generic:
+                - img
+              - generic [ref=e40]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e44]:
+              - link "Chat with Copilot" [ref=e46] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e47]
+              - button "Open agents panel" [ref=e51] [cursor=pointer]:
+                - generic [ref=e52]:
+                  - generic:
+                    - img
+                  - generic:
+                    - img
+            - button "Create new..." [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues" [ref=e56] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e57]
+            - link "Pull requests" [ref=e60] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e61]
+            - link "Repositories" [ref=e63] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e64]
+          - link "You have unread notifications (g then n)" [ref=e66] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e67]
+          - button "Open user navigation menu" [ref=e70] [cursor=pointer]:
+            - img "Tamir Dresher" [ref=e71]
+      - heading "Repository navigation" [level=2] [ref=e72]
+      - navigation "Repository" [ref=e73]:
+        - list [ref=e74]:
+          - listitem [ref=e75]:
+            - link "Code" [ref=e76] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1
+              - img [ref=e78]
+              - generic [ref=e80]: Code
+          - listitem [ref=e81]:
+            - link "Issues (11)" [ref=e82] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/issues
+              - img [ref=e84]
+              - generic [ref=e87]: Issues
+              - generic [ref=e88]:
+                - generic [ref=e89]: "11"
+                - generic [ref=e90]: (11)
+          - listitem [ref=e91]:
+            - link "Pull requests" [ref=e92] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/pulls
+              - img [ref=e94]
+              - generic [ref=e96]: Pull requests
+          - listitem [ref=e97]:
+            - link "Agents" [ref=e98] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/agents?author=tamirdresher_microsoft
+              - img [ref=e100]
+              - generic [ref=e103]: Agents
+          - listitem [ref=e104]:
+            - link "Actions" [ref=e105] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/actions
+              - img [ref=e107]
+              - generic [ref=e109]: Actions
+          - listitem [ref=e110]:
+            - link "Projects" [ref=e111] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/projects
+              - img [ref=e113]
+              - generic [ref=e115]: Projects
+          - listitem [ref=e116]:
+            - link "Wiki" [ref=e117] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/wiki
+              - img [ref=e119]
+              - generic [ref=e121]: Wiki
+          - listitem [ref=e122]:
+            - link "Security" [ref=e123] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/security
+              - img [ref=e125]
+              - generic [ref=e127]: Security
+          - listitem [ref=e128]:
+            - link "Insights" [ref=e129] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/network/dependencies
+              - img [ref=e131]
+              - generic [ref=e133]: Insights
+          - listitem [ref=e134]:
+            - link "Settings" [ref=e135] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/settings
+              - img [ref=e137]
+              - generic [ref=e139]: Settings
+  - main [ref=e143]:
+    - generic [ref=e149]:
+      - region "Header" [ref=e151]:
+        - generic [ref=e152]:
+          - 'heading "[URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked #251" [level=1] [ref=e154]'
+          - generic [ref=e156]:
+            - button "Edit issue title" [ref=e157] [cursor=pointer]:
+              - generic [ref=e159]: Edit
+            - link "New issue" [ref=e161] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/issues/new/choose
+              - generic [ref=e163]: New issue
+            - button "Copy link" [ref=e164] [cursor=pointer]:
+              - img [ref=e165]
+      - generic [ref=e173]:
+        - img "Issue" [ref=e174]
+        - text: Closed
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - generic [ref=e181]:
+            - link "@tamirdresher_microsoft's profile" [ref=e182] [cursor=pointer]:
+              - /url: https://github.com/tamirdresher_microsoft
+              - img "@tamirdresher_microsoft" [ref=e183]
+            - generic [ref=e184]:
+              - heading "Description" [level=2] [ref=e185]
+              - generic [ref=e187]:
+                - generic [ref=e189]:
+                  - generic [ref=e190]:
+                    - link "tamirdresher_microsoft" [ref=e192] [cursor=pointer]:
+                      - /url: https://github.com/tamirdresher_microsoft
+                    - generic [ref=e193]:
+                      - text: opened
+                      - link "on Mar 10, 202611 hours ago" [ref=e194] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issue-4049274367
+                        - generic "Mar 10, 2026, 6:12 AM GMT+2" [ref=e195]: on Mar 10, 202611 hours ago
+                  - button "Issue body actions" [ref=e199] [cursor=pointer]:
+                    - img [ref=e200]
+                - generic [ref=e202]:
+                  - generic [ref=e204]:
+                    - paragraph [ref=e205]:
+                      - strong [ref=e206]: "Source:"
+                      - text: Teams — DK8S | Core Chat (Anand Kumar, ~10 min ago)
+                    - paragraph [ref=e207]:
+                      - strong [ref=e208]: "Summary:"
+                      - text: DK8S staging cluster provisioning is failing due to
+                      - strong [ref=e209]: RoleAssignmentLimitExceeded
+                      - text: — hit the 4,000 RBAC role assignment limit on subscription
+                      - code [ref=e210]: c5d1c552-a815-4fc8-b12d-ab444e3225b1
+                      - text: .
+                    - paragraph [ref=e211]:
+                      - strong [ref=e212]: "Key points:"
+                    - list [ref=e213]:
+                      - listitem [ref=e214]: Pipeline failures in DK8S staging
+                      - listitem [ref=e215]: "Short-term mitigation: cleanup of orphaned role assignments"
+                      - listitem [ref=e216]:
+                        - strong [ref=e217]: "Decision needed:"
+                        - text: Should new clusters/resources continue to be created in this subscription? Should usage be stopped?
+                    - paragraph [ref=e218]:
+                      - strong [ref=e219]: "Action required from Tamir:"
+                      - text: Review and decide on subscription usage strategy.
+                  - generic [ref=e220]:
+                    - generic [ref=e223]:
+                      - button "Create sub-issue" [ref=e225] [cursor=pointer]:
+                        - generic [ref=e227]: Create sub-issue
+                      - button "View more sub-issue options" [ref=e229] [cursor=pointer]:
+                        - img [ref=e230]
+                    - toolbar "Reactions" [ref=e232]:
+                      - button "React" [ref=e233] [cursor=pointer]:
+                        - img [ref=e234]
+          - generic [ref=e237]:
+            - generic [ref=e238]:
+              - heading "Activity" [level=2] [ref=e239]
+              - link [ref=e240] [cursor=pointer]:
+                - /url: /tamirdresher_microsoft/tamresearch1/issues/251?timeline_page=1
+                - text: Next
+              - generic [ref=e241]:
+                - region "Events" [ref=e242]:
+                  - generic [ref=e249]:
+                    - img [ref=e252]
+                    - generic [ref=e256]:
+                      - link "tamirdresher_microsoft" [ref=e258] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e259]: tamirdresher_microsoft
+                      - text: added
+                      - link "squad Squad triage inbox — Lead will assign to a member" [ref=e261] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%22
+                        - generic [ref=e263]: squad
+                        - generic [ref=e264]: Squad triage inbox — Lead will assign to a member
+                      - link "squad:picard Assigned to Picard (Lead)" [ref=e266] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Apicard%22
+                        - generic [ref=e268]: squad:picard
+                        - generic [ref=e269]: Assigned to Picard (Lead)
+                      - link "status:pending-user Waiting for user input or decision" [ref=e271] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e273]: status:pending-user
+                        - generic [ref=e274]: Waiting for user input or decision
+                      - link "teams-bridge Bridged from Teams via WorkIQ" [ref=e276] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22teams-bridge%22
+                        - generic [ref=e278]: teams-bridge
+                        - generic [ref=e279]: Bridged from Teams via WorkIQ
+                      - link "on Mar 10, 202611 hours ago" [ref=e280] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23417891791
+                        - generic "Mar 10, 2026, 6:12 AM GMT+2" [ref=e281]: on Mar 10, 202611 hours ago
+                  - generic [ref=e285]:
+                    - img [ref=e288]
+                    - generic [ref=e292]:
+                      - link "github-project-automation" [ref=e294] [cursor=pointer]:
+                        - /url: /apps/github-project-automation
+                        - generic [ref=e295]: github-project-automation
+                      - text: added this to
+                      - generic [ref=e296]:
+                        - img [ref=e297]
+                        - link "Squad Work Board" [ref=e299] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 202611 hours ago" [ref=e300] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23417892755
+                        - generic "Mar 10, 2026, 6:12 AM GMT+2" [ref=e301]: on Mar 10, 202611 hours ago
+                  - generic [ref=e305]:
+                    - img [ref=e308]
+                    - generic [ref=e312]:
+                      - link "tamirdresher_microsoft" [ref=e314] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e315]: tamirdresher_microsoft
+                      - text: moved this to Pending User in
+                      - generic [ref=e316]:
+                        - img [ref=e317]
+                        - link "Squad Work Board" [ref=e319] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 202611 hours ago" [ref=e320] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 6:12 AM GMT+2" [ref=e321]: on Mar 10, 202611 hours ago
+                  - generic [ref=e325]:
+                    - img [ref=e328]
+                    - generic [ref=e332]:
+                      - link "github-actions" [ref=e334] [cursor=pointer]:
+                        - /url: /apps/github-actions
+                        - generic [ref=e335]: github-actions
+                      - text: added
+                      - link "squad:belanna Assigned to B'Elanna (Infrastructure Expert)" [ref=e337] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Abelanna%22
+                        - generic [ref=e339]: squad:belanna
+                        - generic [ref=e340]: Assigned to B'Elanna (Infrastructure Expert)
+                      - link "go:needs-research Needs investigation" [ref=e342] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22go%3Aneeds-research%22
+                        - generic [ref=e344]: go:needs-research
+                        - generic [ref=e345]: Needs investigation
+                      - link "on Mar 10, 202611 hours ago" [ref=e346] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23417935215
+                        - generic "Mar 10, 2026, 6:15 AM GMT+2" [ref=e347]: on Mar 10, 202611 hours ago
+                - generic [ref=e348]:
+                  - link "@github-actions's profile" [ref=e349] [cursor=pointer]:
+                    - /url: https://github.com/apps/github-actions
+                    - img "github-actions" [ref=e350]
+                  - generic [ref=e357]:
+                    - generic [ref=e359]:
+                      - heading "github-actions commented on Mar 10, 2026 11 hours ago" [level=3] [ref=e360]:
+                        - text: github-actions commented
+                        - generic "Mar 10, 2026, 6:15 AM GMT+2" [ref=e361]: on Mar 10, 2026 11 hours ago
+                      - generic [ref=e362]:
+                        - generic [ref=e363]:
+                          - link "github-actions" [ref=e364] [cursor=pointer]:
+                            - /url: /apps/github-actions
+                          - generic [ref=e365]: bot
+                        - generic [ref=e367]:
+                          - link "on Mar 10, 202611 hours ago" [ref=e368] [cursor=pointer]:
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4028541937
+                            - generic "Mar 10, 2026, 6:15 AM GMT+2" [ref=e369]: on Mar 10, 202611 hours ago
+                          - generic [ref=e370]:
+                            - text: – with
+                            - link "GitHub Actions" [ref=e371] [cursor=pointer]:
+                              - /url: https://help.github.com/en/actions
+                      - button "Actions for github-actions's comment, 6:15 AM today" [ref=e375] [cursor=pointer]:
+                        - img [ref=e376]
+                    - generic [ref=e378]:
+                      - generic [ref=e380]:
+                        - heading "🏗️ Squad Triage — Picard (Lead)" [level=3] [ref=e381]
+                        - 'heading "Issue: #251 — [URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked Assigned to: B''Elanna (Infrastructure Expert) Reason: Issue relates to DevOps/infrastructure work" [level=2] [ref=e382]':
+                          - strong [ref=e383]: "Issue:"
+                          - link "#251" [ref=e384] [cursor=pointer]:
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                          - text: "— [URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked"
+                          - strong [ref=e385]: "Assigned to:"
+                          - text: B'Elanna (Infrastructure Expert)
+                          - strong [ref=e386]: "Reason:"
+                          - text: Issue relates to DevOps/infrastructure work
+                        - paragraph [ref=e387]:
+                          - strong [ref=e388]: "Team roster:"
+                        - list [ref=e389]:
+                          - listitem [ref=e390]:
+                            - strong [ref=e391]: Picard
+                            - text: "(Lead) → label:"
+                            - code [ref=e392]: squad:picard
+                          - listitem [ref=e393]:
+                            - strong [ref=e394]: B'Elanna
+                            - text: "(Infrastructure Expert) → label:"
+                            - code [ref=e395]: squad:belanna
+                          - listitem [ref=e396]:
+                            - strong [ref=e397]: Worf
+                            - text: "(Security & Cloud) → label:"
+                            - code [ref=e398]: squad:worf
+                          - listitem [ref=e399]:
+                            - strong [ref=e400]: Data
+                            - text: "(Code Expert) → label:"
+                            - code [ref=e401]: squad:data
+                          - listitem [ref=e402]:
+                            - strong [ref=e403]: Seven
+                            - text: "(Research & Docs) → label:"
+                            - code [ref=e404]: squad:seven
+                          - listitem [ref=e405]:
+                            - strong [ref=e406]: Podcaster
+                            - text: "(Audio Content Generator) → label:"
+                            - code [ref=e407]: squad:podcaster
+                          - listitem [ref=e408]:
+                            - strong [ref=e409]: Tamir Dresher
+                            - text: "(👤 Human — Project Owner) → label:"
+                            - code [ref=e410]: squad:tamirdresher
+                          - listitem [ref=e411]:
+                            - strong [ref=e412]: Ralph
+                            - text: "(Work Monitor) → label:"
+                            - code [ref=e413]: squad:ralph
+                          - listitem [ref=e414]:
+                            - strong [ref=e415]: Neelix
+                            - text: "(News Reporter) → label:"
+                            - code [ref=e416]: squad:neelix
+                        - blockquote [ref=e417]:
+                          - paragraph [ref=e418]:
+                            - text: To reassign, remove the current
+                            - code [ref=e419]: squad:*
+                            - text: label and add the correct one.
+                      - toolbar "Reactions" [ref=e420]:
+                        - button "React" [ref=e421] [cursor=pointer]:
+                          - img [ref=e422]
+                - generic [ref=e424]:
+                  - link "@github-actions's profile" [ref=e425] [cursor=pointer]:
+                    - /url: https://github.com/apps/github-actions
+                    - img "github-actions" [ref=e426]
+                  - generic [ref=e433]:
+                    - generic [ref=e435]:
+                      - heading "github-actions commented on Mar 10, 2026 11 hours ago" [level=3] [ref=e436]:
+                        - text: github-actions commented
+                        - generic "Mar 10, 2026, 6:15 AM GMT+2" [ref=e437]: on Mar 10, 2026 11 hours ago
+                      - generic [ref=e438]:
+                        - generic [ref=e439]:
+                          - link "github-actions" [ref=e440] [cursor=pointer]:
+                            - /url: /apps/github-actions
+                          - generic [ref=e441]: bot
+                        - generic [ref=e443]:
+                          - link "on Mar 10, 202611 hours ago" [ref=e444] [cursor=pointer]:
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4028542552
+                            - generic "Mar 10, 2026, 6:15 AM GMT+2" [ref=e445]: on Mar 10, 202611 hours ago
+                          - generic [ref=e446]:
+                            - text: – with
+                            - link "GitHub Actions" [ref=e447] [cursor=pointer]:
+                              - /url: https://help.github.com/en/actions
+                      - button "Actions for github-actions's comment, 6:15 AM today" [ref=e451] [cursor=pointer]:
+                        - img [ref=e452]
+                    - generic [ref=e454]:
+                      - generic [ref=e456]:
+                        - heading "📋 Assigned to Picard (Lead)" [level=3] [ref=e457]
+                        - paragraph [ref=e458]:
+                          - strong [ref=e459]: "Issue:"
+                          - link "#251" [ref=e460] [cursor=pointer]:
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                          - text: "— [URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked"
+                        - paragraph [ref=e461]: Picard will pick this up in the next Copilot session.
+                        - blockquote [ref=e462]:
+                          - paragraph [ref=e463]:
+                            - strong [ref=e464]: "For Copilot coding agent:"
+                            - text: If enabled, this issue will be worked automatically.
+                            - text: "Otherwise, start a Copilot session and say:"
+                            - code [ref=e465]: "Picard, work on issue #251"
+                      - toolbar "Reactions" [ref=e466]:
+                        - button "React" [ref=e467] [cursor=pointer]:
+                          - img [ref=e468]
+                - generic [ref=e470]:
+                  - link "@tamirdresher_microsoft's profile" [ref=e471] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher_microsoft
+                    - img "tamirdresher_microsoft" [ref=e472]
+                  - generic [ref=e479]:
+                    - generic [ref=e481]:
+                      - heading "tamirdresher_microsoft commented on Mar 10, 2026 9 hours ago" [level=3] [ref=e482]:
+                        - text: tamirdresher_microsoft commented
+                        - generic "Mar 10, 2026, 8:18 AM GMT+2" [ref=e483]: on Mar 10, 2026 9 hours ago
+                      - generic [ref=e484]:
+                        - link "tamirdresher_microsoft" [ref=e486] [cursor=pointer]:
+                          - /url: /tamirdresher_microsoft
+                        - link "on Mar 10, 20269 hours ago" [ref=e489] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4028981173
+                          - generic "Mar 10, 2026, 8:18 AM GMT+2" [ref=e490]: on Mar 10, 20269 hours ago
+                      - generic [ref=e492]:
+                        - generic "You are the author of this issue" [ref=e494]: Author
+                        - button "Actions for tamirdresher_microsoft's comment, 8:18 AM today" [ref=e496] [cursor=pointer]:
+                          - img [ref=e497]
+                    - generic [ref=e499]:
+                      - paragraph [ref=e502]: Im not if there is anything I can do about it. Next time give me recommendation to such type of issues you bring from the teams bridge
+                      - toolbar "Reactions" [ref=e503]:
+                        - button "React" [ref=e504] [cursor=pointer]:
+                          - img [ref=e505]
+                - region "Events" [ref=e507]:
+                  - generic [ref=e514]:
+                    - img [ref=e517]
+                    - generic [ref=e521]:
+                      - link "tamirdresher_microsoft" [ref=e523] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e524]: tamirdresher_microsoft
+                      - text: removed
+                      - link "status:pending-user Waiting for user input or decision" [ref=e526] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e528]: status:pending-user
+                        - generic [ref=e529]: Waiting for user input or decision
+                      - link "on Mar 10, 20269 hours ago" [ref=e530] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23420276960
+                        - generic "Mar 10, 2026, 8:18 AM GMT+2" [ref=e531]: on Mar 10, 20269 hours ago
+                  - generic [ref=e535]:
+                    - img [ref=e538]
+                    - generic [ref=e542]:
+                      - link "tamirdresher_microsoft" [ref=e544] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e545]: tamirdresher_microsoft
+                      - text: moved this from Pending User to Todo in
+                      - generic [ref=e546]:
+                        - img [ref=e547]
+                        - link "Squad Work Board" [ref=e549] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20269 hours ago" [ref=e550] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 8:18 AM GMT+2" [ref=e551]: on Mar 10, 20269 hours ago
+                  - generic [ref=e555]:
+                    - img [ref=e558]
+                    - generic [ref=e562]:
+                      - link "tamirdresher_microsoft" [ref=e564] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e565]: tamirdresher_microsoft
+                      - text: moved this from Todo to In Progress in
+                      - generic [ref=e566]:
+                        - img [ref=e567]
+                        - link "Squad Work Board" [ref=e569] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20269 hours ago" [ref=e570] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 8:21 AM GMT+2" [ref=e571]: on Mar 10, 20269 hours ago
+                - generic [ref=e572]:
+                  - link "@tamirdresher_microsoft's profile" [ref=e573] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher_microsoft
+                    - img "tamirdresher_microsoft" [ref=e574]
+                  - generic [ref=e581]:
+                    - generic [ref=e583]:
+                      - heading "tamirdresher_microsoft commented on Mar 10, 2026 9 hours ago" [level=3] [ref=e584]:
+                        - text: tamirdresher_microsoft commented
+                        - generic "Mar 10, 2026, 8:24 AM GMT+2" [ref=e585]: on Mar 10, 2026 9 hours ago
+                      - generic [ref=e586]:
+                        - link "tamirdresher_microsoft" [ref=e588] [cursor=pointer]:
+                          - /url: /tamirdresher_microsoft
+                        - link "on Mar 10, 20269 hours ago" [ref=e591] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4029002109
+                          - generic "Mar 10, 2026, 8:24 AM GMT+2" [ref=e592]: on Mar 10, 20269 hours ago
+                      - generic [ref=e594]:
+                        - generic "You are the author of this issue" [ref=e596]: Author
+                        - button "Actions for tamirdresher_microsoft's comment, 8:24 AM today" [ref=e598] [cursor=pointer]:
+                          - img [ref=e599]
+                    - generic [ref=e601]:
+                      - generic [ref=e603]:
+                        - heading "🔍 Azure RBAC 4,000 Role Assignment Limit Analysis" [level=2] [ref=e604]
+                        - heading "Understanding the Issue" [level=3] [ref=e605]
+                        - paragraph [ref=e606]:
+                          - strong [ref=e607]: What is the 4,000 limit?
+                        - list [ref=e608]:
+                          - listitem [ref=e609]:
+                            - text: Azure enforces a hard limit of
+                            - strong [ref=e610]: 4,000 role assignments per subscription
+                          - listitem [ref=e611]: This includes all assignments at subscription, resource group, and individual resource levels
+                          - listitem [ref=e612]:
+                            - strong [ref=e613]: Orphaned role assignments
+                            - text: (where the principal has been deleted)
+                            - strong [ref=e614]: still count
+                            - text: toward this limit until cleaned up
+                          - listitem [ref=e615]:
+                            - strong [ref=e616]: "Good news:"
+                            - text: Assignments at
+                            - strong [ref=e617]: management group level do NOT count
+                            - text: toward this limit
+                        - paragraph [ref=e618]:
+                          - strong [ref=e619]: "What counts toward the limit:"
+                        - list [ref=e620]:
+                          - listitem [ref=e621]: ✅ All active role assignments at subscription/resource group/resource scopes
+                          - listitem [ref=e622]: ✅ Assignments to users, groups, service principals, managed identities
+                          - listitem [ref=e623]: ✅ Orphaned assignments (deleted principals that weren't cleaned up)
+                          - listitem [ref=e624]: ❌ Management group level assignments (do NOT count)
+                          - listitem [ref=e625]: ❌ PIM eligible/future-scheduled assignments (do NOT count)
+                        - separator [ref=e626]
+                        - heading "📊 Audit Commands for Subscription c5d1c552-a815-4fc8-b12d-ab444e3225b1" [level=3] [ref=e627]
+                        - heading "1. Check current role assignment count" [level=4] [ref=e628]
+                        - generic [ref=e629]:
+                          - generic [ref=e630]:
+                            - generic [ref=e631]: "# Get total count of role assignments in the subscription"
+                            - text: $assignments = az role assignment list --subscription c5d1c552-a815-4fc8-b12d-ab444e3225b1 --all | ConvertFrom-Json Write-Host
+                            - generic [ref=e632]:
+                              - text: "\"Total role assignments:"
+                              - generic [ref=e633]: $
+                              - text: (
+                              - generic [ref=e634]: $assignments.Count
+                              - text: ) / 4000"
+                          - button "Copy" [ref=e636] [cursor=pointer]:
+                            - img [ref=e637]
+                        - heading "2. Identify orphaned role assignments" [level=4] [ref=e640]
+                        - generic [ref=e641]:
+                          - generic [ref=e642]:
+                            - generic [ref=e643]: "# Find assignments with missing principals (likely orphaned)"
+                            - text: "$assignments = az role assignment list --subscription c5d1c552-a815-4fc8-b12d-ab444e3225b1 --all | ConvertFrom-Json $orphaned = $assignments | Where-Object {"
+                            - generic [ref=e644]: $_.principalName
+                            - text: "-eq"
+                            - generic [ref=e645]: "\"\""
+                            - text: "-or"
+                            - generic [ref=e646]: $_.principalName
+                            - text: "-eq $null } Write-Host"
+                            - generic [ref=e647]:
+                              - text: "\"Potentially orphaned assignments:"
+                              - generic [ref=e648]: $
+                              - text: (
+                              - generic [ref=e649]: $orphaned.Count
+                              - text: )"
+                            - text: $orphaned | Select-Object id, roleDefinitionName, scope, principalId | Format-Table
+                          - button "Copy" [ref=e651] [cursor=pointer]:
+                            - img [ref=e652]
+                        - heading "3. Export orphaned assignments for review" [level=4] [ref=e655]
+                        - generic [ref=e656]:
+                          - generic [ref=e657]:
+                            - generic [ref=e658]: "# Export to JSON for detailed review"
+                            - text: $orphaned | ConvertTo-Json -Depth 10 | Out-File orphaned-assignments.json Write-Host
+                            - generic [ref=e659]: "\"Exported to orphaned-assignments.json\""
+                          - button "Copy" [ref=e661] [cursor=pointer]:
+                            - img [ref=e662]
+                        - heading "4. Verify if principals are truly deleted (detailed check)" [level=4] [ref=e665]
+                        - generic [ref=e666]:
+                          - generic [ref=e667]:
+                            - generic [ref=e668]: "# This checks each potentially orphaned assignment against Entra ID"
+                            - text: "$verified = @() foreach ($assignment in $orphaned) { $principalId ="
+                            - generic [ref=e669]: $assignment.principalId
+                            - text: $exists = $false
+                            - generic [ref=e670]: "# Try to find user"
+                            - text: "try { az ad user show --id $principalId --output none 2>$null; $exists = $true } catch {}"
+                            - generic [ref=e671]: "# Try to find group"
+                            - text: "if (-not $exists) { try { az ad group show --group $principalId --output none 2>$null; $exists = $true } catch {} }"
+                            - generic [ref=e672]: "# Try to find service principal"
+                            - text: "if (-not $exists) { try { az ad sp show --id $principalId --output none 2>$null; $exists = $true } catch {} } if (-not $exists) { $verified += $assignment } } Write-Host"
+                            - generic [ref=e673]:
+                              - text: "\"Confirmed orphaned (principal deleted):"
+                              - generic [ref=e674]: $
+                              - text: (
+                              - generic [ref=e675]: $verified.Count
+                              - text: )"
+                          - button "Copy" [ref=e677] [cursor=pointer]:
+                            - img [ref=e678]
+                        - heading "5. Breakdown by role type" [level=4] [ref=e681]
+                        - generic [ref=e682]:
+                          - generic [ref=e683]:
+                            - generic [ref=e684]: "# See which roles are consuming the most assignments"
+                            - text: $assignments | Group-Object roleDefinitionName | Sort-Object Count -Descending | Select-Object Name, Count | Format-Table
+                          - button "Copy" [ref=e686] [cursor=pointer]:
+                            - img [ref=e687]
+                        - heading "6. Breakdown by scope level" [level=4] [ref=e690]
+                        - generic [ref=e691]:
+                          - generic [ref=e692]:
+                            - generic [ref=e693]: "# Identify where assignments are concentrated"
+                            - text: "$assignments | ForEach-Object { if ("
+                            - generic [ref=e694]: $_.scope
+                            - text: "-match"
+                            - generic [ref=e695]: "'/subscriptions/[^/]+$'"
+                            - text: ") {"
+                            - generic [ref=e696]: "\"Subscription\""
+                            - text: "} elseif ("
+                            - generic [ref=e697]: $_.scope
+                            - text: "-match"
+                            - generic [ref=e698]: "'/resourceGroups/'"
+                            - text: ") {"
+                            - generic [ref=e699]: "\"ResourceGroup\""
+                            - text: "} else {"
+                            - generic [ref=e700]: "\"Resource\""
+                            - text: "} } | Group-Object | Sort-Object Count -Descending | Select-Object Name, Count | Format-Table"
+                          - button "Copy" [ref=e702] [cursor=pointer]:
+                            - img [ref=e703]
+                        - separator [ref=e706]
+                        - heading "🛠️ Remediation Plan" [level=3] [ref=e707]
+                        - heading "SHORT-TERM (Immediate - Days)" [level=4] [ref=e708]:
+                          - strong [ref=e709]: SHORT-TERM (Immediate - Days)
+                        - list [ref=e710]:
+                          - listitem [ref=e711]:
+                            - paragraph [ref=e712]:
+                              - strong [ref=e713]: Clean up orphaned role assignments
+                            - generic [ref=e714]:
+                              - generic [ref=e715]:
+                                - generic [ref=e716]: "# After verifying with commands above, delete orphaned assignments"
+                                - text: "$verified | ForEach-Object { az role assignment delete --ids"
+                                - generic [ref=e717]: $_.id
+                                - text: "} Write-Host"
+                                - generic [ref=e718]:
+                                  - text: "\"Deleted"
+                                  - generic [ref=e719]: $
+                                  - text: (
+                                  - generic [ref=e720]: $verified.Count
+                                  - text: ) orphaned assignments"
+                              - button "Copy" [ref=e722] [cursor=pointer]:
+                                - img [ref=e723]
+                          - listitem [ref=e726]:
+                            - paragraph [ref=e727]:
+                              - strong [ref=e728]: Review and consolidate redundant assignments
+                            - list [ref=e729]:
+                              - listitem [ref=e730]: Look for duplicate assignments in the audit output
+                              - listitem [ref=e731]: Remove temporary/test assignments that are no longer needed
+                          - listitem [ref=e732]:
+                            - paragraph [ref=e733]:
+                              - strong [ref=e734]: "Expected outcome:"
+                              - text: Free up 10-30% of quota (400-1200 assignments)
+                        - heading "MEDIUM-TERM (Next Sprint - Weeks)" [level=4] [ref=e735]:
+                          - strong [ref=e736]: MEDIUM-TERM (Next Sprint - Weeks)
+                        - list [ref=e737]:
+                          - listitem [ref=e738]:
+                            - paragraph [ref=e739]:
+                              - strong [ref=e740]: Switch from user-level to group-level assignments
+                            - list [ref=e741]:
+                              - listitem [ref=e742]: Assign RBAC to Entra ID groups, not individual users/SPs
+                              - listitem [ref=e743]: Place users and service principals in these groups
+                              - listitem [ref=e744]: One group assignment = hundreds of individual assignments saved
+                          - listitem [ref=e745]:
+                            - paragraph [ref=e746]:
+                              - strong [ref=e747]: Implement RBAC hygiene automation
+                            - generic [ref=e748]:
+                              - generic [ref=e749]:
+                                - generic [ref=e750]: "# Schedule this as an Azure Automation runbook (monthly)"
+                                - generic [ref=e751]: "# Script to detect and report orphaned assignments"
+                              - button "Copy" [ref=e753] [cursor=pointer]:
+                                - img [ref=e754]
+                          - listitem [ref=e757]:
+                            - paragraph [ref=e758]:
+                              - strong [ref=e759]: Review resource-level assignments
+                            - list [ref=e760]:
+                              - listitem [ref=e761]: Move resource-level assignments up to resource group level where appropriate
+                              - listitem [ref=e762]: Reduces assignment count while maintaining security
+                          - listitem [ref=e763]:
+                            - paragraph [ref=e764]:
+                              - strong [ref=e765]: Establish governance policies
+                            - list [ref=e766]:
+                              - listitem [ref=e767]: Require justification for new role assignments
+                              - listitem [ref=e768]: Regular quarterly audits of RBAC assignments
+                              - listitem [ref=e769]: Use managed identities (auto-cleaned) instead of service principals where possible
+                        - heading "LONG-TERM (Architectural - Months)" [level=4] [ref=e770]:
+                          - strong [ref=e771]: LONG-TERM (Architectural - Months)
+                        - list [ref=e772]:
+                          - listitem [ref=e773]:
+                            - paragraph [ref=e774]:
+                              - strong [ref=e775]: Leverage Management Groups
+                              - text: 🎯
+                            - list [ref=e776]:
+                              - listitem [ref=e777]:
+                                - strong [ref=e778]: "Critical:"
+                                - text: Role assignments at management group level
+                                - strong [ref=e779]: do NOT count
+                                - text: toward subscription limits
+                              - listitem [ref=e780]: Move broad permissions (Reader, platform team access) to management group scope
+                              - listitem [ref=e781]:
+                                - text: "Design hierarchy:"
+                                - code [ref=e782]: Root Management Group ├── Platform MG (shared infra) ├── Prod Landing Zone MG ├── NonProd Landing Zone MG └── Sandbox MG
+                          - listitem [ref=e783]:
+                            - paragraph [ref=e784]:
+                              - strong [ref=e785]: Use PIM (Privileged Identity Management)
+                            - list [ref=e786]:
+                              - listitem [ref=e787]: Eligible role assignments don't count toward the limit
+                              - listitem [ref=e788]: Just-in-time access for elevated permissions
+                              - listitem [ref=e789]: Reduces standing permissions
+                          - listitem [ref=e790]:
+                            - paragraph [ref=e791]:
+                              - strong [ref=e792]: Multi-subscription strategy
+                            - list [ref=e793]:
+                              - listitem [ref=e794]: If workloads continue to grow, consider splitting into multiple subscriptions
+                              - listitem [ref=e795]: Each subscription gets its own 4,000 assignment quota
+                              - listitem [ref=e796]: Use management groups to maintain centralized governance
+                          - listitem [ref=e797]:
+                            - paragraph [ref=e798]:
+                              - strong [ref=e799]: Infrastructure as Code
+                            - list [ref=e800]:
+                              - listitem [ref=e801]: Manage all RBAC via Bicep/Terraform for consistency and auditability
+                              - listitem [ref=e802]: Prevents ad-hoc assignment sprawl
+                        - separator [ref=e803]
+                        - heading "🎯 Recommendations for Subscription c5d1c552-a815-4fc8-b12d-ab444e3225b1" [level=3] [ref=e804]
+                        - paragraph [ref=e805]:
+                          - strong [ref=e806]: "Immediate action (TODAY):"
+                        - list [ref=e807]:
+                          - listitem [ref=e808]: Run the audit commands above to understand current state
+                          - listitem [ref=e809]: Identify and clean up orphaned assignments
+                          - listitem [ref=e810]: Remove any temporary/test assignments
+                        - paragraph [ref=e811]:
+                          - strong [ref=e812]: "Decision required:"
+                        - list [ref=e813]:
+                          - listitem [ref=e814]:
+                            - strong [ref=e815]: Can continue using this subscription
+                            - text: IF we commit to RBAC hygiene practices
+                          - listitem [ref=e816]:
+                            - strong [ref=e817]: Should NOT stop usage
+                            - text: "- this is a manageable operational issue, not a blocker"
+                          - listitem [ref=e818]:
+                            - strong [ref=e819]: Must implement
+                            - text: the medium-term fixes within next sprint to prevent recurrence
+                        - paragraph [ref=e820]:
+                          - strong [ref=e821]: "Success criteria:"
+                        - list [ref=e822]:
+                          - listitem [ref=e823]: Reduce current assignment count by 20-30% through cleanup
+                          - listitem [ref=e824]: Implement group-based assignments for new resources
+                          - listitem [ref=e825]: Establish monthly automated cleanup job
+                          - listitem [ref=e826]: Begin management group architecture design
+                        - paragraph [ref=e827]:
+                          - strong [ref=e828]: Need support?
+                          - text: "I can help with:"
+                        - list [ref=e829]:
+                          - listitem [ref=e830]: Writing the Azure Automation runbook for cleanup
+                          - listitem [ref=e831]: Designing the management group hierarchy
+                          - listitem [ref=e832]: Creating Bicep/Terraform templates for standardized RBAC
+                        - separator [ref=e833]
+                        - paragraph [ref=e834]:
+                          - strong [ref=e835]: "References:"
+                        - list [ref=e836]:
+                          - listitem [ref=e837]:
+                            - link "Azure RBAC Limits - Microsoft Learn" [ref=e838] [cursor=pointer]:
+                              - /url: https://learn.microsoft.com/en-us/azure/role-based-access-control/troubleshoot-limits
+                          - listitem [ref=e839]:
+                            - link "Azure RBAC Best Practices" [ref=e840] [cursor=pointer]:
+                              - /url: https://learn.microsoft.com/en-us/azure/role-based-access-control/best-practices
+                          - listitem [ref=e841]:
+                            - link "Management Groups Overview" [ref=e842] [cursor=pointer]:
+                              - /url: https://learn.microsoft.com/en-us/azure/governance/management-groups/overview
+                      - toolbar "Reactions" [ref=e843]:
+                        - button "React" [ref=e844] [cursor=pointer]:
+                          - img [ref=e845]
+                - generic [ref=e855]:
+                  - heading "17 remaining items" [level=3] [ref=e857]:
+                    - text: "17"
+                    - generic [ref=e858]: remaining items
+                  - button "Load more" [ref=e860] [cursor=pointer]:
+                    - generic [ref=e863]: Load more
+                - region "Events" [ref=e867]:
+                  - generic [ref=e871]:
+                    - img [ref=e874]
+                    - generic [ref=e878]:
+                      - link "tamirdresher_microsoft" [ref=e880] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e881]: tamirdresher_microsoft
+                      - text: moved this from Todo to Pending User in
+                      - generic [ref=e882]:
+                        - img [ref=e883]
+                        - link "Squad Work Board" [ref=e885] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20266 hours ago" [ref=e886] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 11:10 AM GMT+2" [ref=e887]: on Mar 10, 20266 hours ago
+                - generic [ref=e888]:
+                  - link "@tamirdresher_microsoft's profile" [ref=e889] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher_microsoft
+                    - img "tamirdresher_microsoft" [ref=e890]
+                  - generic [ref=e897]:
+                    - generic [ref=e899]:
+                      - heading "tamirdresher_microsoft commented on Mar 10, 2026 6 hours ago" [level=3] [ref=e900]:
+                        - text: tamirdresher_microsoft commented
+                        - generic "Mar 10, 2026, 11:16 AM GMT+2" [ref=e901]: on Mar 10, 2026 6 hours ago
+                      - generic [ref=e902]:
+                        - link "tamirdresher_microsoft" [ref=e904] [cursor=pointer]:
+                          - /url: /tamirdresher_microsoft
+                        - link "on Mar 10, 20266 hours ago" [ref=e907] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4029831890
+                          - generic "Mar 10, 2026, 11:16 AM GMT+2" [ref=e908]: on Mar 10, 20266 hours ago
+                      - generic [ref=e910]:
+                        - generic "You are the author of this issue" [ref=e912]: Author
+                        - button "Actions for tamirdresher_microsoft's comment, 11:16 AM today" [ref=e914] [cursor=pointer]:
+                          - img [ref=e915]
+                    - generic [ref=e917]:
+                      - paragraph [ref=e920]: postpone this,.archite this for now
+                      - toolbar "Reactions" [ref=e921]:
+                        - button "React" [ref=e922] [cursor=pointer]:
+                          - img [ref=e923]
+                - region "Events" [ref=e925]:
+                  - generic [ref=e932]:
+                    - img [ref=e935]
+                    - generic [ref=e939]:
+                      - link "tamirdresher_microsoft" [ref=e941] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e942]: tamirdresher_microsoft
+                      - text: moved this from Pending User to Todo in
+                      - generic [ref=e943]:
+                        - img [ref=e944]
+                        - link "Squad Work Board" [ref=e946] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20266 hours ago" [ref=e947] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 11:16 AM GMT+2" [ref=e948]: on Mar 10, 20266 hours ago
+                  - generic [ref=e952]:
+                    - img [ref=e955]
+                    - generic [ref=e959]:
+                      - link "tamirdresher_microsoft" [ref=e961] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e962]: tamirdresher_microsoft
+                      - text: added
+                      - link "status:pending-user Waiting for user input or decision" [ref=e964] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e966]: status:pending-user
+                        - generic [ref=e967]: Waiting for user input or decision
+                      - text: and removed
+                      - link "status:pending-user Waiting for user input or decision" [ref=e969] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e971]: status:pending-user
+                        - generic [ref=e972]: Waiting for user input or decision
+                      - link "on Mar 10, 20266 hours ago" [ref=e973] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23424931835
+                        - generic "Mar 10, 2026, 11:16 AM GMT+2" [ref=e974]: on Mar 10, 20266 hours ago
+                  - generic [ref=e978]:
+                    - img [ref=e981]
+                    - generic [ref=e985]:
+                      - link "tamirdresher_microsoft" [ref=e987] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e988]: tamirdresher_microsoft
+                      - text: moved this from Todo to Pending User in
+                      - generic [ref=e989]:
+                        - img [ref=e990]
+                        - link "Squad Work Board" [ref=e992] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20266 hours ago" [ref=e993] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 11:23 AM GMT+2" [ref=e994]: on Mar 10, 20266 hours ago
+                - generic [ref=e995]:
+                  - link "@tamirdresher_microsoft's profile" [ref=e996] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher_microsoft
+                    - img "tamirdresher_microsoft" [ref=e997]
+                  - generic [ref=e1004]:
+                    - generic [ref=e1006]:
+                      - heading "tamirdresher_microsoft commented on Mar 10, 2026 5 hours ago" [level=3] [ref=e1007]:
+                        - text: tamirdresher_microsoft commented
+                        - generic "Mar 10, 2026, 11:37 AM GMT+2" [ref=e1008]: on Mar 10, 2026 5 hours ago
+                      - generic [ref=e1009]:
+                        - link "tamirdresher_microsoft" [ref=e1011] [cursor=pointer]:
+                          - /url: /tamirdresher_microsoft
+                        - link "on Mar 10, 20265 hours ago" [ref=e1014] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4029965136
+                          - generic "Mar 10, 2026, 11:37 AM GMT+2" [ref=e1015]: on Mar 10, 20265 hours ago
+                      - generic [ref=e1017]:
+                        - generic "You are the author of this issue" [ref=e1019]: Author
+                        - button "Actions for tamirdresher_microsoft's comment, 11:37 AM today" [ref=e1021] [cursor=pointer]:
+                          - img [ref=e1022]
+                    - generic [ref=e1024]:
+                      - paragraph [ref=e1027]: why was this moved to pending0user? i want you to archive this.
+                      - toolbar "Reactions" [ref=e1028]:
+                        - button "React" [ref=e1029] [cursor=pointer]:
+                          - img [ref=e1030]
+                - region "Events" [ref=e1032]:
+                  - generic [ref=e1039]:
+                    - img [ref=e1042]
+                    - generic [ref=e1046]:
+                      - link "tamirdresher_microsoft" [ref=e1048] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e1049]: tamirdresher_microsoft
+                      - text: moved this from Pending User to Todo in
+                      - generic [ref=e1050]:
+                        - img [ref=e1051]
+                        - link "Squad Work Board" [ref=e1053] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20265 hours ago" [ref=e1054] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 11:37 AM GMT+2" [ref=e1055]: on Mar 10, 20265 hours ago
+                  - generic [ref=e1059]:
+                    - img [ref=e1062]
+                    - generic [ref=e1066]:
+                      - link "tamirdresher_microsoft" [ref=e1068] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e1069]: tamirdresher_microsoft
+                      - text: added
+                      - link "status:pending-user Waiting for user input or decision" [ref=e1071] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e1073]: status:pending-user
+                        - generic [ref=e1074]: Waiting for user input or decision
+                      - text: and removed
+                      - link "status:pending-user Waiting for user input or decision" [ref=e1076] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e1078]: status:pending-user
+                        - generic [ref=e1079]: Waiting for user input or decision
+                      - link "on Mar 10, 20265 hours ago" [ref=e1080] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23425557556
+                        - generic "Mar 10, 2026, 11:37 AM GMT+2" [ref=e1081]: on Mar 10, 20265 hours ago
+                  - generic [ref=e1085]:
+                    - img [ref=e1088]
+                    - generic [ref=e1092]:
+                      - link "tamirdresher_microsoft" [ref=e1094] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e1095]: tamirdresher_microsoft
+                      - text: moved this from Todo to Postpone in
+                      - generic [ref=e1096]:
+                        - img [ref=e1097]
+                        - link "Squad Work Board" [ref=e1099] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20264 hours ago" [ref=e1100] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 1:01 PM GMT+2" [ref=e1101]: on Mar 10, 20264 hours ago
+                - generic [ref=e1102]:
+                  - link "@tamirdresher_microsoft's profile" [ref=e1103] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher_microsoft
+                    - img "tamirdresher_microsoft" [ref=e1104]
+                  - generic [ref=e1111]:
+                    - generic [ref=e1113]:
+                      - heading "tamirdresher_microsoft commented on Mar 10, 2026 38 minutes ago" [level=3] [ref=e1114]:
+                        - text: tamirdresher_microsoft commented
+                        - generic "Mar 10, 2026, 4:52 PM GMT+2" [ref=e1115]: on Mar 10, 2026 38 minutes ago
+                      - generic [ref=e1116]:
+                        - link "tamirdresher_microsoft" [ref=e1118] [cursor=pointer]:
+                          - /url: /tamirdresher_microsoft
+                        - link "on Mar 10, 202638 minutes ago" [ref=e1121] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#issuecomment-4032030173
+                          - generic "Mar 10, 2026, 4:52 PM GMT+2" [ref=e1122]: on Mar 10, 202638 minutes ago
+                      - generic [ref=e1124]:
+                        - generic "You are the author of this issue" [ref=e1126]: Author
+                        - button "Actions for tamirdresher_microsoft's comment, 4:52 PM today" [ref=e1128] [cursor=pointer]:
+                          - img [ref=e1129]
+                    - generic [ref=e1131]:
+                      - paragraph [ref=e1134]: Closing per Tamir's request. Issue archived — RBAC limit situation was tracked and postponed.
+                      - toolbar "Reactions" [ref=e1135]:
+                        - button "React" [ref=e1136] [cursor=pointer]:
+                          - img [ref=e1137]
+                - region "Events" [ref=e1139]:
+                  - generic [ref=e1146]:
+                    - img [ref=e1149]
+                    - generic [ref=e1153]:
+                      - link "tamirdresher_microsoft" [ref=e1155] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e1156]: tamirdresher_microsoft
+                      - text: closed this as
+                      - link "completed" [ref=e1157] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=is%3Aissue%20state%3Aclosed%20archived%3Afalse%20reason%3Acompleted
+                      - link "on Mar 10, 202638 minutes ago" [ref=e1158] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23435659910
+                        - generic "Mar 10, 2026, 4:52 PM GMT+2" [ref=e1159]: on Mar 10, 202638 minutes ago
+                  - generic [ref=e1166]:
+                    - img [ref=e1169]
+                    - generic [ref=e1173]:
+                      - link "tamirdresher_microsoft" [ref=e1175] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e1176]: tamirdresher_microsoft
+                      - text: removed
+                      - link "status:pending-user Waiting for user input or decision" [ref=e1178] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e1180]: status:pending-user
+                        - generic [ref=e1181]: Waiting for user input or decision
+                      - link "on Mar 10, 202638 minutes ago" [ref=e1182] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251#event-23435661196
+                        - generic "Mar 10, 2026, 4:52 PM GMT+2" [ref=e1183]: on Mar 10, 202638 minutes ago
+                  - generic [ref=e1187]:
+                    - img [ref=e1190]
+                    - generic [ref=e1194]:
+                      - link "tamirdresher_microsoft" [ref=e1196] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e1197]: tamirdresher_microsoft
+                      - text: moved this from Postpone to Done in
+                      - generic [ref=e1198]:
+                        - img [ref=e1199]
+                        - link "Squad Work Board" [ref=e1201] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 202638 minutes ago" [ref=e1202] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/251
+                        - generic "Mar 10, 2026, 4:52 PM GMT+2" [ref=e1203]: on Mar 10, 202638 minutes ago
+            - generic [ref=e1205]:
+              - link "@tamirdresher_microsoft's profile" [ref=e1206] [cursor=pointer]:
+                - /url: /tamirdresher_microsoft
+                - img "tamirdresher_microsoft" [ref=e1207]
+              - heading "Add a comment" [level=2] [ref=e1208]
+              - group "new Comment" [ref=e1213]:
+                - generic [ref=e1214] [cursor=pointer]: new Comment
+                - generic [ref=e1215]:
+                  - generic [ref=e1216]: "Markdown input: edit mode selected."
+                  - generic [ref=e1217]:
+                    - generic [ref=e1218]:
+                      - navigation "View mode" [ref=e1222]:
+                        - tablist [ref=e1223]:
+                          - tab "Write" [selected] [ref=e1224] [cursor=pointer]
+                          - tab "Preview" [ref=e1225] [cursor=pointer]
+                      - generic [ref=e1226]:
+                        - toolbar "Formatting tools" [ref=e1228]:
+                          - button "Heading" [ref=e1229] [cursor=pointer]:
+                            - img [ref=e1230]
+                          - button "Bold" [ref=e1232] [cursor=pointer]:
+                            - img [ref=e1233]
+                          - button "Italic" [ref=e1235] [cursor=pointer]:
+                            - img [ref=e1236]
+                          - button "Quote" [ref=e1238] [cursor=pointer]:
+                            - img [ref=e1239]
+                          - button "Code" [ref=e1241] [cursor=pointer]:
+                            - img [ref=e1242]
+                          - button "Link" [ref=e1244] [cursor=pointer]:
+                            - img [ref=e1245]
+                          - generic [ref=e1247]:
+                            - button "Unordered list" [ref=e1249] [cursor=pointer]:
+                              - img [ref=e1250]
+                            - button "Numbered list" [ref=e1252] [cursor=pointer]:
+                              - img [ref=e1253]
+                            - button "Task list" [ref=e1255] [cursor=pointer]:
+                              - img [ref=e1256]
+                          - generic [ref=e1258]:
+                            - button "Mention" [ref=e1260] [cursor=pointer]:
+                              - img [ref=e1261]
+                            - button "Reference" [ref=e1263] [cursor=pointer]:
+                              - img [ref=e1264]
+                          - button "Slash commands" [ref=e1266] [cursor=pointer]:
+                            - img [ref=e1267]
+                        - button "Saved replies" [ref=e1269] [cursor=pointer]:
+                          - img [ref=e1270]
+                    - textbox "Add a comment" [ref=e1275]:
+                      - /placeholder: Use Markdown to format your comment
+                  - generic [ref=e1276]:
+                    - button "Paste, drop, or click to add files" [ref=e1279] [cursor=pointer]:
+                      - generic [ref=e1280]:
+                        - generic:
+                          - img
+                        - generic [ref=e1282]: Paste, drop, or click to add files
+                    - generic [ref=e1283]:
+                      - generic [ref=e1284]:
+                        - button "Reopen issue" [ref=e1286] [cursor=pointer]:
+                          - generic [ref=e1287]:
+                            - generic:
+                              - img
+                            - generic [ref=e1288]: Reopen issue
+                        - button "More options" [ref=e1290] [cursor=pointer]:
+                          - img [ref=e1291]
+                      - tooltip "Comment can not be empty" [ref=e1293]:
+                        - button "Comment" [disabled] [ref=e1294]:
+                          - generic [ref=e1296]: Comment
+        - generic [ref=e1298]:
+          - heading "Metadata" [level=2] [ref=e1299]
+          - generic [ref=e1301]:
+            - generic [ref=e1302]:
+              - generic [ref=e1303]:
+                - generic [ref=e1304]:
+                  - heading "Assignees" [level=3]
+                  - button "Edit Assignees" [ref=e1305] [cursor=pointer]:
+                    - generic [ref=e1306]: Edit Assignees
+                    - generic:
+                      - img
+                - generic [ref=e1307]:
+                  - text: No one -
+                  - button "Assign yourself" [ref=e1308] [cursor=pointer]:
+                    - generic [ref=e1310]: Assign yourself
+              - button "Assign to Copilot" [ref=e1313] [cursor=pointer]:
+                - generic [ref=e1314]:
+                  - generic:
+                    - img
+                  - generic [ref=e1315]: Assign to Copilot
+            - generic [ref=e1316]:
+              - generic [ref=e1318]:
+                - heading "Labels" [level=3]
+                - button "Edit Labels" [ref=e1319] [cursor=pointer]:
+                  - generic [ref=e1320]: Edit Labels
+                  - generic:
+                    - img
+              - generic [ref=e1322]:
+                - link "go:needs-research Needs investigation" [ref=e1323] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22go%3Aneeds-research%22
+                  - generic [ref=e1325]: go:needs-research
+                  - generic [ref=e1326]: Needs investigation
+                - link "squad Squad triage inbox — Lead will assign to a member" [ref=e1327] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%22
+                  - generic [ref=e1329]: squad
+                  - generic [ref=e1330]: Squad triage inbox — Lead will assign to a member
+                - link "squad:belanna Assigned to B'Elanna (Infrastructure Expert)" [ref=e1331] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Abelanna%22
+                  - generic [ref=e1333]: squad:belanna
+                  - generic [ref=e1334]: Assigned to B'Elanna (Infrastructure Expert)
+                - link "squad:picard Assigned to Picard (Lead)" [ref=e1335] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Apicard%22
+                  - generic [ref=e1337]: squad:picard
+                  - generic [ref=e1338]: Assigned to Picard (Lead)
+                - link "teams-bridge Bridged from Teams via WorkIQ" [ref=e1339] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22teams-bridge%22
+                  - generic [ref=e1341]: teams-bridge
+                  - generic [ref=e1342]: Bridged from Teams via WorkIQ
+            - generic [ref=e1343]:
+              - generic [ref=e1345]:
+                - heading "Projects" [level=3]
+                - button "Edit Projects" [ref=e1346] [cursor=pointer]:
+                  - generic [ref=e1347]: Edit Projects
+                  - generic:
+                    - img
+              - generic [ref=e1351]:
+                - link "Squad Work Board" [ref=e1353] [cursor=pointer]:
+                  - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                  - img [ref=e1354]
+                  - generic "Squad Work Board" [ref=e1356]
+                - generic [ref=e1357]:
+                  - generic [ref=e1358]:
+                    - paragraph [ref=e1359]: Status
+                    - button "Done" [ref=e1360] [cursor=pointer]:
+                      - generic [ref=e1363]:
+                        - generic [ref=e1365]: Done
+                        - img [ref=e1366]
+                  - button "Show more project fields" [ref=e1368] [cursor=pointer]:
+                    - img [ref=e1369]
+            - generic [ref=e1372]:
+              - generic [ref=e1373]:
+                - heading "Milestone" [level=3]
+                - button "Edit Milestone" [ref=e1374] [cursor=pointer]:
+                  - generic [ref=e1375]: Edit Milestone
+                  - generic:
+                    - img
+              - generic [ref=e1376]: No milestone
+            - generic [ref=e1378]:
+              - generic [ref=e1379]:
+                - heading "Relationships" [level=3]
+                - button "Edit Relationships" [ref=e1380] [cursor=pointer]:
+                  - generic [ref=e1381]: Edit Relationships
+                  - generic:
+                    - img
+              - generic [ref=e1382]: None yet
+            - generic [ref=e1383]:
+              - generic [ref=e1385]:
+                - heading "Development" [level=3]
+                - button "Edit Development" [ref=e1386] [cursor=pointer]:
+                  - generic [ref=e1387]: Edit Development
+                  - generic:
+                    - img
+              - generic [ref=e1388]:
+                - generic [ref=e1390]:
+                  - button "Code with agent mode" [ref=e1392] [cursor=pointer]:
+                    - generic [ref=e1393]:
+                      - generic:
+                        - img
+                      - generic [ref=e1394]: Code with agent mode
+                  - button "Select code repository" [ref=e1397] [cursor=pointer]:
+                    - img [ref=e1398]
+                - generic [ref=e1400]:
+                  - button "Create a branch" [ref=e1401] [cursor=pointer]:
+                    - generic [ref=e1403]: Create a branch
+                  - text: for this issue or link a pull request.
+                - list
+            - generic [ref=e1404]:
+              - generic [ref=e1406]:
+                - heading "Notifications" [level=3]
+              - generic [ref=e1408]:
+                - button "Unsubscribe" [ref=e1409] [cursor=pointer]:
+                  - generic [ref=e1410]:
+                    - generic:
+                      - img
+                    - generic [ref=e1411]: Unsubscribe
+                - paragraph [ref=e1412]: You're receiving notifications because you're subscribed to this thread.
+            - generic [ref=e1413]:
+              - generic [ref=e1415]:
+                - heading "Participants" [level=3]
+              - link "@tamirdresher_microsoft" [ref=e1419] [cursor=pointer]:
+                - /url: /tamirdresher_microsoft
+                - img "@tamirdresher_microsoft" [ref=e1420]
+            - heading "Issue actions" [level=2] [ref=e1421]
+            - list [ref=e1422]:
+              - listitem [ref=e1423]:
+                - button "Transfer issue" [ref=e1424] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e1426]: Transfer issue
+              - listitem [ref=e1427]:
+                - button "Duplicate issue" [ref=e1428] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e1430]: Duplicate issue
+              - listitem [ref=e1431]:
+                - button "Lock conversation" [ref=e1432] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e1434]: Lock conversation
+              - listitem [ref=e1435]:
+                - button "Up to 3 issues can be pinned to the top of the issues page" [ref=e1436] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - tooltip "Up to 3 issues can be pinned to the top of the issues page" [ref=e1439]: Pin issue
+              - listitem [ref=e1440]:
+                - button "Delete issue" [ref=e1441] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e1443]: Delete issue
+              - listitem [ref=e1444]:
+                - button "Give feedback" [ref=e1445] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e1447]: Give feedback
+  - contentinfo [ref=e1448]:
+    - heading "Footer" [level=2] [ref=e1449]
+    - generic [ref=e1450]:
+      - generic [ref=e1451]:
+        - link "GitHub Homepage" [ref=e1452] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e1453]
+        - generic [ref=e1455]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e1456]:
+        - heading "Footer navigation" [level=3] [ref=e1457]
+        - list "Footer navigation" [ref=e1458]:
+          - listitem [ref=e1459]:
+            - link "Terms" [ref=e1460] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e1461]:
+            - link "Privacy" [ref=e1462] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e1463]:
+            - link "Security" [ref=e1464] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e1465]:
+            - link "Status" [ref=e1466] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e1467]:
+            - link "Community" [ref=e1468] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e1469]:
+            - link "Docs" [ref=e1470] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e1471]:
+            - link "Contact" [ref=e1472] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e1473]:
+            - button "Manage cookies" [ref=e1475] [cursor=pointer]
+          - listitem [ref=e1476]:
+            - button "Do not share my personal information" [ref=e1478] [cursor=pointer]

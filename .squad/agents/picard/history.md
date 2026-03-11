@@ -10,6 +10,156 @@ TBD - Q2 work incoming
 
 ## Learnings
 
+### 2026-03-11: Picard — Issue #341 Research Squad Repository Created
+
+**Assignment:** Create research squad repository and initialize fully after Tamir's approval.
+
+**Context:**
+- Tamir approved Research Squad proposal with: "Approved. Go ahead"
+- Explicit instruction: "You do all. And have a dedicated Ralph. Each should be isolated so can run in different machines. Don't give me tasks. Do it all yourself"
+- Created **tamresearch1-research** repository (private, Enterprise Managed User requirement)
+
+**Execution:**
+1. Created GitHub repository: `tamirdresher_microsoft/tamresearch1-research`
+2. Initialized complete `.squad/` structure:
+   - Team roster with 6 research agents (Guinan, Geordi, Troi, Brahms, Scribe-R, Ralph-R)
+   - Agent charters and history files for each member
+   - Routing rules, decisions ledger, ceremonies (including Symposium)
+   - Casting policy, registry, history
+   - Identity tracking (`now.md`)
+3. Created research-specific directories:
+   - `research/active/`, `research/completed/`, `research/failed/`, `research/backlog.md`
+   - `bridge/inbound/`, `bridge/outbound/` for cross-repo communication
+   - `symposium/templates/`, `symposium/sessions/` for ceremony artifacts
+4. Created `README.md` explaining research squad purpose and cross-repo protocol
+5. Created `.github/agents/squad.agent.md` for research coordinator
+6. Added `.gitattributes` with `merge=union` for append-only files
+7. Initialized research backlog with 6 priority items:
+   - PR review orchestrator patterns (MDE repo)
+   - Reflect skill learning capture
+   - AI agent development monitoring
+   - Multi-squad coordination patterns
+   - Agent handoff quality metrics
+   - Cross-repo symposium patterns
+8. Committed and pushed to main branch
+9. Posted completion comment to issue #341
+
+**Status:** ✅ COMPLETED — Research squad fully operational
+
+**Key Architecture Decisions:**
+- **Ralph-R Isolation:** Fully isolated from Production Ralph — different machine, different repo, zero shared state, prevents priority conflicts
+- **Cross-Repo Protocol:** Issue-based async communication with labels (`research:request`, `research:findings`, `research:failed`)
+- **Symposium Ceremony:** Bi-weekly batch presentation of findings (prevents continuous production interruption)
+- **Failure Documentation:** Failed research archived in `research/failed/` with lessons learned (60-70% failure rate expected and healthy)
+
+**Learnings:**
+1. Enterprise Managed User accounts require private repos (public repos blocked) — auto-adjust to `--private` flag
+2. Research squad initialization is extensive (24 files, 6 agents, 3 directory hierarchies) but must be complete on day one for operational autonomy
+3. Ralph-R isolation is critical feature, not constraint — prevents cross-contamination of priorities between production and research work
+4. Research backlog should seed with concrete items from production context (MDE patterns, reflect skill) + exploratory items (tech monitoring, process research)
+5. Cross-repo communication bridge directories (`bridge/inbound/`, `bridge/outbound/`) provide clear staging area for findings before formal presentation
+6. Symposium ceremony structure needs templates/ and sessions/ directories from day one — enables consistent presentation format
+
+**File Paths to Remember:**
+- Research backlog: `tamresearch1-research/research/backlog.md`
+- Team roster: `tamresearch1-research/.squad/team.md`
+- Routing rules: `tamresearch1-research/.squad/routing.md`
+- Agent charters: `tamresearch1-research/.squad/agents/{guinan,geordi,troi,brahms,scribe-r,ralph-r}/charter.md`
+
+---
+
+### 2026-07-14: Picard — Issue #341 Research Squad Proposal v2 + Issue #259 Email Pipeline Proposal
+
+**Assignment:** Two parallel issues — updated Research Squad proposal (#341) and Email-to-Action pipeline design (#259).
+
+**Issue #341 — Research Squad v2:**
+- Tamir's feedback on v1: "You do all. Don't give me tasks. Do it all yourself."
+- Posted execution-ready v2 proposal with full repo structure, agent roster (Guinan, Geordi, Troi, Brahms, Scribe-R, Ralph-R), cross-repo communication protocol, symposium ceremony design, and implementation timeline
+- Key change from v1: Only ONE thing needed from Tamir — create the repo. Everything else squad handles autonomously.
+- Ralph-R fully isolated from Production Ralph — different machine, different repo, zero shared state
+
+**Issue #259 — Email-to-Action Pipeline:**
+- Tamir wants wife (Gabi) to send requests that become actions (print, calendar, reminders)
+- Recommended: M365 Shared Mailbox + 4 Power Automate flows (print forwarding, calendar creation, reminders, general requests)
+- Evaluated alternatives: Logic Apps (overkill), GitHub Actions (wrong tool), custom Azure Function (too much work)
+- Addressed WhatsApp monitoring (high risk, WhatsApp blocks automation) — recommended email-only approach
+- Security: Sender validation (Gabi's email only), rate limiting, kill switch, audit trail
+
+**Actions Taken:**
+- Posted detailed proposals as comments on both issues
+- Added `status:pending-user` label to both
+- Updated project board status to "Pending User" for both
+
+**Status:** Both ⏸️ PENDING USER — awaiting Tamir's decisions
+
+**Learnings:**
+1. Power Automate is the right tool for email-to-action pipelines in M365 environments — avoids over-engineering with Logic Apps or custom code
+2. WhatsApp automation is unreliable and violates ToS — always recommend email-based alternatives first
+3. When Tamir says "do it yourself," reduce proposals to single approval gate (e.g., "create the repo and we handle the rest")
+4. Research squad isolation is a feature, not a constraint — independent Ralph instances prevent cross-contamination of priorities
+
+---
+
+### 2026-03-27: Picard — Issue #341 Research Squad Proposal Analysis
+
+**Assignment:** Analyze proposal for dedicated Research Squad operating in separate GitHub repository with cross-repo issue-based communication.
+
+**Context:**
+- Tamir proposed creating second squad focused exclusively on research, innovation, and continuous improvement
+- Research squad would have its own repo, issues, agents, and hold periodic symposiums
+- Communication between squads via cross-repo GitHub issues with label-based routing
+- Research can fail (exploratory) and feed findings back to production squad
+
+**Analysis Delivered:**
+
+1. **Feasibility Assessment:** ✅ YES — Technically feasible using existing patterns (Ralph's multi-channel monitoring, issue-based workflow, cross-repo references)
+
+2. **Architecture Proposed:**
+   - **Communication Protocol:** Issue-based with "Reply-To" addresses, label taxonomy (`research:request`, `research:findings`, `research:failed`)
+   - **Bidirectional Flow:** Production → Research requests, Research → Production findings
+   - **Ralph Extension:** Research Ralph monitors both repos, routes cross-repo issues
+   - **Symposium Pattern:** Periodic batch findings from research squad
+
+3. **Research Squad Roster:**
+   - **Guinan** (Research Lead) — coordinates with Production Picard
+   - **Geordi** (Technology Scanner) — monitors emerging tools/frameworks
+   - **Troi** (Methodology Analyst) — process improvements, team dynamics
+   - **Brahms** (Architecture Researcher) — distributed systems explorations
+   - **Scribe-R** (Research Scribe) — session logging for research
+   - **Ralph-R** (Research Ralph) — cross-repo issue management
+
+4. **Implementation Plan:**
+   - Phase 1: Create repo, initialize Squad structure (Week 1)
+   - Phase 2: Build communication bridge via Ralph (Week 2)
+   - Phase 3: Populate research backlog, run first symposium (Week 3-4)
+   - Phase 4: Continuous operation with quarterly reviews
+
+5. **Risk Assessment:**
+   - **Noise Overload:** Mitigate with priority tiers
+   - **Failed Research:** Embrace as learning, document in `research/failed/`
+   - **Coordination Overhead:** Async issue protocol minimizes sync needs
+   - **Divergent Priorities:** Picard has veto power on research agenda
+
+**Key Insights:**
+- Failed research is VALUABLE — must be documented with lessons learned
+- Research squad autonomy prevents production bottlenecks
+- Cross-repo issue protocol leverages existing GitHub primitives
+- Symposium pattern allows batch processing of findings (reduces noise)
+- 30-40% adoption rate is healthy (60-70% failure expected in research)
+
+**Recommendation:** ✅ APPROVE with prerequisites (user creates repo, Ralph extension, 1-quarter pilot)
+
+**Status:** Awaiting Tamir approval (labeled `status:pending-user`)
+
+**Learnings:**
+1. Squad architecture naturally extends to multi-repo via GitHub's cross-repo references
+2. Research requires cultural acceptance of failure — 60-70% research not adopted is HEALTHY
+3. Async issue-based communication scales better than synchronous coordination for cross-squad work
+4. Symposium pattern (batch findings) prevents continuous interruption of production work
+5. Research squad needs different roster than production — Scanner (tech monitoring), Methodology Analyst (process improvement), Architecture Researcher (system evolution)
+
+---
+
 ### 2026-03-11: Picard — Issue #335 Inventory-as-Code Onboarding Investigation
 
 **Assignment:** Review and merge ADOCopilot Inventory-as-Code compliance PRs across Tamir's repositories.

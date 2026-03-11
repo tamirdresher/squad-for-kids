@@ -1,0 +1,1199 @@
+- generic [active] [ref=e100]:
+  - banner [ref=e102]:
+    - generic [ref=e103]:
+      - generic [ref=e105]:
+        - button "Chats" [pressed] [ref=e108] [cursor=pointer]:
+          - generic [ref=e110]:
+            - generic [ref=e112]:
+              - img
+            - generic "77 unread messages" [ref=e114]:
+              - generic [ref=e115]: "77"
+        - button "Status" [ref=e118] [cursor=pointer]:
+          - generic [ref=e122]:
+            - img
+        - button "Channels" [ref=e2030] [cursor=pointer]:
+          - generic [ref=e2034]:
+            - img
+        - button "Communities" [ref=e125] [cursor=pointer]:
+          - generic [ref=e129]:
+            - img
+      - generic [ref=e131]:
+        - button "Media" [ref=e134] [cursor=pointer]:
+          - generic [ref=e138]:
+            - img
+        - button "Settings" [ref=e141] [cursor=pointer]:
+          - generic [ref=e145]:
+            - img
+        - button "Profile" [ref=e148] [cursor=pointer]:
+          - img [ref=e2035]
+  - generic [ref=e153]:
+    - banner [ref=e154]:
+      - banner [ref=e155]:
+        - generic [ref=e156]:
+          - heading "WhatsApp" [level=2] [ref=e158]:
+            - generic "WhatsApp" [ref=e162]:
+              - img "wa-wordmark-refreshed"
+          - generic [ref=e164]:
+            - button "New chat" [ref=e167] [cursor=pointer]:
+              - generic [ref=e171]:
+                - img
+            - button "Menu" [ref=e174] [cursor=pointer]:
+              - generic [ref=e178]:
+                - img
+    - generic [ref=e179]:
+      - generic [ref=e182]:
+        - button "search-refreshed-thin":
+          - generic [ref=e184]:
+            - img "search-refreshed-thin"
+        - generic [ref=e186]:
+          - textbox "Search input textbox" [ref=e187]:
+            - paragraph [ref=e188]
+          - generic: Search or start a new chat
+      - tablist "chat-list-filters" [ref=e189]:
+        - tab "All" [ref=e192] [cursor=pointer]:
+          - generic [ref=e198]: All
+        - tab "Unread 77" [ref=e2038] [cursor=pointer]:
+          - generic [ref=e2040]:
+            - generic [ref=e2044]: Unread
+            - generic [ref=e2046]: "77"
+        - tab "Favorites" [ref=e2049] [cursor=pointer]:
+          - generic [ref=e2055]: Favorites
+        - tab "Groups 38" [ref=e2058] [cursor=pointer]:
+          - generic [ref=e2060]:
+            - generic [ref=e2064]: Groups
+            - generic [ref=e2066]: "38"
+        - tab "New list" [ref=e2069] [cursor=pointer]:
+          - generic [ref=e2073]:
+            - img
+      - generic [ref=e2076]:
+        - button "Close" [ref=e2079] [cursor=pointer]:
+          - generic [ref=e2083]:
+            - img
+        - generic [ref=e2084]:
+          - generic [ref=e2085]:
+            - img
+          - generic [ref=e2088]:
+            - text: Message notifications are off.
+            - button "Turn on" [ref=e2089] [cursor=pointer]
+      - generic [ref=e217]:
+        - grid "Chat list" [ref=e220]:
+          - row "נופשים במיקרוסופט ⛱ ⛵ ️ ✈️ 08:48 +972 54-394-6460 is typing… 3 unread messages" [ref=e2090]:
+            - gridcell "נופשים במיקרוסופט ⛱ ⛵ ️ ✈️ 08:48 +972 54-394-6460 is typing… 3 unread messages" [ref=e2091]:
+              - generic [ref=e224] [cursor=pointer]:
+                - img [ref=e2092]
+                - generic [ref=e231]:
+                  - gridcell "נופשים במיקרוסופט ⛱ ⛵ ️ ✈️ 08:48" [ref=e2093]:
+                    - generic "נופשים במיקרוסופט ⛱⛵️✈️" [ref=e234]:
+                      - text: נופשים במיקרוסופט
+                      - img "⛱" [ref=e235]
+                      - img "⛵" [ref=e236]
+                      - text: ️
+                      - img "✈️" [ref=e237]
+                    - generic [ref=e239]: 08:48
+                  - generic [ref=e240]:
+                    - generic "+972 54-394-6460 is typing…" [ref=e2094]
+                    - gridcell "3 unread messages" [ref=e248]:
+                      - generic "3 unread messages" [ref=e251]:
+                        - generic [ref=e252]: "3"
+          - 'row "עדכוני המערכת קבוצה 7 08:44 +972 79-946-9821 : דוברות המשטרה: ״מבצע שאגת הארי״ שוטרי מחוז חוף וחבלנים פועלים כעת בזירת נפילה של שברי יירוט בגזרת מועצה איזורית מנשה דווח על נזק קל ללא דיווח על נפגעים. אנו פונים לציבור להיות קשובים ולהשמע להנחיות, לא להגיע לאתרי נפילות טילים ואתרי הרס, להימנע מנגיעה ברסיסים/ חלקי יירוט ולאפשר לכוחות המשטרה וההצלה בפעולות הצלת חיים. בכל אירוע חריג יש לדווח למוקד החירום של המשטרה 100. למידע חייגו למוקד המידע של המשטרה 110. משטרת ישראל ערוכה בכל הגזרות תמשיך לפעול לשמירה על ביטחון הציבור. עדכוני המערכת 🤖 : בינה מלאכותית מגישה חדשות מצטרפים בקישור 🪀 https://chat.whatsapp.com/HLz6G1rxqE2KHLWv7Xd98k 31 unread messages" [ref=e2095]':
+            - 'gridcell "עדכוני המערכת קבוצה 7 08:44 +972 79-946-9821 : דוברות המשטרה: ״מבצע שאגת הארי״ שוטרי מחוז חוף וחבלנים פועלים כעת בזירת נפילה של שברי יירוט בגזרת מועצה איזורית מנשה דווח על נזק קל ללא דיווח על נפגעים. אנו פונים לציבור להיות קשובים ולהשמע להנחיות, לא להגיע לאתרי נפילות טילים ואתרי הרס, להימנע מנגיעה ברסיסים/ חלקי יירוט ולאפשר לכוחות המשטרה וההצלה בפעולות הצלת חיים. בכל אירוע חריג יש לדווח למוקד החירום של המשטרה 100. למידע חייגו למוקד המידע של המשטרה 110. משטרת ישראל ערוכה בכל הגזרות תמשיך לפעול לשמירה על ביטחון הציבור. עדכוני המערכת 🤖 : בינה מלאכותית מגישה חדשות מצטרפים בקישור 🪀 https://chat.whatsapp.com/HLz6G1rxqE2KHLWv7Xd98k 31 unread messages" [ref=e2096]':
+              - generic [ref=e256] [cursor=pointer]:
+                - img [ref=e2097]
+                - generic [ref=e263]:
+                  - gridcell "עדכוני המערכת קבוצה 7 08:44" [ref=e2098]:
+                    - generic "עדכוני המערכת קבוצה 7" [ref=e266]
+                    - generic [ref=e268]: 08:44
+                  - generic [ref=e269]:
+                    - 'generic "‫דוברות המשטרה: ״מבצע שאגת הארי״ שוטרי מחוז חוף וחבלנים פועלים כעת בזירת נפילה של שברי יירוט בגזרת מועצה איזורית מנשה דווח על נזק קל ללא דיווח על נפגעים. אנו פונים לציבור להיות קשובים ולהשמע להנחיות, לא להגיע לאתרי נפילות טילים ואתרי הרס, להימנע מנגיעה ברסיסים/ חלקי יירוט ולאפשר לכוחות המשטרה וההצלה בפעולות הצלת חיים. בכל אירוע חריג יש לדווח למוקד החירום של המשטרה 100. למידע חייגו למוקד המידע של המשטרה 110. משטרת ישראל ערוכה בכל הגזרות תמשיך לפעול לשמירה על ביטחון הציבור. עדכוני המערכת 🤖 : בינה מלאכותית מגישה חדשות מצטרפים בקישור 🪀 https://chat.whatsapp.com/HLz6G1rxqE2KHLWv7Xd98k‬" [ref=e271]':
+                      - generic [ref=e274]: +972 79-946-9821
+                      - generic [ref=e275]: ":"
+                      - generic [ref=e276]:
+                        - text: "דוברות המשטרה: ״מבצע שאגת הארי״ שוטרי מחוז חוף וחבלנים פועלים כעת בזירת נפילה של שברי יירוט בגזרת מועצה איזורית מנשה דווח על נזק קל ללא דיווח על נפגעים. אנו פונים לציבור להיות קשובים ולהשמע להנחיות, לא להגיע לאתרי נפילות טילים ואתרי הרס, להימנע מנגיעה ברסיסים/ חלקי יירוט ולאפשר לכוחות המשטרה וההצלה בפעולות הצלת חיים. בכל אירוע חריג יש לדווח למוקד החירום של המשטרה 100. למידע חייגו למוקד המידע של המשטרה 110. משטרת ישראל ערוכה בכל הגזרות תמשיך לפעול לשמירה על ביטחון הציבור. עדכוני המערכת"
+                        - img "🤖" [ref=e277]
+                        - text: ": בינה מלאכותית מגישה חדשות מצטרפים בקישור"
+                        - img "🪀" [ref=e278]
+                        - text: https://chat.whatsapp.com/HLz6G1rxqE2KHLWv7Xd98k
+                    - gridcell "31 unread messages" [ref=e279]:
+                      - generic "31 unread messages" [ref=e282]:
+                        - generic [ref=e283]: "31"
+          - 'row "כיתה ז6 הורים- הודעות 08:35 עדי מחנכת יונתן ז''6 🫶🏼 : בוקר טוב הלמידה מרחוק תחל היום בשעה השלישית ב 10:25 🙏🏻 1 unread message" [ref=e2099]':
+            - 'gridcell "כיתה ז6 הורים- הודעות 08:35 עדי מחנכת יונתן ז''6 🫶🏼 : בוקר טוב הלמידה מרחוק תחל היום בשעה השלישית ב 10:25 🙏🏻 1 unread message" [ref=e2100]':
+              - generic [ref=e287] [cursor=pointer]:
+                - generic [ref=e293]:
+                  - img
+                - generic [ref=e294]:
+                  - gridcell "כיתה ז6 הורים- הודעות 08:35" [ref=e2101]:
+                    - generic "כיתה ז6 הורים- הודעות" [ref=e297]
+                    - generic [ref=e299]: 08:35
+                  - generic [ref=e300]:
+                    - generic "‫בוקר טוב הלמידה מרחוק תחל היום בשעה השלישית ב 10:25🙏🏻‬" [ref=e302]:
+                      - generic [ref=e305]:
+                        - text: עדי מחנכת יונתן ז'6
+                        - img "🫶🏼" [ref=e2102]
+                      - generic [ref=e306]: ":"
+                      - generic [ref=e307]:
+                        - text: בוקר טוב הלמידה מרחוק תחל היום בשעה השלישית ב 10:25
+                        - img "🙏🏻" [ref=e308]
+                    - gridcell "1 unread message" [ref=e309]:
+                      - generic "1 unread message" [ref=e312]:
+                        - generic [ref=e313]: "1"
+          - 'row "ז6 אחד העם הורים 08:34 +972 54-652-7130 : בוקר טוב, נתחיל את הלמידה היום בשיעור השלישי בשעה 10:25 בשל סבבי האזעקות המרובים הלילה. יום שקט ובשורות טובות 🙏 1 unread message" [ref=e2103]':
+            - 'gridcell "ז6 אחד העם הורים 08:34 +972 54-652-7130 : בוקר טוב, נתחיל את הלמידה היום בשיעור השלישי בשעה 10:25 בשל סבבי האזעקות המרובים הלילה. יום שקט ובשורות טובות 🙏 1 unread message" [ref=e2104]':
+              - generic [ref=e317] [cursor=pointer]:
+                - generic [ref=e323]:
+                  - img
+                - generic [ref=e324]:
+                  - gridcell "ז6 אחד העם הורים 08:34" [ref=e2105]:
+                    - generic "ז6 אחד העם הורים" [ref=e327]
+                    - generic [ref=e329]: 08:34
+                  - generic [ref=e330]:
+                    - generic "‫בוקר טוב, נתחיל את הלמידה היום בשיעור השלישי בשעה 10:25 בשל סבבי האזעקות המרובים הלילה. יום שקט ובשורות טובות🙏‬" [ref=e332]:
+                      - generic [ref=e335]: +972 54-652-7130
+                      - generic [ref=e336]: ":"
+                      - generic [ref=e337]:
+                        - text: בוקר טוב, נתחיל את הלמידה היום בשיעור השלישי בשעה 10:25 בשל סבבי האזעקות המרובים הלילה. יום שקט ובשורות טובות
+                        - img "🙏" [ref=e338]
+                    - gridcell "1 unread message" [ref=e339]:
+                      - generic "1 unread message" [ref=e342]:
+                        - generic [ref=e343]: "1"
+          - 'row "🇯🇵 מטיילים ביפן עם ילדים! 🇯🇵 08:20 +972 52-836-0036 : תודה רבה. הם מקפידים לבדוק את זה? יודעים אם יש אופציה להוציא במידה ולא נמצאים בארץ? 8 unread messages" [ref=e2106]':
+            - 'gridcell "🇯🇵 מטיילים ביפן עם ילדים! 🇯🇵 08:20 +972 52-836-0036 : תודה רבה. הם מקפידים לבדוק את זה? יודעים אם יש אופציה להוציא במידה ולא נמצאים בארץ? 8 unread messages" [ref=e2107]':
+              - generic [ref=e347] [cursor=pointer]:
+                - img [ref=e2108]
+                - generic [ref=e354]:
+                  - gridcell "🇯🇵 מטיילים ביפן עם ילדים! 🇯🇵 08:20" [ref=e2109]:
+                    - generic "🇯🇵 מטיילים ביפן עם ילדים! 🇯🇵" [ref=e357]:
+                      - img "🇯🇵" [ref=e358]
+                      - text: מטיילים ביפן עם ילדים!
+                      - img "🇯🇵" [ref=e359]
+                    - generic [ref=e361]: 08:20
+                  - generic [ref=e362]:
+                    - generic "‫תודה רבה. הם מקפידים לבדוק את זה? יודעים אם יש אופציה להוציא במידה ולא נמצאים בארץ?‬" [ref=e364]:
+                      - generic [ref=e367]: +972 52-836-0036
+                      - generic [ref=e368]: ":"
+                      - generic [ref=e369]: תודה רבה. הם מקפידים לבדוק את זה? יודעים אם יש אופציה להוציא במידה ולא נמצאים בארץ?
+                    - gridcell "8 unread messages" [ref=e370]:
+                      - generic "8 unread messages" [ref=e373]:
+                        - generic [ref=e374]: "8"
+          - 'row "קהילת שחר 08:08 Sapir ספיר קצינת חמ\"ל משא\"ן במילואים שלישות רמת גן : 11:15 אשליית הוודאות - לבודקים ומיישמים פגישת Microsoft Teams להצטרף אל: https://teams.microsoft.com/meet/27137368654246?p=Ekoq2lltuvKtKnPbS1 מזהה פגישה: 271 373 686 542 46 קוד סיסמה: uM6TR3wm 30 unread messages" [ref=e2110]':
+            - 'gridcell "קהילת שחר 08:08 Sapir ספיר קצינת חמ\"ל משא\"ן במילואים שלישות רמת גן : 11:15 אשליית הוודאות - לבודקים ומיישמים פגישת Microsoft Teams להצטרף אל: https://teams.microsoft.com/meet/27137368654246?p=Ekoq2lltuvKtKnPbS1 מזהה פגישה: 271 373 686 542 46 קוד סיסמה: uM6TR3wm 30 unread messages" [ref=e2111]':
+              - generic [ref=e378] [cursor=pointer]:
+                - generic [ref=e382]:
+                  - img
+                - generic [ref=e383]:
+                  - gridcell "קהילת שחר 08:08" [ref=e2112]:
+                    - generic "קהילת שחר" [ref=e386]
+                    - generic [ref=e388]: 08:08
+                  - generic [ref=e389]:
+                    - 'generic "‫11:15 אשליית הוודאות - לבודקים ומיישמים פגישת Microsoft Teams להצטרף אל: https://teams.microsoft.com/meet/27137368654246?p=Ekoq2lltuvKtKnPbS1 מזהה פגישה: 271 373 686 542 46 קוד סיסמה: uM6TR3wm‬" [ref=e391]':
+                      - generic [ref=e394]: Sapir ספיר קצינת חמ"ל משא"ן במילואים שלישות רמת גן
+                      - generic [ref=e395]: ":"
+                      - generic [ref=e396]: "11:15 אשליית הוודאות - לבודקים ומיישמים פגישת Microsoft Teams להצטרף אל: https://teams.microsoft.com/meet/27137368654246?p=Ekoq2lltuvKtKnPbS1 מזהה פגישה: 271 373 686 542 46 קוד סיסמה: uM6TR3wm"
+                    - gridcell "30 unread messages" [ref=e397]:
+                      - generic "30 unread messages" [ref=e400]:
+                        - generic [ref=e401]: "30"
+          - row "יפן - טיפים ועזרה למטיילים ⛩️ 08:34 +972 54-497-5455 joined via an invite link 120 unread messages" [ref=e2113]:
+            - gridcell "יפן - טיפים ועזרה למטיילים ⛩️ 08:34 +972 54-497-5455 joined via an invite link 120 unread messages" [ref=e2114]:
+              - generic [ref=e405] [cursor=pointer]:
+                - img [ref=e2115]
+                - generic [ref=e412]:
+                  - gridcell "יפן - טיפים ועזרה למטיילים ⛩️ 08:34" [ref=e2116]:
+                    - generic "יפן - טיפים ועזרה למטיילים⛩️" [ref=e415]:
+                      - text: יפן - טיפים ועזרה למטיילים
+                      - img "⛩️" [ref=e416]
+                    - generic [ref=e418]: 08:34
+                  - generic [ref=e419]:
+                    - generic "‪+972 54-497-5455 joined via an invite link‬" [ref=e421]:
+                      - generic [ref=e422]:
+                        - generic [ref=e425]: +972 54-497-5455
+                        - text: joined via an invite link
+                    - gridcell "120 unread messages" [ref=e426]:
+                      - generic "120 unread messages" [ref=e429]:
+                        - generic [ref=e430]: "120"
+          - 'row "פיננסים במיקרוסופט Yesterday +972 54-227-0277 : אם אתה קונה ומוכר לבד בלי ייעוץ, בדרך כלל יש אפס דמי ניהול ודמי אחזקה בין 0 ל50 שקלים. וכמובן דמי קנייה ומכירה של ניירות הערך אבל בגדול לא מוכרים לפני שצריכים את הכסף אז זו גם הוצאה חד פעמית בפועל. 2 unread messages" [ref=e431]':
+            - 'gridcell "פיננסים במיקרוסופט Yesterday +972 54-227-0277 : אם אתה קונה ומוכר לבד בלי ייעוץ, בדרך כלל יש אפס דמי ניהול ודמי אחזקה בין 0 ל50 שקלים. וכמובן דמי קנייה ומכירה של ניירות הערך אבל בגדול לא מוכרים לפני שצריכים את הכסף אז זו גם הוצאה חד פעמית בפועל. 2 unread messages" [ref=e432]':
+              - generic [ref=e434] [cursor=pointer]:
+                - generic [ref=e2118]:
+                  - img
+                - generic [ref=e441]:
+                  - gridcell "פיננסים במיקרוסופט Yesterday" [ref=e442]:
+                    - generic "פיננסים במיקרוסופט" [ref=e444]
+                    - generic [ref=e446]: Yesterday
+                  - generic [ref=e447]:
+                    - generic "‫אם אתה קונה ומוכר לבד בלי ייעוץ, בדרך כלל יש אפס דמי ניהול ודמי אחזקה בין 0 ל50 שקלים. וכמובן דמי קנייה ומכירה של ניירות הערך אבל בגדול לא מוכרים לפני שצריכים את הכסף אז זו גם הוצאה חד פעמית בפועל.‬" [ref=e449]:
+                      - generic [ref=e452]: +972 54-227-0277
+                      - generic [ref=e453]: ":"
+                      - generic [ref=e454]: אם אתה קונה ומוכר לבד בלי ייעוץ, בדרך כלל יש אפס דמי ניהול ודמי אחזקה בין 0 ל50 שקלים. וכמובן דמי קנייה ומכירה של ניירות הערך אבל בגדול לא מוכרים לפני שצריכים את הכסף אז זו גם הוצאה חד פעמית בפועל.
+                    - gridcell "2 unread messages" [ref=e455]:
+                      - generic "2 unread messages" [ref=e458]:
+                        - generic [ref=e459]: "2"
+          - row "Roy Mishael Yesterday נראה מה יבוא מחר" [ref=e2119]:
+            - gridcell "Roy Mishael Yesterday נראה מה יבוא מחר" [ref=e2120]:
+              - generic [ref=e463] [cursor=pointer]:
+                - img [ref=e2121]
+                - generic [ref=e470]:
+                  - gridcell "Roy Mishael Yesterday" [ref=e2122]:
+                    - generic "Roy Mishael" [ref=e2123]
+                    - generic [ref=e477]: Yesterday
+                  - generic [ref=e478]:
+                    - generic "‫נראה מה יבוא מחר‬" [ref=e480]:
+                      - generic [ref=e482]:
+                        - img
+                      - generic [ref=e483]: נראה מה יבוא מחר
+                    - gridcell
+          - row "0525055206 מומי- מונית גדולה Yesterday 🇮🇱 😃 ❤️ 🇮🇱 😃 ❤️ משלוחים מוניות אוטובוסים טיולים והסעות 24/7 לכל חלקי הארץ מחירים מיוחדים לשדה התעופה תודה שנסעתם איתנו 0525055206 🇮🇱 😃 ❤️ 🇮🇱 😄 ❤️ Taxi deliveries buses trips and shuttles 24/7 to all parts of the country Special prices for the airport Thank you for travelling with us 0525055206 🇮🇱 😀 ❤️ 🇮🇱 😀 ❤️" [ref=e2124]:
+            - gridcell "0525055206 מומי- מונית גדולה Yesterday 🇮🇱 😃 ❤️ 🇮🇱 😃 ❤️ משלוחים מוניות אוטובוסים טיולים והסעות 24/7 לכל חלקי הארץ מחירים מיוחדים לשדה התעופה תודה שנסעתם איתנו 0525055206 🇮🇱 😃 ❤️ 🇮🇱 😄 ❤️ Taxi deliveries buses trips and shuttles 24/7 to all parts of the country Special prices for the airport Thank you for travelling with us 0525055206 🇮🇱 😀 ❤️ 🇮🇱 😀 ❤️" [ref=e2125]:
+              - generic [ref=e487] [cursor=pointer]:
+                - img [ref=e2126]
+                - generic [ref=e494]:
+                  - gridcell "0525055206 מומי- מונית גדולה Yesterday" [ref=e2127]:
+                    - generic "0525055206 מומי- מונית גדולה" [ref=e2128]
+                    - generic [ref=e501]: Yesterday
+                  - generic [ref=e502]:
+                    - generic "‪🇮🇱😃❤️🇮🇱😃❤️משלוחים מוניות אוטובוסים טיולים והסעות 24/7 לכל חלקי הארץ מחירים מיוחדים לשדה התעופה תודה שנסעתם איתנו 0525055206 🇮🇱😃❤️🇮🇱😄❤️ Taxi deliveries buses trips and shuttles 24/7 to all parts of the country Special prices for the airport Thank you for travelling with us 0525055206 🇮🇱😀❤️🇮🇱😀❤️‬" [ref=e504]:
+                      - generic [ref=e506]:
+                        - img
+                      - generic [ref=e507]:
+                        - img "🇮🇱" [ref=e508]
+                        - img "😃" [ref=e509]
+                        - img "❤️" [ref=e510]
+                        - img "🇮🇱" [ref=e511]
+                        - img "😃" [ref=e512]
+                        - img "❤️" [ref=e513]
+                        - text: משלוחים מוניות אוטובוסים טיולים והסעות 24/7 לכל חלקי הארץ מחירים מיוחדים לשדה התעופה תודה שנסעתם איתנו 0525055206
+                        - img "🇮🇱" [ref=e514]
+                        - img "😃" [ref=e515]
+                        - img "❤️" [ref=e516]
+                        - img "🇮🇱" [ref=e517]
+                        - img "😄" [ref=e518]
+                        - img "❤️" [ref=e519]
+                        - text: Taxi deliveries buses trips and shuttles 24/7 to all parts of the country Special prices for the airport Thank you for travelling with us 0525055206
+                        - img "🇮🇱" [ref=e520]
+                        - img "😀" [ref=e521]
+                        - img "❤️" [ref=e522]
+                        - img "🇮🇱" [ref=e523]
+                        - img "😀" [ref=e524]
+                        - img "❤️" [ref=e525]
+                    - gridcell
+          - 'row "The Gang! Yesterday You : אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e526]':
+            - 'gridcell "The Gang! Yesterday You : אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e527]':
+              - generic [ref=e529] [cursor=pointer]:
+                - img [ref=e2129]
+                - generic [ref=e536]:
+                  - gridcell "The Gang! Yesterday" [ref=e537]:
+                    - generic "The Gang!" [ref=e539]
+                    - generic [ref=e541]: Yesterday
+                  - generic [ref=e542]:
+                    - generic "‫אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai‬" [ref=e544]:
+                      - generic [ref=e546]:
+                        - img
+                      - generic [ref=e549]: You
+                      - generic [ref=e550]: ":"
+                      - generic [ref=e551]: אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai
+                    - gridcell
+          - 'row "פוד עם תמיר Yesterday You : אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e552]':
+            - 'gridcell "פוד עם תמיר Yesterday You : אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e553]':
+              - generic [ref=e555] [cursor=pointer]:
+                - generic [ref=e561]:
+                  - img
+                - generic [ref=e562]:
+                  - gridcell "פוד עם תמיר Yesterday" [ref=e563]:
+                    - generic "פוד עם תמיר" [ref=e565]
+                    - generic [ref=e567]: Yesterday
+                  - generic [ref=e568]:
+                    - generic "‫אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai‬" [ref=e570]:
+                      - generic [ref=e572]:
+                        - img
+                      - generic [ref=e575]: You
+                      - generic [ref=e576]: ":"
+                      - generic [ref=e577]: אנשים יפים ואהובים, אולי יעניין אתכם https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai
+                    - gridcell
+          - row "Guy Dresher Yesterday נראה לי תאהב מה שכתבתי https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e2130]:
+            - gridcell "Guy Dresher Yesterday נראה לי תאהב מה שכתבתי https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e2131]:
+              - generic [ref=e581] [cursor=pointer]:
+                - img [ref=e2132]
+                - generic [ref=e588]:
+                  - gridcell "Guy Dresher Yesterday" [ref=e2133]:
+                    - generic "Guy Dresher" [ref=e2134]
+                    - generic [ref=e595]: Yesterday
+                  - generic [ref=e596]:
+                    - generic "‫נראה לי תאהב מה שכתבתי https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai‬" [ref=e598]:
+                      - generic [ref=e600]:
+                        - img
+                      - generic [ref=e601]: נראה לי תאהב מה שכתבתי https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai
+                    - gridcell
+          - row "gabi Yesterday https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e2135]:
+            - gridcell "gabi Yesterday https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai" [ref=e2136]:
+              - generic [ref=e605] [cursor=pointer]:
+                - img [ref=e2137]
+                - generic [ref=e612]:
+                  - gridcell "gabi Yesterday" [ref=e2138]:
+                    - generic "gabi" [ref=e2139]
+                    - generic [ref=e619]: Yesterday
+                  - generic [ref=e620]:
+                    - generic "‪https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai‬" [ref=e622]:
+                      - generic [ref=e624]:
+                        - img
+                      - generic [ref=e625]: https://www.tamirdresher.com/blog/2026/03/10/organized-by-ai
+                    - gridcell
+          - 'row "דרשרים Yesterday gabi : 😂 😂" [ref=e2140]':
+            - 'gridcell "דרשרים Yesterday gabi : 😂 😂" [ref=e2141]':
+              - generic [ref=e629] [cursor=pointer]:
+                - img [ref=e2142]
+                - generic [ref=e636]:
+                  - gridcell "דרשרים Yesterday" [ref=e637]:
+                    - generic "דרשרים" [ref=e639]
+                    - generic [ref=e641]: Yesterday
+                  - generic [ref=e642]:
+                    - generic "‪😂😂‬" [ref=e644]:
+                      - generic [ref=e647]: gabi
+                      - generic [ref=e648]: ":"
+                      - generic [ref=e649]:
+                        - img "😂" [ref=e650]
+                        - img "😂" [ref=e651]
+                    - gridcell
+          - row "השחקן שהפך לירקן 🙃 2 08:50 Group members have changed. Click to view 10 unread messages New messages will disappear from this chat 90 days after they're sent, except when kept." [ref=e2143]:
+            - gridcell "השחקן שהפך לירקן 🙃 2 08:50 Group members have changed. Click to view 10 unread messages New messages will disappear from this chat 90 days after they're sent, except when kept." [ref=e2144]:
+              - generic [ref=e654]:
+                - generic [ref=e655] [cursor=pointer]:
+                  - img [ref=e2145]
+                  - generic [ref=e662]:
+                    - gridcell "השחקן שהפך לירקן 🙃 2 08:50" [ref=e2146]:
+                      - generic "השחקן שהפך לירקן 🙃 2" [ref=e665]:
+                        - text: השחקן שהפך לירקן
+                        - img "🙃" [ref=e666]
+                        - text: "2"
+                      - generic [ref=e668]: 08:50
+                    - generic [ref=e669]:
+                      - generic "‪Group members have changed. Click to view‬" [ref=e2147]:
+                        - generic [ref=e2148]: Group members have changed. Click to view
+                      - gridcell "10 unread messages" [ref=e695]:
+                        - generic "10 unread messages" [ref=e698]:
+                          - generic [ref=e699]: "10"
+                - generic "New messages will disappear from this chat 90 days after they're sent, except when kept."
+          - 'row "ג׳3 - יצחק נבון תשפ״ו 💜 Yesterday מורה אייל לירם : ערב טוב לכולם ❣️ מצ״ב מערכת למחר וליום חמישי. לילה טוב ושקט 🙏🏻" [ref=e2149]':
+            - 'gridcell "ג׳3 - יצחק נבון תשפ״ו 💜 Yesterday מורה אייל לירם : ערב טוב לכולם ❣️ מצ״ב מערכת למחר וליום חמישי. לילה טוב ושקט 🙏🏻" [ref=e2150]':
+              - generic [ref=e703] [cursor=pointer]:
+                - img [ref=e2151]
+                - generic [ref=e710]:
+                  - gridcell "ג׳3 - יצחק נבון תשפ״ו 💜 Yesterday" [ref=e711]:
+                    - generic "ג׳3 - יצחק נבון תשפ״ו💜" [ref=e713]:
+                      - text: ג׳3 - יצחק נבון תשפ״ו
+                      - img "💜" [ref=e714]
+                    - generic [ref=e716]: Yesterday
+                  - generic [ref=e717]:
+                    - generic "‫ערב טוב לכולם❣️ מצ״ב מערכת למחר וליום חמישי. לילה טוב ושקט🙏🏻‬" [ref=e719]:
+                      - generic [ref=e722]: מורה אייל לירם
+                      - generic [ref=e723]: ":"
+                      - generic [ref=e724]:
+                        - text: ערב טוב לכולם
+                        - img "❣️" [ref=e725]
+                        - text: מצ״ב מערכת למחר וליום חמישי. לילה טוב ושקט
+                        - img "🙏🏻" [ref=e726]
+                    - gridcell
+          - row "Shira שירה שירולה Yesterday ?" [ref=e2152]:
+            - gridcell "Shira שירה שירולה Yesterday ?" [ref=e2153]:
+              - generic [ref=e730] [cursor=pointer]:
+                - img [ref=e2154]
+                - generic [ref=e737]:
+                  - gridcell "Shira שירה שירולה Yesterday" [ref=e2155]:
+                    - generic "Shira שירה שירולה" [ref=e2156]
+                    - generic [ref=e744]: Yesterday
+                  - generic [ref=e745]:
+                    - generic "‪?‬" [ref=e747]:
+                      - generic [ref=e748]: "?"
+                    - gridcell
+          - 'row "מיקרוסופט יד שנייה Yesterday +972 50-689-0980 : כן 7 unread messages" [ref=e749]':
+            - 'gridcell "מיקרוסופט יד שנייה Yesterday +972 50-689-0980 : כן 7 unread messages" [ref=e750]':
+              - generic [ref=e752] [cursor=pointer]:
+                - generic [ref=e2158]:
+                  - img
+                - generic [ref=e759]:
+                  - gridcell "מיקרוסופט יד שנייה Yesterday" [ref=e760]:
+                    - generic "מיקרוסופט יד שנייה" [ref=e762]
+                    - generic [ref=e764]: Yesterday
+                  - generic [ref=e765]:
+                    - generic "‫כן‬" [ref=e767]:
+                      - generic [ref=e770]: +972 50-689-0980
+                      - generic [ref=e771]: ":"
+                      - generic [ref=e772]: כן
+                    - gridcell "7 unread messages" [ref=e773]:
+                      - generic "7 unread messages" [ref=e776]:
+                        - generic [ref=e777]: "7"
+          - 'row "Microsoft Shop קהילת Yesterday +972 54-452-7133 : חחחחח 3 unread messages" [ref=e778]':
+            - 'gridcell "Microsoft Shop קהילת Yesterday +972 54-452-7133 : חחחחח 3 unread messages" [ref=e779]':
+              - generic [ref=e781] [cursor=pointer]:
+                - img [ref=e2159]
+                - generic [ref=e788]:
+                  - gridcell "Microsoft Shop קהילת Yesterday" [ref=e789]:
+                    - generic "Microsoft Shop קהילת" [ref=e791]
+                    - generic [ref=e793]: Yesterday
+                  - generic [ref=e794]:
+                    - generic "‫חחחחח‬" [ref=e796]:
+                      - generic [ref=e799]: +972 54-452-7133
+                      - generic [ref=e800]: ":"
+                      - generic [ref=e801]: חחחחח
+                    - gridcell "3 unread messages" [ref=e802]:
+                      - generic "3 unread messages" [ref=e805]:
+                        - generic [ref=e806]: "3"
+          - 'row "מיקרוסופטים משוחחים (ציבורי) Yesterday +972 54-329-2918 : הערב מחלקת HR מארחת ב-20:00 למפגש מיוחד את פרופ׳ מולי להד ✨ ️ מומחה בינלאומי לפסיכוטראומה ובין הקולות הבולטים בעולם בתחום התמודדות עם מצבי לחץ ומשב מוזמנים.ות להצטרף! https://teams.microsoft.com/meet/25304791653253?p=ChGggzk17Y9ynDLEkV" [ref=e807]':
+            - 'gridcell "מיקרוסופטים משוחחים (ציבורי) Yesterday +972 54-329-2918 : הערב מחלקת HR מארחת ב-20:00 למפגש מיוחד את פרופ׳ מולי להד ✨ ️ מומחה בינלאומי לפסיכוטראומה ובין הקולות הבולטים בעולם בתחום התמודדות עם מצבי לחץ ומשב מוזמנים.ות להצטרף! https://teams.microsoft.com/meet/25304791653253?p=ChGggzk17Y9ynDLEkV" [ref=e808]':
+              - generic [ref=e810] [cursor=pointer]:
+                - img [ref=e2160]
+                - generic [ref=e817]:
+                  - gridcell "מיקרוסופטים משוחחים (ציבורי) Yesterday" [ref=e818]:
+                    - generic "מיקרוסופטים משוחחים (ציבורי)" [ref=e820]
+                    - generic [ref=e822]: Yesterday
+                  - generic [ref=e823]:
+                    - generic "‫הערב מחלקת HR מארחת ב-20:00 למפגש מיוחד את פרופ׳ מולי להד ✨️ מומחה בינלאומי לפסיכוטראומה ובין הקולות הבולטים בעולם בתחום התמודדות עם מצבי לחץ ומשב מוזמנים.ות להצטרף! https://teams.microsoft.com/meet/25304791653253?p=ChGggzk17Y9ynDLEkV‬" [ref=e825]:
+                      - generic [ref=e828]: +972 54-329-2918
+                      - generic [ref=e829]: ":"
+                      - generic [ref=e831]:
+                        - img
+                      - generic [ref=e832]:
+                        - text: הערב מחלקת HR מארחת ב-20:00 למפגש מיוחד את פרופ׳ מולי להד
+                        - img "✨" [ref=e833]
+                        - text: ️ מומחה בינלאומי לפסיכוטראומה ובין הקולות הבולטים בעולם בתחום התמודדות עם מצבי לחץ ומשב מוזמנים.ות להצטרף! https://teams.microsoft.com/meet/25304791653253?p=ChGggzk17Y9ynDLEkV
+                    - gridcell
+          - 'row "יעל רום 11 🏙 Yesterday +972 50-305-7535 : מדליקים מנגל קומה חמש 28 unread messages" [ref=e834]':
+            - 'gridcell "יעל רום 11 🏙 Yesterday +972 50-305-7535 : מדליקים מנגל קומה חמש 28 unread messages" [ref=e835]':
+              - generic [ref=e837] [cursor=pointer]:
+                - img [ref=e2161]
+                - generic [ref=e844]:
+                  - gridcell "יעל רום 11 🏙 Yesterday" [ref=e845]:
+                    - generic "יעל רום 11 🏙" [ref=e847]:
+                      - text: יעל רום 11
+                      - img "🏙" [ref=e848]
+                    - generic [ref=e850]: Yesterday
+                  - generic [ref=e851]:
+                    - generic "‫מדליקים מנגל קומה חמש‬" [ref=e853]:
+                      - generic [ref=e856]: +972 50-305-7535
+                      - generic [ref=e857]: ":"
+                      - generic [ref=e858]: מדליקים מנגל קומה חמש
+                    - gridcell "28 unread messages" [ref=e859]:
+                      - generic "28 unread messages" [ref=e862]:
+                        - generic [ref=e863]: "28"
+          - 'row "משפוחה Yesterday Mom : מתוקי מתאים לו כפרןני 💋 💋 ❤️ ❤️ 💋" [ref=e2162]':
+            - 'gridcell "משפוחה Yesterday Mom : מתוקי מתאים לו כפרןני 💋 💋 ❤️ ❤️ 💋" [ref=e2163]':
+              - generic [ref=e867] [cursor=pointer]:
+                - img [ref=e2164]
+                - generic [ref=e874]:
+                  - gridcell "משפוחה Yesterday" [ref=e875]:
+                    - generic "משפוחה" [ref=e877]
+                    - generic [ref=e879]: Yesterday
+                  - generic [ref=e880]:
+                    - generic "‫מתוקי מתאים לו כפרןני💋💋❤️❤️💋‬" [ref=e882]:
+                      - generic [ref=e885]: Mom
+                      - generic [ref=e886]: ":"
+                      - generic [ref=e887]:
+                        - text: מתוקי מתאים לו כפרןני
+                        - img "💋" [ref=e888]
+                        - img "💋" [ref=e889]
+                        - img "❤️" [ref=e890]
+                        - img "❤️" [ref=e891]
+                        - img "💋" [ref=e892]
+                    - gridcell
+          - 'row "MTP HRZ site Yesterday +972 50-488-8752 : זה מופיע בMyILDC, שלחתי לך לינק בטימז. Galaxy S24 Plus - 859 11 unread messages" [ref=e893]':
+            - 'gridcell "MTP HRZ site Yesterday +972 50-488-8752 : זה מופיע בMyILDC, שלחתי לך לינק בטימז. Galaxy S24 Plus - 859 11 unread messages" [ref=e894]':
+              - generic [ref=e896] [cursor=pointer]:
+                - img [ref=e2165]
+                - generic [ref=e903]:
+                  - gridcell "MTP HRZ site Yesterday" [ref=e904]:
+                    - generic "MTP HRZ site" [ref=e906]
+                    - generic [ref=e908]: Yesterday
+                  - generic [ref=e909]:
+                    - generic "‫זה מופיע בMyILDC, שלחתי לך לינק בטימז. Galaxy S24 Plus - 859‬" [ref=e911]:
+                      - generic [ref=e914]: +972 50-488-8752
+                      - generic [ref=e915]: ":"
+                      - generic [ref=e916]: זה מופיע בMyILDC, שלחתי לך לינק בטימז. Galaxy S24 Plus - 859
+                    - gridcell "11 unread messages" [ref=e917]:
+                      - generic "11 unread messages" [ref=e920]:
+                        - generic [ref=e921]: "11"
+          - row "הייטק באם המושבות Yesterday +972 54-449-7079 joined via an invite link 5 unread messages" [ref=e922]:
+            - gridcell "הייטק באם המושבות Yesterday +972 54-449-7079 joined via an invite link 5 unread messages" [ref=e923]:
+              - generic [ref=e925] [cursor=pointer]:
+                - img [ref=e2166]
+                - generic [ref=e932]:
+                  - gridcell "הייטק באם המושבות Yesterday" [ref=e933]:
+                    - generic "הייטק באם המושבות" [ref=e935]
+                    - generic [ref=e937]: Yesterday
+                  - generic [ref=e938]:
+                    - generic "‪+972 54-449-7079 joined via an invite link‬" [ref=e940]:
+                      - generic [ref=e941]:
+                        - generic [ref=e944]: +972 54-449-7079
+                        - text: joined via an invite link
+                    - gridcell "5 unread messages" [ref=e945]:
+                      - generic "5 unread messages" [ref=e948]:
+                        - generic [ref=e949]: "5"
+          - 'row "Best@CPR&רפואה&data Yesterday +972 52-573-1872 : יאללה כמו ההודעה למעלה, שש סיכום יום בקישור הדיילי" [ref=e950]':
+            - 'gridcell "Best@CPR&רפואה&data Yesterday +972 52-573-1872 : יאללה כמו ההודעה למעלה, שש סיכום יום בקישור הדיילי" [ref=e951]':
+              - generic [ref=e953] [cursor=pointer]:
+                - generic [ref=e2168]:
+                  - img
+                - generic [ref=e960]:
+                  - gridcell "Best@CPR&רפואה&data Yesterday" [ref=e961]:
+                    - generic "Best@CPR&רפואה&data" [ref=e963]
+                    - generic [ref=e965]: Yesterday
+                  - generic [ref=e966]:
+                    - generic "‫יאללה כמו ההודעה למעלה, שש סיכום יום בקישור הדיילי‬" [ref=e968]:
+                      - generic [ref=e971]: +972 52-573-1872
+                      - generic [ref=e972]: ":"
+                      - generic [ref=e973]: יאללה כמו ההודעה למעלה, שש סיכום יום בקישור הדיילי
+                    - gridcell
+          - row "גיא כהן - מורה לגיטרה Yesterday עולה" [ref=e2169]:
+            - gridcell "גיא כהן - מורה לגיטרה Yesterday עולה" [ref=e2170]:
+              - generic [ref=e977] [cursor=pointer]:
+                - img [ref=e2171]
+                - generic [ref=e984]:
+                  - gridcell "גיא כהן - מורה לגיטרה Yesterday" [ref=e2172]:
+                    - generic "גיא כהן - מורה לגיטרה" [ref=e2173]
+                    - generic [ref=e991]: Yesterday
+                  - generic [ref=e992]:
+                    - generic "‫עולה‬" [ref=e994]:
+                      - generic [ref=e995]: עולה
+                    - gridcell
+          - row "+972 52-507-6504 Yesterday יום טוב" [ref=e996]:
+            - gridcell "+972 52-507-6504 Yesterday יום טוב" [ref=e997]:
+              - generic [ref=e999] [cursor=pointer]:
+                - generic [ref=e1005]:
+                  - img
+                - generic [ref=e1006]:
+                  - gridcell "+972 52-507-6504 Yesterday" [ref=e1007]:
+                    - generic "+972 52-507-6504" [ref=e1011]
+                    - generic [ref=e1013]: Yesterday
+                  - generic [ref=e1014]:
+                    - generic "‫יום טוב‬" [ref=e1016]:
+                      - generic [ref=e1018]:
+                        - img
+                      - generic [ref=e1019]: יום טוב
+                    - gridcell
+          - 'row "C#mmunity Yesterday +972 52-443-5976 : https://alm2.com/lwo9" [ref=e1020]':
+            - 'gridcell "C#mmunity Yesterday +972 52-443-5976 : https://alm2.com/lwo9" [ref=e1021]':
+              - generic [ref=e1023] [cursor=pointer]:
+                - img [ref=e2174]
+                - generic [ref=e1030]:
+                  - gridcell "C#mmunity Yesterday" [ref=e1031]:
+                    - generic "C#mmunity" [ref=e1033]
+                    - generic [ref=e1035]: Yesterday
+                  - generic [ref=e1036]:
+                    - generic "‪https://alm2.com/lwo9‬" [ref=e1038]:
+                      - generic [ref=e1041]: +972 52-443-5976
+                      - generic [ref=e1042]: ":"
+                      - generic [ref=e1043]: https://alm2.com/lwo9
+                    - gridcell
+          - 'row "Security Engineers Unite! Yesterday +972 54-439-5800 : קיוויתי שהם פה, אבל הם כן אישרו שיש משהו והם בודקים" [ref=e1044]':
+            - 'gridcell "Security Engineers Unite! Yesterday +972 54-439-5800 : קיוויתי שהם פה, אבל הם כן אישרו שיש משהו והם בודקים" [ref=e1045]':
+              - generic [ref=e1047] [cursor=pointer]:
+                - img [ref=e2175]
+                - generic [ref=e1054]:
+                  - gridcell "Security Engineers Unite! Yesterday" [ref=e1055]:
+                    - generic "Security Engineers Unite!" [ref=e1057]
+                    - generic [ref=e1059]: Yesterday
+                  - generic [ref=e1060]:
+                    - generic "‫קיוויתי שהם פה, אבל הם כן אישרו שיש משהו והם בודקים‬" [ref=e1062]:
+                      - generic [ref=e1065]: +972 54-439-5800
+                      - generic [ref=e1066]: ":"
+                      - generic [ref=e1067]: קיוויתי שהם פה, אבל הם כן אישרו שיש משהו והם בודקים
+                    - gridcell
+          - row "MS במילואים Yesterday Adi Stein MS MVP added +972 50-329-2949 42 unread messages" [ref=e2176]:
+            - gridcell "MS במילואים Yesterday Adi Stein MS MVP added +972 50-329-2949 42 unread messages" [ref=e2177]:
+              - generic [ref=e1071] [cursor=pointer]:
+                - generic [ref=e2179]:
+                  - img
+                - generic [ref=e1078]:
+                  - gridcell "MS במילואים Yesterday" [ref=e1079]:
+                    - generic "MS במילואים" [ref=e1081]
+                    - generic [ref=e1083]: Yesterday
+                  - generic [ref=e1084]:
+                    - generic "‪+972 52-332-2412 added ‬" [ref=e1086]:
+                      - generic [ref=e1087]:
+                        - generic [ref=e1090]: Adi Stein MS MVP
+                        - text: added
+                        - generic [ref=e1093]: +972 50-329-2949
+                    - gridcell "42 unread messages" [ref=e1094]:
+                      - generic "42 unread messages" [ref=e1097]:
+                        - generic [ref=e1098]: "42"
+          - 'row "♥ ♠ נפגשים במרחק 2 מטר ♠ ♥ Yesterday Assaf : לא ממש מסתיר את זה חחח" [ref=e2180]':
+            - 'gridcell "♥ ♠ נפגשים במרחק 2 מטר ♠ ♥ Yesterday Assaf : לא ממש מסתיר את זה חחח" [ref=e2181]':
+              - generic [ref=e1102] [cursor=pointer]:
+                - img [ref=e2182]
+                - generic [ref=e1109]:
+                  - gridcell "♥ ♠ נפגשים במרחק 2 מטר ♠ ♥ Yesterday" [ref=e1110]:
+                    - generic "♥♠נפגשים במרחק 2 מטר♠♥" [ref=e1112]:
+                      - img "♥" [ref=e1113]
+                      - img "♠" [ref=e1114]
+                      - text: נפגשים במרחק 2 מטר
+                      - img "♠" [ref=e1115]
+                      - img "♥" [ref=e1116]
+                    - generic [ref=e1118]: Yesterday
+                  - generic [ref=e1119]:
+                    - generic "‫לא ממש מסתיר את זה חחח‬" [ref=e1121]:
+                      - generic [ref=e1124]: Assaf
+                      - generic [ref=e1125]: ":"
+                      - generic [ref=e1126]: לא ממש מסתיר את זה חחח
+                    - gridcell
+          - row "Shirley Dresher Yesterday סבבה" [ref=e2183]:
+            - gridcell "Shirley Dresher Yesterday סבבה" [ref=e2184]:
+              - generic [ref=e1130] [cursor=pointer]:
+                - img [ref=e2185]
+                - generic [ref=e1137]:
+                  - gridcell "Shirley Dresher Yesterday" [ref=e2186]:
+                    - generic "Shirley Dresher" [ref=e2187]
+                    - generic [ref=e1144]: Yesterday
+                  - generic [ref=e1145]:
+                    - generic "‫סבבה‬" [ref=e1147]:
+                      - generic [ref=e1148]: סבבה
+                    - gridcell
+          - row "+972 52-318-2211 Yesterday קומה 1 דירה 2" [ref=e1149]:
+            - gridcell "+972 52-318-2211 Yesterday קומה 1 דירה 2" [ref=e1150]:
+              - generic [ref=e1152] [cursor=pointer]:
+                - generic [ref=e1158]:
+                  - img
+                - generic [ref=e1159]:
+                  - gridcell "+972 52-318-2211 Yesterday" [ref=e1160]:
+                    - generic "+972 52-318-2211" [ref=e1164]
+                    - generic [ref=e1166]: Yesterday
+                  - generic [ref=e1167]:
+                    - generic "‫קומה 1 דירה 2‬" [ref=e1169]:
+                      - generic [ref=e1171]:
+                        - img
+                      - generic [ref=e1172]: קומה 1 דירה 2
+                    - gridcell
+          - 'row "כיתה ג1- יצחק נבון Yesterday חן חיון 🌸 מורה אייל : מערכת למידה מרחוק – כיתה ג''1 שבוע 2.pdf • 2 pages" [ref=e2188]':
+            - 'gridcell "כיתה ג1- יצחק נבון Yesterday חן חיון 🌸 מורה אייל : מערכת למידה מרחוק – כיתה ג''1 שבוע 2.pdf • 2 pages" [ref=e2189]':
+              - generic [ref=e1176] [cursor=pointer]:
+                - generic [ref=e2191]:
+                  - img
+                - generic [ref=e1183]:
+                  - gridcell "כיתה ג1- יצחק נבון Yesterday" [ref=e1184]:
+                    - generic "כיתה ג1- יצחק נבון" [ref=e1186]
+                    - generic [ref=e1188]: Yesterday
+                  - generic [ref=e1189]:
+                    - generic "‫מערכת למידה מרחוק – כיתה ג'1 שבוע 2.pdf • 2 pages‬" [ref=e1191]:
+                      - generic [ref=e1194]:
+                        - text: חן חיון
+                        - img "🌸" [ref=e2192]
+                        - text: מורה אייל
+                      - generic [ref=e1195]: ":"
+                      - generic [ref=e1197]:
+                        - img
+                      - generic [ref=e1198]: מערכת למידה מרחוק – כיתה ג'1 שבוע 2.pdf • 2 pages
+                    - gridcell
+          - row "+972 55-931-2474 Yesterday OP AutoClicker - 3.0" [ref=e1199]:
+            - gridcell "+972 55-931-2474 Yesterday OP AutoClicker - 3.0" [ref=e1200]:
+              - generic [ref=e1202] [cursor=pointer]:
+                - img [ref=e2193]
+                - generic [ref=e1209]:
+                  - gridcell "+972 55-931-2474 Yesterday" [ref=e1210]:
+                    - generic "+972 55-931-2474" [ref=e1214]
+                    - generic [ref=e1216]: Yesterday
+                  - generic [ref=e1217]:
+                    - generic "‪OP AutoClicker - 3.0‬" [ref=e1219]:
+                      - generic [ref=e1220]: OP AutoClicker - 3.0
+                    - gridcell
+          - 'row "משפחת דרשר Yesterday Mom : \"רחל! יש אזעקה\": כך נשמעת גרסת המלחמה לשיר האירוויזיון \"מישל\" - סרוגים https://share.google/I63GNn9OrPWCUv6ut" [ref=e2194]':
+            - 'gridcell "משפחת דרשר Yesterday Mom : \"רחל! יש אזעקה\": כך נשמעת גרסת המלחמה לשיר האירוויזיון \"מישל\" - סרוגים https://share.google/I63GNn9OrPWCUv6ut" [ref=e2195]':
+              - generic [ref=e1224] [cursor=pointer]:
+                - img [ref=e2196]
+                - generic [ref=e1231]:
+                  - gridcell "משפחת דרשר Yesterday" [ref=e1232]:
+                    - generic "משפחת דרשר" [ref=e1234]
+                    - generic [ref=e1236]: Yesterday
+                  - generic [ref=e1237]:
+                    - 'generic "‫\"רחל! יש אזעקה\": כך נשמעת גרסת המלחמה לשיר האירוויזיון \"מישל\" - סרוגים https://share.google/I63GNn9OrPWCUv6ut‬" [ref=e1239]':
+                      - generic [ref=e1242]: Mom
+                      - generic [ref=e1243]: ":"
+                      - generic [ref=e1244]: "\"רחל! יש אזעקה\": כך נשמעת גרסת המלחמה לשיר האירוויזיון \"מישל\" - סרוגים https://share.google/I63GNn9OrPWCUv6ut"
+                    - gridcell
+          - row "+972 52-875-3619 Yesterday שירה דרשר שלום, התור הבא שלך אצל ד\"ר נעמי בכור, ביום רביעי, בתאריך ה- 25/03/2026 בשעה 16:45, כתובתינו ימין שושן 17 פ\"ת, במידה ואין באפשרותך להגיע נא לעדכן בהקדם. תודה והמשך יום נפלא :)" [ref=e1245]:
+            - gridcell "+972 52-875-3619 Yesterday שירה דרשר שלום, התור הבא שלך אצל ד\"ר נעמי בכור, ביום רביעי, בתאריך ה- 25/03/2026 בשעה 16:45, כתובתינו ימין שושן 17 פ\"ת, במידה ואין באפשרותך להגיע נא לעדכן בהקדם. תודה והמשך יום נפלא :)" [ref=e1246]:
+              - generic [ref=e1248] [cursor=pointer]:
+                - generic [ref=e1254]:
+                  - img
+                - generic [ref=e1255]:
+                  - gridcell "+972 52-875-3619 Yesterday" [ref=e1256]:
+                    - generic "+972 52-875-3619" [ref=e1260]
+                    - generic [ref=e1262]: Yesterday
+                  - generic [ref=e1263]:
+                    - generic "‫שירה דרשר שלום, התור הבא שלך אצל ד\"ר נעמי בכור, ביום רביעי, בתאריך ה- 25/03/2026 בשעה 16:45, כתובתינו ימין שושן 17 פ\"ת, במידה ואין באפשרותך להגיע נא לעדכן בהקדם. תודה והמשך יום נפלא :)‬" [ref=e1265]:
+                      - generic [ref=e1266]: שירה דרשר שלום, התור הבא שלך אצל ד"ר נעמי בכור, ביום רביעי, בתאריך ה- 25/03/2026 בשעה 16:45, כתובתינו ימין שושן 17 פ"ת, במידה ואין באפשרותך להגיע נא לעדכן בהקדם. תודה והמשך יום נפלא :)
+                    - gridcell
+          - 'row "BACK_SPACE | LAST CHANCE Yesterday +972 50-295-0228 : שעת סיפור ושיר עם דידה (גילאי 2-5) כבר התרגלנו שנפגשים ב09:30 אבל אנחנו פה להזכיר 😇 מפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים להיום: 💜 גלילי נייר טואלט 💜 ניירות צבעוניים 💜 מספריים ודבק 💜 עיניים זזות (לא חובה) לינק להצטרפות - https://aka.ms/Dida0930" [ref=e1267]':
+            - 'gridcell "BACK_SPACE | LAST CHANCE Yesterday +972 50-295-0228 : שעת סיפור ושיר עם דידה (גילאי 2-5) כבר התרגלנו שנפגשים ב09:30 אבל אנחנו פה להזכיר 😇 מפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים להיום: 💜 גלילי נייר טואלט 💜 ניירות צבעוניים 💜 מספריים ודבק 💜 עיניים זזות (לא חובה) לינק להצטרפות - https://aka.ms/Dida0930" [ref=e1268]':
+              - generic [ref=e1270] [cursor=pointer]:
+                - img [ref=e2197]
+                - generic [ref=e1277]:
+                  - gridcell "BACK_SPACE | LAST CHANCE Yesterday" [ref=e1278]:
+                    - generic "BACK_SPACE | LAST CHANCE" [ref=e1280]
+                    - generic [ref=e1282]: Yesterday
+                  - generic [ref=e1283]:
+                    - 'generic "‫שעת סיפור ושיר עם דידה (גילאי 2-5) כבר התרגלנו שנפגשים ב09:30 אבל אנחנו פה להזכיר 😇 מפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים להיום: 💜גלילי נייר טואלט 💜ניירות צבעוניים 💜מספריים ודבק 💜עיניים זזות (לא חובה) לינק להצטרפות - https://aka.ms/Dida0930‬" [ref=e1285]':
+                      - generic [ref=e1288]: +972 50-295-0228
+                      - generic [ref=e1289]: ":"
+                      - generic [ref=e1291]:
+                        - img
+                      - generic [ref=e1292]:
+                        - text: שעת סיפור ושיר עם דידה (גילאי 2-5) כבר התרגלנו שנפגשים ב09:30 אבל אנחנו פה להזכיר
+                        - img "😇" [ref=e1293]
+                        - text: "מפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים להיום:"
+                        - img "💜" [ref=e1294]
+                        - text: גלילי נייר טואלט
+                        - img "💜" [ref=e1295]
+                        - text: ניירות צבעוניים
+                        - img "💜" [ref=e1296]
+                        - text: מספריים ודבק
+                        - img "💜" [ref=e1297]
+                        - text: עיניים זזות (לא חובה) לינק להצטרפות - https://aka.ms/Dida0930
+                    - gridcell
+          - row "Mamram CTO Group Yesterday Your security code with +972 52-425-0439 changed. Click to learn more 1 unread message" [ref=e2198]:
+            - gridcell "Mamram CTO Group Yesterday Your security code with +972 52-425-0439 changed. Click to learn more 1 unread message" [ref=e2199]:
+              - generic [ref=e1301] [cursor=pointer]:
+                - img [ref=e2200]
+                - generic [ref=e1308]:
+                  - gridcell "Mamram CTO Group Yesterday" [ref=e1309]:
+                    - generic "Mamram CTO Group" [ref=e1311]
+                    - generic [ref=e1313]: Yesterday
+                  - generic [ref=e1314]:
+                    - generic "‪Your security code with +972 52-425-0439 changed. Click to learn more‬" [ref=e2201]:
+                      - generic [ref=e1317]: Your security code with +972 52-425-0439 changed. Click to learn more
+                    - gridcell "1 unread message" [ref=e1318]:
+                      - generic "1 unread message" [ref=e1321]:
+                        - generic [ref=e1322]: "1"
+          - row "Moaid CodeValue Monday בכיף, אין בעיה" [ref=e2202]:
+            - gridcell "Moaid CodeValue Monday בכיף, אין בעיה" [ref=e2203]:
+              - generic [ref=e1326] [cursor=pointer]:
+                - img [ref=e2204]
+                - generic [ref=e1333]:
+                  - gridcell "Moaid CodeValue Monday" [ref=e2205]:
+                    - generic "Moaid CodeValue" [ref=e2206]
+                    - generic [ref=e1340]: Monday
+                  - generic [ref=e1341]:
+                    - generic "‫בכיף, אין בעיה‬" [ref=e1343]:
+                      - generic [ref=e1344]: בכיף, אין בעיה
+                    - gridcell
+          - 'row "מפתחים מפתחים מפתחים Monday +972 52-328-1793 : לא מאמין שקלוד נופל בטריק הכי ישן בספר 🤣 (סחטתי ממנו יעוץ רפואי בלי שהוא רצה)" [ref=e1345]':
+            - 'gridcell "מפתחים מפתחים מפתחים Monday +972 52-328-1793 : לא מאמין שקלוד נופל בטריק הכי ישן בספר 🤣 (סחטתי ממנו יעוץ רפואי בלי שהוא רצה)" [ref=e1346]':
+              - generic [ref=e1348] [cursor=pointer]:
+                - img [ref=e2207]
+                - generic [ref=e1355]:
+                  - gridcell "מפתחים מפתחים מפתחים Monday" [ref=e1356]:
+                    - generic "מפתחים מפתחים מפתחים" [ref=e1358]
+                    - generic [ref=e1360]: Monday
+                  - generic [ref=e1361]:
+                    - generic "‫לא מאמין שקלוד נופל בטריק הכי ישן בספר 🤣 (סחטתי ממנו יעוץ רפואי בלי שהוא רצה)‬" [ref=e1363]:
+                      - generic [ref=e1366]: +972 52-328-1793
+                      - generic [ref=e1367]: ":"
+                      - generic [ref=e1369]:
+                        - img
+                      - generic [ref=e1370]:
+                        - text: לא מאמין שקלוד נופל בטריק הכי ישן בספר
+                        - img "🤣" [ref=e1371]
+                        - text: (סחטתי ממנו יעוץ רפואי בלי שהוא רצה)
+                    - gridcell
+          - 'row "MEN POWER הדר המושבות 💪🏽 Monday +972 54-256-6131 reacted 😂 to: \" \"הסר" [ref=e2208]':
+            - 'gridcell "MEN POWER הדר המושבות 💪🏽 Monday +972 54-256-6131 reacted 😂 to: \" \"הסר" [ref=e2209]':
+              - generic [ref=e1375] [cursor=pointer]:
+                - img [ref=e2210]
+                - generic [ref=e1382]:
+                  - gridcell "MEN POWER הדר המושבות 💪🏽 Monday" [ref=e1383]:
+                    - generic "MEN POWER הדר המושבות 💪🏽" [ref=e1385]:
+                      - text: MEN POWER הדר המושבות
+                      - img "💪🏽" [ref=e1386]
+                    - generic [ref=e1388]: Monday
+                  - generic [ref=e1389]:
+                    - generic "‫הסר‬" [ref=e1391]:
+                      - generic [ref=e1392]:
+                        - generic [ref=e1395]: +972 54-256-6131
+                        - text: reacted
+                        - img "😂" [ref=e1396]
+                        - text: "to:"
+                      - text: "\""
+                      - generic [ref=e1398]: "\"הסר"
+                    - gridcell
+          - 'row "הבית שלנו Monday You : Video" [ref=e1399]':
+            - 'gridcell "הבית שלנו Monday You : Video" [ref=e1400]':
+              - generic [ref=e1402] [cursor=pointer]:
+                - img [ref=e2211]
+                - generic [ref=e1409]:
+                  - gridcell "הבית שלנו Monday" [ref=e1410]:
+                    - generic "הבית שלנו" [ref=e1412]
+                    - generic [ref=e1414]: Monday
+                  - generic [ref=e1415]:
+                    - generic "‪Video‬" [ref=e1417]:
+                      - generic [ref=e1419]:
+                        - img
+                      - generic [ref=e1422]: You
+                      - generic [ref=e1423]: ":"
+                      - generic [ref=e1425]:
+                        - img
+                      - generic [ref=e1426]: Video
+                    - gridcell
+          - row "אירועים במיקרוסופט Monday Your security code with +972 52-450-0833 changed. Click to learn more 15 unread messages" [ref=e2212]:
+            - gridcell "אירועים במיקרוסופט Monday Your security code with +972 52-450-0833 changed. Click to learn more 15 unread messages" [ref=e2213]:
+              - generic [ref=e1430] [cursor=pointer]:
+                - generic [ref=e2215]:
+                  - img
+                - generic [ref=e1437]:
+                  - gridcell "אירועים במיקרוסופט Monday" [ref=e1438]:
+                    - generic "אירועים במיקרוסופט" [ref=e1440]
+                    - generic [ref=e1442]: Monday
+                  - generic [ref=e1443]:
+                    - generic "‪Your security code with +972 52-450-0833 changed. Click to learn more‬" [ref=e2216]:
+                      - generic [ref=e1446]: Your security code with +972 52-450-0833 changed. Click to learn more
+                    - gridcell "15 unread messages" [ref=e1447]:
+                      - generic "15 unread messages" [ref=e1450]:
+                        - generic [ref=e1451]: "15"
+          - row "+972 50-777-2017 Monday תודה ננסה" [ref=e1452]:
+            - gridcell "+972 50-777-2017 Monday תודה ננסה" [ref=e1453]:
+              - generic [ref=e1455] [cursor=pointer]:
+                - img [ref=e2217]
+                - generic [ref=e1462]:
+                  - gridcell "+972 50-777-2017 Monday" [ref=e1463]:
+                    - generic "+972 50-777-2017" [ref=e1467]
+                    - generic [ref=e1469]: Monday
+                  - generic [ref=e1470]:
+                    - generic "‫תודה ננסה‬" [ref=e1472]:
+                      - generic [ref=e1474]:
+                        - img
+                      - generic [ref=e1475]: תודה ננסה
+                    - gridcell
+          - row "גינה קהילתית אם המושבות 08:50 Group members have changed. Click to view 13 unread messages" [ref=e2218]:
+            - gridcell "גינה קהילתית אם המושבות 08:50 Group members have changed. Click to view 13 unread messages" [ref=e2219]:
+              - generic [ref=e1479] [cursor=pointer]:
+                - img [ref=e2220]
+                - generic [ref=e1486]:
+                  - gridcell "גינה קהילתית אם המושבות 08:50" [ref=e2221]:
+                    - generic "גינה קהילתית אם המושבות" [ref=e1489]
+                    - generic [ref=e1491]: 08:50
+                  - generic [ref=e1492]:
+                    - generic "‪Group members have changed. Click to view‬" [ref=e2222]:
+                      - generic [ref=e2223]: Group members have changed. Click to view
+                    - gridcell "13 unread messages" [ref=e1496]:
+                      - generic "13 unread messages" [ref=e1499]:
+                        - generic [ref=e1500]: "13"
+          - row "Microsoft Linkedin pod Yesterday +972 52-294-5911 joined from the community 2 unread messages" [ref=e1501]:
+            - gridcell "Microsoft Linkedin pod Yesterday +972 52-294-5911 joined from the community 2 unread messages" [ref=e1502]:
+              - generic [ref=e1504] [cursor=pointer]:
+                - generic [ref=e2225]:
+                  - img
+                - generic [ref=e1511]:
+                  - gridcell "Microsoft Linkedin pod Yesterday" [ref=e1512]:
+                    - generic "Microsoft Linkedin pod" [ref=e1514]
+                    - generic [ref=e1516]: Yesterday
+                  - generic [ref=e1517]:
+                    - generic "‪ joined from the community‬" [ref=e1519]:
+                      - generic [ref=e1520]:
+                        - generic [ref=e1523]: +972 52-294-5911
+                        - text: joined from the community
+                    - gridcell "2 unread messages" [ref=e1524]:
+                      - generic "2 unread messages" [ref=e1527]:
+                        - generic [ref=e1528]: "2"
+          - row "שו\"ת למפתחי Net. 08:50 Group members have changed. Click to view 5 unread messages" [ref=e2226]:
+            - gridcell "שו\"ת למפתחי Net. 08:50 Group members have changed. Click to view 5 unread messages" [ref=e2227]:
+              - generic [ref=e1532] [cursor=pointer]:
+                - generic [ref=e2229]:
+                  - img
+                - generic [ref=e1539]:
+                  - gridcell "שו\"ת למפתחי Net. 08:50" [ref=e2230]:
+                    - generic "שו\"ת למפתחי Net." [ref=e1542]
+                    - generic [ref=e1544]: 08:50
+                  - generic [ref=e1545]:
+                    - generic "‪Group members have changed. Click to view‬" [ref=e2231]:
+                      - generic [ref=e2232]: Group members have changed. Click to view
+                    - gridcell "5 unread messages" [ref=e1549]:
+                      - generic "5 unread messages" [ref=e1552]:
+                        - generic [ref=e1553]: "5"
+          - 'row "מאפים עד הבית Monday Reacted 🙏 to: \" Photo\"" [ref=e2233]':
+            - 'gridcell "מאפים עד הבית Monday Reacted 🙏 to: \" Photo\"" [ref=e2234]':
+              - generic [ref=e1557] [cursor=pointer]:
+                - img [ref=e2235]
+                - generic [ref=e1564]:
+                  - gridcell "מאפים עד הבית Monday" [ref=e2236]:
+                    - generic "מאפים עד הבית" [ref=e2237]
+                    - generic [ref=e1571]: Monday
+                  - generic [ref=e1572]:
+                    - generic "‪Photo‬" [ref=e1574]:
+                      - generic [ref=e1575]:
+                        - text: Reacted
+                        - img "🙏" [ref=e1576]
+                        - text: "to:"
+                      - text: "\""
+                      - generic [ref=e1579]:
+                        - img
+                      - generic [ref=e1580]: Photo"
+                    - gridcell
+          - row "ארכיטקטים - Software Architects @Israel Monday Your security code with +972 54-483-8475 changed. Click to learn more" [ref=e2238]:
+            - gridcell "ארכיטקטים - Software Architects @Israel Monday Your security code with +972 54-483-8475 changed. Click to learn more" [ref=e2239]:
+              - generic [ref=e1584] [cursor=pointer]:
+                - img [ref=e2240]
+                - generic [ref=e1591]:
+                  - gridcell "ארכיטקטים - Software Architects @Israel Monday" [ref=e1592]:
+                    - generic "ארכיטקטים - Software Architects @Israel" [ref=e1594]
+                    - generic [ref=e1596]: Monday
+                  - generic [ref=e1597]:
+                    - generic "‪Your security code with +972 54-483-8475 changed. Click to learn more‬" [ref=e2241]:
+                      - generic [ref=e1600]: Your security code with +972 54-483-8475 changed. Click to learn more
+                    - gridcell
+          - row "פסיכולוגיה יוליה Sunday היי מה שלומך? מקווה שכולם בסדר לא שלחת לנו עדיין בקשת תשלום 🙂" [ref=e2242]:
+            - gridcell "פסיכולוגיה יוליה Sunday היי מה שלומך? מקווה שכולם בסדר לא שלחת לנו עדיין בקשת תשלום 🙂" [ref=e2243]:
+              - generic [ref=e1604] [cursor=pointer]:
+                - img [ref=e2244]
+                - generic [ref=e1611]:
+                  - gridcell "פסיכולוגיה יוליה Sunday" [ref=e2245]:
+                    - generic "פסיכולוגיה יוליה" [ref=e2246]
+                    - generic [ref=e1618]: Sunday
+                  - generic [ref=e1619]:
+                    - generic "‫היי מה שלומך? מקווה שכולם בסדר לא שלחת לנו עדיין בקשת תשלום 🙂‬" [ref=e1621]:
+                      - generic [ref=e1623]:
+                        - img
+                      - generic [ref=e1624]:
+                        - text: היי מה שלומך? מקווה שכולם בסדר לא שלחת לנו עדיין בקשת תשלום
+                        - img "🙂" [ref=e1625]
+                    - gridcell
+          - row "+972 52-818-7111 Sunday במזל טוב ובבשורות טובות 🙏🏼 🫶🏼" [ref=e1626]:
+            - gridcell "+972 52-818-7111 Sunday במזל טוב ובבשורות טובות 🙏🏼 🫶🏼" [ref=e1627]:
+              - generic [ref=e1629] [cursor=pointer]:
+                - img [ref=e2247]
+                - generic [ref=e1636]:
+                  - gridcell "+972 52-818-7111 Sunday" [ref=e1637]:
+                    - generic "+972 52-818-7111" [ref=e1641]
+                    - generic [ref=e1643]: Sunday
+                  - generic [ref=e1644]:
+                    - generic "‫במזל טוב ובבשורות טובות 🙏🏼🫶🏼‬" [ref=e1646]:
+                      - generic [ref=e1647]:
+                        - text: במזל טוב ובבשורות טובות
+                        - img "🙏🏼" [ref=e1648]
+                        - img "🫶🏼" [ref=e1649]
+                    - gridcell
+          - row "אסנת חברת ניקיון Sunday תודה רבה" [ref=e2248]:
+            - gridcell "אסנת חברת ניקיון Sunday תודה רבה" [ref=e2249]:
+              - generic [ref=e1653] [cursor=pointer]:
+                - img [ref=e2250]
+                - generic [ref=e1660]:
+                  - gridcell "אסנת חברת ניקיון Sunday" [ref=e2251]:
+                    - generic "אסנת חברת ניקיון" [ref=e2252]
+                    - generic [ref=e1667]: Sunday
+                  - generic [ref=e1668]:
+                    - generic "‫תודה רבה‬" [ref=e1670]:
+                      - generic [ref=e1671]: תודה רבה
+                    - gridcell
+          - row "Mom Sunday כתובת וטלפון שלך באמצע הזמנה" [ref=e2253]:
+            - gridcell "Mom Sunday כתובת וטלפון שלך באמצע הזמנה" [ref=e2254]:
+              - generic [ref=e1675] [cursor=pointer]:
+                - img [ref=e2255]
+                - generic [ref=e1682]:
+                  - gridcell "Mom Sunday" [ref=e2256]:
+                    - generic "Mom" [ref=e2257]
+                    - generic [ref=e1689]: Sunday
+                  - generic [ref=e1690]:
+                    - generic "‫כתובת וטלפון שלך באמצע הזמנה‬" [ref=e1692]:
+                      - generic [ref=e1693]: כתובת וטלפון שלך באמצע הזמנה
+                    - gridcell
+          - row "+1 (201) 431-5131 Sunday חזק" [ref=e1694]:
+            - gridcell "+1 (201) 431-5131 Sunday חזק" [ref=e1695]:
+              - generic [ref=e1697] [cursor=pointer]:
+                - img [ref=e2258]
+                - generic [ref=e1704]:
+                  - gridcell "+1 (201) 431-5131 Sunday" [ref=e1705]:
+                    - generic "+1 (201) 431-5131" [ref=e1709]
+                    - generic [ref=e1711]: Sunday
+                  - generic [ref=e1712]:
+                    - generic "‫חזק‬" [ref=e1714]:
+                      - generic [ref=e1715]: חזק
+                    - gridcell
+          - row "+972 54-719-4540 Sunday אנא דרג/י את השירות שלנו תודה, שיר" [ref=e1716]:
+            - gridcell "+972 54-719-4540 Sunday אנא דרג/י את השירות שלנו תודה, שיר" [ref=e1717]:
+              - generic [ref=e1719] [cursor=pointer]:
+                - generic [ref=e1725]:
+                  - img
+                - generic [ref=e1726]:
+                  - gridcell "+972 54-719-4540 Sunday" [ref=e1727]:
+                    - generic "+972 54-719-4540" [ref=e1731]
+                    - generic [ref=e1733]: Sunday
+                  - generic [ref=e1734]:
+                    - generic "‫אנא דרג/י את השירות שלנו תודה, שיר‬" [ref=e1736]:
+                      - generic [ref=e1737]: אנא דרג/י את השירות שלנו תודה, שיר
+                    - gridcell
+          - row "Rami Tevel Sunday חלום ליסוע ליפן" [ref=e2259]:
+            - gridcell "Rami Tevel Sunday חלום ליסוע ליפן" [ref=e2260]:
+              - generic [ref=e1741] [cursor=pointer]:
+                - img [ref=e2261]
+                - generic [ref=e1748]:
+                  - gridcell "Rami Tevel Sunday" [ref=e2262]:
+                    - generic "Rami Tevel" [ref=e2263]
+                    - generic [ref=e1755]: Sunday
+                  - generic [ref=e1756]:
+                    - generic "‫חלום ליסוע ליפן‬" [ref=e1758]:
+                      - generic [ref=e1759]: חלום ליסוע ליפן
+                    - gridcell
+          - row "+972 53-523-6722 Sunday 🙏🏻" [ref=e1760]:
+            - gridcell "+972 53-523-6722 Sunday 🙏🏻" [ref=e1761]:
+              - generic [ref=e1763] [cursor=pointer]:
+                - img [ref=e2264]
+                - generic [ref=e1770]:
+                  - gridcell "+972 53-523-6722 Sunday" [ref=e1771]:
+                    - generic "+972 53-523-6722" [ref=e1775]
+                    - generic [ref=e1777]: Sunday
+                  - generic [ref=e1778]:
+                    - generic "‪🙏🏻‬" [ref=e1780]:
+                      - img "🙏🏻" [ref=e1782]
+                    - gridcell
+          - row "Pnina Reichman Sunday ונפגש רק בשמחות 🙏 🙏" [ref=e2265]:
+            - gridcell "Pnina Reichman Sunday ונפגש רק בשמחות 🙏 🙏" [ref=e2266]:
+              - generic [ref=e1786] [cursor=pointer]:
+                - img [ref=e2267]
+                - generic [ref=e1793]:
+                  - gridcell "Pnina Reichman Sunday" [ref=e2268]:
+                    - generic "Pnina Reichman" [ref=e2269]
+                    - generic [ref=e1800]: Sunday
+                  - generic [ref=e1801]:
+                    - generic "‫ונפגש רק בשמחות🙏🙏‬" [ref=e1803]:
+                      - generic [ref=e1804]:
+                        - text: ונפגש רק בשמחות
+                        - img "🙏" [ref=e1805]
+                        - img "🙏" [ref=e1806]
+                    - gridcell
+          - 'row "אנחנו Sunday You : מחזיקים מעמד איך אתם?" [ref=e1807]':
+            - 'gridcell "אנחנו Sunday You : מחזיקים מעמד איך אתם?" [ref=e1808]':
+              - generic [ref=e1810] [cursor=pointer]:
+                - img [ref=e2270]
+                - generic [ref=e1817]:
+                  - gridcell "אנחנו Sunday" [ref=e1818]:
+                    - generic "אנחנו" [ref=e1820]
+                    - generic [ref=e1822]: Sunday
+                  - generic [ref=e1823]:
+                    - generic "‫מחזיקים מעמד איך אתם?‬" [ref=e1825]:
+                      - generic [ref=e1827]:
+                        - img
+                      - generic [ref=e1830]: You
+                      - generic [ref=e1831]: ":"
+                      - generic [ref=e1832]: מחזיקים מעמד איך אתם?
+                    - gridcell
+          - row "Ilanit Aderei Sunday בשורות טובות אמן 🙏" [ref=e2271]:
+            - gridcell "Ilanit Aderei Sunday בשורות טובות אמן 🙏" [ref=e2272]:
+              - generic [ref=e1836] [cursor=pointer]:
+                - img [ref=e2273]
+                - generic [ref=e1843]:
+                  - gridcell "Ilanit Aderei Sunday" [ref=e2274]:
+                    - generic "Ilanit Aderei" [ref=e2275]
+                    - generic [ref=e1850]: Sunday
+                  - generic [ref=e1851]:
+                    - generic "‫בשורות טובות אמן🙏‬" [ref=e1853]:
+                      - generic [ref=e1854]:
+                        - text: בשורות טובות אמן
+                        - img "🙏" [ref=e1855]
+                    - gridcell
+          - 'row "MTP Base ILDC Sunday +972 52-429-2921 : שעת סיפור ושיר עם דידה מתחילים שבוע, נפגש ב09:30 עם ילדיכם (2-5) למפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים למחר: 🌈 6 מקלות אוזניים 🌈 סלוטייפ (רצוי רחב) 🌈 דף 🌈 צמר גפן 🌈 דבק 🌈 טושים לינק להצטרפות - https://aka.ms/Dida0930" [ref=e1856]':
+            - 'gridcell "MTP Base ILDC Sunday +972 52-429-2921 : שעת סיפור ושיר עם דידה מתחילים שבוע, נפגש ב09:30 עם ילדיכם (2-5) למפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים למחר: 🌈 6 מקלות אוזניים 🌈 סלוטייפ (רצוי רחב) 🌈 דף 🌈 צמר גפן 🌈 דבק 🌈 טושים לינק להצטרפות - https://aka.ms/Dida0930" [ref=e1857]':
+              - generic [ref=e1859] [cursor=pointer]:
+                - img [ref=e2276]
+                - generic [ref=e1866]:
+                  - gridcell "MTP Base ILDC Sunday" [ref=e1867]:
+                    - generic "MTP Base ILDC" [ref=e1869]
+                    - generic [ref=e1871]: Sunday
+                  - generic [ref=e1872]:
+                    - 'generic "‫שעת סיפור ושיר עם דידה מתחילים שבוע, נפגש ב09:30 עם ילדיכם (2-5) למפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים למחר: 🌈6 מקלות אוזניים 🌈סלוטייפ (רצוי רחב) 🌈דף 🌈צמר גפן 🌈דבק 🌈טושים לינק להצטרפות - https://aka.ms/Dida0930‬" [ref=e1874]':
+                      - generic [ref=e1877]: +972 52-429-2921
+                      - generic [ref=e1878]: ":"
+                      - generic [ref=e1880]:
+                        - img
+                      - generic [ref=e1881]:
+                        - text: "שעת סיפור ושיר עם דידה מתחילים שבוע, נפגש ב09:30 עם ילדיכם (2-5) למפגש מיוחד כמעט כמו בגן, יחד נשיר שירים, נספר סיפורים ועוד המון הפתעות. חומרים למחר:"
+                        - img "🌈" [ref=e1882]
+                        - text: 6 מקלות אוזניים
+                        - img "🌈" [ref=e1883]
+                        - text: סלוטייפ (רצוי רחב)
+                        - img "🌈" [ref=e1884]
+                        - text: דף
+                        - img "🌈" [ref=e1885]
+                        - text: צמר גפן
+                        - img "🌈" [ref=e1886]
+                        - text: דבק
+                        - img "🌈" [ref=e1887]
+                        - text: טושים לינק להצטרפות - https://aka.ms/Dida0930
+                    - gridcell
+          - row "Rami Applbaum Sunday Photo" [ref=e2277]:
+            - gridcell "Rami Applbaum Sunday Photo" [ref=e2278]:
+              - generic [ref=e1891] [cursor=pointer]:
+                - generic [ref=e1897]:
+                  - img
+                - generic [ref=e1898]:
+                  - gridcell "Rami Applbaum Sunday" [ref=e2279]:
+                    - generic "Rami Applbaum" [ref=e2280]
+                    - generic [ref=e1905]: Sunday
+                  - generic [ref=e1906]:
+                    - generic "‪Photo‬" [ref=e1908]:
+                      - generic [ref=e1910]:
+                        - img
+                      - generic [ref=e1912]:
+                        - img
+                      - generic [ref=e1913]: Photo
+                    - gridcell
+          - 'row "Shlomo Sunday You reacted ❤️ to: \" \"בשורות טובות מקווים לטוב ושקט" [ref=e2281]':
+            - 'gridcell "Shlomo Sunday You reacted ❤️ to: \" \"בשורות טובות מקווים לטוב ושקט" [ref=e2282]':
+              - generic [ref=e1917] [cursor=pointer]:
+                - img [ref=e2283]
+                - generic [ref=e1924]:
+                  - gridcell "Shlomo Sunday" [ref=e2284]:
+                    - generic "Shlomo" [ref=e2285]
+                    - generic [ref=e1931]: Sunday
+                  - generic [ref=e1932]:
+                    - generic "‫בשורות טובות מקווים לטוב ושקט‬" [ref=e1934]:
+                      - generic [ref=e1935]:
+                        - text: You reacted
+                        - img "❤️" [ref=e1936]
+                        - text: "to:"
+                      - text: "\""
+                      - generic [ref=e1938]: "\"בשורות טובות מקווים לטוב ושקט"
+                    - gridcell
+          - row "Ami Sytbon Sunday משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב." [ref=e2286]:
+            - gridcell "Ami Sytbon Sunday משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב." [ref=e2287]:
+              - generic [ref=e1942] [cursor=pointer]:
+                - img [ref=e2288]
+                - generic [ref=e1949]:
+                  - gridcell "Ami Sytbon Sunday" [ref=e2289]:
+                    - generic "Ami Sytbon" [ref=e2290]
+                    - generic [ref=e1956]: Sunday
+                  - generic [ref=e1957]:
+                    - generic "‫משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב.‬" [ref=e1959]:
+                      - generic [ref=e1961]:
+                        - img
+                      - generic [ref=e1962]: משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב.
+                    - gridcell
+          - row "+972 54-559-3379 Sunday משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב." [ref=e1963]:
+            - gridcell "+972 54-559-3379 Sunday משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב." [ref=e1964]:
+              - generic [ref=e1966] [cursor=pointer]:
+                - img [ref=e2291]
+                - generic [ref=e1973]:
+                  - gridcell "+972 54-559-3379 Sunday" [ref=e1974]:
+                    - generic "+972 54-559-3379" [ref=e1978]
+                    - generic [ref=e1980]: Sunday
+                  - generic [ref=e1981]:
+                    - generic "‫משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב.‬" [ref=e1983]:
+                      - generic [ref=e1985]:
+                        - img
+                      - generic [ref=e1986]: משפחה וחברים יקרים, בעקבות המצב החלטנו לדחות את בר המצווה של יונתן לתאריך 16/04. בהתאם להתפתחויות נוציא בהמשך הזמנה מעודכנת עם כל הפרטים. מאחלים לכולנו ימים שקטים יותר, ושניפגש בקרוב.
+                    - gridcell
+        - generic [ref=e2013]:
+          - generic [ref=e2014]:
+            - img
+          - text: Your personal messages are
+          - button "end-to-end encrypted" [ref=e2015] [cursor=pointer]
+  - generic [ref=e2017]:
+    - generic [ref=e2292]:
+      - generic [ref=e2294]:
+        - img
+      - generic [ref=e2295]:
+        - generic [ref=e2296]: Download WhatsApp for Windows
+        - generic [ref=e2297]: Get extra features like voice and video calling, screen sharing and more.
+      - button "Download" [ref=e2298] [cursor=pointer]:
+        - generic [ref=e2304]: Download
+    - generic [ref=e2018]:
+      - button "Send document" [ref=e2019] [cursor=pointer]:
+        - generic [ref=e2021]:
+          - img
+        - generic [ref=e2022]: Send document
+      - button "Add contact" [ref=e2023] [cursor=pointer]:
+        - generic [ref=e2025]:
+          - img
+        - generic [ref=e2026]: Add contact

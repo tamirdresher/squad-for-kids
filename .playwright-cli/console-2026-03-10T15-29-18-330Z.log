@@ -1,0 +1,2 @@
+[     838ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://github.com/users/tamirdresher-microsoft/projects/1/views/1:0
+[    6044ms] [WARNING] The resource https://github.githubassets.com/assets/mona-sans-14595085164a.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://github.com/users/tamirdresher-microsoft/projects/1/views/1:0

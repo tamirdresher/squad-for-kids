@@ -1,0 +1,775 @@
+- generic [ref=e2]:
+  - region:
+    - generic:
+      - tooltip "You are the author of this issue"
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - text: GitHub Enterprise
+        - generic "Users managed by Microsoft EMU" [ref=e14]:
+          - text: Users managed by
+          - link "Microsoft EMU" [ref=e15] [cursor=pointer]:
+            - /url: /enterprises/microsoft
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - button "Open menu" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+          - link "Homepage Enterprise (g then d)" [ref=e22] [cursor=pointer]:
+            - /url: /
+            - img [ref=e23]
+        - generic [ref=e25]:
+          - navigation "Breadcrumbs" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "tamirdresher_microsoft" [ref=e29] [cursor=pointer]:
+                  - /url: /tamirdresher_microsoft
+                  - generic [ref=e30]: tamirdresher_microsoft
+              - listitem [ref=e31]:
+                - link "tamresearch1" [ref=e32] [cursor=pointer]:
+                  - /url: /tamirdresher_microsoft/tamresearch1
+                  - generic [ref=e33]: tamresearch1
+                  - img [ref=e34]
+          - button "Search or jump to…" [ref=e38] [cursor=pointer]:
+            - generic [ref=e39]:
+              - generic:
+                - img
+              - generic [ref=e40]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e44]:
+              - link "Chat with Copilot" [ref=e46] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e47]
+              - button "Open agents panel" [ref=e51] [cursor=pointer]:
+                - generic [ref=e52]:
+                  - generic:
+                    - img
+                  - generic:
+                    - img
+            - button "Create new..." [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues" [ref=e56] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e57]
+            - link "Pull requests" [ref=e60] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e61]
+            - link "Repositories" [ref=e63] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e64]
+          - link "You have unread notifications (g then n)" [ref=e66] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e67]
+          - button "Open user navigation menu" [ref=e70] [cursor=pointer]:
+            - img "Tamir Dresher" [ref=e71]
+      - heading "Repository navigation" [level=2] [ref=e72]
+      - navigation "Repository" [ref=e73]:
+        - list [ref=e74]:
+          - listitem [ref=e75]:
+            - link "Code" [ref=e76] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1
+              - img [ref=e78]
+              - generic [ref=e80]: Code
+          - listitem [ref=e81]:
+            - link "Issues (11)" [ref=e82] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/issues
+              - img [ref=e84]
+              - generic [ref=e87]: Issues
+              - generic [ref=e88]:
+                - generic [ref=e89]: "11"
+                - generic [ref=e90]: (11)
+          - listitem [ref=e91]:
+            - link "Pull requests" [ref=e92] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/pulls
+              - img [ref=e94]
+              - generic [ref=e96]: Pull requests
+          - listitem [ref=e97]:
+            - link "Agents" [ref=e98] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/agents?author=tamirdresher_microsoft
+              - img [ref=e100]
+              - generic [ref=e103]: Agents
+          - listitem [ref=e104]:
+            - link "Actions" [ref=e105] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/actions
+              - img [ref=e107]
+              - generic [ref=e109]: Actions
+          - listitem [ref=e110]:
+            - link "Projects" [ref=e111] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/projects
+              - img [ref=e113]
+              - generic [ref=e115]: Projects
+          - listitem [ref=e116]:
+            - link "Wiki" [ref=e117] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/wiki
+              - img [ref=e119]
+              - generic [ref=e121]: Wiki
+          - listitem [ref=e122]:
+            - link "Security" [ref=e123] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/security
+              - img [ref=e125]
+              - generic [ref=e127]: Security
+          - listitem [ref=e128]:
+            - link "Insights" [ref=e129] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/network/dependencies
+              - img [ref=e131]
+              - generic [ref=e133]: Insights
+          - listitem [ref=e134]:
+            - link "Settings" [ref=e135] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/settings
+              - img [ref=e137]
+              - generic [ref=e139]: Settings
+  - main [ref=e143]:
+    - generic [ref=e149]:
+      - region "Header" [ref=e151]:
+        - generic [ref=e152]:
+          - 'heading "Tech News Digest: 2026-03-10 #273" [level=1] [ref=e154]'
+          - generic [ref=e156]:
+            - button "Edit issue title" [ref=e157] [cursor=pointer]:
+              - generic [ref=e159]: Edit
+            - link "New issue" [ref=e161] [cursor=pointer]:
+              - /url: /tamirdresher_microsoft/tamresearch1/issues/new/choose
+              - generic [ref=e163]: New issue
+            - button "Copy link" [ref=e164] [cursor=pointer]:
+              - img [ref=e165]
+      - generic [ref=e173]:
+        - img "Issue" [ref=e174]
+        - text: Closed
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - generic [ref=e181]:
+            - link "@tamirdresher_microsoft's profile" [ref=e182] [cursor=pointer]:
+              - /url: https://github.com/tamirdresher_microsoft
+              - img "@tamirdresher_microsoft" [ref=e183]
+            - generic [ref=e184]:
+              - heading "Description" [level=2] [ref=e185]
+              - generic [ref=e187]:
+                - generic [ref=e189]:
+                  - generic [ref=e190]:
+                    - link "tamirdresher_microsoft" [ref=e192] [cursor=pointer]:
+                      - /url: https://github.com/tamirdresher_microsoft
+                    - generic [ref=e193]:
+                      - text: opened
+                      - link "on Mar 10, 20263 hours ago" [ref=e194] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#issue-4051283702
+                        - generic "Mar 10, 2026, 1:55 PM GMT+2" [ref=e195]: on Mar 10, 20263 hours ago
+                  - button "Issue body actions" [ref=e199] [cursor=pointer]:
+                    - img [ref=e200]
+                - generic [ref=e202]:
+                  - generic [ref=e204]:
+                    - heading "Tech News Digest — March 10, 2026" [level=1] [ref=e205]
+                    - paragraph [ref=e206]: "75 stories scanned from HackerNews and Reddit. Here are the highlights relevant to our stack (AI, .NET, Go, K8s, dev tools):"
+                    - heading "🔥 Top Stories" [level=2] [ref=e207]
+                    - heading ".NET / C#" [level=3] [ref=e208]
+                    - list [ref=e209]:
+                      - listitem [ref=e210]:
+                        - strong [ref=e211]: C# 15 unions merged into .NET 11 preview 3
+                        - text: (209⬆) —
+                        - link "r/dotnet" [ref=e212] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/dotnet/comments/1rnxu25/
+                      - listitem [ref=e213]:
+                        - strong [ref=e214]: Terminal UI framework for .NET — multi-window, compositor effects
+                        - text: (234⬆) —
+                        - link "r/dotnet" [ref=e215] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/dotnet/comments/1rmspk3/
+                      - listitem [ref=e216]:
+                        - strong [ref=e217]: .NET 11 will have a new AI-native data type
+                        - text: (0⬆ new) —
+                        - link "r/dotnet" [ref=e218] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/dotnet/comments/1rpsuu7/
+                      - listitem [ref=e219]:
+                        - strong [ref=e220]: GoRules C# SDK — open-source rules engine for fintech/insurance
+                        - text: (61⬆) —
+                        - link "r/dotnet" [ref=e221] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/dotnet/comments/1rmd5kr/
+                      - listitem [ref=e222]:
+                        - strong [ref=e223]: Cross-platform .NET secure credential storage
+                        - text: (18⬆) —
+                        - link "r/dotnet" [ref=e224] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/dotnet/comments/1rpepsc/
+                    - heading "AI / Agents" [level=3] [ref=e225]
+                    - list [ref=e226]:
+                      - listitem [ref=e227]:
+                        - strong [ref=e228]: "Flask creator: Go works better than Python for AI agents"
+                        - text: (357⬆) —
+                        - link "r/golang" [ref=e229] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/golang/comments/1rn675y/
+                      - listitem [ref=e230]:
+                        - strong [ref=e231]: Open source persistent memory for AI agents — local embeddings, no APIs
+                        - text: (13⬆) —
+                        - link "r/artificial" [ref=e232] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/artificial/comments/1roxh71/
+                      - listitem [ref=e233]:
+                        - strong [ref=e234]: "Unpopular opinion: most AI agent use cases are productivity theater"
+                        - text: (99⬆) —
+                        - link "r/artificial" [ref=e235] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/artificial/comments/1rnom51/
+                      - listitem [ref=e236]:
+                        - strong [ref=e237]: Using AI agents for development in .NET Framework
+                        - text: (0⬆ new) —
+                        - link "r/dotnet" [ref=e238] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/dotnet/comments/1rp2fkp/
+                      - listitem [ref=e239]:
+                        - strong [ref=e240]: OpenAI acquiring Promptfoo (AI security platform)
+                        - text: (2⬆) —
+                        - link "r/artificial" [ref=e241] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/artificial/comments/1rp7xif/
+                    - heading "Go / Infrastructure" [level=3] [ref=e242]
+                    - list [ref=e243]:
+                      - listitem [ref=e244]:
+                        - strong [ref=e245]: Goroutines in production backends — practical discussion
+                        - text: (112⬆) —
+                        - link "r/golang" [ref=e246] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/golang/comments/1roncof/
+                      - listitem [ref=e247]:
+                        - strong [ref=e248]: Open-source ngrok alternative in Go — no signup, free subdomains
+                        - text: (54⬆) —
+                        - link "r/golang" [ref=e249] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/golang/comments/1rnd78x/
+                      - listitem [ref=e250]:
+                        - strong [ref=e251]: AI coding for large teams in Go — real value?
+                        - text: (73⬆) —
+                        - link "r/golang" [ref=e252] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/golang/comments/1rp70e7/
+                    - heading "Industry" [level=3] [ref=e253]
+                    - list [ref=e254]:
+                      - listitem [ref=e255]:
+                        - strong [ref=e256]: AI reimplementation and the erosion of copyleft
+                        - text: (488⬆) —
+                        - link "HackerNews" [ref=e257] [cursor=pointer]:
+                          - /url: https://writings.hongminhee.org/2026/03/legal-vs-legitimate/
+                      - listitem [ref=e258]:
+                        - strong [ref=e259]: Yann LeCun's AI startup raises \ — Europe's largest seed round
+                        - text: (69⬆) —
+                        - link "HackerNews" [ref=e260] [cursor=pointer]:
+                          - /url: https://www.ft.com/content/e5245ec3-1a58-4eff-ab58-480b6259aaf1
+                      - listitem [ref=e261]:
+                        - strong [ref=e262]: OpenAI Robotics head resigns after Pentagon deal
+                        - text: (82⬆) —
+                        - link "r/artificial" [ref=e263] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/artificial/comments/1rnmbpr/
+                    - separator [ref=e264]
+                    - paragraph [ref=e265]:
+                      - emphasis [ref=e266]: Auto-generated by tech-news-scanner.js — Ralph Round 1
+                  - generic [ref=e267]:
+                    - generic [ref=e270]:
+                      - button "Create sub-issue" [ref=e272] [cursor=pointer]:
+                        - generic [ref=e274]: Create sub-issue
+                      - button "View more sub-issue options" [ref=e276] [cursor=pointer]:
+                        - img [ref=e277]
+                    - toolbar "Reactions" [ref=e279]:
+                      - button "React" [ref=e280] [cursor=pointer]:
+                        - img [ref=e281]
+          - generic [ref=e284]:
+            - generic [ref=e285]:
+              - heading "Activity" [level=2] [ref=e286]
+              - generic [ref=e287]:
+                - region "Events" [ref=e288]:
+                  - generic [ref=e295]:
+                    - img [ref=e298]
+                    - generic [ref=e302]:
+                      - link "tamirdresher_microsoft" [ref=e304] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e305]: tamirdresher_microsoft
+                      - text: added
+                      - link "squad Squad triage inbox — Lead will assign to a member" [ref=e307] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%22
+                        - generic [ref=e309]: squad
+                        - generic [ref=e310]: Squad triage inbox — Lead will assign to a member
+                      - link "squad:seven Assigned to Seven (Research & Docs)" [ref=e312] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Aseven%22
+                        - generic [ref=e314]: squad:seven
+                        - generic [ref=e315]: Assigned to Seven (Research & Docs)
+                      - link "on Mar 10, 20263 hours ago" [ref=e316] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#event-23429486074
+                        - generic "Mar 10, 2026, 1:55 PM GMT+2" [ref=e317]: on Mar 10, 20263 hours ago
+                  - generic [ref=e321]:
+                    - img [ref=e324]
+                    - generic [ref=e328]:
+                      - link "github-project-automation" [ref=e330] [cursor=pointer]:
+                        - /url: /apps/github-project-automation
+                        - generic [ref=e331]: github-project-automation
+                      - text: added this to
+                      - generic [ref=e332]:
+                        - img [ref=e333]
+                        - link "Squad Work Board" [ref=e335] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20263 hours ago" [ref=e336] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#event-23429488497
+                        - generic "Mar 10, 2026, 1:55 PM GMT+2" [ref=e337]: on Mar 10, 20263 hours ago
+                  - generic [ref=e341]:
+                    - img [ref=e344]
+                    - generic [ref=e348]:
+                      - link "github-actions" [ref=e350] [cursor=pointer]:
+                        - /url: /apps/github-actions
+                        - generic [ref=e351]: github-actions
+                      - text: added
+                      - link "squad:belanna Assigned to B'Elanna (Infrastructure Expert)" [ref=e353] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Abelanna%22
+                        - generic [ref=e355]: squad:belanna
+                        - generic [ref=e356]: Assigned to B'Elanna (Infrastructure Expert)
+                      - link "go:needs-research Needs investigation" [ref=e358] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22go%3Aneeds-research%22
+                        - generic [ref=e360]: go:needs-research
+                        - generic [ref=e361]: Needs investigation
+                      - link "on Mar 10, 20263 hours ago" [ref=e362] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#event-23429619282
+                        - generic "Mar 10, 2026, 2:00 PM GMT+2" [ref=e363]: on Mar 10, 20263 hours ago
+                - generic [ref=e364]:
+                  - link "@github-actions's profile" [ref=e365] [cursor=pointer]:
+                    - /url: https://github.com/apps/github-actions
+                    - img "github-actions" [ref=e366]
+                  - generic [ref=e373]:
+                    - generic [ref=e375]:
+                      - heading "github-actions commented on Mar 10, 2026 3 hours ago" [level=3] [ref=e376]:
+                        - text: github-actions commented
+                        - generic "Mar 10, 2026, 2:00 PM GMT+2" [ref=e377]: on Mar 10, 2026 3 hours ago
+                      - generic [ref=e378]:
+                        - generic [ref=e379]:
+                          - link "github-actions" [ref=e380] [cursor=pointer]:
+                            - /url: /apps/github-actions
+                          - generic [ref=e381]: bot
+                        - generic [ref=e383]:
+                          - link "on Mar 10, 20263 hours ago" [ref=e384] [cursor=pointer]:
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#issuecomment-4030874700
+                            - generic "Mar 10, 2026, 2:00 PM GMT+2" [ref=e385]: on Mar 10, 20263 hours ago
+                          - generic [ref=e386]:
+                            - text: – with
+                            - link "GitHub Actions" [ref=e387] [cursor=pointer]:
+                              - /url: https://help.github.com/en/actions
+                      - button "Actions for github-actions's comment, 2:00 PM today" [ref=e391] [cursor=pointer]:
+                        - img [ref=e392]
+                    - generic [ref=e394]:
+                      - generic [ref=e396]:
+                        - heading "🏗️ Squad Triage — Picard (Lead)" [level=3] [ref=e397]
+                        - 'heading "Issue: #273 — Tech News Digest: 2026-03-10 Assigned to: B''Elanna (Infrastructure Expert) Reason: Issue relates to DevOps/infrastructure work" [level=2] [ref=e398]':
+                          - strong [ref=e399]: "Issue:"
+                          - link "#273" [ref=e400] [cursor=pointer]:
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273
+                          - text: "— Tech News Digest: 2026-03-10"
+                          - strong [ref=e401]: "Assigned to:"
+                          - text: B'Elanna (Infrastructure Expert)
+                          - strong [ref=e402]: "Reason:"
+                          - text: Issue relates to DevOps/infrastructure work
+                        - paragraph [ref=e403]:
+                          - strong [ref=e404]: "Team roster:"
+                        - list [ref=e405]:
+                          - listitem [ref=e406]:
+                            - strong [ref=e407]: Picard
+                            - text: "(Lead) → label:"
+                            - code [ref=e408]: squad:picard
+                          - listitem [ref=e409]:
+                            - strong [ref=e410]: B'Elanna
+                            - text: "(Infrastructure Expert) → label:"
+                            - code [ref=e411]: squad:belanna
+                          - listitem [ref=e412]:
+                            - strong [ref=e413]: Worf
+                            - text: "(Security & Cloud) → label:"
+                            - code [ref=e414]: squad:worf
+                          - listitem [ref=e415]:
+                            - strong [ref=e416]: Data
+                            - text: "(Code Expert) → label:"
+                            - code [ref=e417]: squad:data
+                          - listitem [ref=e418]:
+                            - strong [ref=e419]: Seven
+                            - text: "(Research & Docs) → label:"
+                            - code [ref=e420]: squad:seven
+                          - listitem [ref=e421]:
+                            - strong [ref=e422]: Podcaster
+                            - text: "(Audio Content Generator) → label:"
+                            - code [ref=e423]: squad:podcaster
+                          - listitem [ref=e424]:
+                            - strong [ref=e425]: Tamir Dresher
+                            - text: "(👤 Human — Project Owner) → label:"
+                            - code [ref=e426]: squad:tamirdresher
+                          - listitem [ref=e427]:
+                            - strong [ref=e428]: Kes
+                            - text: "(Communications & Scheduling) → label:"
+                            - code [ref=e429]: squad:kes
+                          - listitem [ref=e430]:
+                            - strong [ref=e431]: Ralph
+                            - text: "(Work Monitor) → label:"
+                            - code [ref=e432]: squad:ralph
+                          - listitem [ref=e433]:
+                            - strong [ref=e434]: Neelix
+                            - text: "(News Reporter) → label:"
+                            - code [ref=e435]: squad:neelix
+                          - listitem [ref=e436]:
+                            - strong [ref=e437]: "@copilot"
+                            - text: "(Coding Agent) → label:"
+                            - code [ref=e438]: squad:copilot
+                        - blockquote [ref=e439]:
+                          - paragraph [ref=e440]:
+                            - text: To reassign, remove the current
+                            - code [ref=e441]: squad:*
+                            - text: label and add the correct one.
+                      - toolbar "Reactions" [ref=e442]:
+                        - button "React" [ref=e443] [cursor=pointer]:
+                          - img [ref=e444]
+                - region "Events" [ref=e446]:
+                  - generic [ref=e453]:
+                    - img [ref=e456]
+                    - generic [ref=e460]:
+                      - link "tamirdresher_microsoft" [ref=e462] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e463]: tamirdresher_microsoft
+                      - text: added
+                      - link "status:pending-user Waiting for user input or decision" [ref=e465] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e467]: status:pending-user
+                        - generic [ref=e468]: Waiting for user input or decision
+                      - text: and removed
+                      - link "go:needs-research Needs investigation" [ref=e470] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22go%3Aneeds-research%22
+                        - generic [ref=e472]: go:needs-research
+                        - generic [ref=e473]: Needs investigation
+                      - link "status:pending-user Waiting for user input or decision" [ref=e475] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22status%3Apending-user%22
+                        - generic [ref=e477]: status:pending-user
+                        - generic [ref=e478]: Waiting for user input or decision
+                      - link "on Mar 10, 20263 hours ago" [ref=e479] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#event-23429766322
+                        - generic "Mar 10, 2026, 2:05 PM GMT+2" [ref=e480]: on Mar 10, 20263 hours ago
+                  - generic [ref=e484]:
+                    - img [ref=e487]
+                    - generic [ref=e491]:
+                      - link "tamirdresher_microsoft" [ref=e493] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e494]: tamirdresher_microsoft
+                      - text: moved this to Todo in
+                      - generic [ref=e495]:
+                        - img [ref=e496]
+                        - link "Squad Work Board" [ref=e498] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20262 hours ago" [ref=e499] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273
+                        - generic "Mar 10, 2026, 2:28 PM GMT+2" [ref=e500]: on Mar 10, 20262 hours ago
+                - generic [ref=e501]:
+                  - link "@tamirdresher_microsoft's profile" [ref=e502] [cursor=pointer]:
+                    - /url: https://github.com/tamirdresher_microsoft
+                    - img "tamirdresher_microsoft" [ref=e503]
+                  - generic [ref=e510]:
+                    - generic [ref=e512]:
+                      - heading "tamirdresher_microsoft commented on Mar 10, 2026 2 hours ago" [level=3] [ref=e513]:
+                        - text: tamirdresher_microsoft commented
+                        - generic "Mar 10, 2026, 2:39 PM GMT+2" [ref=e514]: on Mar 10, 2026 2 hours ago
+                      - generic [ref=e515]:
+                        - link "tamirdresher_microsoft" [ref=e517] [cursor=pointer]:
+                          - /url: /tamirdresher_microsoft
+                        - link "on Mar 10, 20262 hours ago" [ref=e520] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#issuecomment-4031088391
+                          - generic "Mar 10, 2026, 2:39 PM GMT+2" [ref=e521]: on Mar 10, 20262 hours ago
+                      - generic [ref=e523]:
+                        - generic "You are the author of this issue" [ref=e525]: Author
+                        - button "Actions for tamirdresher_microsoft's comment, 2:39 PM today" [ref=e527] [cursor=pointer]:
+                          - img [ref=e528]
+                    - generic [ref=e530]:
+                      - paragraph [ref=e533]: ✅ Tech News Digest for March 10, 2026 is complete. Content was auto-generated and posted to the issue body. Closing as done.
+                      - toolbar "Reactions" [ref=e534]:
+                        - button "React" [ref=e535] [cursor=pointer]:
+                          - img [ref=e536]
+                - region "Events" [ref=e538]:
+                  - generic [ref=e545]:
+                    - img [ref=e548]
+                    - generic [ref=e552]:
+                      - link "tamirdresher_microsoft" [ref=e554] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e555]: tamirdresher_microsoft
+                      - text: closed this as
+                      - link "completed" [ref=e556] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft/tamresearch1/issues?q=is%3Aissue%20state%3Aclosed%20archived%3Afalse%20reason%3Acompleted
+                      - link "on Mar 10, 20262 hours ago" [ref=e557] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#event-23430767681
+                        - generic "Mar 10, 2026, 2:39 PM GMT+2" [ref=e558]: on Mar 10, 20262 hours ago
+                  - generic [ref=e565]:
+                    - img [ref=e568]
+                    - generic [ref=e572]:
+                      - link "tamirdresher_microsoft" [ref=e574] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e575]: tamirdresher_microsoft
+                      - text: moved this from Todo to Done in
+                      - generic [ref=e576]:
+                        - img [ref=e577]
+                        - link "Squad Work Board" [ref=e579] [cursor=pointer]:
+                          - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                      - link "on Mar 10, 20262 hours ago" [ref=e580] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273
+                        - generic "Mar 10, 2026, 2:42 PM GMT+2" [ref=e581]: on Mar 10, 20262 hours ago
+                  - generic [ref=e588]:
+                    - img [ref=e591]
+                    - generic [ref=e595]:
+                      - link "tamirdresher_microsoft" [ref=e597] [cursor=pointer]:
+                        - /url: /tamirdresher_microsoft
+                        - generic [ref=e598]: tamirdresher_microsoft
+                      - text: added a commit that references this issue
+                      - link "on Mar 10, 20262 hours ago" [ref=e599] [cursor=pointer]:
+                        - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/273#event-23431261573
+                        - generic "Mar 10, 2026, 2:55 PM GMT+2" [ref=e600]: on Mar 10, 20262 hours ago
+                      - generic [ref=e603]:
+                        - generic [ref=e604]:
+                          - 'generic "Ralph Round 1 Work-Check: Orchestration Complete - Orchestration log: Round 1 scan results (16 issues, 13 pending-user, 3 actionable) - Session log: Brief status (ralph-active) - Decisions: Merged Picard parallelism architecture (Option 2 adopted) - Identity/now.md: Updated focus (Ralph active, Data on #265) - Issues: #273 closed, #265 in progress, #277 created Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>" [ref=e605]':
+                            - 'link "Ralph Round 1 Work-Check: Orchestration Complete - Orchestration log: Round 1 scan results (16 issues, 13 pending-user, 3 actionable) - Session log: Brief status (ralph-active) - Decisions: Merged Picard parallelism architecture (Option 2 adopted) - Identity/now.md: Updated focus (Ralph active, Data on #265) - Issues: #273 closed, #265 in progress, #277 created Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>" [ref=e606] [cursor=pointer]':
+                              - /url: https://github.com/tamirdresher_microsoft/tamresearch1/commit/0a2a051781e294aed54a7dc1710a4c791a978618
+                              - paragraph [ref=e608]: "Ralph Round 1 Work-Check: Orchestration Complete"
+                          - button "Show commit message body" [ref=e609] [cursor=pointer]:
+                            - generic [ref=e611]: ...
+                        - link "0a2a051" [ref=e613] [cursor=pointer]:
+                          - /url: https://github.com/tamirdresher_microsoft/tamresearch1/commit/0a2a051781e294aed54a7dc1710a4c791a978618
+            - generic [ref=e615]:
+              - link "@tamirdresher_microsoft's profile" [ref=e616] [cursor=pointer]:
+                - /url: /tamirdresher_microsoft
+                - img "tamirdresher_microsoft" [ref=e617]
+              - heading "Add a comment" [level=2] [ref=e618]
+              - group "new Comment" [ref=e623]:
+                - generic [ref=e624] [cursor=pointer]: new Comment
+                - generic [ref=e625]:
+                  - generic [ref=e626]: "Markdown input: edit mode selected."
+                  - generic [ref=e627]:
+                    - generic [ref=e628]:
+                      - navigation "View mode" [ref=e632]:
+                        - tablist [ref=e633]:
+                          - tab "Write" [selected] [ref=e634] [cursor=pointer]
+                          - tab "Preview" [ref=e635] [cursor=pointer]
+                      - generic [ref=e636]:
+                        - toolbar "Formatting tools" [ref=e638]:
+                          - button "Heading" [ref=e639] [cursor=pointer]:
+                            - img [ref=e640]
+                          - button "Bold" [ref=e642] [cursor=pointer]:
+                            - img [ref=e643]
+                          - button "Italic" [ref=e645] [cursor=pointer]:
+                            - img [ref=e646]
+                          - button "Quote" [ref=e648] [cursor=pointer]:
+                            - img [ref=e649]
+                          - button "Code" [ref=e651] [cursor=pointer]:
+                            - img [ref=e652]
+                          - button "Link" [ref=e654] [cursor=pointer]:
+                            - img [ref=e655]
+                          - generic [ref=e657]:
+                            - button "Unordered list" [ref=e659] [cursor=pointer]:
+                              - img [ref=e660]
+                            - button "Numbered list" [ref=e662] [cursor=pointer]:
+                              - img [ref=e663]
+                            - button "Task list" [ref=e665] [cursor=pointer]:
+                              - img [ref=e666]
+                          - generic [ref=e668]:
+                            - button "Mention" [ref=e670] [cursor=pointer]:
+                              - img [ref=e671]
+                            - button "Reference" [ref=e673] [cursor=pointer]:
+                              - img [ref=e674]
+                          - button "Slash commands" [ref=e676] [cursor=pointer]:
+                            - img [ref=e677]
+                        - button "Saved replies" [ref=e679] [cursor=pointer]:
+                          - img [ref=e680]
+                    - textbox "Add a comment" [ref=e685]:
+                      - /placeholder: Use Markdown to format your comment
+                  - generic [ref=e686]:
+                    - button "Paste, drop, or click to add files" [ref=e689] [cursor=pointer]:
+                      - generic [ref=e690]:
+                        - generic:
+                          - img
+                        - generic [ref=e692]: Paste, drop, or click to add files
+                    - generic [ref=e693]:
+                      - generic [ref=e694]:
+                        - button "Reopen issue" [ref=e696] [cursor=pointer]:
+                          - generic [ref=e697]:
+                            - generic:
+                              - img
+                            - generic [ref=e698]: Reopen issue
+                        - button "More options" [ref=e700] [cursor=pointer]:
+                          - img [ref=e701]
+                      - tooltip "Comment can not be empty" [ref=e703]:
+                        - button "Comment" [disabled] [ref=e704]:
+                          - generic [ref=e706]: Comment
+        - generic [ref=e708]:
+          - heading "Metadata" [level=2] [ref=e709]
+          - generic [ref=e711]:
+            - generic [ref=e712]:
+              - generic [ref=e713]:
+                - generic [ref=e714]:
+                  - heading "Assignees" [level=3]
+                  - button "Edit Assignees" [ref=e715] [cursor=pointer]:
+                    - generic [ref=e716]: Edit Assignees
+                    - generic:
+                      - img
+                - generic [ref=e717]:
+                  - text: No one -
+                  - button "Assign yourself" [ref=e718] [cursor=pointer]:
+                    - generic [ref=e720]: Assign yourself
+              - button "Assign to Copilot" [ref=e723] [cursor=pointer]:
+                - generic [ref=e724]:
+                  - generic:
+                    - img
+                  - generic [ref=e725]: Assign to Copilot
+            - generic [ref=e726]:
+              - generic [ref=e728]:
+                - heading "Labels" [level=3]
+                - button "Edit Labels" [ref=e729] [cursor=pointer]:
+                  - generic [ref=e730]: Edit Labels
+                  - generic:
+                    - img
+              - generic [ref=e732]:
+                - link "squad Squad triage inbox — Lead will assign to a member" [ref=e733] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%22
+                  - generic [ref=e735]: squad
+                  - generic [ref=e736]: Squad triage inbox — Lead will assign to a member
+                - link "squad:belanna Assigned to B'Elanna (Infrastructure Expert)" [ref=e737] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Abelanna%22
+                  - generic [ref=e739]: squad:belanna
+                  - generic [ref=e740]: Assigned to B'Elanna (Infrastructure Expert)
+                - link "squad:seven Assigned to Seven (Research & Docs)" [ref=e741] [cursor=pointer]:
+                  - /url: https://github.com/tamirdresher_microsoft/tamresearch1/issues?q=state%3Aopen%20label%3A%22squad%3Aseven%22
+                  - generic [ref=e743]: squad:seven
+                  - generic [ref=e744]: Assigned to Seven (Research & Docs)
+            - generic [ref=e745]:
+              - generic [ref=e747]:
+                - heading "Projects" [level=3]
+                - button "Edit Projects" [ref=e748] [cursor=pointer]:
+                  - generic [ref=e749]: Edit Projects
+                  - generic:
+                    - img
+              - generic [ref=e753]:
+                - link "Squad Work Board" [ref=e755] [cursor=pointer]:
+                  - /url: https://github.com/users/tamirdresher_microsoft/projects/1
+                  - img [ref=e756]
+                  - generic "Squad Work Board" [ref=e758]
+                - generic [ref=e759]:
+                  - generic [ref=e760]:
+                    - paragraph [ref=e761]: Status
+                    - button "Done" [ref=e762] [cursor=pointer]:
+                      - generic [ref=e765]:
+                        - generic [ref=e767]: Done
+                        - img [ref=e768]
+                  - button "Show more project fields" [ref=e770] [cursor=pointer]:
+                    - img [ref=e771]
+            - generic [ref=e774]:
+              - generic [ref=e775]:
+                - heading "Milestone" [level=3]
+                - button "Edit Milestone" [ref=e776] [cursor=pointer]:
+                  - generic [ref=e777]: Edit Milestone
+                  - generic:
+                    - img
+              - generic [ref=e778]: No milestone
+            - generic [ref=e780]:
+              - generic [ref=e781]:
+                - heading "Relationships" [level=3]
+                - button "Edit Relationships" [ref=e782] [cursor=pointer]:
+                  - generic [ref=e783]: Edit Relationships
+                  - generic:
+                    - img
+              - generic [ref=e784]: None yet
+            - generic [ref=e785]:
+              - generic [ref=e787]:
+                - heading "Development" [level=3]
+                - button "Edit Development" [ref=e788] [cursor=pointer]:
+                  - generic [ref=e789]: Edit Development
+                  - generic:
+                    - img
+              - generic [ref=e790]:
+                - generic [ref=e792]:
+                  - button "Code with agent mode" [ref=e794] [cursor=pointer]:
+                    - generic [ref=e795]:
+                      - generic:
+                        - img
+                      - generic [ref=e796]: Code with agent mode
+                  - button "Select code repository" [ref=e799] [cursor=pointer]:
+                    - img [ref=e800]
+                - generic [ref=e802]:
+                  - button "Create a branch" [ref=e803] [cursor=pointer]:
+                    - generic [ref=e805]: Create a branch
+                  - text: for this issue or link a pull request.
+                - list
+            - generic [ref=e806]:
+              - generic [ref=e808]:
+                - heading "Notifications" [level=3]
+              - generic [ref=e810]:
+                - button "Unsubscribe" [ref=e811] [cursor=pointer]:
+                  - generic [ref=e812]:
+                    - generic:
+                      - img
+                    - generic [ref=e813]: Unsubscribe
+                - paragraph [ref=e814]: You're receiving notifications because you're subscribed to this thread.
+            - generic [ref=e815]:
+              - generic [ref=e817]:
+                - heading "Participants" [level=3]
+              - link "@tamirdresher_microsoft" [ref=e821] [cursor=pointer]:
+                - /url: /tamirdresher_microsoft
+                - img "@tamirdresher_microsoft" [ref=e822]
+            - heading "Issue actions" [level=2] [ref=e823]
+            - list [ref=e824]:
+              - listitem [ref=e825]:
+                - button "Transfer issue" [ref=e826] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e828]: Transfer issue
+              - listitem [ref=e829]:
+                - button "Duplicate issue" [ref=e830] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e832]: Duplicate issue
+              - listitem [ref=e833]:
+                - button "Lock conversation" [ref=e834] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e836]: Lock conversation
+              - listitem [ref=e837]:
+                - button "Up to 3 issues can be pinned to the top of the issues page" [ref=e838] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - tooltip "Up to 3 issues can be pinned to the top of the issues page" [ref=e841]: Pin issue
+              - listitem [ref=e842]:
+                - button "Delete issue" [ref=e843] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e845]: Delete issue
+              - listitem [ref=e846]:
+                - button "Give feedback" [ref=e847] [cursor=pointer]:
+                  - generic:
+                    - img
+                  - generic [ref=e849]: Give feedback
+  - contentinfo [ref=e850]:
+    - heading "Footer" [level=2] [ref=e851]
+    - generic [ref=e852]:
+      - generic [ref=e853]:
+        - link "GitHub Homepage" [ref=e854] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e855]
+        - generic [ref=e857]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e858]:
+        - heading "Footer navigation" [level=3] [ref=e859]
+        - list "Footer navigation" [ref=e860]:
+          - listitem [ref=e861]:
+            - link "Terms" [ref=e862] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e863]:
+            - link "Privacy" [ref=e864] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e865]:
+            - link "Security" [ref=e866] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e867]:
+            - link "Status" [ref=e868] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e869]:
+            - link "Community" [ref=e870] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e871]:
+            - link "Docs" [ref=e872] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e873]:
+            - link "Contact" [ref=e874] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e875]:
+            - button "Manage cookies" [ref=e877] [cursor=pointer]
+          - listitem [ref=e878]:
+            - button "Do not share my personal information" [ref=e880] [cursor=pointer]

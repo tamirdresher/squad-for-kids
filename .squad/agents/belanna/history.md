@@ -310,3 +310,31 @@ Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish w
 **Pattern Learned — Private Repo Triage:**
 When issue references repos we can't access, document the exact commands and checklist for the human to execute, rather than blocking on access issues.
 
+
+---
+
+## 2026-03-11: Cross-Agent Context — Wizard CodeQL & IaC Drift Follow-up
+
+**Incoming Work (from cross-agent coordination):**
+
+### Issue #339 — DK8S Wizard CodeQL & 1ES Permissions 
+
+**From Seven's research, your action items:**
+1. **CodeQL Setup (URGENT):** Enable CodeQL scanning on DK8S Provisioning Wizard repo
+   - Compliance deadline: 30-day SLA (Liquid portal PRD-14079533)
+   - Integrate CodeQL tasks into build pipelines
+   - Coordinate with Ramaprakash on 1ES permission flows for wizard Managed Identity
+
+2. **1ES Permissions Service Impact:**
+   - Wizard-initiated PRs/branches/pipeline triggers broken post-migration
+   - MI attribution issue (ADO lacks On-Behalf-Of flow)
+   - Requires action on both infrastructure (your domain) and wizard configuration (Ramaprakash)
+
+**Decision 20** captures full analysis. Ramaprakash has parallel action items.
+
+### Related: Decision 23 — Cosmos DB IaC Drift (Your Input Pending)
+
+**Status:** Proposed in inbox, now merged to decisions.md. Review your own decision for implementation planning when bandwidth available.
+
+**Cross-Agent Note:** Scribe has updated orchestration logs and consolidated decisions. Your history.md kept current for continuity.
+

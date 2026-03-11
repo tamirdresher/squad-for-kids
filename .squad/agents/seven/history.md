@@ -208,3 +208,49 @@
 - Added `status:pending-user` label for Tamir's review
 
 **Status:** Research complete. Clarified that Ramaprakash's request was about enabling CodeQL scanning on DK8S wizard (compliance), while separate operational issues exist due to 1ES migration.
+
+---
+
+## 2026-03-11: Issue #339 — DK8S Wizard CodeQL & Operational Analysis
+
+**Assignment:** Investigate Ramaprakash's DK8S wizard statement in context of Issue #339 CodeQL compliance research.
+
+**Research Methodology:**
+- WorkIQ (M365 search) — Found Ramaprakash Teams message requesting CodeQL review
+- ADO work item search — Identified CodeQL issues for wizards (but different product lines)
+- Teams channel analysis — Found 1ES Permissions Service migration impact on DK8S wizard operations
+- Cross-reference pattern — Distinguished DK8S wizard from OEM/Fulfillment wizard implementation
+
+**Key Findings:**
+
+### Finding 1: CodeQL Compliance Gap (Direct Request)
+- Source: Ramaprakash → Tamir via Teams
+- Action: Enable CodeQL scanning on DK8S Provisioning Wizard repository
+- Compliance: Liquid portal PRD-14079533 (Microsoft.Security.CodeQL.10000)
+- Blocker: 30-day SLA for compliance evidence submission
+
+### Finding 2: Wizard Operational Failures (Separate Issue)
+- Root cause: 1ES Permissions Service migration
+- Impact: Wizard-initiated PRs, branch creation, pipeline triggers broken
+- Secondary: Managed Identity attribution conflict (ADO lacks On-Behalf-Of)
+- Architecture guidance: Clusters must scope to single service tree leaf nodes
+
+### Finding 3: Cross-Product Confusion (Red Herring)
+- Found multiple CodeQL issues for Microsoft.MDOS.Wizard.V2 (OEM wizard)
+- Investigated but ruled out — different team, different codebase
+- Value: Demonstrates importance of cross-tool validation
+
+**Action Owners Identified:**
+- **CodeQL Setup:** B'Elanna (Infrastructure/CI-CD)
+- **Wizard 1ES Fixes:** Ramaprakash + B'Elanna
+- **Service Tree Scoping:** Ramaprakash (guidance owner)
+
+**Recommendations for Squad:**
+1. Document cross-tool research methodology (WorkIQ + ADO + Teams pattern)
+2. Create "research findings handoff" template for handing off complex issues to action owners
+3. Consider bi-weekly research office hours for coordination on multi-owner issues
+
+**Decision:** Documented as Decision 20 in `.squad/decisions.md`
+
+**Related:** Orchestration log at `.squad/orchestration-log/2026-03-11T22-04-55Z-seven.md`
+

@@ -19702,3 +19702,311 @@ Status: Rebased onto latest main, build clean, awaiting PR merge
 
 Implements squad-monitor issue #10 (UI consolidation). PR #4 ready for review.
 
+
+## Decision 18: Research Squad Repository Created
+
+**Decision ID:** 18  
+**Date:** 2026-03-11  
+**Author:** Picard  
+**Issue:** #341  
+**Status:** ✅ ACTIVE
+
+### Context
+
+Tamir approved the Research Squad proposal for a dedicated research team operating in a separate repository. Key requirement: "You do all. And have a dedicated Ralph. Each should be isolated so can run in different machines."
+
+### Decision
+
+Created **tamresearch1-research** repository with full Squad structure and 6-member research team.
+
+**Repository:** `tamirdresher_microsoft/tamresearch1-research` (private)
+
+**Team Roster:**
+- Guinan — Research Lead
+- Geordi — Technology Scanner
+- Troi — Methodology Analyst
+- Brahms — Architecture Researcher
+- Scribe-R — Research Scribe
+- Ralph-R — Research Ralph (isolated from Production Ralph)
+
+### Implementation
+
+1. ✅ Full .squad/ Structure (agents, routing, decisions, ceremonies, casting)
+2. ✅ Research Directories (active/, completed/, failed/)
+3. ✅ Cross-Repo Bridge (inbound/, outbound/)
+4. ✅ Symposium Structure (templates/, sessions/)
+5. ✅ Initial Research Backlog (6 priorities)
+
+### Consequences
+
+- ✅ Research squad fully autonomous — no production bottlenecks
+- ✅ Ralph-R isolation prevents priority conflicts with Production Ralph
+- ✅ Failed research is safe — separate repo means experiments don't clutter production
+- ✅ Symposium ceremony enables batch findings (reduces noise)
+- ⚠️ Two repos to monitor (Ralph-R handles this)
+- ⚠️ Cross-repo issue protocol adds coordination overhead
+
+### Status
+
+✅ Operational as of 2026-03-11. Research capacity ready.
+
+---
+
+## Decision 19: MDE CopilotCliAssets Integration
+
+**Decision ID:** 19  
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** ✅ ACTIVE  
+**Scope:** Skills & Knowledge Management
+
+### Context
+
+Evaluated https://dev.azure.com/microsoft/DefenderCommon/_git/MDE.ServiceModernization.CopilotCliAssets to identify useful patterns for Squad integration.
+
+### Decision
+
+### ✅ INTEGRATED: Reflect Skill
+
+**Adopted:** `.squad/skills/reflect/SKILL.md`
+
+**Why:** Squad already uses history.md and decisions.md. Reflect adds in-flight learning capture with confidence levels (HIGH/MED/LOW), preventing mistakes. Complements existing knowledge systems.
+
+**Adaptations:**
+- Storage paths adapted to `.squad/` structure
+- Routes team-wide learnings through `.squad/decisions/inbox/`
+- Agent-specific learnings append to `.squad/agents/{agent}/history.md`
+- Preserves HIGH/MED/LOW confidence classification
+
+**Original credit:** Richard Murillo (rimuri), MDE.ServiceModernization.CopilotCliAssets
+
+### ❌ NOT INTEGRATED: PR Review Orchestrator
+
+**Why:** Squad already has Ralph monitoring PRs. Adding parallel sub-agent orchestration duplicates existing workflows.
+
+### ❌ NOT INTEGRATED: Monthly Service Report
+
+**Why:** Highly specific to MDE team. Squad has no monthly reporting requirements.
+
+### ❌ NOT INTEGRATED: Plugin Packaging Structure
+
+**Why:** Squad designed for single-repo adoption, not plugin marketplace.
+
+### Rationale
+
+Adopt patterns enhancing existing knowledge management without duplicating workflows or adding unnecessary complexity.
+
+### Consequences
+
+- ✅ Improved learning capture with confidence-leveled patterns
+- ⚠️ Adoption overhead — Squad agents must learn to invoke reflect proactively
+- ⚠️ Potential duplication if learnings captured in both reflect AND history.md
+
+### Status
+
+✅ Implementation complete. Reflect skill ready for agent adoption.
+
+---
+
+## Decision 20: DK8S Wizard CodeQL & Operational Issues
+
+**Decision ID:** 20  
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Issue:** #339  
+**Status:** ⏳ Pending Review
+
+### Summary
+
+Research uncovered two distinct DK8S wizard issues: (1) CodeQL compliance requirement, (2) operational failures from 1ES Permissions Service migration.
+
+### Findings
+
+### 1. CodeQL Compliance Request (Direct Ask)
+
+**Source:** Teams message from Ramaprakash to Tamir  
+**Content:** Explicit request to review CodeQL compliance for DK8S Provisioning Wizard  
+**Link:** Microsoft.Security.CodeQL.10000 compliance (Liquid portal PRD-14079533)  
+**Action Required:** Enable CodeQL scanning on DK8S wizard repository
+
+### 2. Wizard Operational Issues (Separate Problem)
+
+**1ES Permissions Migration Impact:**
+- Org onboarded to 1ES Permissions Service
+- Broke wizard-initiated PRs, branch creation, pipeline triggers
+- Non-human identities (MI/SP) require new 1ES processes
+
+**Managed Identity Attribution:**
+- Wizard uses MI for ADO operations
+- ADO doesn't support On-Behalf-Of flow
+- Actions appear as MI, not initiating user → audit/compliance concerns
+
+**Security Architecture Guidance:**
+- Clusters should scope to single service tree leaf nodes
+- Rationale: smaller blast radius, granular security boundaries
+
+### 3. ADO CodeQL Work Items (Not DK8S)
+
+**Found:** Multiple CodeQL findings for Microsoft.MDOS.Wizard.V2 (OEM wizard)  
+**Relevance:** Different wizard implementation, not applicable to DK8S wizard
+
+### Action Owners
+
+| Problem Domain | Owner | Reason |
+|---|---|---|
+| CodeQL scanning setup | B'Elanna (Infrastructure) | CI/CD pipeline configuration |
+| Wizard 1ES fixes | Ramaprakash + B'Elanna | DK8S expertise + infra access |
+| Service tree scoping | Ramaprakash | Already provided guidance |
+
+### Recommended Actions
+
+**Immediate (Issue #339):**
+1. Enable CodeQL scanning on DK8S wizard repository
+2. Integrate CodeQL tasks into build pipelines
+3. Submit compliance evidence to Liquid portal
+
+**Follow-up (Wizard Operations):**
+1. Fix 1ES permission flows for wizard MI
+2. Implement proper user attribution for audit trails
+3. Validate wizard enforces service-tree-scoped cluster creation
+
+### Implications
+
+- Research methodology validated: WorkIQ + ADO search + Teams channel analysis
+- Cross-tool correlation required to distinguish related but separate issues
+- Naming similarity (wizard) doesn't imply same codebase/team
+
+### Status
+
+Research complete. Findings ready for squad action and cross-team coordination.
+
+---
+
+## Decision 21: Email-to-Action Pipeline for Family Requests
+
+**Decision ID:** 21  
+**Date:** 2026-07-14  
+**Author:** Picard  
+**Issue:** #259  
+**Status:** Proposed (pending Tamir approval)
+
+### Context
+
+Tamir wants his wife (Gabi) to be able to send requests that the squad can act on — printing documents, adding calendar events, setting reminders, and general tasks.
+
+### Decision
+
+Recommend **M365 Shared Mailbox + Power Automate** as the email-to-action pipeline:
+
+1. **Print requests** → Forward to `Dresherhome@hpeprint.com`
+2. **Calendar requests** → Create Outlook calendar event
+3. **Reminders** → Create Outlook Task/To-Do
+4. **General requests** → Create GitHub issue with `source:family` label
+
+### Rationale
+
+- Power Automate is native to M365 (no extra cost)
+- Shared mailbox is free with existing M365 license
+- Email is more reliable than WhatsApp automation (which violates ToS)
+- Security: sender validation ensures only Gabi's email triggers actions
+
+### Impact
+
+- New label `source:family` for family-originated issues
+- Squad may receive non-technical issues (household tasks) — routing rules needed
+- No infrastructure changes to existing squad setup
+
+### Team Relevance
+
+All squad members should know that `source:family` labeled issues are household/personal tasks from Tamir's family, not technical work items.
+
+### Status
+
+Proposed. Awaiting user approval for implementation.
+
+---
+
+## Decision 22: Multi-Org ADO MCP Configuration Implementation
+
+**Decision ID:** 22  
+**Date:** 2026-06-24  
+**Author:** Data (Code Expert)  
+**Related Issue:** #329  
+**Status:** Pending user decision
+
+### Proposal
+
+Complete the implementation of approved multi-instance MCP pattern by updating both global and repo-level MCP config files. Replace single `azure-devops` instance with named `ado-microsoft` and `ado-msazure` instances.
+
+### Why This Matters
+
+- All squad agents currently blind to `msazure` org repos, PRs, and work items
+- Cross-org PR reviews (e.g., PR #15000967 in msazure/CESEC) fail silently
+- Decision 14 approved 3+ months ago but Phase 2 validation never completed
+
+### Config Change (both files)
+
+```json
+{
+  "ado-microsoft": {
+    "type": "local",
+    "command": "npx",
+    "args": ["-y", "@azure-devops/mcp", "microsoft"],
+    "tools": ["*"]
+  },
+  "ado-msazure": {
+    "type": "local",
+    "command": "npx",
+    "args": ["-y", "@azure-devops/mcp", "msazure"],
+    "tools": ["*"]
+  }
+}
+```
+
+### Impact
+
+- Tool names change: `azure-devops-*` → `ado-microsoft-*` / `ado-msazure-*`
+- All agent routing.md references need updating
+- Memory: ~50MB additional for second Node.js process
+
+### Status
+
+Pending user decision on approach confirmation and org list.
+
+---
+
+## Decision 23: Cosmos DB IaC Drift Remediation
+
+**Decision ID:** 23  
+**Date:** 2026-07-17  
+**Author:** B'Elanna (Infrastructure)  
+**Related Issue:** #337  
+**Related Incident:** IcM 759361753  
+**Status:** Proposed
+
+### Problem
+
+Live Azure state for multiple Cosmos DB accounts diverges from IaC definitions:
+- Bicep template defines `publicNetworkAccess: 'Enabled'` and `networkAclBypass: 'AzureServices'`
+- Several live accounts show `publicNetworkAccess: Disabled`, `networkAclBypass: None`
+- NSP (Network Security Perimeter) policies enforcing network restrictions in Deny mode
+
+This drift means IaC is no longer the source of truth for Cosmos DB network configuration.
+
+### Recommendation
+
+1. **Audit and reconcile** IaC templates with actual Azure state for all Cosmos DB accounts
+2. **Import existing network rules** into Bicep/Terraform to prevent future drift
+3. **Document which policies are managed centrally** (governance team) vs. team-managed
+4. **Add drift detection** to CI/CD — `az deployment what-if` or similar
+
+### Impact
+
+Without this, future incidents like IcM 759361753 will keep occurring. Team cannot confidently answer "did we change anything?" when IaC doesn't reflect reality.
+
+### Status
+
+Proposed. Awaiting B'Elanna follow-up for implementation planning.
+
+---
+

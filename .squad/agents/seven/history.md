@@ -4623,3 +4623,49 @@ For multi-repo deliverables:
 7. Notify via Teams webhook
 8. Comment on originating issue with PR link
 
+
+## Learnings
+
+### 2026-03-04: Blog Series Continuity (Issue #313)
+
+**Context:** Tamir requested a refresh of the "Resistance is Futile" blog post to flow as a natural continuation of the existing blog series, not as if Squad was being introduced for the first time.
+
+**What I Did:**
+1. Read all existing blog posts from tamirdresher.github.io (_posts directory) to understand the narrative arc
+2. Analyzed the progression: personal productivity struggles → Squad discovery → technical implementations (symlinks, remote control, video production) → workflow transformation
+3. Reviewed the original draft that needed refreshing
+4. Wrote "From Personal Repo to Work Team" as a bridge post that:
+   - References previous posts naturally (building on established context)
+   - Covers the transition from personal experimental repo to production work repo (DK8S team)
+   - Emphasizes human + AI team model (not AI replacement)
+   - Includes Brady Gaster attribution and team member details
+   - Covers routing rules, metrics, costs, and limitations
+
+**Key Insight:** When writing serialized content, always read the full series history first. The narrative arc matters more than individual post quality — readers need to feel progression and continuity, not repetition of concepts.
+
+**Team Impact:** This establishes the pattern for future blog posts in the series. Part 0 (personal), Part 1 (first team), Part 2 (work team), Part 3+ (organizational scale). Each builds on previous context rather than reintroducing concepts.
+
+**Tamir's Voice:** Maintained the characteristic style: confessional opening, technical depth with real examples, "here's what doesn't work" honesty, Star Trek references where appropriate, concrete metrics and cost transparency.
+
+### 2026-03-11: Seven — Blog Part 2 Refresh Research & Writing — Issue #313 (COMPLETED)
+
+**Assignment:** Tamir requested blog post Part 2 for AI Squad productivity narrative. Focus: lessons learned from 48-hour sprint, system design principles, integration patterns that enabled high throughput.
+
+**What I Did:**
+1. Reviewed blog-draft-ai-squad-productivity.md (Part 1) to understand narrative voice and key themes
+2. Analyzed squad activity logs for concrete examples: 14 PRs merged, 6 security findings, 3 infra improvements
+3. Researched technical blog best practices per Decision 6
+4. Drafted comprehensive Part 2 covering: lessons learned, system design principles, integration patterns, recommendations
+5. Applied TLDR directive and consistency checks
+6. Posted research and draft excerpt to GitHub issue #313
+
+**Deliverable:**
+- File: blog-part2-refresh.md (2,149 words)
+- GitHub comment posted to issue #313
+- Ready for editorial review
+
+**Key Learning:**
+- Blog Part 2 bridges narrative (Part 1) with lessons learned
+- Part 0 needs update per Directive 3: add onboarding/team composition context
+
+**Status:** ✅ DELIVERED — Orchestration log at .squad/orchestration-log/2026-03-11T07-14-00Z-seven.md

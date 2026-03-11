@@ -18002,3 +18002,44 @@ When an issue has sufficient context to make a reasonable decision, agents MUST 
 **Scope:** Documentation & Content
 
 Blog posts in numbered series MUST open with continuity to previous post, assume reader context, and focus on new ground.
+
+---
+
+## Decision 4: User Directives on Blog Content & Delivery (Batch)
+
+**Date:** 2026-03-11T07:13Z
+**Author:** Tamir Dresher (via Copilot directive, logged by Ralph)
+**Status:** ✅ Adopted
+**Scope:** Documentation, Podcast Delivery, Onboarding
+
+Three user directives for squad operations:
+
+### Directive 1 — Weekly Retro to Teams
+After every weekly retrospective, send the summary as a Teams message to Tamir. Include: work done, insights, learnings, and self-improvement tasks the squad gave itself.
+
+**Applies to:** All retrospective sessions  
+**Rationale:** Keep Tamir informed of team reflection + self-improvement efforts
+
+### Directive 2 — Podcast Links MUST Be Clickable Cloud URLs
+ALWAYS when sending podcasts, include a DIRECT clickable link from cloud storage (OneDrive/blob) so Tamir can click and start listening immediately. Never just reference the file path — provide the URL.
+
+**Applies to:** All podcast deliverables  
+**Rationale:** Usability — Tamir shouldn't have to manually construct URLs to open media
+
+### Directive 3 — Blog Post Part 0 Update Needed
+The blog post should also mention that during squad onboarding, Tamir told it to:
+1. Evaluate if additional team members are needed beyond the initial cast
+2. Add domain experts as needed (Azure expert for cloud work, compliance person for regulatory)
+3. Specify which MCPs and skills to install, and tell it to configure them globally or repo-specific
+
+**Applies to:** Blog post Part 0 (rewrite/expansion)  
+**Rationale:** Blog should document the autonomy + usability model that drove agent composition
+
+**Consequences:**
+- ✅ Blog posts become more actionable for readers considering squad adoption
+- ✅ Podcast workflow improves user experience
+- ✅ Retro summaries provide visibility into team self-improvement
+- ⚠️ Requires URL generation overhead for podcast tasks
+- ⚠️ Blog Part 0 requires additional writing/editing work
+
+**Mitigation:** Podcast URL generation is one-time per artifact; blog rewrite scheduled for editorial review round

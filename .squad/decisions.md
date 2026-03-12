@@ -20460,3 +20460,125 @@ Both versions are high-quality, but they represent different angles on the "scal
 **Recommendation:** Prioritize #323 (BYOK decision) to unblock PAO. Everything else is healthy or in flight.
 
 
+
+---
+
+# Decision: ConfigGen PR Review Process Without Direct ADO Access
+
+**Date:** 2026-03-12  
+**Decider:** Picard (Lead)  
+**Context:** Issue #344 — Review request for ADO PR #15002885 (Add IsBleu and IsDelos methods)
+
+## Decision
+
+When reviewing ConfigGen PRs in msazure/CESEC/CIEng-Infra-AKS:
+
+1. **ADO MCP tools don't have access** to this organization
+2. **Provide pattern-based guidance** leveraging:
+   - Similar PR reviews (e.g., #328 Keel MCP review)
+   - ConfigGen knowledge base (.squad/scripts/workiq-queries/configgen.md)
+   - Team experience with ConfigGen patterns
+3. **Hand off to Tamir** for actual ADO review with:
+   - Checklist of items to verify
+   - Expected verdict based on patterns
+   - Questions to ask if unclear
+
+## Rationale
+
+- Can't access msazure/CESEC org via current auth
+- Manual ADO navigation possible but inefficient for AI agents
+- Pattern-based guidance + human verification is pragmatic
+- Leverages team's ConfigGen domain knowledge
+
+## Alternatives Considered
+
+- **Playwright automation**: Too brittle for cross-org ADO auth
+- **Request access**: Long lead time, may not be granted
+- **Decline review**: Unhelpful, Tamir needs input
+
+## Impact
+
+- **Short term**: Tamir reviews PRs manually with AI-provided checklists
+- **Medium term**: If more ConfigGen PRs, document patterns in .squad/knowledge/
+- **Long term**: If access granted, switch to direct ADO MCP review
+
+## Related
+
+- Issue #344 (this PR)
+- Issue #328 (previous ConfigGen PR review)
+- Issue #329 (multi-org ADO access blocker)
+
+---
+
+## Decision: NAP Node Pool Taint Strategy for System Pod Isolation
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna  
+**Status:** Recommendation  
+**Context:** Issue #345 — DK8S Core production incident (AGC page)
+
+### Problem
+
+System pods (kube-system namespace) were scheduling on NAP-managed nodes, causing operational issues. The `CriticalAddonsOnly=true:NoSchedule` taint on system pools blocks user workloads from system nodes, but doesn't prevent system pods from landing on NAP/user nodes.
+
+### Decision
+
+**Apply custom taints to NAP node pools to repel system pods:**
+
+```yaml
+# NAP Node Pool Configuration
+--node-taints workload=nap:NoSchedule
+--labels workload-type=nap
+```
+
+```yaml
+# Application Pod (needs NAP nodes)
+tolerations:
+  - key: "workload"
+    operator: "Equal"
+    value: "nap"
+    effect: "NoSchedule"
+```
+
+**System pods require no changes** — they will avoid NAP nodes automatically since they don't tolerate the custom taint.
+
+### Rationale
+
+1. **Isolation Principle:** System pod isolation requires *repelling* taints on NAP/user pools, not just *attracting* taints on system pools
+2. **NAP Behavior:** NAP respects node taints when provisioning — won't provision nodes for pods that can't tolerate the taint
+3. **Minimal Change:** System pods maintain existing tolerations; only app pods need toleration updates
+4. **DaemonSet Safety:** Cluster-wide DaemonSets can use nodeAffinity to target system pools explicitly if needed
+
+### Alternatives Considered
+
+1. **Node Affinity on System Pods:** Requires modifying every system pod manifest (high blast radius, complex)
+2. **No NAP Taints + System Pool Affinity Only:** System pods could still land on NAP nodes under resource pressure
+3. **`CriticalAddonsOnly` Everywhere:** Would require broad toleration changes across all system components
+
+### Implementation Notes
+
+- Custom taint key should be descriptive (`workload`, `pool-type`, `dedicated`)
+- Coordinate with app teams to add tolerations to workload manifests
+- For DaemonSets requiring cluster-wide deployment, add explicit system pool targeting:
+  ```yaml
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/system
+              operator: In
+              values: ["true"]
+  ```
+
+### References
+
+- [AKS NAP Node Pool Config](https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-node-pools)
+- [AKS Workload Isolation Best Practices](https://learn.microsoft.com/en-us/answers/questions/2118589/azure-kubernetes-service-why-are-system-pods-being)
+- [NAP Troubleshooting Guide](https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/extensions/troubleshoot-node-auto-provision)
+
+### Team Impact
+
+**DK8S Core:** Immediate mitigation for production incident  
+**Platform Teams:** Pattern applicable to any AKS cluster with NAP + system/user pool separation  
+**Squad:** Establishes tainting strategy for node pool isolation scenarios
+

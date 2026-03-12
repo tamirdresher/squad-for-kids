@@ -23,3 +23,13 @@
 ## Learnings
 
 - Created 2026-03-12. Studying Tamir's voice from existing blog posts and issue discussions.
+- **2026-03-12 — Part 1 Revision (Issue #313):**
+  - Tamir's voice signature: confession-style openings, self-deprecating humor about being disorganized, bold text for emphasis, "Here's the thing" / "Here's what's different" transitions, parenthetical asides that add humor.
+  - Part 0 is the gold standard. Key pattern: story-driven sections that flow into each other, not isolated feature lists. Every technical concept is wrapped in a personal anecdote.
+  - The narrative arc matters more than feature coverage. Human Squad Members is the climax of Part 1 because it's the bridge from "personal toy" to "real team tool" — the same emotional arc as Part 0's "first system I didn't abandon."
+  - Features section works best as flowing paragraphs with bold feature names, not H3 subsections with bullet points. Part 0 uses prose paragraphs exclusively.
+  - Honest Reflection sections are essential to Tamir's voice — he always ends with genuine self-assessment, acknowledging both the magic and the mess. Never pure hype.
+  - Published blog URL format confirmed: `/blog/{year}/{month}/{day}/{slug}` — no `.html`. Part 0 on the live site still has `.html` in its own footer but Part 1 (published later) corrected this.
+  - Star Trek references should be woven naturally into the narrative, not forced. The Borg/assimilation metaphor works because it maps to genuine parallel execution — the metaphor earns itself.
+  - Squad roster for all public content: Picard (Lead), Data (Code), Worf (Security), Seven (Docs/Research), B'Elanna (Infra), Ralph (Monitor). Never use Riker, Troi, Geordi or other wrong roster names.
+  - Decision: Cut "Adding More Expertise" and "Onboarding" sections from Part 1 — Part 0 already covered onboarding in detail. Part 1 should assume the reader did the onboarding and is now seeing the team *work*.

@@ -226,7 +226,7 @@ function Send-TeamsNotification {
     
     $text = "🔔 Teams Monitor: Found $ActionableCount actionable message(s)"
     if ($IssuesCreated -gt 0) {
-        $text += " — Created $IssuesCreated GitHub issue(s) for review"
+        $text += " - Created $IssuesCreated GitHub issue(s) for review"
     }
     
     $body = @{ text = $text } | ConvertTo-Json

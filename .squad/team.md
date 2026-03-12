@@ -13,6 +13,7 @@
 | Seven | Research & Docs | `.squad/agents/seven/charter.md` | ✅ Active |
 | Podcaster | Audio Content Generator | `.squad/agents/podcaster/charter.md` | ✅ Active |
 | Tamir Dresher | 👤 Human — Project Owner | — | 👤 Human |
+| Q | Devil's Advocate & Fact Checker | `.squad/agents/q/charter.md` | ✅ Active |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Kes | Communications & Scheduling | `.squad/agents/kes/charter.md` | ✅ Active |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |

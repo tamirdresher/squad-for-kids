@@ -1,20 +1,20 @@
 {
   "teams-message-monitor": {
-    "lastRun": "2026-03-12T06:00:52.9259820Z",
-    "provider": "local-polling",
+    "lastRun": "2026-03-12T00:35:34.2797184Z",
+    "result": "success",
     "error": null,
-    "result": "success"
+    "provider": "local-polling"
   },
   "ralph-heartbeat": {
-    "lastRun": "2026-03-12T06:00:52.9259820Z",
-    "provider": "local-polling",
-    "error": "Workflow trigger failed",
-    "result": "failed"
+    "lastRun": "2026-03-12T00:35:34.2797184Z",
+    "result": "success",
+    "error": null,
+    "provider": "local-polling"
   },
   "whatsapp-check": {
-    "lastRun": "2026-03-12T06:00:52.9259820Z",
-    "provider": "local-polling",
+    "lastRun": "2026-03-12T00:35:34.2797184Z",
+    "result": "skipped",
     "error": null,
-    "result": "skipped"
+    "provider": "local-polling"
   }
 }

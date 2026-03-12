@@ -1,0 +1,279 @@
+- main [ref=e6]:
+  - generic [ref=e7]:
+    - button [ref=e8]:
+      - img [ref=e11]
+    - navigation [ref=e13]:
+      - generic [ref=e14]:
+        - link "Microsoft 365 Copilot" [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+        - button "Collapse navigation" [expanded] [ref=e18]:
+          - img [ref=e20]
+      - generic [ref=e22]:
+        - generic [ref=e24]:
+          - button "New chat" [ref=e25] [cursor=pointer]:
+            - img [ref=e27]
+            - text: New chat
+          - button "Search" [ref=e30] [cursor=pointer]:
+            - img [ref=e32]
+            - text: Search
+          - button "Library" [ref=e34] [cursor=pointer]:
+            - img [ref=e36]
+            - text: Library
+          - button "Create" [ref=e38] [cursor=pointer]:
+            - img [ref=e40]
+            - text: Create
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - generic [ref=e46]:
+              - button "Agents" [expanded] [ref=e47]
+              - button "New agent" [ref=e48]:
+                - img [ref=e50]
+              - img [ref=e53]
+            - generic [ref=e56]:
+              - generic "Researcher" [ref=e58] [cursor=pointer]:
+                - button "Researcher pinned" [ref=e59]:
+                  - img [ref=e62]
+                  - generic [ref=e66]: Researcher
+                - button "This was pinned by Microsoft and can't be unpinned." [disabled] [pressed]:
+                  - generic:
+                    - img
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Analyst" [ref=e69] [cursor=pointer]:
+                - button "Analyst pinned" [ref=e70]:
+                  - img [ref=e73]
+                  - generic [ref=e77]: Analyst
+                - button "This was pinned by Microsoft and can't be unpinned." [disabled] [pressed]:
+                  - generic:
+                    - img
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Tamir Detection Agent" [ref=e80] [cursor=pointer]:
+                - button "Tamir Detection Agent" [ref=e81]:
+                  - img [ref=e84]
+                  - generic [ref=e88]: Tamir Detection Agent
+                - button "Pin":
+                  - generic:
+                    - img
+                - button "More":
+                  - generic:
+                    - img
+              - generic "ADO WI Classifier" [ref=e91] [cursor=pointer]:
+                - button "ADO WI Classifier" [ref=e92]:
+                  - img [ref=e95]
+                  - generic [ref=e99]: ADO WI Classifier
+                - button "Pin":
+                  - generic:
+                    - img
+                - button "More":
+                  - generic:
+                    - img
+              - button "New agent" [ref=e102] [cursor=pointer]:
+                - img [ref=e104]
+                - text: New agent
+              - button "All agents" [ref=e106] [cursor=pointer]:
+                - img [ref=e108]
+                - text: All agents
+          - generic [ref=e110]:
+            - generic "Notebooks" [ref=e112]:
+              - button "Notebooks" [expanded] [ref=e113]
+              - button "New notebook" [ref=e114]:
+                - img [ref=e116]
+              - img [ref=e119]
+            - button "All notebooks" [ref=e123] [cursor=pointer]:
+              - img [ref=e125]
+              - text: All notebooks
+          - generic [ref=e127]:
+            - generic "Chats" [ref=e130] [cursor=pointer]:
+              - button "Chats" [ref=e131]:
+                - generic [ref=e132]: Chats
+              - button "Search chats":
+                - generic:
+                  - generic:
+                    - img
+            - generic [ref=e134]:
+              - generic "creatre an image inspired by star trek borg that s" [ref=e137] [cursor=pointer]:
+                - button "creatre an image inspired by star trek borg that s" [ref=e138]:
+                  - generic [ref=e139]: creatre an image inspired by star trek borg that s
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Support for Copiot Cowork Inquiry" [ref=e143] [cursor=pointer]:
+                - button "Support for Copiot Cowork Inquiry" [ref=e144]:
+                  - generic [ref=e145]: Support for Copiot Cowork Inquiry
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Requested Band Resources and Datamart Repos Links" [ref=e149] [cursor=pointer]:
+                - button "Requested Band Resources and Datamart Repos Links" [ref=e150]:
+                  - generic [ref=e151]: Requested Band Resources and Datamart Repos Links
+                - button "More":
+                  - generic:
+                    - img
+              - 'generic "Help me phrase it: I recently delivered an interna" [ref=e155] [cursor=pointer]':
+                - 'button "Help me phrase it: I recently delivered an interna" [ref=e156]':
+                  - generic [ref=e157]: "Help me phrase it: I recently delivered an interna"
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Previous Discussion on Managed Identity Question" [ref=e161] [cursor=pointer]:
+                - button "Previous Discussion on Managed Identity Question" [ref=e162]:
+                  - generic [ref=e163]: Previous Discussion on Managed Identity Question
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Finding Azure Subscription for Devbox Details" [ref=e167] [cursor=pointer]:
+                - button "Finding Azure Subscription for Devbox Details" [ref=e168]:
+                  - generic [ref=e169]: Finding Azure Subscription for Devbox Details
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Funny Geeky MTG vs Pokemon Cards Comparison" [ref=e173] [cursor=pointer]:
+                - button "Funny Geeky MTG vs Pokemon Cards Comparison" [ref=e174]:
+                  - generic [ref=e175]: Funny Geeky MTG vs Pokemon Cards Comparison
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Joining Frugal Tips Group Guide" [ref=e179] [cursor=pointer]:
+                - button "Joining Frugal Tips Group Guide" [ref=e180]:
+                  - generic [ref=e181]: Joining Frugal Tips Group Guide
+                - button "More":
+                  - generic:
+                    - img
+              - generic "AzProfiler Support in DK8s Clusters Discussion" [ref=e185] [cursor=pointer]:
+                - button "AzProfiler Support in DK8s Clusters Discussion" [ref=e186]:
+                  - generic [ref=e187]: AzProfiler Support in DK8s Clusters Discussion
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Microsoft AI Skills for Windows Desktop Control" [ref=e191] [cursor=pointer]:
+                - button "unread Microsoft AI Skills for Windows Desktop Control" [ref=e192]:
+                  - generic [ref=e193]: Microsoft AI Skills for Windows Desktop Control
+                - button "More":
+                  - generic:
+                    - img
+              - generic "M365 Copilot Mobile App Work Benefits" [ref=e197] [cursor=pointer]:
+                - button "unread M365 Copilot Mobile App Work Benefits" [ref=e198]:
+                  - generic [ref=e199]: M365 Copilot Mobile App Work Benefits
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Daily Task List Prioritizing Urgent and Important Items" [ref=e203] [cursor=pointer]:
+                - button "Daily Task List Prioritizing Urgent and Important Items" [ref=e204]:
+                  - generic [ref=e205]: Daily Task List Prioritizing Urgent and Important Items
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Find me the link to Scott henselman twitch but int" [ref=e209] [cursor=pointer]:
+                - button "Find me the link to Scott henselman twitch but int" [ref=e210]:
+                  - generic [ref=e211]: Find me the link to Scott henselman twitch but int
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Weekly Summary as a Comedy Roast" [ref=e215] [cursor=pointer]:
+                - button "Weekly Summary as a Comedy Roast" [ref=e216]:
+                  - generic [ref=e217]: Weekly Summary as a Comedy Roast
+                - button "More":
+                  - generic:
+                    - img
+              - generic "Connecting to Internal Twitch with Scott Hanselman" [ref=e221] [cursor=pointer]:
+                - button "Connecting to Internal Twitch with Scott Hanselman" [ref=e222]:
+                  - generic [ref=e223]: Connecting to Internal Twitch with Scott Hanselman
+                - button "More":
+                  - generic:
+                    - img
+            - button "All chats" [ref=e226] [cursor=pointer]:
+              - img [ref=e228]
+              - text: All chats
+      - generic [ref=e231]:
+        - generic [ref=e234] [cursor=pointer]:
+          - button "Apps" [ref=e235]:
+            - img [ref=e382]
+            - text: Apps
+          - button:
+            - generic:
+              - img
+        - generic [ref=e240]:
+          - button "Tamir Dresher" [ref=e241] [cursor=pointer]:
+            - img "Tamir Dresher":
+              - generic: TD
+              - img
+            - generic:
+              - generic: Tamir Dresher
+              - generic [ref=e385]:
+                - generic [ref=e386]: M365 Copilot (Premium)
+                - button "M365 Copilot (Premium) information" [ref=e387]:
+                  - img [ref=e388]
+          - button "Settings and more" [ref=e242]:
+            - img [ref=e244]
+  - generic [ref=e249]:
+    - generic [ref=e250]:
+      - generic [ref=e253]:
+        - button "Work" [pressed] [ref=e254]
+        - button "Web" [ref=e255]
+      - generic [ref=e256]:
+        - button "Auto" [ref=e258]:
+          - generic [ref=e259]: Auto
+          - img [ref=e261]
+        - generic [ref=e263]:
+          - button "New chat" [ref=e264]:
+            - img [ref=e266]
+          - button "New chat options" [ref=e269]:
+            - img [ref=e397]
+        - button "Commercial data protection badge." [ref=e273]:
+          - img [ref=e275]
+        - button "Copilot chats and more" [ref=e277]:
+          - img [ref=e279]
+    - generic [ref=e281]:
+      - feed [ref=e405]:
+        - generic [ref=e408]:
+          - generic [ref=e409]:
+            - heading "Today" [level=4] [ref=e410]
+            - separator [ref=e411]
+          - 'article "You said: Create a funny meme image about scheduling. Show a robot or AI assistant looking confused at a calendar where all the dates keep moving around. Caption: ''When your AI Squad discovers GitHub Issues don''t have a snooze button... so you build your own scheduling system''. Make it cartoon style, colorful, and humorous." [ref=e415]':
+            - heading "You said:" [level=5] [ref=e416]
+            - button "More actions" [ref=e417]
+            - generic [ref=e419]: "Create a funny meme image about scheduling. Show a robot or AI assistant looking confused at a calendar where all the dates keep moving around. Caption: 'When your AI Squad discovers GitHub Issues don't have a snooze button... so you build your own scheduling system'. Make it cartoon style, colorful, and humorous."
+          - article "Copilot said:" [ref=e425]:
+            - generic [ref=e426]:
+              - heading "Copilot said:" [level=6] [ref=e427]
+              - img "Copilot's Logo" [ref=e431]
+              - generic [ref=e433]: Copilot
+      - generic [ref=e289]:
+        - status [ref=e290]: Prompt suggestions menu open. Use up or down arrow keys to navigate
+        - group [ref=e453]:
+          - listbox "Prompt Suggestions" [ref=e454]:
+            - generic "Prompt Suggestions" [ref=e456]
+            - group "History" [ref=e457]:
+              - img [ref=e458]
+              - text: History
+              - option "creatre an image inspired by star trek borg that shows how AI agents called \"squad\" are connected to the humans" [ref=e461] [cursor=pointer]:
+                - generic [ref=e463]: creatre an image inspired by star trek borg that shows how AI agents called "squad" are connected to the humans
+              - option "do you support Copiot Cowork?" [ref=e465] [cursor=pointer]:
+                - generic [ref=e467]: do you support Copiot Cowork?
+              - option "trevor sent me a link in the past to the band resources and to datamart repos. give me them" [ref=e469] [cursor=pointer]:
+                - generic [ref=e471]: trevor sent me a link in the past to the band resources and to datamart repos. give me them
+              - 'option "Help me phrase it: I recently delivered an internal course in Aspire as part Microsoft TechTrain . Its not for Java developers but you might find some decks insides Also This is the material i prepared for the course I''m doing https://1drv.ms/b/c/927229788375ca3d/IQAWZ-xKczCkR6y_v_27_M-FAbvID5ffAATpKzZa7mj39dQ https://github.com/tamirdresher/aspire-workshop" [ref=e473] [cursor=pointer]':
+                - generic [ref=e475]: "Help me phrase it: I recently delivered an internal course in Aspire as part Microsoft TechTrain . Its not for Java developers but you might find some decks insides Also This is the material i prepared for the course I'm doing https://1drv.ms/b/c/927229788375ca3d/IQAWZ-xKczCkR6y_v_27_M-FAbvID5ffAATpKzZa7mj39dQ https://github.com/tamirdresher/aspire-workshop"
+              - option "what is Frugal Tips <rugalTips and hoe do i join it ?" [ref=e477] [cursor=pointer]:
+                - generic [ref=e479]: what is Frugal Tips <rugalTips and hoe do i join it ?
+              - 'option "I have a devbox with these details. How can I find in which Azure subscription it is running? Issue ID: QTzL47yyXi8jwCgcf3Agjb Dev box pool: 1ES-Enhanced-WEU - DEPRECATED (1ES-Enhanced-WEU) Dev box Id: IDPDev (c4429c44-ecf1-4601-814e-7f15922ced58)" [ref=e481] [cursor=pointer]':
+                - generic [ref=e483]: "I have a devbox with these details. How can I find in which Azure subscription it is running? Issue ID: QTzL47yyXi8jwCgcf3Agjb Dev box pool: 1ES-Enhanced-WEU - DEPRECATED (1ES-Enhanced-WEU) Dev box Id: IDPDev (c4429c44-ecf1-4601-814e-7f15922ced58)"
+        - generic [ref=e294]:
+          - generic [ref=e296]:
+            - generic:
+              - generic:
+                - toolbar "Attachments"
+          - generic [ref=e299]:
+            - textbox "Message Copilot" [active] [ref=e300]
+            - generic [ref=e485]: Message Copilot
+          - button "Add content" [ref=e305]:
+            - img [ref=e307]
+          - generic [ref=e310]:
+            - button "Microphone Paused" [ref=e312]:
+              - img "Mic-Regular" [ref=e314]
+            - button "Stop generating" [ref=e486]:
+              - img [ref=e489]
+      - generic [ref=e492]: AI-generated content may be incorrect

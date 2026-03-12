@@ -1,0 +1,159 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - link "DEV Community" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "DEV Community" [ref=e9]
+      - heading "Join the DEV Community" [level=1] [ref=e10]
+      - paragraph [ref=e11]: DEV Community is a community of 3,785,268 amazing developers
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - button "Continue with Apple" [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+          - generic [ref=e18]: Continue with Apple
+        - button "Continue with Facebook" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - generic [ref=e24]: Continue with Facebook
+        - button "Continue with GitHub" [ref=e26] [cursor=pointer]:
+          - img [ref=e27]
+          - generic [ref=e29]: Continue with GitHub
+        - button "Continue with Google" [ref=e31] [cursor=pointer]:
+          - img [ref=e32]
+          - generic [ref=e37]: Continue with Google
+        - button "Continue with MyMLH" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+          - generic [ref=e69]: Continue with MyMLH
+        - button "Continue with Twitter (X)" [ref=e71] [cursor=pointer]:
+          - img [ref=e72]
+          - generic [ref=e74]: Continue with Twitter (X)
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - separator [ref=e77]
+          - generic [ref=e78]: OR
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]: Email
+            - textbox "Email" [ref=e82]
+          - generic [ref=e83]:
+            - generic [ref=e84]: Password
+            - textbox "Password" [ref=e85]
+          - generic [ref=e86]:
+            - generic [ref=e87]:
+              - checkbox "Remember me" [checked] [ref=e88] [cursor=pointer]
+              - text: Remember me
+            - link "Forgot password?" [ref=e89] [cursor=pointer]:
+              - /url: /users/password/new
+          - button "Log in" [ref=e91] [cursor=pointer]
+        - generic [ref=e92]:
+          - text: By signing in, you are agreeing to our
+          - link "privacy policy" [ref=e93] [cursor=pointer]:
+            - /url: /privacy
+          - text: ","
+          - link "terms of use" [ref=e94] [cursor=pointer]:
+            - /url: /terms
+          - text: and
+          - link "code of conduct" [ref=e95] [cursor=pointer]:
+            - /url: /code-of-conduct
+          - text: .
+        - separator [ref=e96]
+        - generic [ref=e97]:
+          - text: New to DEV Community?
+          - link "Create account" [ref=e98] [cursor=pointer]:
+            - /url: https://dev.to/enter?signup_subforem=1&state=new-user
+          - text: .
+  - contentinfo [ref=e99]:
+    - generic [ref=e100]:
+      - generic [ref=e102]:
+        - paragraph [ref=e103]: 💎 DEV Diamond Sponsors
+        - paragraph [ref=e104]: Thank you to our Diamond Sponsors for supporting the DEV Community
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - link "Google AI - Official AI Model and Platform Partner" [ref=e107] [cursor=pointer]:
+              - /url: https://aistudio.google.com/?utm_source=partner&utm_medium=partner&utm_campaign=FY25-Global-DEVpartnership-sponsorship-AIS&utm_content=-&utm_term=-&bb=146443
+              - img "Google AI - Official AI Model and Platform Partner" [ref=e108]
+            - paragraph [ref=e109]: Google AI is the official AI Model and Platform Partner of DEV
+          - generic [ref=e110]:
+            - link "Neon - Official Database Partner" [ref=e111] [cursor=pointer]:
+              - /url: https://neon.tech/?ref=devto&bb=146443
+              - img "Neon - Official Database Partner" [ref=e112]
+            - paragraph [ref=e113]: Neon is the official database partner of DEV
+          - generic [ref=e114]:
+            - link "Algolia - Official Search Partner" [ref=e115] [cursor=pointer]:
+              - /url: https://www.algolia.com/developers/?utm_source=devto&utm_medium=referral&bb=146443
+              - img "Algolia - Official Search Partner" [ref=e116]
+            - paragraph [ref=e117]: Algolia is the official search partner of DEV
+      - paragraph [ref=e118]:
+        - link "DEV Community Home" [ref=e119] [cursor=pointer]:
+          - /url: /
+          - text: DEV Community
+        - text: — A space to discuss and keep up software development and manage your software career
+      - list [ref=e120]:
+        - listitem [ref=e121]:
+          - link "Home" [ref=e122] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e124]:
+          - link "DEV++" [ref=e125] [cursor=pointer]:
+            - /url: /++
+        - listitem [ref=e127]:
+          - link "Videos" [ref=e128] [cursor=pointer]:
+            - /url: /videos
+        - listitem [ref=e130]:
+          - link "DEV Education Tracks" [ref=e131] [cursor=pointer]:
+            - /url: /deved
+        - listitem [ref=e133]:
+          - link "DEV Challenges" [ref=e134] [cursor=pointer]:
+            - /url: /challenges
+        - listitem [ref=e136]:
+          - link "DEV Help" [ref=e137] [cursor=pointer]:
+            - /url: /help
+        - listitem [ref=e139]:
+          - link "Advertise on DEV" [ref=e140] [cursor=pointer]:
+            - /url: /advertise
+        - listitem [ref=e142]:
+          - link "Organization Accounts" [ref=e143] [cursor=pointer]:
+            - /url: /organizations
+        - listitem [ref=e145]:
+          - link "DEV Showcase" [ref=e146] [cursor=pointer]:
+            - /url: /showcase
+        - listitem [ref=e148]:
+          - link "About" [ref=e149] [cursor=pointer]:
+            - /url: /about
+        - listitem [ref=e151]:
+          - link "Contact" [ref=e152] [cursor=pointer]:
+            - /url: /contact
+        - listitem [ref=e154]:
+          - link "Free Postgres Database" [ref=e155] [cursor=pointer]:
+            - /url: /free-postgres-database-tier
+        - listitem [ref=e157]:
+          - link "Forem Shop" [ref=e158] [cursor=pointer]:
+            - /url: https://shop.forem.com/
+        - listitem [ref=e160]:
+          - link "MLH" [ref=e161] [cursor=pointer]:
+            - /url: https://mlh.io/
+      - list [ref=e162]:
+        - listitem [ref=e163]:
+          - link "Code of Conduct" [ref=e164] [cursor=pointer]:
+            - /url: /code-of-conduct
+        - listitem [ref=e166]:
+          - link "Privacy Policy" [ref=e167] [cursor=pointer]:
+            - /url: /privacy
+        - listitem [ref=e169]:
+          - link "Terms of Use" [ref=e170] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e171]:
+        - paragraph [ref=e172]:
+          - text: Built on
+          - link "Forem" [ref=e173] [cursor=pointer]:
+            - /url: https://www.forem.com
+          - text: — the
+          - link "open source" [ref=e174] [cursor=pointer]:
+            - /url: https://dev.to/t/opensource
+          - text: software that powers
+          - link "DEV" [ref=e175] [cursor=pointer]:
+            - /url: https://dev.to
+          - text: and other inclusive communities.
+        - paragraph [ref=e176]:
+          - text: Made with love and
+          - link "Ruby on Rails" [ref=e177] [cursor=pointer]:
+            - /url: https://dev.to/t/rails
+          - text: . DEV Community © 2016 - 2026.

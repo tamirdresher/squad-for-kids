@@ -1,0 +1,2 @@
+[    5807ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://login.microsoftonline.com/favicon.ico:0
+[    8404ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://autologon.microsoftazuread-sso.com/72f988bf-86f1-41af-91ab-2d7cd011db47/winauth/ssoprobe?client-request-id=9355a8e7-2864-4d77-8268-647f2bcda5cc&_=1773233228497:0

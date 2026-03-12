@@ -1,0 +1,10 @@
+squad: Scribe R2-3 session completion
+
+- Decision 17: Blog Anonymization — Public Content Policy (merged from inbox)
+- Updated decisions.md with new anonymization directive for public content
+- Merged copilot-directive-blog-anonymize.md from inbox
+- Marked inbox decision as adopted
+
+Board state: 0 actionable, 26 pending-user, 1 blocked
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

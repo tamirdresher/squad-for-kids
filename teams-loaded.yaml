@@ -1,0 +1,79 @@
+- application [active] [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - button "Open office app launcher" [ref=e13]:
+            - img [ref=e15]
+          - img [ref=e17]
+        - generic [ref=e33]: MS
+      - search [ref=e40]:
+        - button [ref=e41]:
+          - img [ref=e42]
+        - combobox "Search (Ctrl+Alt+E)" [ref=e48]
+      - generic [ref=e50]:
+        - button "Settings and more" [ref=e52]:
+          - img [ref=e55]
+        - button [ref=e60]:
+          - img [ref=e62]:
+            - img [ref=e64]
+    - generic [ref=e69]:
+      - generic [ref=e71]:
+        - navigation "Apps" [ref=e73]:
+          - generic "Activity (Ctrl+Shift+1)" [ref=e75]:
+            - button "Activity (Ctrl+Shift+1)" [ref=e76]:
+              - generic [ref=e77]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Activity
+          - generic "Chat (Ctrl+Shift+2)" [ref=e79]:
+            - button "Chat (Ctrl+Shift+2)" [pressed] [ref=e80]:
+              - generic [ref=e81]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Chat
+            - generic: "36"
+            - generic [ref=e82]: 36 new notifications
+          - generic "Calendar (Ctrl+Shift+3)" [ref=e84]:
+            - button "Calendar (Ctrl+Shift+3)" [ref=e85]:
+              - generic [ref=e86]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calendar
+          - generic "OneDrive (Ctrl+Shift+4)" [ref=e88]:
+            - button "OneDrive (Ctrl+Shift+4)" [ref=e89]:
+              - generic [ref=e90]:
+                - generic:
+                  - generic:
+                    - img "OneDrive"
+                    - img
+                  - generic: OneDrive
+          - generic "Copilot (Ctrl+Shift+5)" [ref=e92]:
+            - button "Copilot (Ctrl+Shift+5)" [ref=e93]:
+              - generic [ref=e94]:
+                - generic:
+                  - generic:
+                    - img "Copilot"
+                    - img
+                  - generic: Copilot
+        - generic [ref=e95]:
+          - generic "View more apps" [ref=e96]:
+            - button "View more apps" [ref=e97]:
+              - generic [ref=e98]:
+                - generic:
+                  - generic:
+                    - img
+          - generic "Apps" [ref=e100]:
+            - button "Apps" [ref=e101]:
+              - generic [ref=e102]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Apps
+      - generic [ref=e104]: Has context menu
+    - slider "Resize left panel" [ref=e110]
+  - progressbar [ref=e119]:
+    - generic [ref=e122]: We're setting things up for you…

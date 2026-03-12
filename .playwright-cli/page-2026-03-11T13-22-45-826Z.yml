@@ -1,0 +1,60 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]: ●
+    - generic [ref=e5]: PTY Mirror
+    - button "Sessions" [ref=e6] [cursor=pointer]
+  - generic [ref=e25]:
+    - textbox "Terminal input" [active] [ref=e26]
+    - generic [ref=e27]:
+      - generic [ref=e147]: Windows PowerShell
+      - generic [ref=e148]: Copyright (C) Microsoft Corporation. All rights reserved.
+      - generic [ref=e149]: Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+      - generic [ref=e150]: PS C:\Users\tamirdresher\tamresearch1>
+      - generic [ref=e39]:
+        - generic [ref=e151]: PS C:\Users\tamirdresher\tamresearch1>
+        - generic [ref=e152]: s
+        - generic [ref=e153]: "-Name"
+        - generic [ref=e154]: pwsh |
+        - generic [ref=e155]: Where-Object
+        - generic [ref=e156]: "{"
+        - generic [ref=e157]: $_
+        - generic [ref=e158]: .CommandLine
+        - generic [ref=e159]: "-match"
+        - generic [ref=e160]: "'ralph'"
+        - generic [ref=e161]: "}"
+        - generic [ref=e162]: assThru | Select-Object Id
+      - generic [ref=e163]: "s : The term 's' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the"
+      - generic [ref=e164]: spelling of the name, or if a path was included, verify that the path is correct and try again.
+      - generic [ref=e165]: At line:1 char:1
+      - generic [ref=e166]: "+ s -Name pwsh | Where-Object { $_.CommandLine -match 'ralph' }"
+      - generic [ref=e167]: + ~
+      - generic [ref=e168]: "+ CategoryInfo : ObjectNotFound: (s:String) [], CommandNotFoundException"
+      - generic [ref=e169]: "+ FullyQualifiedErrorId : CommandNotFoundException"
+      - generic [ref=e171]: PS C:\Users\tamirdresher\tamresearch1>
+      - generic [ref=e49]:
+        - generic [ref=e172]: PS C:\Users\tamirdresher\tamresearch1>
+        - generic [ref=e173]: cat
+        - generic [ref=e174]: .ralph-watch.lock
+      - generic [ref=e175]: "{"
+      - generic [ref=e176]: "\"pid\": 8036,"
+      - generic [ref=e177]: "\"started\": \"2026-03-11T13:46:07\","
+      - generic [ref=e178]: "\"directory\": \"C:\\\\Users\\\\tamirdresher\\\\tamresearch1\""
+      - generic [ref=e179]: "}"
+      - generic [ref=e55]:
+        - generic [ref=e182]: PS C:\Users\tamirdresher\tamresearch1>
+        - generic [ref=e183]: Test-Path
+        - generic [ref=e184]: .ralph-watch.lock
+      - generic [ref=e185]: "True"
+      - generic [ref=e186]: PS C:\Users\tamirdresher\tamresearch1>
+  - contentinfo [ref=e8]:
+    - generic [ref=e9]:
+      - button "↑" [ref=e10] [cursor=pointer]
+      - button "↓" [ref=e11] [cursor=pointer]
+      - button "→" [ref=e12] [cursor=pointer]
+      - button "←" [ref=e13] [cursor=pointer]
+      - button "Tab" [ref=e14] [cursor=pointer]
+      - button "Enter" [ref=e15] [cursor=pointer]
+      - button "Esc" [ref=e16] [cursor=pointer]
+      - button "Ctrl+C" [ref=e17] [cursor=pointer]
+      - button "Space" [ref=e18] [cursor=pointer]
+      - button "⌫" [ref=e19] [cursor=pointer]

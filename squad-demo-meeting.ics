@@ -1,0 +1,37 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Copilot//Squad Demo Meeting//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20260312T110000Z
+DTEND:20260312T120000Z
+SUMMARY:Setting Up Your Personal AI Squad — Demo by Tamir
+LOCATION:Microsoft Teams Meeting
+DESCRIPTION:Hey team! I want to show you how I set up a personal AI squad
+  that works autonomously — researches\, codes\, monitors\, and reports
+  back to me.\n\nWhat I'll cover:\n- Squad setup — how to hire your AI
+  team with roles\, charters\, and memory\n- Ralph — the autonomous loop
+  that works while you sleep\n- Live Monitor — see what your agents are
+  doing in real-time\n- Teams/Email scanning — agents that silently
+  monitor your channels\n- Podcaster — auto-generate audio summaries\n-
+  News Reporter — styled briefings delivered to Teams\n- Tools we built
+  — scheduler\, dashboard\, cross-squad orchestration\n\nThis is NOT a
+  product pitch — it's me sharing what I built for myself. Bring your
+  laptop if you want to try it live.
+ORGANIZER;CN=Tamir Dresher:mailto:tamirdresher@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Adir Atias:mailto:Adir.Atias@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Efi Shtain:mailto:efishtain@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Roy Mishael:mailto:roymishael@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Ofek Finkelstein:mailto:ofinkelstein@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Meir Blachman:mailto:Meir.Blachman@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Yadin Ben Kessous:mailto:ybenkessous@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Moshe Peretz:mailto:mosheperetz@microsoft.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;CN=Ravid Brown:mailto:ravidbrown@microsoft.com
+STATUS:CONFIRMED
+SEQUENCE:0
+X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+END:VEVENT
+END:VCALENDAR

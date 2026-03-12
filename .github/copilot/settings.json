@@ -1,0 +1,8 @@
+{
+  "companyAnnouncements": [
+    "Welcome to tamresearch1! 🚀 Use the 'squad' agent for specialized infrastructure and development support.",
+    "First time? Run '/init' to load custom instructions and agentic features from AGENTS.md.",
+    "See .squad/skills/ for extended agent capabilities and specialized tools."
+  ],
+  "enabledPlugins": {}
+}

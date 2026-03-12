@@ -1,0 +1,32 @@
+- generic [ref=e5]:
+  - img "Organization background image" [ref=e14]
+  - generic [ref=e15]:
+    - generic [ref=e21]:
+      - img "Microsoft" [ref=e24]
+      - main [ref=e25]:
+        - generic [ref=e28]:
+          - heading "Pick an account" [level=1] [ref=e32]
+          - list "Pick an account" [ref=e35]:
+            - listitem [ref=e37] [cursor=pointer]:
+              - button "Sign in with tamirdresher@microsoft.com work or school account." [active] [ref=e38]:
+                - generic [ref=e41]:
+                  - generic [ref=e42]: Tamir Dresher
+                  - generic [ref=e43]: tamirdresher@microsoft.com
+                  - generic [ref=e44]: Connected to Windows
+            - listitem [ref=e46] [cursor=pointer]:
+              - button "Sign in with tamir.dresher@gmail.com personal Microsoft account." [ref=e47]:
+                - generic [ref=e50]:
+                  - generic [ref=e51]: Tamir Dresher
+                  - generic [ref=e52]: tamir.dresher@gmail.com
+                  - generic [ref=e53]: Signed in
+              - button "Open menu" [ref=e55]
+            - listitem [ref=e56] [cursor=pointer]:
+              - button "Use another account" [ref=e57]:
+                - generic [ref=e61]: Use another account
+    - contentinfo [ref=e62]:
+      - generic [ref=e63]:
+        - link "Terms of use" [ref=e64] [cursor=pointer]:
+          - /url: https://www.microsoft.com/en-US/servicesagreement/
+        - link "Privacy & cookies" [ref=e65] [cursor=pointer]:
+          - /url: https://privacy.microsoft.com/en-US/privacystatement
+        - button "Click here for troubleshooting information" [ref=e66] [cursor=pointer]: ...

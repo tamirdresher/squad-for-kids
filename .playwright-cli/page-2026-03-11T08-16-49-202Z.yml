@@ -1,0 +1,40 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - dialog:
+                - group [ref=e7]:
+                  - dialog "Sign in to X" [ref=e9]:
+                    - group [ref=e12]:
+                      - generic [ref=e17]:
+                        - button "Close" [active] [ref=e19] [cursor=pointer]:
+                          - img [ref=e21]
+                        - img "X" [ref=e26]
+                      - generic [ref=e33]:
+                        - heading "Sign in to X" [level=1] [ref=e36]:
+                          - generic [ref=e37]: Sign in to X
+                        - iframe [ref=e40]:
+                          - button "Sign in with Google. Opens in new tab" [ref=f15e3] [cursor=pointer]:
+                            - generic [ref=f15e5]:
+                              - img [ref=f15e7]
+                              - generic [ref=f15e14]: Sign in with Google
+                        - button "Sign in with Apple" [ref=e41] [cursor=pointer]:
+                          - generic [ref=e42]:
+                            - img [ref=e43]
+                            - generic [ref=e47]: Sign in with Apple
+                        - generic [ref=e52]: or
+                        - generic [ref=e57]:
+                          - generic [ref=e59]: Phone, email, or username
+                          - textbox "Phone, email, or username" [ref=e62]
+                        - button "Next" [ref=e65] [cursor=pointer]:
+                          - generic [ref=e68]: Next
+                        - button "Forgot password?" [ref=e69] [cursor=pointer]:
+                          - generic [ref=e72]: Forgot password?
+                        - generic [ref=e73]:
+                          - generic [ref=e74]: Don't have an account?
+                          - button "Sign up" [ref=e75]:
+                            - generic [ref=e76]: Sign up
+      - main [ref=e78]

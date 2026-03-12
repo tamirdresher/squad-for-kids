@@ -59,6 +59,7 @@ When triaging, the Lead should ask:
 | Work Type | Primary | Secondary |
 |-----------|---------|----------|
 | Architecture, distributed systems, decisions | Picard | — |
+| Fact-checking, verification, counter-hypothesis, review challenge | Q | Picard |
 | K8s, Helm, ArgoCD, cloud native | B'Elanna | — |
 | Security, Azure, networking | Worf | — |
 | C#, Go, .NET, clean code | Data | — |
@@ -68,3 +69,4 @@ When triaging, the Lead should ask:
 
 
 | Meetings, calendar, email, scheduling, invites, attendees, communications | Kes | Playwright + Outlook web |
+| Fact-checking, verification, counter-hypothesis testing | Q | Challenge claims, verify sources, test assumptions |

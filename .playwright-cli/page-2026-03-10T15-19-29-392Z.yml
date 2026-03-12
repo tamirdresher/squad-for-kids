@@ -1,0 +1,542 @@
+- generic [ref=e2]:
+  - region:
+    - generic:
+      - tooltip "tamirdresher_microsoft"
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - text: GitHub Enterprise
+        - generic "Users managed by Microsoft EMU" [ref=e14]:
+          - text: Users managed by
+          - link "Microsoft EMU" [ref=e15] [cursor=pointer]:
+            - /url: /enterprises/microsoft
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - button "Open menu" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+          - link "Homepage Enterprise (g then d)" [ref=e22] [cursor=pointer]:
+            - /url: /
+            - img [ref=e23]
+        - generic [ref=e25]:
+          - navigation "Breadcrumbs" [ref=e26]:
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - link "tamirdresher_microsoft" [ref=e29] [cursor=pointer]:
+                  - /url: /tamirdresher_microsoft
+                  - generic [ref=e30]: tamirdresher_microsoft
+              - listitem [ref=e31]:
+                - link "Projects" [ref=e32] [cursor=pointer]:
+                  - /url: /users/tamirdresher_microsoft/projects
+                  - generic [ref=e33]: Projects
+              - listitem [ref=e34]:
+                - link "Squad Work Board" [ref=e35] [cursor=pointer]:
+                  - /url: /users/tamirdresher_microsoft/projects/1
+                  - generic [ref=e36]: Squad Work Board
+                  - img [ref=e37]
+          - button "Search or jump to…" [ref=e41] [cursor=pointer]:
+            - generic [ref=e42]:
+              - generic:
+                - img
+              - generic [ref=e43]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e47]:
+              - link "Chat with Copilot" [ref=e49] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e50]
+              - button "Open agents panel" [ref=e54] [cursor=pointer]:
+                - generic [ref=e55]:
+                  - generic:
+                    - img
+                  - generic:
+                    - img
+            - button "Create new..." [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues (g then i)" [ref=e59] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e60]
+            - link "Pull requests (g then p)" [ref=e63] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e64]
+            - link "Repositories" [ref=e66] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e67]
+          - link "You have unread notifications (g then n)" [ref=e69] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e70]
+          - button "Open user navigation menu" [ref=e73] [cursor=pointer]:
+            - img "Tamir Dresher" [ref=e74]
+  - generic [ref=e78]:
+    - main [ref=e83]:
+      - generic [ref=e85]:
+        - navigation "Project" [ref=e86]:
+          - generic [ref=e89] [cursor=pointer]:
+            - img [ref=e90]
+            - heading "Squad Work Board" [level=1] [ref=e92]
+          - generic [ref=e93]:
+            - button "Add status update" [ref=e95] [cursor=pointer]:
+              - generic [ref=e99]: Add status update
+            - generic [ref=e100]:
+              - link "Insights" [ref=e102] [cursor=pointer]:
+                - /url: /users/tamirdresher_microsoft/projects/1/insights
+                - generic [ref=e103]:
+                  - generic:
+                    - img
+                  - generic [ref=e104]: Insights
+              - link "Workflows (2 enabled)" [ref=e106] [cursor=pointer]:
+                - /url: /users/tamirdresher_microsoft/projects/1/workflows
+                - generic [ref=e107]:
+                  - generic:
+                    - img
+                  - generic [ref=e108]: Workflows
+                  - generic:
+                    - generic: "2"
+                    - generic: (2)
+            - generic [ref=e109]:
+              - button "Project details" [ref=e111] [cursor=pointer]:
+                - img [ref=e112]
+              - button "View more options" [ref=e116] [cursor=pointer]:
+                - img [ref=e117]
+        - generic [ref=e119]:
+          - generic [ref=e120]:
+            - navigation "Select view" [ref=e123]:
+              - tablist [ref=e124]:
+                - tab "View 1" [selected] [ref=e125] [cursor=pointer]:
+                  - generic [ref=e126]:
+                    - img [ref=e128]
+                    - generic [ref=e131]: View 1
+                - tab "New view" [ref=e132] [cursor=pointer]:
+                  - generic [ref=e133]:
+                    - generic:
+                      - img
+                    - generic [ref=e134]: New view
+            - button "View options for View 1" [ref=e137] [cursor=pointer]:
+              - img [ref=e138]
+          - tabpanel [ref=e140]:
+            - region "View filters" [ref=e142]:
+              - form "Filter" [ref=e144]:
+                - generic [ref=e145]: Filter
+                - generic [ref=e148]:
+                  - img "Search" [ref=e150]
+                  - combobox "Filter" [ref=e154]
+              - button "View" [ref=e155] [cursor=pointer]:
+                - generic [ref=e156]:
+                  - generic:
+                    - generic:
+                      - img
+                  - generic [ref=e157]: View
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - generic [ref=e162]:
+                  - generic [ref=e164]:
+                    - heading "Todo" [level=2] [ref=e166]:
+                      - generic [ref=e167]: Todo
+                    - generic [ref=e168]: "6"
+                    - generic [ref=e169]: (6)
+                  - 'button "Actions for column: Todo" [ref=e171] [cursor=pointer]':
+                    - img [ref=e172]
+                - generic [ref=e174]: Not started
+                - generic [ref=e175]:
+                  - 'button "Take a look and use this https://github.com/dotnet/skills Closed as completed issue tamresearch1 #252" [ref=e176]':
+                    - generic [ref=e177]:
+                      - generic [ref=e178]:
+                        - generic [ref=e181]:
+                          - img "Closed as completed issue" [ref=e183]
+                          - generic [ref=e187]: "tamresearch1 #252"
+                          - button "More actions" [ref=e189] [cursor=pointer]:
+                            - img [ref=e190]
+                        - button "Take a look and use this https://github.com/dotnet/skills" [ref=e192] [cursor=pointer]:
+                          - heading "Take a look and use this https://github.com/dotnet/skills" [level=3] [ref=e193]
+                      - list "Fields" [ref=e194]:
+                        - listitem [ref=e195]:
+                          - 'button "Label: squad" [ref=e196] [cursor=pointer]':
+                            - generic [ref=e197]: squad
+                        - listitem [ref=e198]:
+                          - 'button "Label: squad:picard" [ref=e199] [cursor=pointer]':
+                            - generic [ref=e200]: squad:picard
+                      - generic [ref=e201]: Click a value to filter the view
+                  - 'button "What we did with scanning hakernews and rddit. Lets run it peridically and always add all the newest and popular tech dev sources Closed as completed issue tamresearch1 #255" [ref=e202]':
+                    - generic [ref=e203]:
+                      - generic [ref=e204]:
+                        - generic [ref=e207]:
+                          - img "Closed as completed issue" [ref=e209]
+                          - generic [ref=e213]: "tamresearch1 #255"
+                          - button "More actions" [ref=e215] [cursor=pointer]:
+                            - img [ref=e216]
+                        - button "What we did with scanning hakernews and rddit. Lets run it peridically and always add all the newest and popular tech dev sources" [ref=e218] [cursor=pointer]:
+                          - heading "What we did with scanning hakernews and rddit. Lets run it peridically and always add all the newest and popular tech dev sources" [level=3] [ref=e219]
+                      - list "Fields" [ref=e220]:
+                        - listitem [ref=e221]:
+                          - 'button "Label: go:needs-research" [ref=e222] [cursor=pointer]':
+                            - generic [ref=e223]: go:needs-research
+                        - listitem [ref=e224]:
+                          - 'button "Label: squad" [ref=e225] [cursor=pointer]':
+                            - generic [ref=e226]: squad
+                        - listitem [ref=e227]:
+                          - 'button "Label: squad:picard" [ref=e228] [cursor=pointer]':
+                            - generic [ref=e229]: squad:picard
+                      - generic [ref=e230]: Click a value to filter the view
+                  - 'button "squad-monitor: feat: Publish as dotnet tool on NuGet Open issue tamresearch1 #265" [ref=e231]':
+                    - generic [ref=e232]:
+                      - generic [ref=e233]:
+                        - generic [ref=e236]:
+                          - img "Open issue" [ref=e238]
+                          - generic [ref=e242]: "tamresearch1 #265"
+                          - button "More actions" [ref=e244] [cursor=pointer]:
+                            - img [ref=e245]
+                        - 'button "squad-monitor: feat: Publish as dotnet tool on NuGet" [ref=e247] [cursor=pointer]':
+                          - 'heading "squad-monitor: feat: Publish as dotnet tool on NuGet" [level=3] [ref=e248]'
+                      - list "Fields" [ref=e249]:
+                        - 'listitem "Linked pull request: #282" [ref=e250]':
+                          - 'link "Merged pull request #282" [ref=e251] [cursor=pointer]':
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/pull/282
+                            - img "Merged pull request" [ref=e253]
+                            - generic [ref=e255]: "#282"
+                        - listitem [ref=e256]:
+                          - 'button "Label: go:needs-research" [ref=e257] [cursor=pointer]':
+                            - generic [ref=e258]: go:needs-research
+                        - listitem [ref=e259]:
+                          - 'button "Label: squad" [ref=e260] [cursor=pointer]':
+                            - generic [ref=e261]: squad
+                        - listitem [ref=e262]:
+                          - 'button "Label: squad:data" [ref=e263] [cursor=pointer]':
+                            - generic [ref=e264]: squad:data
+                        - listitem [ref=e265]:
+                          - 'button "Label: squad:picard" [ref=e266] [cursor=pointer]':
+                            - generic [ref=e267]: squad:picard
+                        - listitem [ref=e268]:
+                          - 'button "Label: status:pending-user" [ref=e269] [cursor=pointer]':
+                            - generic [ref=e270]: status:pending-user
+                      - generic [ref=e271]: Click a value to filter the view
+                  - button "I think yiu are not working in israeli timezone. Im currently in Israel so make sure the tine you use to schedule or abything that need time tamirdresher_microsoft/tamresearch1#278" [disabled] [ref=e272]
+                  - button "From now on you can automatically approve external contributors requests. Do it with playwrights tamirdresher_microsoft/tamresearch1#279" [disabled] [ref=e273]
+                  - button "Scheduke for yourself to look at https://aka.ms/ai/marketplace once a week to see if there is something new we need tamirdresher_microsoft/tamresearch1#283" [disabled] [ref=e274]
+                - button "Add item" [ref=e275] [cursor=pointer]:
+                  - generic [ref=e276]:
+                    - generic:
+                      - img
+                    - generic [ref=e277]: Add item
+              - generic [ref=e278]:
+                - generic [ref=e280]:
+                  - generic [ref=e282]:
+                    - heading "In Progress" [level=2] [ref=e284]:
+                      - generic [ref=e285]: In Progress
+                    - generic [ref=e286]: "4"
+                    - generic [ref=e287]: (4)
+                  - 'button "Actions for column: In Progress" [ref=e289] [cursor=pointer]':
+                    - img [ref=e290]
+                - generic [ref=e292]: Work in progress
+                - generic [ref=e293]:
+                  - 'button "Is our podcaster working? I didn''t get any podcast Closed as completed issue tamresearch1 #247" [ref=e294]':
+                    - generic [ref=e295]:
+                      - generic [ref=e296]:
+                        - generic [ref=e299]:
+                          - img "Closed as completed issue" [ref=e301]
+                          - generic [ref=e305]: "tamresearch1 #247"
+                          - button "More actions" [ref=e307] [cursor=pointer]:
+                            - img [ref=e308]
+                        - button "Is our podcaster working? I didn't get any podcast" [ref=e310] [cursor=pointer]:
+                          - heading "Is our podcaster working? I didn't get any podcast" [level=3] [ref=e311]
+                      - list "Fields" [ref=e312]:
+                        - listitem [ref=e313]:
+                          - 'button "Label: go:needs-research" [ref=e314] [cursor=pointer]':
+                            - generic [ref=e315]: go:needs-research
+                        - listitem [ref=e316]:
+                          - 'button "Label: squad" [ref=e317] [cursor=pointer]':
+                            - generic [ref=e318]: squad
+                        - listitem [ref=e319]:
+                          - 'button "Label: squad:podcaster" [ref=e320] [cursor=pointer]':
+                            - generic [ref=e321]: squad:podcaster
+                      - generic [ref=e322]: Click a value to filter the view
+                  - 'button "Add @copilot to squad + enable Copilot PR reviews + scheduled PR monitoring Closed as completed issue tamresearch1 #269" [ref=e323]':
+                    - generic [ref=e324]:
+                      - generic [ref=e325]:
+                        - generic [ref=e327]:
+                          - generic [ref=e328]:
+                            - img "Closed as completed issue" [ref=e330]
+                            - generic [ref=e334]: "tamresearch1 #269"
+                            - button "More actions" [ref=e336] [cursor=pointer]:
+                              - img [ref=e337]
+                          - 'figure "Assignees: tamirdresher_microsoft" [ref=e340]':
+                            - generic [ref=e341]: "Assignees: tamirdresher_microsoft"
+                            - button "tamirdresher_microsoft" [ref=e344] [cursor=pointer]:
+                              - img "tamirdresher_microsoft" [ref=e345]
+                        - button "Add @copilot to squad + enable Copilot PR reviews + scheduled PR monitoring" [ref=e346] [cursor=pointer]:
+                          - heading "Add @copilot to squad + enable Copilot PR reviews + scheduled PR monitoring" [level=3] [ref=e347]
+                      - list "Fields" [ref=e348]:
+                        - 'listitem "Linked pull request: #270" [ref=e349]':
+                          - 'link "Merged pull request #270" [ref=e350] [cursor=pointer]':
+                            - /url: https://github.com/tamirdresher_microsoft/tamresearch1/pull/270
+                            - img "Merged pull request" [ref=e352]
+                            - generic [ref=e354]: "#270"
+                        - listitem [ref=e355]:
+                          - 'button "Label: go:needs-research" [ref=e356] [cursor=pointer]':
+                            - generic [ref=e357]: go:needs-research
+                        - listitem [ref=e358]:
+                          - 'button "Label: squad" [ref=e359] [cursor=pointer]':
+                            - generic [ref=e360]: squad
+                        - listitem [ref=e361]:
+                          - 'button "Label: squad:belanna" [ref=e362] [cursor=pointer]':
+                            - generic [ref=e363]: squad:belanna
+                        - listitem [ref=e364]:
+                          - 'button "Label: squad:picard" [ref=e365] [cursor=pointer]':
+                            - generic [ref=e366]: squad:picard
+                        - listitem [ref=e367]:
+                          - 'button "Label: squad:ralph" [ref=e368] [cursor=pointer]':
+                            - generic [ref=e369]: squad:ralph
+                      - generic [ref=e370]: Click a value to filter the view
+                  - 'button "i got an email about FW: IcM Copilot Newsletter - What''s New, March 2026 . let;''s explore the tool and try it our and add to our toolbox!!!! Closed as completed issue tamresearch1 #260" [ref=e371]':
+                    - generic [ref=e372]:
+                      - generic [ref=e373]:
+                        - generic [ref=e376]:
+                          - img "Closed as completed issue" [ref=e378]
+                          - generic [ref=e382]: "tamresearch1 #260"
+                          - button "More actions" [ref=e384] [cursor=pointer]:
+                            - img [ref=e385]
+                        - 'button "i got an email about FW: IcM Copilot Newsletter - What''s New, March 2026 . let;''s explore the tool and try it our and add to our toolbox!!!!" [ref=e387] [cursor=pointer]':
+                          - 'heading "i got an email about FW: IcM Copilot Newsletter - What''s New, March 2026 . let;''s explore the tool and try it our and add to our toolbox!!!!" [level=3] [ref=e388]'
+                      - list "Fields" [ref=e389]:
+                        - listitem [ref=e390]:
+                          - 'button "Label: go:needs-research" [ref=e391] [cursor=pointer]':
+                            - generic [ref=e392]: go:needs-research
+                        - listitem [ref=e393]:
+                          - 'button "Label: squad" [ref=e394] [cursor=pointer]':
+                            - generic [ref=e395]: squad
+                        - listitem [ref=e396]:
+                          - 'button "Label: squad:picard" [ref=e397] [cursor=pointer]':
+                            - generic [ref=e398]: squad:picard
+                      - generic [ref=e399]: Click a value to filter the view
+                  - button "Look at the emails i got today. There are some github emails about errors why? Fix it tamirdresher_microsoft/tamresearch1#276" [disabled] [ref=e400]
+                - button "Add item" [ref=e401] [cursor=pointer]:
+                  - generic [ref=e402]:
+                    - generic:
+                      - img
+                    - generic [ref=e403]: Add item
+              - generic [ref=e404]:
+                - generic [ref=e406]:
+                  - generic [ref=e408]:
+                    - heading "Review" [level=2] [ref=e410]:
+                      - generic [ref=e411]: Review
+                    - generic [ref=e412]: "0"
+                    - generic [ref=e413]: (0)
+                  - 'button "Actions for column: Review" [ref=e415] [cursor=pointer]':
+                    - img [ref=e416]
+                - generic [ref=e418]: Squad completed - awaiting user approval
+                - button "Add item" [ref=e420] [cursor=pointer]:
+                  - generic [ref=e421]:
+                    - generic:
+                      - img
+                    - generic [ref=e422]: Add item
+              - generic [ref=e423]:
+                - generic [ref=e425]:
+                  - generic [ref=e427]:
+                    - heading "Done" [level=2] [ref=e429]:
+                      - generic [ref=e430]: Done
+                    - generic [ref=e431]: "121"
+                    - generic [ref=e432]: (121)
+                  - 'button "Actions for column: Done" [ref=e434] [cursor=pointer]':
+                    - img [ref=e435]
+                - generic [ref=e437]: Completed and approved
+                - generic [ref=e438]:
+                  - 'button "[URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked Closed as completed issue tamresearch1 #251" [ref=e439]':
+                    - generic [ref=e440]:
+                      - generic [ref=e441]:
+                        - generic [ref=e444]:
+                          - img "Closed as completed issue" [ref=e446]
+                          - generic [ref=e450]: "tamresearch1 #251"
+                          - button "More actions" [ref=e452] [cursor=pointer]:
+                            - img [ref=e453]
+                        - 'button "[URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked" [ref=e455] [cursor=pointer]':
+                          - 'heading "[URGENT] DK8S Staging: RoleAssignmentLimitExceeded (4k RBAC limit) — cluster provisioning blocked" [level=3] [ref=e456]'
+                      - list "Fields" [ref=e457]:
+                        - listitem [ref=e458]:
+                          - 'button "Label: go:needs-research" [ref=e459] [cursor=pointer]':
+                            - generic [ref=e460]: go:needs-research
+                        - listitem [ref=e461]:
+                          - 'button "Label: squad" [ref=e462] [cursor=pointer]':
+                            - generic [ref=e463]: squad
+                        - listitem [ref=e464]:
+                          - 'button "Label: squad:belanna" [ref=e465] [cursor=pointer]':
+                            - generic [ref=e466]: squad:belanna
+                        - listitem [ref=e467]:
+                          - 'button "Label: squad:picard" [ref=e468] [cursor=pointer]':
+                            - generic [ref=e469]: squad:picard
+                        - listitem [ref=e470]:
+                          - 'button "Label: teams-bridge" [ref=e471] [cursor=pointer]':
+                            - generic [ref=e472]: teams-bridge
+                      - generic [ref=e473]: Click a value to filter the view
+                  - 'button "[PROD] Sev 3: DK8S Platform InternalServerError — RP onboarding blocked Closed as completed issue tamresearch1 #240" [ref=e474]':
+                    - generic [ref=e475]:
+                      - generic [ref=e476]:
+                        - generic [ref=e479]:
+                          - img "Closed as completed issue" [ref=e481]
+                          - generic [ref=e485]: "tamresearch1 #240"
+                          - button "More actions" [ref=e487] [cursor=pointer]:
+                            - img [ref=e488]
+                        - 'button "[PROD] Sev 3: DK8S Platform InternalServerError — RP onboarding blocked" [ref=e490] [cursor=pointer]':
+                          - 'heading "[PROD] Sev 3: DK8S Platform InternalServerError — RP onboarding blocked" [level=3] [ref=e491]'
+                      - list "Fields" [ref=e492]:
+                        - listitem [ref=e493]:
+                          - 'button "Label: go:needs-research" [ref=e494] [cursor=pointer]':
+                            - generic [ref=e495]: go:needs-research
+                        - listitem [ref=e496]:
+                          - 'button "Label: squad" [ref=e497] [cursor=pointer]':
+                            - generic [ref=e498]: squad
+                        - listitem [ref=e499]:
+                          - 'button "Label: squad:belanna" [ref=e500] [cursor=pointer]':
+                            - generic [ref=e501]: squad:belanna
+                        - listitem [ref=e502]:
+                          - 'button "Label: squad:picard" [ref=e503] [cursor=pointer]':
+                            - generic [ref=e504]: squad:picard
+                        - listitem [ref=e505]:
+                          - 'button "Label: teams-bridge" [ref=e506] [cursor=pointer]':
+                            - generic [ref=e507]: teams-bridge
+                      - generic [ref=e508]: Click a value to filter the view
+                  - 'button "schdule a meeting i will show how to set up your personal squad to wednsday Closed as completed issue tamresearch1 #268" [ref=e509]':
+                    - generic [ref=e510]:
+                      - generic [ref=e511]:
+                        - generic [ref=e514]:
+                          - img "Closed as completed issue" [ref=e516]
+                          - generic [ref=e520]: "tamresearch1 #268"
+                          - button "More actions" [ref=e522] [cursor=pointer]:
+                            - img [ref=e523]
+                        - button "schdule a meeting i will show how to set up your personal squad to wednsday" [ref=e525] [cursor=pointer]:
+                          - heading "schdule a meeting i will show how to set up your personal squad to wednsday" [level=3] [ref=e526]
+                      - list "Fields" [ref=e527]:
+                        - listitem [ref=e528]:
+                          - 'button "Label: go:needs-research" [ref=e529] [cursor=pointer]':
+                            - generic [ref=e530]: go:needs-research
+                        - listitem [ref=e531]:
+                          - 'button "Label: squad" [ref=e532] [cursor=pointer]':
+                            - generic [ref=e533]: squad
+                        - listitem [ref=e534]:
+                          - 'button "Label: squad:picard" [ref=e535] [cursor=pointer]':
+                            - generic [ref=e536]: squad:picard
+                      - generic [ref=e537]: Click a value to filter the view
+                  - 'button "[Action] Azure DevOps PR: ConfigGen CLI tool — approved, waiting for author tamirdresher_microsoft/tamresearch1#241" [disabled] [ref=e538]'
+                  - 'button "squad-monitor: GitHub sections should be optional (graceful without gh CLI) tamirdresher_microsoft/tamresearch1#263" [disabled] [ref=e539]'
+                  - button "i keep getting email like this. can i stop get them? tamirdresher_microsoft/tamresearch1#267" [disabled] [ref=e540]
+                  - 'button "squad-monitor: feat: Token usage, cost, and model stats panel tamirdresher_microsoft/tamresearch1#266" [disabled] [ref=e541]'
+                  - 'button "[Action] Access approval: Noya Arav → DK8S External Contributors (due March 13) tamirdresher_microsoft/tamresearch1#275" [disabled] [ref=e542]'
+                  - 'button "[Action] Teams membership request: Sivan Oddes → DK8s Champions team tamirdresher_microsoft/tamresearch1#274" [disabled] [ref=e543]'
+                  - 'button "[Action] Access approval: Shivam Chaudhary (LTIMindtree) → DK8S External Contributors (due March 13) tamirdresher_microsoft/tamresearch1#277" [disabled] [ref=e544]'
+                  - button "Ralph should watch and work on issues in tamirdresher/squad-monitor repo too tamirdresher_microsoft/tamresearch1#262" [disabled] [ref=e545]
+                  - button "[Teams Bridge] STG-EUS2-28 Cluster Failures — Validates DK8S Stability Tier 1/2 Mitigations tamirdresher_microsoft/tamresearch1#46" [disabled] [ref=e546]
+                  - button "[Action] Out-of-SLA SDL Action Items — Review and remediate in S360 tamirdresher_microsoft/tamresearch1#248" [disabled] [ref=e547]
+                  - button "Create a devbox for me and share with me its details tamirdresher_microsoft/tamresearch1#103" [disabled] [ref=e548]
+                  - button "Implement squad-notification-bot GitHub App authentication in Squad codebase tamirdresher_microsoft/tamresearch1#62" [disabled] [ref=e549]
+                  - 'button "[Action] Access approval: Rahul Shivangi → DK8S Team Contributors (OVERDUE — deadline March 9) tamirdresher_microsoft/tamresearch1#249" [disabled] [ref=e550]'
+                  - 'button "CI: All GitHub Actions workflows failing — runner provisioning issue tamirdresher_microsoft/tamresearch1#110" [disabled] [ref=e551]'
+                  - button "check the product/project Work-Claw that i was invited to use tamirdresher_microsoft/tamresearch1#17" [disabled] [ref=e552]
+                  - 'button "[Action] Access approval: Konstantin Oleinikov → DK8S Team Contributors (deadline March 12) tamirdresher_microsoft/tamresearch1#244" [disabled] [ref=e553]'
+                  - 'button "Squad CLI: ''upstream'' command not available in latest version tamirdresher_microsoft/tamresearch1#1" [disabled] [ref=e554]'
+                  - button "does it make sense to use github project or something else to have visisbility and visualization on the work we do here? tamirdresher_microsoft/tamresearch1#109" [disabled] [ref=e555]
+                  - button "[Action] Azure internal subscription creation approval (#5253534) tamirdresher_microsoft/tamresearch1#261" [disabled] [ref=e556]
+                  - button "[Action] Re-approve Michael Shalom's ConfigGen PR — git submodule fix (formatting changes pushed) tamirdresher_microsoft/tamresearch1#250" [disabled] [ref=e557]
+                  - 'button "Cache Review: April 2026 tamirdresher_microsoft/tamresearch1#116" [disabled] [ref=e558]'
+                  - button "[Action] Approve/deny Shay Gabison access to DK8S External Contributors (due March 13) tamirdresher_microsoft/tamresearch1#258" [disabled] [ref=e559]
+                - button "Add item" [ref=e567] [cursor=pointer]:
+                  - generic [ref=e568]:
+                    - generic:
+                      - img
+                    - generic [ref=e569]: Add item
+              - generic [ref=e570]:
+                - generic [ref=e572]:
+                  - generic [ref=e574]:
+                    - heading "Blocked" [level=2] [ref=e576]:
+                      - generic [ref=e577]: Blocked
+                    - generic [ref=e578]: "0"
+                    - generic [ref=e579]: (0)
+                  - 'button "Actions for column: Blocked" [ref=e581] [cursor=pointer]':
+                    - img [ref=e582]
+                - generic [ref=e584]: Blocked on external dependency
+                - button "Add item" [ref=e586] [cursor=pointer]:
+                  - generic [ref=e587]:
+                    - generic:
+                      - img
+                    - generic [ref=e588]: Add item
+              - generic [ref=e589]:
+                - generic [ref=e591]:
+                  - generic [ref=e593]:
+                    - heading "Pending User" [level=2] [ref=e595]:
+                      - generic [ref=e596]: Pending User
+                    - generic [ref=e597]: "7"
+                    - generic [ref=e598]: (7)
+                  - 'button "Actions for column: Pending User" [ref=e600] [cursor=pointer]':
+                    - img [ref=e601]
+                - generic [ref=e603]: Waiting for user input
+                - generic [ref=e604]:
+                  - 'button "Research: Workload Identity / FIC Automation — Fleet Manager Prerequisite tamirdresher_microsoft/tamresearch1#26" [disabled] [ref=e605]'
+                  - 'button "DK8S Stability: Plan Tier 2 High-Impact Improvements tamirdresher_microsoft/tamresearch1#25" [disabled] [ref=e606]'
+                  - 'button "DK8S Stability: Tier 3 Strategic Architecture Initiatives tamirdresher_microsoft/tamresearch1#29" [disabled] [ref=e607]'
+                  - button "is what we created here and combination with squad multi sub agents and all the glue around it, could be considered a good thing to making a patent? tamirdresher_microsoft/tamresearch1#42" [disabled] [ref=e608]
+                  - button "i got an email about Upcoming services going out of SLA . Maya sent me a link to a doc. tell me what i need to do. or if someome else need to do and i can ignore tamirdresher_microsoft/tamresearch1#221" [disabled] [ref=e609]
+                  - button "set the squad ralph script to run in my new devbox. use this cli-tunnel that i created to connect there (into the powershell) and set it up. tamirdresher_microsoft/tamresearch1#222" [disabled] [ref=e610]
+                  - 'button "[ACTION] Sev 2: ImagePullBackoffCritical - Acknowledge in IcM (ID 759758501) tamirdresher_microsoft/tamresearch1#271" [disabled] [ref=e611]'
+                - button "Add item" [ref=e612] [cursor=pointer]:
+                  - generic [ref=e613]:
+                    - generic:
+                      - img
+                    - generic [ref=e614]: Add item
+              - generic [ref=e615]:
+                - generic [ref=e617]:
+                  - generic [ref=e619]:
+                    - heading "Waiting for user review" [level=2] [ref=e621]:
+                      - generic [ref=e622]: Waiting for user review
+                    - generic [ref=e623]: "2"
+                    - generic [ref=e624]: (2)
+                  - 'button "Actions for column: Waiting for user review" [ref=e626] [cursor=pointer]':
+                    - img [ref=e627]
+                - generic [ref=e630]:
+                  - button "Writing a blog on what we built here - an AI assitant or maybe some toher food name tamirdresher_microsoft/tamresearch1#41" [disabled] [ref=e631]
+                  - button "create an email address i can give my wife so she could send requests for you to do for me or remind etc. for example if she asks to print something, then email it to Dresherhome@hpeprint.com because that the printer email. or put things in my calandr tamirdresher_microsoft/tamresearch1#259" [disabled] [ref=e632]
+                - button "Add item" [ref=e633] [cursor=pointer]:
+                  - generic [ref=e634]:
+                    - generic:
+                      - img
+                    - generic [ref=e635]: Add item
+              - generic [ref=e636]:
+                - generic [ref=e638]:
+                  - generic [ref=e640]:
+                    - heading "Cancel" [level=2] [ref=e642]:
+                      - generic [ref=e643]: Cancel
+                    - generic [ref=e644]: "0"
+                    - generic [ref=e645]: (0)
+                  - 'button "Actions for column: Cancel" [ref=e647] [cursor=pointer]':
+                    - img [ref=e648]
+                - button "Add item" [ref=e652] [cursor=pointer]:
+                  - generic [ref=e653]:
+                    - generic:
+                      - img
+                    - generic [ref=e654]: Add item
+              - generic [ref=e655]:
+                - generic [ref=e657]:
+                  - generic [ref=e659]:
+                    - heading "Postpone" [level=2] [ref=e661]:
+                      - generic [ref=e662]: Postpone
+                    - generic [ref=e663]: "0"
+                    - generic [ref=e664]: (0)
+                  - 'button "Actions for column: Postpone" [ref=e666] [cursor=pointer]':
+                    - img [ref=e667]
+                - button "Add item" [ref=e671] [cursor=pointer]:
+                  - generic [ref=e672]:
+                    - generic:
+                      - img
+                    - generic [ref=e673]: Add item
+              - button "Add a new column to the board" [ref=e674] [cursor=pointer]:
+                - generic [ref=e675]:
+                  - generic:
+                    - img
+    - status [ref=e676]

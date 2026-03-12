@@ -1,0 +1,472 @@
+- application [active] [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - button "Open office app launcher" [ref=e13]:
+            - img [ref=e15]
+          - img [ref=e17]
+        - generic [ref=e33]: MS
+      - search [ref=e40]:
+        - button [ref=e41]:
+          - img [ref=e42]
+        - combobox "Press Ctrl+Alt+G to go right to a chat or channel" [ref=e128]
+      - generic [ref=e50]:
+        - button "Settings and more" [ref=e52]:
+          - img [ref=e55]
+        - button "Your profile, status Busy" [ref=e130]:
+          - img "Profile picture of Tamir Dresher." [ref=e131]:
+            - generic [ref=e132]: TD
+            - img [ref=e133]
+            - img "busy" [ref=e134]:
+              - img [ref=e136]
+    - generic [ref=e69]:
+      - generic [ref=e71]:
+        - navigation "Apps" [ref=e73]:
+          - generic "Activity (Ctrl+Shift+1)" [ref=e75]:
+            - button "Activity (Ctrl+Shift+1)" [ref=e76]:
+              - generic [ref=e77]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Activity
+          - generic "Chat (Ctrl+Shift+2)" [ref=e79]:
+            - button "Chat (Ctrl+Shift+2)" [pressed] [ref=e80]:
+              - generic [ref=e81]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Chat
+            - generic: "36"
+            - generic [ref=e82]: 36 new notifications
+          - generic "Calendar (Ctrl+Shift+3)" [ref=e84]:
+            - button "Calendar (Ctrl+Shift+3)" [ref=e85]:
+              - generic [ref=e86]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calendar
+          - generic "Calls (Ctrl+Shift+4)" [ref=e139]:
+            - button "Calls (Ctrl+Shift+4)" [ref=e140]:
+              - generic [ref=e141]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Calls
+          - generic "OneDrive (Ctrl+Shift+5)" [ref=e142]:
+            - button "OneDrive (Ctrl+Shift+5)" [ref=e143]:
+              - generic [ref=e90]:
+                - generic:
+                  - generic:
+                    - img "OneDrive"
+                    - img
+                  - generic: OneDrive
+          - generic "Copilot (Ctrl+Shift+6)" [ref=e145]:
+            - button "Copilot (Ctrl+Shift+6)" [ref=e146]:
+              - generic [ref=e147]:
+                - generic:
+                  - generic:
+                    - img "Copilot"
+                    - img
+                  - generic: Copilot
+        - generic [ref=e95]:
+          - generic "View more apps" [ref=e96]:
+            - button "View more apps" [ref=e97]:
+              - generic [ref=e98]:
+                - generic:
+                  - generic:
+                    - img
+          - generic "Apps" [ref=e100]:
+            - button "Apps" [ref=e101]:
+              - generic [ref=e102]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Apps
+      - generic [ref=e104]: Has context menu
+    - slider "Resize left panel" [ref=e110]
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - button "Change the group profile picture" [ref=e154]:
+          - generic [ref=e155]:
+            - img [ref=e157]
+            - img [ref=e159]
+        - generic [ref=e164]:
+          - generic [ref=e166]:
+            - heading "[DK8s] new tartarus PPE cluster (with DK8s onboarding wizard)" [level=2] [ref=e168]:
+              - generic "[DK8s] new tartarus PPE cluster (with DK8s onboarding wizard)" [ref=e170]
+            - list "Chat participants" [ref=e171]
+          - button "Name group chat" [ref=e172]:
+            - img [ref=e174]
+      - generic [ref=e176]:
+        - generic [ref=e177]:
+          - tablist [ref=e178]:
+            - tab "Chat" [selected] [ref=e180] [cursor=pointer]:
+              - generic [ref=e183]: Chat
+            - tab "1 more tabs." [ref=e184]: "+1"
+            - tab "Add a tab" [ref=e185]:
+              - img [ref=e187]
+          - generic [ref=e190]: Has context menu
+        - status [ref=e191]
+      - toolbar "Chat actions" [ref=e192]:
+        - generic [ref=e194]:
+          - button "Meet now" [ref=e195]:
+            - img [ref=e197]
+            - generic [ref=e199]: Meet now
+          - button "More call options" [ref=e200]:
+            - img [ref=e202]
+        - button "Add people, agents, and bots, 9 participants" [ref=e204]:
+          - img [ref=e206]
+          - text: "9"
+        - separator [ref=e208]
+        - generic "Sidepane Features" [ref=e209]:
+          - button "Open notes" [ref=e211]:
+            - img [ref=e213]
+          - button "Open Agents and bots" [ref=e215]:
+            - img [ref=e217]
+          - button "Find in chat (Ctrl+F)" [ref=e219]:
+            - img [ref=e221]
+        - button "More chat options" [ref=e224]:
+          - img [ref=e226]
+    - generic [ref=e229]:
+      - generic [ref=e232]:
+        - generic [ref=e238]:
+          - generic [ref=e241]:
+            - heading "heya, I have no clue what this (buddy) pipe... by Nada Jasikova" [level=4] [ref=e242]
+            - generic [ref=e244]:
+              - generic [ref=e245]:
+                - generic [ref=e249]: Nada Jasikova
+                - time [ref=e250]: 12:04 PM
+              - generic [ref=e251]:
+                - generic [ref=e253]:
+                  - img [ref=e254]
+                  - img [ref=e255]:
+                    - img [ref=e257]
+                - group "Nada Jasikova heya, I have no clue what this (buddy) pipeline is for, so hopefully it's not important Smile (I can see it's been steadily failing for all commits, but I'll still bring it up with the team to make sure) I think we can ignore it can you share the 2 failed runs due to submitter permission errors, please? Today at 12:04 PM." [ref=e260]:
+                  - button "More message options" [ref=e261]
+                  - generic "heya, I have no clue what this (buddy) pipeline is for, so hopefully it's not important Smile (I can see it's been steadily failing for all commits, but I'll still bring it up with the team to make sure) I think we can ignore it can you share the 2 failed runs due to submitter permission errors, please?" [ref=e262]:
+                    - paragraph [ref=e263]:
+                      - text: heya, I have no clue what this (buddy) pipeline is for, so hopefully it's not important
+                      - generic "Smile" [ref=e264]:
+                        - img "🙂" [ref=e265]
+                      - text: (I can see it's been steadily failing for all commits, but I'll still bring it up with the team to make sure)
+                    - paragraph [ref=e266]
+                    - paragraph [ref=e267]: I think we can ignore it
+                    - paragraph [ref=e268]
+                    - paragraph [ref=e269]: can you share the 2 failed runs due to submitter permission errors, please?
+          - generic [ref=e273]:
+            - heading "Sure, Link Pipelines - Run 20260309.4 logs... by Mina Hasanovic" [level=4] [ref=e274]
+            - generic [ref=e276]:
+              - generic [ref=e277]:
+                - generic [ref=e281]: Mina Hasanovic
+                - time [ref=e282]: 12:06 PM
+              - generic [ref=e283]:
+                - generic [ref=e285]:
+                  - img [ref=e286]
+                  - img [ref=e287]:
+                    - img [ref=e289]
+                - group "Mina Hasanovic Sure, Link Pipelines - Run 20260309.4 logs and Link Pipelines - Run 20260309.3 logs 1 Eyes reaction. Today at 12:06 PM." [ref=e292]:
+                  - button "More message options" [ref=e293]
+                  - generic "Sure, Link Pipelines - Run 20260309.4 logs and Link Pipelines - Run 20260309.3 logs" [ref=e294]:
+                    - paragraph [ref=e295]:
+                      - text: Sure,
+                      - link "Link Pipelines - Run 20260309.4 logs" [ref=e296] [cursor=pointer]:
+                        - /url: https://dev.azure.com/microsoft/WDATP/_build/results?buildId=141585565&view=logs&j=3e558fa2-f71c-5cd1-0e3b-b6d06f283281&t=0e3a991e-8fe1-5f6f-74b3-d454def7116c&s=44814dfa-b87e-5948-aeae-b207b1978a2e
+                        - text: Pipelines - Run 20260309.4 logs
+                      - text: and
+                      - link "Link Pipelines - Run 20260309.3 logs" [ref=e297] [cursor=pointer]:
+                        - /url: https://dev.azure.com/microsoft/WDATP/_build/results?buildId=141585559&view=logs&j=2ed5c950-3530-5d1c-be1f-061cb1f21bac&t=e97616fd-cd47-5b7b-c861-672a147c104b&s=af253718-79aa-5603-94f6-a229ebaf2ec1
+                        - text: Pipelines - Run 20260309.3 logs
+                  - toolbar "Reaction summary" [ref=e298]:
+                    - button "1 Eyes reaction." [ref=e300]:
+                      - generic [ref=e301]:
+                        - img "👀" [ref=e303]
+                        - generic [ref=e304]: 1 Eyes reaction.
+                    - button "More reactions" [ref=e306]:
+                      - img [ref=e308]
+          - generic [ref=e314]:
+            - heading "(sorry, running around today a bit, checkin... by Nada Jasikova" [level=4] [ref=e315]
+            - generic [ref=e317]:
+              - generic [ref=e318]:
+                - generic [ref=e322]: Nada Jasikova
+                - time [ref=e323]: 1:40 PM
+              - generic [ref=e324]:
+                - generic [ref=e326]:
+                  - img [ref=e327]
+                  - img [ref=e328]:
+                    - img [ref=e330]
+                - group "Nada Jasikova (sorry, running around today a bit, checking now) Today at 1:40 PM." [ref=e333]:
+                  - button "More message options" [ref=e334]
+                  - generic "(sorry, running around today a bit, checking now)" [ref=e335]:
+                    - paragraph [ref=e336]: (sorry, running around today a bit, checking now)
+          - generic [ref=e340]:
+            - heading "Mina you can ignore these as well (these s... by Nada Jasikova" [level=4] [ref=e341]
+            - generic [ref=e343]:
+              - generic:
+                - generic [ref=e347]: Nada Jasikova
+                - time [ref=e348]: 1:41 PM
+              - group "Nada Jasikova Mina you can ignore these as well (these should not be triggered at all and I'll add that to my report to the team) Today at 1:41 PM." [ref=e351]:
+                - button "More message options" [ref=e352]
+                - generic "Mina you can ignore these as well (these should not be triggered at all and I'll add that to my report to the team)" [ref=e353]:
+                  - paragraph [ref=e354]: Mina you can ignore these as well (these should not be triggered at all and I'll add that to my report to the team)
+          - generic [ref=e358]:
+            - heading "are all the other pipelines completed? by Nada Jasikova" [level=4] [ref=e359]
+            - generic [ref=e361]:
+              - generic:
+                - generic [ref=e365]: Nada Jasikova
+                - time [ref=e366]: 1:41 PM
+              - group "Nada Jasikova are all the other pipelines completed? Today at 1:41 PM." [ref=e369]:
+                - button "More message options" [ref=e370]
+                - generic "are all the other pipelines completed?" [ref=e371]:
+                  - paragraph [ref=e372]: are all the other pipelines completed?
+          - generic [ref=e376]:
+            - heading "Oh ok that's great, there is one more runni... by Mina Hasanovic" [level=4] [ref=e377]
+            - generic [ref=e379]:
+              - generic [ref=e380]:
+                - generic [ref=e384]: Mina Hasanovic
+                - time [ref=e385]: 1:42 PM
+              - generic [ref=e386]:
+                - generic [ref=e388]:
+                  - img [ref=e389]
+                  - img [ref=e390]:
+                    - img [ref=e392]
+                - 'group "Mina Hasanovic Oh ok that''s great, there is one more running that is blocked for completion because of a lock: Link Pipelines - Run 20260309.3 . The rest of the pipelines suceeded 1 Eyes reaction. Today at 1:42 PM." [ref=e395]':
+                  - button "More message options" [ref=e396]
+                  - 'generic "Oh ok that''s great, there is one more running that is blocked for completion because of a lock: Link Pipelines - Run 20260309.3 . The rest of the pipelines suceeded" [ref=e397]':
+                    - paragraph [ref=e398]:
+                      - text: "Oh ok that's great, there is one more running that is blocked for completion because of a lock:"
+                      - link "Link Pipelines - Run 20260309.3" [ref=e399] [cursor=pointer]:
+                        - /url: https://dev.azure.com/microsoft/WDATP/_build/results?buildId=141585572&view=results
+                        - text: Pipelines - Run 20260309.3
+                      - text: . The rest of the pipelines suceeded
+                  - toolbar "Reaction summary" [ref=e400]:
+                    - button "1 Eyes reaction." [ref=e402]:
+                      - generic [ref=e403]:
+                        - img "👀" [ref=e405]
+                        - generic [ref=e406]: 1 Eyes reaction.
+                    - button "More reactions" [ref=e408]:
+                      - img [ref=e410]
+          - generic [ref=e416]:
+            - heading "also not needed (the wizard is great, but... by Nada Jasikova" [level=4] [ref=e417]
+            - generic [ref=e419]:
+              - generic [ref=e420]:
+                - generic [ref=e424]: Nada Jasikova
+                - time [ref=e425]: 1:43 PM
+              - generic [ref=e426]:
+                - generic [ref=e428]:
+                  - img [ref=e429]
+                  - img [ref=e430]:
+                    - img [ref=e432]
+                - group "Nada Jasikova also not needed (the wizard is great, but it's also showing all the tech debt we've managed to collect Speechless ) 1 Folded hands reaction. Today at 1:43 PM." [ref=e435]:
+                  - button "More message options" [ref=e436]
+                  - generic "also not needed (the wizard is great, but it's also showing all the tech debt we've managed to collect Speechless )" [ref=e437]:
+                    - paragraph [ref=e438]: also not needed
+                    - paragraph [ref=e439]
+                    - paragraph [ref=e440]:
+                      - text: (the wizard is great, but it's also showing all the tech debt we've managed to collect
+                      - generic "Speechless" [ref=e441]:
+                        - img "😐" [ref=e442]
+                      - text: )
+                  - toolbar "Reaction summary" [ref=e443]:
+                    - button "1 Folded hands reaction." [ref=e445]:
+                      - generic [ref=e446]:
+                        - img "🙏" [ref=e448]
+                        - generic [ref=e449]: 1 Folded hands reaction.
+                    - button "More reactions" [ref=e451]:
+                      - img [ref=e453]
+          - generic [ref=e459]:
+            - heading "Mina feel free to trigger your cluster pro... by Nada Jasikova" [level=4] [ref=e460]
+            - generic [ref=e462]:
+              - generic:
+                - generic [ref=e466]: Nada Jasikova
+                - time [ref=e467]: 1:43 PM
+              - group "Nada Jasikova Mina feel free to trigger your cluster provisioning release, we should be set Today at 1:43 PM." [ref=e470]:
+                - button "More message options" [ref=e471]
+                - generic "Mina feel free to trigger your cluster provisioning release, we should be set" [ref=e472]:
+                  - paragraph [ref=e473]: Mina feel free to trigger your cluster provisioning release, we should be set
+          - generic [ref=e477]:
+            - 'heading "Thanks, then I am triggering this one: Lin... by Mina Hasanovic" [level=4] [ref=e478]'
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - generic [ref=e485]: Mina Hasanovic
+                - time [ref=e486]: 1:45 PM
+                - generic "Edited Today at 1:45 PM" [ref=e489]: Edited
+              - generic [ref=e490]:
+                - generic [ref=e492]:
+                  - img [ref=e493]
+                  - img [ref=e494]:
+                    - img [ref=e496]
+                - 'group "Mina Hasanovic Thanks, then I am triggering this one: Link Pipelines - Runs for WDATP.Infra.System.ClusterProvisioning-azfc_platform_protection Today at 1:45 PM. Edited" [ref=e499]':
+                  - button "More message options" [ref=e500]
+                  - 'generic "Thanks, then I am triggering this one: Link Pipelines - Runs for WDATP.Infra.System.ClusterProvisioning-azfc_platform_protection" [ref=e501]':
+                    - paragraph [ref=e502]:
+                      - text: "Thanks, then I am triggering this one:"
+                      - link "Link Pipelines - Runs for WDATP.Infra.System.ClusterProvisioning-azfc_platform_protection" [ref=e503] [cursor=pointer]:
+                        - /url: https://dev.azure.com/microsoft/WDATP/_build?definitionId=181089
+                        - text: Pipelines - Runs for WDATP.Infra.System.ClusterProvisioning-azfc_platform_protection
+          - heading "Last read" [level=3] [ref=e507]:
+            - generic [ref=e508]: Last read
+          - generic [ref=e511]:
+            - 'heading "we have a failure, checking: Link Pipeline... by Nada Jasikova" [level=4] [ref=e512]'
+            - generic [ref=e514]:
+              - generic [ref=e515]:
+                - generic [ref=e519]: Nada Jasikova
+                - time [ref=e520]: 2:32 PM
+              - generic [ref=e521]:
+                - generic [ref=e523]:
+                  - img [ref=e524]
+                  - img [ref=e525]:
+                    - img [ref=e527]
+                - 'group "Nada Jasikova we have a failure, checking: Link Pipelines - Run STG.CIN.1502 logs Today at 2:32 PM." [ref=e530]':
+                  - button "More message options" [ref=e531]
+                  - 'generic "we have a failure, checking: Link Pipelines - Run STG.CIN.1502 logs" [ref=e532]':
+                    - paragraph [ref=e533]:
+                      - text: "we have a failure, checking:"
+                      - link "Link Pipelines - Run STG.CIN.1502 logs" [ref=e534] [cursor=pointer]:
+                        - /url: https://dev.azure.com/microsoft/WDATP/_build/results?buildId=141662227&view=logs&j=6e62c84d-c71d-5ba5-fca2-946b9404afe2&t=745e6af4-81c5-4fa7-a40e-b8bfb44201e6
+                        - text: Pipelines - Run STG.CIN.1502 logs
+          - generic [ref=e538]:
+            - 'heading "Code: NoMatchingInventoryForRequestedVip ... by Nada Jasikova" [level=4] [ref=e539]'
+            - generic [ref=e541]:
+              - generic:
+                - generic [ref=e545]: Nada Jasikova
+                - time [ref=e546]: 2:32 PM
+              - 'group "Nada Jasikova Code: NoMatchingInventoryForRequestedVip Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more details. ref: Link Ev2 Portal - Dashboard this looks like the service tags are not available for this cluster Today at 2:32 PM." [ref=e549]':
+                - button "More message options" [ref=e550]
+                - 'generic "Code: NoMatchingInventoryForRequestedVip Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more details. ref: Link Ev2 Portal - Dashboard this looks like the service tags are not available for this cluster" [ref=e551]':
+                  - paragraph [ref=e552]
+                  - generic [ref=e554]:
+                    - img [ref=e555]
+                    - generic [ref=e557]: Plain Text
+                    - generic [ref=e558]:
+                      - button "Copy" [ref=e559]:
+                        - img [ref=e561]
+                      - button "More options" [ref=e563]:
+                        - img [ref=e565]
+                  - code [ref=e568]:
+                    - text: "Code: NoMatchingInventoryForRequestedVip"
+                    - text: "Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more details."
+                  - paragraph [ref=e569]
+                  - paragraph [ref=e570]:
+                    - text: "ref:"
+                    - link "Link Ev2 Portal - Dashboard" [ref=e571] [cursor=pointer]:
+                      - /url: https://ev2portal.azure.net/#/Rollout/DEFENDER.K8S.Infra/c06493ed-95fd-4327-b05a-b8ef04675bf8?RolloutInfra=Test
+                      - text: Ev2 Portal - Dashboard
+                  - paragraph [ref=e572]
+                  - paragraph [ref=e573]: this looks like the service tags are not available for this cluster
+          - generic [ref=e577]:
+            - heading "(you might be out of quota) by Nada Jasikova" [level=4] [ref=e578]
+            - generic [ref=e580]:
+              - generic:
+                - generic [ref=e584]: Nada Jasikova
+                - time [ref=e585]: 2:32 PM
+              - group "Nada Jasikova (you might be out of quota) Today at 2:32 PM." [ref=e588]:
+                - button "More message options" [ref=e589]
+                - generic "(you might be out of quota)" [ref=e590]:
+                  - paragraph [ref=e591]: (you might be out of quota)
+          - generic [ref=e595]:
+            - 'heading "this is the doc: Link Using Service Tags i... by Nada Jasikova" [level=4] [ref=e596]'
+            - generic [ref=e598]:
+              - generic:
+                - generic [ref=e602]: Nada Jasikova
+                - time [ref=e603]: 2:37 PM
+              - 'group "Nada Jasikova this is the doc: Link Using Service Tags in Defender K8S Platform | Infra and Developer Platform but TL;DR - if you run out of quota, you need to request for more, and it takes forever to fulfil we can create the cluster without service tags (that would need a change in the inventory), but you''ll start flagging in your S360 on it Today at 2:37 PM." [ref=e606]':
+                - button "More message options" [ref=e607]
+                - 'generic "this is the doc: Link Using Service Tags in Defender K8S Platform | Infra and Developer Platform but TL;DR - if you run out of quota, you need to request for more, and it takes forever to fulfil we can create the cluster without service tags (that would need a change in the inventory), but you''ll start flagging in your S360 on it" [ref=e608]':
+                  - paragraph [ref=e609]:
+                    - text: "this is the doc:"
+                    - link "Link Using Service Tags in Defender K8S Platform | Infra and Developer Platform" [ref=e610] [cursor=pointer]:
+                      - /url: https://eng.ms/docs/microsoft-security/microsoft-threat-protection-mtp/onesoc-1soc/infra-and-developer-platform-scip-idp/infra-and-developer-platform-scip-idp/core-concepts-tools/k8s/how_to/service_tags/using_service_tags
+                      - text: Using Service Tags in Defender K8S Platform | Infra and Developer Platform
+                  - paragraph [ref=e611]
+                  - paragraph [ref=e612]: but TL;DR - if you run out of quota, you need to request for more, and it takes forever to fulfil
+                  - paragraph [ref=e613]
+                  - paragraph [ref=e614]: we can create the cluster without service tags (that would need a change in the inventory), but you'll start flagging in your S360 on it
+          - generic [ref=e618]:
+            - 'heading "Begin Reference, Code: NoMatchingInventoryF... by Sreekara Reddy" [level=4] [ref=e619]'
+            - generic [ref=e621]:
+              - generic [ref=e622]:
+                - generic [ref=e626]: Sreekara Reddy
+                - time [ref=e627]: 2:40 PM
+              - generic [ref=e628]:
+                - generic [ref=e630]:
+                  - img [ref=e631]
+                  - img [ref=e632]:
+                    - img [ref=e634]
+                - 'group "Sreekara Reddy Begin Reference, Code: NoMatchingInventoryForRequestedVip Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more…, Nada Jasikova , 3/10/2026 2:32 PM, End reference We have reserved 16 IPs for non prod. Mina Hasanovic , please check if all details are matching Today at 2:40 PM." [ref=e637]':
+                  - button "More message options" [ref=e638]
+                  - 'generic "Begin Reference, Code: NoMatchingInventoryForRequestedVip Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more…, Nada Jasikova , 3/10/2026 2:32 PM, End reference We have reserved 16 IPs for non prod. Mina Hasanovic , please check if all details are matching" [ref=e639]':
+                    - generic [ref=e640]:
+                      - 'group "Begin Reference, Code: NoMatchingInventoryForRequestedVip Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more…, Nada Jasikova, 3/10/2026 2:32 PM, End reference" [ref=e641] [cursor=pointer]':
+                        - generic [ref=e644]:
+                          - generic [ref=e645]:
+                            - generic [ref=e646]: Nada Jasikova
+                            - generic [ref=e647]: 3/10/2026 2:32 PM
+                          - generic [ref=e648]: "Code: NoMatchingInventoryForRequestedVip Message: No matching inventory for the requested VIP of address family: IPv4, sku: Standard and availability zone: zone redundant. Please contact support for more…"
+                      - text: We have reserved 16 IPs for non prod.
+                      - text: Mina Hasanovic, please check if all details are matching
+          - generic [ref=e652]:
+            - heading "each cluster requires minimum 4-6 IPs by Ciprian Hacman" [level=4] [ref=e653]
+            - generic [ref=e655]:
+              - generic [ref=e656]:
+                - generic [ref=e660]: Ciprian Hacman
+                - time [ref=e661]: 2:41 PM
+              - generic [ref=e662]:
+                - generic [ref=e664]:
+                  - img [ref=e665]
+                  - img [ref=e666]:
+                    - img [ref=e668]
+                - group "Ciprian Hacman each cluster requires minimum 4-6 IPs Today at 2:41 PM." [ref=e671]:
+                  - button "More message options" [ref=e672]
+                  - generic "each cluster requires minimum 4-6 IPs" [ref=e673]:
+                    - paragraph [ref=e674]: each cluster requires minimum 4-6 IPs
+          - generic [ref=e678]:
+            - heading "there are 6 in use by the existing DEV-CIN-... by Nada Jasikova" [level=4] [ref=e679]
+            - generic [ref=e681]:
+              - generic [ref=e682]:
+                - generic [ref=e686]: Nada Jasikova
+                - time [ref=e687]: 2:41 PM
+              - generic [ref=e688]:
+                - generic [ref=e690]:
+                  - img [ref=e691]
+                  - img [ref=e692]:
+                    - img [ref=e694]
+                - 'group "Nada Jasikova there are 6 in use by the existing DEV-CIN-1501: image Today at 2:41 PM." [ref=e697]':
+                  - button "More message options" [ref=e698]
+                  - 'generic "there are 6 in use by the existing DEV-CIN-1501: image" [ref=e699]':
+                    - paragraph [ref=e700]: "there are 6 in use by the existing DEV-CIN-1501:"
+                    - paragraph [ref=e701]:
+                      - img "image" [ref=e705]
+          - generic [ref=e709]:
+            - heading "Mina 's cluster would also require 6 (as in... by Nada Jasikova" [level=4] [ref=e710]
+            - generic [ref=e712]:
+              - generic:
+                - generic [ref=e716]: Nada Jasikova
+                - time [ref=e717]: 2:42 PM
+              - group "Nada Jasikova Mina 's cluster would also require 6 (as ingress is enabled there) Today at 2:42 PM." [ref=e720]:
+                - button "More message options" [ref=e721]
+                - generic "Mina 's cluster would also require 6 (as ingress is enabled there)" [ref=e722]:
+                  - paragraph [ref=e723]: Mina's cluster would also require 6 (as ingress is enabled there)
+        - generic [ref=e726]: has context menu
+      - generic [ref=e734]:
+        - textbox [ref=e736]:
+          - /placeholder: Type a message
+          - paragraph [ref=e737]: Type a message
+        - generic [ref=e738]:
+          - toolbar [ref=e739]:
+            - button "Show Formatting options (Ctrl+Shift+X)" [ref=e740] [cursor=pointer]:
+              - img [ref=e742]
+            - button "Emoji, GIFs and Stickers" [ref=e745] [cursor=pointer]:
+              - img [ref=e747]
+            - button "Rewrite with Copilot (Alt+A)" [ref=e749] [cursor=pointer]:
+              - img [ref=e752]
+          - toolbar "Actions for new message" [ref=e754]:
+            - generic [ref=e756]:
+              - button "Send (Ctrl+Enter)" [ref=e757] [cursor=pointer]:
+                - img [ref=e759]
+              - generic [ref=e762]: has context menu
+  - progressbar [ref=e119]:
+    - generic [ref=e120]:
+      - generic:
+        - generic [ref=e764]: We're setting things up for you…
+        - generic [ref=e765]: Just another minute…

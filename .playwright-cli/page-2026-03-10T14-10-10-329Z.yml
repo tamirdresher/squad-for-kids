@@ -1,0 +1,19 @@
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - img [ref=e6]
+  - main [ref=e7]:
+    - img [ref=e8]
+    - heading "Stay better connected with the Teams desktop app" [level=1] [ref=e9]
+    - generic [ref=e10]:
+      - button "Download the Windows app" [ref=e11] [cursor=pointer]
+      - button "Use the web app instead" [ref=e12] [cursor=pointer]
+    - paragraph [ref=e13]:
+      - text: Already have the Teams app?
+      - link "Launch it now" [ref=e14] [cursor=pointer]:
+        - /url: "#"
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - link "Privacy and cookies" [ref=e17] [cursor=pointer]:
+        - /url: https://go.microsoft.com/fwlink/?LinkId=521839
+      - link "Third-party disclosures" [ref=e18] [cursor=pointer]:
+        - /url: attribution.txt

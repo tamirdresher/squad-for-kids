@@ -1,0 +1,227 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]:
+        - link "Skip To Content":
+          - /url: "#"
+      - generic [ref=e7]:
+        - link "NuGet Home" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img "NuGet Home" [ref=e10]
+        - generic [ref=e11]:
+          - tablist [ref=e12]:
+            - tab "Packages" [ref=e13] [cursor=pointer]
+            - tab "Upload" [ref=e14] [cursor=pointer]
+            - tab "Statistics" [ref=e15] [cursor=pointer]
+            - tab "Documentation" [ref=e16] [cursor=pointer]
+            - tab "Downloads" [ref=e17] [cursor=pointer]
+            - tab "Blog" [ref=e18] [cursor=pointer]
+          - tablist [ref=e19]:
+            - tab "tamir.dresher" [ref=e20] [cursor=pointer]:
+              - generic [ref=e22]: tamir.dresher
+    - form "Package search bar" [ref=e26]:
+      - generic [ref=e27]:
+        - textbox "Enter packages to search" [ref=e28]:
+          - /placeholder: Search for packages...
+        - button "Search" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: 
+  - main [ref=e33]:
+    - generic [ref=e35]:
+      - heading "View my profile API keys" [level=1] [ref=e36]:
+        - link "View my profile" [ref=e38] [cursor=pointer]:
+          - /url: /profiles/tamir.dresher
+          - generic [ref=e39]: 
+        - generic [ref=e40]: 
+        - text: API keys
+      - separator [ref=e41]
+      - generic [ref=e42]:
+        - strong [ref=e43]: Looking for a more secure and streamlined way to publish packages?
+        - text: If you're using GitHub Actions, we recommend switching to
+        - link "Trusted Publishing" [ref=e44] [cursor=pointer]:
+          - /url: /account/trustedpublishing
+        - text: since it eliminates the need to manage API keys.
+      - paragraph [ref=e45]:
+        - text: An API key is a token that can identify you to NuGet Gallery. The
+        - link "NuGet command-line utility" [ref=e46] [cursor=pointer]:
+          - /url: https://docs.nuget.org/Consume/Command-Line-Reference
+        - text: allows you to submit a NuGet package to the gallery using your API key to authenticate.
+      - paragraph [ref=e47]:
+        - strong [ref=e48]: Always keep your API keys a secret! If an API key is ever exposed, revoke it immediately and generate a new one to maintain security.
+      - heading "Create" [level=2] [ref=e51]:
+        - button "Create" [expanded] [active] [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: 
+          - text: Create
+      - generic [ref=e138]:
+        - generic [ref=e139]:
+          - generic [ref=e140]:
+            - generic [ref=e141]: Key Name *
+            - textbox "Key Name *" [ref=e142]
+          - generic [ref=e143]:
+            - generic [ref=e144]: Expires In
+            - combobox "Expires In" [ref=e145]:
+              - option "1 day"
+              - option "90 days"
+              - option "180 days"
+              - option "270 days"
+              - option "365 days" [selected]
+        - generic [ref=e147]:
+          - generic [ref=e148]: Package Owner *
+          - combobox "Package Owner *" [ref=e149]:
+            - option "Select an owner..."
+            - option "tamir.dresher" [selected]
+          - generic:
+            - alert
+        - generic [ref=e151]:
+          - heading "Select Scopes" [level=4] [ref=e152]
+          - generic:
+            - alert
+          - generic [ref=e154] [cursor=pointer]:
+            - checkbox "✓ Push Select Scopes" [checked] [ref=e155]: ✓
+            - generic [ref=e156]: Push
+          - generic "Push new packages and package versions Select Scopes" [ref=e158] [cursor=pointer]:
+            - radio "Push new packages and package versions Select Scopes" [checked] [ref=e159]
+            - generic [ref=e160]: Push new packages and package versions
+          - generic "Push only new package versions Select Scopes" [ref=e162] [cursor=pointer]:
+            - radio "Push only new package versions Select Scopes" [ref=e163]
+            - generic [ref=e164]: Push only new package versions
+          - generic [ref=e166] [cursor=pointer]:
+            - checkbox "Unlist or relist package versions Select Scopes" [ref=e167]
+            - generic [ref=e168]: Unlist or relist package versions
+        - generic [ref=e170]:
+          - heading "Select Packages" [level=4] [ref=e171]
+          - paragraph [ref=e172]: To select which packages to associate with a key, use a glob pattern, select individual packages, or both.
+          - generic:
+            - alert
+          - generic:
+            - alert
+        - generic [ref=e175]: Glob Pattern
+        - generic [ref=e176]:
+          - generic [ref=e178]:
+            - textbox "Glob Pattern" [ref=e180]
+            - generic [ref=e181]:
+              - generic [ref=e182]: Available Packages
+              - generic [ref=e184]:
+                - generic [ref=e186] [cursor=pointer]:
+                  - checkbox "DynamicConfigurationManager" [ref=e187]
+                  - generic [ref=e188]: DynamicConfigurationManager
+                - generic [ref=e190] [cursor=pointer]:
+                  - checkbox "VoiceMCP" [ref=e191]
+                  - generic [ref=e192]: VoiceMCP
+                - generic [ref=e194] [cursor=pointer]:
+                  - checkbox "WPFLiteTreeView" [ref=e195]
+                  - generic [ref=e196]: WPFLiteTreeView
+          - generic [ref=e200]:
+            - paragraph [ref=e201]: A glob pattern allows you to replace any sequence of characters with '*'.
+            - paragraph [ref=e202]: "Example glob patterns:"
+            - table "Example glob patterns" [ref=e203]:
+              - rowgroup [ref=e204]:
+                - row "Pattern Result" [ref=e205]:
+                  - columnheader "Pattern" [ref=e206]
+                  - columnheader "Result" [ref=e207]
+              - rowgroup [ref=e208]:
+                - row "* Select all packages" [ref=e209]:
+                  - cell "*" [ref=e210]
+                  - cell "Select all packages" [ref=e211]
+                - row "Alpha* Select any package that has an ID beginning with Alpha" [ref=e212]:
+                  - cell "Alpha*" [ref=e213]
+                  - cell "Select any package that has an ID beginning with Alpha" [ref=e214]
+        - paragraph [ref=e217]: 0 of 3 packages selected
+        - generic [ref=e218]:
+          - button "Create" [ref=e220] [cursor=pointer]
+          - button "Cancel" [ref=e222] [cursor=pointer]
+      - heading " Manage" [level=2] [ref=e56]:
+        - button " Manage" [expanded] [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: 
+          - text: Manage
+      - generic [ref=e61]:
+        - alert [ref=e62]:
+          - generic [ref=e63]: 
+          - text: Your API key 'Full access API key' has expired.
+        - generic [ref=e64]:
+          - generic [ref=e66]:
+            - img [ref=e68]
+            - generic [ref=e69]:
+              - heading "VoiceMCP2" [level=3] [ref=e70]
+              - generic [ref=e71]: 
+              - text: Expires in 9 months
+              - generic [ref=e72]: 
+              - text: "Push new packages and package versions, Unlist or relist package versions Package owner: tamir.dresher"
+              - text: "Packages: VoiceMCP"
+              - button "Edit" [ref=e73] [cursor=pointer]:
+                - generic [ref=e74]: 
+                - text: Edit
+              - button "Regenerate" [ref=e75] [cursor=pointer]:
+                - generic [ref=e76]: 
+                - text: Regenerate
+              - button "Delete" [ref=e77] [cursor=pointer]:
+                - generic [ref=e78]: 
+                - text: Delete
+              - button "Revoke" [ref=e79] [cursor=pointer]:
+                - generic [ref=e80]: 
+                - text: Revoke
+          - generic [ref=e82]:
+            - img [ref=e84]
+            - generic [ref=e85]:
+              - heading "VoiceMCP" [level=3] [ref=e86]
+              - generic [ref=e87]: 
+              - text: Expires in 9 months
+              - generic [ref=e88]: 
+              - text: "Push new packages and package versions Package owner: tamir.dresher"
+              - text: "Packages: VoiceMCP"
+              - button "Edit" [ref=e89] [cursor=pointer]:
+                - generic [ref=e90]: 
+                - text: Edit
+              - button "Regenerate" [ref=e91] [cursor=pointer]:
+                - generic [ref=e92]: 
+                - text: Regenerate
+              - button "Delete" [ref=e93] [cursor=pointer]:
+                - generic [ref=e94]: 
+                - text: Delete
+              - button "Revoke" [ref=e95] [cursor=pointer]:
+                - generic [ref=e96]: 
+                - text: Revoke
+          - generic [ref=e98]:
+            - img [ref=e100]
+            - generic [ref=e101]:
+              - heading "Full access API key" [level=3] [ref=e102]
+              - generic [ref=e103]: 
+              - text: Expired
+              - generic [ref=e104]: 
+              - text: "Scopes: All"
+              - button "Delete" [ref=e105] [cursor=pointer]:
+                - generic [ref=e106]: 
+                - text: Delete
+  - contentinfo [ref=e107]:
+    - generic [ref=e108]:
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - link "Contact" [ref=e112] [cursor=pointer]:
+            - /url: /policies/Contact
+          - paragraph [ref=e113]: Got questions about NuGet or the NuGet Gallery?
+        - generic [ref=e114]:
+          - link "Status" [ref=e116] [cursor=pointer]:
+            - /url: https://status.nuget.org/
+          - paragraph [ref=e117]: Find out the service status of NuGet.org and its related services.
+        - generic [ref=e118]:
+          - link "Frequently Asked Questions" [ref=e120] [cursor=pointer]:
+            - /url: https://aka.ms/nuget-faq
+            - text: FAQ
+          - paragraph [ref=e121]: Read the Frequently Asked Questions about NuGet and see if your question made the list.
+      - generic [ref=e122]:
+        - img "NuGet Home" [ref=e124]
+        - paragraph [ref=e128]:
+          - text: © Microsoft 2026 -
+          - link "About" [ref=e129] [cursor=pointer]:
+            - /url: /policies/About
+          - text: "-"
+          - link "Terms of Use" [ref=e130] [cursor=pointer]:
+            - /url: /policies/Terms
+          - text: "-"
+          - link "Privacy Statement" [ref=e131] [cursor=pointer]:
+            - /url: https://go.microsoft.com/fwlink/?LinkId=521839
+          - text: "-"
+          - link "Manage Cookies" [ref=e132] [cursor=pointer]:
+            - /url: "javascript: window.nuget.wcpSiteConsent.manageConsent()"
+          - text: "-"
+          - link "Trademarks" [ref=e133] [cursor=pointer]:
+            - /url: https://www.microsoft.com/trademarks

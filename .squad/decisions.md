@@ -4,6 +4,50 @@
 
 ---
 
+## Decision 17: Blog Anonymization — Public Content Policy
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Public Communications & Security
+
+### Decision
+
+**NEVER mention the real team name (DK8S, Distributed Kubernetes) or what the team does specifically in PUBLIC blog posts. Also don't mention FedRAMP. Keep it generic — "my team at Microsoft", "infrastructure platform team", etc.**
+
+### Rationale
+
+- Public blog should not expose internal team names or compliance programs
+- Security through obscurity — prevents external actors from directly targeting known team
+- Compliance requirement — FedRAMP status is sensitive information
+- Best practice for internal Microsoft teams publishing externally
+
+### Applies To
+
+All blog posts, public talks, conference presentations, social media posts authored by squad members or using squad resources.
+
+### Does NOT Apply When
+
+- Content is internal-only (Teams, internal wiki, employee intranet)
+- Disclosure is explicitly authorized by security/compliance teams
+- Content is posted to internal Microsoft forums or communities
+
+### Consequences
+
+- ✅ Reduced attack surface for public-facing content
+- ✅ Compliance with FedRAMP disclosure requirements
+- ⚠️ Requires conscious effort during writing — must remember to anonymize
+- ⚠️ May reduce impact of technical deep-dives (can't cite specific architecture)
+
+### Implementation
+
+When reviewing or drafting public content:
+1. Search for "DK8S", "Distributed Kubernetes", "FedRAMP", team member names
+2. Replace with generic terms: "my team", "infrastructure platform", "government compliance"
+3. Keep technical depth but remove Microsoft/team-specific context
+
+---
+
 ## Decision 1: Gap Analysis When Repository Access Blocked
 
 **Date:** 2026-03-02  
@@ -430,6 +474,229 @@ Consolidated all existing DK8S platform knowledge from 10+ analysis files, 2 loc
 **Author:** Picard (Lead)  
 **Status:** Needs Team Review  
 **Scope:** Communication & Integration  
+
+---
+
+## Decision 14: Azure DevOps Multi-Org MCP Configuration
+
+**Date:** 2026-03-11  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** ✅ Approved by Scribe for Team Adoption  
+**Scope:** Team Tools & Multi-Org Access  
+**Related Issue:** #329
+
+### Context
+
+Squad agents need to access Azure DevOps repos, PRs, and work items across multiple organizations:
+- `microsoft` org (primary)
+- `msazure` org (CESEC project and other Azure infrastructure repos)
+
+The `@azure-devops/mcp` package is single-org by design and cannot switch orgs at runtime.
+
+### Problem
+
+When Picard tried to review a PR in `msazure/CESEC/CIEng-Infra-AKS` (PR #15000967), the MCP tools failed because they were connected to the `microsoft` org. This blocked cross-org work.
+
+**Root Causes:**
+1. Org name is a required startup argument for `@azure-devops/mcp`
+2. No runtime reconfiguration capability
+3. Repo-level MCP config doesn't override global server instances
+4. Only one active connection per MCP instance
+
+### Decision
+
+**Adopt a multi-instance MCP pattern** where we run separate named MCP server instances for each Azure DevOps org.
+
+#### Global Config (~/.copilot/mcp-config.json)
+
+```json
+{
+  "mcpServers": {
+    "ado-microsoft": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "microsoft"],
+      "tools": ["*"]
+    },
+    "ado-msazure": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "msazure"],
+      "tools": ["*"]
+    }
+  }
+}
+```
+
+#### Tool Naming Convention
+
+Tools will be prefixed with the instance name:
+- `ado-microsoft-core_list_projects` → microsoft org
+- `ado-msazure-repo_get_pull_request_by_id` → msazure org
+
+### Alternatives Considered & Rejected
+
+1. **Az CLI Fallback Skill** ❌
+   - Rejected: Slower than native MCP, less structured output, Azure CLI failing in test environment
+   
+2. **Dynamic Config Swapping** ❌
+   - Rejected: MCP servers don't support runtime reload without full session restart
+
+### Implementation Plan
+
+**Phase 1: Configuration Update** ✅
+1. Update `~/.copilot/mcp-config.json` with multi-instance setup
+2. Remove single `azure-devops` instance
+3. Restart Copilot session to activate both instances
+
+**Phase 2: Validation** ⏳
+1. Test `ado-microsoft-core_list_projects` returns microsoft org projects
+2. Test `ado-msazure-core_list_projects` returns msazure org projects
+3. Test PR access: `ado-msazure-repo_get_pull_request_by_id` for PR #15000967
+4. Verify both instances authenticate independently
+
+**Phase 3: Documentation** 📝
+1. Update `.squad/routing.md` with org-detection rules
+2. Document tool prefixes in agent history
+3. Add examples of cross-org work to Squad docs
+
+### Trade-offs
+
+**Pros:**
+- ✅ Both orgs accessible simultaneously
+- ✅ No context switching needed
+- ✅ Clean separation of concerns
+- ✅ Scales to additional orgs (just add more instances)
+
+**Cons:**
+- ⚠️ Runs multiple MCP processes (higher memory)
+- ⚠️ Tool names are longer with prefixes
+- ⚠️ Agents need to know which instance to use (until auto-detection skill is built)
+
+### Success Metrics
+
+- [x] Multi-instance MCP pattern documented
+- [ ] Both `ado-microsoft-*` and `ado-msazure-*` tools available and functional
+- [ ] Successfully review PR #15000967 in msazure/CESEC
+- [ ] No manual config changes needed for cross-org work
+- [ ] All Squad agents can access both orgs seamlessly
+
+---
+
+## Decision 15: Squad Production Approval Framework
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** ✅ Approved by Scribe for Team Adoption  
+**Scope:** Team / External Guidance  
+**Related Issue:** #294
+
+### Decision
+
+Establish a comprehensive **production approval framework for Squad** that:
+
+1. Maps all compliance domains required for AI agent deployment in production
+2. Identifies stakeholders (security, compliance, IAM, platform, product)
+3. Provides actionable evidence checklists for each stakeholder
+4. Recommends realistic timeline (4-12 weeks depending on org maturity)
+5. Clarifies Squad-specific concerns (MCP tool access, agent autonomy, data residency)
+
+This framework is documented in `prod-approval-path.md` (15K words) and posted to issue #294 for Brady's immediate use.
+
+### Rationale
+
+**Why now:**
+- Brady is actively seeking production approval guidance
+- Squad team needs clarity on what approvals are required vs. optional
+- Future operators (not just Brady) will benefit from a documented path
+
+**Why this approach:**
+- **Organization by stakeholder** (not phase) allows Brady to parallelize reviews
+- **Evidence checklists** make it specific and non-negotiable (reduces ambiguity)
+- **Squad-specific section** addresses AI agent risks head-on (not generic)
+- **Timeline expectations** (4-12 weeks) prevent unrealistic "next week" promises
+
+### Key Findings for Squad Team
+
+1. **Security clearance is not binary** — Multiple approval layers: AI security, access control, data handling, secrets
+2. **MCP tool inventory is critical** — Document what each agent can do with each tool
+3. **Agent autonomy boundaries must be explicit** — Define what agents never decide alone (e.g., "merge to main")
+4. **Data residency is often overlooked** — Existing `.squad/decisions.md` and agent history must be audited for sensitive data
+
+### Implementation
+
+1. ✅ **Completed:** `prod-approval-path.md` created (15K comprehensive guide)
+2. ✅ **Completed:** Posted to issue #294 with executive summary
+3. **Recommended:** Brady uses this as starting point for conversations with approvers
+4. **Recommended:** Squad team reviews and updates based on Brady's feedback
+
+### Consequences
+
+**Benefits:**
+- Brady (and future operators) have clear, structured guidance
+- Squad team has framework for future deployments
+- Reduces back-and-forth with approvers
+- Document can be tailored per organization
+
+**Risks:**
+- Document is generic; Brady's org may have different frameworks
+- Some approvers may not follow outlined timeline
+- Assumes standard org structure (may not apply to startups)
+
+---
+
+## Decision 16: Knowledge Management Phase 1 Implementation
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** ✅ Approved by Scribe for Team Adoption  
+**Scope:** Knowledge Management  
+**Related Issue:** #321
+
+### Decision
+
+Implement Phase 1 of the knowledge management system to establish quarterly history rotation, cleanup process, and documentation for sustainable squad knowledge management.
+
+### Implementation Completed
+
+1. **Quarterly History Rotation**
+   - Rotated all 10 agent history files to quarterly archives (history-2026-Q1.md)
+   - Created fresh history.md files for Q2 active work tracking
+   - Established pattern: rotate at quarter boundary, keep fresh file per agent
+
+2. **Gitignore Cleanup**
+   - Updated `.squad/.gitignore` to exclude build artifacts and future vector DB indices
+   - Saved ~29.5 MB from repo size
+
+3. **Documentation Created**
+   - **KNOWLEDGE_MANAGEMENT.md** (6.7 KB): Quarterly rotation strategy, search patterns, Phase 2 roadmap
+   - Created INDEX.md in `agents/` and `decisions/` directories for navigation
+
+4. **Knowledge Capture**
+   - All rotations and new files properly tracked in git
+   - Full history preserved and recoverable via `git log --follow`
+
+### Outcomes
+
+**Metrics:**
+- ✅ Repository remains pure GitHub (no binaries, git-friendly)
+- ✅ Knowledge base is queryable via GitHub search + local ripgrep
+- ✅ Active history files now < 50 KB (stays performant)
+- ✅ Full history preserved in dated archives
+- ✅ Team has clear documentation on how the system works
+
+**Technical Learnings:**
+1. Quarterly rotation is manual but simple — one-line file rename per agent per quarter
+2. Gitignore must explicitly exclude build dirs — saves significant space
+3. INDEX.md files are valuable for navigation in large directories
+4. Git history is the real backup — `git log --follow` shows all rotations
+5. Markdown + GitHub search beats custom tools for current scale
+
+### Next Steps
+
+1. Monitor `.squad/` size monthly (alert if > 50 MB)
+2. Rotate Q1 → Q2 histories when Q2 ends (~June 2026)
+3. Consider Phase 2 (vector DB) planning for Q3 or Q4
 **Related Issues:** #18, #19, #33
 
 ### Context
@@ -13616,6 +13883,60 @@ No code changes required in tamresearch1 until factories are wired in bradygaste
 
 ---
 
+## Decision: Token Usage Panel — Event Deduplication Strategy
+
+**Date:** 2026-06-18
+**Author:** Data (Code Expert)
+**Issue:** squad-monitor #1
+**Status:** ✅ IMPLEMENTED (PR #9 merged)
+**Scope:** Code — Token Usage Analytics
+
+### Problem
+
+Token Usage & Model Stats panel was inflating token counts and call counts due to duplicate event processing.
+
+### Solution
+
+Deduplicate `assistant_usage` and `cli.model_call` events using API call ID. Process whichever event appears first, skip duplicates.
+
+### Rationale
+
+- Both event types report the same LLM invocation with different field names
+- `assistant_usage` has cost data; `cli.model_call` has duration/feature flags
+- Without deduplication, counts inflated ~2x
+
+### Impact
+
+- No breaking changes
+- Uses `HashSet<string>` for O(1) dedup lookups in `BuildTokenStatsSection`
+
+---
+
+## Decision: Multi-Session View Mode for squad-monitor
+
+**Date:** 2026-03-11
+**Author:** Data (Code Expert)
+**Issue:** squad-monitor #3
+**PR:** #8
+**Status:** ✅ IMPLEMENTED (PR #8 merged)
+**Scope:** Features — Dashboard Views
+
+### Problem
+
+Full dashboard is information-dense. When debugging agent sessions, need only session data. Default session scan window was hardcoded to 4 hours — too wide for real-time monitoring.
+
+### Solution
+
+Added `--multi-session` (`-m`) mode showing only session overview + merged feed. Made scan window configurable (default 30 minutes). Added keyboard toggle (`m` key) for view switching.
+
+### Impact
+
+- No breaking changes — existing behavior preserved
+- Default session window: 30 minutes (configurable via `--session-window`)
+- Keyboard shortcut `m` for view toggle
+
+---
+
 ## Decision 5: Watch Command Strategy — squad-cli vs ralph-watch.ps1
 
 **Date:** 2026-03-09
@@ -13953,6 +14274,206 @@ Designed a **provider-agnostic scheduling system** with:
 
 **Why:**
 - **Extensibility:** Easy to add new providers (Azure DevOps, K8s CronJobs, webhooks)
+
+---
+
+# Decision 29: Keel MCP Requires CUE-Aware Parsing for Migration Completeness
+
+**Date:** 2026-03-11  
+**Decider:** Picard (Lead)  
+**Context:** Issue #328 — Review of Keel-to-ConfigGen Migration MCP (ADO PR #15000967)  
+**Status:** Recommendation — Awaiting Tamir's implementation decision
+
+## Problem
+
+Tamir built a Keel MCP Server (with Abhishek) that automates ~50% of Keel→ConfigGen migration effort via boilerplate generation. His concern: "CUE itself allows certain 'logic' that I'm not sure if the MCP tools here would know and won't miss."
+
+**Key Question:** Will the migration tool capture CUE's semantic logic (conditionals, computations, constraints) or only structural syntax?
+
+## Analysis
+
+### CUE Language Characteristics
+
+CUE is a **constraint-based configuration language**, not just structured data:
+- **Conditionals:** Field guards, if statements
+- **Computations:** String interpolation, arithmetic expressions, list comprehensions
+- **Type Unification:** Constraint propagation across template hierarchy
+- **Template Composition:** Embedding, imports, inheritance
+
+### Current ConfigGen MCP Capabilities
+
+**Existing tools (configgen-package-updates, configgen-breaking-changes):**
+- ✅ NuGet package metadata
+- ✅ Breaking change documents
+- ✅ API surface changes (PublicAPI.txt)
+- ❌ CUE AST parsing
+- ❌ Template logic analysis
+- ❌ Constraint evaluation
+
+**Gap:** ConfigGen MCP operates at the **package ecosystem level**, not the **template DSL level**.
+
+### Migration Risk
+
+Without CUE-aware parsing, the keel MCP may:
+- Copy CUE file structure ✅
+- Miss conditional field generation ❌
+- Miss computed values in templates ❌
+- Miss validation constraints affecting runtime ❌
+- Miss template composition patterns ❌
+
+**Result:** Incomplete migrations requiring manual fixes — defeats the purpose of automation.
+
+## Options
+
+### Option A: Text/Regex-Based Migration
+- **Approach:** Parse CUE files as text, use regex/string manipulation
+- **Verdict:** ❌ Insufficient
+
+### Option B: Generic AST Parser
+- **Approach:** Use generic AST library to parse CUE syntax tree
+- **Verdict:** 🟡 Partial solution, but not complete
+
+### Option C: CUE Native Tooling (RECOMMENDED)
+- **Approach:** Use `cue eval` CLI or CUE Go API for semantic analysis
+- **Verdict:** ✅ Complete solution
+
+## Decision
+
+**Recommendation: Implement Option C — CUE Native Tooling Integration**
+
+### Implementation Plan
+
+1. **Phase 1: CUE Parser Integration**
+   - Add `cue eval` to keel MCP tool dependencies
+   - Or integrate CUE Go API for programmatic access
+   - Parse Keel templates semantically, not just syntactically
+
+2. **Phase 2: Template Auto-Discovery**
+   - Build `scan-templates` command in keel MCP
+   - Walk directory structure for .cue files
+   - Build dependency graph (imports, embeddings)
+
+3. **Phase 3: configgen-cli Integration**
+   - Wrap Tamir's configgen-cli as MCP tool
+   - Add validation: `configgen-cli validate` post-migration
+   - Add dry-run: `configgen-cli migrate --dry-run` before commit
+
+### Success Criteria
+
+- ✅ Migration captures 100% of Keel template logic (not just structure)
+- ✅ configgen-cli validation passes on migrated output
+- ✅ Complex templates with conditionals migrate correctly
+- ✅ No manual fixes required post-migration
+
+## Rationale
+
+**Why CUE Native Tooling is Non-Negotiable:**
+
+1. **Semantic Correctness:** Text/regex cannot capture constraint propagation or type unification
+2. **Future-Proofing:** CUE syntax may evolve; native tooling stays compatible
+3. **Error Detection:** CUE compiler catches invalid constraints that regex won't
+4. **Evaluation Capability:** Can resolve templates to final values for validation
+
+---
+
+*Decision merged from inbox on 2026-03-11T13-05-00Z by Scribe.*
+
+---
+
+# Decision 28: Multi-Squad Architecture Model
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** Approved  
+**Context:** Issue #326 — Jack Batzner's multi-squad architecture questions
+
+## Decision
+
+**Squad deployment model: One squad instance per repository, with upstream inheritance for coordination and cross-squad delegation for collaboration.**
+
+### Core Model: Squad-Per-Repo
+
+**One `.squad/` directory per repository**, containing:
+- Team roster (`.squad/team.md`)
+- Decisions (`.squad/decisions.md`)
+- Agent charters (`.squad/agents/*/charter.md`)
+- History (`.squad/agents/*/history.md`)
+- Skills (`.squad/skills/`)
+- Workflows (`.github/workflows/squad-*.yml`)
+
+**Rationale:**
+- Squad's identity tied to repository (decisions, code patterns, team memory live with code)
+- GitHub Actions integration assumes repo-local config
+- Autonomous work (Ralph monitoring, auto-assign) requires repo-local configuration
+- Clean separation of concerns: Each product team owns their squad
+
+### Coordination Mechanisms
+
+#### 1. Upstream Inheritance (Available Today)
+
+**Purpose:** Passive knowledge sharing — Squad A learns from Squad B's decisions
+
+**Use cases:**
+- Inherit architecture patterns from Platform Squad
+- Follow security policies from Security Squad
+- Learn coding standards from established projects
+- Real example: tamresearch1 reads from bradygaster/squad
+
+#### 2. Cross-Squad Delegation (Design Phase, Issue #197)
+
+**Purpose:** Active work handoff — Squad A tasks Squad B to execute work requiring Squad B's expertise
+
+**Protocol:**
+- Delegation request (JSON with requestId, context, requirements, authorizedActions)
+- Squad B accepts/declines
+- Squad B executes with Squad A's context loaded
+- Results returned via integration branch or draft PR
+- Audit trail logs all cross-squad actions
+
+### Recommended Topologies by Scale
+
+#### Small Org (1-3 teams, 1-5 repos)
+**Topology:** Squad-per-product with upstream inheritance
+
+#### Medium Org (4-10 teams, 6-20 repos)
+**Topology:** Squad-per-product + Platform Squad hub
+
+#### Large Org (10+ teams, 20+ repos)
+**Topology:** Squad-per-team + tiered upstreams
+
+### Design Principles
+
+1. **One squad instance per repo** — Decisions, team, and memory live with the code
+2. **Upstream for knowledge sharing** — Read-only inheritance of decisions and patterns
+3. **Delegation for execution** — Active collaboration when expertise is needed
+4. **Lead routing** — Lead agent decides which squad handles what based on capabilities
+5. **Autonomous by default** — Squads operate independently, coordinate only when necessary
+
+### Implementation Phases
+
+- **Phase 1 (Available Today):** Squad-per-repo model, upstream inheritance, manual coordination
+- **Phase 2 (Q1 2026):** Cross-squad delegation protocol, squad registry, authorization boundaries, audit trail
+- **Phase 3 (Future):** Central squad registry, capacity management, work marketplace
+
+### Consequences
+
+**Positive:**
+- ✅ Clear model: one squad per repo, easy to understand
+- ✅ Scalable: works for 1 repo or 100 repos
+- ✅ Preserves autonomy: squads operate independently
+- ✅ Enables coordination: upstreams + delegation cover knowledge sharing and execution
+
+**Neutral:**
+- ⚠️ Requires discipline: teams must manage upstream dependencies
+- ⚠️ Phase 2 not yet available: delegation requires Issue #197 implementation
+
+**Negative:**
+- ❌ No single-squad-multi-repo option: may disappoint teams wanting centralized config
+- ❌ Coordination overhead: larger orgs need registry management
+
+---
+
+*Decision merged from inbox on 2026-03-11T13-05-00Z by Scribe.*
 - **Testability:** Each provider can be tested independently
 - **Separation of Concerns:** Scheduler logic decoupled from execution logic
 - **Fallback Support:** Provider priority + automatic fallback
@@ -18455,5 +18976,1487 @@ Tech News Digest #315 validates three core pillars of our squad's architecture. 
 ---
 
 *Decision created as part of tech news digest analysis workflow.*
+
+
+
+---
+
+# Decision: Keel MCP Tooling Enhancement Requirements
+
+**Date:** 2026-03-11  
+**Context:** ADO PR #15000967 review (Keel-to-ConfigGen migration MCP)  
+**Decision Maker:** B'Elanna (Infrastructure Expert)  
+**Status:** 📋 Recommendation (pending Tamir review)
+
+## Background
+
+Tamir built a Keel MCP Server to automate migration from Keel (CUE-based infra) to ConfigGen (C# code generation). PR #15000967 implements Step 1, saving ~50% of migration effort. Issue #328 requests review focusing on:
+1. CUE logic handling (constraints, conditionals, computations)
+2. Template auto-discovery
+3. configgen-cli integration gaps
+
+## Problem Statement
+
+Current ConfigGen MCP tools (configgen-package-updates, configgen-breaking-changes) are designed for **NuGet package management**, not **migration workflows**. They lack:
+- CUE language awareness (only see text/AST, miss logic semantics)
+- Template discovery mechanisms
+- Integration with configgen-cli tool
+
+## Recommendation: 3-Layer MCP Enhancement
+
+### Layer 1: CUE-Aware Parsing (HIGH PRIORITY)
+**Gap:** CUE supports logic beyond data — conditionals, computed values, validation constraints, template composition.  
+**Risk:** Migration tools may silently drop logic patterns during Keel → ConfigGen transform.  
+**Solution:** 
+- Add CUE AST parser to MCP toolchain
+- Detect logic patterns: conditionals (if, guards), computations (interpolation, arithmetic), constraints (validation rules)
+- Flag unsupported patterns for manual review
+
+### Layer 2: Template Discovery (MEDIUM PRIORITY)
+**Gap:** No automatic template scanning in current MCP.  
+**Solution:**
+- Add template directory scanner to configgen-cli MCP integration
+- Discover: Template inheritance, parameterization patterns, composition structures
+- Map Keel template patterns → ConfigGen equivalents
+
+### Layer 3: configgen-cli Integration (MEDIUM PRIORITY)
+**Gap:** Tamir built configgen-cli for migration workflows, but it's not exposed via MCP.  
+**Solution:**
+- Wrap configgen-cli operations in MCP tool layer:
+  - Template validation
+  - Migration dry-run
+  - CUE validation hooks
+- Integrate with existing configgen-* tools for unified workflow
+
+## Decision
+
+**Approve phased enhancement:**
+1. **Phase 1 (Weeks 1-2):** CUE logic detection — add parser + flagging for unsupported patterns
+2. **Phase 2 (Week 3):** Template discovery — scan template dirs, document inheritance
+3. **Phase 3 (Week 4):** CLI integration — wrap configgen-cli in MCP tool layer
+
+**Alternative:** Accept risk and rely on manual review for CUE logic patterns (NOT RECOMMENDED — high error rate on complex blueprints)
+
+## Rationale
+
+- **CUE logic is non-trivial:** Constraints and computations are first-class citizens in CUE, not metadata
+- **Template complexity scales:** Simple blueprints (tested) vs. production blueprints with deep inheritance
+- **Tooling ROI:** 50% effort savings (current) → 80%+ with enhanced tooling (projected)
+
+## Action Items
+
+| Item | Owner | Priority |
+|------|-------|----------|
+| Review actual PR files (grant ADO access or export) | Tamir | HIGH |
+| Audit sample .cue files for logic patterns | B'Elanna | HIGH |
+| Document template structure (Keel & ConfigGen) | Squad | MEDIUM |
+| Evaluate CUE parser libraries (Go/C#) | Data | MEDIUM |
+| Test MCP tools against complex blueprints | Tamir + Abhishek | HIGH |
+
+## References
+
+- Issue #328: PR review request
+- Issue #287: Keel MCP reminder
+- Issue #241: ConfigGen CLI tool (approved, merged)
+- ADO PR: https://dev.azure.com/msazure/CESEC/_git/CIEng-Infra-AKS/pullrequest/15000967
+
+---
+
+*Decision created as part of ADO PR review workflow (Issue #328).*
+
+
+---
+
+# Multi-Squad Architecture Position
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Context:** Issue #326 — Response to Jack Batzner's question about multi-squad model
+
+## Decision
+
+Squad's multi-repo architecture follows a **federation model** with three tiers:
+
+### Tier 1: Squad Per Repo (Default)
+- Each repository maintains its own `.squad/` directory with independent team roster, decisions, and history
+- Squads operate autonomously within their repo context
+- **Recommendation:** Start here for most teams — simple, clear ownership
+
+### Tier 2: Upstream Knowledge Sharing (Current)
+- One squad can pull decisions/knowledge from another via `.squad/upstream.json`
+- One-way dependency: consuming squad reads upstream squad's metadata
+- **Use case:** Sharing platform standards, security policies, architecture patterns across squads
+
+### Tier 3: Cross-Squad Delegation (In Design)
+- Formal protocol for squads to task each other across repo boundaries
+- Executing squad runs under delegating squad's context (decisions, team structure, authorization)
+- Signed requests, authorization boundaries, audit trails
+- **Use case:** Expertise-based task routing when specialized knowledge lives in another squad
+
+### Special Case: Mono-Squad Multi-Repo
+- One squad instance monitors/works across multiple repos
+- Ralph (work monitor) already does this — watches tamresearch1 + private research repos
+- **Use case:** Small teams with centralized coordination across related codebases
+- **Limitation:** Not recommended for multiple independent teams — context bleed is problematic
+
+## Multi-Repo Capabilities Already Implemented
+
+1. **Ralph's cross-repo monitoring**: Can track issues across different repositories simultaneously
+2. **Worktree awareness**: Branch-local squad state prevents conflicts in parallel sessions
+3. **Upstream repos**: Decision-sharing via `.squad/upstream.json` (e.g., dk8s-platform-squad)
+
+## Architectural Guidance
+
+**Recommended pattern:**
+- Squad per repo for isolation
+- Upstream.json for knowledge sharing
+- Cross-squad delegation for execution (when ready)
+
+**Not recommended:**
+- Single squad instance spanning multiple repos with different teams (context management becomes chaotic)
+
+## Related Work
+
+- `docs/cross-squad-orchestration-design.md` — Detailed design for Tier 3 delegation protocol
+- `.squad/upstream.json` — Current upstream knowledge-sharing implementation
+- `.squad/agents/ralph/charter.md` — Multi-repo monitoring capabilities
+
+## Status
+
+**Current state:** Tiers 1-2 fully operational  
+**Next phase:** Implement Tier 3 cross-squad delegation protocol (Issue #197)
+
+
+---
+
+# Tech Trends Validation Decision
+**Issue:** #324 (Tech News Digest: 2026-03-11)
+**Agent:** Seven (Research & Docs)
+**Date:** 2026-03-11
+**Status:** ✅ COMPLETED
+
+---
+
+## Decision
+**Validate Squad's core architecture against March 2026 tech trends.**
+
+Squad's strategy remains well-aligned with industry direction. No architectural changes needed.
+
+---
+
+## Evidence
+
+### 1. CLI-First Agent Approach ✅ VALIDATED
+**Source:** "The Agentic CLI Takeover" story in Tech News Digest #324
+**Finding:** Industry is adopting CLI-first agents as standard pattern (not fringe)
+**Impact:** Squad's CLI-first design is ahead of mainstream adoption curve
+**Confidence:** HIGH
+
+### 2. Go for Systems/Agents ✅ CONFIRMED
+**Source:** Flask creator publicly endorses Go > Python for AI agents (HN, 367 pts)
+**Finding:** Language creators and infrastructure experts prefer Go for agent work
+**Impact:** Validates choice of Go for DK8S operators
+**Confidence:** HIGH - Industry authority endorsement
+
+### 3. C# for Domain Modeling ✅ ENHANCED
+**Source:** C# 15 unions merged into .NET 11 Preview 3 (r/dotnet, 219 pts)
+**Finding:** Language evolution supports discriminated union patterns
+**Impact:** ConfigGen and .NET CLI tools can use modern domain modeling
+**Action:** Monitor Preview releases; update test suites for union syntax support
+**Confidence:** MEDIUM (preview feature, not stable)
+
+### 4. State Management Infrastructure ✅ ADDRESSED
+**Source:** Open source persistent memory for AI agents (Issue #321 connector)
+**Finding:** Community building solutions for agent state/context persistence
+**Impact:** Squad's "second brain" problem (#321) has emerging solutions
+**Action:** Evaluate for integration in next cycle
+**Confidence:** MEDIUM (early-stage solutions)
+
+---
+
+## Community Engagement
+**Tamir's Blog:** "Organized by AI" appeared on r/dotnet (2026-03-11)
+- Positive community engagement
+- Squad visibility in target ecosystem
+- No intervention needed; monitor for follow-up engagement
+
+---
+
+## Recommendation
+✅ **Continue current trajectory.** All four validation targets confirm Squad's strategic alignment with 2026 tech ecosystem. Maintain focus on:
+- CLI-first agent architecture
+- Go for systems work
+- C# for domain/library code
+- State management for persistent context
+
+No pivots or course corrections needed based on this analysis.
+
+---
+
+## Next Steps
+1. **Data/Picard:** Evaluate persistent memory solutions for #321
+2. **Ralph/Neelix:** Add "Agentic CLI Takeover" trend to market watch
+3. **Seven:** Monitor C# 15 release progress for ConfigGen team
+4. **Blog team:** Consider ecosystem validation post based on these findings
+
+---
+
+# Teams CC Message Monitoring Decision
+
+**Issue:** #332 (Teams message monitoring enhancement)  
+**Author:** Picard (Lead)  
+**Date:** 2026-03-11  
+**Status:** ✅ COMPLETED - ROUTED
+
+## Decision
+
+Routed issue #332 (Teams CC message tracking) to **Kes (Communications & Scheduling)** instead of infrastructure/code specialists.
+
+## Rationale
+
+This is a **communications/integration layer** request, not a code or infrastructure problem:
+- **Enhancement:** Track Squad's ability to detect and respond to CC'd messages in Teams and follow discussion thread continuations
+- **Current gap:** Ralph's monitoring only catches direct mentions; misses:
+  - Messages where Tamir is CC'd but not explicitly mentioned
+  - Discussion threads that continue after Squad's initial action (e.g., Nada's follow-up in #331)
+
+## Domain Ownership
+
+Kes owns Squad's Teams integration and communications automation (Outlook, Teams, scheduling). This naturally belongs in her domain:
+- Evaluate whether enhancement lives in Ralph's monitoring logic or Kes's Teams bridge
+- Define message patterns for "CC'd message" vs. "thread continuation"
+- Coordinate escalation rules to surface relevant communications
+
+## Consequences
+
+**Positive:**
+- ✅ Establishes clear pattern: communications features route to Kes, not to infrastructure
+- ✅ Clarifies boundaries for future similar requests
+- ✅ Prevents unnecessary spike in infrastructure team
+
+**Next Steps (for Kes):**
+1. Review Issue #331 (Nada's unanswered follow-up) as concrete use case
+2. Determine if this requires:
+   - Ralph enhancement (watch for reply depth, not just mentions)
+   - New Teams bridge patterns
+   - Or orchestration with communication workflows
+3. Propose implementation (or spike) with effort estimate
+
+---
+
+# DK8S Wizard Pipeline Triggering Pattern Documentation
+
+**Issue:** #331 (DK8S onboarding pipeline triggering)  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-11  
+**Status:** 📝 DOCUMENTED (Not a new decision — documents existing pattern)
+
+## Analysis
+
+The DK8S onboarding wizard explicitly triggers Buddy and Official pipelines via API after creating a new cluster repository, rather than relying on automatic CI trigger policies. This prompted a question from Nada: "why does the wizard explicitly trigger these?"
+
+### Why Explicit Triggering for Orchestrated Workflows
+
+1. **Bootstrapping Problem** — Initial commits may not satisfy pre-configured trigger filters; explicit triggering ensures pipelines run regardless
+2. **Deterministic Sequencing** — Wizard requires Buddy → Official execution order; auto-triggers fire asynchronously with no guaranteed order
+3. **Branch Constraint Mismatches** — CI policies typically fire on main/release/* branches; wizard setup commits target setup/* or feature/* branches
+4. **Parameter Injection** — Buddy/Official pipelines require cluster-specific parameters; auto-triggers use defaults from commit context
+5. **Synchronous User Feedback** — Wizard UI needs real-time pipeline status; auto-triggers require polling
+
+## Pattern Classification
+
+**Event-Driven Automation (Auto-Triggers):**
+- ✅ Best for: Routine commits, stateless pipelines, independent stages
+- ✅ Use when: Repository structure is stable, trigger conditions well-defined
+
+**Orchestrated Workflows (Explicit Triggers):**
+- ✅ Best for: Setup wizards, multi-stage deployments, parameter-driven pipelines
+- ✅ Use when: Sequencing matters, synchronous feedback required, dynamic parameters needed
+
+## Decision
+
+✅ **Keep explicit triggering for Buddy/Official pipelines in onboarding wizard** — this is sound engineering practice for orchestrated workflows where determinism and control are critical.
+
+## Team Knowledge
+
+Wizards and setup automation should use **explicit pipeline triggering for bootstrapping workflows**. Auto-triggers are appropriate for routine post-commit CI/CD on established repositories.
+
+---
+
+# DevBox Persistent Access Decision
+
+**Issue:** #330 (DevBox autonomous access)  
+**Author:** Data (Code Expert) / B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-11  
+**Status:** ✅ APPROVED
+
+## Problem
+
+Squad requires autonomous DevBox access to:
+- Check Ralph status without manual tunnel opening
+- Install tools and run commands remotely
+- Survive DevBox restarts without re-authentication
+
+Current blocker: Manual dev tunnel management by Tamir.
+
+## Decision
+
+**Use SSH with key-based authentication as the standard for Squad's autonomous DevBox access.**
+
+## Analysis
+
+Evaluated 5 solutions across security, reliability, autonomy, and simplicity:
+
+| Solution | Security | Reliability | Autonomy | Simplicity | Score |
+|----------|----------|-------------|----------|------------|-------|
+| **SSH + Keys** | 🟢 Excellent | 🟢 Auto-starts | 🟢 Zero manual | 🟢 Native | **10/10** ⭐ |
+| Auto-start DevTunnel | 🟡 Auth required | 🟢 Persistent | 🟢 Zero manual | 🟡 Setup needed | 7/10 |
+| cli-tunnel auto-start | 🟡 Auth required | 🟢 Persistent | 🟢 Zero manual | 🟡 npm dependency | 6/10 |
+| Run Command API | 🟢 Azure IAM | 🟢 API-based | 🟢 Zero manual | 🔴 Complex API | 6/10 |
+| Self-Hosted Runner | 🔴 High risk | 🟢 Auto-starts | 🟢 Zero manual | 🔴 Complex | 4/10 |
+
+## Why SSH Wins
+
+1. **Security** — Industry-standard key-based auth, no secrets in URLs/tokens
+2. **Reliability** — Native Windows OpenSSH service, auto-starts on boot
+3. **Autonomy** — Zero manual intervention after one-time key setup
+4. **Simplicity** — Built into Windows, PowerShell remoting works natively
+5. **Auditability** — SSH logs all access attempts
+
+## Implementation Plan
+
+1. **One-Time Setup (Tamir):**
+   - Install OpenSSH Server on DevBox
+   - Generate SSH key pair on local machine
+   - Configure authorized_keys on DevBox
+   - Test: `Enter-PSSession -HostName <devbox> -UserName <user> -SSHTransport`
+
+2. **Squad Integration:**
+   - Update Playwright DevBox skill to use SSH instead of dev tunnels
+   - Store DevBox hostname/IP in `.squad/config` or environment variable
+   - Test autonomous Ralph status check
+
+3. **Keep cli-tunnel for Monitoring:**
+   - cli-tunnel remains for terminal recording, demos, and hub mode
+   - Not used for Squad automation
+
+## Consequences
+
+**Positive:**
+- ✅ Squad can autonomously check Ralph, install tools, run commands
+- ✅ No manual tunnel opening required
+- ✅ Strong security with key-based auth
+- ✅ Works across reboots
+
+**Considerations:**
+- Initial SSH key setup required (one-time)
+- DevBox must be network-reachable (standard practice)
+
+---
+
+# Multi-Org ADO/MCP Configuration Decision
+
+**Issue:** #329 (Multi-org Azure DevOps access)  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Date:** 2026-03-11  
+**Status:** ✅ APPROVED (Pending Implementation)
+
+## Problem
+
+The ADO MCP server is configured with a single org ("microsoft"). When Squad needs to access repos in other orgs (e.g., "msazure/CESEC"), it fails silently. This blocked PR review on issue #328.
+
+## Root Cause
+
+The `@azure-devops/mcp` package has a **single-org limitation by design**:
+- Org name is required startup argument: `npx @azure-devops/mcp <org-name>`
+- No runtime reconfiguration possible — requires server restart to change orgs
+- Global MCP server instances take precedence over repo-level configs
+
+**Current Configuration Conflict:**
+- Global config (`~/.copilot/mcp-config.json`): "microsoft" org
+- Repo config (`./.copilot/mcp-config.json`): "msazure" org
+- Global server overrides repo config, blocking msazure access
+
+## Decision
+
+**Implement multi-instance MCP pattern** — Run separate MCP server instances per org with unique names:
+
+```json
+{
+  "mcpServers": {
+    "ado-microsoft": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "microsoft"],
+      "tools": ["*"]
+    },
+    "ado-msazure": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "msazure"],
+      "tools": ["*"]
+    }
+  }
+}
+```
+
+## Benefits
+
+- ✅ Both orgs accessible simultaneously
+- ✅ Uses official Microsoft package (no third-party risk)
+- ✅ Clean tool namespacing: `ado-microsoft-*` vs `ado-msazure-*`
+- ✅ Zero context switching required
+- ✅ No breaking changes to existing Squad workflows
+
+## Consequences
+
+**Positive:**
+- ✅ Solves cross-org access issue permanently
+- ✅ Uses official Microsoft tooling
+- ✅ Enables autonomous Squad operations across orgs
+- ✅ Clear tool namespacing prevents conflicts
+
+**Considerations:**
+- Tool names change from `azure-devops-*` to `ado-{org}-*`
+- Skills may need updates for org-aware routing
+- Slightly more verbose tool names
+
+## Implementation Plan
+
+1. **Update global config** (`~/.copilot/mcp-config.json`) with both org instances
+2. **Test both org access** from Copilot CLI
+3. **Verify tools are properly namespaced:** `ado-microsoft-core_list_projects` etc.
+4. **Update Squad skills** to detect org context and route accordingly
+5. **Document multi-org routing patterns** in `.squad/skills/`
+
+**Status:** Research complete. Awaiting Tamir's approval to implement global config changes.
+
+---
+
+# Decision: Infrastructure Incident Investigation Pattern
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna  
+**Context:** Issue #337 — IcM Incident 759361753 (Cosmos DB firewall/policy investigation)  
+**Status:** Pattern documented for team adoption
+
+## Problem
+
+When an external stakeholder (like Brett DeFoy in IcM) asks "did your team change X infrastructure setting around date Y?", we need a fast, authoritative investigation process.
+
+## Decision
+
+**Adopt this triage pattern for infrastructure incident investigations:**
+
+### Step 1: Check IaC/Git History First (Fastest)
+- Review git log for commits around the timeframe
+- Search for keywords: resource type, firewall, network, policy
+- Check Bicep/Terraform templates for current vs. expected configuration
+- **Why:** If IaC is clean, we can immediately say "not our deployment pipeline"
+
+### Step 2: Query Azure Activity Logs (Manual Changes)
+- Use z monitor activity-log list with resource-specific filters
+- Focus on Update/Write operations around the timeframe
+- Check caller field to identify who made manual changes
+- **Why:** Catches Portal/CLI changes by admins outside our team
+
+### Step 3: Check Azure Policy Assignments (Governance)
+- Use z policy assignment list to find relevant policies
+- Filter for: Cosmos, Network, Firewall, Public Access keywords
+- Check EnforcementMode (Default = actively blocking)
+- **Why:** Central governance teams often apply policies without notifying workload teams
+
+### Step 4: Inspect Current Resource Config
+- Use resource-specific show commands (e.g., z cosmosdb show)
+- Compare actual settings vs. IaC template definitions
+- Look for drift: IP rules, VNet rules, public access settings
+- **Why:** Confirms what's actually deployed vs. what should be deployed
+
+### Step 5: Check Policy Compliance Events (Denials)
+- Use z policy state list with date filters
+- Filter for NonCompliant state
+- Check for denial events (policy blocked a compliant→non-compliant change)
+- **Why:** Reveals if a policy *prevented* someone from making a change
+
+## Rationale
+
+**Speed:** Starting with git/IaC takes seconds and gives immediate "yes/no" on team responsibility.
+
+**Accountability:** Activity Logs show exactly who/what/when for manual changes (no guessing).
+
+**Governance Visibility:** Azure Policy often operates "invisibly" at subscription/MG level — explicit check surfaces this.
+
+**Evidence-Based:** Each step produces CLI output that can be shared with stakeholders (no "we don't think so" answers).
+
+## Implementation
+
+1. **Create runbook template** with pre-filled Azure CLI commands for common resources (Cosmos, Storage, AKS, Key Vault)
+2. **Document in skill:** .squad/skills/incident-response/infrastructure-triage.md
+3. **Update DRI playbook:** Cross-reference with existing incident playbook (Issue #334)
+4. **Store as Copilot snippet:** Save CLI commands in .squad/snippets/azure-cli/ for quick copy-paste
+
+## Related
+- Issue #333: Azure Status Check in Incident Response
+- Issue #334: DRI Incident Playbook
+- .squad/skills/incident-response/ (future home)
+
+---
+
+# Decision: Session Display Format
+
+**Date:** 2026-03-11  
+**Author:** Data  
+**Context:** Issue #10 — squad-monitor session display enhancement
+
+## Decision
+
+Session display format integrates date/time, resume ID, and repo name into a single consolidated string:
+
+`
+Format: "MMM dd HH:mm (resumeId) | reponame"
+Example: "Mar 11 20:39 (30380cd9) | tamresearch1"
+`
+
+## Rationale
+
+1. **Consolidated Display**: Single column vs separate columns reduces visual scanning
+2. **Resume ID Length**: 8 chars provides uniqueness while maintaining density
+3. **CWD Format**: Last path segment only (repo name) vs full path
+4. **Timestamp Source**: events.jsonl session.start preferred over directory timestamps
+
+## Alternatives Considered
+
+1. **Separate columns** — Rejected: requires more horizontal space
+2. **Full GUID** — Rejected: 36 chars too long
+3. **Full path for CWD** — Rejected: wastes space
+4. **Directory timestamps** — Rejected: less accurate than event timestamps
+
+## Related
+- Issue: tamirdresher/squad-monitor#10
+- Branch: squad/10-session-display
+
+---
+
+# Decision: Dependabot Security Investigation Process
+
+**Date:** 2026-03-10  
+**Author:** Worf (Security & Cloud)  
+**Issue:** #336  
+**Status:** Recommendation
+
+## Context
+
+Received alert about critical Dependabot security PRs for DK8S CapacityController and ArgoRollouts repositories. Investigation revealed repositories not accessible via standard GitHub search methods.
+
+## Decision
+
+**Standardized process for investigating external Dependabot security alerts:**
+
+1. **Verify notification source first** — Check original Dependabot email for exact repository URLs
+2. **Check multiple platforms** — Enterprise repos may exist in public GitHub, private GHE, or Azure DevOps
+3. **Confirm current ownership** — Verify repository ownership/access rights before investigation
+4. **Tag early if blocked** — Add "status:pending-user" label immediately if access barriers prevent assessment
+
+## Rationale
+
+- Saves investigation time by confirming access/location upfront
+- Prevents false negatives
+- Maintains security posture by documenting blockers
+- Ensures Commander (Tamir) is engaged early
+
+## Related
+- Issue #336
+- .squad/agents/worf/history.md (2026-03-10 learnings)
+
+---
+
+## Decision 20: GitHub Account Switching — EMU Workaround
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Tool Automation  
+
+### Decision
+
+The squad MUST handle GitHub account switching automatically. When working on personal public repos (tamirdresher/squad-monitor, tamirdresher/tamirdresher.github.io, etc.), ALWAYS switch to personal account first: gh auth switch --user tamirdresher. When done, ALWAYS switch back: gh auth switch --user tamirdresher_microsoft. NEVER report "PR creation blocked by EMU" — just switch accounts and create the PR.
+
+### Rationale
+
+- EMU (Enterprise-managed User) account cannot create PRs on personal public repositories
+- Simple workaround: switch GitHub CLI authentication context to personal account
+- Agents must execute this autonomously without asking or escalating as a blocker
+- This directive has been stated multiple times — agents keep forgetting
+
+### Applies To
+
+All PR creation work on personal public repos (squad-monitor, tamirdresher.github.io, squad-personal-demo, etc.)
+
+### Implementation
+
+`ash
+# Before working on personal public repos:
+gh auth switch --user tamirdresher
+
+# After work is complete:
+gh auth switch --user tamirdresher_microsoft
+`
+
+### Consequences
+
+- ✅ PR creation workflow becomes frictionless
+- ✅ No false blockers or escalations  
+- ⚠️ Requires remembering to switch back (failure mode: EMU context left active)
+
+### Related
+
+EMU is a Microsoft Azure DevOps identity management system. Agents operating on personal GitHub repos must use personal account context.
+
+---
+
+## Decision 21: Teams CC Monitoring — Autonomous Follow-up
+
+**Date:** 2026-03-11  
+**Author:** Tamir Dresher (User Directive)  
+**Status:** ✅ Adopted  
+**Scope:** Team Process & Issue Tracking  
+
+### Decision
+
+Monitor Teams messages where Tamir is CC'd (not just direct mentions). Track these conversations so if the other person continues the discussion and follow-up action is needed, the squad can pick it up autonomously.
+
+### Rationale
+
+- User request for improved context tracking
+- Example: Nada thread where she continued asking questions after Tamir's initial reply — team should have detected and responded
+- Ensures no Teams conversations fall through the cracks
+
+### Applies To
+
+All Teams channels and direct messages where Tamir is CC'd (visible in message thread)
+
+### Does NOT Apply When
+
+- Conversation is resolved (marked as Answered)
+- Message is informational only, no action required
+- Requester explicitly states "no follow-up needed"
+
+### Implementation
+
+When monitoring Teams:
+1. Check both direct mentions and CC mentions
+2. Track conversation threads and participant continuations
+3. If new response from another participant after Tamir replied, flag for squad action
+4. Create issue or escalate to Picard (Lead) if response needed
+
+### Consequences
+
+- ✅ Proactive issue detection
+- ✅ Faster response to community questions
+- ⚠️ Requires continuous Teams monitoring (see: Data agent scope)
+- ⚠️ May create false positives (informational follow-ups)
+
+### Related
+
+Captured 2026-03-11. Coordinator monitors Teams CC messages; escalates to squad for action.
+
+---
+
+## Decision 22: Session Display Format — squad-monitor UI (Issue #10)
+
+**Date:** 2026-03-11  
+**Author:** Data (submitted from inbox)  
+**Status:** Pending PR merge  
+**Scope:** squad-monitor Tool  
+
+### Decision
+
+Session display in squad-monitor consolidates all metadata into a single widened Session column rather than adding separate columns for each field. This maximizes terminal real estate while remaining readable.
+
+### Format
+
+- **Agency sessions:** Ralph-Mar 11 20:39 (30380cd9) | tamresearch1
+- **Copilot sessions:** Copilot-shortId | reponame
+
+### Key Choices
+
+1. **Resume ID truncated to 8 chars** — full GUID too long for terminal display
+2. **CWD shown as last path segment only** — repo name, not full path (e.g., 	amresearch1, not /home/user/code/tamresearch1)
+3. **Single consolidated column** — removed separate Repo/CWD columns, widened Session column to 45 chars max
+4. **16KB read limit on events.jsonl** — session metadata always in first few KB, avoids reading multi-MB historical files
+5. **Graceful fallback** — missing metadata degrades to short directory ID
+
+### Implementation
+
+Branch: squad/10-session-display on tamirdresher/squad-monitor  
+Status: Rebased onto latest main, build clean, awaiting PR merge
+
+### Consequences
+
+- ✅ Improved terminal readability (single consolidated column)
+- ✅ Faster metadata reads (16KB limit)
+- ⚠️ Truncated IDs require disambiguation in logs (full ID available in events.jsonl)
+- ⚠️ Lost repo column (recoverable from events.jsonl if needed)
+
+### Related
+
+Implements squad-monitor issue #10 (UI consolidation). PR #4 ready for review.
+
+
+## Decision 18: Research Squad Repository Created
+
+**Decision ID:** 18  
+**Date:** 2026-03-11  
+**Author:** Picard  
+**Issue:** #341  
+**Status:** ✅ ACTIVE
+
+### Context
+
+Tamir approved the Research Squad proposal for a dedicated research team operating in a separate repository. Key requirement: "You do all. And have a dedicated Ralph. Each should be isolated so can run in different machines."
+
+### Decision
+
+Created **tamresearch1-research** repository with full Squad structure and 6-member research team.
+
+**Repository:** `tamirdresher_microsoft/tamresearch1-research` (private)
+
+**Team Roster:**
+- Guinan — Research Lead
+- Geordi — Technology Scanner
+- Troi — Methodology Analyst
+- Brahms — Architecture Researcher
+- Scribe-R — Research Scribe
+- Ralph-R — Research Ralph (isolated from Production Ralph)
+
+### Implementation
+
+1. ✅ Full .squad/ Structure (agents, routing, decisions, ceremonies, casting)
+2. ✅ Research Directories (active/, completed/, failed/)
+3. ✅ Cross-Repo Bridge (inbound/, outbound/)
+4. ✅ Symposium Structure (templates/, sessions/)
+5. ✅ Initial Research Backlog (6 priorities)
+
+### Consequences
+
+- ✅ Research squad fully autonomous — no production bottlenecks
+- ✅ Ralph-R isolation prevents priority conflicts with Production Ralph
+- ✅ Failed research is safe — separate repo means experiments don't clutter production
+- ✅ Symposium ceremony enables batch findings (reduces noise)
+- ⚠️ Two repos to monitor (Ralph-R handles this)
+- ⚠️ Cross-repo issue protocol adds coordination overhead
+
+### Status
+
+✅ Operational as of 2026-03-11. Research capacity ready.
+
+---
+
+## Decision 19: MDE CopilotCliAssets Integration
+
+**Decision ID:** 19  
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** ✅ ACTIVE  
+**Scope:** Skills & Knowledge Management
+
+### Context
+
+Evaluated https://dev.azure.com/microsoft/DefenderCommon/_git/MDE.ServiceModernization.CopilotCliAssets to identify useful patterns for Squad integration.
+
+### Decision
+
+### ✅ INTEGRATED: Reflect Skill
+
+**Adopted:** `.squad/skills/reflect/SKILL.md`
+
+**Why:** Squad already uses history.md and decisions.md. Reflect adds in-flight learning capture with confidence levels (HIGH/MED/LOW), preventing mistakes. Complements existing knowledge systems.
+
+**Adaptations:**
+- Storage paths adapted to `.squad/` structure
+- Routes team-wide learnings through `.squad/decisions/inbox/`
+- Agent-specific learnings append to `.squad/agents/{agent}/history.md`
+- Preserves HIGH/MED/LOW confidence classification
+
+**Original credit:** Richard Murillo (rimuri), MDE.ServiceModernization.CopilotCliAssets
+
+### ❌ NOT INTEGRATED: PR Review Orchestrator
+
+**Why:** Squad already has Ralph monitoring PRs. Adding parallel sub-agent orchestration duplicates existing workflows.
+
+### ❌ NOT INTEGRATED: Monthly Service Report
+
+**Why:** Highly specific to MDE team. Squad has no monthly reporting requirements.
+
+### ❌ NOT INTEGRATED: Plugin Packaging Structure
+
+**Why:** Squad designed for single-repo adoption, not plugin marketplace.
+
+### Rationale
+
+Adopt patterns enhancing existing knowledge management without duplicating workflows or adding unnecessary complexity.
+
+### Consequences
+
+- ✅ Improved learning capture with confidence-leveled patterns
+- ⚠️ Adoption overhead — Squad agents must learn to invoke reflect proactively
+- ⚠️ Potential duplication if learnings captured in both reflect AND history.md
+
+### Status
+
+✅ Implementation complete. Reflect skill ready for agent adoption.
+
+---
+
+## Decision 20: DK8S Wizard CodeQL & Operational Issues
+
+**Decision ID:** 20  
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Issue:** #339  
+**Status:** ⏳ Pending Review
+
+### Summary
+
+Research uncovered two distinct DK8S wizard issues: (1) CodeQL compliance requirement, (2) operational failures from 1ES Permissions Service migration.
+
+### Findings
+
+### 1. CodeQL Compliance Request (Direct Ask)
+
+**Source:** Teams message from Ramaprakash to Tamir  
+**Content:** Explicit request to review CodeQL compliance for DK8S Provisioning Wizard  
+**Link:** Microsoft.Security.CodeQL.10000 compliance (Liquid portal PRD-14079533)  
+**Action Required:** Enable CodeQL scanning on DK8S wizard repository
+
+### 2. Wizard Operational Issues (Separate Problem)
+
+**1ES Permissions Migration Impact:**
+- Org onboarded to 1ES Permissions Service
+- Broke wizard-initiated PRs, branch creation, pipeline triggers
+- Non-human identities (MI/SP) require new 1ES processes
+
+**Managed Identity Attribution:**
+- Wizard uses MI for ADO operations
+- ADO doesn't support On-Behalf-Of flow
+- Actions appear as MI, not initiating user → audit/compliance concerns
+
+**Security Architecture Guidance:**
+- Clusters should scope to single service tree leaf nodes
+- Rationale: smaller blast radius, granular security boundaries
+
+### 3. ADO CodeQL Work Items (Not DK8S)
+
+**Found:** Multiple CodeQL findings for Microsoft.MDOS.Wizard.V2 (OEM wizard)  
+**Relevance:** Different wizard implementation, not applicable to DK8S wizard
+
+### Action Owners
+
+| Problem Domain | Owner | Reason |
+|---|---|---|
+| CodeQL scanning setup | B'Elanna (Infrastructure) | CI/CD pipeline configuration |
+| Wizard 1ES fixes | Ramaprakash + B'Elanna | DK8S expertise + infra access |
+| Service tree scoping | Ramaprakash | Already provided guidance |
+
+### Recommended Actions
+
+**Immediate (Issue #339):**
+1. Enable CodeQL scanning on DK8S wizard repository
+2. Integrate CodeQL tasks into build pipelines
+3. Submit compliance evidence to Liquid portal
+
+**Follow-up (Wizard Operations):**
+1. Fix 1ES permission flows for wizard MI
+2. Implement proper user attribution for audit trails
+3. Validate wizard enforces service-tree-scoped cluster creation
+
+### Implications
+
+- Research methodology validated: WorkIQ + ADO search + Teams channel analysis
+- Cross-tool correlation required to distinguish related but separate issues
+- Naming similarity (wizard) doesn't imply same codebase/team
+
+### Status
+
+Research complete. Findings ready for squad action and cross-team coordination.
+
+---
+
+## Decision 21: Email-to-Action Pipeline for Family Requests
+
+**Decision ID:** 21  
+**Date:** 2026-07-14  
+**Author:** Picard  
+**Issue:** #259  
+**Status:** Proposed (pending Tamir approval)
+
+### Context
+
+Tamir wants his wife (Gabi) to be able to send requests that the squad can act on — printing documents, adding calendar events, setting reminders, and general tasks.
+
+### Decision
+
+Recommend **M365 Shared Mailbox + Power Automate** as the email-to-action pipeline:
+
+1. **Print requests** → Forward to `Dresherhome@hpeprint.com`
+2. **Calendar requests** → Create Outlook calendar event
+3. **Reminders** → Create Outlook Task/To-Do
+4. **General requests** → Create GitHub issue with `source:family` label
+
+### Rationale
+
+- Power Automate is native to M365 (no extra cost)
+- Shared mailbox is free with existing M365 license
+- Email is more reliable than WhatsApp automation (which violates ToS)
+- Security: sender validation ensures only Gabi's email triggers actions
+
+### Impact
+
+- New label `source:family` for family-originated issues
+- Squad may receive non-technical issues (household tasks) — routing rules needed
+- No infrastructure changes to existing squad setup
+
+### Team Relevance
+
+All squad members should know that `source:family` labeled issues are household/personal tasks from Tamir's family, not technical work items.
+
+### Status
+
+Proposed. Awaiting user approval for implementation.
+
+---
+
+## Decision 22: Multi-Org ADO MCP Configuration Implementation
+
+**Decision ID:** 22  
+**Date:** 2026-06-24  
+**Author:** Data (Code Expert)  
+**Related Issue:** #329  
+**Status:** Pending user decision
+
+### Proposal
+
+Complete the implementation of approved multi-instance MCP pattern by updating both global and repo-level MCP config files. Replace single `azure-devops` instance with named `ado-microsoft` and `ado-msazure` instances.
+
+### Why This Matters
+
+- All squad agents currently blind to `msazure` org repos, PRs, and work items
+- Cross-org PR reviews (e.g., PR #15000967 in msazure/CESEC) fail silently
+- Decision 14 approved 3+ months ago but Phase 2 validation never completed
+
+### Config Change (both files)
+
+```json
+{
+  "ado-microsoft": {
+    "type": "local",
+    "command": "npx",
+    "args": ["-y", "@azure-devops/mcp", "microsoft"],
+    "tools": ["*"]
+  },
+  "ado-msazure": {
+    "type": "local",
+    "command": "npx",
+    "args": ["-y", "@azure-devops/mcp", "msazure"],
+    "tools": ["*"]
+  }
+}
+```
+
+### Impact
+
+- Tool names change: `azure-devops-*` → `ado-microsoft-*` / `ado-msazure-*`
+- All agent routing.md references need updating
+- Memory: ~50MB additional for second Node.js process
+
+### Status
+
+Pending user decision on approach confirmation and org list.
+
+---
+
+## Decision 23: Cosmos DB IaC Drift Remediation
+
+**Decision ID:** 23  
+**Date:** 2026-07-17  
+**Author:** B'Elanna (Infrastructure)  
+**Related Issue:** #337  
+**Related Incident:** IcM 759361753  
+**Status:** Proposed
+
+### Problem
+
+Live Azure state for multiple Cosmos DB accounts diverges from IaC definitions:
+- Bicep template defines `publicNetworkAccess: 'Enabled'` and `networkAclBypass: 'AzureServices'`
+- Several live accounts show `publicNetworkAccess: Disabled`, `networkAclBypass: None`
+- NSP (Network Security Perimeter) policies enforcing network restrictions in Deny mode
+
+This drift means IaC is no longer the source of truth for Cosmos DB network configuration.
+
+### Recommendation
+
+1. **Audit and reconcile** IaC templates with actual Azure state for all Cosmos DB accounts
+2. **Import existing network rules** into Bicep/Terraform to prevent future drift
+3. **Document which policies are managed centrally** (governance team) vs. team-managed
+4. **Add drift detection** to CI/CD — `az deployment what-if` or similar
+
+### Impact
+
+Without this, future incidents like IcM 759361753 will keep occurring. Team cannot confidently answer "did we change anything?" when IaC doesn't reflect reality.
+
+### Status
+
+Proposed. Awaiting B'Elanna follow-up for implementation planning.
+
+---
+
+
+---
+
+## 2026-03-11 - Decision: Q Role (Devil's Advocate / Fact-Checker)
+
+**Date:** 2026-03-11
+**Decider:** Picard
+**Issue:** #342
+**Status:** APPROVED
+
+### Problem Statement
+
+AI agents can hallucinate, exhibit confirmation bias, and miss critical verification steps. The current squad lacks a dedicated mechanism to challenge assumptions, run counter-hypotheses, or fact-check claims before decisions finalize.
+
+### Solution: Q Role
+
+**Charter:**
+- **Role:** Devil's Advocate / Fact-Checker
+- **Style:** Skeptical, probing, adversarial reasoning
+- **Expertise:** Logic, verification, assumption validation
+- **Activation:** Before major decisions commit, on groupthink detection, on security-critical paths
+
+**Responsibilities:**
+- Review proposals before .squad/decisions/ entries commit
+- Challenge assumptions with evidence requirements
+- Run counter-hypotheses and verify claims
+- Flag unverified statements and request proof
+- Test reasoning through Socratic questioning
+
+**Boundaries:**
+- Handles: Decision review, fact-checking, assumption challenges, counter-hypotheses
+- Does not handle: Implementation, design, feature building
+- Activates only on significant decisions (not routine work)
+
+**Voice:** "Are you certain? Prove it. What if you're wrong? Show me the evidence."
+
+### Rationale
+
+- **Character:** Q (Star Trek TNG/Voyager) — ultimate adversarial thinker, omniscient, skeptical, forces reasoning rigor
+- **Why Q:** Challenges assumptions constantly, not malicious but deeply skeptical, proven record testing crew thinking
+- **Implementation:** Existing agents invoke Q review when needed; Picard/Worf invoke Q before architectural/security decisions
+
+### Outcomes
+
+- Higher decision quality through adversarial review
+- Reduced hallucination risk through verification gates
+- Better trust calibration (validated > confident claims)
+- Groupthink detection and disruption
+
+### Implementation
+
+1. Create Q charter: .squad/agents/q/charter.md and .squad/agents/q/history.md
+2. Update routing: Add Q trigger before decision commits
+3. Update team.md: Add Q role with status ✅ Active
+4. Update decision workflow: Require Q review for high-impact decisions
+5. Integrate with: Picard (architecture), Worf (security), all agents (on-demand)
+
+**Decision:** APPROVED — Add Q role as Devil's Advocate. Coordinator to implement charter and routing immediately.
+
+---
+
+## Decision 18: Add Q as Devil's Advocate & Fact Checker
+
+**Date:** 2026-03-11  
+**Author:** Picard (Lead)  
+**Status:** ✅ Adopted  
+**Issue:** #342  
+**Scope:** Team Composition & Quality Control
+
+### Decision
+
+Add Q to the squad as **Devil's Advocate & Fact Checker**. Q will continuously challenge assumptions, run counter-hypotheses, verify claims, and prevent hallucination in team deliverables.
+
+### Rationale
+
+- Tamir identified a critical gap: hallucination detection and claim verification at scale
+- Q (Star Trek TNG/Voyager — the omnipotent character who constantly tests and challenges) is the perfect archetype
+- As the squad scales and agents produce more output, systematic fact-checking becomes essential
+- Q's role complements the existing skill set: agents build/research, Q validates and challenges
+- This is a defensive mechanism — Q strengthens everything without slowing other agents
+
+### Applies To
+
+All agent deliverables. Q can be routed to:
+- Review research outputs before publication
+- Challenge architectural decisions
+- Verify external sources, URLs, and API endpoints
+- Test counter-hypotheses before decisions are locked in
+
+### Consequences
+
+✅ Reduced risk of hallucinated claims in deliverables  
+✅ Stronger decision-making through systematic challenge  
+✅ Quality gate before publishing research or architecture docs  
+⚠️ Adds a review step to some workflows  
+⚠️ Requires other agents to be receptive to challenge (cultural shift)
+
+### Implementation
+
+1. ✅ Created .squad/agents/q/charter.md and .squad/agents/q/history.md
+2. ✅ Added Q to .squad/team.md Members table
+3. ✅ Added Q to .squad/routing.md Work Type → Agent table
+4. ✅ Added Q entry to .squad/casting/registry.json
+5. ✅ Commented on issue #342 with setup summary
+6. ✅ Closed issue #342
+
+Q is ready for assignment.
+
+---
+
+## Decision 19: Azure Skills Plugin Adoption (Pending)
+
+**Date:** 2026-03-11  
+**Author:** Seven (Research & Docs)  
+**Status:** 🟡 Proposed  
+**Issue:** #343  
+**Scope:** Azure Tooling & Capability Integration
+
+### Context
+
+Microsoft announced the **Azure Skills Plugin** — a packaged solution that bundles 20+ Azure workflow skills, Azure MCP Server (200+ tools), and Foundry MCP into a single installable plugin. It provides structured Azure expertise and execution capabilities to coding agents.
+
+**Blog:** https://devblogs.microsoft.com/all-things-azure/announcing-the-azure-skills-plugin  
+**Repo:** https://github.com/microsoft/azure-skills  
+**Research:** .squad/research/azure-skills-plugin-research.md
+
+### The Decision
+
+**Should the squad adopt the Azure Skills Plugin?**
+
+### Options
+
+#### Option 1: Install Plugin as Team Capability
+- Install Azure Skills Plugin at repository level
+- Make available to all agents when working on Azure-related issues
+- B'Elanna (Infrastructure) and Worf (Security) are primary consumers
+
+**Pros:**
+- Turnkey Azure expertise without re-implementation
+- Production-proven (validated by Microsoft Defender team research)
+- Portable across Copilot CLI, VS Code, Claude Code
+- 200+ MCP tools for live Azure operations
+
+**Cons:**
+- Requires Node.js 18+, Azure CLI, Azure Developer CLI
+- Only valuable if squad does meaningful Azure work
+- Adds plugin dependency
+
+#### Option 2: Fork Selected Skills into .squad/skills/azure/
+- Cherry-pick 3-5 high-value skills (e.g., azure-deploy, azure-compliance, azure-diagnostics)
+- Customize with squad-specific context from .squad/decisions.md
+- Maintain as repository-native skills
+
+**Pros:**
+- Full control and customization
+- No external plugin dependency
+- Can integrate squad routing and conventions
+
+**Cons:**
+- Maintenance burden (upstream changes require manual sync)
+- Duplicates work Microsoft already maintains
+- Smaller skill catalog
+
+#### Option 3: No Action (Document as Reference)
+- Document Azure Skills Plugin in .squad/decisions.md as known resource
+- Reference on Azure-related issues but don't formally adopt
+- Re-evaluate if Azure work increases
+
+**Pros:**
+- No overhead
+- No dependencies
+- Keeps options open
+
+**Cons:**
+- Agents must rediscover Azure patterns each time
+- No MCP tool access for live Azure operations
+- Misses efficiency gains
+
+### Recommendation
+
+**Start with Option 1 (Install Plugin), evaluate, then decide on Option 2 if needed.**
+
+**Rationale:**
+1. **Low friction** — One-line install, no code changes
+2. **Testable** — Can evaluate value with real use cases
+3. **Reversible** — Can uninstall if not valuable
+4. **Skills validate our architecture** — Azure Skills Plugin uses same skill + MCP pattern the squad already embraced
+
+**Assignment:** B'Elanna (Infrastructure) as evaluation owner since Azure deployment/compute is her domain.
+
+### Technical Prerequisites
+
+If Option 1 or 2 is chosen:
+- Node.js 18+ (for Azure MCP Server)
+- Azure CLI (\z\) installed and authenticated
+- Azure Developer CLI (\zd\) for deployment workflows
+- Azure subscription (for live operations)
+
+**Squad impact:** Minimal. Plugin installs to user-level Copilot CLI config, not repository.
+
+### Skills to Squad Role Mapping
+
+| Azure Skill | Squad Member | Use Case |
+|-------------|--------------|----------|
+| azure-deploy | B'Elanna | Deployment orchestration |
+| azure-diagnostics | Worf | Security posture troubleshooting |
+| azure-compliance | Worf | Compliance audits |
+| azure-rbac | Worf | Permission management |
+| azure-cost-optimization | Picard | Budget oversight |
+| azure-compute | B'Elanna | Service selection/sizing |
+| azure-ai | Data | AI services integration |
+| entra-app-registration | Worf | Identity management |
+
+### Open Questions
+
+1. **How much Azure work does the squad do?** (Critical for ROI assessment)
+2. **Should Azure MCP Server be enabled globally or per-agent?**
+3. **Who installs and maintains plugin configuration?** (B'Elanna? Picard?)
+4. **Should we document Azure workflows in .squad/decisions.md if adopted?**
+
+### Next Steps
+
+1. **Tamir reviews research** (Issue #343)
+2. **Assign to B'Elanna** for evaluation if Azure work is planned
+3. **Pilot test:** Install plugin, try 2-3 real Azure tasks, assess value
+4. **Team decision:** Install permanently, fork skills, or document as reference
+5. **If adopted:** Document Azure skill usage patterns in .squad/decisions.md
+
+### Conclusion
+
+The Azure Skills Plugin is a **well-architected, production-grade solution** that validates the squad's skill-based orchestration pattern. It provides immediate Azure expertise without implementation overhead.
+
+**Proposed decision:** Install plugin for evaluation. If valuable, keep it; if not, uninstall and document as reference.
+
+**Owner:** B'Elanna (Infrastructure) or Picard (Lead)  
+**Timeline:** Evaluate within 1-2 sprints
+
+---
+
+## Decision: Azure Skills Integration Pattern (Staged Adoption)
+
+**Date:** 2026-03-11  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #343  
+**Status:** Approved
+
+### Decision
+
+**Adopt staged adoption pattern for external skill plugins: copy skill markdown files first, defer full plugin installation until usage is validated.**
+
+### Context
+
+The Azure Skills Plugin provides 21 Azure-specific skills and an Azure MCP Server with 200+ tools. Research (issue #343) recommended integration. Question: Should we install the full plugin immediately or take a staged approach?
+
+### Recommendation: Staged Integration Pattern
+
+#### Phase 1 (Current): Skill Files Only
+- Copy priority skill markdown files to .squad/skills/azure/
+- Provide workflow guidance without infrastructure overhead
+- Squad members reference skills and use existing Az CLI commands
+- Track which skills are actually used in practice
+
+#### Phase 2 (Future): Full Plugin + MCP Server
+- Install full plugin if Azure work becomes frequent (multiple tasks per sprint)
+- Enable Azure MCP Server (200+ tools) via .copilot/mcp-config.json
+- Requires: Azure CLI z + Azure Developer CLI zd installed and authenticated
+
+#### Phase 3 (Long-term): Customization
+- Fork high-value skills with squad-specific context
+- Integrate with .squad/decisions.md conventions
+- Add squad routing logic
+
+### Rationale
+
+1. **Reduce Infrastructure Overhead** — Full plugin requires zd installation, Azure subscription auth, MCP server configuration. Defer until value is proven.
+2. **Validate Usage First** — Track skill references before investing in full setup.
+3. **Skills Are Portable Documentation** — Markdown files provide complete workflow guidance. MCP tools are optional execution layer.
+4. **Staged Risk** — Installing full plugin now adds MCP server maintenance, auth flows, tool namespace collision risks (200+ new tools).
+5. **Precedent** — This pattern matches how we handle other integrations — prove value with minimal setup, then expand.
+
+### Skills Integrated (Phase 1)
+
+**6 priority skills copied:**
+- zure-diagnostics — Production troubleshooting (Infrastructure + Security)
+- zure-rbac — Permission management (Security)
+- zure-compliance — Compliance checks (Security)
+- zure-cost-optimization — Cost management (Lead + Infrastructure)
+- zure-resource-lookup — Resource discovery (All squad)
+- zure-deploy — Deployment orchestration (Infrastructure)
+
+**15 skills deferred** (on-demand): azure-prepare, azure-validate, azure-ai, azure-kusto, azure-storage, azure-messaging, azure-cloud-migrate, azure-compute, azure-quotas, azure-resource-visualizer, azure-aigateway, azure-hosted-copilot-sdk, microsoft-foundry, entra-app-registration, appinsights-instrumentation
+
+### Impact
+
+**✅ Benefits**
+- Zero infrastructure overhead — no new MCP servers to configure
+- Immediate value — squad can reference skills now
+- Usage validation — learn which skills matter before investing in full plugin
+- Flexibility — can still install full plugin later without losing skill files
+
+**⚠️ Trade-offs**
+- Manual execution — squad must translate skill guidance into Az CLI commands
+- No MCP automation — 200+ Azure tools unavailable until Phase 2
+- Limited depth — some skills reference MCP tools that won't work without full plugin
+
+**🔧 Mitigation**
+- Document exact Az CLI commands for common skill workflows
+- Add "How to Use" section in .squad/skills/azure/README.md
+- Track skill references in squad history — if frequent, trigger Phase 2
+
+### Success Metrics
+
+**Trigger for Phase 2 (full plugin installation):**
+- Squad references Azure skills in 3+ issues per sprint (frequent usage)
+- OR squad has recurring Azure deployment workflows (not one-off tasks)
+- OR squad explicitly requests Azure MCP Server tools
+
+**Trigger for Phase 3 (skill customization):**
+- Squad consistently references 2-3 specific skills (high-value subset identified)
+- Squad has established Azure conventions worth encoding in skills
+- Skills need integration with .squad/decisions.md or .squad/routing.md
+
+### References
+
+- Research: .squad/research/azure-skills-plugin-research.md (by Seven)
+- Skills directory: .squad/skills/azure/
+- Upstream repo: https://github.com/microsoft/azure-skills
+- Azure MCP docs: https://learn.microsoft.com/azure/developer/azure-mcp-server/
+- Orchestration log: .squad/orchestration-log/2026-03-11T23-11-46Z-belanna.md
+
+### Approval
+
+**Status:** Approved and implemented by B'Elanna  
+**Owner:** B'Elanna (Infrastructure)  
+**Related Decisions:** Decision 1 (Gap Analysis When Repository Access Blocked), Decision 14 (Multi-Org ADO MCP Setup)
+
+---
+
+## Decision: Blog Part 2 Refresh Status — Issue #313
+
+**Date:** 2026-03-12  
+**Author:** Seven (Researcher)  
+**Issue:** #313  
+**Status:** Decision Required
+
+# Blog Part 2 Refresh Status — Issue #313
+
+## Decision: Two Different Blog Versions Exist
+
+**Finding:** The local refresh file (`blog-part2-refresh.md`) and the open PR #25 contain **completely different content** for Part 2 of the blog series.
+
+### Version 1 (Local refresh file)
+- **Title:** "From Personal Repo to Work Team — Scaling Squad to Production"
+- **Focus:** Integrating Squad with work teams, human squad members, routing rules, FedRAMP compliance audit, team onboarding
+- **Date in file:** 2026-03-04
+- **Length:** 16.6 KB, 335 lines
+
+### Version 2 (PR #25 branch)
+- **Title:** "The Collective — Organizational Knowledge for AI Teams"
+- **Focus:** Upstream inheritance, hierarchical knowledge systems, skills lifecycle, plugin marketplace
+- **Date in file:** 2026-03-12
+- **Length:** 291 additions, with asset images
+
+## Status
+- PR #25 is OPEN and ready for merge (mergeable_state: clean)
+- The PR contains Part 2 content that is **different** from the locally refreshed version
+- Issue #313 does not exist in the blog repo (404 Not Found)
+- No determination made about which version is "correct" or "better"
+
+## Next Steps
+- **For Tamir:** Clarify which Part 2 version should be the canonical one
+  - If the PR version ("The Collective") is correct: the local refresh file is outdated/superseded
+  - If the local refresh version ("From Personal Repo to Work Team") is correct: PR #25 needs to be updated
+- **For the blog series:** Ensure the series narrative is clear and parts are in logical order
+
+## Note
+Both versions are high-quality, but they represent different angles on the "scaling Squad" story. A decision is needed before proceeding.
+
+
+---
+
+## Decision: Action Item Audit (2026-03-12)
+
+**Date:** 2026-03-12  
+**Author:** Picard (Lead)  
+**Status:** Completed - Recommendations Provided
+
+# Action Item Audit (2026-03-12)
+
+**Auditor:** Picard (Lead)  
+**Request:** Triage [Action] items from Teams/email monitoring (created 2026-03-10/11)  
+**Status:** Completed. 3 issues STALE + RESOLVED. 10 issues active/pending.
+
+---
+
+## Issues Reviewed
+
+### ✅ STALE & RESOLVED (Recommend Close)
+
+| Issue | Title | Status | Resolution |
+|-------|-------|--------|-----------|
+| #295 | Upgrading squad: npm error | Closed | User lucabol found workaround: `npx @bradygaster/squad-cli upgrade`. Works correctly. |
+| #285 | Add validation steps to Quick Start | Closed | Completed via PR #286 (awaiting first-time contributor approval). |
+| #287 | Add installation decision tree | Closed | Completed via PR #303 (pending rebase/merge). |
+
+**Action:** Close these 3 issues once dependent PRs merge.
+
+---
+
+### 🟡 AWAITING DECISION
+
+| Issue | Title | Owner | Action |
+|-------|-------|-------|--------|
+| #323 | Clarify GitHub Copilot + BYOK provider status | PAO (DevRel) | **Tamir: Chase Brady for BYOK decision.** SDK exports `SquadProviderConfig` (openai, azure, anthropic, local) but docs don't mention it. Once decision made, PAO can draft doc fix quickly. |
+
+---
+
+### 🟢 ACTIVE & NOT STALE
+
+| Issue | Title | Owner | Status |
+|-------|-------|-------|--------|
+| #338 | Ralph (Work Monitor) missing from squad.config.ts | FIDO (Quality) | Open. Related to #337. Brad confirmed Ralph works at coordinator level; gap is SDK-consumer-facing. Needs config update. |
+| #337 | SDK init: team members not added to squad.config.ts | eecom (Core Dev) | Open. Root cause identified. SDK config doesn't sync when adding/removing members. Fix needed in 3 places (init, add, remove). |
+| #336 | Multi-Repo Coordination Patterns (A2A design) | -- | Open. Research doc (by Tamir). 5 patterns documented, anti-patterns listed. Awaiting feedback/integration. |
+| #335 | A2A Security & Authentication | -- | Open. Design task. Phase 1 (local) + Phase 2 (network) outlined. Depends on #332 (Core A2A). |
+| #331 | Docs: scenario & feature guides (blog analysis) | PAO (DevRel) | MERGED. Flight + FIDO approved. Addresses "How Squad works" patterns from Tamir's blog post. |
+| #293 | Squad/docs astro rewrite | IEvangelist | Open. PR. Recently deployed. Author planning fast-follow PR (logo fix + tweaks). |
+| #286 | PR: Add validation steps to Quick Start | PAO (DevRel) | Open PR. Ready for review (CI green). Blocking: first-time contributor approval. **Action for Tamir: Approve contributor workflow if you're an admin.** |
+| #305 | PR: Node.js version alignment (20 LTS) | PAO (DevRel) | Open PR. Changes package.json engines requirement from 22 to 20 LTS. Closes #302. Ready for review. |
+| #294 | Architectural: Platform/Communication adapter layer | Flight/CAPCOM | Open. Good technical discussion. Tamir clarified adapter role (thin plumbing for MCP/plugins future). Brady hasn't replied yet. Informational, not blocking. |
+
+---
+
+## Issues NOT in Original List (but should note)
+
+- **#323 awaits Brady's decision.** This is the most time-critical for Tamir.
+
+---
+
+## Summary for Tamir
+
+1. **3 stale issues** can be closed once PRs #286, #303 merge (auto-close or Brady closes).
+2. **#323 decision** is blocking PAO's doc work. Chase Brady on BYOK support status.
+3. **#286 (PR)** may need your approval (first-time contributor workflow) if you have admin rights.
+4. **#331 (PR)** is merged—no action needed.
+5. All other issues are in active development or awaiting design decisions (not stale).
+
+**Recommendation:** Prioritize #323 (BYOK decision) to unblock PAO. Everything else is healthy or in flight.
 
 

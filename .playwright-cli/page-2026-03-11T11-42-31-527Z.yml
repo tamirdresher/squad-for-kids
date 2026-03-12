@@ -1,0 +1,111 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]: ●
+    - generic [ref=e5]: PTY Mirror
+    - button "Sessions" [ref=e6] [cursor=pointer]
+  - generic [ref=e25]:
+    - textbox "Terminal input" [active] [ref=e26]
+    - generic [ref=e27]:
+      - generic [ref=e30]:
+        - generic [ref=e395]: PS C:\Users\tamirdresher
+        - generic [ref=e396]: ">"
+        - generic [ref=e397]: pwsh
+        - generic [ref=e398]: "--version &&"
+        - generic [ref=e399]: node
+        - generic [ref=e400]: "--version &&"
+        - generic [ref=e401]: git
+        - generic [ref=e402]: "--version &&"
+        - generic [ref=e403]: gh
+        - generic [ref=e404]: auth status
+      - generic [ref=e405]: At line:1 char:16
+      - generic [ref=e406]: + pwsh --version && node --version && git --version && gh auth status
+      - generic [ref=e407]: + ~~
+      - generic [ref=e408]: The token '&&' is not a valid statement separator in this version.
+      - generic [ref=e409]: At line:1 char:34
+      - generic [ref=e410]: + pwsh --version && node --version && git --version && gh auth status
+      - generic [ref=e411]: + ~~
+      - generic [ref=e412]: The token '&&' is not a valid statement separator in this version.
+      - generic [ref=e413]: At line:1 char:51
+      - generic [ref=e414]: + pwsh --version && node --version && git --version && gh auth status
+      - generic [ref=e415]: + ~~
+      - generic [ref=e416]: The token '&&' is not a valid statement separator in this version.
+      - generic [ref=e417]: "+ CategoryInfo : ParserError: (:) [], ParentContainsErrorRecordException"
+      - generic [ref=e418]: "+ FullyQualifiedErrorId : InvalidEndOfLine"
+      - generic [ref=e50]:
+        - generic [ref=e420]: PS C:\Users\tamirdresher>
+        - generic [ref=e421]: pwsh
+      - generic [ref=e422]: PowerShell 7.5.4
+      - generic [ref=e52]:
+        - generic [ref=e423]: PS C:\Users\tamirdresher>
+        - generic [ref=e424]: node
+        - generic [ref=e425]: "--version"
+        - generic [ref=e426]: ;
+        - generic [ref=e427]: git
+        - generic [ref=e428]: "--version"
+        - generic [ref=e429]: ;
+        - generic [ref=e430]: gh
+        - generic [ref=e431]: auth status 2>&1 |
+        - generic [ref=e432]: Select-Object
+        - generic [ref=e433]: "-First"
+        - generic [ref=e434]: "3"
+      - generic [ref=e435]: v24.14.0
+      - generic [ref=e436]: git version 2.53.0.vfs.0.0 or 'true' using your favorite shell.of telemet
+      - generic [ref=e55]:
+        - generic [ref=e437]: ry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' o
+        - generic [ref=e438]: g
+        - generic [ref=e439]: .ps1irdresher\tamresearch1
+      - generic [ref=e440]: "Read more about .NET CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry"
+      - generic [ref=e441]: "True"
+      - generic [ref=e58]:
+        - generic [ref=e442]: "----------------10.0!her\\tamresearch1>"
+        - generic [ref=e443]: dotnet
+        - generic [ref=e444]: "--version"
+        - generic [ref=e445]: ;
+        - generic [ref=e446]: dotnet
+        - generic [ref=e447]: tool
+        - generic [ref=e448]: stalled.
+      - generic [ref=e449]: "You can invoke the tool using the following command: squad-monitor"
+      - generic [ref=e450]: Tool 'squad-monitor' (version '1.1.0') was successfully installed.
+      - generic [ref=e61]:
+        - generic [ref=e481]: PS C:\Users\tamirdresher\tamresearch1>e
+        - generic [ref=e482]: gh
+        - generic [ref=e483]: auth login
+        - generic [ref=e484]: "-p"
+        - generic [ref=e485]: https
+        - generic [ref=e486]: "-h"
+        - generic [ref=e487]: github.com
+      - generic [ref=e62]:
+        - generic [ref=e488]: "?"
+        - generic [ref=e489]: Authenticate Git with your GitHub credentials?
+        - generic [ref=e490]: (Y/n)
+      - generic [ref=e455]: "----------------"
+      - generic [ref=e456]: "Write your first app: https://aka.ms/dotnet-hello-worldmprove your experience. It is collected by Microsoft and shared w"
+      - generic [ref=e457]: "Find out what's new: https://aka.ms/dotnet-whats-new"
+      - generic [ref=e458]: "Explore documentation: https://aka.ms/dotnet-docs"
+      - generic [ref=e459]: "Report issues and find source on GitHub: https://github.com/dotnet/core"
+      - generic [ref=e460]: "Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli"
+      - generic [ref=e461]: "--------------------------------------------------------------------------------------"
+      - generic [ref=e462]: Package Id Version Commands
+      - generic [ref=e463]: "-------------------------------------"
+      - generic [ref=e72]:
+        - generic [ref=e464]: PS C:\Users\tamirdresher\tamresearch1>
+        - generic [ref=e465]: dotnet
+        - generic [ref=e466]: tool install
+        - generic [ref=e467]: "-g"
+        - generic [ref=e468]: squad-monitor 2>&1 |
+        - generic [ref=e469]: Select-Object
+        - generic [ref=e470]: "-Last"
+        - generic [ref=e471]: "3"
+      - generic [ref=e472]: Since you just installed the .NET SDK, you will need to reopen the Command Prompt window before running the tool you ins
+  - contentinfo [ref=e8]:
+    - generic [ref=e9]:
+      - button "↑" [ref=e10] [cursor=pointer]
+      - button "↓" [ref=e11] [cursor=pointer]
+      - button "→" [ref=e12] [cursor=pointer]
+      - button "←" [ref=e13] [cursor=pointer]
+      - button "Tab" [ref=e14] [cursor=pointer]
+      - button "Enter" [ref=e15] [cursor=pointer]
+      - button "Esc" [ref=e16] [cursor=pointer]
+      - button "Ctrl+C" [ref=e17] [cursor=pointer]
+      - button "Space" [ref=e18] [cursor=pointer]
+      - button "⌫" [ref=e19] [cursor=pointer]

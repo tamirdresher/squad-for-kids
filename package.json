@@ -5,6 +5,7 @@
   "type": "module",
   "devDependencies": {
     "@bradygaster/squad-cli": "^0.8.18",
-    "edge-tts": "^1.0.1"
+    "edge-tts": "^1.0.1",
+    "nano-banana-mcp": "^1.0.3"
   }
 }

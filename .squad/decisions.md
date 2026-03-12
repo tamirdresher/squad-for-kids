@@ -20345,3 +20345,118 @@ The Azure Skills Plugin provides 21 Azure-specific skills and an Azure MCP Serve
 **Status:** Approved and implemented by B'Elanna  
 **Owner:** B'Elanna (Infrastructure)  
 **Related Decisions:** Decision 1 (Gap Analysis When Repository Access Blocked), Decision 14 (Multi-Org ADO MCP Setup)
+
+---
+
+## Decision: Blog Part 2 Refresh Status — Issue #313
+
+**Date:** 2026-03-12  
+**Author:** Seven (Researcher)  
+**Issue:** #313  
+**Status:** Decision Required
+
+# Blog Part 2 Refresh Status — Issue #313
+
+## Decision: Two Different Blog Versions Exist
+
+**Finding:** The local refresh file (`blog-part2-refresh.md`) and the open PR #25 contain **completely different content** for Part 2 of the blog series.
+
+### Version 1 (Local refresh file)
+- **Title:** "From Personal Repo to Work Team — Scaling Squad to Production"
+- **Focus:** Integrating Squad with work teams, human squad members, routing rules, FedRAMP compliance audit, team onboarding
+- **Date in file:** 2026-03-04
+- **Length:** 16.6 KB, 335 lines
+
+### Version 2 (PR #25 branch)
+- **Title:** "The Collective — Organizational Knowledge for AI Teams"
+- **Focus:** Upstream inheritance, hierarchical knowledge systems, skills lifecycle, plugin marketplace
+- **Date in file:** 2026-03-12
+- **Length:** 291 additions, with asset images
+
+## Status
+- PR #25 is OPEN and ready for merge (mergeable_state: clean)
+- The PR contains Part 2 content that is **different** from the locally refreshed version
+- Issue #313 does not exist in the blog repo (404 Not Found)
+- No determination made about which version is "correct" or "better"
+
+## Next Steps
+- **For Tamir:** Clarify which Part 2 version should be the canonical one
+  - If the PR version ("The Collective") is correct: the local refresh file is outdated/superseded
+  - If the local refresh version ("From Personal Repo to Work Team") is correct: PR #25 needs to be updated
+- **For the blog series:** Ensure the series narrative is clear and parts are in logical order
+
+## Note
+Both versions are high-quality, but they represent different angles on the "scaling Squad" story. A decision is needed before proceeding.
+
+
+---
+
+## Decision: Action Item Audit (2026-03-12)
+
+**Date:** 2026-03-12  
+**Author:** Picard (Lead)  
+**Status:** Completed - Recommendations Provided
+
+# Action Item Audit (2026-03-12)
+
+**Auditor:** Picard (Lead)  
+**Request:** Triage [Action] items from Teams/email monitoring (created 2026-03-10/11)  
+**Status:** Completed. 3 issues STALE + RESOLVED. 10 issues active/pending.
+
+---
+
+## Issues Reviewed
+
+### ✅ STALE & RESOLVED (Recommend Close)
+
+| Issue | Title | Status | Resolution |
+|-------|-------|--------|-----------|
+| #295 | Upgrading squad: npm error | Closed | User lucabol found workaround: `npx @bradygaster/squad-cli upgrade`. Works correctly. |
+| #285 | Add validation steps to Quick Start | Closed | Completed via PR #286 (awaiting first-time contributor approval). |
+| #287 | Add installation decision tree | Closed | Completed via PR #303 (pending rebase/merge). |
+
+**Action:** Close these 3 issues once dependent PRs merge.
+
+---
+
+### 🟡 AWAITING DECISION
+
+| Issue | Title | Owner | Action |
+|-------|-------|-------|--------|
+| #323 | Clarify GitHub Copilot + BYOK provider status | PAO (DevRel) | **Tamir: Chase Brady for BYOK decision.** SDK exports `SquadProviderConfig` (openai, azure, anthropic, local) but docs don't mention it. Once decision made, PAO can draft doc fix quickly. |
+
+---
+
+### 🟢 ACTIVE & NOT STALE
+
+| Issue | Title | Owner | Status |
+|-------|-------|-------|--------|
+| #338 | Ralph (Work Monitor) missing from squad.config.ts | FIDO (Quality) | Open. Related to #337. Brad confirmed Ralph works at coordinator level; gap is SDK-consumer-facing. Needs config update. |
+| #337 | SDK init: team members not added to squad.config.ts | eecom (Core Dev) | Open. Root cause identified. SDK config doesn't sync when adding/removing members. Fix needed in 3 places (init, add, remove). |
+| #336 | Multi-Repo Coordination Patterns (A2A design) | -- | Open. Research doc (by Tamir). 5 patterns documented, anti-patterns listed. Awaiting feedback/integration. |
+| #335 | A2A Security & Authentication | -- | Open. Design task. Phase 1 (local) + Phase 2 (network) outlined. Depends on #332 (Core A2A). |
+| #331 | Docs: scenario & feature guides (blog analysis) | PAO (DevRel) | MERGED. Flight + FIDO approved. Addresses "How Squad works" patterns from Tamir's blog post. |
+| #293 | Squad/docs astro rewrite | IEvangelist | Open. PR. Recently deployed. Author planning fast-follow PR (logo fix + tweaks). |
+| #286 | PR: Add validation steps to Quick Start | PAO (DevRel) | Open PR. Ready for review (CI green). Blocking: first-time contributor approval. **Action for Tamir: Approve contributor workflow if you're an admin.** |
+| #305 | PR: Node.js version alignment (20 LTS) | PAO (DevRel) | Open PR. Changes package.json engines requirement from 22 to 20 LTS. Closes #302. Ready for review. |
+| #294 | Architectural: Platform/Communication adapter layer | Flight/CAPCOM | Open. Good technical discussion. Tamir clarified adapter role (thin plumbing for MCP/plugins future). Brady hasn't replied yet. Informational, not blocking. |
+
+---
+
+## Issues NOT in Original List (but should note)
+
+- **#323 awaits Brady's decision.** This is the most time-critical for Tamir.
+
+---
+
+## Summary for Tamir
+
+1. **3 stale issues** can be closed once PRs #286, #303 merge (auto-close or Brady closes).
+2. **#323 decision** is blocking PAO's doc work. Chase Brady on BYOK support status.
+3. **#286 (PR)** may need your approval (first-time contributor workflow) if you have admin rights.
+4. **#331 (PR)** is merged—no action needed.
+5. All other issues are in active development or awaiting design decisions (not stale).
+
+**Recommendation:** Prioritize #323 (BYOK decision) to unblock PAO. Everything else is healthy or in flight.
+
+

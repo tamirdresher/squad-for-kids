@@ -21475,6 +21475,41 @@ All new issues created by agents or humans across all repositories (tamresearch1
 3. Add validation to issue creation workflows
 
 
+---
+
+# Decision: NAP Node System Pod Isolation Pattern
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Status:** 🟡 Proposed  
+**Scope:** Infrastructure, AKS, Workload Scheduling  
+**Issue:** #345
+
+## Decision
+
+Use **bidirectional taint isolation** for NAP-managed nodes in AKS clusters:
+
+1. **Custom taint on NAP node pools:** `workload-type=nap-managed:NoSchedule`
+2. **Application pods:** Add toleration for the custom taint
+3. **System pods:** No changes — they naturally avoid tainted NAP nodes
+4. **Defense-in-depth:** Pin critical system workloads with `nodeSelector: kubernetes.azure.com/mode: system`
+
+## Rationale
+
+- AKS's built-in `CriticalAddonsOnly` taint only provides one-directional isolation (user pods off system nodes)
+- System pods can freely schedule on NAP nodes, leading to disruptions when NAP scales down
+- Custom taint on NAP pools closes the gap with minimal blast radius
+- `nodeSelector` on system workloads adds a second layer of protection
+
+## Applies To
+
+- All AKS clusters using NAP (Node Auto-Provisioning)
+- DK8S platform clusters with mixed node pool types
+- Any cluster where system pod stability is critical
+
+## Risk
+
+Low — taint/toleration is a standard Kubernetes mechanism. Only app pod specs need toleration updates; system pods require no changes.
 
 ---
 
@@ -21537,3 +21572,154 @@ Seven's analysis (issue #313) identified that the draft read as a standalone int
 - All future blog series posts should follow this pattern: continuation, not repetition
 - Part 2 should open by referencing the Human Squad Members cliffhanger from Part 1
 
+
+---
+
+
+# Decision: Multi-Machine Ralph Coordination Architecture
+
+**Date:** 2026-03-12  
+**Author:** Data (Code Expert)  
+**Issue:** #346  
+**PR:** #353  
+**Status:** Proposed (Draft PR)
+
+## Context
+
+Multiple Ralph instances running on TAMIRDRESHER (local) and CPC-tamir-WCBED (DevBox) were picking up the same issues simultaneously, resulting in:
+- Duplicate work and wasted agent compute
+- Conflicting PRs for the same issue
+- Abandoned branches when one machine finished first
+- No visibility into which machine was working on what
+
+Issue #350 provided machine configuration data confirming both machines were coordination-ready with stable hostnames and GitHub authentication.
+
+## Decision
+
+Implement **GitHub-native coordination** using issue assignments, labels, and comments as the coordination layer.
+
+### Core Protocol
+
+1. **Claim Check:** Before picking up an issue, check if it's assigned via `gh issue view --json assignees`
+2. **Claim Acquisition:** If not assigned, claim via `gh issue edit --add-assignee "@me"` + comment "🔄 Claimed by {machine}"
+3. **Heartbeat:** Update every 2 minutes with label `ralph:{machine}:active` and "💓 Heartbeat" comment
+4. **Stale Detection:** Check other machines' heartbeats; reclaim if >15 min stale
+5. **Branch Namespacing:** Use `squad/{issue}-{slug}-{machine}` pattern
+
+### Key Design Choices
+
+**Why GitHub-native vs. external coordination store?**
+- ✅ Zero infrastructure: No Redis, Cosmos DB, or external dependencies
+- ✅ Visible in GitHub UI: Anyone can see claim status, timestamps, machine identity
+- ✅ Survives machine crashes: State persists in GitHub, not local memory
+- ✅ Works with EMU authentication: No special auth setup needed
+- ✅ Audit trail: All claims/heartbeats visible in issue comments
+
+**Why issue assignment + labels vs. comments only?**
+- Assignment provides instant visual indicator in issue list
+- Labels enable fast filtering (`ralph:*:active`)
+- Comments provide human-readable audit trail with timestamps
+- All three together provide redundancy and visibility
+
+**Why 15-minute stale threshold?**
+- Typical agency round: 2-5 minutes
+- Allows for 3 missed heartbeats (2 min × 3 = 6 min) + buffer
+- Not too short (avoids false positives from network hiccups)
+- Not too long (avoids blocking issues for extended periods)
+
+**Why heartbeat every 2 minutes vs. per-round?**
+- Rounds can be long (5+ minutes)
+- More frequent updates provide better visibility
+- Low overhead: single `gh issue edit` + comment
+- Enables faster stale detection
+
+## Implementation
+
+### Code Location
+`ralph-watch.ps1` (lines 74-81, 79-95, 268-415, 582-618)
+
+### Functions Added
+- `Test-IssueAlreadyAssigned`: Check assignment status
+- `Invoke-IssueClaim`: Claim issue + add comment
+- `Update-IssueHeartbeat`: Update label + heartbeat comment
+- `Get-StaleIssues`: Find stale work from other machines
+- `Invoke-StaleWorkReclaim`: Reclaim abandoned work
+
+### Integration Points
+- **Step 1.6** in main loop (runs every round):
+  - Check for stale work from other machines
+  - Update heartbeats for our active issues
+- **Ralph Prompt:** Added multi-machine coordination instructions
+  - Check assignment before claiming
+  - Use machine-specific branch names
+
+### Configuration
+```powershell
+$machineId = $env:COMPUTERNAME           # Machine identifier
+$heartbeatIntervalSeconds = 120          # 2 minutes
+$staleThresholdMinutes = 15              # Stale work threshold
+```
+
+## Consequences
+
+### Positive
+- ✅ Prevents duplicate work across machines
+- ✅ No external dependencies (database, queue, etc.)
+- ✅ Visible coordination state in GitHub UI
+- ✅ Automatic recovery from stale work (machine crashes, network issues)
+- ✅ Backward compatible with single-machine deployments
+- ✅ Machine-specific branch names prevent conflicts
+- ✅ Audit trail via issue comments
+
+### Negative
+- ⚠️ Relies on GitHub API availability
+- ⚠️ Stale detection has 15-minute lag
+- ⚠️ Issue comments can accumulate (heartbeat every 2 min)
+- ⚠️ No real-time conflict detection (eventual consistency)
+
+### Mitigations
+- **GitHub API dependency:** If `gh` fails, skip coordination (degrade gracefully)
+- **Comment accumulation:** Future: move heartbeat to separate metadata API or use single editable comment
+- **15-minute lag:** Acceptable trade-off for simplicity; can be tuned down if needed
+
+## Testing Plan
+
+1. **Single Machine Test:** Verify backward compatibility on TAMIRDRESHER
+2. **Dual Machine Test:** Run both Ralph instances simultaneously
+   - Assign multiple issues to squad:copilot
+   - Verify each machine claims different issues
+   - Verify no duplicate PRs
+3. **Stale Work Test:** Simulate machine crash
+   - Start work on DevBox, kill Ralph
+   - Wait 15+ minutes
+   - Verify local Ralph reclaims the work
+4. **Heartbeat Test:** Monitor issue comments for regular heartbeats
+
+## Alternatives Considered
+
+### 1. Redis-based coordination
+- ❌ External dependency (Redis server)
+- ❌ Requires hosting, auth, network config
+- ✅ Lower latency
+- Decision: Rejected due to complexity
+
+### 2. File-based lockfile on shared storage
+- ❌ Requires shared filesystem (OneDrive, Azure Files)
+- ❌ Sync delays, lock contention
+- Decision: Rejected due to reliability concerns
+
+### 3. GitHub Actions workflow coordination
+- ❌ Only works for Actions-based workflows, not local Ralph
+- Decision: Not applicable
+
+## Related Issues
+
+- #346: Multi-machine Ralph coordination (this issue)
+- #350: Machine configuration reports (closed)
+- #353: Implementation PR (draft)
+
+## References
+
+- Machine config: `.squad/agents/data/350-closure-summary.md`
+- Multi-machine strategy: `.squad/decisions/inbox/data-350-closure.md`
+- Ralph implementation: `ralph-watch.ps1`

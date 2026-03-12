@@ -201,3 +201,201 @@ Proposed multi-instance MCP pattern to connect multiple Azure DevOps orgs. Recom
 
 Multiple iterations on squad-monitor display and monitoring features. Consolidated into Core Context above. Key learning: separate columns clearer than embedded metadata in strings. EMU restrictions persist — plan for browser-based manual PR creation as fallback.
 
+**Deliverables:**
+- Technical proposal with architecture diagram posted as comment on issue #329
+- Label `status:pending-user` added — waiting for Tamir to confirm approach and org list
+- Project board updated to "Pending User"
+
+**Key Insight:** The solution is purely configuration. Each MCP server instance gets a unique name prefix (e.g., `ado-microsoft`, `ado-msazure`), and tools are automatically namespaced by MCP. Adding a new org = 5 lines of JSON config.
+
+### Issue #10: Session Display Enhancement - Separate Columns (2026-06-24)
+
+**Context:** Revisited issue #10 with new approach. Previous implementation embedded CWD and Resume ID in session name string. New approach uses dedicated table columns for better scanability.
+
+**Implementation Changes:**
+- Modified session table to add **CWD** and **Resume ID** columns
+- Session column width reduced from 45 to 25 chars (cleaner names)
+- CWD column: 20 chars width, yellow color for visibility
+- Resume ID column: 10 chars width, cyan color
+- Total columns: 8 (Session, CWD, Resume ID, Agents, MCPs, Age, Last Write, Type)
+
+**DeriveSessionName() Simplification:**
+- Removed embedded CWD/Resume ID logic from session name string
+- Session name now shows only: `"MMM dd HH:mm (shortId)"` for Agency/Copilot sessions
+- Copilot sessions: just `shortId` without metadata
+- CWD and Resume ID now populated directly from SessionInfo.Cwd and SessionInfo.ResumeId properties
+
+**Table Rendering Changes:**
+- SessionInfo class already had Cwd and ResumeId properties (from previous work)
+- Updated sessionTable.AddRow() to include `session.Cwd` and `session.ResumeId` columns
+- Removed string manipulation to extract metadata from Name field
+
+**Build & Deploy:**
+- Branch: `squad/10-session-display-improvements` (new branch name)
+- Build: ✅ Success (23.8s, 0 warnings)
+- PR: #12 created and linked to issue #10
+- Comment added to issue
+
+**Key Learning:** Separate columns are clearer than embedded metadata in strings. SessionInfo already had the properties populated by ExtractSessionMetadataFromEventsFile() from previous work, so this was a pure display layer change.
+
+### Issue #1: Token Usage Panel Status Check (2026-06-24)
+
+**Context:** Assigned to implement issue #1 "Token usage, cost, and model stats panel" in squad-monitor repo. Task instructions indicated creating new feature implementation.
+
+**Discovery:**
+- Issue #1 was already CLOSED — feature implemented in commit 1b68db8 (PR #9)
+- Commit message: "feat: enhance token usage panel with cli.model_call parsing, latency stats, and per-session costs (#1) (#9)"
+- Git history shows feature deployed 2 days ago along with issue #3 multi-session view
+- Issue comment notes: "Moved to tamirdresher_microsoft/tamresearch1 — that's where our dev team works. This repo is code-only."
+
+**Existing Implementation Review (BuildTokenStatsSection):**
+- ✅ Parses all three event types: `assistant_usage`, `cli.model_call`, `session_usage_info`
+- ✅ Tracks model name, calls count, prompt/completion/cached tokens
+- ✅ Calculates cache hit % with color-coding (green >50%, yellow >20%, dim otherwise)
+- ✅ Computes per-session cost breakdown (average + max displayed)
+- ✅ Shows premium request count (Opus model filter)
+- ✅ Displays context window usage % from session_usage_info
+- ✅ Deduplicated via api_id HashSet to prevent double-counting
+- ✅ Formats token counts with K/M suffixes (FormatTokenCount)
+- ✅ Displays avg latency from duration_ms with color thresholds
+
+**Key Code Patterns:**
+- Uses `ModelCallStats` class for per-model aggregation (Calls, PromptTokens, CompletionTokens, CachedTokens, TotalCost, DurationsMs)
+- `ReadAheadBlock()` reads multi-line JSON blocks from log stream (up to 80 lines or closing brace)
+- `ExtractLong()`, `ExtractDouble()`, `ExtractString()` helpers use regex for field extraction
+- Log files opened with `FileShare.ReadWrite` for safe concurrent access
+- Scans 5 most recent log files from ~/.copilot/logs/
+- Summary line shows totals with color-coded thresholds
+
+**Build Verification:**
+- Project builds clean: ✅ 1.2s, 0 errors, 0 warnings
+- Target: net10.0, single-file architecture (~2500 lines in Program.cs)
+
+**Status Resolution:** Feature complete and deployed. No work needed. Issue correctly marked as closed in GitHub.
+
+### Issue #3: Multi-Session View Implementation Status (2026-06-24)
+
+**Context:** Assigned to implement issue #3 "Multi-session view — show ALL active agents and copilot sessions" in tamirdresher/squad-monitor repo.
+
+**Discovery:**
+- Issue #3 is already CLOSED — full feature implemented across multiple PRs
+- Git history shows commits: 7abfb04, f9a878c, 8699644, 2041a38, 0e5d91c
+- Latest main commit (6b4b04b): "Improve session display with CWD and Resume ID columns (#10) (#12)"
+- Feature deployed includes enhanced session table with separate CWD/Resume ID columns
+
+**Existing Implementation Review (BuildLiveAgentFeedSection):**
+- ✅ Scans ALL session dirs in both ~/.agency/logs/ and ~/.copilot/logs/
+- ✅ Filters to recently active sessions (configurable via --session-window, default 30min)
+- ✅ Session overview panel shows: Active Sessions count, Copilot Processes count, MCP Servers count
+- ✅ Session table displays: Session name, CWD, Resume ID, Agents, MCPs, Age, Last Write, Type
+- ✅ Merged activity feed combines tool calls from all sessions chronologically
+- ✅ Activity entries tagged with session name and color-coded by session type
+- ✅ Session type detection: Ralph, CLI, Copilot, Interactive, Update
+- ✅ Keyboard toggle 'm' for multi-session view (mutually exclusive with orchestration view)
+- ✅ Expandable feed: 80 entries in multi-session mode vs 30 in dashboard mode
+- ✅ Color-coded session types: Ralph=cyan, CLI=yellow, Copilot=blue, Interactive=green, Update=magenta
+
+**Architecture Decisions:**
+- **SessionInfo class** tracks: Name, FullPath, Age, LastWrite, ProcessCount, McpCount, Type, Cwd, ResumeId
+- **FeedEntry class** tracks: Time, TimeValue, Icon, Text, SessionName
+- **Multi-source scanning:** Agency sessions from session dirs + Copilot sessions from both process-*.log files AND session subdirs with events.jsonl
+- **Session name derivation:** ExtractSessionMetadataFromEventsFile() parses events.jsonl for start time, CWD, and resume ID
+- **Session type detection:** DeriveAgencySessionType() checks chat.json and process logs for Ralph indicators, checks for update/copilot patterns
+- **Feed merging:** ExtractFeedEntriesFromEvents() for structured events.jsonl data, ExtractFeedEntriesFromLog() for fallback log parsing
+- **Chronological ordering:** All feed entries sorted by TimeValue before display
+- **Color assignment:** AssignSessionColors() distributes distinct colors across active sessions
+- **Tail reading:** Reads last 200KB from events.jsonl, 100KB from process logs for efficiency
+- **Safe concurrent access:** FileShare.ReadWrite on all log file operations
+
+**Key Code Patterns:**
+- Session scanning logic in BuildLiveAgentFeedSection (lines 1360-1637)
+- Session metadata extraction: ExtractSessionMetadataFromEventsFile, DeriveAgencySessionType, ParseSessionCreationTime
+- Feed entry extraction: ExtractFeedEntriesFromEvents (structured), ExtractFeedEntriesFromLog (fallback)
+- Helper methods: CountProcessesInSession, CountMcpServersInSession, CountMcpServers (process scan fallback)
+- Display formatting: FormatAge() for human-readable time deltas, GetToolIcon() for activity icons
+
+**Build Verification:**
+- Project builds clean: ✅ 4.3s, 0 errors, 0 warnings
+- Target: net10.0, single-file architecture (~2650 lines in Program.cs)
+- All multi-session functionality integrated into main branch
+
+**Status Resolution:** Feature complete and deployed. Issue correctly closed. Full spec implemented including session overview panel, merged activity feed, color-coding, session type detection, and configurable scan window.
+
+
+## Learnings
+
+### Session Display Enhancement (Issue #10) - 2026-03-12
+
+**Problem:** Sessions were displaying with meaningless truncated IDs like "49_58236" instead of human-readable timestamps.
+
+**Root Cause:** The DeriveSessionName() function had a fallback case (line 1741) that produced truncated formats when creationTime was not provided. This occurred when:
+- Session directories lacked events.jsonl files
+- Event parsing failed to extract start time
+- The function fell back to parsing directory name components
+
+**Solution Implemented:**
+- Enhanced DeriveSessionName() to parse timestamps from session_YYYYMMDD_HHMMSS_ID directory names
+- Added DateTime parsing logic to extract date/time components from directory name structure
+- Ensured all session formats (copilot-*, session_*) display date+time consistently
+- Format: "MMM dd HH:mm (shortId)" - e.g., "Mar 11 20:39 (58236)"
+
+**Key Code Changes:**
+- Lines 1716-1787: Rewrote DeriveSessionName with comprehensive timestamp parsing
+- Added try-catch DateTime parsing from session directory name parts
+- Fallback chain: creationTime param → directory name parsing → minimal ID display
+- Handles edge cases: missing events.jsonl, unparseable formats, unknown directory structures
+
+**Technical Details:**
+- Session directory format: session_YYYYMMDD_HHMMSS_UNIQUEID
+- Parsing extracts: year (4), month (2), day (2), hour (2), minute (2) from fixed positions
+- Short ID: first 5 chars of unique identifier for compact display
+- Metadata already extracted via ExtractSessionMetadataFromEventsFile(): CWD, Resume ID, start time
+
+**Display Architecture:**
+- Session table columns: Session | CWD | Resume ID | Agents | MCPs | Age | Last Write | Type
+- Session column shows date+time with ID
+- CWD column shows last path segment (repo name)
+- Resume ID column shows first 8 chars of session UUID
+- Age column shows human-readable time since session start
+
+**Build Status:** ✅ Clean build in 9.9s, 0 errors, 0 warnings
+
+**PR:** https://github.com/tamirdresher/squad-monitor/pull/13
+
+### Multi-Machine Ralph Coordination (Issue #346) - 2026-03-12
+
+**Problem:** Multiple Ralph instances on different machines (TAMIRDRESHER, CPC-tamir-WCBED) were picking up the same issues simultaneously, causing duplicate work, conflicting PRs, and abandoned branches.
+
+**Solution Implemented:** GitHub-native coordination system in ralph-watch.ps1:
+1. **Machine Identity:** Uses `$env:COMPUTERNAME` for stable machine identification
+2. **Issue Assignment Protocol:** Before claiming work, checks `gh issue view --json assignees`. If assigned, skips. If not, assigns via `gh issue edit --add-assignee "@me"`
+3. **Claim Comments:** Adds "🔄 Claimed by {machine} at {timestamp}" comment for visibility
+4. **Heartbeat System:** Updates every 2 minutes with label `ralph:{machine}:active` and "💓 Heartbeat" comment
+5. **Stale Detection:** Checks other machines' heartbeats; reclaims work if >15 min stale
+6. **Branch Namespacing:** Uses pattern `squad/{issue}-{slug}-{machine}` to prevent branch conflicts
+7. **Ralph Prompt Integration:** Added multi-machine coordination instructions to Ralph's prompt
+
+**Key Functions Added:**
+- `Test-IssueAlreadyAssigned`: Checks issue assignment status
+- `Invoke-IssueClaim`: Claims issue + adds comment
+- `Update-IssueHeartbeat`: Updates label + heartbeat comment
+- `Get-StaleIssues`: Finds stale work from other machines
+- `Invoke-StaleWorkReclaim`: Reclaims abandoned work
+
+**Coordination Variables:**
+- `$machineId = $env:COMPUTERNAME`
+- `$heartbeatIntervalSeconds = 120` (2 minutes)
+- `$staleThresholdMinutes = 15`
+
+**Integration Points:**
+- Step 1.6 in main loop: Checks for stale work and updates heartbeats
+- Runs before each agency invocation
+- Backward compatible: single-machine Ralph deployments work unchanged
+
+**Files Modified:** 
+- `ralph-watch.ps1` (lines 74-81, 79-95, 268-415, 582-618)
+- Added 7 functions for coordination logic (~150 lines)
+
+**PR:** #353 (draft) - Branch: squad/346-ralph-multi-machine
+
+**Testing Required:** Deploy to both machines and verify no duplicate PRs for same issue.

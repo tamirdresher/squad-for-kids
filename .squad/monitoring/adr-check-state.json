@@ -1,18 +1,20 @@
 {
-  "scanTo": "2026-03-09 10:17",
-  "firstRun": true,
-  "hasActionableItems": true,
-  "scanFrom": "2026-03-08 10:17",
   "queriesRun": 3,
-  "lastCheck": "2026-03-09T10:17:42",
+  "scanTo": "2026-03-12 09:07",
+  "scanFrom": "2026-03-11 09:07",
   "findings": {
     "newADRs": [
-      "ADR: Regional AMW vs Tenant-Level AMW (PR 14971229 in MTP.Infra.ManagedPrometheus, by Krishna Chaitanya)"
+      "ADR: Regional AMW vs Tenant-Level AMW (PR 14971229 in MTP.Infra.ManagedPrometheus, by Krishna Chaitanya)",
+      "ADR: version bump adr (PR 14994424 in Infra.K8s.ArgoCD, by Efi Shtain)"
     ],
     "decisions": [],
-    "blockers": [],
     "reviewRequests": [
-      "Reviewer list updated for PR 14971229"
-    ]
-  }
+      "Reviewer list updated for PR 14971229",
+      "Reviewer list updated for PR 14994424"
+    ],
+    "blockers": []
+  },
+  "firstRun": false,
+  "lastCheck": "2026-03-12T09:07:23",
+  "hasActionableItems": true
 }

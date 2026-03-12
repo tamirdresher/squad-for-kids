@@ -33,3 +33,25 @@
   - Star Trek references should be woven naturally into the narrative, not forced. The Borg/assimilation metaphor works because it maps to genuine parallel execution — the metaphor earns itself.
   - Squad roster for all public content: Picard (Lead), Data (Code), Worf (Security), Seven (Docs/Research), B'Elanna (Infra), Ralph (Monitor). Never use Riker, Troi, Geordi or other wrong roster names.
   - Decision: Cut "Adding More Expertise" and "Onboarding" sections from Part 1 — Part 0 already covered onboarding in detail. Part 1 should assume the reader did the onboarding and is now seeing the team *work*.
+
+- **2026-03-12 — Part 2 Refresh (Issue #313):**
+  - Part 2 is the bridge from personal playground to real work team. The emotional arc: "Can Squad work where real stakes exist?"
+  - Started with existing draft that had good structure but over-indexed on work-specific details (DK8S, FedRAMP). Needed to make it relatable to any team, not just infrastructure/compliance.
+  - Key narrative shift: led with "The First Attempt (Spoiler: It Didn't Work)" — showing that you can't just copy-paste personal Squad to work. This builds credibility.
+  - Human squad members are the hero of Part 2, not just a feature mention. Showed them in practice with real example (auth token bug with parallel AI analysis + human decision).
+  - Maintained Tamir's voice patterns: conversational flow, self-deprecating honesty ("some days I spend more time correcting AI mistakes"), specific examples over generic claims.
+  - Removed all DK8S/Distributed Kubernetes/FedRAMP references as per sanitization rules. Used "my team at Microsoft" and "infrastructure platform team" instead.
+  - "Honest Reflection" section is critical — Tamir always ends with genuine self-assessment, acknowledging rough edges alongside wins.
+  - Part 3 teaser: organizational knowledge, Squad upstreams, multiple teams learning from each other. The series is scaling: personal → team → org.
+  - Flowing prose throughout. No bullet point sections except where listing specific routing examples or metrics table (which Part 1 didn't have, so I kept metrics as prose).
+  - Series footer uses consistent URL format: /blog/{year}/{month}/{day}/{slug} with no .html extension.
+
+---
+
+## 2026-03-12 Round 1 Team Updates
+
+**Data (Code Expert):** Completed multi-machine Ralph coordination implementation (#346). GitHub-native coordination protocol using issue assignments, labels, and heartbeat comments. Spec documented with 15-minute stale threshold, 2-minute heartbeat interval, machine-specific branch naming. PR #353 created on `squad/346-ralph-multi-machine` branch, awaiting review.
+
+**Neelix (Comms):** Teams morning briefing sent with 3 urgent items, 8 pending, full squad progress. Board state synchronized. Tech news scanned. All squad-monitor issues closed.
+
+**Board State:** Issues #344–#349 added to backlog. Board reconciliation clean, no mismatches.

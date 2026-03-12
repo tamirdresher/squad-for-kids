@@ -81,8 +81,21 @@ $maxLogBytes = 1048576  # 1MB
 $maxLogBytes = 1MB
 $maxLogEntries = 500
 
+# Multi-machine coordination settings (Issue #346)
+$machineId = $env:COMPUTERNAME
+$heartbeatIntervalSeconds = 120  # 2 minutes
+$staleThresholdMinutes = 15
+$lastHeartbeatTime = Get-Date
+
 $prompt = @'
 Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round.
+
+MULTI-MACHINE COORDINATION (Issue #346): Before spawning an agent for ANY issue, check if it's already assigned:
+1. Use `gh issue view <number> --json assignees` to check if issue is assigned
+2. If assigned to someone else — SKIP IT, another Ralph instance is working on it
+3. If NOT assigned — claim it: `gh issue edit <number> --add-assignee "@me"` and add comment: "🔄 Claimed by **$env:COMPUTERNAME** at {timestamp}"
+4. Use branch naming: `squad/{issue}-{slug}-$env:COMPUTERNAME` for machine-specific branches
+5. This prevents duplicate work across multiple Ralph instances on different machines
 
 MULTI-REPO WATCH: In addition to tamresearch1, also scan tamirdresher/squad-monitor for actionable issues. Use "gh issue list --repo tamirdresher/squad-monitor --search 'is:open'" to discover them. Apply the same triage rules: if actionable (not blocked, not waiting, clearly defined), spawn agents to work on it. You may need to clone squad-monitor in a temp directory to run certain operations, or use 'gh' remote repo commands directly. The goal is to get all three squad-monitor issues (#1 token usage, #2 NuGet publish, #3 multi-session) assigned and in progress.
 
@@ -274,6 +287,153 @@ function Parse-AgencyMetrics {
     return $metrics
 }
 
+# Function to check if issue is already assigned (multi-machine coordination)
+function Test-IssueAlreadyAssigned {
+    param(
+        [string]$IssueNumber
+    )
+    
+    try {
+        $issueData = gh issue view $IssueNumber --json assignees 2>$null | ConvertFrom-Json
+        if ($issueData.assignees -and $issueData.assignees.Count -gt 0) {
+            return $true
+        }
+    } catch {
+        # If we can't check, assume not assigned to avoid blocking
+        return $false
+    }
+    
+    return $false
+}
+
+# Function to claim issue for this machine
+function Invoke-IssueClaim {
+    param(
+        [string]$IssueNumber,
+        [string]$MachineId
+    )
+    
+    try {
+        # Assign to self
+        gh issue edit $IssueNumber --add-assignee "@me" 2>$null | Out-Null
+        
+        # Add claim comment
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $claimMessage = "🔄 Claimed by **$MachineId** at $timestamp"
+        gh issue comment $IssueNumber --body $claimMessage 2>$null | Out-Null
+        
+        return $true
+    } catch {
+        Write-Host "Warning: Failed to claim issue #$IssueNumber - $($_.Exception.Message)" -ForegroundColor Yellow
+        return $false
+    }
+}
+
+# Function to update heartbeat for claimed issues
+function Update-IssueHeartbeat {
+    param(
+        [string]$IssueNumber,
+        [string]$MachineId
+    )
+    
+    try {
+        # Check if issue has our machine's active label
+        $labelName = "ralph:${MachineId}:active"
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        
+        # Add or update label (gh will update if exists)
+        gh issue edit $IssueNumber --add-label $labelName 2>$null | Out-Null
+        
+        # Add heartbeat comment
+        $heartbeatMessage = "💓 Heartbeat from **$MachineId** at $timestamp"
+        gh issue comment $IssueNumber --body $heartbeatMessage 2>$null | Out-Null
+        
+        return $true
+    } catch {
+        Write-Host "Warning: Failed to update heartbeat for issue #$IssueNumber - $($_.Exception.Message)" -ForegroundColor Yellow
+        return $false
+    }
+}
+
+# Function to check for stale work from other machines
+function Get-StaleIssues {
+    param(
+        [string]$MachineId,
+        [int]$StaleThresholdMinutes
+    )
+    
+    $staleIssues = @()
+    
+    try {
+        # Get all open issues with ralph:*:active labels
+        $issues = gh issue list --json number,labels,comments --limit 100 2>$null | ConvertFrom-Json
+        
+        foreach ($issue in $issues) {
+            # Find ralph:*:active labels from other machines
+            $ralphLabels = $issue.labels | Where-Object { $_.name -match '^ralph:(.+):active$' -and $Matches[1] -ne $MachineId }
+            
+            if ($ralphLabels) {
+                # Check last comment timestamp for heartbeat
+                $lastHeartbeat = $null
+                foreach ($comment in ($issue.comments | Sort-Object -Property createdAt -Descending)) {
+                    if ($comment.body -match '💓 Heartbeat from \*\*(.+)\*\* at (.+)') {
+                        $lastHeartbeat = [datetime]::Parse($Matches[2])
+                        break
+                    }
+                }
+                
+                if ($lastHeartbeat) {
+                    $ageMinutes = ((Get-Date) - $lastHeartbeat).TotalMinutes
+                    if ($ageMinutes -gt $StaleThresholdMinutes) {
+                        $staleIssues += @{
+                            number = $issue.number
+                            staleMachine = $Matches[1]
+                            ageMinutes = [math]::Round($ageMinutes, 1)
+                        }
+                    }
+                }
+            }
+        }
+    } catch {
+        Write-Host "Warning: Failed to check for stale issues - $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+    
+    return $staleIssues
+}
+
+# Function to reclaim stale work
+function Invoke-StaleWorkReclaim {
+    param(
+        [string]$IssueNumber,
+        [string]$StaleMachine,
+        [string]$MachineId,
+        [double]$AgeMinutes
+    )
+    
+    try {
+        # Remove old machine's label
+        $oldLabel = "ralph:${StaleMachine}:active"
+        gh issue edit $IssueNumber --remove-label $oldLabel 2>$null | Out-Null
+        
+        # Claim for this machine
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $reclaimMessage = "⚠️ Reclaimed by **$MachineId** at $timestamp (previous owner **$StaleMachine** was stale for $([math]::Round($AgeMinutes, 1)) minutes)"
+        gh issue comment $IssueNumber --body $reclaimMessage 2>$null | Out-Null
+        
+        # Assign to self
+        gh issue edit $IssueNumber --add-assignee "@me" 2>$null | Out-Null
+        
+        # Add our label
+        $newLabel = "ralph:${MachineId}:active"
+        gh issue edit $IssueNumber --add-label $newLabel 2>$null | Out-Null
+        
+        return $true
+    } catch {
+        Write-Host "Warning: Failed to reclaim stale issue #$IssueNumber - $($_.Exception.Message)" -ForegroundColor Yellow
+        return $false
+    }
+}
+
 # Function to send Teams alert
 function Send-TeamsAlert {
     param(
@@ -435,6 +595,40 @@ while ($true) {
                 }
             }
         }
+    }
+    
+    # Step 1.6: Multi-machine coordination check (Issue #346)
+    Write-Host "[$timestamp] Multi-machine coordination: Checking for stale work..." -ForegroundColor Yellow
+    $staleIssues = Get-StaleIssues -MachineId $machineId -StaleThresholdMinutes $staleThresholdMinutes
+    if ($staleIssues.Count -gt 0) {
+        Write-Host "[$timestamp] Found $($staleIssues.Count) stale issue(s) from other machines" -ForegroundColor Yellow
+        foreach ($staleItem in $staleIssues) {
+            Write-Host "[$timestamp]   - Issue #$($staleItem.number) from $($staleItem.staleMachine) (stale for $($staleItem.ageMinutes) min)" -ForegroundColor Yellow
+            $reclaimed = Invoke-StaleWorkReclaim -IssueNumber $staleItem.number -StaleMachine $staleItem.staleMachine -MachineId $machineId -AgeMinutes $staleItem.ageMinutes
+            if ($reclaimed) {
+                Write-Host "[$timestamp]   ✓ Successfully reclaimed issue #$($staleItem.number)" -ForegroundColor Green
+            }
+        }
+    }
+    
+    # Update heartbeat for any issues we're actively working on
+    $timeSinceLastHeartbeat = ((Get-Date) - $lastHeartbeatTime).TotalSeconds
+    if ($timeSinceLastHeartbeat -ge $heartbeatIntervalSeconds) {
+        Write-Host "[$timestamp] Multi-machine coordination: Updating heartbeats..." -ForegroundColor Yellow
+        try {
+            # Find issues with our machine's label
+            $myLabel = "ralph:${machineId}:active"
+            $myIssues = gh issue list --label $myLabel --json number --limit 50 2>$null | ConvertFrom-Json
+            foreach ($issue in $myIssues) {
+                Update-IssueHeartbeat -IssueNumber $issue.number -MachineId $machineId
+            }
+            if ($myIssues.Count -gt 0) {
+                Write-Host "[$timestamp]   ✓ Updated heartbeat for $($myIssues.Count) issue(s)" -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "[$timestamp] Warning: Failed to update heartbeats - $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+        $lastHeartbeatTime = Get-Date
     }
     
     # Step 2: Run the agency copilot and capture exit code + output

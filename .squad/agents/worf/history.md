@@ -105,3 +105,67 @@ Q2 work incoming: Issue #26 (Defender-Fleet Teams chat review)
 - Label status:pending-user added — waiting for Brett's response with account details
 
 **Lesson:** WorkIQ efficiently locates Teams discussion threads for IcM incidents. Direct channel posting in active thread is more effective than DM or issue comments for time-sensitive operational issues. Natural language maintained in technical contexts builds trust with external stakeholders.
+
+### Issue #337 — IcM 759361753 Follow-Up: Investigation Guide (2026-03-12)
+
+**Context:** Follow-up on Brett DeFoy's Cosmos DB firewall inquiry. Drafted comprehensive investigation guide with az CLI commands and response template.
+
+**Key Deliverables:**
+- Activity Log query commands for Cosmos DB firewall changes (Jan 28 – Feb 5 window)
+- Azure Policy investigation commands targeting NSP-CDB-v1-0-En-Deny
+- Common Cosmos DB networking issues reference table
+- Copy-paste template response for Brett DeFoy
+- Posted as issue #337 comment for Tamir's use
+
+**Architecture Decisions Referenced:**
+- Policy `NSP-CDB-v1-0-En-Deny` is the primary suspect for Cosmos DB non-compliance
+- Deployment code shows `publicNetworkAccess: Enabled` but live env shows `Disabled` on some accounts — points to out-of-band changes
+- `az monitor activity-log list` with `--resource-type Microsoft.DocumentDB/databaseAccounts` is the correct diagnostic command for Cosmos DB changes
+
+**Lesson:** For IcM incident responses, provide both the investigation commands AND a ready-to-send template. Reduces friction for the assignee to relay findings. Always include the time window in Activity Log queries with a few days padding on each side.
+
+### Issue #26 — Workload Identity / FIC Automation Research (2026-03-12)
+
+**Context:** Deep research on Workload Identity Federation and FIC automation gaps blocking Fleet Manager adoption. Requested by Tamir as Fleet Manager prerequisite analysis.
+
+**Key Findings:**
+- AKS Workload Identity is GA and mature, but FIC lifecycle management remains manual
+- **20-FIC-per-UAMI hard limit** is architecturally incompatible with fleet-scale (N clusters × M workloads)
+- **OIDC issuer mutability** — spoofing/DNS compromise of issuer endpoint allows token forgery
+- **Service account name mutability** — anyone with SA creation RBAC in target namespace can impersonate federated workloads
+- **FIC as persistence vector** — Dirkjan Mollema (2024) documented FIC as backdoor persistence mechanism on Entra apps/UAMIs; survives credential rotation
+- **Chained FIC** (Workload → UAMI → AAD App) limited by 20-FIC cap, no concurrent updates, exact-match-only subjects
+- **Identity Bindings (Preview)** solves the scaling problem (1 FIC per UAMI regardless of cluster count) but is NOT GA
+- **Flexible FICs (Preview)** allow wildcard/expression matching but also NOT GA
+- Fleet Manager + KubeFleet integration exists but depends on Identity Bindings for identity distribution
+
+**Recommendation:** DEFER remains correct. Re-evaluate when Identity Bindings reaches GA. Interim: harden single-cluster WI deployments, lock down FIC management RBAC, implement FIC audit logging.
+
+**Deliverable:** Comprehensive research comment posted to issue #26 with security gap analysis, chained FIC limitations, roadmap features, and interim hardening recommendations.
+
+**Lesson:** FIC security analysis requires examining both the Entra ID control plane (FIC creation permissions, audit logging) and the Kubernetes data plane (SA creation RBAC, OIDC issuer integrity). Fleet-scale identity problems can't be solved by multiplying single-cluster patterns — need architectural solutions like Identity Bindings.
+
+### Issue #26 — Workload Identity Rewrite for Tamir's Voice (2026-03-12)
+
+**Context:** Tamir requested rewrite of formal Workload Identity security analysis into casual, first-person message matching his tone and style.
+
+**Original Message Style:**
+- Formal security analysis with headers, bullet points, structured sections
+- Third-person technical documentation voice
+- Comprehensive but lengthy
+
+**Tamir's Feedback:**
+"I wanted not formal and short that comes from me and my tone and style"
+
+**Rewrite Approach:**
+- ✅ First person ("I", "we", "our") — sounds like Tamir talking
+- ✅ Short — compressed from formal analysis to 4 paragraphs
+- ✅ Conversational — "So I looked into..." / "Like, if you've got..." / "Not ideal but..."
+- ✅ No headers, no bullets — natural prose flow
+- ✅ Gets to the point fast — lead with the blocker (20-FIC limit), then security gaps, then conclusion
+- ✅ Kept technical substance — all key findings preserved (FIC limits, security exposures, roadmap gaps, DEFER rationale)
+- ✅ Referenced Fleet Manager eval naturally — "after Fleet Manager gave us that DEFER"
+
+**Deliverable:** Posted rewritten message as issue #26 comment
+
+**Lesson:** When Tamir says "my tone and style," he means casual technical chat — first person, conversational transitions, natural language, no formal structure. Think "explaining to a colleague in Teams" not "writing a security doc." Keep the technical depth but strip the formality. Short is better — condense multi-section analyses into 3-4 flowing paragraphs.

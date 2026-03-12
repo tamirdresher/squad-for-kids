@@ -10,6 +10,40 @@ TBD - Q2 work incoming
 
 ## Learnings
 
+### 2026-03-12: Picard — Ralph Cluster Coordination Protocol Design
+
+**Assignment:** Design a concrete, implementable protocol for multi-machine Ralph coordination (Issue #346).
+
+**Context:**
+- Ralph runs on Tamir's local machine AND on DevBox simultaneously
+- Key constraint: GitHub is the ONLY coordination layer — no Redis, no databases, no queues
+- Previous triage (picard-multi-ralph-triage.md) approved Phase 1 MVP approach
+- Existing design doc (.squad/research/multi-machine-ralph-design.md) provided high-level architecture
+
+**Deliverables:**
+1. **Protocol Spec:** `.squad/implementations/ralph-cluster-protocol.md` — 400+ lines covering:
+   - Machine identity resolution (file > env var > hostname fallback)
+   - Heartbeat via pinned issue comments (1 comment/round/repo, ~12/hour/machine)
+   - Work claiming via atomic issue assignment + comment timestamp tiebreaker
+   - Dual-check stale recovery (per-issue staleness + global heartbeat cross-reference)
+   - "First to claim wins" work splitting (sufficient for <5 machines)
+   - Exact PowerShell functions for ralph-watch.ps1
+   - Coordinator prompt injection text
+   - Rate limit budget (226 extra calls/hour for 2 machines = 4.5% of budget)
+   - 7-step implementation order for Data, estimated 7-8 hours
+2. **Decision:** `.squad/decisions/inbox/picard-ralph-cluster-protocol.md`
+
+**Key Design Decisions:**
+- **Heartbeat: Comments on a pinned issue** (not file commits — avoids merge conflicts)
+- **Claiming: Issue assignment** (atomic per HTTP request) + comment timestamp tiebreaker for races
+- **Stale recovery: Dual check** — per-issue activity AND global heartbeat must both be stale before reclaiming (prevents false positives from long-running agents)
+- **Work splitting: No algorithm** — natural jitter between 5-min intervals plus "first to claim" is sufficient for 2-5 machines
+- **Branch namespacing:** `squad/{N}-{slug}-{machineId}` eliminates push conflicts
+
+**Learning:** GitHub issue assignment is atomic at the HTTP level but allows multiple assignees. This means two simultaneous claims both succeed — the race detection must happen AFTER assignment by checking assignee count and using comment timestamps as tiebreaker. The protocol must handle this gracefully rather than assuming assignment is exclusive.
+
+**Status:** ✅ COMPLETED — Protocol spec and decision written, ready for Data to implement.
+
 ### 2026-03-11: Picard — Issue #340 MDE.ServiceModernization.CopilotCliAssets Investigation
 
 **Assignment:** Investigate Azure DevOps repository for interesting Copilot CLI assets and report findings.
@@ -680,4 +714,117 @@ Considered adding fact-checking to existing agents' charters (Seven for research
 - .squad/routing.md — Work type routing includes Q for fact-checking
 
 **Status:** ✅ Q ready for assignment. No action required from you.
+
+
+### 2026-03-12: Picard — Issue #346 Multi-Machine Ralph Coordination Architecture
+
+**Assignment:** Analyze GitHub Issue #346 proposal for multi-machine Ralph coordination and create production-ready architecture design.
+
+**Context:**
+- Multiple Ralph instances (local dev, DevBox, CI/CD) need coordination to avoid duplicate work
+- Constraint: NO new infrastructure (zero tolerance for Redis, databases, queues)
+- Must use GitHub-native primitives only (issues, labels, comments, assignments)
+- Backward compatible with single-machine Ralph (coordination is opt-in)
+
+**Architecture Decision:**
+
+**Core Pattern: GitHub as Coordinator**
+1. **Work Claiming:** Issue assignment (atomic operation) for exclusive claim
+2. **Heartbeat:** Comments every 5 minutes prove machine is alive
+3. **Stale Detection:** Background scan checks heartbeat age → reclaim after 15 min timeout
+4. **Branch Namespacing:** squad/{issue}-{slug}-{machine} prevents push conflicts
+5. **Machine Identity:** Hostname or config file (.ralph-machine-id)
+
+**Key Insight: GitHub Issue Assignment is Atomic**
+- Issue assignment API is atomic at HTTP request level → reliable mutual exclusion
+- If two machines claim simultaneously, both succeed (GitHub allows multiple assignees)
+- Mitigation: Read back assignee count → if >1, back off and retry with jitter
+- Comment timestamps provide tiebreaker for true race resolution
+
+**Race Condition Analysis:**
+Three race types identified:
+1. **Simultaneous Claim:** Two machines POST assignment at same time → assignee count check detects → loser backs off
+2. **False Positive Stale:** Network hiccup → machine appears dead → reclaimed → git push conflict surfaces collision
+3. **Label Operations:** NOT atomic (last write wins) → use labels for observability only, not critical state
+
+**Phase 1 MVP (2-3 days):**
+- Work claiming via assignment + claim comment
+- Heartbeat comments every 5 min (12/hour per issue)
+- Stale detection every 10 min (2 Ralph rounds)
+- Automatic reclaim after 15-min timeout
+- Branch namespacing with machine ID
+- Changes: ~80 lines added to ralph-watch.ps1
+
+**Phase 2 Hardening (3-5 days):**
+- Comment timestamp tiebreaker for races
+- Git push conflict detection → automatic abort
+- Dashboard integration (squad-monitor shows machine status)
+- Configurable thresholds (JSON config file)
+- Metrics (claim success rate, reclaim frequency, race collisions)
+
+**Rate Limit Analysis:**
+- Single machine baseline: ~120 API calls/hour
+- With coordination: ~150 calls/hour per machine
+- 2 machines = 300/hour, 5 machines = 750/hour, 10 machines = 1500/hour
+- GitHub limit: 5000/hour authenticated → safe for <20 machines
+
+**Design Deliverables:**
+1. **Architecture Doc:** .squad/research/multi-machine-ralph-design.md (28 KB, 650+ lines)
+   - Sequence diagrams (Mermaid) for claim, heartbeat, recovery flows
+   - Exact GitHub API calls (gh CLI + HTTP endpoints)
+   - PowerShell implementation code for ralph-watch.ps1
+   - Race condition scenarios with mitigations
+   - Testing plan with 6 scenarios
+   - Configuration schema (JSON)
+2. **Triage Comment:** .squad/decisions/inbox/picard-multi-ralph-triage.md
+   - Executive summary with recommendation (APPROVE Phase 1)
+   - Decision points for Tamir (4 choices)
+   - Success criteria and next steps
+
+**Technical Approach:**
+- Read existing decisions.md (lines 525-635) for original proposal
+- Analyzed ralph-watch.ps1 structure (lockfile, mutex, heartbeat patterns already exist)
+- Researched GitHub API atomicity guarantees (issue assignment, comments)
+- Modeled race conditions with probability analysis
+- Designed mitigation strategies (assignee count, comment tiebreaker, git conflict detection)
+- Calculated rate limit impact for 2-20 machines
+- Created sequence diagrams for key flows
+
+**Key Learning: Coordination Without Infrastructure**
+GitHub's issue primitives are sufficient for distributed coordination:
+- Issue assignment = distributed lock (atomic claim)
+- Comments = append-only log (heartbeat timestamps)
+- Labels = advisory metadata (observability, not correctness)
+- No centralized coordinator needed → GitHub API IS the coordinator
+
+**Design Principles Applied:**
+1. **Atomic Operations First:** Use GitHub's atomic primitives (assignment) for correctness; use eventually-consistent primitives (labels) for observability only
+2. **Fail-Safe Defaults:** If coordination fails (API down), Ralph operates as single-machine mode
+3. **Audit Trail:** All state visible in GitHub UI (comments show full history)
+4. **Race Mitigation in Layers:** Detection (assignee count) → tiebreaker (comment timestamp) → final arbiter (git push conflict)
+5. **Backward Compatibility:** Single-machine Ralph unchanged (coordination is additive, not replacement)
+
+**Architecture Patterns:**
+- **Lease-Based Claiming:** Machine claims work with timestamp → lease expires after 15 min without heartbeat
+- **Heartbeat Protocol:** Periodic "I'm alive" signals → stale detection reclaims abandoned work
+- **Optimistic Concurrency:** Assume no collision, detect race post-facto, resolve gracefully
+- **Idempotent Operations:** Safe to retry claims, heartbeats, reclaims (GitHub APIs are idempotent)
+
+**Alternatives Considered & Rejected:**
+1. Redis Coordinator → violates "no infrastructure" constraint
+2. GitHub Actions as Coordinator → too slow (30-60s latency), rate limits
+3. File-Based Git Locking → merge conflicts painful, requires push/pull every claim
+4. GitHub Project Board State Machine → no atomic operations, GraphQL-only
+
+**Status:** ✅ COMPLETED — Design doc + triage comment delivered
+
+**Impact for Squad:**
+- Unblocks multi-machine Ralph workflows (DevBox + Local + CI/CD can coexist)
+- Zero new infrastructure (aligns with Tamir's "no more backend" constraint)
+- Pattern is reusable for Research Squad multi-machine coordination
+- Demonstrates GitHub-native distributed coordination (novel approach)
+
+**Recommendation:** APPROVE Phase 1 MVP (2-3 days effort). Low risk, high value, production-ready design.
+
+**Decision Authority:** Tamir (Ralph maintainer)
 

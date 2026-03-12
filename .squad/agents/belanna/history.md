@@ -84,6 +84,43 @@ Azure Skills Plugin validates that markdown-based skills are portable between sq
 
 ## Learnings
 
+### 2026-03-12: Issue #347 — Power Automate Flow Disabled (Triage Complete)
+
+**Context:** Tamir received notification that a Power Automate flow was disabled due to consistent trigger failures over 14 days. Flow ID: f91a7405-0786-4f44-a000-0159ff860872 in environment 08423dca-b139-e38b-8eb8-5cd498808b08 (preview.powerautomate.com).
+
+**Investigation Findings:**
+
+1. **Two Possible Power Automate Systems in Scope:**
+   - **Email Gateway** (shared mailbox + 4 flows for print/calendar/reminders/GitHub catch-all)
+     - Design: `docs/email-gateway-setup-guide.md` (complete 409-line documentation)
+     - Status: Awaiting Tamir's implementation (marked `pending-user` in issue #259)
+     - Criticality: Low (personal/family automation)
+   - **ADO → Power Automate Service Hook** (upstream CI/CD notifications)
+     - Status: Already known to be broken (401 Unauthorized)
+     - Criticality: High (infrastructure monitoring dependency)
+     - Found in: Multiple squad agent histories (picard, scribe, worf)
+
+2. **Search Results:** No active Power Automate flow configs/secrets in codebase (correct security posture). Extensive documentation in squad agent histories (Kes, Picard) about Power Automate reliability, design patterns, and M365 integration approach.
+
+3. **Root Cause Assessment:**
+   - Most likely: **ADO service hook** (already documented as broken; 14-day disablement window matches typical Power Automate failure recovery)
+   - Less likely: **Email Gateway component** (would only fail if set up + authentication expired)
+
+**Recommendation to Tamir:** Check Power Automate portal directly using provided flow URL to identify which system is disabled, then decide:
+- ✅ **Re-enable** if critical to squad operations
+- ❌ **Decommission** if experimental or obsolete
+- 🔄 **Investigate** if auth/dependencies need refresh (401 errors)
+
+**Key Pattern — Power Automate Reliability in Squad Context:**
+- Shared mailbox triggers: 1-5 min latency acceptable for email-to-action pipelines
+- GitHub connector: Needs periodic re-authorization (token expiry risk documented)
+- ADO service hooks: Prone to 401 auth failures during key rotation events
+- Design recommendation: Email Gateway is ideal M365 automation (no-code, 30 min setup, included in Office 365)
+
+**Decision Document Prepared:** `.squad/decisions/inbox/belanna-powerautomate-347.md` — ready for issue comment linking once Tamir identifies the flow.
+
+**Status:** Triage complete. Awaiting Tamir's manual action (requires Power Automate portal access). Recommend `status:pending-user` + `component:automation` labels.
+
 ### 2026-03-12: Issue #337 — IcM Incident 759361753 Cosmos DB Firewall Investigation
 
 **Context:** Brett DeFoy asked via IcM incident whether our team or CI/CD changed Cosmos DB network/firewall settings around Feb 1, 2026, or if Azure Policies could be blocking access.

@@ -20565,3 +20565,8 @@ Aligns with:
 - B'Elanna's prior proposal (`.squad/decisions/inbox/belanna-devbox-access.md`)
 - Issue #330 research findings (Data's recommendation, 10/10 score)
 - Team consensus: SSH + key-based auth is the right solution
+
+
+---
+
+# DECISIONS MERGED FROM INBOX (2026-03-12T06:25:00Z)

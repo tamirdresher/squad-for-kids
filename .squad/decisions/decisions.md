@@ -634,3 +634,227 @@ Same pattern:
 - All state visible in GitHub (no opaque backend)
 - Zero additional infrastructure
 
+
+---
+
+### 2026-03-12: B'Elanna — Power Automate Flow Investigation (Issue #347)
+
+# Issue #347: Power Automate Flow Disabled — Investigation & Recommendation
+
+**Date:** 2026-03-12  
+**Investigator:** B'Elanna (Infrastructure Expert)  
+**Status:** Ready for Action
+
+---
+
+## Executive Summary
+
+The disabled Power Automate flow is likely part of the **Email Gateway system** (shared mailbox + trigger flows for print, calendar, reminders, and GitHub issue creation) OR the **upstream ADO notification pipeline** (Azure DevOps → Power Automate service hook).
+
+**Recommendation:** **Status `pending-user` — Tamir must manually check the Power Automate portal** to identify the specific flow and decide whether to re-enable or decommission it.
+
+---
+
+## Investigation Findings
+
+### 1. Power Automate Usage in This Repo
+
+Found comprehensive documentation and references across squad agent histories:
+
+#### **Active Systems:**
+
+**A) Email Gateway (Shared Mailbox + 4 Flows)**
+- **Design:** Personal automation for Tamir's wife to send email requests
+- **Architecture:**
+  - Shared mailbox: `tamir.requests@yourdomain.com`
+  - Flow 1: "Email Gateway - Print" → forwards attachments to HP ePrint
+  - Flow 2: "Email Gateway - Calendar" → creates Outlook events
+  - Flow 3: "Email Gateway - Reminders" → creates To Do tasks
+  - Flow 4: "Email Gateway - Catch-All (GitHub)" → creates GitHub issues for unmatched requests
+- **Setup Guide:** `docs/email-gateway-setup-guide.md` (409 lines, complete instructions)
+- **Status in Squad:** Awaiting Tamir's implementation (marked `status:pending-user` in issue #259)
+- **Criticality:** Low (personal/family automation, not squad-critical)
+
+**B) Upstream ADO Notification Pipeline**
+- **Purpose:** Azure DevOps → Power Automate service hook for real-time alerting
+- **Current Status:** ❌ **BROKEN** — Returns 401 Unauthorized
+- **Found in:** Squad agent histories (picard, scribe, worf)
+- **Documentation:** `.squad/agents/picard/history-2026-Q1.md` (detailed 401 investigation)
+- **Criticality:** High (infrastructure monitoring dependency)
+
+---
+
+### 2. Which Flow Is Likely Disabled?
+
+| Scenario | Likelihood | Why |
+|----------|-----------|-----|
+| **Email Gateway flow** | 🟡 Medium | Personal automation — Tamir may not have set it up yet (still marked pending-user). If he did, a 14-day disable window suggests chronic trigger failures or user action. |
+| **ADO service hook** | 🟢 High | Already known to be broken (401 error). Power Automate would disable after repeated failures. The 14-day window matches typical automation disablement windows. |
+
+**Most likely:** The disabled flow is the **ADO → Power Automate service hook** for upstream CI/CD notifications.
+
+---
+
+### 3. Search Results
+
+**Scope:** Searched entire repo for Power Automate references:
+
+✅ **Found:**
+- Email Gateway design documentation (complete, no active flows yet)
+- ADO integration issue (existing 401 Unauthorized failure)
+- Squad agent learnings on Power Automate reliability (Kes and Picard)
+- Multiple references in agent history files confirming design patterns
+
+❌ **Not Found:**
+- Active Power Automate flow scripts or configs
+- Flow IDs or connection strings in codebase (correctly kept out of version control)
+- Issue #347 discussion or comments in repo
+- Any recent Power Automate warnings or monitoring logs
+
+---
+
+### 4. Power Automate Reliability Insights from Squad
+
+**Documented by Kes (Data Agent):**
+- Shared mailbox triggers can have 1-5 min delay (acceptable for email gateway)
+- GitHub connector needs periodic re-authorization (token expiry risk)
+- No critical squad operations currently depend on active Power Automate flows
+
+**Documented by Picard (Lead):**
+- Power Automate is the right tool for M365 email-to-action pipelines (30 min setup)
+- Email Gateway designed but awaiting Tamir's manual approval to implement
+- ADO service hook known to be broken (squads can live with daily polling as interim)
+
+---
+
+## Recommended Action
+
+**For Tamir:**
+
+1. **Go to:** https://make.preview.powerautomate.com/environments/08423dca-b139-e38b-8eb8-5cd498808b08/flows/f91a7405-0786-4f44-a000-0159ff860872/details/
+   
+2. **Identify the flow:** Determine if it's:
+   - Email Gateway component (print, calendar, reminders, or catch-all)?
+   - ADO → Power Automate service hook?
+   - Other squad automation?
+
+3. **Decide:**
+   - ✅ **Re-enable if critical:** Flow is needed for squad operations
+   - ❌ **Decommission if obsolete:** Flow was experimental or no longer needed
+   - 🔄 **Investigate if broken:** Fix any upstream dependencies (e.g., 401 errors)
+
+4. **Next Steps:**
+   - Update issue #347 with findings
+   - Remove `status:pending-user` label once action taken
+   - If ADO-related, escalate to Worf (Security & Cloud) — 401 may indicate auth rotation needed
+
+---
+
+## Infrastructure Impact
+
+- **Criticality:** **Low-to-Medium** (depends on which flow)
+  - Email Gateway: Nice-to-have (personal automation)
+  - ADO hook: Higher priority (affects CI/CD notifications)
+  
+- **Consequences of Leaving Disabled:**
+  - If Email Gateway: Tamir's wife cannot trigger requests via email (manual workaround: create GitHub issues directly)
+  - If ADO hook: Squad relies on daily polling instead of real-time alerts (degraded monitoring)
+  
+- **Time to Fix:** 5 minutes to re-enable if credentials/config still valid; 15-30 minutes if auth refresh needed
+
+---
+
+## Labels Recommendation
+
+- Add: `status:pending-user` (requires Tamir's manual action in Power Automate portal)
+- Add: `component:automation` (Power Automate/integration)
+- Consider: `priority:low` (email gateway) or `priority:medium` (if ADO-related)
+
+---
+
+## Referenced Files
+
+- `docs/email-gateway-setup-guide.md` — Complete Email Gateway architecture
+- `.squad/agents/belanna/history.md` — Infrastructure context
+- `.squad/agents/picard/history-2026-Q1.md` — ADO integration failure details
+- `.squad/agents/kes/history-2026-Q1.md` — Power Automate reliability patterns
+
+---
+
+**Next Step:** Awaiting Tamir to check the flow URL and report back findings. Once identified, escalate to appropriate squad member if infrastructure-critical.
+
+
+---
+
+### 2026-03-12: Picard — Ralph Cluster Coordination Protocol
+
+# Decision: Ralph Cluster Coordination Protocol
+
+**Date:** 2026-03-12  
+**Author:** Picard (Lead)  
+**Status:** 🟡 Proposed  
+**Scope:** Infrastructure — Multi-Machine Ralph  
+**Related:** Issue #346, `.squad/implementations/ralph-cluster-protocol.md`
+
+---
+
+## Decision
+
+Adopt a GitHub-native coordination protocol for multi-machine Ralph instances. The protocol uses **one pinned heartbeat issue per repo** for peer discovery, **issue assignment** as the atomic work-claiming primitive, **comment timestamps** as the race tiebreaker, and a **15-minute stale threshold** with cross-reference safety before reclaiming abandoned work.
+
+No new infrastructure. GitHub is the only coordination layer.
+
+## Rationale
+
+1. **Zero infrastructure constraint** — Tamir's explicit requirement: no Redis, databases, or queues
+2. **GitHub assignment is atomic** — Provides a reliable claiming primitive without distributed locking
+3. **Comments are append-only** — No merge conflicts, no race conditions on writes, full audit trail
+4. **Rate-limit safe** — Protocol adds ~226 API calls/hour for 2 machines across 2 repos (4.5% of budget)
+5. **Backward compatible** — Single-machine Ralph works unchanged; coordination is opt-in via config
+
+## Key Design Choices
+
+| Choice | Selected | Alternatives Rejected |
+|--------|----------|----------------------|
+| Heartbeat mechanism | Pinned issue comments | File commits (merge conflicts), Labels (not atomic) |
+| Claiming primitive | Issue assignment | Labels (race-prone), File locks (git conflicts) |
+| Race tiebreaker | Comment created_at timestamp | Random backoff only (less deterministic) |
+| Stale detection | Dual check (per-issue + global heartbeat) | Per-issue only (false positives on long agents) |
+| Work splitting | First-to-claim wins | Round-robin (unnecessary complexity for <5 machines) |
+
+## Applies To
+
+- `ralph-watch.ps1` (main loop modifications)
+- Ralph coordinator prompt (claiming instructions injected per round)
+- All repos the squad watches (tamresearch1, squad-monitor, future repos)
+
+## Does NOT Apply When
+
+- Only one Ralph machine is running (protocol becomes no-op)
+- GitHub API is unavailable (fall back to single-machine mode)
+
+## Consequences
+
+- ✅ Eliminates duplicate work across machines
+- ✅ Stale work auto-reclaimed within 15 minutes
+- ✅ Full audit trail visible in GitHub issue comments
+- ✅ No new infrastructure to maintain
+- ⚠️ Adds ~165 lines to ralph-watch.ps1
+- ⚠️ Heartbeat comments accumulate on the heartbeat issue (~12/hour/machine)
+- ⚠️ Race handling depends on LLM following claiming instructions correctly
+
+## Implementation
+
+**Spec:** `.squad/implementations/ralph-cluster-protocol.md` (full protocol with PowerShell code, API calls, race analysis, and testing plan)
+
+**Effort:** ~1 day (7-8 hours) for Phase 1 MVP
+
+**Assign to:** Data (implementer)
+
+## Success Criteria
+
+- Two Ralphs on different machines can work the same board without duplicate claims
+- Stale work reclaimed within 15 minutes of machine going offline
+- Zero branch name conflicts (machine ID in branch name)
+- No increase in failed rounds for existing single-machine Ralph
+

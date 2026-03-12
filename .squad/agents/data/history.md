@@ -242,3 +242,16 @@ Multiple iterations on squad-monitor display and monitoring features. Consolidat
 - Target: net10.0, single-file architecture (~2500 lines in Program.cs)
 
 **Status Resolution:** Feature complete and deployed. No work needed. Issue correctly marked as closed in GitHub.
+
+### 2026-06-25: DevBox Config Setup (#346/#350)
+
+**Context:** Cross-machine Ralph coordination requires proper DevBox configuration. Config had placeholders, SSH keys missing, user-level MCP config absent.
+
+**Work Done:**
+1. **`.squad/config.json`** — Replaced placeholders with actual DevBox identity (CPC-tamir-WCBED), added `machineId`, `peers` section for TAMIRDRESHER local machine
+2. **SSH keys** — Generated ed25519 key pair at `~/.ssh/squad-devbox-key`, created `~/.ssh/config` with `squad-devbox` host entry
+3. **User-level MCP config** — Created `~/.copilot/mcp-config.json` with azure-devops MCP server (GitHub MCP is built-in to Copilot CLI)
+4. **`~/.squad/teams-webhook.url`** — Created placeholder awaiting URL from local machine
+5. **gh CLI auth** — Token from git credential manager lacks `read:org` scope (EMU restriction). ralph-watch.ps1 handles its own auth independently.
+
+**Key Finding:** EMU token scopes are limited — gh CLI auth requires `read:org` which GCM tokens don't provide. Not a blocker; ralph-watch manages authentication directly.

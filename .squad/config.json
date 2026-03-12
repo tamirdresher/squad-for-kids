@@ -1,10 +1,18 @@
 {
   "version": 1,
-  "teamRoot": "C:\\temp\\tamresearch1",
+  "teamRoot": "C:\\Users\\tamirdresher\\tamresearch1",
+  "machineId": "CPC-tamir-WCBED",
   "devbox": {
-    "hostname": "PLACEHOLDER_DEVBOX_IP_OR_HOSTNAME",
-    "username": "PLACEHOLDER_DEVBOX_USERNAME",
+    "hostname": "CPC-tamir-WCBED",
+    "username": "tamirdresher",
     "sshKeyPath": "~/.ssh/squad-devbox-key",
     "sshConfigAlias": "squad-devbox"
+  },
+  "peers": {
+    "TAMIRDRESHER": {
+      "teamRoot": "C:\\temp\\tamresearch1",
+      "role": "local-machine",
+      "lastSeen": null
+    }
   }
 }

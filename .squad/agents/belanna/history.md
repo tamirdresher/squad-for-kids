@@ -8,6 +8,22 @@
 
 Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish when Tamir creates a GitHub release.
 
+### 2026-03-12: Issue #345 — NAP System Pod Isolation (Ralph Round 1)
+
+**Assignment:** Research NAP-managed node taints for workload isolation
+
+**Work Completed:**
+- ✅ Researched NAP (Node Auto-Provisioning) system pod scheduling behavior
+- ✅ Identified root cause: `CriticalAddonsOnly=true:NoSchedule` taint on system pools doesn't *repel* system pods from NAP/user nodes
+- ✅ Analyzed taint/toleration patterns for effective workload isolation
+- ✅ Posted technical response to issue #345 with solution
+- ✅ Decision documented: `.squad/decisions/inbox/belanna-nap-system-pods.md`
+
+**Recommended Solution:**
+Apply custom taint `workload=nap:NoSchedule` to NAP node pools. Application pods require toleration update; system pods require no changes. NAP respects taints when provisioning — achieves isolation with minimal blast radius.
+
+**Status:** ✅ Complete. Decision ready for merge to decisions.md
+
 ### 2026-03-11 Completion: squad-monitor Issue #2 NuGet Publish (PR #4)
 
 **Status:** Confirmed merged in prior session. Work complete.
@@ -492,4 +508,70 @@ When issue references repos we can't access, document the exact commands and che
 - "Decide all and do it already" → Prefers autonomous decisions over proposal/approval cycles
 - Values immediate functionality over perfect architecture
 - Wife-friendly UX matters (simple email address, reliable confirmations)
+
+### 2026-03-11: Issue #345 — NAP System Pod Prevention (DK8S Core Support)
+
+**Context:** Michael from DK8S Core was paged into AGC tonight due to system pods scheduling on NAP-managed (Node Auto-Provisioning) nodes. Asked how to prevent this.
+
+**Research Summary:**
+- Reviewed AKS NAP documentation and troubleshooting guides
+- System pods (kube-system namespace) can land on NAP nodes because:
+  - NAP nodes may not have taints that repel system pods
+  - System pods often have broad tolerations allowing them to schedule anywhere
+  - CriticalAddonsOnly=true:NoSchedule on system pools blocks user workloads from system nodes, but doesn't prevent system pods from going elsewhere
+
+**Solution:**
+Apply a custom taint to NAP node pools that system pods won't tolerate by default:
+- NAP nodes: workload=nap:NoSchedule
+- App pods: Add matching toleration
+- System pods: No changes (they avoid NAP nodes automatically)
+
+**DaemonSet Consideration:** For cluster-wide DaemonSets that need to stay on system pools, use nodeAffinity/nodeSelector targeting system pool labels.
+
+**Deliverable:** Posted detailed response to issue #345 with:
+- Quick solution (custom taint approach)
+- Implementation details
+- Architecture explanation
+- DaemonSet caveat
+- Microsoft Learn documentation references
+
+**Pattern Learned — NAP System Pod Isolation:**
+- NAP respects node taints when provisioning nodes
+- System pod placement control requires *repelling* taints on user/NAP pools, not just *attracting* taints on system pools
+- Custom taints (not CriticalAddonsOnly) provide best isolation for NAP nodes
+
+**Status:** ✅ Complete. Response posted to issue #345 for Tamir to send to Michael in DK8S Core channel.
+
+
+## Learnings
+
+### 2026-03-11: squad-monitor NuGet Tool Packaging
+
+**Task:** Implement GitHub issue #2 for publishing squad-monitor as a dotnet global tool on NuGet.
+
+**Finding:** Issue already completed. All requirements satisfied:
+1. ✅ .csproj configured with PackAsTool=true, ToolCommandName=squad-monitor, and full NuGet metadata
+2. ✅ GitHub Actions workflow (.github/workflows/publish-nuget.yml) set up for automated NuGet publishing on release
+3. ✅ README.md updated with install instructions (dotnet tool install -g squad-monitor)
+4. ✅ tamresearch1 .squad/tools/squad-monitor/ replaced with skill doc pointing to NuGet package
+
+**Verification:**
+- Build: ✅ dotnet build succeeds (net10.0 target)
+- Pack: ✅ dotnet pack produces squad-monitor.1.0.0.nupkg successfully
+
+**NuGet Tool Configuration Pattern:**
+`xml
+<PackAsTool>true</PackAsTool>
+<ToolCommandName>squad-monitor</ToolCommandName>
+<PackageId>squad-monitor</PackageId>
+<Version>1.0.0</Version>
+<PackageReadmeFile>README.md</PackageReadmeFile>
+`
+
+**Publishing Workflow Pattern:**
+- Triggers: release (published) or workflow_dispatch with version input
+- Steps: restore → build → determine version from tag → pack → publish to NuGet → attach to GitHub release
+- Uses NUGET_API_KEY secret for authentication
+
+**Status:** No work needed. Issue #2 already closed with all deliverables complete.
 

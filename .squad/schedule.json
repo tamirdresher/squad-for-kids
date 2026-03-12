@@ -241,7 +241,8 @@
       "description": "Review all work done this week, read issue comments and discussions, identify what Tamir liked/disliked, retrospect on squad behavior, improve rules/directives/tooling proactively",
       "trigger": {
         "description": "Every Friday at 14:00 UTC (4 PM Israel)",
-        "cron": "0 14 * * 5",
+        "expression": "0 14 * * 5",
+        "timezone": "UTC",
         "type": "cron"
       },
       "providers": [

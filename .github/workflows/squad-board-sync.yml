@@ -1,0 +1,155 @@
+name: Squad Board Sync
+
+# Automatically move project board items to "Done" when issues are closed,
+# and reconcile board state weekly to catch drift.
+# Created as a guardrail — see issue for context.
+
+on:
+  issues:
+    types: [closed, reopened]
+  schedule:
+    # Weekly reconciliation every Sunday at 3:00 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch: # Allow manual trigger for immediate reconciliation
+
+jobs:
+  # ── Job 1: Move item on issue close/reopen ──
+  sync-on-close:
+    if: github.event_name == 'issues'
+    runs-on: self-hosted
+    permissions:
+      issues: read
+      contents: read
+
+    env:
+      PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
+      PROJECT_NUMBER: '1'
+      PROJECT_OWNER: 'tamirdresher_microsoft'
+      STATUS_FIELD_ID: 'PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc'
+      DONE_OPTION_ID: '4830e3e3'
+      TODO_OPTION_ID: '0de780a1'
+
+    steps:
+      - name: Sync board status on issue state change
+        shell: pwsh
+        run: |
+          $issueNumber = ${{ github.event.issue.number }}
+          $action = '${{ github.event.action }}'
+          Write-Host "🔄 Issue #$issueNumber was $action"
+
+          # Find the item on the board
+          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Could not list project items: $itemsJson"
+            exit 0  # Don't fail the workflow
+          }
+
+          $data = $itemsJson | ConvertFrom-Json
+          $item = $data.items | Where-Object { $_.content.number -eq $issueNumber }
+
+          if (-not $item) {
+            Write-Host "ℹ️ Issue #$issueNumber is not on the project board — skipping"
+            exit 0
+          }
+
+          $currentStatus = $item.status
+          $itemId = $item.id
+
+          if ($action -eq 'closed') {
+            if ($currentStatus -eq 'Done') {
+              Write-Host "✅ Issue #$issueNumber already in Done — no change needed"
+              exit 0
+            }
+            Write-Host "📋 Moving #$issueNumber from '$currentStatus' → Done"
+            gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:DONE_OPTION_ID 2>&1
+            Write-Host "✅ Done"
+          }
+          elseif ($action -eq 'reopened') {
+            if ($currentStatus -eq 'Done') {
+              Write-Host "📋 Issue #$issueNumber was reopened — moving from Done → Todo"
+              gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
+              Write-Host "✅ Moved to Todo"
+            } else {
+              Write-Host "ℹ️ Issue #$issueNumber reopened but not in Done ('$currentStatus') — no change"
+            }
+          }
+
+  # ── Job 2: Weekly reconciliation of all board items ──
+  reconcile-board:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: self-hosted
+    permissions:
+      issues: read
+      contents: read
+
+    env:
+      PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
+      PROJECT_NUMBER: '1'
+      PROJECT_OWNER: 'tamirdresher_microsoft'
+      STATUS_FIELD_ID: 'PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc'
+      DONE_OPTION_ID: '4830e3e3'
+      TODO_OPTION_ID: '0de780a1'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconcile board state
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Starting weekly board reconciliation"
+
+          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --limit 200 --format json 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "❌ Failed to list project items: $itemsJson"
+            exit 1
+          }
+
+          $data = $itemsJson | ConvertFrom-Json
+          $items = $data.items
+          Write-Host "📋 Found $($items.Count) items on board"
+
+          $fixedCount = 0
+          $checkedCount = 0
+          $issues = @()
+
+          foreach ($item in $items) {
+            $num = $item.content.number
+            if (-not $num) { continue }
+            $checkedCount++
+
+            $boardStatus = $item.status
+            $issueJson = gh issue view $num --json state,title 2>$null
+            if ($LASTEXITCODE -ne 0) { continue }
+            $issue = $issueJson | ConvertFrom-Json
+            $issueState = $issue.state
+
+            # Rule 1: CLOSED issue must be in Done
+            if ($issueState -eq 'CLOSED' -and $boardStatus -ne 'Done') {
+              Write-Host "🔧 #$num: CLOSED but in '$boardStatus' → moving to Done"
+              gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:DONE_OPTION_ID 2>&1
+              $fixedCount++
+              $issues += "#$num (was '$boardStatus')"
+            }
+
+            # Rule 2: OPEN issue in Done should move to Todo
+            if ($issueState -eq 'OPEN' -and $boardStatus -eq 'Done') {
+              Write-Host "🔧 #$num: OPEN but in 'Done' → moving to Todo"
+              gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
+              $fixedCount++
+              $issues += "#$num (OPEN in Done)"
+            }
+          }
+
+          Write-Host ""
+          Write-Host "✅ Reconciliation complete:"
+          Write-Host "   Checked: $checkedCount items"
+          Write-Host "   Fixed: $fixedCount mismatches"
+
+          if ($fixedCount -gt 0) {
+            $body = "## 🔄 Board Reconciliation Report`n`nFixed $fixedCount mismatched items:`n"
+            foreach ($i in $issues) { $body += "- $i`n" }
+            $body += "`nRun by: squad-board-sync workflow (weekly reconciliation)"
+            # Create a comment on a tracking issue or log
+            Write-Host $body
+          }

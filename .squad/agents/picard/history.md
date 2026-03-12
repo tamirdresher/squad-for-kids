@@ -153,6 +153,52 @@ TBD - Q2 work incoming
 **Learning:** GitHub issue assignment is atomic at the HTTP level but allows multiple assignees. This means two simultaneous claims both succeed — the race detection must happen AFTER assignment by checking assignee count and using comment timestamps as tiebreaker. The protocol must handle this gracefully rather than assuming assignment is exclusive.
 
 **Status:** ✅ COMPLETED — Protocol spec and decision written, ready for Data to implement.
+### 2026-03-12: Picard — Issue #346 Multi-Machine Ralph Coordination Design
+
+**Assignment:** Research and design implementation for multi-machine Ralph coordination using GitHub as coordination backend.
+
+**Context:**
+- Multiple Ralph instances (different machines) can duplicate work
+- Problem: Race conditions on issue assignment, conflicting PR branches, orphaned work when machines fail
+- Constraint: No new infrastructure — GitHub-native coordination only
+- Goal: Zero-downtime work recovery, transparent coordination state
+
+**Current Ralph Implementation Analysis:**
+- ralph-watch.ps1 v8: Single-machine mutex, local lockfile, heartbeat tracking
+- Runs agency copilot every 5 minutes with squad agent
+- Already has: process detection, stale cleanup, metrics tracking
+- Gap: No cross-machine awareness or work claiming protocol
+
+**Design Delivered:**
+1. **Machine Identity Layer** — Stable machine ID (hostname or env var `RALPH_MACHINE_ID`)
+2. **GitHub-Native Work Claiming** — Issue comments as atomic claim operations with 15-minute lease
+3. **Heartbeat Protocol** — Periodic timestamp updates via comment edits
+4. **Stale Work Recovery** — Automatic reclaim of orphaned work after lease expiration
+5. **Branch Namespacing** — Machine ID suffix prevents push conflicts: `squad/{issue}-{slug}-{machineId}`
+6. **Backward Compatibility** — Single-machine deployments unaffected
+
+**Key Implementation Files:**
+- `.squad/scripts/Claim-Issue.ps1` — Core coordination functions (Claim-Issue, Release-Claim, Recover-StaleWork)
+- `ralph-watch.ps1` — Modified to add machine ID, stale recovery, and coordination prompt
+- Branch naming pattern: Changed from `squad/{issue}-{slug}` to `squad/{issue}-{slug}-{machineId}`
+
+**Rollout Plan:** 4-week phased approach (foundation → claiming → recovery → observability)
+
+**Open Questions for Tamir:**
+1. GitHub API rate limits with frequent heartbeat updates — caching strategy?
+2. Machine identity for DevBox/CI environments — explicit env var vs auto-detection?
+3. Lease duration tuning — 15min fixed vs configurable?
+4. Conflicting PR scenario handling — auto-close duplicates or manual resolution?
+5. Cross-repo coordination for squad-monitor — shared vs separate claim state?
+
+**Technical Blockers:**
+- GitHub comment API rate limits (need validation)
+- Label creation permissions for dynamic `ralph:machine-*` labels
+- Clock skew handling across machines
+
+**Status:** ✅ DESIGN POSTED — Awaiting Tamir's input on open questions (issue marked `status:pending-user`)
+
+**Key Architecture Decision:** Using GitHub comments as distributed lock mechanism — atomic, visible, auditable, zero infrastructure cost. Lease-based claiming with automatic recovery prevents indefinite work starvation.
 
 ### 2026-03-11: Picard — Issue #340 MDE.ServiceModernization.CopilotCliAssets Investigation
 
@@ -938,3 +984,47 @@ GitHub's issue primitives are sufficient for distributed coordination:
 
 **Decision Authority:** Tamir (Ralph maintainer)
 
+### 2026-03-12: Picard — Issue #344 ConfigGen PR Review (ADO #15002885)
+
+**Assignment:** Review Azure DevOps PR for Catie MacBryde — "Add IsBleu and IsDelos methods"
+
+**Challenge:** 
+- ADO MCP tools require project parameter but still fail auth to msazure/CESEC org
+- Same limitation encountered in issue #328 (Keel MCP review in same repo)
+- Cannot directly access PR files, diff, or metadata
+
+**Approach:**
+- Leveraged context from issue #328 (previous ConfigGen PR review in same repo)
+- Reviewed ConfigGen knowledge base (.squad/scripts/workiq-queries/configgen.md)
+- Provided pattern-based review guidance:
+  - Method naming follows Is* pattern (IsFairfax, IsMooncake, etc.)
+  - Likely environment/cluster detection helpers
+  - Additive change (low risk if tests pass)
+  - Created review checklist for Tamir to use in ADO
+
+**Learnings:**
+1. **ConfigGen PR Review Process Without Direct Access:**
+   - Pattern recognition from similar PRs is effective
+   - Review checklists + human verification works when direct access unavailable
+   - Is* methods are common ConfigGen pattern for environment detection
+   - Additive utility methods are typically low-risk approvals
+
+2. **ADO MCP Multi-Org Limitations:**
+   - azure-devops-repo_get_pull_request_by_id requires project param but still auth fails
+   - msazure/CESEC org not accessible via current ADO MCP auth
+   - Issue #329 tracks this blocker
+
+3. **Team Routing Pattern:**
+   - ConfigGen PRs assigned to Picard (Lead) + B'Elanna (Infrastructure)
+   - Review guidance sufficient for human final review
+   - Status flow: go:needs-research → status:pending-user after guidance provided
+
+**Output:**
+- Posted review notes with checklist to issue #344
+- Added status:pending-user label (Tamir needs to approve in ADO)
+- Created decision: .squad/decisions/inbox/picard-configgen-pr-review.md
+
+**Related:**
+- Issue #328: Previous ConfigGen PR (Keel MCP) with similar access limitations
+- Issue #329: Multi-org ADO access blocker
+- ConfigGen knowledge: .squad/scripts/workiq-queries/configgen.md

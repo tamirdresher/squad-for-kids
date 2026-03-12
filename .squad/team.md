@@ -17,6 +17,7 @@
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Kes | Communications & Scheduling | `.squad/agents/kes/charter.md` | ✅ Active |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
+| Troi | Blogger & Voice Writer | `.squad/agents/troi/charter.md` | ✅ Active |
 | Neelix | News Reporter | `.squad/agents/neelix/charter.md` | ✅ Active |
 | @copilot | Coding Agent | — | 🤖 Active |
 

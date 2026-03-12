@@ -4,6 +4,114 @@
 
 ---
 
+## Decision 18: Multi-Machine Ralph Coordination Architecture
+
+**Date:** 2026-03-12  
+**Author:** Picard (Lead)  
+**Status:** 🟡 Proposed — Awaiting Tamir's approval  
+**Scope:** Architecture, Infrastructure
+
+### Decision
+
+Use **GitHub as the distributed coordination backend** for multi-machine Ralph work claiming, with zero new infrastructure.
+
+**Core mechanisms:**
+1. **Issue comments as distributed locks** — Atomic claim operations with timestamps
+2. **15-minute lease-based work claiming** — Automatic release on expiration
+3. **Machine-specific branch namespacing** — `squad/{issue}-{slug}-{machineId}` prevents conflicts
+4. **Heartbeat via comment edits** — Stale work detection without external services
+5. **Round-start stale recovery** — Automatic reclaim of orphaned work
+
+### Rationale
+
+**Why GitHub-native coordination:**
+- ✅ Zero new infrastructure — no Redis, Postgres, message queues, or coordination services
+- ✅ Transparent state — all coordination visible in GitHub UI (comments, labels, board)
+- ✅ Auditable — complete history of which machine worked what and when
+- ✅ Already authorized — Ralph has GitHub API access, no new auth required
+- ✅ Conflict-free — GitHub's comment ordering provides natural serialization
+
+**Why comment-based locking (not labels/assignments):**
+- Comments are immutable and timestamped (GitHub preserves creation time)
+- Comment order provides atomic sequencing for race condition handling
+- Label updates are eventually consistent; comments provide strong ordering
+- Issue assignments would require bot accounts (comments work with existing auth)
+
+**Why 15-minute lease:**
+- Long enough: Most issue work completes in 5-10 minutes
+- Short enough: Failed machine work recovers quickly (acceptable 15min delay)
+- Prevents indefinite starvation if a machine crashes mid-work
+
+### Applies To
+
+- All Ralph deployments (tamresearch1, squad-monitor, future repos)
+- Single-machine deployments (transparent no-op)
+- Multi-machine deployments (active coordination)
+
+### Does NOT Apply When
+
+- Non-Ralph automation (other agents don't need coordination)
+- Manual user work (humans can see issue status themselves)
+
+### Consequences
+
+**Positive**
+- ✅ Multi-machine Ralph can run without duplicate work
+- ✅ Automatic recovery from machine failures (15min window)
+- ✅ Complete visibility into which machine is working what
+- ✅ Backward compatible — single-machine Ralph unaffected
+
+**Negative**
+- ⚠️ GitHub API rate limits — frequent comment/label updates may hit limits
+- ⚠️ 15-minute recovery window — orphaned work isn't instant
+- ⚠️ Clock skew between machines can cause lease calculation errors
+- ⚠️ Manual cleanup needed if machines create conflicting PRs during race
+
+**Mitigation**
+- Monitor GitHub API usage and implement exponential backoff if needed
+- Cache claim state locally with periodic refresh to reduce API calls
+- Add clock skew tolerance (±2 min) when checking lease expiration
+- Document PR conflict resolution procedure for operators
+
+### Implementation
+
+**Code changes:**
+- Create `.squad/scripts/Claim-Issue.ps1` with coordination functions
+- Modify `ralph-watch.ps1` to add machine ID and stale recovery
+- Update Ralph prompt to include claim protocol instructions
+- Add branch namespacing with machine ID suffix
+
+**Rollout:** 4-week phased approach
+1. Foundation (Week 1): Core functions, single-machine testing
+2. Work Claiming (Week 2): Integration, two-machine testing
+3. Stale Recovery (Week 3): Failure scenarios, automatic reclaim
+4. Observability (Week 4): Metrics, Teams alerts, dashboard
+
+### Open Questions
+
+**Awaiting Tamir's input:**
+1. GitHub API rate limit handling — cache claim state or use GraphQL?
+2. Machine identity for DevBox/CI — explicit env var or auto-detect?
+3. Lease duration configurable or fixed 15min?
+4. Conflicting PR resolution — auto-close duplicates or manual?
+5. Cross-repo coordination — shared or separate claim state per repo?
+
+### Related
+
+- **Issue #346:** Multi-machine Ralph coordination proposal
+- **ralph-watch.ps1:** Current single-machine implementation
+- **.squad/skills/github-project-board/SKILL.md:** Board status tracking
+
+### Next Steps
+
+1. Get Tamir's answers to open questions
+2. Implement Phase 1 (foundation + tests)
+3. Deploy to DevBox for multi-machine validation
+4. Monitor GitHub API usage in production
+5. Document operator procedures
+
+---
+
 ## Decision 17: Blog Anonymization — Public Content Policy
 
 **Date:** 2026-03-11  
@@ -21184,4 +21292,185 @@ Both machines are ready for distributed work claiming:
 ---
 
 **Approve and close when ready.**
+
+---
+
+# Decision: ConfigGen PR Review Process Without Direct ADO Access
+
+**Date:** 2026-03-12  
+**Decider:** Picard (Lead)  
+**Context:** Issue #344 — Review request for ADO PR #15002885 (Add IsBleu and IsDelos methods)
+
+## Decision
+
+When reviewing ConfigGen PRs in msazure/CESEC/CIEng-Infra-AKS:
+
+1. **ADO MCP tools don't have access** to this organization
+2. **Provide pattern-based guidance** leveraging:
+   - Similar PR reviews (e.g., #328 Keel MCP review)
+   - ConfigGen knowledge base (.squad/scripts/workiq-queries/configgen.md)
+   - Team experience with ConfigGen patterns
+3. **Hand off to Tamir** for actual ADO review with:
+   - Checklist of items to verify
+   - Expected verdict based on patterns
+   - Questions to ask if unclear
+
+## Rationale
+
+- Can't access msazure/CESEC org via current auth
+- Manual ADO navigation possible but inefficient for AI agents
+- Pattern-based guidance + human verification is pragmatic
+- Leverages team's ConfigGen domain knowledge
+
+## Alternatives Considered
+
+- **Playwright automation**: Too brittle for cross-org ADO auth
+- **Request access**: Long lead time, may not be granted
+- **Decline review**: Unhelpful, Tamir needs input
+
+## Impact
+
+- **Short term**: Tamir reviews PRs manually with AI-provided checklists
+- **Medium term**: If more ConfigGen PRs, document patterns in .squad/knowledge/
+- **Long term**: If access granted, switch to direct ADO MCP review
+
+## Related
+
+- Issue #344 (this PR)
+- Issue #328 (previous ConfigGen PR review)
+- Issue #329 (multi-org ADO access blocker)
+
+---
+
+## Decision: NAP Node Pool Taint Strategy for System Pod Isolation
+
+**Date:** 2026-03-12  
+**Author:** B'Elanna  
+**Status:** Recommendation  
+**Context:** Issue #345 — DK8S Core production incident (AGC page)
+
+### Problem
+
+System pods (kube-system namespace) were scheduling on NAP-managed nodes, causing operational issues. The `CriticalAddonsOnly=true:NoSchedule` taint on system pools blocks user workloads from system nodes, but doesn't prevent system pods from landing on NAP/user nodes.
+
+### Decision
+
+**Apply custom taints to NAP node pools to repel system pods:**
+
+```yaml
+# NAP Node Pool Configuration
+--node-taints workload=nap:NoSchedule
+--labels workload-type=nap
+```
+
+```yaml
+# Application Pod (needs NAP nodes)
+tolerations:
+  - key: "workload"
+    operator: "Equal"
+    value: "nap"
+    effect: "NoSchedule"
+```
+
+**System pods require no changes** — they will avoid NAP nodes automatically since they don't tolerate the custom taint.
+
+### Rationale
+
+1. **Isolation Principle:** System pod isolation requires *repelling* taints on NAP/user pools, not just *attracting* taints on system pools
+2. **NAP Behavior:** NAP respects node taints when provisioning — won't provision nodes for pods that can't tolerate the taint
+3. **Minimal Change:** System pods maintain existing tolerations; only app pods need toleration updates
+4. **DaemonSet Safety:** Cluster-wide DaemonSets can use nodeAffinity to target system pools explicitly if needed
+
+### Alternatives Considered
+
+1. **Node Affinity on System Pods:** Requires modifying every system pod manifest (high blast radius, complex)
+2. **No NAP Taints + System Pool Affinity Only:** System pods could still land on NAP nodes under resource pressure
+3. **`CriticalAddonsOnly` Everywhere:** Would require broad toleration changes across all system components
+
+### Implementation Notes
+
+- Custom taint key should be descriptive (`workload`, `pool-type`, `dedicated`)
+- Coordinate with app teams to add tolerations to workload manifests
+- For DaemonSets requiring cluster-wide deployment, add explicit system pool targeting:
+  ```yaml
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/system
+              operator: In
+              values: ["true"]
+  ```
+
+### References
+
+- [AKS NAP Node Pool Config](https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-node-pools)
+- [AKS Workload Isolation Best Practices](https://learn.microsoft.com/en-us/answers/questions/2118589/azure-kubernetes-service-why-are-system-pods-being)
+- [NAP Troubleshooting Guide](https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/extensions/troubleshoot-node-auto-provision)
+
+### Team Impact
+
+**DK8S Core:** Immediate mitigation for production incident  
+**Platform Teams:** Pattern applicable to any AKS cluster with NAP + system/user pool separation  
+**Squad:** Establishes tainting strategy for node pool isolation scenarios
+
+
+---
+
+## Decision 19: Always Set Board Status for New Issues
+
+**Date:** 2026-03-12T06:34:30Z
+**Author:** Tamir Dresher (User Directive)
+**Status:** ✅ Adopted
+**Scope:** Team Process & Issue Management
+
+### Decision
+
+Whenever creating tasks or issues, **always set them to a board status** (Todo, In Progress, Done, etc.). Never leave issues statusless on the project board.
+
+### Rationale
+
+- User request for clarity and project board consistency
+- Prevents orphaned issues that don't fit the team's workflow
+- Ensures all work is visible and trackable on the project board
+- Improves project visibility and team coordination
+
+### Applies To
+
+All new issues created by agents or humans across all repositories (tamresearch1, squad-monitor, etc.)
+
+### Does NOT Apply When
+
+- Closing/completing an issue (board status is automatically handled)
+- Editing existing issues that already have board status
+
+### Consequences
+
+- ✅ All issues are immediately visible on the project board with clear status
+- ✅ Improves project visibility and team coordination
+- ✅ Prevents "lost" issues without status
+- ⚠️ Requires discipline — agents and humans must always set status on creation
+
+### Implementation
+
+**For issue creation:**
+1. Always specify a board status label when creating new issues
+2. Default to status:todo for new work
+3. Use status:in-progress only if work is actively being done
+4. Never leave an issue without a status label
+
+**For agents:**
+- Update issue creation scripts to automatically add status label
+- Document in Ralph and Scribe charters that status must be set on creation
+
+### Related
+
+- User feedback from issue #351
+- Decision 1.1 on pending-user status explanations
+
+### Next Steps
+
+1. Update all agent creation scripts to enforce status labels
+2. Audit existing "statusless" issues on projects
+3. Add validation to issue creation workflows
 

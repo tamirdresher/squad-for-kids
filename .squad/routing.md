@@ -65,6 +65,7 @@ When triaging, the Lead should ask:
 | C#, Go, .NET, clean code | Data | — |
 | Documentation, presentations, analysis | Seven | — |
 | Audio content generation, TTS, markdown to audio | Podcaster | — |
+| Blog writing, voice matching, content series, blog publishing | Troi | Seven |
 | News, briefings, status reports, Teams updates | Neelix | Seven |
 
 

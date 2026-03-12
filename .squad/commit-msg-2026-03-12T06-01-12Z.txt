@@ -1,0 +1,9 @@
+squad: Merge decision on multi-machine Ralph coordination (#346)
+
+- Merged picard-multi-machine-ralph.md into decisions.md
+- GitHub-native work claiming via issue assignments and labels
+- Stale work recovery with automatic reclaim mechanism
+- Branch namespacing to prevent conflicts
+- Decision approved: Phase 1 implementation ready
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

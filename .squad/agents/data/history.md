@@ -36,7 +36,61 @@
 - Branch: `squad/10-session-display`
 - Build: ✅ Success (0 warnings)
 
-TBD - Q2 work incoming
+### 2026-03-12 Completion: Issue #330 — DevBox SSH Implementation Scripts
+
+**Context:** Issue #330 research identified SSH + key-based auth as optimal solution (10/10 score, unanimous team recommendation). However, no implementation artifacts existed — blocker to adoption.
+
+**Deliverables:**
+1. **scripts/devbox-ssh-setup.ps1** (7660 bytes)
+   - PowerShell script for DevBox (run as Administrator)
+   - Installs OpenSSH Server Windows capability
+   - Configures sshd for key-only authentication (password auth disabled)
+   - Sets up authorized_keys with Squad public key
+   - Configures Windows Firewall rules for port 22
+   - Idempotent design with sshd_config backup
+   - Interactive prompts for public key
+   - Colored output (Yellow=progress, Green=success, Red=error)
+
+2. **scripts/devbox-ssh-keygen.ps1** (6237 bytes)
+   - PowerShell script for local machine where Squad runs
+   - Generates ed25519 SSH key pair at `~/.ssh/squad-devbox-key`
+   - Won't overwrite existing keys without confirmation
+   - Creates/updates `~/.ssh/config` with DevBox host entry (alias: `squad-devbox`)
+   - Checks ssh-keygen availability (instructs installation if missing)
+   - Interactive prompts for DevBox hostname and username
+   - Provides PowerShell remoting syntax for Squad automation
+
+3. **.squad/config.json** (enhanced)
+   - Added `devbox` section with placeholders:
+     - hostname, username, sshKeyPath, sshConfigAlias
+   - Ready for team customization
+
+4. **.squad/decisions/inbox/data-devbox-ssh-implementation.md** (4357 bytes)
+   - Complete decision record with rationale, design, testing flow
+
+**SSH Configuration:**
+- Uses ed25519 keys (modern, secure, compact)
+- Key-only authentication (password auth disabled for security)
+- SSH config alias (`squad-devbox`) for easy connection
+- StrictHostKeyChecking=accept-new for auto-accept on first connection
+- PowerShell remoting support: `Enter-PSSession -HostName squad-devbox -SSHTransport`
+
+**Error Handling:**
+- All scripts: `$ErrorActionPreference = "Stop"` (fail-fast)
+- Administrator privilege checks on setup script
+- Graceful fallbacks for missing config (interactive prompts)
+- Backup of sshd_config before modifications
+
+**Status:** Scripts ready for testing. Recommended flow:
+1. Run keygen script on local machine → generates keys, displays public key
+2. Copy public key
+3. Run setup script on DevBox with public key
+4. Test: `ssh squad-devbox` from local machine
+5. Test PowerShell remoting: `Enter-PSSession -HostName squad-devbox -SSHTransport`
+
+**Rationale:** Implementation-focused approach; consensus already achieved. Blocker was lack of runnable artifacts. PowerShell scripts = native Windows tooling, no dependencies, easy to read/modify. Idempotent design = safe to re-run if first attempt fails.
+
+**Next:** User testing, config.json placeholder updates, integration into Squad automation workflows.
 
 ### 2026-03-11 Completion: squad-monitor Issues #1 & #3
 
@@ -272,3 +326,59 @@ TBD - Q2 work incoming
 - Comment added to issue
 
 **Key Learning:** Separate columns are clearer than embedded metadata in strings. SessionInfo already had the properties populated by ExtractSessionMetadataFromEventsFile() from previous work, so this was a pure display layer change.
+
+### Issue #330: DevBox SSH Implementation (2026-04-01)
+
+**Context:** Issue #330 research identified SSH as the optimal solution (10/10 score, unanimous), but no implementation artifacts existed. Tamir had to manually connect to DevBox and run Ralph himself. This created the actual implementation deliverables.
+
+**Created Artifacts:**
+
+1. **scripts/devbox-ssh-setup.ps1** — Server-side setup script (runs ON DevBox as Administrator):
+   - Installs OpenSSH Server Windows capability via `Add-WindowsCapability`
+   - Configures sshd for key-only authentication (disables password auth in sshd_config)
+   - Sets up authorized_keys with Squad's public key (interactive prompt or parameter)
+   - Configures Windows Firewall rule for port 22 (`New-NetFirewallRule`)
+   - Sets proper permissions on authorized_keys (owner-only via ACL)
+   - Restarts sshd service to apply changes
+   - Displays connection instructions with IP addresses and examples
+
+2. **scripts/devbox-ssh-keygen.ps1** — Client-side key generation (runs on local machine):
+   - Generates ed25519 SSH key pair at `~/.ssh/squad-devbox-key`
+   - Safe overwrite handling (prompts before replacing existing keys)
+   - Displays public key for copying to DevBox
+   - Creates/updates `~/.ssh/config` with host entry (alias: `squad-devbox`)
+   - Provides connection examples (ssh, Enter-PSSession)
+
+3. **.squad/config.json** — Added devbox configuration section:
+   ```json
+   "devbox": {
+     "hostname": "PLACEHOLDER_DEVBOX_IP_OR_HOSTNAME",
+     "username": "PLACEHOLDER_DEVBOX_USERNAME",
+     "sshKeyPath": "~/.ssh/squad-devbox-key",
+     "sshConfigAlias": "squad-devbox"
+   }
+   ```
+
+**Implementation Decisions:**
+- **ed25519 keys:** Modern, secure, small signature (vs RSA 4096)
+- **Key-only auth:** Password authentication disabled for security
+- **SSH config alias:** Simplifies connection (`ssh squad-devbox` vs full hostname/user/key path)
+- **Idempotent scripts:** Safe to run multiple times (checks existing state, prompts before overwrite)
+- **PowerShell remoting support:** `Enter-PSSession -HostName squad-devbox -SSHTransport`
+- **Colored output:** Yellow=progress, Green=success, Red=error, Cyan=prompts
+- **Error handling:** `$ErrorActionPreference = "Stop"` for fail-fast, Administrator checks
+
+**Key Patterns:**
+- Backup before modification (sshd_config backed up with timestamp)
+- FileShare considerations (authorized_keys ACL set to owner-only)
+- Parameter-based or interactive (scripts work both ways)
+- Clear separation (setup vs keygen — prevents confusion about where to run what)
+
+**Testing Flow:**
+1. Run `devbox-ssh-keygen.ps1` locally → generates keys, displays public key
+2. Copy public key output
+3. Run `devbox-ssh-setup.ps1` on DevBox with `-PublicKey` parameter
+4. Test: `ssh squad-devbox` from local machine
+5. Test PowerShell remoting: `Enter-PSSession -HostName squad-devbox -SSHTransport`
+
+**Decision Document:** `.squad/decisions/inbox/data-devbox-ssh-implementation.md`

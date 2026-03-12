@@ -7,13 +7,18 @@
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -OutputFile briefing.mp3
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Voice en-US-GuyNeural
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -ForceFallback
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -ConversationMode
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Rate "+10%" -Volume "+50%"
 
 param(
     [Parameter(Mandatory=$true)]
     [string]$InputFile,
     [string]$OutputFile,
     [string]$Voice = "en-US-JennyNeural",
-    [switch]$ForceFallback
+    [switch]$ForceFallback,
+    [switch]$ConversationMode,
+    [string]$Rate = "+0%",
+    [string]$Volume = "+0%"
 )
 
 $ErrorActionPreference = "Stop"
@@ -62,13 +67,14 @@ function ConvertFrom-Markdown {
 # ============================================================================
 
 function Invoke-EdgeTTS {
-    param([string]$Text, [string]$Output, [string]$Voice)
+    param([string]$Text, [string]$Output, [string]$Voice, [string]$Rate = "+0%", [string]$Volume = "+0%")
 
     $tempText = [System.IO.Path]::GetTempFileName()
     [System.IO.File]::WriteAllText($tempText, $Text, [System.Text.Encoding]::UTF8)
 
     try {
-        $proc = Start-Process -FilePath "edge-tts" -ArgumentList "--file `"$tempText`" --write-media `"$Output`" --voice $Voice" -NoNewWindow -Wait -PassThru -ErrorAction Stop
+        $args = "--file `"$tempText`" --write-media `"$Output`" --voice $Voice --rate=$Rate --volume=$Volume"
+        $proc = Start-Process -FilePath "edge-tts" -ArgumentList $args -NoNewWindow -Wait -PassThru -ErrorAction Stop
         if ($proc.ExitCode -ne 0) { throw "edge-tts exited with code $($proc.ExitCode)" }
         return $true
     } catch {
@@ -132,6 +138,21 @@ if (-not $OutputFile) {
 Write-Host "Input:  $inputPath"
 Write-Host "Output: $OutputFile"
 
+# Conversation mode: delegate to the two-voice Python script
+if ($ConversationMode) {
+    Write-Host "`nConversation mode enabled — invoking podcaster-conversational.py" -ForegroundColor Cyan
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $convScript = Join-Path $scriptDir "podcaster-conversational.py"
+
+    $pyArgs = @("`"$convScript`"", "`"$inputPath`"", "--rate", $Rate, "--volume", $Volume)
+    if ($Voice -ne "en-US-JennyNeural") {
+        $pyArgs += @("--host-voice", $Voice)
+    }
+
+    $proc = Start-Process -FilePath "python" -ArgumentList ($pyArgs -join " ") -NoNewWindow -Wait -PassThru
+    exit $proc.ExitCode
+}
+
 # Read and strip markdown
 $raw = Get-Content $inputPath -Raw -Encoding utf8
 $plainText = ConvertFrom-Markdown -Text $raw
@@ -151,7 +172,7 @@ $success = $false
 
 if (-not $ForceFallback) {
     Write-Host "`nTrying edge-tts (neural quality)..." -ForegroundColor Cyan
-    $success = Invoke-EdgeTTS -Text $plainText -Output $OutputFile -Voice $Voice
+    $success = Invoke-EdgeTTS -Text $plainText -Output $OutputFile -Voice $Voice -Rate $Rate -Volume $Volume
 }
 
 if (-not $success) {

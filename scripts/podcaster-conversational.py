@@ -6,6 +6,7 @@ Converts markdown to two-voice conversational podcast using edge-tts
 """
 
 import asyncio
+import argparse
 import re
 import sys
 import os
@@ -208,11 +209,11 @@ def estimate_duration(text):
     secs = seconds % 60
     return f"{mins}m {secs}s"
 
-async def generate_audio_segment(text, voice, output_path, max_retries=3):
+async def generate_audio_segment(text, voice, output_path, rate="+0%", volume="+0%", max_retries=3):
     """Generate audio for a single segment with retry logic"""
     for attempt in range(max_retries):
         try:
-            communicate = edge_tts.Communicate(text, voice)
+            communicate = edge_tts.Communicate(text, voice, rate=rate, volume=volume)
             await communicate.save(str(output_path))
             return
         except Exception as e:
@@ -223,12 +224,15 @@ async def generate_audio_segment(text, voice, output_path, max_retries=3):
                 raise
 
 async def main():
-    if len(sys.argv) < 2:
-        print("Usage: python podcaster-conversational.py <markdown-file>")
-        print("Example: python podcaster-conversational.py EXECUTIVE_SUMMARY.md")
-        sys.exit(1)
-    
-    input_path = Path(sys.argv[1]).resolve()
+    parser = argparse.ArgumentParser(description="Conversational Podcaster - converts markdown to two-voice podcast")
+    parser.add_argument("input_file", help="Path to the markdown file")
+    parser.add_argument("--rate", default="+0%", help="Speech rate adjustment (e.g., '+10%%', '-20%%')")
+    parser.add_argument("--volume", default="+0%", help="Volume adjustment (e.g., '+50%%', '-10%%')")
+    parser.add_argument("--host-voice", default="en-US-JennyNeural", help="Voice for HOST speaker")
+    parser.add_argument("--expert-voice", default="en-US-GuyNeural", help="Voice for EXPERT speaker")
+    args = parser.parse_args()
+
+    input_path = Path(args.input_file).resolve()
     input_filename = input_path.stem
     output_path = Path(f"{input_filename}-conversational.mp3").resolve()
     
@@ -269,8 +273,8 @@ async def main():
         
         # Voice configuration
         voices = {
-            'HOST': 'en-US-JennyNeural',    # Female, professional
-            'EXPERT': 'en-US-GuyNeural'      # Male, authoritative
+            'HOST': args.host_voice,
+            'EXPERT': args.expert_voice
         }
         
         # Create temporary directory for segments
@@ -285,7 +289,7 @@ async def main():
                 segment_path = temp_path / f"segment_{i:03d}_{speaker}.mp3"
                 
                 print(f"   [{i+1}/{len(script)}] {speaker}: {text[:50]}...")
-                await generate_audio_segment(text, voice, segment_path)
+                await generate_audio_segment(text, voice, segment_path, rate=args.rate, volume=args.volume)
                 segment_files.append(segment_path)
             
             # Concatenate segments
@@ -335,7 +339,7 @@ async def main():
         print(f"   Audio file: {output_path}")
         print(f"   File size: {format_bytes(file_size)}")
         print(f"   Format: MP3")
-        print(f"   Voices: HOST (en-US-JennyNeural) + EXPERT (en-US-GuyNeural)")
+        print(f"   Voices: HOST ({args.host_voice}) + EXPERT ({args.expert_voice})")
         print(f"   Dialogue turns: {len(script)}")
         print(f"   Quality: Neural (production-grade)")
         print(f"\n✨ Success! Conversational podcast generated.")

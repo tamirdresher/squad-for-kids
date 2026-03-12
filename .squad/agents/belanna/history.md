@@ -436,3 +436,60 @@ When issue references repos we can't access, document the exact commands and che
 
 **Cross-Agent Note:** Scribe has updated orchestration logs and consolidated decisions. Your history.md kept current for continuity.
 
+---
+
+## 2026-03-12: Issues #259 & #347 — Family Email Pipeline (Power Automate)
+
+**Context:** Tamir needed a wife-friendly email address for Gabi to send family requests (print, calendar, reminders). Issue #347 identified a broken Power Automate flow that auto-disabled after 14 days of trigger failures.
+
+**Decision Made:**
+- **Email address:** `tamirdresher+family@microsoft.com` (Microsoft 365 plus-addressing)
+- **Architecture:** 4 parallel Power Automate flows (print, calendar, reminder, general catch-all)
+- **Rationale:** Zero setup time, stays in Microsoft ecosystem, immediate availability
+
+**Deliverables Created:**
+1. `infrastructure/power-automate-flows/flow-print-requests.json` — Forwards to HP printer with attachments
+2. `infrastructure/power-automate-flows/flow-calendar-events.json` — Creates Outlook calendar events (default: tomorrow)
+3. `infrastructure/power-automate-flows/flow-reminders.json` — Creates Outlook tasks with reminders
+4. `infrastructure/power-automate-flows/flow-general-requests.json` — Notifies Tamir via high-priority email
+5. `infrastructure/power-automate-flows/README.md` — Complete import instructions, troubleshooting, fix for #347
+6. `.squad/decisions/inbox/belanna-email-pipeline.md` — Architectural decision record
+
+**Key Technical Choices:**
+- **Plus-addressing over dedicated Gmail:** Instant setup, no external dependencies, corporate security
+- **4 flows over 1 monolithic:** Independent triggers, easier debugging, better maintainability
+- **Keyword-based routing:** Simple, reliable, no AI/NLP needed for low-volume family use
+- **Sender filtering:** All flows only process emails from `gabrielayael@gmail.com` (security)
+- **Auto-reply confirmations:** Every flow replies to Gabi confirming action taken
+
+**Flow Definition Format:** OpenAPI Workflow Definition Language (Logic Apps schema) for Power Automate import
+
+**Issue #347 Root Cause:** Likely incorrect email trigger address or expired Office 365 connection. Fix: delete old flow, import new definitions, reconfigure connections.
+
+**Setup Time:** ~15-20 minutes to import all 4 flows and test
+
+**Success Criteria:** Gabi sends email → automatic routing → confirmation reply within 5 minutes
+
+## Learnings
+
+### Power Automate Architecture Patterns
+- **Parallel flows preferred over monolithic branching** when handling multiple independent request types
+- Email triggers in Power Automate should use plus-addressing for filtering rather than dedicated mailboxes
+- Always implement sender allowlisting (security) and auto-reply confirmations (UX)
+- Flow definitions use Logic Apps OpenAPI schema, portable across environments
+
+### Microsoft 365 Integration
+- Plus-addressing (`user+tag@domain.com`) works natively in Exchange Online, no config needed
+- Office 365 Outlook connector handles email + calendar (one connection for both)
+- Separate Outlook Tasks connector required for task/reminder creation
+- Connection expiration common cause of flow failures — monitor run history weekly
+
+### Key File Paths
+- Power Automate flow definitions: `infrastructure/power-automate-flows/*.json`
+- Decision records: `.squad/decisions/inbox/belanna-email-pipeline.md`
+
+### User Preference (Tamir)
+- "Decide all and do it already" → Prefers autonomous decisions over proposal/approval cycles
+- Values immediate functionality over perfect architecture
+- Wife-friendly UX matters (simple email address, reliable confirmations)
+

@@ -1,26 +1,33 @@
 ---
-updated_at: 2026-03-11T21-55-00Z
-focus_area: Ralph Round 3 complete. Board clear — idling.
-active_issues: []
-session_status: idle
+updated_at: 2026-03-12T06-50-00Z
+focus_area: Ralph Round 1 complete. Working on #259 email pipeline.
+active_issues: [259, 347]
+session_status: active
 ---
 
 # What We're Focused On
 
-Ralph Round 3 (2026-03-11T21:55:00Z) — Complete.
+Ralph Round 1 (2026-03-12T06:50:00Z) — Complete.
 
 **This Round:**
-- 🏗️ Picard: #341 — Created research squad repo (tamresearch1-research), issue CLOSED ✅
-- 🏗️ Picard: #340 — Integrated reflect skill from MDE CopilotCliAssets → pending user review
-- 🔬 Seven: #339 — Researched DK8S wizard CodeQL issue (Ramaprakash's concern) → pending user review
-- 📰 Neelix: Teams broadcast sent with research squad launch announcement
-- Fixed 4 issues missing status:pending-user labels (#340, #336, #329, #259)
-- Board updated: #341→Done, #340→Pending User, #339→Pending User
+- ⚙️ B'Elanna: #259 + #347 — Created Power Automate email pipeline (4 flow definitions + README)
+  - Email address: tamirdresher+family@microsoft.com (plus-addressing, zero setup)
+  - Flow files: infrastructure/power-automate-flows/
+  - Decision documented in decisions inbox
+- 📌 Directive captured from #351 (always set board status on new tasks)
+- ✅ Teams monitoring: No new messages
+- ✅ Email monitoring: All items already tracked as issues
+- ✅ Tech news scanning: All stories already reported
+- ⚠️ GH CLI not authenticated — board updates, issue comments, and PRs blocked
+
+**Limitations This Session:**
+- gh CLI not authenticated (no GH_TOKEN, no hosts.yml)
+- Cannot post issue comments, update labels, modify project board, or push code
+- MCP tools provide read-only GitHub access
+- Teams webhook file not found — cannot send Neelix notifications
 
 **Current State:**
-- **Open Issues:** 26 tamresearch1 (all pending-user), 0 squad-monitor
-- **Actionable Items:** 0
+- **Open Issues:** 29 tamresearch1 (27 pending-user, 2 actionable)
 - **Open PRs:** 0 (both repos)
-- **Board Status:** Clear — idle
-- **Teams:** DK8S pipeline failures (not our action), no urgent items for Tamir
-- **Email:** GitHub bot notifications only
+- **squad-monitor:** 0 open issues (all 4 closed)
+- **Board Status:** Cannot update (no gh auth)

@@ -20570,3 +20570,39 @@ Aligns with:
 ---
 
 # DECISIONS MERGED FROM INBOX (2026-03-12T06:25:00Z)
+
+---
+
+## Decision 22: Email Pipeline Investigation Status (#259, #347)
+**Date:** 2026-03-12  
+**Investigator:** Picard (Lead)  
+**Status:** Investigation Complete — Blocked on User Input
+
+### Finding
+Shared mailbox for family email pipeline was **never created** in M365 Admin Center. Architecture was approved (Decision 21) but implementation never happened.
+
+### Blocking Information Required
+1. **Email domain:** What domain to use for shared mailbox? (e.g., dresherhome.com or tenant domain)
+2. **M365 admin access:** Does Tamir have M365 Admin rights to create shared mailbox?
+3. **Gabi's email:** What is Gabi's email address for sender validation?
+
+### Two Paths Forward
+
+**Path A (Fastest):** Tamir creates mailbox in M365 Admin Center (5 min) + Squad builds flows (30 min) = 1 hour total
+
+**Path B (Slower):** No admin access → ServiceNow request → IT provisions (1-3 days) → Squad builds flows = 3-5 days
+
+### Power Automate Failures
+Failures reported are **unrelated to #259** (different flow, likely #347). Shared mailbox doesn't exist, so family email flows can't exist.
+
+### Next Action
+Comment on #259 with status and blocking questions. Awaiting user response.
+
+---
+
+## Directive 2026-03-12T06-42-55Z: Project Board Status Requirement
+**Source:** Tamir Dresher (Issue #351)  
+**Requirement:** Whenever creating tasks/issues, always assign them a relevant status (Todo, In Progress, Done, etc.) on the project board. Do not leave items without status.  
+**Rationale:** Ensures project board remains current and useful for tracking work.  
+**Applies to:** All squad agents creating new issues or tasks.
+

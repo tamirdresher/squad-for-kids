@@ -449,3 +449,36 @@ Apply a custom taint to NAP node pools that system pods won't tolerate by defaul
 
 **Status:** ✅ Complete. Response posted to issue #345 for Tamir to send to Michael in DK8S Core channel.
 
+
+## Learnings
+
+### 2026-03-11: squad-monitor NuGet Tool Packaging
+
+**Task:** Implement GitHub issue #2 for publishing squad-monitor as a dotnet global tool on NuGet.
+
+**Finding:** Issue already completed. All requirements satisfied:
+1. ✅ .csproj configured with PackAsTool=true, ToolCommandName=squad-monitor, and full NuGet metadata
+2. ✅ GitHub Actions workflow (.github/workflows/publish-nuget.yml) set up for automated NuGet publishing on release
+3. ✅ README.md updated with install instructions (dotnet tool install -g squad-monitor)
+4. ✅ tamresearch1 .squad/tools/squad-monitor/ replaced with skill doc pointing to NuGet package
+
+**Verification:**
+- Build: ✅ dotnet build succeeds (net10.0 target)
+- Pack: ✅ dotnet pack produces squad-monitor.1.0.0.nupkg successfully
+
+**NuGet Tool Configuration Pattern:**
+`xml
+<PackAsTool>true</PackAsTool>
+<ToolCommandName>squad-monitor</ToolCommandName>
+<PackageId>squad-monitor</PackageId>
+<Version>1.0.0</Version>
+<PackageReadmeFile>README.md</PackageReadmeFile>
+`
+
+**Publishing Workflow Pattern:**
+- Triggers: release (published) or workflow_dispatch with version input
+- Steps: restore → build → determine version from tag → pack → publish to NuGet → attach to GitHub release
+- Uses NUGET_API_KEY secret for authentication
+
+**Status:** No work needed. Issue #2 already closed with all deliverables complete.
+

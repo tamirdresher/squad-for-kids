@@ -20690,3 +20690,63 @@ tolerations:
 **Platform Teams:** Pattern applicable to any AKS cluster with NAP + system/user pool separation  
 **Squad:** Establishes tainting strategy for node pool isolation scenarios
 
+
+---
+
+## Decision 19: Always Set Board Status for New Issues
+
+**Date:** 2026-03-12T06:34:30Z
+**Author:** Tamir Dresher (User Directive)
+**Status:** ✅ Adopted
+**Scope:** Team Process & Issue Management
+
+### Decision
+
+Whenever creating tasks or issues, **always set them to a board status** (Todo, In Progress, Done, etc.). Never leave issues statusless on the project board.
+
+### Rationale
+
+- User request for clarity and project board consistency
+- Prevents orphaned issues that don't fit the team's workflow
+- Ensures all work is visible and trackable on the project board
+- Improves project visibility and team coordination
+
+### Applies To
+
+All new issues created by agents or humans across all repositories (tamresearch1, squad-monitor, etc.)
+
+### Does NOT Apply When
+
+- Closing/completing an issue (board status is automatically handled)
+- Editing existing issues that already have board status
+
+### Consequences
+
+- ✅ All issues are immediately visible on the project board with clear status
+- ✅ Improves project visibility and team coordination
+- ✅ Prevents "lost" issues without status
+- ⚠️ Requires discipline — agents and humans must always set status on creation
+
+### Implementation
+
+**For issue creation:**
+1. Always specify a board status label when creating new issues
+2. Default to status:todo for new work
+3. Use status:in-progress only if work is actively being done
+4. Never leave an issue without a status label
+
+**For agents:**
+- Update issue creation scripts to automatically add status label
+- Document in Ralph and Scribe charters that status must be set on creation
+
+### Related
+
+- User feedback from issue #351
+- Decision 1.1 on pending-user status explanations
+
+### Next Steps
+
+1. Update all agent creation scripts to enforce status labels
+2. Audit existing "statusless" issues on projects
+3. Add validation to issue creation workflows
+

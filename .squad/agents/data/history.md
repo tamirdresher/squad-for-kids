@@ -272,3 +272,38 @@ TBD - Q2 work incoming
 - Comment added to issue
 
 **Key Learning:** Separate columns are clearer than embedded metadata in strings. SessionInfo already had the properties populated by ExtractSessionMetadataFromEventsFile() from previous work, so this was a pure display layer change.
+
+### Issue #1: Token Usage Panel Status Check (2026-06-24)
+
+**Context:** Assigned to implement issue #1 "Token usage, cost, and model stats panel" in squad-monitor repo. Task instructions indicated creating new feature implementation.
+
+**Discovery:**
+- Issue #1 was already CLOSED — feature implemented in commit 1b68db8 (PR #9)
+- Commit message: "feat: enhance token usage panel with cli.model_call parsing, latency stats, and per-session costs (#1) (#9)"
+- Git history shows feature deployed 2 days ago along with issue #3 multi-session view
+- Issue comment notes: "Moved to tamirdresher_microsoft/tamresearch1 — that's where our dev team works. This repo is code-only."
+
+**Existing Implementation Review (BuildTokenStatsSection):**
+- ✅ Parses all three event types: `assistant_usage`, `cli.model_call`, `session_usage_info`
+- ✅ Tracks model name, calls count, prompt/completion/cached tokens
+- ✅ Calculates cache hit % with color-coding (green >50%, yellow >20%, dim otherwise)
+- ✅ Computes per-session cost breakdown (average + max displayed)
+- ✅ Shows premium request count (Opus model filter)
+- ✅ Displays context window usage % from session_usage_info
+- ✅ Deduplicated via api_id HashSet to prevent double-counting
+- ✅ Formats token counts with K/M suffixes (FormatTokenCount)
+- ✅ Displays avg latency from duration_ms with color thresholds
+
+**Key Code Patterns:**
+- Uses `ModelCallStats` class for per-model aggregation (Calls, PromptTokens, CompletionTokens, CachedTokens, TotalCost, DurationsMs)
+- `ReadAheadBlock()` reads multi-line JSON blocks from log stream (up to 80 lines or closing brace)
+- `ExtractLong()`, `ExtractDouble()`, `ExtractString()` helpers use regex for field extraction
+- Log files opened with `FileShare.ReadWrite` for safe concurrent access
+- Scans 5 most recent log files from ~/.copilot/logs/
+- Summary line shows totals with color-coded thresholds
+
+**Build Verification:**
+- Project builds clean: ✅ 1.2s, 0 errors, 0 warnings
+- Target: net10.0, single-file architecture (~2500 lines in Program.cs)
+
+**Status Resolution:** Feature complete and deployed. No work needed. Issue correctly marked as closed in GitHub.

@@ -78,3 +78,5 @@ Agents MUST update the board in these situations:
 - Always update the board AND the label together — they serve different audiences (board = visual, labels = automation)
 - If `gh project` commands fail, log the failure but don't block the main work
 - The project ID is `PVT_kwHOC0L5c84BRG-P` and the Status field ID is `PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc`
+- **When closing ANY issue (including "not planned" / cancel), ALWAYS move it to Done (4830e3e3)**. The "Cancel" and "Postpone" columns are for OPEN issues only. Closed issues must be in Done regardless of how they were closed.
+- The `squad-board-sync` GitHub Action auto-moves items to Done on issue close as a safety net, but agents should still update the board proactively.

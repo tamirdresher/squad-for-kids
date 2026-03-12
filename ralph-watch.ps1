@@ -87,6 +87,8 @@ TEAMS & EMAIL MONITORING (do this EVERY round):
 
 DONE ITEMS ARCHIVING: Check the project board for items in "Done" status that have been done for more than 3 days. Close the GitHub issue if still open and add a comment summarizing what was accomplished.
 
+BOARD RECONCILIATION (every round): After triaging issues, do a quick board health check. List all project items with `gh project item-list 1 --owner tamirdresher_microsoft --format json` and for any item where the issue is CLOSED but the board column is NOT "Done", move it to Done (4830e3e3). For any item where the issue is OPEN but the board column is "Done", move it to Todo (0de780a1). Log how many mismatches you fixed. This prevents board drift.
+
 NEWS REPORTER (Neelix): When you find important updates worth reporting (PRs merged, issues completed, Teams messages needing attention, blockers resolved), send a styled Teams message via the webhook at $env:USERPROFILE\.squad\teams-webhook.url. Format it like a news broadcast — use emoji, bold headers, and make it scannable. Read .squad/agents/neelix/charter.md for the style guide. Only send when there is genuinely newsworthy activity — not every round.
 
 PODCASTER: After any agent completes a significant deliverable (research report, blog draft, design doc, architecture proposal, or any document >500 words), run the podcaster to generate an audio version. Use: pwsh scripts/podcaster.ps1 -InputFile <path-to-deliverable>. The audio file will be saved next to the source file with -audio.wav suffix. Mention the audio file in the Teams notification so Tamir knows it's available to listen to. Read .squad/agents/podcaster/charter.md for details.

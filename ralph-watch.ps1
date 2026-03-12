@@ -1,6 +1,8 @@
 # Ralph Watch v8 - Runs agency copilot with Squad agent every interval
 # Launches a full Copilot session that can do actual work
 # To stop: Ctrl+C
+# IMPORTANT: Must be launched with pwsh (PowerShell 7+), NOT powershell.exe (5.1)
+#   PS 5.1 mangles multi-line strings passed to native executables, breaking agency prompts.
 # 
 # Observability Features (v8 — aligned with squad-monitor v2):
 # - Structured logging to $env:USERPROFILE\.squad\ralph-watch.log
@@ -11,6 +13,13 @@
 #   → Written BEFORE round (status=running) and AFTER (status=idle/error)
 #   → Includes pid, status, round, lastRun, exitCode, consecutiveFailures
 # - Log rotation: capped at 500 entries / 1MB
+
+# Require PowerShell 7+ — PS 5.1 breaks multi-line native command arguments
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    Write-Host "ERROR: Ralph Watch requires PowerShell 7+ (pwsh). Current: $($PSVersionTable.PSVersion)" -ForegroundColor Red
+    Write-Host "Launch with: pwsh -NoProfile -ExecutionPolicy Bypass -File ralph-watch.ps1" -ForegroundColor Yellow
+    exit 1
+}
 
 # Fix UTF-8 rendering in Windows PowerShell console
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8

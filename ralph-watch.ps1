@@ -45,10 +45,11 @@ if (-not $acquired) {
     exit 1
 }
 
-# 2. Process scan — kill any stale ralph-watch processes (not us)
-$staleRalphs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'ralph-watch' -and $_.ProcessId -ne $PID }
+# 2. Process scan — kill any stale ralph-watch processes for THIS repo only (not us, not other repos)
+$thisRepoDir = (Get-Location).Path.Replace('\', '\\')
+$staleRalphs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'ralph-watch' -and $_.CommandLine -match [regex]::Escape($thisRepoDir) -and $_.ProcessId -ne $PID }
 foreach ($stale in $staleRalphs) {
-    Write-Host "WARNING: Killing stale Ralph instance PID $($stale.ProcessId)" -ForegroundColor Yellow
+    Write-Host "WARNING: Killing stale Ralph instance PID $($stale.ProcessId) for this repo" -ForegroundColor Yellow
     Stop-Process -Id $stale.ProcessId -Force -ErrorAction SilentlyContinue
 }
 
@@ -107,10 +108,11 @@ TECH NEWS SCANNING (once per day, morning round only): On the first round after 
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
 '@
 
-# Initialize observability paths
+# Initialize observability paths (per-repo to avoid collisions when running multiple ralphs)
 $squadDir = Join-Path $env:USERPROFILE ".squad"
-$logFile = Join-Path $squadDir "ralph-watch.log"
-$heartbeatFile = Join-Path $squadDir "ralph-heartbeat.json"
+$repoName = Split-Path (Get-Location).Path -Leaf
+$logFile = Join-Path $squadDir "ralph-watch-$repoName.log"
+$heartbeatFile = Join-Path $squadDir "ralph-heartbeat-$repoName.json"
 $teamsWebhookFile = Join-Path $squadDir "teams-webhook.url"
 
 # Ensure .squad directory exists

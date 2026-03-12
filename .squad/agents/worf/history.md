@@ -77,3 +77,31 @@ Q2 work incoming: Issue #26 (Defender-Fleet Teams chat review)
 - Fleet team (Stephane, Simon, David) engaged and responsive
 
 **Lesson:** Teams chat revealed existing awareness of automation gaps. Positioning our FIC/Workload Identity blocker in context of known Fleet limitations makes ask more actionable.
+
+### Issue #337 — IcM Incident 759361753 Response (2026-03-12)
+
+**Context:** Responded to Brett DeFoy's inquiry about Cosmos DB firewall/network policy changes around Feb 1 via IcM incident 759361753.
+
+**Investigation Approach:**
+- Used WorkIQ to locate Brett DeFoy's Teams presence and incident discussion thread
+- Identified target channel: "Iterative Dev in Canary Testing" (RP-as-a-Service Partners team)
+- Posted findings directly to active Teams channel where incident was being discussed
+
+**Key Findings Communicated:**
+- No deployment pipeline changes to Cosmos DB firewall/network settings around Feb 1
+- Git history confirmed publicNetworkAccess: Enabled still configured in code
+- Live Azure environment showed multiple Cosmos DB accounts non-compliant with Azure Policy NSP-CDB-v1-0-En-Deny
+- Several accounts had publicNetworkAccess: Disabled despite deployment configuration
+- Evidence points to manual changes or policy-driven overrides outside pipeline
+
+**Message Delivery:**
+- Successfully posted to Teams channel (Message ID: 1773295431683)
+- Used natural, conversational tone per Tamir's direction ("don't sound like AI")
+- Kept draft message as-is — already well-written and human
+- Requested specific Cosmos DB account name to check Activity Logs for Feb 1 changes
+
+**Follow-Up Actions:**
+- Issue #337 updated with delivery status and channel link
+- Label status:pending-user added — waiting for Brett's response with account details
+
+**Lesson:** WorkIQ efficiently locates Teams discussion threads for IcM incidents. Direct channel posting in active thread is more effective than DM or issue comments for time-sensitive operational issues. Natural language maintained in technical contexts builds trust with external stakeholders.

@@ -4,6 +4,114 @@
 
 ---
 
+## Decision 18: Multi-Machine Ralph Coordination Architecture
+
+**Date:** 2026-03-12  
+**Author:** Picard (Lead)  
+**Status:** 🟡 Proposed — Awaiting Tamir's approval  
+**Scope:** Architecture, Infrastructure
+
+### Decision
+
+Use **GitHub as the distributed coordination backend** for multi-machine Ralph work claiming, with zero new infrastructure.
+
+**Core mechanisms:**
+1. **Issue comments as distributed locks** — Atomic claim operations with timestamps
+2. **15-minute lease-based work claiming** — Automatic release on expiration
+3. **Machine-specific branch namespacing** — `squad/{issue}-{slug}-{machineId}` prevents conflicts
+4. **Heartbeat via comment edits** — Stale work detection without external services
+5. **Round-start stale recovery** — Automatic reclaim of orphaned work
+
+### Rationale
+
+**Why GitHub-native coordination:**
+- ✅ Zero new infrastructure — no Redis, Postgres, message queues, or coordination services
+- ✅ Transparent state — all coordination visible in GitHub UI (comments, labels, board)
+- ✅ Auditable — complete history of which machine worked what and when
+- ✅ Already authorized — Ralph has GitHub API access, no new auth required
+- ✅ Conflict-free — GitHub's comment ordering provides natural serialization
+
+**Why comment-based locking (not labels/assignments):**
+- Comments are immutable and timestamped (GitHub preserves creation time)
+- Comment order provides atomic sequencing for race condition handling
+- Label updates are eventually consistent; comments provide strong ordering
+- Issue assignments would require bot accounts (comments work with existing auth)
+
+**Why 15-minute lease:**
+- Long enough: Most issue work completes in 5-10 minutes
+- Short enough: Failed machine work recovers quickly (acceptable 15min delay)
+- Prevents indefinite starvation if a machine crashes mid-work
+
+### Applies To
+
+- All Ralph deployments (tamresearch1, squad-monitor, future repos)
+- Single-machine deployments (transparent no-op)
+- Multi-machine deployments (active coordination)
+
+### Does NOT Apply When
+
+- Non-Ralph automation (other agents don't need coordination)
+- Manual user work (humans can see issue status themselves)
+
+### Consequences
+
+**Positive**
+- ✅ Multi-machine Ralph can run without duplicate work
+- ✅ Automatic recovery from machine failures (15min window)
+- ✅ Complete visibility into which machine is working what
+- ✅ Backward compatible — single-machine Ralph unaffected
+
+**Negative**
+- ⚠️ GitHub API rate limits — frequent comment/label updates may hit limits
+- ⚠️ 15-minute recovery window — orphaned work isn't instant
+- ⚠️ Clock skew between machines can cause lease calculation errors
+- ⚠️ Manual cleanup needed if machines create conflicting PRs during race
+
+**Mitigation**
+- Monitor GitHub API usage and implement exponential backoff if needed
+- Cache claim state locally with periodic refresh to reduce API calls
+- Add clock skew tolerance (±2 min) when checking lease expiration
+- Document PR conflict resolution procedure for operators
+
+### Implementation
+
+**Code changes:**
+- Create `.squad/scripts/Claim-Issue.ps1` with coordination functions
+- Modify `ralph-watch.ps1` to add machine ID and stale recovery
+- Update Ralph prompt to include claim protocol instructions
+- Add branch namespacing with machine ID suffix
+
+**Rollout:** 4-week phased approach
+1. Foundation (Week 1): Core functions, single-machine testing
+2. Work Claiming (Week 2): Integration, two-machine testing
+3. Stale Recovery (Week 3): Failure scenarios, automatic reclaim
+4. Observability (Week 4): Metrics, Teams alerts, dashboard
+
+### Open Questions
+
+**Awaiting Tamir's input:**
+1. GitHub API rate limit handling — cache claim state or use GraphQL?
+2. Machine identity for DevBox/CI — explicit env var or auto-detect?
+3. Lease duration configurable or fixed 15min?
+4. Conflicting PR resolution — auto-close duplicates or manual?
+5. Cross-repo coordination — shared or separate claim state per repo?
+
+### Related
+
+- **Issue #346:** Multi-machine Ralph coordination proposal
+- **ralph-watch.ps1:** Current single-machine implementation
+- **.squad/skills/github-project-board/SKILL.md:** Board status tracking
+
+### Next Steps
+
+1. Get Tamir's answers to open questions
+2. Implement Phase 1 (foundation + tests)
+3. Deploy to DevBox for multi-machine validation
+4. Monitor GitHub API usage in production
+5. Document operator procedures
+
+---
+
 ## Decision 17: Blog Anonymization — Public Content Policy
 
 **Date:** 2026-03-11  

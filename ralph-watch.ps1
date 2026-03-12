@@ -509,7 +509,9 @@ while ($true) {
         # and call agency without pipes so $LASTEXITCODE is preserved.
         $ErrorActionPreference_saved = $ErrorActionPreference
         $ErrorActionPreference = "SilentlyContinue"
-        agency copilot --yolo --autopilot --agent squad -p $prompt
+        # Fresh session per round to prevent history accumulation (causes 400 Bad Request)
+        $roundSessionId = [guid]::NewGuid().ToString()
+        agency copilot --yolo --autopilot --agent squad -p $prompt "--resume=$roundSessionId"
         $exitCode = $LASTEXITCODE
         $ErrorActionPreference = $ErrorActionPreference_saved
         $agencyOutput = ""  # Can't capture without pipes — but that's OK

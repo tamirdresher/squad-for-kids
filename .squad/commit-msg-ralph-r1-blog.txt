@@ -1,0 +1,8 @@
+Add Troi (Blogger) + blog Part 1 final revision (#313)
+
+- Added Troi as Blogger & Voice Writer team member
+- Revised blog Part 1 per Seven's analysis: proper Part 0 continuity,
+  correct roster, elevated Human Squad Members narrative, DK8S scrubbed
+- Saved as blog-part1-final.md and Jekyll-formatted copy
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

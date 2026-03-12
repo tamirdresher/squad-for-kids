@@ -21474,3 +21474,66 @@ All new issues created by agents or humans across all repositories (tamresearch1
 2. Audit existing "statusless" issues on projects
 3. Add validation to issue creation workflows
 
+
+
+---
+
+# Decision: DevBox Configuration for Cross-Machine Coordination
+
+**Date:** 2026-06-25
+**Author:** Data (Code Expert)
+**Context:** Issues #346, #350
+
+## Decision
+
+DevBox (CPC-tamir-WCBED) configured as follows for cross-machine Ralph coordination:
+
+1. **Machine identity** uses OS hostname (`CPC-tamir-WCBED`) — stable, no external dependencies
+2. **Peer tracking** via `peers` map in `.squad/config.json` — each machine declares known peers with their teamRoot and role
+3. **SSH key type:** ed25519 at `~/.ssh/squad-devbox-key` with `squad-devbox` alias in SSH config
+4. **GitHub MCP** is built-in to Copilot CLI — no user-level MCP config entry needed. azure-devops added at user level for cross-project availability.
+5. **gh CLI auth** not persisted system-wide. EMU token lacks required scopes. ralph-watch.ps1 manages its own authentication.
+
+## Rationale
+
+- Hostname-based machine IDs are stable across sessions and require no setup
+- Peer map enables discovery without a central registry
+- SSH key naming convention (`squad-devbox-key`) avoids collision with personal keys
+
+## Status
+
+Ready for local machine (TAMIRDRESHER) to mirror this config pattern.
+
+
+---
+
+# Decision: Blog Part 1 Revision Structure
+
+**Date:** 2026-03-12  
+**Author:** Troi (Blogger & Voice Writer)  
+**Status:** ✅ Implemented  
+**Scope:** Blog series, content strategy
+
+## Decision
+
+Part 1 ("Resistance is Futile") is restructured around a narrative arc that climaxes with Human Squad Members, rather than being a feature tour. The post cuts redundant Squad/onboarding explanations (already covered in Part 0) and elevates the "personal tool → real team tool" transition as the central story.
+
+## Key Changes
+
+1. **Opening** — Direct callback to Part 0, no standalone intro
+2. **Features section** — Condensed from H3 subsections to flowing paragraphs with bold names
+3. **Human Squad Members** — Elevated from "one more feature" to the narrative climax and bridge to Part 2
+4. **Onboarding/Adding Expertise sections** — Cut entirely (Part 0 covers this)
+5. **Honest Reflection** — Preserved as closing section (essential to Tamir's voice)
+6. **All DK8S/FedRAMP references** — Scrubbed, replaced with "infrastructure platform team"
+7. **Series footer** — Uses `/blog/` prefix, no `.html` extension
+
+## Rationale
+
+Seven's analysis (issue #313) identified that the draft read as a standalone intro rather than a continuation. Part 0 already established Squad, onboarding, and Ralph — Part 1 should show the team *working* and build toward the question "can this work with real humans?" The narrative arc mirrors Part 0's emotional structure: confession → discovery → honest reflection.
+
+## Applies To
+
+- All future blog series posts should follow this pattern: continuation, not repetition
+- Part 2 should open by referencing the Human Squad Members cliffhanger from Part 1
+

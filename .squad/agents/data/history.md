@@ -6,6 +6,25 @@
 
 ## Active Context
 
+### 2026-03-12: Issue #350 — Machine Config Report Analysis (COMPLETE)
+
+Machine configuration data gathered for multi-machine Ralph coordination (#346):
+- **Local Machine (TAMIRDRESHER):** Comprehensive report — 15 skills, MCP config (azure-devops, playwright, enghub), squad-monitor deployed, GitHub auth verified (EMU)
+- **DevBox (CPC-tamir-WCBED):** Identity report — hostname stable, Ralph loop active, Teams webhook available, GitHub auth verified
+
+**Key Findings:**
+- Both machines coordination-ready for distributed work claiming
+- Stable hostnames available for machine ID strategy
+- EMU authentication constraint identified (PR creation may need fallback to comments)
+- Branch namespacing strategy: `squad/{issue}-{slug}-{machineid}` recommended
+
+**Deliverables:**
+- Closure summary: `.squad/agents/data/350-closure-summary.md`
+- Decision record: `.squad/decisions/inbox/data-350-closure.md`
+- Ready to close #350; #346 implementation can proceed with gathered data
+
+**Status:** CLOSED. Recommendation: Remove `squad:data` label and close as DONE.
+
 ### 2026-03-12: Issue #330 — DevBox SSH Implementation (READY FOR TESTING)
 
 Scripts created for SSH-based autonomous DevBox access:

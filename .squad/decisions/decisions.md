@@ -519,3 +519,118 @@ Three extensions to existing infrastructure:
 ## Archive
 
 (None yet)
+
+---
+
+# Decision: Multi-machine Ralph coordination via GitHub-native work claiming
+
+**Owner:** Picard (Lead)  
+**Date:** 2026-03-12  
+**Status:** Proposed  
+**Stakeholders:** Tamir (Ralph maintainer), Squad (consumers)
+
+## Problem Statement
+
+Ralph instances running on multiple machines (local dev, DevBox, CI/CD, etc.) have no coordination mechanism. This causes:
+
+1. **Duplicate work:** Two machines pick up the same issue simultaneously and spawn duplicate agents
+2. **Push conflicts:** Machines try to push branches with the same name or step on each other's git state
+3. **Work starvation:** When a machine goes offline, its claimed issues remain stuck and are never reclaimed
+4. **No observability:** No way to see which machine is working on what
+
+This is a **critical blocker** for multi-machine workflows.
+
+## Constraints
+
+- **No new infrastructure:** Tamir explicitly stated "we don't want more backend." Zero tolerance for Redis, databases, message queues, or centralized services.
+- **GitHub-native only:** Use GitHub issues, labels, PR assignments, and Actions as the coordination layer.
+- **Backward compatible:** Single-machine Ralph must work unchanged.
+
+## Proposed Solution
+
+Use GitHub itself as the distributed coordination backend.
+
+### Core Pattern: GitHub-based Work Claiming
+
+**1. Machine Identity**
+- Each Ralph instance is assigned a machine name (hostname or configured string)
+- Machine ID appears in: claims, heartbeats, PR branches, issue comments
+- Audit trail: always visible who is working on what
+
+**2. Work Claiming via Issue Assignment**
+- When Ralph claims an issue, it assigns itself to that GitHub issue **before** spawning agents
+- Other Ralph instances check issue assignment before claiming
+- Prevents duplicate work
+
+**3. Heartbeat via Labels**
+- Active Ralph instances maintain a label like `ralph:machine-{name}:active`
+- Label contains or references a timestamp (e.g., comment with timestamp)
+- Heartbeat check: every 5 minutes
+- Stale threshold: 15 minutes without heartbeat = machine presumed offline
+
+**4. Lease-based Work Release**
+- When claiming work, Ralph adds a comment: `🔄 Claimed by {machine-name} at {ISO8601-timestamp}`
+- Lease period: 15 minutes
+- After lease expires without completion, other machines can reclaim the work
+- Enables automatic recovery if original machine crashes mid-task
+
+**5. Branch Namespacing**
+- Branch names include machine identity: `squad/{issue}-{slug}-{machine-name}`
+- Prevents push conflicts between machines
+- Clear traceability of which machine created which branch
+
+**6. Stale Work Recovery**
+- Background task: scan claimed issues every 10 minutes
+- If issue is claimed but heartbeat is stale (>15 min), any machine can reclaim it
+- Add comment: `♻️ Reclaimed by {new-machine-name} — original machine offline`
+
+### For Squad Research Repos
+
+Same pattern:
+- Issues as work units
+- Labels for active machine tracking
+- Comments for lease/claim markers
+- No new backends
+
+## Implementation Approach
+
+**Phase 1 (MVP):**
+- Issue assignment + heartbeat label
+- Stale detection + automatic reclaim
+- Branch namespacing
+
+**Phase 2 (if needed):**
+- Lease-based claiming (comment timestamps)
+- More sophisticated conflict resolution
+- Metrics/observability
+
+## Non-goals
+
+- **No centralized coordinator:** GitHub IS the coordinator
+- **No new services:** Zero infrastructure overhead
+- **No schema changes:** Use GitHub's native primitives only
+- **No single-machine impact:** Ralph on one machine works today, unchanged tomorrow
+
+## Decision
+
+**Approved.** GitHub-native coordination is the right pattern for this use case:
+- Leverages existing GitHub platform (no new ops burden)
+- Fully transparent (all state in issues/labels/comments)
+- Simple and predictable failure modes
+- Aligns with Tamir's stated constraints
+
+## Next Steps
+
+1. File issue: "Multi-machine Ralph coordination" (GitHub issue)
+2. Design heartbeat label schema (decide on format)
+3. Implement Phase 1 in Ralph codebase
+4. Test with 2+ instances on different machines
+5. Extend to squad-monitor repo
+
+## Success Metrics
+
+- Two Ralph instances can work same board without duplication
+- Stale machine recovery time: <15 min
+- All state visible in GitHub (no opaque backend)
+- Zero additional infrastructure
+

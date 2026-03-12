@@ -1,4 +1,10 @@
 {
   "version": 1,
-  "teamRoot": "C:\\temp\\tamresearch1"
+  "teamRoot": "C:\\temp\\tamresearch1",
+  "devbox": {
+    "hostname": "PLACEHOLDER_DEVBOX_IP_OR_HOSTNAME",
+    "username": "PLACEHOLDER_DEVBOX_USERNAME",
+    "sshKeyPath": "~/.ssh/squad-devbox-key",
+    "sshConfigAlias": "squad-devbox"
+  }
 }

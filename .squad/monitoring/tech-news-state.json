@@ -1,5 +1,5 @@
 {
-  "lastScanDate": "2026-03-11",
+  "lastScanDate": "2026-03-12",
   "reportedUrls": {
     "2026-03-11": {
       "https://www.reddit.com/r/webdev/comments/1rpwape/using_tailwind_today_feels_a_lot_like_writing/": true,
@@ -75,6 +75,17 @@
       "https://www.reddit.com/r/MachineLearning/comments/1roykna/r_seeking_arxiv_endorsement_for_csai_memento_a/": true,
       "https://www.reddit.com/r/MachineLearning/comments/1roe3ua/p_made_an_ai_fia_steward_to_predict_penalties/": true,
       "https://www.reddit.com/r/MachineLearning/comments/1ro8t22/d_we_analyzed_4000_ethereum_contracts_by/": true
+    },
+    "2026-03-12": {
+      "https://news.ycombinator.com/newsguidelines.html#generated": true,
+      "https://codewall.ai/blog/how-we-hacked-mckinseys-ai-platform": true,
+      "https://www.theverge.com/featured-video/892850/i-was-interviewed-by-an-ai-bot-for-a-job": true,
+      "https://apnews.com/article/uk-house-of-lords-hereditary-peers-expelled-535df8781dd01e8970acda1dca99d3d4": true,
+      "https://16bpp.net/blog/post/faster-asin-was-hiding-in-plain-sight/": true,
+      "https://newatlas.com/environment/5-200-holes-peruvian-mountain/": true,
+      "https://krebsonsecurity.com/2026/03/iran-backed-hackers-claim-wiper-attack-on-medtech-firm-stryker/": true,
+      "https://www.williamjbowman.com/blog/2026/03/05/against-vibes-when-is-a-generative-model-useful/": true,
+      "https://poloclub.github.io/cnn-explainer/": true
     }
   }
 }

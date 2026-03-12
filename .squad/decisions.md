@@ -15026,6 +15026,211 @@ Implemented Podcaster agent using edge-tts (Python) for text-to-speech conversio
 
 ---
 
+## Decision 18: GitHub App v285-1 Installation — SharePoint Authentication Approach
+
+**Date:** 2026-03-12  
+**Author:** Picard (Lead)  
+**Status:** ✅ Adopted  
+**Scope:** DevOps & Tool Management
+
+### Decision
+
+When GitHub App releases are hosted on SharePoint and automated download is blocked by OAuth authentication, provide the user with direct links and manual download instructions as the fastest unblocking path. Document Graph API approach for future automation when infrastructure supports it.
+
+### Context
+
+Issue #305 investigation located GitHub App Copilot v285-1 (with multiple GitHub account support) in a Teams message from Jeremy Moseley. The file (GitHub-App-copilot-v285-1-d37e642.zip) is stored in SharePoint at `/teams/Copilot-CLI-Insiders/Shared Documents/Github App Releases/`.
+
+### Rationale
+
+- **Automation blocked:** PowerShell -UseDefaultCredentials cannot satisfy SharePoint's OAuth requirements
+- **User has access:** User can authenticate manually via Teams or browser
+- **Fastest path:** Manual download takes < 2 minutes vs debugging Graph API token setup
+- **Unblocking principle:** Sometimes manual is the right answer when automation hits hard blocker
+
+### Alternatives Considered
+
+- ❌ Request Microsoft Graph API token — Adds complexity, delays implementation
+- ❌ Store releases in GitHub Releases instead — Better long-term, but doesn't help current release
+- ✅ Direct link + manual download instructions — **SELECTED** — Fastest, zero dependencies
+
+### Recommended Next Steps
+
+1. Open Microsoft Teams → GitHub Copilot at Microsoft → GitHub App channel
+2. Find Jeremy Moseley's message (ID: 1773252305382)
+3. Click on **GitHub-App-copilot-v285-1-d37e642.zip** to download
+4. Extract and run installation script
+5. Verify multiple GitHub account support is working
+
+### Consequences
+
+- ✅ Unblocked — User can proceed immediately
+- ✅ Clear instructions — No confusion about what to do
+- ⚠️ Manual step — Requires user action (acceptable for one-time install)
+- ✅ Documents path for future — If more SharePoint releases arise, same approach proven
+
+### Implementation
+
+Status comment posted to #305 with:
+- Direct Teams message link
+- SharePoint browser URL
+- Extraction and installation commands
+- Testing instructions for multiple GitHub account feature
+
+### Related Issues
+
+- **#305:** Teams message investigation and ZIP location discovery
+- **Future:** Graph API automation if releases move to automated distribution
+
+---
+
+## Decision 19: Email Pipeline Architecture for Issue #259
+
+**Date:** 2026-03-12 (merged from 2025-06-08 inbox)  
+**Author:** Picard (Lead)  
+**Status:** ✅ Adopted  
+**Scope:** Family Coordination & M365 Automation
+
+### Decision Summary
+
+Created a comprehensive email pipeline system using M365 Shared Mailbox with 4 Power Automate flows to handle family requests from Gabi.
+
+### Key Decisions Made
+
+#### Email Address: family-requests@microsoft.com
+- Shared mailbox (supports automation vs DL)
+- Descriptive, professional, memorable
+- Same domain as Tamir's M365 account
+
+#### Architecture: 4 Specialized Flows
+1. Print Handler — Forwards to printer
+2. Calendar Handler — Creates Outlook events
+3. Reminder Handler — Creates To Do tasks
+4. General Handler — Forwards to inbox (catch-all)
+
+#### Security: Email Sender Validation
+- Every flow validates sender is gabrielayael@gmail.com
+- Rejections sent to unauthorized senders
+- Fails closed (unauthorized = no action)
+
+#### Keyword System: Subject Line Prefixes
+- `@print` — Print handler
+- `@calendar` — Calendar handler
+- `@reminder` — Reminder handler
+- (no keyword) — General handler
+
+**Why keywords?** Intuitive for non-technical users, visible in email clients, no hidden metadata.
+
+#### Implementation Without Admin Rights
+- Tamir: No Exchange Admin role
+- Solution: Document manual setup steps (5 min for admin)
+- Power Automate flows: Run with user permissions (no admin needed)
+- Pragmatic & unblocking — admin one-time task, not blocker
+
+### Consequences
+
+- ✅ Unified request system for family coordination
+- ✅ Automation reduces manual email processing
+- ✅ Clear separation of concerns (4 flows, each does one thing)
+- ✅ Security validated (sender check on all flows)
+- ⚠️ Requires admin setup of shared mailbox (Tamir lacks Exchange Admin)
+- ⚠️ Keyword system requires user education (tips sent in confirmations)
+
+### Implementation Status
+
+Complete setup guide created at `docs/email-pipeline-setup.md` with:
+- Step-by-step shared mailbox creation
+- 4 complete Power Automate flow definitions (zero placeholders)
+- Real expressions and implementation code
+- Testing procedures
+- Troubleshooting guide
+- All flows send confirmation emails for audit trail
+
+### Success Criteria
+
+**All met:**
+- ✅ Email address decided: family-requests@microsoft.com
+- ✅ 4 flows fully specified with real implementations
+- ✅ Security validation on all flows
+- ✅ Setup possible in < 30 minutes
+- ✅ Can proceed without admin rights (manual steps documented)
+
+### Related Issues
+
+- **#259:** Email address for wife to send requests (original request)
+- **Setup Guide:** `docs/email-pipeline-setup.md`
+
+---
+
+## Decision 20: Close Issue #350 — Machine Configuration Reporting Complete
+
+**Date:** 2026-03-12  
+**Author:** Data (Code Expert)  
+**Status:** ✅ Adopted  
+**Scope:** DevOps & Multi-Machine Coordination
+
+### Decision
+
+Close Issue #350 as DONE. Both machine configuration reports (local TAMIRDRESHER and DevBox CPC-tamir-WCBED) have been gathered and posted. Sufficient data exists to proceed with #346 (multi-machine Ralph coordination design).
+
+### Context
+
+Issue #350 "[Ralph-to-Ralph] DevBox: Report machine config for cross-machine coordination" aimed to gather machine configuration from both local and DevBox environments to inform #346 implementation.
+
+**Reports successfully posted:**
+1. Local Machine (TAMIRDRESHER) — 15 skills, MCP config, auth verification
+2. DevBox (CPC-tamir-WCBED) — Hostname, coordination readiness, auth status
+
+### Findings
+
+#### Data Completeness ✅
+- Local: COMPREHENSIVE — includes skills, tools, MCP config, squad-monitor status
+- DevBox: ADEQUATE — includes identity, auth, coordination readiness
+
+#### Coordination Readiness ✅
+Both machines ready for distributed work:
+- Machine identity stable (hostnames available)
+- GitHub authentication verified (EMU account with required scopes)
+- Teams webhook available for alerts
+- Ralph loops active on both machines
+
+#### Data Quality ✅
+- All critical fields populated for #346 implementation
+- No blocking data gaps
+- DevBox MCP config can be verified during implementation
+
+### Rationale
+
+- Issue purpose achieved — machine reports completed and posted
+- Data sufficient for #346 team to proceed with design
+- Follow-up verification (DevBox full audit) is better as task within #346
+- Closes blocker, unblocks downstream work
+
+### Consequences
+
+- ✅ #346 team can proceed with coordination protocol design
+- ✅ Closure document created for #346 team reference
+- ✅ Machine identities established for work claiming
+- ⚠️ DevBox MCP config audit deferred to #346 (acceptable — not blocking)
+
+### Implementation
+
+Closure summary document created at `.squad/agents/data/350-closure-summary.md` for #346 team.
+
+### Next Steps for #346
+
+1. Use gathered machine hostnames (TAMIRDRESHER, CPC-tamir-WCBED) as coordination IDs
+2. Reference closure summary for machine config context
+3. Verify DevBox MCP config during implementation (not prerequisite)
+4. Design work claiming protocol with confidence both machines are ready
+
+### Related Issues
+
+- **#346:** Multi-machine Ralph coordination (primary consumer)
+- **#330:** DevBox SSH setup (related infrastructure)
+
+---
+
 ## Decision: Sanitized Demo Repository Approach
 
 **Date:** 2026-03-25

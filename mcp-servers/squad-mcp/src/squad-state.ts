@@ -20,7 +20,14 @@ export class SquadState {
    */
   async getTeamMembers(): Promise<TeamMember[]> {
     const teamMdPath = join(this.squadRoot, "team.md");
-    const content = await readFile(teamMdPath, "utf-8");
+    let content: string;
+    try {
+      content = await readFile(teamMdPath, "utf-8");
+    } catch (err) {
+      throw new Error(
+        `Failed to read team.md at ${teamMdPath}: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
 
     const members: TeamMember[] = [];
     const lines = content.split("\n");

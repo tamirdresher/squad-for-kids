@@ -63,7 +63,8 @@ export async function loadConfig(): Promise<SquadConfig> {
 
     return config;
   } catch (err) {
-    // Config file not found or invalid
+    // Log config errors to stderr to help users debug
+    console.error(`Failed to load config file: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 
   // Fallback: try to construct config with minimal info

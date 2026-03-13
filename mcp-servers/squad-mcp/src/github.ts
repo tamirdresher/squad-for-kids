@@ -22,38 +22,22 @@ export class GitHubClient {
    * Get open issues count
    */
   async getOpenIssuesCount(): Promise<number> {
-    // Use paginate to get all issues across all pages
-    const allIssues = await this.octokit.paginate(
-      this.octokit.rest.issues.listForRepo,
-      {
-        owner: this.owner,
-        repo: this.repo,
-        state: "open",
-        per_page: 100,
-      }
-    );
-
-    // Filter out pull requests (GitHub API includes PRs in issues endpoint)
-    const issues = allIssues.filter((issue) => !issue.pull_request);
-    return issues.length;
+    // Use search API for accurate count beyond 100
+    const { data } = await this.octokit.rest.search.issuesAndPullRequests({
+      q: `repo:${this.owner}/${this.repo} is:issue is:open`,
+    });
+    return data.total_count;
   }
 
   /**
    * Get open pull requests count
    */
   async getOpenPRsCount(): Promise<number> {
-    // Use paginate to get all PRs across all pages
-    const allPRs = await this.octokit.paginate(
-      this.octokit.rest.pulls.list,
-      {
-        owner: this.owner,
-        repo: this.repo,
-        state: "open",
-        per_page: 100,
-      }
-    );
-
-    return allPRs.length;
+    // Use search API for accurate count beyond 100
+    const { data } = await this.octokit.rest.search.issuesAndPullRequests({
+      q: `repo:${this.owner}/${this.repo} is:pr is:open`,
+    });
+    return data.total_count;
   }
 
   /**

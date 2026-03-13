@@ -191,6 +191,12 @@ async def render_podcast(turns, output_path, voice_alex, voice_sam, rate, volume
     print(f"   Turns: {len(turns)}")
 
 
+VOICE_MAP = {
+    'en': {'ALEX': 'en-US-GuyNeural',  'SAM': 'en-US-JennyNeural'},
+    'he': {'ALEX': 'he-IL-AvriNeural',  'SAM': 'he-IL-HilaNeural'},
+}
+
+
 async def main():
     parser = argparse.ArgumentParser(description="Conversational Podcaster v2")
     parser.add_argument("input_file", nargs='?', help="Markdown file (legacy mode)")
@@ -198,14 +204,17 @@ async def main():
     parser.add_argument("-o", "--output", help="Output MP3 path")
     parser.add_argument("--rate", default="+0%", help="Base speech rate")
     parser.add_argument("--volume", default="+0%", help="Volume adjustment")
-    parser.add_argument("--alex-voice", default="en-US-GuyNeural", help="Voice for Alex")
-    parser.add_argument("--sam-voice", default="en-US-JennyNeural", help="Voice for Sam")
+    parser.add_argument("--language", default="en", choices=["en", "he"],
+                        help="Language for TTS voices (default: en)")
+    parser.add_argument("--alex-voice", default=None, help="Voice for Alex (overrides language default)")
+    parser.add_argument("--sam-voice", default=None, help="Voice for Sam (overrides language default)")
     parser.add_argument("--host-voice", help="(Legacy) alias for --alex-voice")
     parser.add_argument("--expert-voice", help="(Legacy) alias for --sam-voice")
     args = parser.parse_args()
 
-    alex_voice = args.host_voice or args.alex_voice
-    sam_voice = args.expert_voice or args.sam_voice
+    lang_voices = VOICE_MAP.get(args.language, VOICE_MAP['en'])
+    alex_voice = args.host_voice or args.alex_voice or lang_voices['ALEX']
+    sam_voice = args.expert_voice or args.sam_voice or lang_voices['SAM']
 
     if args.script:
         script_path = Path(args.script).resolve()

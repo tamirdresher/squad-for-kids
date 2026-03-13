@@ -31,7 +31,9 @@ param(
     [string]$DeliverTo,
     [string]$PodcastTitle,
     [switch]$NaturalSpeech,
-    [double]$BackchannelFrequency = 0.30
+    [double]$BackchannelFrequency = 0.30,
+    [ValidateSet("en", "he")]
+    [string]$Language = "en"
 )
 
 $ErrorActionPreference = "Stop"
@@ -190,7 +192,7 @@ if ($ConversationMode) {
     $convScript = Join-Path $scriptDir "podcaster-conversational.py"
 
     $env:PYTHONIOENCODING = "utf-8"
-    $pyArgs = @("`"$convScript`"", "`"$inputPath`"", "-o", "`"$OutputFile`"", "--rate", $Rate, "--volume", $Volume)
+    $pyArgs = @("`"$convScript`"", "`"$inputPath`"", "-o", "`"$OutputFile`"", "--rate", $Rate, "--volume", $Volume, "--language", $Language)
     if ($Voice -ne "en-US-JennyNeural") {
         $pyArgs += @("--host-voice", $Voice)
     }
@@ -220,7 +222,7 @@ if ($PodcastMode) {
         $genScript = Join-Path $scriptDir "generate-podcast-script.py"
         $podcastScript = [System.IO.Path]::ChangeExtension($inputPath, ".podcast-script.txt")
 
-        & python $genScript $inputPath -o $podcastScript
+        & python $genScript $inputPath -o $podcastScript --language $Language
         if ($LASTEXITCODE -ne 0) {
             Write-Host "  Script generation failed" -ForegroundColor Red
             exit 1
@@ -254,7 +256,7 @@ if ($PodcastMode) {
         $OutputFile = Join-Path (Split-Path $inputPath) "$inputName-podcast.mp3"
     }
 
-    & python $convScript --script $podcastScript -o $OutputFile --rate $Rate --volume $Volume
+    & python $convScript --script $podcastScript -o $OutputFile --rate $Rate --volume $Volume --language $Language
     if ($LASTEXITCODE -ne 0) {
         Write-Host "  Audio rendering failed" -ForegroundColor Red
         exit 1

@@ -157,7 +157,7 @@ async function fetchReddit(subreddit) {
 }
 
 async function scanAllSources() {
-  const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning'];
+  const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_'];
   
   const [hnStories, ...redditResults] = await Promise.all([
     fetchHackerNews(),

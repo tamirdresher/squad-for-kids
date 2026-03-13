@@ -21723,3 +21723,4 @@ $staleThresholdMinutes = 15              # Stale work threshold
 - Machine config: `.squad/agents/data/350-closure-summary.md`
 - Multi-machine strategy: `.squad/decisions/inbox/data-350-closure.md`
 - Ralph implementation: `ralph-watch.ps1`
+

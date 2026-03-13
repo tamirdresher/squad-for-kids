@@ -1,7 +1,0 @@
-feat(squad): reskill charters — extract 6 skills, slim 5 agents (#483)
-
-Charters slimmed: kes (2666→1509), neelix (4538→1520), podcaster (3777→1271), q (3007→1620), troi (3463→1705)
-Skills created: news-broadcasting, voice-writing, blog-publishing, fact-checking, outlook-web-workflows, reskill
-Total savings: ~9.8KB
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

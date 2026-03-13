@@ -35,6 +35,38 @@
 
 ## Active Context
 
+### 2026-03-13: Issue #473 — Rework Rate Integration Proposal (Complete - Background Task)
+
+**Assignment:** Continue Rework Rate (5th DORA metric) integration proposal for bradygaster/squad; add explicit Azure DevOps support.
+
+**Outcome:** ✅ **SUCCESS** — Background task from Ralph work monitor round
+
+**Deliverables:**
+- **Research Report**: `research/rework-rate-squad-integration.md` (28KB comprehensive analysis)
+- **Decision Record**: `.squad/decisions/inbox/picard-rework-rate-proposal.md` → merged to decisions.md
+- **GitHub Issue Comment**: Posted full strategy summary to #473
+
+**Key Integration Strategy:**
+1. Extend `PlatformAdapter` with `getPullRequestReviews()` and `getPullRequestIterations()` methods
+2. Create `ReworkCollector` in `runtime/rework-collector.ts` for PR rework analysis
+3. OTel metrics namespace: `squad.rework.*` (rate, review_cycles, time, changes_requested, ai_retention_rate)
+4. ADO gets first-class support — native PR iterations API superior to GitHub for rework tracking
+5. 4-phase rollout: Core types → GitHub → ADO → AI retention → Dashboard
+
+**Key Finding:**
+- ADO's `_apis/git/pullRequests/{id}/iterations` API provides better rework tracking than GitHub
+- ADO adapter already exists (`platform/azure-devops.ts`); auto-detection via git remote URL works
+- OTel infrastructure production-ready with no-op fallbacks
+
+**Impact:**
+- All agents should reference rework metrics when discussing PR quality
+- Ralph: Can integrate weekly rework rate reporting
+- Data/Seven: Next owners for implementation phase
+
+**Status:** Research & decision complete. Ready for Data/Seven implementation handoff.
+
+---
+
 ### 2026-03-13: Issue #454 — Copilot CLI v1.0.5 Adoption Triage (Complete)
 
 **Assignment:** Triage issue requesting squad adoption of Copilot CLI v1.0.5 features (25 features released).
@@ -148,3 +180,39 @@
 
 
 
+
+### Rework Rate → bradygaster/squad Integration (Issue #473)
+
+**Context:** Researched bradygaster/squad (v0.8.25) codebase to propose Rework Rate metric integration with full ADO support.
+
+**Architecture Findings:**
+- Squad has a clean `PlatformAdapter` pattern in `platform/types.ts` with `GitHubAdapter`, `AzureDevOpsAdapter`, and `PlannerAdapter`
+- ADO adapter already wraps `az` CLI for work items, PRs, branches — fully functional
+- OTel infrastructure is comprehensive: `otel-api.ts` (resilient wrapper), `otel-metrics.ts` (tokens, agents, sessions, latency), `otel-bridge.ts` (EventBus→spans)
+- Platform auto-detection reads git remote URL in `platform/detect.ts`
+- Communication adapters exist for GitHub Discussions, ADO Work Item discussions, and file logging
+
+**Key Insight — ADO Iterations API:** Azure DevOps has first-class PR iteration support (`_apis/git/pullRequests/{id}/iterations`) which provides better rework tracking than GitHub's commit-based approach. This is a competitive advantage for ADO users of the squad framework.
+
+**Integration Strategy:**
+1. Extend `PlatformAdapter` with optional review/iteration methods (backward compatible)
+2. Create `ReworkCollector` class for aggregation logic
+3. Add `squad.rework.*` OTel metrics (rate, review_cycles, time, changes_requested, ai_retention_rate)
+4. ADO gets special treatment with native iterations API; GitHub uses commit timeline as proxy
+
+**Deliverables:**
+- Full proposal at `research/rework-rate-squad-integration.md` (~28KB)
+- Comment posted on issue #473 with executive summary and community message
+- Decision record at `.squad/decisions/inbox/picard-rework-rate-proposal.md`
+
+**Repo Structure Pattern (bradygaster/squad):**
+```
+packages/squad-sdk/src/
+  platform/     → PlatformAdapter interface + GitHub/ADO/Planner implementations
+  runtime/      → OTel, metrics, event bus, telemetry, config
+  adapter/      → Copilot SDK adapter types
+  agents/       → Charter compilation
+  coordinator/  → Agent coordination
+  ralph/        → Work monitor
+  streams/      → SubSquad definitions
+```

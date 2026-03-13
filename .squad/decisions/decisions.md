@@ -2,6 +2,77 @@
 
 ## Active Decisions
 
+### 2026-03-14: Picard — Rework Rate Integration Proposal for bradygaster/squad (Issue #473)
+
+# Decision: Rework Rate Integration Proposal for bradygaster/squad
+
+**Author:** Picard (Lead)  
+**Date:** 2026-03-14  
+**Issue:** #473  
+**Status:** Proposed
+
+## Context
+
+Tamir asked us to continue the Rework Rate (5th DORA metric) integration proposal for bradygaster/squad and explicitly include Azure DevOps support.
+
+## Decision
+
+After thorough analysis of the bradygaster/squad codebase (v0.8.25), the integration path is clear:
+
+1. **Extend `PlatformAdapter`** with optional `getPullRequestReviews()` and `getPullRequestIterations()` methods
+2. **Create `ReworkCollector`** in `runtime/rework-collector.ts` for PR rework analysis
+3. **Add OTel metrics** under `squad.rework.*` namespace (rate, review_cycles, time, changes_requested, ai_retention_rate)
+4. **ADO gets first-class support** — ADO's native PR iterations API is actually superior to GitHub for rework tracking
+5. **4-phase rollout** — Core types → GitHub → ADO → AI retention → Dashboard
+
+## Key Findings
+
+- ADO adapter already exists (`platform/azure-devops.ts`) with work items, PRs, branches
+- OTel infrastructure is production-ready with no-op fallbacks
+- ADO's `_apis/git/pullRequests/{id}/iterations` API provides better rework tracking than GitHub
+- Platform auto-detection via git remote URL already works for both platforms
+
+## Impact
+
+- **All agents:** Should reference rework metrics when discussing PR quality
+- **Ralph:** Could integrate weekly rework rate reporting
+- **Data/Seven:** May need to implement the actual code changes on bradygaster/squad
+
+## Artifacts
+
+- Full proposal: `research/rework-rate-squad-integration.md`
+- Issue comment posted: #473
+
+---
+
+### 2026-03-13: Kes — Issue #471 Meeting Scheduled (Kind Aspire + Celestial Integration)
+
+# Decision: Issue #471 Meeting Scheduled
+
+**Date:** 2026-03-13  
+**Author:** Kes (Communications)  
+**Status:** Done
+
+## Context
+Tamir requested scheduling a meeting about the Kind Aspire resource / Celestial integration with all participants from the original email thread.
+
+## Decision
+- Meeting scheduled for **Monday March 23, 2026, 12:00–13:00 Israel Time**
+- Title: "Kind Aspire Resource Discussion — DK8S & Celestial Integration"
+- All 10 recipients from the email thread invited plus Tamir as organizer
+- Calendar invites sent via Outlook COM automation
+- GitHub issue #471 commented with full details
+
+## Attendees
+Andrey Noskov, Joshua Johnson, Moshe Peretz, Matt Kotsenas, IDP Leadership DL, Ofek Finkelstein, Adir Atias, Yadin Ben Kessous, Roy Mishael, Efi Shtain, Tamir Dresher (organizer)
+
+## Notes
+- Used Outlook COM (preferred method) — faster and more reliable than Playwright
+- WorkIQ could not surface the original email thread (only Reaction Digests); Outlook COM search was the reliable path
+- All recipients resolved successfully including the IDP Leadership distribution list
+
+---
+
 ### 2026-03-13: Seven — nano-banana-mcp Integration Recommendation (Issue #375)
 
 # Decision: nano-banana-mcp Integration Recommendation

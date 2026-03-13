@@ -10,4 +10,10 @@ TBD - Q2 work incoming
 
 ## Learnings
 
-*Learnings will accumulate here during Q2.*
+### Issue #471: Kind Aspire Meeting Scheduling
+- **Calendar lookup limitations**: WorkIQ can access calendars for most team members, but availability search fails when:
+  - Person not found in directory (Nada Lahlou needed UPN lookup)
+  - Calendar fully booked (Ramaprakash—no open slots returned, calendar inaccessible)
+- **Best practice**: Always request email/UPN upfront for attendees outside primary team
+- **Gauge busy schedules**: Gaurav Bhandare has recurring patterns (Tues/Wed/Thurs focus hours 12–17), but many early morning or Friday slots open
+- **PostComment flow**: GitHub CLI comment posting works well for availability summaries; use pending-user label to signal awaiting attendee choice

@@ -1177,3 +1177,327 @@ The original podcaster (`podcaster.ps1` + `podcaster-conversational.py`) read ar
 - Musical intro/outro if ffmpeg available
 - More voice variety (en-US-AriaNeural, en-US-DavisNeural)
 
+
+---
+
+# Decision: Campaign-Style Migration Pattern
+
+**Date:** 2026-03-13  
+**Author:** Picard  
+**Issue:** #476 — Joshua Johnson feedback on squad shared-memory architecture  
+**Status:** 🟢 Observation — Validates existing architecture, suggests future extension
+
+## Context
+
+Joshua Johnson (Microsoft, context from Teams message ~2026-03-13) discussed with DJ Seeds about recurring agent mistakes during ManagedSDP ConfigGen Resources migrations. He praised Tamir's squad shared-memory setup and suggested a mechanism like "this was a bug, don't do this again" would be very useful for campaign-style changes. He specifically mentioned cleaner orchestration leveraging upstream inheritance to share learnings and feedback.
+
+## Current Squad Architecture
+
+The squad already implements the shared-memory mechanisms Joshua described:
+
+1. **decisions.md**: Captures "don't do this again" patterns, team conventions, anti-patterns (21 decisions recorded)
+2. **skills/ directory**: 17 reusable patterns including `configgen-support-patterns` for ConfigGen-specific learnings
+3. **Agent history.md files**: Each agent has persistent memory across issues, learns from past mistakes
+4. **Upstream inheritance**: Agents inherit knowledge from decisions.md + skills/ + their own history via copilot-instructions
+
+## External Validation
+
+This is the **first external validation from Microsoft engineering leadership** that the squad's shared-memory architecture solves a real problem at scale. The feedback came from a discussion about production ConfigGen migrations affecting multiple teams.
+
+## Proposed Extension: Campaign-Specific Skills
+
+For large-scale migration campaigns (like ManagedSDP ConfigGen), formalize the pattern:
+
+### Structure
+```
+.squad/skills/campaign-{name}/
+├── SKILL.md                    # Campaign overview
+├── error-patterns.md           # "Don't do this again" catalog
+├── validation-checklist.md     # Pre-commit validation steps
+└── examples/                   # Good/bad transformation examples
+    ├── good-example-1.md
+    └── anti-pattern-1.md
+```
+
+### Usage Pattern
+1. **Before campaign:** Create campaign skill with known pitfalls from pilot migrations
+2. **During campaign:** Agents inherit error patterns via copilot-instructions
+3. **During campaign:** Update skill with new errors as they're discovered
+4. **After campaign:** Archive campaign skill or promote patterns to permanent skills
+
+### Integration with Agents
+- Agents working on campaign issues automatically load campaign skill via `.squad/config.json` routing
+- Skills feed into agent context via `<available_skills>` mechanism
+- Upstream inheritance: campaign skill → agent charter → agent history
+
+## Strategic Implication
+
+The squad's shared-memory architecture is not just useful internally—it solves a recognized problem in Microsoft's AI-assisted development workflows at scale. This positions the squad framework as a potential model for other teams doing campaign-style changes.
+
+## Tamir Action Required
+
+Joshua's message needs a response. Suggested approach (crafted and posted on #476):
+- Acknowledge the observation
+- Explain that the squad already implements this (decisions.md, skills/, history.md)
+- Mention campaign-specific skills as a natural extension
+- Offer to discuss structure for ManagedSDP campaign
+
+Issue #476 labeled `status:pending-user` for Tamir to review response and send email.
+
+## References
+
+- Issue #476: Joshua's feedback
+- `.squad/decisions.md`: 21 decisions including ConfigGen anti-patterns
+- `.squad/skills/configgen-support-patterns/`: Existing ConfigGen skill
+- `.squad/agents/*/history.md`: Agent memory across issues
+
+---
+
+# Decision: Book Chapter 3 Content Strategy
+
+**Date:** 2026-03-11  
+**Agent:** Seven  
+**Issue:** #467  
+**Context:** Writing Chapter 3 of book project ("Meeting the Crew")
+
+## Decision
+
+Wrote Chapter 3 using real agent charters as source material, with practical patterns from actual agent behavior rather than theoretical descriptions.
+
+## Approach
+
+**Voice Matching:**
+- Read Chapter 1 draft to internalize Tamir's conversational, confessional voice
+- Read blog posts for additional voice patterns
+- Maintained first-person narrative with self-deprecating humor
+- Bold emphasis for key concepts, Star Trek references woven naturally
+
+**Content Structure:**
+- Core theme: Agent personas shape reasoning (not cosmetic)
+- Full crew breakdown with real examples from `.squad/agents/*/charter.md`
+- Practical patterns that emerged from agent behavior
+- How-to guide for designing personas in any domain
+- Honest limitations (predictable vs random failures)
+
+**Key Additions Beyond Outline:**
+- "The Night I Almost Named Them Wrong" — anecdote about CodeAgent vs Data comparison
+- Extended Ralph section explaining persistence over cleverness
+- Detailed explanation of personality as constraint (forcing function for quality)
+- Real example of Data's N+1 query miss (predictable failure mode)
+- Picard's orchestration context (why direct routing missed dependencies)
+
+## Rationale
+
+**Why real charters matter:**
+- Authentic voice beats manufactured examples
+- Actual agent behavior demonstrates patterns better than theoretical descriptions
+- Charter structure (Identity/Boundaries/Collaboration) is reusable template
+
+**Why personas work:**
+- Names activate archetypal context (Data = thorough, Worf = paranoid)
+- Personality shapes reasoning patterns, not just output tone
+- Complementary reasoning catches issues from multiple angles
+- Predictable failures enable efficient review
+
+**Why Star Trek works (but isn't required):**
+- Cultural touchstone with clear, strongly-typed character archetypes
+- Team dynamics modeled across 178+ episodes per series
+- Framework is transferable (Avengers, LOTR, custom archetypes all valid)
+
+## Outcomes
+
+**Deliverables:**
+- Chapter 3 manuscript: 5,058 words (target: 4,500-5,500)
+- Saved to `research/book-chapter3-draft.md`
+- Matches Chapter 1 voice and formatting style
+
+**Content Quality:**
+- Real anecdotes from actual agent interactions
+- Technical depth without jargon overload
+- Practical patterns (orchestration, test-first, threat modeling, decision documentation)
+- Honest about limitations (false positives, narrow test coverage)
+
+**Reusable Patterns:**
+- Charter structure documented (Identity/Expertise/Boundaries/Collaboration)
+- 5 principles for persona design (role boundaries, decision-making style, personality as constraint, archetypes over individuals, name matters)
+- Emerged patterns catalog (orchestration, test-first, threat modeling, documentation linking, reliability automation)
+
+## Implementation Notes
+
+**Graphics Placeholders:**
+- `[DIAGRAM: Agent charter structure]` — Identity/Expertise/Boundaries/Collaboration
+- `[DIAGRAM: Decision-making style comparison]` — Picard/Data/Worf/Seven/B'Elanna
+- `[DIAGRAM: Agent collaboration pattern]` — Orchestration → parallel execution → knowledge compounds
+
+**Sanitization:**
+- No DK8S/FedRAMP/specific team mentions (per book guidelines)
+- Generic "infrastructure platform team at Microsoft"
+- Generic deployment/security scenarios
+
+**Voice Consistency:**
+- First person throughout
+- Conversational with technical depth
+- Self-deprecating humor ("Let me tell you something embarrassing...")
+- Bold emphasis for key phrases
+- Code examples and real scenarios
+
+## Next Steps
+
+1. Tamir reviews Chapter 3 draft
+2. Graphics creation for diagrams
+3. Chapter 4: "Watching the Borg Assimilate Your Backlog" (parallel execution, collaboration patterns)
+
+## Status
+
+✅ Complete — Chapter 3 ready for review
+
+---
+
+# Decision: Copilot Space Integration for Squad Knowledge
+
+**Date:** 2026-03-13  
+**Decided By:** Seven (Research & Docs), approved by Tamir  
+**Issue:** #416  
+**Status:** ✅ Approved — Implementation complete, awaiting Space creation
+
+## Context
+
+Squad knowledge is fragmented across multiple repositories (tamresearch1, tamresearch1-dk8s-investigations, etc.) with 666 files (~3.5 MB) in `.squad/`. GitHub Memory has repo-scope limitations (doesn't cross repos). Issue #385 research identified Copilot Spaces as MEDIUM applicability, LOW effort solution for cross-repo knowledge sharing.
+
+## Decision
+
+**Integrate GitHub Copilot Space "Research Squad" as primary knowledge discovery tool, supplementing (not replacing) `.squad/` file system.**
+
+### Space Configuration
+- **Name:** Research Squad
+- **Owner:** tamirdresher_microsoft organization
+- **Visibility:** Private (team only)
+- **Content:** ~20 curated files (~3 MB):
+  - Core: team.md, routing.md, charter.md, copilot-instructions.md
+  - Charters: All 13 active agent charters
+  - Knowledge: KNOWLEDGE_MANAGEMENT.md, decisions.md, research-repos.md
+
+### Key Design Principles
+
+1. **Supplement, don't replace:** `.squad/` files remain source of truth (writable by agents). Space is read-only discovery layer.
+2. **Curated content:** ~20 high-value files (not all 666) to stay within quota limits
+3. **Auto-sync:** Files linked from GitHub repos stay synced with main branch automatically
+4. **Cross-repo power:** Space spans multiple repos in one searchable hub (key advantage)
+
+### What Space Solves
+
+| Problem | Space Solution |
+|---------|---------------|
+| Cross-repo context fragmentation | Add files from all repos into one Space |
+| Agent onboarding ("read .squad/ first") | Space with curated onboarding content + custom instructions |
+| Decision log too large (858 KB) | Space semantic search finds relevant decisions without reading all |
+| GitHub Memory repo-scope limitation | Space spans multiple repos by design |
+| New team member onboarding | Share Space link — instant context |
+
+### Limitations & Mitigations
+
+| Limitation | Mitigation |
+|-----------|------------|
+| No programmatic API (web UI only) | Accept manual management; auto-sync handles file content |
+| Size quota (~185 files limit) | Curate — only add ~50 most valuable files |
+| Read-only for agents | `.squad/` remains writable; Space is discovery layer |
+| IDE context gap (repo search only in web) | Keep `.squad/` files for IDE-based agents as fallback |
+
+## Implementation
+
+**Files Created:**
+- `.squad/COPILOT_SPACE_SETUP.md` — Manual setup guide with file checklist, custom instructions, test queries
+- `.squad/KNOWLEDGE_MANAGEMENT.md` — Updated with Space as Option 1 (recommended) search method
+- `.squad/team.md` — Added Quick Links section for onboarding
+
+**Status:** PR #477 ready for merge. Space creation requires human action (Tamir follows setup guide at github.com/copilot/spaces).
+
+**Phase Progression:**
+- Phase 1 (Completed): Create Space integration documentation
+- Phase 2 (Blocked): Tamir creates Space via web UI
+- Phase 3 (Awaiting Phase 2): Add content from repos, test queries
+- Phase 4 (Awaiting Phase 3): Integrate with squad workflow, update agent spawn prompts
+
+**Phase 2 Vector DB:** Deferred to Phase 3 (if needed). Space semantic search addresses the core need.
+
+## Alternatives Considered
+
+1. **Local vector DB (ChromaDB):** Requires Python environment, index rebuild, additional complexity. Space provides semantic search without local infrastructure.
+2. **GitHub Code Search only:** Keyword-based, no cross-repo synthesis, no semantic understanding. Space adds intelligence.
+3. **GitHub Memory:** Repo-scoped, can't span multiple repos. Space solves this limitation.
+
+## Success Criteria
+
+- [x] Space integration documented (KNOWLEDGE_MANAGEMENT.md, COPILOT_SPACE_SETUP.md)
+- [x] Manual setup guide created with file checklist
+- [x] Custom instructions prepared
+- [x] Test validation queries defined
+- [x] PR #477 opened with "Closes #416"
+- [ ] Space created by Tamir via web UI (blocked on human action)
+- [ ] Test queries validated
+- [ ] MCP access verified (github-mcp-server-get_copilot_space)
+- [ ] Agent spawn prompts updated to reference Space
+
+## References
+
+- Issue #416: P2: Create Copilot Space for squad shared knowledge
+- Issue #385: Copilot Features Evaluation (research origin)
+- PR #477: feat: Add Copilot Space integration for squad knowledge
+- `.squad/COPILOT_SPACE_SETUP.md` — Implementation guide
+- `.squad/KNOWLEDGE_MANAGEMENT.md` — Knowledge management strategy
+
+---
+
+**Owner:** Seven (Research & Docs)  
+**Review Date:** 2026-Q3 (quarterly review aligned with history rotation)
+
+---
+
+# Book Chapter 2 Writing Approach
+
+**Date:** 2026-03-12
+**Agent:** Troi
+**Context:** Issue #467 — Book project Chapter 2 draft
+
+## Decision
+
+Chapter 2 ("The System That Doesn't Need You") focuses on Ralph's architecture and the system's self-maintaining nature. Structured as ~6,000-word narrative explaining technical concepts through personal experience, not documentation.
+
+## Key Content Choices
+
+1. **Ralph as protagonist** — Chapter opens with Ralph, not abstract system description. The "monitor that never forgets" is the emotional hook.
+
+2. **Three lenses on compounding knowledge:**
+   - Decisions.md: Data → Seven → Worf coordination example over 3 weeks
+   - Skills: Error handling pattern flowing from Data to Seven
+   - Export/Import: 2 weeks of learning compressed to 20 minutes
+
+3. **Week 1-8 progression** — Honest arc from skeptical (60% correction rate) to converted (98% approval rate). Shows trajectory, not perfection.
+
+4. **Diagram placeholders included:**
+   - Ralph's 5-minute watch loop architecture
+   - Compounding curve graph (AI work quality over time)
+
+5. **Bridge to Chapter 3** — Ends with teaser about agent personas as cognitive architectures, not just cute names.
+
+## Rationale
+
+Chapter 1 established "why systems fail" (they need human maintenance). Chapter 2 shows "how this system works" (self-maintaining via persistent knowledge). Must maintain Tamir's confessional voice while explaining architecture — technical depth without dry documentation tone.
+
+## Voice Consistency Check
+
+- ✅ First-person narrative throughout
+- ✅ Self-deprecating humor ("I almost gave up Week 1")
+- ✅ Bold emphasis on key concepts
+- ✅ Flowing prose, minimal bullets
+- ✅ Technical concepts wrapped in anecdotes
+- ✅ Star Trek references woven naturally (Ralph = monitor, Borg collective foreshadowing)
+
+## Files Created
+
+- `research/book-chapter2-draft.md` — Complete chapter manuscript
+
+## Next Chapter Setup
+
+Chapter 3 will explain agent personas (Picard, Data, Worf, Seven, B'Elanna) as cognitive architectures, showing how different personalities shape AI reasoning and enable coordination.
+

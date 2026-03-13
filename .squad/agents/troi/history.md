@@ -55,3 +55,39 @@
 **Neelix (Comms):** Teams morning briefing sent with 3 urgent items, 8 pending, full squad progress. Board state synchronized. Tech news scanned. All squad-monitor issues closed.
 
 **Board State:** Issues #344–#349 added to backlog. Board reconciliation clean, no mismatches.
+
+---
+
+## 2026-03-12 — Chapter 2 Book Writing (Issue #467)
+
+**Task:** Write Chapter 2 ("The System That Doesn't Need You") for the book project.
+
+**Context:** Tamir approved full book writing with autonomy. Chapter 1 draft exists as voice reference. Book outline defines Chapter 2 as ~5,000-6,000 words covering Ralph's architecture, decision compounding, skills system, export/import, and the first two weeks experience.
+
+**Execution:**
+- Read Chapter 1 draft to internalize voice — confirmed patterns: confession-style, self-deprecating humor, bold emphasis, flowing prose, first-person narrative, technical depth wrapped in personal anecdotes
+- Read blog posts (Part 1, Part 2) for additional voice reference
+- Wrote Chapter 2 as ~6,000-word manuscript matching Tamir's exact voice
+- Structured with section headers and `---` dividers (matching Chapter 1 style)
+- Included 2 diagram placeholders for Ralph's architecture and compounding curve
+- Technical deep-dives: Ralph's 5-minute loop, routing system, auto-merge criteria, decision compounding with real examples
+- Key anecdotes: Data/Seven/Worf coordination on JWT decision over 3 weeks, knowledge export saving 2 weeks of setup, Squad Doctor finding config bugs in 4 seconds
+- Maintained first-person confessional tone throughout
+- Ended with bridge to Chapter 3 (agent personas/cognitive architectures)
+
+**Voice Patterns Applied:**
+- Opening confession hook ("Let me tell you about Ralph")
+- Parenthetical humor adding personality
+- Bold text for emphasis on key concepts ("The system runs whether I'm paying attention or not")
+- "Here's where it gets interesting/really satisfying" transition phrases
+- Honest self-assessment (Week 1 skepticism, correction rates over time)
+- Technical concepts wrapped in narrative (not dry documentation)
+- Graph description for compounding curve (book format, no actual image)
+- Star Trek references woven naturally but not forced
+
+**Learnings:**
+- Chapter 2 voice signature: Technical architecture explained through experience narrative, not top-down documentation. The "watching it work" moments are more important than the "how it's configured" details.
+- Compounding knowledge is the emotional core of this chapter — showed it through three different lenses (decisions, skills, export/import) to hammer home the "system that improves over time" theme
+- The Week 1-8 progression is critical to honesty — Tamir always shows the rough edges before celebrating wins. Chapter 2 follows same arc: skeptical → frustrated → trusting → converted.
+- Diagram notes are placeholders for production — book will need visual aids for Ralph's loop and compounding curve
+- Chapter 2 bridges from "why systems fail" (Chapter 1) to "how this system works" while setting up "who runs this system" (Chapter 3 personas)

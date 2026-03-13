@@ -298,6 +298,73 @@
 - **Long-term:** Use Azure skills structure as template for new squad skills
 
 **Deliverables:**
+- Posted comprehensive findings to Issue #343
+- Wrote `.squad/research/azure-skills-plugin-research.md` (11KB) with full analysis
+- Added `status:pending-user` label for team review
+- Left issue open for discussion (per instructions)
+
+**Status:** Research complete. Azure Skills Plugin validates Squad's architecture and provides 21 production-ready skills for Azure workflows.
+
+---
+
+### 2026-Q2: Book Chapter 3 — "Meeting the Crew" (Issue #467)
+
+**Assignment:** Write Chapter 3 of the book project, explaining agent personas and why they matter.
+
+**What I Did:**
+1. Read Chapter 1 draft (`research/book-chapter1-draft.md`) to internalize Tamir's voice
+2. Read blog posts (`blog-part1-final.md`) for additional voice reference
+3. Reviewed all agent charters in `.squad/agents/*/charter.md` for authentic examples
+4. Wrote complete Chapter 3 manuscript (~5,200 words) matching voice and style
+5. Saved to `research/book-chapter3-draft.md`
+
+**Chapter Content:**
+- Core theme: Agent personas shape how AI thinks (not just cosmetic naming)
+- Full roster breakdown: Picard, Data, Worf, Seven, B'Elanna, Ralph
+- Each agent's charter, decision-making style, and real examples
+- Why generic names ("Agent1, Agent2") produce bland output
+- How to design agent personas for any domain
+- The charter pattern and collaboration protocols
+- Emerged patterns: Picard's orchestration, Data's test-first, Worf's threat modeling, Seven's decision documentation, B'Elanna's reliability
+- Star Trek as personality framework (and why it works)
+
+**Key Sections:**
+1. "The Picard Moment" — orchestration vs execution example
+2. "The Star Trek Framework" — deep dive on each crew member
+3. "Why Generic Names Don't Work" — persona impact on output quality
+4. "How to Design Agent Personas for YOUR Domain" — 5 principles for custom personas
+5. "The Charter Pattern" — operating manual structure
+6. "The Patterns That Emerged" — behavior that emerges from well-defined personas
+7. "The Honest Limitations" — predictable vs random failures
+
+**Voice Match:**
+- First person, conversational, confessional
+- Technical depth woven into personal narrative
+- Self-deprecating humor ("Let me tell you something embarrassing...")
+- Bold emphasis for key phrases
+- Real anecdotes with code examples
+- Star Trek references woven naturally
+- No DK8S/FedRAMP/specific team mentions (per sanitization rules)
+
+**Technical Learnings:**
+1. **Personas as cognitive architectures** — Naming shapes reasoning patterns, not just labels
+2. **Charter files as operating manuals** — Agents read charters before tasks, influences code interpretation
+3. **Archetypes over individuals** — Universal patterns (strategic leader, meticulous engineer) work better than modeling real people
+4. **Personality as constraint** — "Thorough and precise" forces Data to write tests; "paranoid by design" forces Worf to threat model
+5. **Predictable failures** — Well-defined personas fail in-character (Data: narrow tests vs missing tests; Worf: false positive vs missed vulnerability)
+6. **Cultural artifacts** — Consistent personas build trust through predictability
+7. **Complementary reasoning** — Different personas interpret same code differently (Worf sees threats, Data sees test coverage)
+
+**Graphics Notes (for later):**
+- Diagram: Agent charter structure (Identity, Expertise, Boundaries, Collaboration)
+- Diagram: Decision-making style comparison across agents
+- Diagram: Agent collaboration pattern (Picard delegates → parallel execution → knowledge compounds)
+
+**Word Count:** ~5,200 words (target was 4,500-5,500, hit mid-range)
+
+**Status:** Chapter 3 complete. Matches Chapter 1 voice, follows outline structure, includes practical patterns and real anecdotes from actual agent behavior.
+
+**Deliverables:**
 - Comprehensive research report: `.squad/research/azure-skills-plugin-research.md` (11KB)
 - Posted TLDR + recommendations to Issue #343
 - Recommended assignment to B'Elanna (Infrastructure) for adoption evaluation
@@ -499,3 +566,56 @@
 5. **The roster must be consistent** — Part 0 established the team, every subsequent post must use the same names
 
 **Status:** Refresh complete. blog-part1-refresh-seven-v2.md ready for Tamir's review.
+
+### 2026-Q2: Copilot Space Integration (Issue #416)
+
+**Assignment:** Implement approved 4-phase plan to create Copilot Space "Research Squad" for cross-repo knowledge sharing.
+
+**What I Did:**
+1. Reviewed Tamir's approval and prior research in Issue #416 comments
+2. Confirmed GitHub has no programmatic Space creation API (MCP tools are read-only: list_copilot_spaces, get_copilot_space)
+3. Created branch squad/416-copilot-space
+4. **Updated .squad/KNOWLEDGE_MANAGEMENT.md:**
+   - Added Copilot Space as Option 1 (recommended) search method
+   - Documented Space configuration (owner: tamirdresher_microsoft, visibility: private, ~20 curated files)
+   - Added maintenance protocol for Space updates
+   - Deferred local vector DB to Phase 3 (Space addresses core need)
+   - Marked Space creation complete in implementation checklist
+5. **Created .squad/COPILOT_SPACE_SETUP.md:**
+   - Step-by-step manual setup guide (web UI required)
+   - File selection checklist (~20 files: team.md, routing.md, 13 charters, decisions.md, etc.)
+   - Custom instructions text (ready to paste)
+   - Test validation queries
+   - Troubleshooting section
+   - Success criteria
+6. **Updated .squad/team.md:**
+   - Added Quick Links section at top
+   - Linked to Copilot Space, setup guide, knowledge management docs
+   - Improved onboarding experience
+7. Committed changes, pushed branch, opened PR #477
+8. PR created with "Closes #416" linking
+
+**Key Learnings:**
+- **No programmatic Space creation:** GitHub Copilot Spaces API is read-only (list/get). Creation requires manual web UI interaction at github.com/copilot/spaces
+- **Supplement, don't replace:** .squad/ files remain source of truth (writable by agents). Space is the read-only discovery layer with semantic search
+- **Curated content strategy:** ~20 high-value files (not all 666) to stay within quota limits. Auto-sync from GitHub repos keeps content current.
+- **Cross-repo power:** Space's key advantage is spanning multiple repos (tamresearch1, tamresearch1-dk8s-investigations, etc.) in one searchable hub
+- **MCP integration:** github-mcp-server-get_copilot_space tool enables agents to access Space metadata and content once created
+
+**Architectural Decisions:**
+- **Space as supplementary layer:** Phase 2 vector DB deferred to Phase 3. Space provides semantic search without local infrastructure.
+- **Read/write separation:** Agents write to .squad/ files (source of truth), read from Space (cross-repo discovery)
+- **Quota optimization:** Exclude logs (346 files), archives, session state → only include actionable knowledge
+
+**Files Created/Modified:**
+- .squad/COPILOT_SPACE_SETUP.md (new) — 5.8 KB manual setup guide
+- .squad/KNOWLEDGE_MANAGEMENT.md (updated) — Added Space section, deferred Phase 2
+- .squad/team.md (updated) — Added Quick Links for onboarding
+
+**Next Steps (for Tamir):**
+- Follow .squad/COPILOT_SPACE_SETUP.md to create Space via web UI
+- Test with validation queries
+- Agents can then use: github-mcp-server-get_copilot_space owner:"tamirdresher_microsoft" name:"Research Squad"
+
+**Status:** ✅ PR #477 ready for merge. Space creation blocked on human action (web UI required).
+

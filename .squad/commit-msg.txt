@@ -1,9 +1,9 @@
-Ralph monitor session complete: rounds 1–2
+feat: add book chapters 2-3 for issue #467
 
-- Round 1: Scanned 30 issues, detected IcM Sev 2 (#474), board reconciliation (9 items moved to Done)
-- Round 2: Deep-scanned 4 in-progress issues, identified MCP gap analysis (#420), verified monitor health
-- Board status: Fully reconciled, no mismatches, ~22 issues pending user action
-- Orchestration logged to .squad/orchestration-log/
-- Session logged to .squad/log/
+- Chapter 2: 'The System That Doesn't Need You' (~3,750 words) by Troi
+- Chapter 3: 'Meeting the Crew' (~5,250 words) by Seven
+- Includes existing Chapter 1 draft and book outline
+
+Relates to #467
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

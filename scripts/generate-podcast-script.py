@@ -130,11 +130,79 @@ FORMAT:
 - Keep technical accuracy but explain jargon naturally
 """)
 
+SYSTEM_PROMPT_HE = textwrap.dedent("""\
+אתה כותב תסריטים לפודקאסטים טכנולוגיים בעברית. אתה ממיר מאמרים טכניים לשיחות
+פודקאסט מרתקות בין שני מגישים בשמות אלכס וסם.
 
-def build_user_prompt(article_text: str, title: str) -> str:
+אישיות המגישים:
+- אלכס (Alex): סקרן, שואל שאלות הבהרה, מייצג את נקודת המבט של הקהל.
+  לפעמים קוטע עם "רגע, רגע..." או "אז מה שאתה אומר זה..."
+  משתמש במילות מילוי ("אממ", "אה", "אתה יודע", "כאילו").
+- סם (Sam): יותר טכני/מומחה, מסביר מושגים בבהירות, מוסיף הקשר מעשי.
+  לפעמים סקפטי או מציע נקודות מבט חלופיות. משתמש בביטויים כמו
+  "בעצם, הנה העניין..." או "נכון, אבל..."
+
+סגנון שיחה — לגרום לזה להישמע כמו שני אנשים מדברים, לא קוראים:
+- הפסקות טבעיות (אלכס קוטע באמצע מחשבה)
+- חילוקי דעות ודיונים ("אני לא בטוח לגבי זה..." "באמת? אני דווקא חושב...")
+- מילות מילוי בנקודות טבעיות: "אממ", "אה", "נו", "יאללה", "כאילו", "בקיצור", "תשמע"
+- רגעי חשיבה בקול רם ("תן לי לחשוב על זה..." "רגע, איך זה עובד...")
+- שאלות ותשובות הלוך ושוב, לא מונולוגים
+- שינויי רגש: התלהבות, ספקנות, הסכמה, הפתעה ("וואו!" "לא ייאמן!" "בדיוק!")
+- בדיחות וקלילות (הומור טבעי, לא מאולץ)
+- התייחסויות לחוויות משותפות ("זוכר כשדיברנו על..." "כן, גם אני ראיתי את זה...")
+
+מעברים טבעיים:
+- לעבור בין נושאים כמו אנשים אמיתיים, לא כמו פרקים
+- "אז זה מזכיר לי..." "אגב על..." "אה, ועוד משהו..."
+- לפעמים לחזור: "רגע, חזרה למה שאמרת קודם..."
+
+מבנה:
+- פתיחה: הקדמה קלילה עם שיחת חולין על הנושא
+- גוף: חקירה שיחתית של התוכן עם סטיות טבעיות
+- סיום: נקודות מפתח, מחשבות אחרונות, סגירה קלילה
+- סה"כ: ~2000-4000 מילים לפרק של 15-20 דקות
+
+פורמט:
+- כתוב רק שורות דיאלוג עם הקידומת [ALEX] או [SAM]
+- שנה אורכי תור — תגובות קצרות וגם הסברים ארוכים
+- בלי הוראות בימוי, אפקטים קוליים, או כל דבר מלבד דיאלוג
+- שמור על דיוק טכני אבל הסבר מונחים באופן טבעי
+- כתוב בעברית טבעית ומדוברת, לא עברית ספרותית
+""")
+
+
+def build_user_prompt(article_text: str, title: str, language: str = "en") -> str:
     # Truncate very long articles to stay within token limits
     if len(article_text) > 12000:
         article_text = article_text[:12000] + "\n\n[Article truncated for length]"
+
+    if language == "he":
+        return textwrap.dedent(f"""\
+המר את המאמר הבא לשיחת פודקאסט טבעית ומרתקת בעברית בין אלכס וסם.
+כותרת המאמר: "{title}".
+
+חשוב — לגרום לזה להישמע כמו פודקאסט טכנולוגי אמיתי בעברית:
+- להתחיל עם שיחת חולין קלילה, לא הקדמה פורמלית
+- אלכס צריך לקטוע את סם 3-5 פעמים עם "רגע..." או "חכה, אז..."
+- לכלול לפחות נקודת מחלוקת או דיון אחת
+- להשתמש במילות מילוי באופן אסטרטגי: "אממ", "כאילו", "נו", "תשמע", "בקיצור"
+- להוסיף בדיחות או אנלוגיות שמרגישות טבעיות
+- לשנות את הקצב — קצת הלוך ושוב מהיר, קצת הסברים ארוכים יותר
+- לסיים עם סגירה קלילה, לא סיכום פורמלי
+- מונחים טכניים באנגלית אפשר להשאיר באנגלית (כמו API, cloud, deployment)
+
+פורמט:
+[ALEX] טקסט דיאלוג כאן
+[SAM] טקסט דיאלוג כאן
+
+תוכן המאמר:
+---
+{article_text}
+---
+
+צור את תסריט הפודקאסט המלא עכשיו. זכור: שיחתי, לא מתוסרט!
+""")
 
     return textwrap.dedent(f"""\
 Convert this article into a natural, engaging podcast conversation between
@@ -264,6 +332,39 @@ _ALEX_FOLLOWUPS = [
     "What would you tell someone who's just getting started with this?",
 ]
 
+# Hebrew template phrases
+_ALEX_INTROS_HE = [
+    "אז בוא נדבר על {topic}. מה הסיפור פה?",
+    "טוב, {topic} — תפרק לי את זה.",
+    "הנה החלק שהייתי סקרן לגביו: {topic}.",
+    "יאללה, בוא נעבור ל-{topic}. מה אנשים צריכים לדעת?",
+    "אה, {topic}! שמעתי הרבה על זה. מה הסיפור האמיתי?",
+    "נמשיך הלאה — {topic}. זה מעניין, נכון?",
+    "אז {topic}. אני מרגיש שפה זה נהיה ממש מעשי.",
+    "רגע, לפני שנמשיך — ספר לי על {topic}.",
+]
+
+_ALEX_REACTIONS_HE = [
+    "אממ, זו נקודה ממש טובה.",
+    "וואו, לא חשבתי על זה ככה.",
+    "נכון, נכון. זה הגיוני לגמרי.",
+    "רגע, באמת? זה יותר משמעותי ממה שציפיתי.",
+    "אתה יודע, זה מזכיר לי איך צוותים אחרים מטפלים בזה.",
+    "אז בעצם מה שאתה אומר זה — שזה עניין יותר גדול ממה שנשמע.",
+    "מרתק. תמשיך.",
+    "הא, כן. ראיתי את הדפוס הזה בעבר.",
+    "אז המסקנה פה די ברורה.",
+    "מעניין. ואני מניח שיש לזה גם השפעות נוספות.",
+]
+
+_ALEX_FOLLOWUPS_HE = [
+    "אתה יכול לתת דוגמה לזה?",
+    "איך זה עובד בפועל?",
+    "מה המלכודת הכי גדולה שאנשים נתקלים בה פה?",
+    "זה משהו שרוב הצוותים עושים, או שזה יותר חדשני?",
+    "מה היית אומר למישהו שרק מתחיל עם זה?",
+]
+
 
 def _pick(options: list[str], index: int) -> str:
     return options[index % len(options)]
@@ -289,15 +390,30 @@ def _sentences_to_chunks(sentences: list[str], max_words: int = 80) -> list[str]
     return chunks
 
 
-def generate_template_script(markdown: str, title: str) -> str:
+def generate_template_script(markdown: str, title: str, language: str = "en") -> str:
     """Produce a decent conversation script without any LLM, using templates."""
     sections = extract_sections(markdown)
     lines: list[str] = []
 
+    # Select language-appropriate templates
+    if language == "he":
+        intros = _ALEX_INTROS_HE
+        reactions = _ALEX_REACTIONS_HE
+        followups = _ALEX_FOLLOWUPS_HE
+    else:
+        intros = _ALEX_INTROS
+        reactions = _ALEX_REACTIONS
+        followups = _ALEX_FOLLOWUPS
+
     # ── Intro ──
-    lines.append(f'[ALEX] Hey everyone, welcome back to the show! Today we\'re diving into something really interesting — "{title}". I\'ve been looking forward to this one.')
-    lines.append(f'[SAM] Yeah, me too. There\'s a lot to unpack here, and I think our listeners are going to find this super relevant to what they\'re working on.')
-    lines.append('[ALEX] Alright, let\'s get into it. Give us the high-level overview first — what are we actually looking at?')
+    if language == "he":
+        lines.append(f'[ALEX] היי לכולם, ברוכים הבאים בחזרה לתוכנית! היום אנחנו צוללים למשהו ממש מעניין — "{title}". חיכיתי לזה.')
+        lines.append(f'[SAM] כן, גם אני. יש פה הרבה מה לפרק, ואני חושב שהמאזינים שלנו ימצאו את זה סופר רלוונטי למה שהם עובדים עליו.')
+        lines.append('[ALEX] יאללה, בוא נתחיל. תן לנו קודם את התמונה הגדולה — על מה בעצם מדובר?')
+    else:
+        lines.append(f'[ALEX] Hey everyone, welcome back to the show! Today we\'re diving into something really interesting — "{title}". I\'ve been looking forward to this one.')
+        lines.append(f'[SAM] Yeah, me too. There\'s a lot to unpack here, and I think our listeners are going to find this super relevant to what they\'re working on.')
+        lines.append('[ALEX] Alright, let\'s get into it. Give us the high-level overview first — what are we actually looking at?')
 
     # Filter to sections with real content, skip table-heavy and tiny sections
     content_sections = []
@@ -328,8 +444,11 @@ def generate_template_script(markdown: str, title: str) -> str:
         for i, chunk in enumerate(chunks[:20]):
             lines.append(f'[SAM] {chunk}')
             if i < len(chunks) - 1 and (i % 3 == 1):
-                lines.append(f'[ALEX] {_pick(_ALEX_REACTIONS, i)}')
-        lines.append('[ALEX] That\'s a great rundown. Thanks for walking us through all of that.')
+                lines.append(f'[ALEX] {_pick(reactions, i)}')
+        if language == "he":
+            lines.append('[ALEX] זה סיכום מצוין. תודה שהעברת אותנו דרך כל זה.')
+        else:
+            lines.append('[ALEX] That\'s a great rundown. Thanks for walking us through all of that.')
     else:
         for idx, section in enumerate(content_sections):
             topic = section['title']
@@ -339,9 +458,12 @@ def generate_template_script(markdown: str, title: str) -> str:
 
             # Alex introduces the section
             if idx == 0:
-                lines.append(f'[SAM] So the big picture with {topic} is pretty compelling. Let me walk you through it.')
+                if language == "he":
+                    lines.append(f'[SAM] אז התמונה הגדולה עם {topic} די משכנעת. תן לי להעביר אותך דרך זה.')
+                else:
+                    lines.append(f'[SAM] So the big picture with {topic} is pretty compelling. Let me walk you through it.')
             else:
-                lines.append(f'[ALEX] {_pick(_ALEX_INTROS, idx).format(topic=topic)}')
+                lines.append(f'[ALEX] {_pick(intros, idx).format(topic=topic)}')
 
             # Split content into natural chunks
             sentences = re.split(r'(?<=[.!?])\s+', content)
@@ -354,20 +476,28 @@ def generate_template_script(markdown: str, title: str) -> str:
                 lines.append(f'[SAM] {chunk}')
                 if ci < len(chunks) - 1:
                     if len(chunks) > 2 and ci % 2 == 1:
-                        lines.append(f'[ALEX] {_pick(_ALEX_REACTIONS, idx * 10 + ci)}')
+                        lines.append(f'[ALEX] {_pick(reactions, idx * 10 + ci)}')
                     elif len(chunks) > 4 and ci == len(chunks) // 2:
-                        lines.append(f'[ALEX] {_pick(_ALEX_FOLLOWUPS, idx)}')
+                        lines.append(f'[ALEX] {_pick(followups, idx)}')
 
             if idx < len(content_sections) - 1:
-                lines.append(f'[ALEX] {_pick(_ALEX_REACTIONS, idx + 5)}')
+                lines.append(f'[ALEX] {_pick(reactions, idx + 5)}')
 
     # ── Outro ──
-    lines.append('[ALEX] Alright, so let\'s wrap up with the key takeaways. If our listeners remember one or two things from this, what should it be?')
-    lines.append(f'[SAM] I\'d say the biggest thing is that {title.lower()} represents a real shift in how we approach this problem. The details we covered today show there\'s a lot of depth here, but the core message is pretty actionable.')
-    lines.append('[ALEX] Love it. And honestly, I think the practical angle here is what makes it so compelling. It\'s not just theory — there\'s real stuff you can go implement.')
-    lines.append('[SAM] Exactly. And for anyone who wants to dig deeper, definitely check out the full writeup. We only scratched the surface today.')
-    lines.append('[ALEX] Awesome. Thanks for listening everyone! If you enjoyed this episode, share it with your team. We\'ll catch you in the next one.')
-    lines.append('[SAM] See you next time!')
+    if language == "he":
+        lines.append('[ALEX] טוב, אז בוא נסכם עם הנקודות המרכזיות. אם המאזינים שלנו זוכרים דבר אחד או שניים מהפרק הזה, מה זה צריך להיות?')
+        lines.append(f'[SAM] הייתי אומר שהדבר הכי גדול הוא ש-{title} מייצג שינוי אמיתי באיך שאנחנו ניגשים לבעיה הזו. הפרטים שכיסינו היום מראים שיש פה הרבה עומק, אבל המסר המרכזי די ישים.')
+        lines.append('[ALEX] אהבתי. ובאמת, אני חושב שהזווית המעשית פה היא מה שהופך את זה לכל כך משכנע. זה לא רק תיאוריה — יש פה דברים אמיתיים שאפשר ללכת וליישם.')
+        lines.append('[SAM] בדיוק. ולכל מי שרוצה להעמיק, בהחלט תבדקו את הכתבה המלאה. רק גרדנו את פני השטח היום.')
+        lines.append('[ALEX] מעולה. תודה שהאזנתם! אם נהניתם מהפרק, שתפו אותו עם הצוות שלכם. נתפוס אתכם בפרק הבא.')
+        lines.append('[SAM] להתראות בפעם הבאה!')
+    else:
+        lines.append('[ALEX] Alright, so let\'s wrap up with the key takeaways. If our listeners remember one or two things from this, what should it be?')
+        lines.append(f'[SAM] I\'d say the biggest thing is that {title.lower()} represents a real shift in how we approach this problem. The details we covered today show there\'s a lot of depth here, but the core message is pretty actionable.')
+        lines.append('[ALEX] Love it. And honestly, I think the practical angle here is what makes it so compelling. It\'s not just theory — there\'s real stuff you can go implement.')
+        lines.append('[SAM] Exactly. And for anyone who wants to dig deeper, definitely check out the full writeup. We only scratched the surface today.')
+        lines.append('[ALEX] Awesome. Thanks for listening everyone! If you enjoyed this episode, share it with your team. We\'ll catch you in the next one.')
+        lines.append('[SAM] See you next time!')
 
     return '\n'.join(lines)
 
@@ -598,6 +728,8 @@ def main():
     )
     parser.add_argument("input_file", help="Path to markdown/text file")
     parser.add_argument("-o", "--output", help="Output script file (default: <input>-podcast-script.txt)")
+    parser.add_argument("--language", default="en", choices=["en", "he"],
+                        help="Language for the generated script (default: en)")
     parser.add_argument("--prompt-only", action="store_true",
                         help="Print the LLM prompt to stdout and exit (for manual use)")
     parser.add_argument("--template-only", action="store_true",
@@ -610,6 +742,8 @@ def main():
                         help="Probability of inserting a backchannel per turn transition (0.0-1.0, default: 0.30)")
     args = parser.parse_args()
 
+    lang = args.language
+
     input_path = Path(args.input_file).resolve()
     if not input_path.exists():
         print(f"❌ File not found: {input_path}")
@@ -619,7 +753,8 @@ def main():
 
     print("🎙️  Podcast Script Generator")
     print(f"📄 Input:  {input_path}")
-    print(f"📝 Output: {output_path}\n")
+    print(f"📝 Output: {output_path}")
+    print(f"🌐 Language: {lang}\n")
 
     # Read and process input
     markdown = input_path.read_text(encoding='utf-8')
@@ -628,14 +763,17 @@ def main():
     word_count = len(plain.split())
     print(f"📊 Article: \"{title}\" ({word_count} words)\n")
 
+    # Select system prompt based on language
+    system_prompt = SYSTEM_PROMPT_HE if lang == "he" else SYSTEM_PROMPT
+
     # Build prompt
-    user_prompt = build_user_prompt(plain, title)
+    user_prompt = build_user_prompt(plain, title, language=lang)
 
     if args.prompt_only:
         print("=" * 60)
         print("SYSTEM PROMPT:")
         print("=" * 60)
-        print(SYSTEM_PROMPT)
+        print(system_prompt)
         print("=" * 60)
         print("USER PROMPT:")
         print("=" * 60)
@@ -649,11 +787,11 @@ def main():
         print("🔍 Checking for LLM API keys...")
 
         # 1. Azure OpenAI
-        script = call_azure_openai(SYSTEM_PROMPT, user_prompt)
+        script = call_azure_openai(system_prompt, user_prompt)
 
         # 2. OpenAI
         if script is None:
-            script = call_openai(SYSTEM_PROMPT, user_prompt)
+            script = call_openai(system_prompt, user_prompt)
 
         if script:
             print("  ✅ LLM-generated conversation script received")
@@ -664,10 +802,11 @@ def main():
     # 3. Template fallback
     if not script:
         print("🔧 Generating conversation with template engine...")
-        script = generate_template_script(markdown, title)
+        script = generate_template_script(markdown, title, language=lang)
 
     # Post-processing passes (issue #464)
-    if args.natural_speech:
+    # Skip English-specific natural speech rewriting for Hebrew
+    if args.natural_speech and lang == "en":
         print("🗣️  Rewriting script for natural speech...")
         script = rewrite_for_speech(script)
 

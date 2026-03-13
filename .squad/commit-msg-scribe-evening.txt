@@ -1,0 +1,14 @@
+📋 Scribe: Ralph evening watch — PR #484 merged, board reconciled
+
+Orchestration logs:
+- Picard PR #484 review: F5-TTS Hebrew voice cloning approved and merged
+- Ralph evening watch: 3 rounds, 14 board items fixed, #465 closed
+
+Session logs:
+- Ralph evening watch session: Board cleared, team notified
+
+Decision management:
+- Merged F5-TTS voice cloning decision into decisions.md
+- Cleaned up decision inbox
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

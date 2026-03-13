@@ -764,3 +764,24 @@ Researched and analyzed implementation requirements for Hebrew podcast support t
 3. **Backend pattern established** — voice-clone-podcast.py now supports 4 backends with consistent interface
 4. **Multilingual support** — F5-TTS trained on multilingual dataset; Hebrew works experimentally
 5. **Model caching** — First run downloads model (~500MB); subsequent runs use cached checkpoint
+
+### 2026-03-14: Issue #375 — nano-banana-mcp Free Tier Assessment (COMPLETE)
+
+**Task:** Evaluate if nano-banana-mcp (AI image generation via Gemini) can be used without billing/costs. Configure Gemini API key via Playwright. Assess Azure OpenAI fallback.
+
+**Findings:**
+- Gemini API free tier works — no billing info required, key retrieved via Playwright from AI Studio
+- nano-banana-mcp configured in `~/.copilot/mcp-config.json` with free-tier API key
+- nano-banana-mcp is Gemini-only (hardcoded REST API, no provider abstraction)
+- No Azure OpenAI support; would require ~50 LOC fork to add DALL-E 3 backend
+- Azure fallback not needed — free tier sufficient for dev/demo use
+
+**Files Modified:**
+- `~/.copilot/mcp-config.json` — Added nano-banana MCP server entry
+
+## Learnings
+
+1. **Gemini API free tier** — Google AI Studio provides free API keys with 15 RPM / 1500 RPD limits, no billing required
+2. **nano-banana-mcp architecture** — Single-file TypeScript MCP server, no provider abstraction, Gemini-hardcoded
+3. **Playwright for auth flows** — Successfully used Playwright browser tools to navigate Google AI Studio, accept TOS, and retrieve API keys
+4. **MCP config location** — Copilot CLI MCP servers configured at `~/.copilot/mcp-config.json`

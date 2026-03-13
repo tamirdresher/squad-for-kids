@@ -109,5 +109,13 @@
 
 **Applied Here:** `write_agent` (high impact × low effort × high alignment) → immediate. `/extensions` (low impact × low effort × low alignment) → defer.
 
+**Formalized Adoption Strategy (2026-03-13):**
+- **Adopt Now (Tier 1):** write_agent, embedding-based MCP retrieval, preCompact hook
+- **Adopt Next Sprint (Tier 2):** /pr command, /diff syntax highlighting
+- **Auto-Adopt (Tier 3):** All bug fixes (zero friction)
+- **Defer (Tier 4):** /extensions, /experimental (low alignment)
+- Decision record: `.squad/decisions/inbox/picard-copilot-cli-features.md`
+- Data owner for write_agent + embedding retrieval integration (coordinates with squad-mcp #417)
+
 
 

@@ -93,6 +93,47 @@ Built Squad MCP Server to expose squad operations as reusable MCP tools for AI a
 
 ### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1)
 
+### 2026-03-13: Issue #454 — Copilot CLI v1.0.5 Feature Adoption (PLANNING)
+
+**Decision:** Picard created 3-tier adoption strategy for Copilot CLI v1.0.5 (Issue #454). Plan filed to decisions.md.
+
+**Tier 1: Adopt Now (Immediate — Data Owner)**
+- **write_agent:** Background agent messaging tool (2-3h effort)
+  - Enables sophisticated multi-agent orchestration without session breaks
+  - Requires squad-mcp server updates (Issue #417, PR #453) — coordinate before merge
+  - Success: Scribe sends prioritized work to Ralph without session break
+  
+- **Embedding-based MCP retrieval:** Dynamic instruction loading (4-6h effort, Data + Scribe)
+  - Reduces context bloat; enables 10+ hour sessions without manual pruning
+  - Target: 40-50% context savings
+  - Risk: May miss critical docs (HIGH) — test with real workflows; measure F1 score
+  - MCP config schema update required
+
+- **preCompact hook:** State preservation (2-3h effort, Picard + Scribe)
+  - Preserves Squad state through long sessions; enables safe context resets
+  - Hook action: Save decisions.md + board_snapshot.json to git before compaction
+  - Config + simple PowerShell script implementation
+
+**Tier 2: Secondary (Data Owner, Next Sprint)**
+- **`/pr` command:** Unified PR lifecycle (1-2h effort) — Adopt next sprint
+- **Syntax highlighting in `/diff`:** Automatic; 0h effort
+
+**Tier 3: Auto-Adopt (Zero Friction)**
+- 7 bug fixes + security improvements (immediate adoption)
+
+**Tier 4: Defer**
+- `/extensions` command + experimental features (revisit if Squad-relevant extensions released)
+
+**Critical Dependencies:**
+- write_agent blocked on squad-mcp server updates (PR #453 review pending)
+- Embedding retrieval blocked on MCP config schema validation
+
+**Risk Mitigation:** Data validates write_agent with squad-mcp before merge; measure embedding retrieval F1 score with real workflows; Scribe coordinates preCompact timing for concurrent agents.
+
+**Timeline:** Immediate adoption for Tier 1 (targeting this sprint); Tier 2 next sprint; Tier 3 continuous; Tier 4 deferred.
+
+**Status:** PLANNING. Decision record merged to decisions.md. Awaiting Data ownership assignment for Phase 1 work (write_agent + embedding + preCompact).
+
 ## Learnings
 - Branch namespacing strategy: `squad/{issue}-{slug}-{machineid}` recommended
 

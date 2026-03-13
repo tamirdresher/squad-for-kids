@@ -1,8 +1,27 @@
 {
-  "failureCount": 0,
-  "maxFailuresBeforeRecalibrate": 3,
-  "elements": {},
-  "calibratedAt": null,
-  "version": "1.0",
-  "teamsVersion": "26043.2011.4461.9586"
+  "version": "2.0",
+  "teamsVersion": "26043.2011.4461.9586",
+  "approach": "hybrid",
+  "layers": {
+    "playwright": {
+      "baseUrl": "https://teams.microsoft.com",
+      "selectors": {
+        "appsButton": "[data-tid='app-bar-apps']",
+        "searchBox": "[data-tid='search-input']",
+        "addTabButton": "[data-tid='add-tab-button']",
+        "profileMenu": "[data-tid='profile-menu']",
+        "teamsButton": "[data-tid='app-bar-teams']",
+        "chatButton": "[data-tid='app-bar-chat']"
+      }
+    },
+    "keyboard": {
+      "shortcuts": {}
+    },
+    "uia": {
+      "windowClass": "TeamsWebView",
+      "processName": "ms-teams"
+    }
+  },
+  "recipes": {},
+  "failureLog": []
 }

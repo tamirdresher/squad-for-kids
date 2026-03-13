@@ -221,8 +221,10 @@ Write-Host "  Recipient: $Recipient"
 if ($DryRun) { Write-Host "  MODE:      DRY RUN" -ForegroundColor Yellow }
 Write-Host ""
 
-$shareLink = $null
-$results   = @()
+$shareLink   = $null
+$results     = @()
+$emailSentOk = $false
+$emailHadAttachment = $false
 
 # ── Phase 1: OneDrive Upload ──────────────────────────────────────────────
 
@@ -260,6 +262,53 @@ if (-not $SkipOneDrive) {
     catch {
         Write-Host "  OneDrive failed: $($_.Exception.Message)" -ForegroundColor Yellow
         $results += "OneDrive: FAILED"
+    }
+    Write-Host ""
+}
+
+# ── Phase 1b: SharePoint MCP Upload (fallback) ───────────────────────────
+# If OneDrive sync failed, try uploading via agency SharePoint MCP to get a
+# real sharing link. This ensures the Teams card always has a download button.
+
+if (-not $shareLink -and -not $SkipOneDrive -and -not $DryRun -and (Test-Path $AgencyBin)) {
+    Write-Host "[Phase 1b] SharePoint MCP Upload (fallback)" -ForegroundColor Cyan
+    try {
+        # Upload to user's OneDrive via SharePoint MCP
+        $bytes = [System.IO.File]::ReadAllBytes($audioPath)
+        $b64 = [Convert]::ToBase64String($bytes)
+        $contentType = if ($fileName -match '\.wav$') { "audio/wav" } else { "audio/mpeg" }
+
+        $uploadResult = Invoke-AgencyMcp -McpType "sharepoint" `
+            -ToolName "createSmallBinaryFile" `
+            -Arguments @{
+                filename          = $fileName
+                base64Content     = $b64
+                documentLibraryId = "me"
+            } `
+            -Binary $AgencyBin -TimeoutMs 120000
+
+        if ($uploadResult -and $uploadResult.result -and -not $uploadResult.error) {
+            # Extract file metadata from result
+            $content = $uploadResult.result.content
+            if ($content -and $content.Count -gt 0) {
+                $respText = ($content | ForEach-Object { $_.text }) -join ""
+                if ($respText -match '"webUrl"\s*:\s*"([^"]+)"') {
+                    $shareLink = $Matches[1]
+                    Write-Host "  SharePoint upload OK: $shareLink" -ForegroundColor Green
+                    $results += "SharePoint MCP: OK"
+                } else {
+                    Write-Host "  SharePoint upload succeeded but no webUrl in response" -ForegroundColor Yellow
+                    $results += "SharePoint MCP: PARTIAL"
+                }
+            }
+        } else {
+            $errMsg = if ($uploadResult.error) { $uploadResult.error.message } else { "unknown" }
+            throw "SharePoint MCP error: $errMsg"
+        }
+    }
+    catch {
+        Write-Host "  SharePoint MCP failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        $results += "SharePoint MCP: FAILED"
     }
     Write-Host ""
 }
@@ -349,6 +398,9 @@ if (-not $SkipEmail) {
         if (-not $emailSent) {
             Write-Host "  Email delivery failed (all methods exhausted)" -ForegroundColor Yellow
             $results += "Email: FAILED"
+        } else {
+            $emailSentOk = $true
+            $emailHadAttachment = [bool]$attachPath
         }
     }
     Write-Host ""
@@ -366,12 +418,6 @@ if (-not $SkipTeams) {
         if ([string]::IsNullOrWhiteSpace($webhookUrl)) { throw "Webhook URL file is empty" }
 
         # Build O365 Connector MessageCard (reliable for incoming webhooks)
-        $facts = @(
-            @{ name = "File";      value = $fileName }
-            @{ name = "Size";      value = "$fileSizeMB MB" }
-            @{ name = "Generated"; value = (Get-Date -Format "yyyy-MM-dd HH:mm") }
-        )
-
         $actions = @()
         if ($shareLink) {
             $actions += @{
@@ -380,6 +426,33 @@ if (-not $SkipTeams) {
                 targets  = @( @{ os = "default"; uri = $shareLink } )
             }
         }
+        if ($emailSentOk -and $emailHadAttachment) {
+            $actions += @{
+                "@type"  = "OpenUri"
+                name     = "Open Email (attachment)"
+                targets  = @( @{ os = "default"; uri = "https://outlook.office.com/mail/" } )
+            }
+        }
+
+        # Build delivery status summary
+        $deliveryNote = if ($shareLink -and $emailSentOk) {
+            "OneDrive link + email attachment"
+        } elseif ($shareLink) {
+            "OneDrive link (email skipped or failed)"
+        } elseif ($emailSentOk -and $emailHadAttachment) {
+            "Email with file attached"
+        } elseif ($emailSentOk) {
+            "Email sent (file too large to attach — link only)"
+        } else {
+            "No delivery method succeeded — file is on the build machine only"
+        }
+
+        $facts = @(
+            @{ name = "File";      value = $fileName }
+            @{ name = "Size";      value = "$fileSizeMB MB" }
+            @{ name = "Delivery";  value = $deliveryNote }
+            @{ name = "Generated"; value = (Get-Date -Format "yyyy-MM-dd HH:mm") }
+        )
 
         $card = @{
             "@type"         = "MessageCard"

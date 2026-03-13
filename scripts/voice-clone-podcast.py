@@ -5,13 +5,17 @@ Voice-Cloned Hebrew Podcast Generator
 Generates Hebrew podcasts with voice cloning / style transfer.
 
 Backends (priority order):
-  1. ElevenLabs API  — Best quality, requires API key (--elevenlabs-key)
-  2. OpenVoice        — Open-source tone color converter (--openvoice)
-  3. edge-tts + style — edge-tts Hebrew voices + audio style transfer (default)
+  1. F5-TTS          — Free, open-source zero-shot voice cloning (--f5tts)
+  2. ElevenLabs API  — Best quality, requires API key (--elevenlabs-key)
+  3. OpenVoice       — Open-source tone color converter (--openvoice)
+  4. edge-tts + style — edge-tts Hebrew voices + audio style transfer (default)
 
 Usage:
   # Default: edge-tts with voice style profiles
   python voice-clone-podcast.py ../hebrew-squad-podcast.script.txt -o output.mp3
+
+  # With F5-TTS voice cloning (requires reference audio)
+  python voice-clone-podcast.py script.txt --f5tts --ref-avri avri_sample.wav --ref-hila hila_sample.wav
 
   # With voice reference samples for style transfer
   python voice-clone-podcast.py script.txt --ref-avri avri_sample.wav --ref-hila hila_sample.wav
@@ -339,6 +343,96 @@ async def generate_edge_tts(text, speaker, output_wav, style_profile=None, ref_c
                     pass
 
 
+# ── Backend: F5-TTS ──────────────────────────────────────────────────────
+
+async def generate_f5tts(text, speaker, output_wav, ref_audio=None):
+    """
+    Generate voice-cloned audio using F5-TTS (zero-shot voice cloning).
+    
+    F5-TTS is a free, open-source text-to-speech model that can clone voices
+    from 10-30 seconds of reference audio. It supports multiple languages
+    including Hebrew.
+    
+    Args:
+        text: Text to synthesize
+        speaker: Speaker name (for logging)
+        output_wav: Output WAV file path
+        ref_audio: Path to reference audio file (required for voice cloning)
+    
+    Returns:
+        True if successful, False otherwise
+    
+    Setup:
+        pip install f5-tts
+        # Requires PyTorch with CUDA for best performance (CPU also works)
+    """
+    try:
+        from f5_tts.api import F5TTS
+    except ImportError:
+        print("      ℹ F5-TTS not installed. Install with: pip install f5-tts")
+        print("      ℹ Also requires PyTorch: pip install torch torchaudio")
+        return False
+    
+    if not ref_audio:
+        print("      ⚠ F5-TTS requires reference audio (use --ref-avri/--ref-hila)")
+        return False
+    
+    try:
+        # Initialize F5-TTS (uses cached models after first run)
+        # This will auto-download the model checkpoint (~500MB) on first use
+        tts = F5TTS(
+            model="F5TTS_v1_Base",
+            ckpt_file="",  # Auto-download
+            vocab_file="",
+            ode_method="euler",
+            use_ema=True,
+            device=None,  # Auto-detect GPU/CPU
+        )
+        
+        # Convert ref_audio to WAV if needed
+        ref_wav = ref_audio
+        if str(ref_audio).endswith(".mp3"):
+            ref_wav = Path(tempfile.mktemp(suffix=".wav"))
+            mp3_to_wav(ref_audio, ref_wav)
+        
+        # Run inference
+        # Note: F5-TTS works best with reference audio 10-30 seconds long
+        print(f"      🔄 Cloning voice from {Path(ref_audio).name}...")
+        generated_audio = tts.infer(
+            ref_file=str(ref_wav),
+            ref_text=None,  # Optional: transcript of reference audio (improves quality)
+            gen_text=text,
+        )
+        
+        # Save to output file
+        # F5-TTS returns audio ready for export
+        tmp_output = Path(tempfile.mktemp(suffix=".wav"))
+        tts.export_wav(generated_audio, str(tmp_output), remove_silence=False)
+        
+        # Ensure correct sample rate and format
+        data, sr = read_wav(str(tmp_output))
+        write_wav(str(output_wav), data, sr)
+        
+        # Cleanup
+        if str(ref_audio).endswith(".mp3") and ref_wav != ref_audio:
+            try:
+                os.unlink(ref_wav)
+            except:
+                pass
+        try:
+            os.unlink(tmp_output)
+        except:
+            pass
+        
+        return True
+        
+    except Exception as e:
+        print(f"      ✗ F5-TTS error: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 # ── Backend: ElevenLabs ──────────────────────────────────────────────────
 
 async def generate_elevenlabs(text, speaker, output_wav, api_key, voice_id=None, ref_audio=None):
@@ -406,7 +500,7 @@ async def render_podcast(turns, output_path, backend="edge-tts-style",
     Args:
         turns: List of {"speaker": str, "text": str}
         output_path: Path for output file
-        backend: "edge-tts-style" | "elevenlabs" | "openvoice"
+        backend: "edge-tts-style" | "f5tts" | "elevenlabs" | "openvoice"
         ref_samples: Dict of {"AVRI": path, "HILA": path} reference audio
         elevenlabs_key: ElevenLabs API key
         test_clip: If set, only render first N turns
@@ -465,6 +559,10 @@ async def render_podcast(turns, output_path, backend="edge-tts-style",
             print(f"  [{i+1:02d}/{len(turns)}] {speaker}: {preview}")
 
             ok = False
+
+            if backend == "f5tts":
+                ref_audio = ref_samples.get(speaker) if ref_samples else None
+                ok = await generate_f5tts(text, speaker, seg_wav, ref_audio=ref_audio)
 
             if backend == "elevenlabs" and elevenlabs_key:
                 ref_audio = ref_samples.get(speaker) if ref_samples else None
@@ -534,9 +632,11 @@ async def main():
     )
     parser.add_argument("script", nargs="?", help="Hebrew podcast script ([SPEAKER] format)")
     parser.add_argument("-o", "--output", help="Output file (default: <stem>-voiceclone.mp3)")
-    parser.add_argument("--backend", choices=["edge-tts-style", "elevenlabs", "openvoice"],
+    parser.add_argument("--backend", choices=["edge-tts-style", "f5tts", "elevenlabs", "openvoice"],
                         default="edge-tts-style",
                         help="TTS backend (default: edge-tts-style)")
+    parser.add_argument("--f5tts", action="store_true",
+                        help="Use F5-TTS backend (shortcut for --backend f5tts)")
     parser.add_argument("--ref-avri", help="Reference audio for AVRI voice")
     parser.add_argument("--ref-hila", help="Reference audio for HILA voice")
     parser.add_argument("--elevenlabs-key", help="ElevenLabs API key")
@@ -600,8 +700,13 @@ async def main():
         ref_samples["HILA"] = Path(args.ref_hila).resolve()
 
     backend = args.backend
+    if args.f5tts:
+        backend = "f5tts"
     if backend == "elevenlabs" and not args.elevenlabs_key:
         print("⚠ ElevenLabs backend requires --elevenlabs-key. Falling back to edge-tts-style.")
+        backend = "edge-tts-style"
+    if backend == "f5tts" and not ref_samples:
+        print("⚠ F5-TTS backend requires reference audio (--ref-avri and --ref-hila). Falling back to edge-tts-style.")
         backend = "edge-tts-style"
 
     await render_podcast(

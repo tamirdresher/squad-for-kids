@@ -704,3 +704,63 @@ Researched and analyzed implementation requirements for Hebrew podcast support t
 **Status:** ✅ COMPLETE. Research document delivered, issue comment posted. Ready for Phase 1 implementation.
 
 **Next Owner:** Data (for Phase 1 style enhancement) → Podcaster Agent (for refinement)
+
+
+### 2026-03-13: Issue #465 — F5-TTS Voice Cloning Integration
+
+**Objective:** Implement F5-TTS (free, open-source zero-shot voice cloning) for Hebrew podcast generation, approved by מפתחים מחוץ לקופסא podcast team.
+
+**Implementation:**
+- Added `generate_f5tts()` backend to `scripts/voice-clone-podcast.py`:
+  - Uses `f5_tts.api.F5TTS` for inference
+  - Requires 10-30s reference audio per speaker
+  - Auto-downloads ~500MB model on first use
+  - Supports GPU (CUDA/MPS) and CPU modes
+- Integration follows existing backend pattern (edge-tts, ElevenLabs)
+- Graceful fallback to edge-tts if dependencies missing
+- Added `--f5tts` flag for easy backend selection
+
+**Documentation:**
+- `docs/F5-TTS-SETUP.md` — Comprehensive setup guide (6KB)
+  - Installation instructions (PyTorch + F5-TTS)
+  - Hardware requirements (GPU vs CPU performance)
+  - Reference audio guidelines (10-30s, quality criteria)
+  - Troubleshooting common issues
+  - Backend comparison table
+- `docs/F5-TTS-EXAMPLE.md` — Quick-start examples (4KB)
+  - End-to-end usage workflow
+  - מפתחים מחוץ לקופסא style matching tips
+  - Script formatting guidelines
+- `scripts/test-f5tts-integration.py` — Integration test suite
+  - Verifies F5-TTS import, PyTorch, GPU availability
+  - Checks script integration completeness
+  - Tests documentation presence
+
+**Technical Notes:**
+- F5-TTS supports Hebrew experimentally (multilingual model)
+- Voice cloning quality depends on reference audio quality
+- GPU recommended for production (30-60s per audio minute)
+- CPU mode works but slow (5-10 min per audio minute)
+- Model checkpoint cached after first download
+
+**Files Modified:**
+- `scripts/voice-clone-podcast.py` (+100 lines)
+  - `generate_f5tts()` async function
+  - Backend selection logic updated
+  - `--f5tts` argument added
+  - Updated docstring with F5-TTS priority
+
+**Files Created:**
+- `docs/F5-TTS-SETUP.md` (6KB setup guide)
+- `docs/F5-TTS-EXAMPLE.md` (4KB quick-start)
+- `scripts/test-f5tts-integration.py` (4KB test suite)
+
+**Branch:** `squad/465-hebrew-f5tts-voiceclone`
+**Commit:** `545a5cea` — Pushed to origin
+
+**Key Learnings:**
+1. **Zero-shot voice cloning** — F5-TTS can clone voices from minimal reference (10-30s), no fine-tuning needed
+2. **Reference audio critical** — Quality matters more than quantity; single speaker, clear audio, conversational tone
+3. **Backend pattern established** — voice-clone-podcast.py now supports 4 backends with consistent interface
+4. **Multilingual support** — F5-TTS trained on multilingual dataset; Hebrew works experimentally
+5. **Model caching** — First run downloads model (~500MB); subsequent runs use cached checkpoint

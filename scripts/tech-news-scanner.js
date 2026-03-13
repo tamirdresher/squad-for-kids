@@ -2,7 +2,7 @@
 
 /**
  * Tech News Scanner
- * Scans HackerNews and Reddit for relevant tech stories
+ * Scans HackerNews, Reddit, and Morning Dew (alvinashcraft.com) for relevant tech stories
  * Filters by topics: AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools
  * 
  * Deduplication:
@@ -156,15 +156,61 @@ async function fetchReddit(subreddit) {
   }
 }
 
+async function fetchMorningDew() {
+  console.error('Fetching Morning Dew (alvinashcraft.com)...');
+  try {
+    const xml = await httpsGet('https://www.alvinashcraft.com/feed/');
+
+    if (typeof xml !== 'string') {
+      console.error('Unexpected response from Morning Dew feed');
+      return [];
+    }
+
+    // Parse RSS <item> entries with simple regex
+    const items = [];
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+    let match;
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const block = match[1];
+      const title = (block.match(/<title><!\[CDATA\[(.*?)\]\]>|<title>(.*?)<\/title>/) || [])[1]
+        || (block.match(/<title>(.*?)<\/title>/) || [])[1]
+        || '';
+      const link = (block.match(/<link>(.*?)<\/link>/) || [])[1] || '';
+      const pubDate = (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || '';
+
+      if (title && link) {
+        items.push({ title: title.trim(), url: link.trim(), pubDate });
+      }
+    }
+
+    // Filter by keywords
+    const filtered = items
+      .filter(item => matchesKeywords(item.title))
+      .map(item => ({
+        title: item.title,
+        url: item.url,
+        score: 50, // base score for RSS items (no upvote data)
+        source: 'Morning Dew'
+      }));
+
+    console.error(`Found ${filtered.length} relevant Morning Dew items`);
+    return filtered;
+  } catch (e) {
+    console.error(`Error fetching Morning Dew: ${e.message}`);
+    return [];
+  }
+}
+
 async function scanAllSources() {
   const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_'];
   
-  const [hnStories, ...redditResults] = await Promise.all([
+  const [hnStories, morningDew, ...redditResults] = await Promise.all([
     fetchHackerNews(),
+    fetchMorningDew(),
     ...subreddits.map(sub => fetchReddit(sub))
   ]);
   
-  const allStories = [...hnStories, ...redditResults.flat()];
+  const allStories = [...hnStories, ...morningDew, ...redditResults.flat()];
   
   // Sort by score descending
   allStories.sort((a, b) => b.score - a.score);
@@ -176,7 +222,7 @@ function formatDigest(stories) {
   const date = new Date().toISOString().split('T')[0];
   
   let digest = `# Tech News Digest - ${date}\n\n`;
-  digest += `Found ${stories.length} relevant stories across HackerNews and Reddit.\n\n`;
+  digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, and Morning Dew.\n\n`;
   digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools\n\n`;
   digest += `---\n\n`;
   

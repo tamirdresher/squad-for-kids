@@ -1015,3 +1015,165 @@ No new infrastructure. GitHub is the only coordination layer.
 - Zero branch name conflicts (machine ID in branch name)
 - No increase in failed rounds for existing single-machine Ralph
 
+---
+
+### 2026-07-15: Data — Workflow Comment Dedup Pattern
+
+**Date:** 2026-07-15
+**Author:** Data (Code Expert)
+**Status:** Implemented
+
+## Context
+
+The `squad-issue-assign.yml` and `squad-triage.yml` workflows both post comments on GitHub issues when squad labels are applied. Because triage adds a `squad:{member}` label which re-triggers the assign workflow, every triage event produced 2+ comments — causing email notification spam for the repo owner.
+
+## Decision
+
+Adopt the `listComments → find(marker) → updateComment/createComment` dedup pattern (already used in `drift-detection.yml`) for all squad workflows that post issue comments.
+
+### Rules
+1. **Triage workflow:** Uses `🏗️ Squad Triage` as the dedup marker. Updates existing triage comment if one exists.
+2. **Assign workflow:** Uses `📋 Assigned to {name}` / `🤖 Routed to @copilot` as markers. Updates if same-marker comment exists. **Additionally skips entirely** if triage already posted a comment assigning the same member.
+3. **Future workflows** that post issue comments should follow this same pattern.
+
+## Consequences
+
+- No more duplicate comments on issues when labels are toggled
+- Existing comments get updated with latest info rather than creating a trail of stale ones
+- Slight API overhead (one `listComments` call per workflow run) — negligible
+
+---
+
+### 2026-03-13: Data — Conversational Podcast Quality Strategy
+
+**Date:** 2026-03-13  
+**Author:** Data  
+**Issue:** #455  
+**PR:** #457  
+**Status:** Implemented — Phase 1 Complete
+
+---
+
+## Context
+
+Current podcaster sounds like "someone reading from a page." Seven's research (research/active/podcast-quality/README.md) identified the root cause and solution.
+
+---
+
+## Decision
+
+**Adopt 2-phase architecture for podcast generation:**
+
+1. **Phase 1: LLM Conversation Script Generation** — Generate realistic dialogue with natural banter, disagreements, filler words, interruptions
+2. **Phase 2: Multi-Voice TTS with Prosody** — Render with distinct voices, rate variation, natural pauses
+
+**Key Finding:** Script quality matters more than TTS quality.
+
+---
+
+## Implementation (Phase 1 Complete)
+
+### LLM Improvements
+
+**Enhanced Prompts (generate-podcast-script.py):**
+- Detailed host personalities (Alex: curious/interrupts, Sam: expert/skeptical)
+- Conversational style guidelines (interruptions, disagreements, filler words, emotional shifts)
+- Specific instructions for natural dialogue (3-5 interruptions, 1+ debate, casual banter)
+
+### TTS Improvements
+
+**Rendering (podcaster-conversational.py):**
+- Rate variation: Alex +5% (excitable), Sam -2% (measured)
+- Enhanced pauses: 400-700ms between speakers, 200-350ms same speaker
+- Prosody markers for filler words
+- Natural turn-taking
+
+### Technology Stack
+
+- **LLM:** Azure OpenAI / OpenAI (with template fallback)
+- **TTS:** edge-tts (free, no API keys, neural quality)
+- **Architecture:** Separate script generation + rendering scripts
+
+---
+
+## Rationale
+
+1. **Script quality > TTS quality:** Research shows a great script with decent TTS beats perfect TTS with a flat script
+2. **Edge-TTS sufficient for Phase 1:** Free, neural quality, no API setup
+3. **LLM prompts are high-leverage:** Small prompt changes produce significantly more natural output
+4. **Modular architecture:** Separate script generation allows testing different LLMs or manual script editing
+
+---
+
+## Impact
+
+- More natural-sounding podcasts that feel like real conversations
+- Better engagement — listeners hear two people talking, not one person reading
+- Foundation for Phase 2 TTS upgrades (Fish Speech, ElevenLabs)
+
+---
+
+## Future Phases
+
+**Phase 2 (Optional):**
+- Evaluate Fish Speech S2 (open-source, LLM-integrated) or ElevenLabs (premium) for TTS upgrade
+- Fine-tune LLM prompts based on user feedback
+- A/B test different host personalities
+
+---
+
+## References
+
+- Research: research/active/podcast-quality/README.md
+- Seven's key insight: Google NotebookLM's success comes from conversation script quality
+- Issue: #455
+- PR: #457
+
+---
+
+### 2026-06-27: B'Elanna — Podcaster v2 — Conversational Podcast Architecture
+
+**Date:** 2026-06-27
+**Author:** B'Elanna (Infrastructure/DevOps)
+**Status:** ✅ Implemented
+
+## Decision
+
+Rebuild the podcaster into a three-phase pipeline that separates **conversation script generation** from **TTS rendering**, enabling real two-host dialogue podcasts from any markdown input.
+
+## Context
+
+The original podcaster (`podcaster.ps1` + `podcaster-conversational.py`) read articles aloud using one or two voices, but there was no actual conversation. It sounded like someone reading a document, not like a podcast discussion. Tamir requested a rebuild to produce output resembling .NET Rocks or NotebookLM-style podcasts.
+
+## Architecture
+
+### Phase 1: Script Generation (`generate-podcast-script.py`)
+- Converts articles into [ALEX]/[SAM] tagged dialogue
+- **LLM backends** (tried in order): Azure OpenAI → OpenAI → built-in template engine
+- Template engine works without any API keys for zero-config usage
+- Output is a plain text `.podcast-script.txt` file
+
+### Phase 2: TTS Rendering (`podcaster-conversational.py` v2)
+- Parses [ALEX]/[SAM]/[HOST_A]/[HOST_B] tagged scripts
+- Distinct neural voices: en-US-GuyNeural (Alex) + en-US-JennyNeural (Sam)
+- Rate variation between speakers for natural feel
+- Backward-compatible legacy mode preserved
+
+### Phase 3: Pipeline (`podcaster.ps1 -PodcastMode`)
+- Chains Phase 1 → Phase 2 automatically
+- `-ScriptFile` parameter to skip generation with pre-made scripts
+
+## Key Decisions
+
+1. **Separation of script generation from TTS** — allows manual editing of conversation scripts before rendering, and decouples LLM dependency from audio pipeline
+2. **Template engine fallback** — ensures podcasts can always be generated even without LLM API keys
+3. **[ALEX]/[SAM] tagged format** — simple, parseable, human-editable dialogue format
+4. **edge-tts neural voices** — free, high-quality, no API key needed; sufficient for v1
+
+## Future Improvements
+
+- LLM-generated scripts will be dramatically better than template output
+- ffmpeg installation for proper pause insertion between turns
+- Musical intro/outro if ffmpeg available
+- More voice variety (en-US-AriaNeural, en-US-DavisNeural)
+

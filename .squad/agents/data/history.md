@@ -49,34 +49,49 @@ Machine configuration data gathered for multi-machine Ralph coordination (#346):
 - Stable hostnames available for machine ID strategy
 - EMU authentication constraint identified (PR creation may need fallback to comments)
 
-### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE)
+### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1)
 
 Built Squad MCP Server to expose squad operations as reusable MCP tools for AI assistants.
 
-**Implementation (Phase 1):**
-- **Design:** Comprehensive architecture document (`DESIGN.md`) — tool definitions, deployment options, integration with `.squad/` state
-- **Project scaffolding:** TypeScript/Node.js with @modelcontextprotocol/sdk, @octokit/rest, zod
-- **Core infrastructure:** MCP server entry point, config loader (env vars or file), GitHub API client wrapper, squad state readers
-- **First tool:** `get_squad_health` — reads team.md, queries GitHub API, calculates health status (healthy/warning/critical), returns metrics + per-member stats
-- **PR #453:** Branch `squad/417-squad-mcp-server`, fully functional Phase 1 complete
+**Deliverables (40 files):**
+- **Design:** Comprehensive architecture document (`mcp-servers/squad-mcp/DESIGN.md`) — tool definitions, deployment options, integration with `.squad/` state, health status thresholds
+- **Project scaffolding:** TypeScript/Node.js project with @modelcontextprotocol/sdk, @octokit/rest, zod, build pipeline
+- **Core infrastructure:** MCP server entry point, config loader (env vars → ~/.config/squad-mcp/config.json → auto-detect), GitHub API client wrapper, squad state readers
+- **First tool:** `get_squad_health` — queries GitHub for issues/PRs, reads team.md, calculates health status (healthy/warning/critical), returns detailed metrics + per-member analysis
+- **PR #453:** 3707 additions, fully functional Phase 1, ready for review
 
-**Architecture Decision:**
-- **Runtime:** Node.js + TypeScript (consistency with existing squad-cli by bradygaster)
-- **MCP SDK:** @modelcontextprotocol/sdk v1.12.1+ for tool registration
+**Architecture Decision Filed:**
+- **Runtime:** Node.js + TypeScript (consistency with existing squad-cli by bradygaster, MDN documentation, ecosystem alignment)
+- **MCP SDK:** @modelcontextprotocol/sdk for tool registration, validated with test client
 - **State integration:** Read-only access to `.squad/` files (team.md, routing.md, board_snapshot.json); mutations via GitHub API only
-- **Deployment:** stdio transport (stdin/stdout) for local MCP clients; future: DevBox service, container, serverless
+- **Configuration:** Environment variables first (DevBox deployment), config file fallback (~/.config/squad-mcp/config.json), auto-detect SQUAD_ROOT
+- **Transport:** stdio (stdin/stdout) for local MCP clients; HTTP/WebSocket deferred to Phase 4
 
-**Key Files:**
-- `mcp-servers/squad-mcp/DESIGN.md` — Full architecture and tool specs
-- `mcp-servers/squad-mcp/src/index.ts` — MCP server entry point
-- `mcp-servers/squad-mcp/src/tools/get-squad-health.ts` — First implemented tool
-- `mcp-servers/squad-mcp/src/github.ts` — Octokit wrapper for GitHub API
-- `mcp-servers/squad-mcp/src/squad-state.ts` — .squad/ file parsers
+**Phase 1 Scope Complete:**
+- ✅ Design document with full API contracts
+- ✅ Project scaffolding and build pipeline
+- ✅ Configuration system (env vars + file fallback)
+- ✅ GitHub API integration with error handling
+- ✅ Team.md parser for member/capacity data
+- ✅ get_squad_health tool fully implemented and tested
 
-**Next Phases:**
-- Phase 2: check_board_status, get_member_capacity, evaluate_routing (read-only tools)
-- Phase 3: triage_issue (write operations with audit logging)
-- Phase 4: DevBox deployment + MCP Registry registration
+**Phase 2 Planned (Next PR):**
+- check_board_status: Compare cached vs live board state
+- get_member_capacity: Query member workload
+- evaluate_routing: Pattern matching on routing.md
+
+**Phase 3 Planned (Future PR):**
+- triage_issue: Apply labels, assign, comment (write operations with audit logging)
+- Permission checks and rate limiting
+
+**Phase 4 Planned (Future PR):**
+- DevBox systemd service deployment
+- MCP Registry registration
+- Performance optimization
+
+**Status:** ✅ DELIVERED. Awaiting team review on PR #453 before moving to Phase 2. Decision record filed to inbox (now merged into decisions.md as Decision 21).
+
+### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1)
 
 ## Learnings
 - Branch namespacing strategy: `squad/{issue}-{slug}-{machineid}` recommended

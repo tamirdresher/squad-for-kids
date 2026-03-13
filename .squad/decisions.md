@@ -4,6 +4,176 @@
 
 ---
 
+## Decision 21: Squad MCP Server Architecture Decision
+
+**Date:** 2026-03-13  
+**Author:** Data  
+**Issue:** #417 — Build Squad MCP Server to expose squad operations (#385)  
+**PR:** #453  
+**Status:** 🟡 Proposed — Phase 1 Complete, awaiting review
+
+### Decision
+
+Build a dedicated Squad MCP Server using Node.js + TypeScript to expose squad operations (triage, routing, status, board health) as reusable MCP tools for AI assistants and external systems.
+
+### Context
+
+From Copilot Features Evaluation research (#385), we identified a need for squad operations to be accessible programmatically beyond just embedded copilot-instructions context. This enables:
+- External MCP clients to query squad health
+- Other agents to evaluate routing without full context load
+- Automation tools to triage issues
+- Board sync tools to check drift status
+
+### Architecture Decisions
+
+**Runtime Choice: Node.js + TypeScript**
+- **Rationale:** Existing squad-cli ecosystem (by bradygaster) is Node/TS-based; consistency reduces learning curve; @modelcontextprotocol/sdk has excellent TypeScript support
+- **Alternatives Considered:** .NET/C# (bifurcates squad tooling), Python (lacks squad ecosystem consistency)
+
+**State Integration: Read `.squad/`, Write via GitHub API**
+- `.squad/` files are source of truth (maintained by squad members)
+- MCP server is read-only observer for most operations
+- Mutations (labels, assignees) go through GitHub API for audit trail
+
+**Configuration: Environment Variables → Config File → Auto-Detect**
+1. Environment variables (GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO, SQUAD_ROOT)
+2. Config file at ~/.config/squad-mcp/config.json
+3. Auto-detect SQUAD_ROOT from current directory
+
+**Transport: stdio (Phase 1)**
+- For local MCP clients (Copilot CLI)
+- HTTP/WebSocket deferred to future phases
+
+### Tool Implementation Strategy
+
+- **Phase 1 (PR #453, COMPLETE):** Core infrastructure + get_squad_health tool
+- **Phase 2 (Next PR):** Read-only tools (check_board_status, get_member_capacity, evaluate_routing)
+- **Phase 3 (Future PR):** Write operations (triage_issue with audit logging)
+- **Phase 4 (Future PR):** Deployment (DevBox systemd service, MCP registry)
+
+### Health Status Thresholds
+
+- **Healthy (✅):** <10 open issues, <5 PRs, <2 issues per member
+- **Warning (⚠️):** 10-20 issues, 5-10 PRs, 2-4 issues per member
+- **Critical (🔴):** >20 issues, >10 PRs, >4 issues per member
+
+### Security Considerations
+
+- **GitHub Token Storage:** Recommend Azure Key Vault or GitHub Secrets, not config files
+- **Read-Only Default:** Most tools are read-only
+- **Write Operations Gated:** triage_issue requires explicit repo write access, audit logs via GitHub API
+- **Input Validation:** All tool parameters validated via Zod schemas
+
+### Implications for Team
+
+1. **MCP Server Reusability:** Any Copilot agent can query squad health without loading full `.squad/` context
+2. **External Integration:** External automation tools can interact with squad state programmatically
+3. **Board Sync Tooling:** Future tools can leverage check_board_status instead of reimplementing state comparison
+4. **Triage Automation:** Once Phase 3 ships, agents can use triage_issue to label/assign issues programmatically
+
+### References
+
+- **Design Document:** `mcp-servers/squad-mcp/DESIGN.md`
+- **PR #453:** https://github.com/tamirdresher_microsoft/tamresearch1/pull/453
+- **Issue #417:** Squad MCP Server initial scope
+
+---
+
+## Decision 20: Self-Healing Architecture for Teams UI Automation
+
+**Status:** 🟡 Proposed  
+**Date:** 2026-03-12  
+**Decider:** Data (Code Expert)  
+**Context:** Need UI automation for Teams desktop operations not available via Graph API/Teams MCP
+
+### Problem
+
+Teams Graph API and MCP server cannot perform:
+- Installing apps to teams/channels
+- Adding tabs (Wiki, Planner, website tabs)
+- Configuring connectors
+- UI-based navigation and testing
+
+Traditional UI automation breaks when Teams updates change element IDs, localization changes labels, UI layout changes, or theme changes.
+
+### Decision
+
+Implement a **self-healing UI automation system** with multi-strategy element discovery and automatic cache invalidation.
+
+**Core Architecture:**
+1. **Multi-Strategy Element Discovery:** AutomationID → Name pattern → ControlType+hierarchy → Spatial heuristics
+2. **Cached Mappings with Auto-Invalidation:** Cache discovered elements with Teams version; invalidate on failure
+3. **Automatic Calibration:** Full UI tree scan on persistent failures (threshold: 3)
+4. **Failure Recovery Flow:** Cached → Strategy chain → Full calibration → Diagnostic failure
+
+### Implementation
+
+**Files Created:**
+- `.squad/skills/teams-ui-automation/SKILL.md` — Documentation, architecture overview
+- `.squad/skills/teams-ui-automation/Teams-UIA.ps1` — PowerShell module (~850 lines)
+- `.squad/skills/teams-ui-automation/element-cache.json` — Persistent cache
+
+**Key Functions:**
+- Find-TeamsElement: Multi-strategy finder with caching
+- Calibrate-TeamsUI: Full UI tree scan
+- Get-TeamsUISnapshot: Debug dump for manual inspection
+
+### Alternatives Considered
+
+1. **Hardcoded Element IDs** — Breaks on Teams updates, high maintenance
+2. **Visual/Image Recognition** — More robust but requires ML dependencies, deferred
+3. **Accessibility Tree API** — Limited access in Teams, deferred
+4. **Graph API Waiting** — Microsoft hasn't added these APIs in years, pragmatic to automate
+
+### Consequences
+
+**Positive**
+- ✅ Resilient — auto-adapts to UI changes
+- ✅ Observable — verbose logging, UI snapshots
+- ✅ Versioned — cache invalidates on Teams updates
+- ✅ Extensible — easy to add patterns and actions
+
+**Negative**
+- ⚠️ Windows-Only — UI Automation is Windows-specific
+- ⚠️ Desktop Required — doesn't work with Teams web/PWA
+- ⚠️ Not Headless — requires visible UI
+- ⚠️ Timing-Dependent — async UI rendering requires tuning
+
+**Confidence:** Medium-High for architecture, Low for initial implementation
+
+---
+
+## Decision 19: CodeQL Workflow Changed to Manual Trigger
+
+**Author:** B'Elanna (DevOps/Infrastructure)  
+**Date:** 2026-03-12  
+**Status:** ✅ Adopted  
+**Scope:** CI/CD & Security
+
+### Context
+
+The CodeQL Analysis workflow (`.github/workflows/codeql-analysis.yml`) was running on every push to main and every PR, but failing every time because this repo has no root-level build process. The Autobuild step cannot find anything to build — the repo is primarily markdown, PowerShell scripts, and config files with some scattered JS/TS in `dashboard-ui/` and `scripts/`.
+
+### Decision
+
+Changed CodeQL from automatic triggers (push/PR) to `workflow_dispatch` only (manual trigger). This stops CI noise and email notifications while preserving ability to run CodeQL security scanning on-demand.
+
+Also created the `ai-assisted` label that `label-squad-prs.yml` depends on — it was missing from the repo, causing that workflow to fail on every squad PR.
+
+### Alternatives Considered
+
+1. **Fix the build so Autobuild works** — Not practical; no single root build covers all JS/TS
+2. **Remove CodeQL entirely** — Too aggressive; manual scans still have value
+3. **Add path filters** — Would reduce runs but Autobuild would still fail
+
+### Impact
+
+- No more automatic CodeQL failure notifications on every commit/PR
+- CodeQL can still be triggered manually from the Actions tab
+- Label Squad PRs workflow will now succeed for squad-branch PRs
+
+---
+
 ## Decision 18: Multi-Machine Ralph Coordination Architecture
 
 **Date:** 2026-03-12  

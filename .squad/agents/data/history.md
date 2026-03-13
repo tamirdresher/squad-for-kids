@@ -136,6 +136,7 @@ Built Squad MCP Server to expose squad operations as reusable MCP tools for AI a
 
 ## Learnings
 - Branch namespacing strategy: `squad/{issue}-{slug}-{machineid}` recommended
+- Hebrew podcast generation with edge-tts: Successfully generated Hebrew audio using voice-clone-podcast.py script with edge-tts backend (AVRI male/HILA female voices). Required imageio-ffmpeg for audio processing. Natural conversational Hebrew translation with technical terms in English worked well for tech podcast format.
 
 **Deliverables:**
 - Closure summary: `.squad/agents/data/350-closure-summary.md`

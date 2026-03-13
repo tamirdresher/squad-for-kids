@@ -22,23 +22,19 @@ export class GitHubClient {
    * Get open issues count
    */
   async getOpenIssuesCount(): Promise<number> {
-    const { data } = await this.octokit.rest.issues.listForRepo({
-      owner: this.owner,
-      repo: this.repo,
-      state: "open",
-      per_page: 1,
-    });
-
-    // GitHub API returns total count in headers
-    const response = await this.octokit.rest.issues.listForRepo({
-      owner: this.owner,
-      repo: this.repo,
-      state: "open",
-      per_page: 100,
-    });
+    // Use paginate to get all issues across all pages
+    const allIssues = await this.octokit.paginate(
+      this.octokit.rest.issues.listForRepo,
+      {
+        owner: this.owner,
+        repo: this.repo,
+        state: "open",
+        per_page: 100,
+      }
+    );
 
     // Filter out pull requests (GitHub API includes PRs in issues endpoint)
-    const issues = response.data.filter((issue) => !issue.pull_request);
+    const issues = allIssues.filter((issue) => !issue.pull_request);
     return issues.length;
   }
 
@@ -46,45 +42,57 @@ export class GitHubClient {
    * Get open pull requests count
    */
   async getOpenPRsCount(): Promise<number> {
-    const { data } = await this.octokit.rest.pulls.list({
-      owner: this.owner,
-      repo: this.repo,
-      state: "open",
-      per_page: 100,
-    });
+    // Use paginate to get all PRs across all pages
+    const allPRs = await this.octokit.paginate(
+      this.octokit.rest.pulls.list,
+      {
+        owner: this.owner,
+        repo: this.repo,
+        state: "open",
+        per_page: 100,
+      }
+    );
 
-    return data.length;
+    return allPRs.length;
   }
 
   /**
    * Get issues with a specific label
    */
   async getIssuesByLabel(label: string): Promise<GitHubIssue[]> {
-    const { data } = await this.octokit.rest.issues.listForRepo({
-      owner: this.owner,
-      repo: this.repo,
-      state: "open",
-      labels: label,
-      per_page: 100,
-    });
+    // Use paginate to get all issues across all pages
+    const allIssues = await this.octokit.paginate(
+      this.octokit.rest.issues.listForRepo,
+      {
+        owner: this.owner,
+        repo: this.repo,
+        state: "open",
+        labels: label,
+        per_page: 100,
+      }
+    );
 
     // Filter out pull requests
-    return data.filter((issue) => !issue.pull_request) as GitHubIssue[];
+    return allIssues.filter((issue) => !issue.pull_request) as GitHubIssue[];
   }
 
   /**
    * Get all open issues (for calculating avg age)
    */
   async getAllOpenIssues(): Promise<GitHubIssue[]> {
-    const { data } = await this.octokit.rest.issues.listForRepo({
-      owner: this.owner,
-      repo: this.repo,
-      state: "open",
-      per_page: 100,
-    });
+    // Use paginate to get all issues across all pages
+    const allIssues = await this.octokit.paginate(
+      this.octokit.rest.issues.listForRepo,
+      {
+        owner: this.owner,
+        repo: this.repo,
+        state: "open",
+        per_page: 100,
+      }
+    );
 
     // Filter out pull requests
-    return data.filter((issue) => !issue.pull_request) as GitHubIssue[];
+    return allIssues.filter((issue) => !issue.pull_request) as GitHubIssue[];
   }
 
   /**

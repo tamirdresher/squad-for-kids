@@ -7,7 +7,18 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
+import { z } from "zod";
 import type { SquadConfig } from "./types.js";
+
+// Zod schema for validating config
+const SquadConfigSchema = z.object({
+  github: z.object({
+    token: z.string().min(1),
+    owner: z.string().min(1),
+    repo: z.string().min(1),
+  }),
+  squadRoot: z.string().optional(),
+});
 
 /**
  * Load Squad MCP Server configuration
@@ -40,12 +51,10 @@ export async function loadConfig(): Promise<SquadConfig> {
   try {
     const configPath = join(homedir(), ".config", "squad-mcp", "config.json");
     const configContent = await readFile(configPath, "utf-8");
-    const config = JSON.parse(configContent) as SquadConfig;
-
-    // Validate config
-    if (!config.github?.token || !config.github?.owner || !config.github?.repo) {
-      throw new Error("Invalid config file: missing required fields");
-    }
+    const parsedConfig = JSON.parse(configContent);
+    
+    // Validate with Zod schema
+    const config = SquadConfigSchema.parse(parsedConfig) as SquadConfig;
 
     // Auto-detect squadRoot if not provided
     if (!config.squadRoot) {

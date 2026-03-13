@@ -48,6 +48,37 @@ Machine configuration data gathered for multi-machine Ralph coordination (#346):
 - Both machines coordination-ready for distributed work claiming
 - Stable hostnames available for machine ID strategy
 - EMU authentication constraint identified (PR creation may need fallback to comments)
+
+### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE)
+
+Built Squad MCP Server to expose squad operations as reusable MCP tools for AI assistants.
+
+**Implementation (Phase 1):**
+- **Design:** Comprehensive architecture document (`DESIGN.md`) — tool definitions, deployment options, integration with `.squad/` state
+- **Project scaffolding:** TypeScript/Node.js with @modelcontextprotocol/sdk, @octokit/rest, zod
+- **Core infrastructure:** MCP server entry point, config loader (env vars or file), GitHub API client wrapper, squad state readers
+- **First tool:** `get_squad_health` — reads team.md, queries GitHub API, calculates health status (healthy/warning/critical), returns metrics + per-member stats
+- **PR #453:** Branch `squad/417-squad-mcp-server`, fully functional Phase 1 complete
+
+**Architecture Decision:**
+- **Runtime:** Node.js + TypeScript (consistency with existing squad-cli by bradygaster)
+- **MCP SDK:** @modelcontextprotocol/sdk v1.12.1+ for tool registration
+- **State integration:** Read-only access to `.squad/` files (team.md, routing.md, board_snapshot.json); mutations via GitHub API only
+- **Deployment:** stdio transport (stdin/stdout) for local MCP clients; future: DevBox service, container, serverless
+
+**Key Files:**
+- `mcp-servers/squad-mcp/DESIGN.md` — Full architecture and tool specs
+- `mcp-servers/squad-mcp/src/index.ts` — MCP server entry point
+- `mcp-servers/squad-mcp/src/tools/get-squad-health.ts` — First implemented tool
+- `mcp-servers/squad-mcp/src/github.ts` — Octokit wrapper for GitHub API
+- `mcp-servers/squad-mcp/src/squad-state.ts` — .squad/ file parsers
+
+**Next Phases:**
+- Phase 2: check_board_status, get_member_capacity, evaluate_routing (read-only tools)
+- Phase 3: triage_issue (write operations with audit logging)
+- Phase 4: DevBox deployment + MCP Registry registration
+
+## Learnings
 - Branch namespacing strategy: `squad/{issue}-{slug}-{machineid}` recommended
 
 **Deliverables:**
@@ -399,3 +430,28 @@ Multiple iterations on squad-monitor display and monitoring features. Consolidat
 **PR:** #353 (draft) - Branch: squad/346-ralph-multi-machine
 
 **Testing Required:** Deploy to both machines and verify no duplicate PRs for same issue.
+
+### Teams UI Automation Skill (2026-03-12)
+
+**Created:** Self-healing Teams UI Automation skill at .squad/skills/teams-ui-automation/ for operations not supported by Teams MCP/Graph API (app installation, tab management, connectors).
+
+**Architecture:** Multi-strategy element discovery with automatic cache invalidation:
+- **Strategy Chain:** AutomationID → Name Pattern → Structure → Spatial heuristics
+- **Cache System:** JSON cache with Teams version tracking, auto-invalidates on Teams updates or persistent failures
+- **Self-Healing:** When element not found, tries fallback strategies, auto-calibrates after threshold failures
+- **Calibration Mode:** Full UI tree scan to rebuild element mappings
+
+**Key Functions:**
+- Core: Initialize-TeamsUIA, Find-TeamsElement, Calibrate-TeamsUI, Invoke-TeamsAction
+- Cache: Get-ElementCache, Save-ElementCache, Invalidate-CacheEntry, Test-CacheValidity
+- Actions: Install-TeamsApp, Add-TeamsTab, Navigate-ToTeam/ToChannel, Open-TeamsAppStore/Settings, Get-TeamsUISnapshot
+- Utils: Wait-ForElement, Click-Element, Type-InElement, Get-TeamsVersion
+
+**Technical Details:**
+- Uses System.Windows.Automation namespace (Windows-only)
+- Element cache: .squad/skills/teams-ui-automation/element-cache.json
+- Failure threshold: 3 failures trigger auto-calibration
+- Discovery strategies with fallback chain prevent breakage from UI changes
+- Verbose logging support for debugging UI discovery issues
+
+**Status:** Initial implementation (confidence: low). Actions are prototype-level with TODO markers for full implementation. Framework is production-ready for extension.

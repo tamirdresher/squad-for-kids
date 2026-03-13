@@ -13,6 +13,8 @@
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Rate "+10%" -Volume "+50%"
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -Deliver
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Deliver -DeliverTo user@example.com
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -NaturalSpeech
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -NaturalSpeech -BackchannelFrequency 0.4
 
 param(
     [Parameter(Mandatory=$true)]
@@ -27,7 +29,9 @@ param(
     [string]$Volume = "+0%",
     [switch]$Deliver,
     [string]$DeliverTo,
-    [string]$PodcastTitle
+    [string]$PodcastTitle,
+    [switch]$NaturalSpeech,
+    [double]$BackchannelFrequency = 0.30
 )
 
 $ErrorActionPreference = "Stop"
@@ -220,6 +224,19 @@ if ($PodcastMode) {
         if ($LASTEXITCODE -ne 0) {
             Write-Host "  Script generation failed" -ForegroundColor Red
             exit 1
+        }
+
+        # Apply natural speech post-processing (issue #464)
+        if ($NaturalSpeech -or $BackchannelFrequency -gt 0) {
+            $postArgs = @($genScript, $inputPath, "-o", $podcastScript)
+            if ($NaturalSpeech) { $postArgs += "--natural-speech" }
+            if ($BackchannelFrequency -gt 0) {
+                $postArgs += @("--backchannels", "--backchannel-frequency", $BackchannelFrequency)
+            }
+            & python @postArgs
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "  Post-processing failed, using original script" -ForegroundColor Yellow
+            }
         }
         if (-not (Test-Path $podcastScript)) {
             Write-Host "  Script file not created" -ForegroundColor Red

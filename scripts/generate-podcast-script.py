@@ -19,6 +19,7 @@ import argparse
 import io
 import json
 import os
+import random
 import re
 import sys
 import textwrap
@@ -391,6 +392,203 @@ def validate_script(raw: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Post-processing: rewrite for natural speech (Improvement #1, issue #464)
+# ---------------------------------------------------------------------------
+
+# Formal → contraction mappings for spoken naturalness
+_CONTRACTIONS = [
+    (r'\bdo not\b', "don't"), (r'\bDo not\b', "Don't"),
+    (r'\bcannot\b', "can't"), (r'\bCannot\b', "Can't"),
+    (r'\bwill not\b', "won't"), (r'\bWill not\b', "Won't"),
+    (r'\bshould not\b', "shouldn't"), (r'\bShould not\b', "Shouldn't"),
+    (r'\bwould not\b', "wouldn't"), (r'\bWould not\b', "Wouldn't"),
+    (r'\bcould not\b', "couldn't"), (r'\bCould not\b', "Couldn't"),
+    (r'\bis not\b', "isn't"), (r'\bIs not\b', "Isn't"),
+    (r'\bare not\b', "aren't"), (r'\bAre not\b', "Aren't"),
+    (r'\bwas not\b', "wasn't"), (r'\bWas not\b', "Wasn't"),
+    (r'\bwere not\b', "weren't"), (r'\bWere not\b', "Weren't"),
+    (r'\bhas not\b', "hasn't"), (r'\bHas not\b', "Hasn't"),
+    (r'\bhave not\b', "haven't"), (r'\bHave not\b', "Haven't"),
+    (r'\bhad not\b', "hadn't"), (r'\bHad not\b', "Hadn't"),
+    (r'\bdoes not\b', "doesn't"), (r'\bDoes not\b', "Doesn't"),
+    (r'\bdid not\b', "didn't"), (r'\bDid not\b', "Didn't"),
+    (r'\bit is\b', "it's"), (r'\bIt is\b', "It's"),
+    (r'\bthat is\b', "that's"), (r'\bThat is\b', "That's"),
+    (r'\bthere is\b', "there's"), (r'\bThere is\b', "There's"),
+    (r'\bwhat is\b', "what's"), (r'\bWhat is\b', "What's"),
+    (r'\bhere is\b', "here's"), (r'\bHere is\b', "Here's"),
+    (r'\blet us\b', "let's"), (r'\bLet us\b', "Let's"),
+    (r'\bI am\b', "I'm"),
+    (r'\bI will\b', "I'll"),
+    (r'\bI have\b', "I've"),
+    (r'\bI would\b', "I'd"),
+    (r'\bwe are\b', "we're"), (r'\bWe are\b', "We're"),
+    (r'\bwe will\b', "we'll"), (r'\bWe will\b', "We'll"),
+    (r'\bwe have\b', "we've"), (r'\bWe have\b', "We've"),
+    (r'\bthey are\b', "they're"), (r'\bThey are\b', "They're"),
+    (r'\bthey will\b', "they'll"), (r'\bThey will\b', "They'll"),
+    (r'\byou are\b', "you're"), (r'\bYou are\b', "You're"),
+    (r'\byou will\b', "you'll"), (r'\bYou will\b', "You'll"),
+    (r'\byou have\b', "you've"), (r'\bYou have\b', "You've"),
+    (r'\bgoing to\b', "gonna"),
+    (r'\bwant to\b', "wanna"),
+    (r'\bgot to\b', "gotta"),
+]
+
+# Filler words/phrases to sprinkle at sentence boundaries
+_FILLERS_START = [
+    "You know, ", "I mean, ", "Like, ", "So, ", "Well, ",
+    "Honestly, ", "Look, ", "Okay so, ", "Yeah, ",
+]
+
+# Mid-sentence disfluencies (inserted before a clause)
+_DISFLUENCIES = [
+    ", you know,", ", like,", ", I mean,", ", right,",
+]
+
+# Conversational transitions to replace formal connectors
+_TRANSITION_REWRITES = [
+    (r'\bHowever,\b', "But hey,"),
+    (r'\bFurthermore,\b', "And also,"),
+    (r'\bAdditionally,\b', "Plus,"),
+    (r'\bMoreover,\b', "On top of that,"),
+    (r'\bIn conclusion,\b', "So bottom line,"),
+    (r'\bConsequently,\b', "So basically,"),
+    (r'\bNevertheless,\b', "But still,"),
+    (r'\bTherefore,\b', "So,"),
+    (r'\bIn other words,\b', "Basically,"),
+    (r'\bIt is important to note that\b', "Here's the thing —"),
+    (r'\bIt should be noted that\b', "Worth mentioning —"),
+    (r'\bFor example,\b', "Like for instance,"),
+    (r'\bAs a result,\b', "So what happens is,"),
+]
+
+
+def _apply_contractions(text: str) -> str:
+    for pattern, replacement in _CONTRACTIONS:
+        text = re.sub(pattern, replacement, text)
+    return text
+
+
+def _add_fillers(text: str, filler_rate: float = 0.15) -> str:
+    """Add filler words at the start of ~filler_rate fraction of sentences."""
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    result = []
+    for i, s in enumerate(sentences):
+        # Skip first sentence (keep the opening clean) and short sentences
+        if i > 0 and len(s.split()) > 5 and random.random() < filler_rate:
+            filler = random.choice(_FILLERS_START)
+            # Lowercase the first char of the sentence after adding filler
+            if s and s[0].isupper():
+                s = s[0].lower() + s[1:]
+            s = filler + s
+        result.append(s)
+    return ' '.join(result)
+
+
+def _add_disfluencies(text: str, disfluency_rate: float = 0.08) -> str:
+    """Insert mid-sentence disfluencies before random commas/clauses."""
+    # Find clause boundaries (comma followed by space and a word)
+    parts = re.split(r'(,\s+)', text)
+    result = []
+    for i, part in enumerate(parts):
+        result.append(part)
+        # Randomly insert a disfluency after a comma-space separator
+        if re.match(r',\s+$', part) and random.random() < disfluency_rate:
+            disf = random.choice(_DISFLUENCIES).strip(', ')
+            result.append(disf + ', ')
+    return ''.join(result)
+
+
+def _apply_transitions(text: str) -> str:
+    for pattern, replacement in _TRANSITION_REWRITES:
+        text = re.sub(pattern, replacement, text)
+    return text
+
+
+def rewrite_for_speech(script: str) -> str:
+    """Rewrite a podcast script for natural spoken delivery.
+
+    Transforms formal written text into conversational speech patterns by:
+    - Applying contractions (do not → don't)
+    - Replacing formal transitions with casual ones
+    - Adding filler words and disfluencies
+    """
+    lines = script.strip().splitlines()
+    rewritten = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        m = re.match(r'^(\[(ALEX|SAM)\])\s+(.+)$', line)
+        if not m:
+            rewritten.append(line)
+            continue
+        prefix = m.group(1)
+        text = m.group(3)
+        text = _apply_contractions(text)
+        text = _apply_transitions(text)
+        text = _add_fillers(text)
+        text = _add_disfluencies(text)
+        rewritten.append(f'{prefix} {text}')
+    return '\n'.join(rewritten)
+
+
+# ---------------------------------------------------------------------------
+# Post-processing: back-channeling & interjections (Improvement #2, #464)
+# ---------------------------------------------------------------------------
+
+# Short listener responses that signal engagement
+_BACKCHANNELS = [
+    "Mmhm.", "Right.", "Exactly.", "Interesting.", "Oh wow.",
+    "Yeah.", "Sure.", "Got it.", "Makes sense.", "Totally.",
+    "Oh, nice.", "Huh.", "For real?", "Wow.", "True.",
+    "Yeah, yeah.", "Okay.", "Absolutely.", "Fair enough.", "Oh, cool.",
+]
+
+
+def insert_backchannels(script: str, frequency: float = 0.30) -> str:
+    """Insert short listener back-channel responses between speaker turns.
+
+    Inserts a brief interjection from the *other* speaker between turns
+    at the given frequency (0.0–1.0). Avoids inserting back-to-back, at the
+    very start/end, or when the previous turn is already very short.
+    """
+    lines = [l.strip() for l in script.strip().splitlines() if l.strip()]
+    if len(lines) < 4:
+        return script
+
+    result = [lines[0]]  # keep first line as-is
+    prev_was_backchannel = False
+
+    for i in range(1, len(lines)):
+        curr_line = lines[i]
+        prev_line = lines[i - 1]
+
+        # Parse speakers
+        prev_m = re.match(r'^\[(ALEX|SAM)\]\s+(.+)$', prev_line)
+        curr_m = re.match(r'^\[(ALEX|SAM)\]\s+(.+)$', curr_line)
+
+        if (prev_m and curr_m
+                and prev_m.group(1) != curr_m.group(1)
+                and not prev_was_backchannel
+                and i < len(lines) - 1  # not before the last line
+                and len(prev_m.group(2).split()) > 8  # previous turn long enough
+                and random.random() < frequency):
+            # Insert a backchannel from the current speaker
+            listener = curr_m.group(1)
+            bc = random.choice(_BACKCHANNELS)
+            result.append(f'[{listener}] {bc}')
+            prev_was_backchannel = True
+        else:
+            prev_was_backchannel = False
+
+        result.append(curr_line)
+
+    return '\n'.join(result)
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -404,6 +602,12 @@ def main():
                         help="Print the LLM prompt to stdout and exit (for manual use)")
     parser.add_argument("--template-only", action="store_true",
                         help="Force template engine even if LLM keys are set")
+    parser.add_argument("--natural-speech", action="store_true",
+                        help="Rewrite script for natural spoken delivery (contractions, fillers, disfluencies)")
+    parser.add_argument("--backchannels", action="store_true",
+                        help="Insert listener back-channel responses between turns")
+    parser.add_argument("--backchannel-frequency", type=float, default=0.30,
+                        help="Probability of inserting a backchannel per turn transition (0.0-1.0, default: 0.30)")
     args = parser.parse_args()
 
     input_path = Path(args.input_file).resolve()
@@ -461,6 +665,16 @@ def main():
     if not script:
         print("🔧 Generating conversation with template engine...")
         script = generate_template_script(markdown, title)
+
+    # Post-processing passes (issue #464)
+    if args.natural_speech:
+        print("🗣️  Rewriting script for natural speech...")
+        script = rewrite_for_speech(script)
+
+    if args.backchannels:
+        freq = max(0.0, min(1.0, args.backchannel_frequency))
+        print(f"💬 Inserting back-channel responses ({int(freq*100)}% frequency)...")
+        script = insert_backchannels(script, frequency=freq)
 
     # Count turns
     turns = len([l for l in script.splitlines() if l.strip()])

@@ -650,3 +650,13 @@ Generated a podcast showcasing the podcaster's own improvements (Issue #460, req
 - Source string: `'Morning Dew'` — consistent with `'HackerNews'` and `'Reddit: r/{sub}'` patterns
 - Wired into `scanAllSources()` via `Promise.all` alongside HackerNews and Reddit fetches
 - PR #462 on branch `squad/461-add-alvinashcraft-news-source`
+
+### Podcaster Quality Improvements (Issue #464) - 2026-03-13
+
+- Added ewrite_for_speech() post-processing pass: applies contractions, casual transitions, filler words (~15% rate), and mid-sentence disfluencies (~8% rate) to generated scripts
+- Added insert_backchannels(): randomly inserts short listener responses ("Mmhm", "Right", "Exactly") between speaker turns at configurable frequency (default 30%)
+- Both features are additive and opt-in via --natural-speech and --backchannels CLI flags
+- Created podcaster-vibevoice.py wrapper for Microsoft VibeVoice multi-speaker TTS (not yet installable locally — requires CUDA GPU)
+- Updated podcaster.ps1 orchestrator with -NaturalSpeech and -BackchannelFrequency parameters
+- Architecture: post-processing runs AFTER script generation, BEFORE TTS — clean separation of concerns
+- Random seed not pinned — output varies per run, which is desirable for natural-sounding podcasts

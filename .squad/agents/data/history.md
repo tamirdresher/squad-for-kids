@@ -470,3 +470,33 @@ Multiple iterations on squad-monitor display and monitoring features. Consolidat
 - Verbose logging support for debugging UI discovery issues
 
 **Status:** Initial implementation (confidence: low). Actions are prototype-level with TODO markers for full implementation. Framework is production-ready for extension.
+
+### Squad MCP Server Code Review Fixes (2026-03-13)
+
+**Fixed PR #453 Review Issues:**
+All 5 high/medium severity issues identified in code review for squad/417-mcp-server branch.
+
+**Changes Made:**
+1. **Search API for Counts (High):** Changed getOpenIssuesCount() and getOpenPRsCount() to use GitHub Search API (/search/issues) instead of pagination. Returns accurate 	otal_count for repos with >100 issues/PRs.
+2. **Error Handling (High):** Added try-catch in squad-state.ts::getTeamMembers() for missing team.md with descriptive error message.
+3. **Config Error Logging (High):** Added stderr logging in config.ts catch block to surface JSON parse errors and file access issues.
+4. **Removed Unused API Call (Medium):** Previous commit already removed the wasted per_page: 1 call in github.ts.
+5. **Unit Tests (Medium):** Added test suite using Node.js native test runner via tsx:
+   - config.test.ts: Environment variable loading, auto-detection, validation
+   - squad-state.test.ts: Markdown table parsing, human/agent filtering, error handling
+
+**Testing:** All 8 tests pass. Build succeeds with no TypeScript errors.
+
+**Key Learnings:**
+- GitHub Search API provides 	otal_count field — more efficient for counts >100 than pagination
+- Node.js 20+ native test runner works well with tsx for TypeScript tests
+- Error messages should be descriptive and include file paths for troubleshooting
+- Markdown table parsing needs edge case tests (empty sections, header rows, human vs agent filtering)
+
+**Files Modified:**
+- mcp-servers/squad-mcp/src/github.ts (lines 21-47)
+- mcp-servers/squad-mcp/src/squad-state.ts (lines 21-28)
+- mcp-servers/squad-mcp/src/config.ts (line 65-67)
+- mcp-servers/squad-mcp/package.json (test script)
+- mcp-servers/squad-mcp/src/config.test.ts (new)
+- mcp-servers/squad-mcp/src/squad-state.test.ts (new)

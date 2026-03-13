@@ -35,6 +35,34 @@
 
 ## Active Context
 
+### 2026-03-13: Issue #454 — Copilot CLI v1.0.5 Adoption Triage (Complete)
+
+**Assignment:** Triage issue requesting squad adoption of Copilot CLI v1.0.5 features (25 features released).
+
+**Analysis & Recommendation:**
+- **Top 3 to adopt immediately:**
+  1. `write_agent` tool — async messaging to background agents (enables sophisticated multi-agent orchestration)
+  2. Embedding-based MCP/skill retrieval — dynamic context loading (reduces token waste in long sessions)
+  3. `preCompact` hook — preserve squad state during context compaction (improves multi-hour session continuity)
+- **Secondary priority:** `/pr` command + `/diff` syntax highlighting (this sprint + next sprint)
+- **Auto-adopt:** All bug fixes (Kitty, ghp_ warning, backtick rendering) — zero friction
+- **Deferred:** `/extensions`, `/experimental` toggle — not needed for current workflow
+
+**Outcome:**
+- Added `squad:picard` label
+- Posted triage comment on #454 with prioritized feature list
+- Wrote decision record to `.squad/decisions/inbox/picard-cli-features-454.md` with:
+  - Detailed analysis of each feature (why, owner, scope, impact, effort)
+  - Adoption timeline (immediate, this sprint, next sprint)
+  - Risks + mitigations
+  - Success criteria (write_agent integration, embedding testing, preCompact configuration)
+  - Dependencies: ties to Squad MCP server work (#417, PR #453)
+- **Next:** Data will investigate write_agent integration with squad-mcp for Phase 2 of PR #453
+
+**Status:** Triage complete. Ready for Data handoff.
+
+---
+
 ### 2026-03-12: Issue #347 — Power Automate Flow Disabled (Investigation Complete)
 
 **Assignment:** Investigate disabled Power Automate flow (f91a7405-0786-4f44-a000-0159ff860872) that auto-disabled after 14 days of trigger failures.
@@ -63,4 +91,23 @@
 **Neelix (Comms):** Teams morning briefing sent covering 3 urgent items, 8 pending items, squad progress. Board state synchronized. Tech news already scanned today.
 
 **Board State:** Issues #344–#349 added. #344, #345, #348, #349 → Pending User. #346, #347 → In Progress. #346 moved to Review (post-PR). Board reconciliation clean.
+
+---
+
+## Learnings
+
+### CLI Features & Agent Orchestration (Issue #454)
+
+**Context:** When evaluating new Copilot CLI features for squad adoption, always prioritize features that:
+1. Amplify existing workflows (agent orchestration, context preservation, async patterns)
+2. Have clear ROI for the squad's specific use case (not generic CLI improvements)
+3. Enable new capabilities previously impossible or tedious (e.g., `write_agent` tool vs. manual follow-ups)
+
+**Key Insight:** The `write_agent` tool is strategically important because our squad architecture depends on agent-to-agent messaging for coordination. Without it, follow-ups require session breaks. With it, agents can guide each other mid-execution → faster convergence, better workflows.
+
+**Decision-Making Pattern:** For CLI/infrastructure features, create a prioritization matrix: Impact (team-wide benefit) × Effort (integration cost) × Strategic Alignment (supports future squad evolution). Features in high-impact, low-effort, high-alignment quadrant go to "immediate" bucket.
+
+**Applied Here:** `write_agent` (high impact × low effort × high alignment) → immediate. `/extensions` (low impact × low effort × low alignment) → defer.
+
+
 

@@ -4,6 +4,176 @@
 
 ---
 
+## Decision 21: Squad MCP Server Architecture Decision
+
+**Date:** 2026-03-13  
+**Author:** Data  
+**Issue:** #417 — Build Squad MCP Server to expose squad operations (#385)  
+**PR:** #453  
+**Status:** 🟡 Proposed — Phase 1 Complete, awaiting review
+
+### Decision
+
+Build a dedicated Squad MCP Server using Node.js + TypeScript to expose squad operations (triage, routing, status, board health) as reusable MCP tools for AI assistants and external systems.
+
+### Context
+
+From Copilot Features Evaluation research (#385), we identified a need for squad operations to be accessible programmatically beyond just embedded copilot-instructions context. This enables:
+- External MCP clients to query squad health
+- Other agents to evaluate routing without full context load
+- Automation tools to triage issues
+- Board sync tools to check drift status
+
+### Architecture Decisions
+
+**Runtime Choice: Node.js + TypeScript**
+- **Rationale:** Existing squad-cli ecosystem (by bradygaster) is Node/TS-based; consistency reduces learning curve; @modelcontextprotocol/sdk has excellent TypeScript support
+- **Alternatives Considered:** .NET/C# (bifurcates squad tooling), Python (lacks squad ecosystem consistency)
+
+**State Integration: Read `.squad/`, Write via GitHub API**
+- `.squad/` files are source of truth (maintained by squad members)
+- MCP server is read-only observer for most operations
+- Mutations (labels, assignees) go through GitHub API for audit trail
+
+**Configuration: Environment Variables → Config File → Auto-Detect**
+1. Environment variables (GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO, SQUAD_ROOT)
+2. Config file at ~/.config/squad-mcp/config.json
+3. Auto-detect SQUAD_ROOT from current directory
+
+**Transport: stdio (Phase 1)**
+- For local MCP clients (Copilot CLI)
+- HTTP/WebSocket deferred to future phases
+
+### Tool Implementation Strategy
+
+- **Phase 1 (PR #453, COMPLETE):** Core infrastructure + get_squad_health tool
+- **Phase 2 (Next PR):** Read-only tools (check_board_status, get_member_capacity, evaluate_routing)
+- **Phase 3 (Future PR):** Write operations (triage_issue with audit logging)
+- **Phase 4 (Future PR):** Deployment (DevBox systemd service, MCP registry)
+
+### Health Status Thresholds
+
+- **Healthy (✅):** <10 open issues, <5 PRs, <2 issues per member
+- **Warning (⚠️):** 10-20 issues, 5-10 PRs, 2-4 issues per member
+- **Critical (🔴):** >20 issues, >10 PRs, >4 issues per member
+
+### Security Considerations
+
+- **GitHub Token Storage:** Recommend Azure Key Vault or GitHub Secrets, not config files
+- **Read-Only Default:** Most tools are read-only
+- **Write Operations Gated:** triage_issue requires explicit repo write access, audit logs via GitHub API
+- **Input Validation:** All tool parameters validated via Zod schemas
+
+### Implications for Team
+
+1. **MCP Server Reusability:** Any Copilot agent can query squad health without loading full `.squad/` context
+2. **External Integration:** External automation tools can interact with squad state programmatically
+3. **Board Sync Tooling:** Future tools can leverage check_board_status instead of reimplementing state comparison
+4. **Triage Automation:** Once Phase 3 ships, agents can use triage_issue to label/assign issues programmatically
+
+### References
+
+- **Design Document:** `mcp-servers/squad-mcp/DESIGN.md`
+- **PR #453:** https://github.com/tamirdresher_microsoft/tamresearch1/pull/453
+- **Issue #417:** Squad MCP Server initial scope
+
+---
+
+## Decision 20: Self-Healing Architecture for Teams UI Automation
+
+**Status:** 🟡 Proposed  
+**Date:** 2026-03-12  
+**Decider:** Data (Code Expert)  
+**Context:** Need UI automation for Teams desktop operations not available via Graph API/Teams MCP
+
+### Problem
+
+Teams Graph API and MCP server cannot perform:
+- Installing apps to teams/channels
+- Adding tabs (Wiki, Planner, website tabs)
+- Configuring connectors
+- UI-based navigation and testing
+
+Traditional UI automation breaks when Teams updates change element IDs, localization changes labels, UI layout changes, or theme changes.
+
+### Decision
+
+Implement a **self-healing UI automation system** with multi-strategy element discovery and automatic cache invalidation.
+
+**Core Architecture:**
+1. **Multi-Strategy Element Discovery:** AutomationID → Name pattern → ControlType+hierarchy → Spatial heuristics
+2. **Cached Mappings with Auto-Invalidation:** Cache discovered elements with Teams version; invalidate on failure
+3. **Automatic Calibration:** Full UI tree scan on persistent failures (threshold: 3)
+4. **Failure Recovery Flow:** Cached → Strategy chain → Full calibration → Diagnostic failure
+
+### Implementation
+
+**Files Created:**
+- `.squad/skills/teams-ui-automation/SKILL.md` — Documentation, architecture overview
+- `.squad/skills/teams-ui-automation/Teams-UIA.ps1` — PowerShell module (~850 lines)
+- `.squad/skills/teams-ui-automation/element-cache.json` — Persistent cache
+
+**Key Functions:**
+- Find-TeamsElement: Multi-strategy finder with caching
+- Calibrate-TeamsUI: Full UI tree scan
+- Get-TeamsUISnapshot: Debug dump for manual inspection
+
+### Alternatives Considered
+
+1. **Hardcoded Element IDs** — Breaks on Teams updates, high maintenance
+2. **Visual/Image Recognition** — More robust but requires ML dependencies, deferred
+3. **Accessibility Tree API** — Limited access in Teams, deferred
+4. **Graph API Waiting** — Microsoft hasn't added these APIs in years, pragmatic to automate
+
+### Consequences
+
+**Positive**
+- ✅ Resilient — auto-adapts to UI changes
+- ✅ Observable — verbose logging, UI snapshots
+- ✅ Versioned — cache invalidates on Teams updates
+- ✅ Extensible — easy to add patterns and actions
+
+**Negative**
+- ⚠️ Windows-Only — UI Automation is Windows-specific
+- ⚠️ Desktop Required — doesn't work with Teams web/PWA
+- ⚠️ Not Headless — requires visible UI
+- ⚠️ Timing-Dependent — async UI rendering requires tuning
+
+**Confidence:** Medium-High for architecture, Low for initial implementation
+
+---
+
+## Decision 19: CodeQL Workflow Changed to Manual Trigger
+
+**Author:** B'Elanna (DevOps/Infrastructure)  
+**Date:** 2026-03-12  
+**Status:** ✅ Adopted  
+**Scope:** CI/CD & Security
+
+### Context
+
+The CodeQL Analysis workflow (`.github/workflows/codeql-analysis.yml`) was running on every push to main and every PR, but failing every time because this repo has no root-level build process. The Autobuild step cannot find anything to build — the repo is primarily markdown, PowerShell scripts, and config files with some scattered JS/TS in `dashboard-ui/` and `scripts/`.
+
+### Decision
+
+Changed CodeQL from automatic triggers (push/PR) to `workflow_dispatch` only (manual trigger). This stops CI noise and email notifications while preserving ability to run CodeQL security scanning on-demand.
+
+Also created the `ai-assisted` label that `label-squad-prs.yml` depends on — it was missing from the repo, causing that workflow to fail on every squad PR.
+
+### Alternatives Considered
+
+1. **Fix the build so Autobuild works** — Not practical; no single root build covers all JS/TS
+2. **Remove CodeQL entirely** — Too aggressive; manual scans still have value
+3. **Add path filters** — Would reduce runs but Autobuild would still fail
+
+### Impact
+
+- No more automatic CodeQL failure notifications on every commit/PR
+- CodeQL can still be triggered manually from the Actions tab
+- Label Squad PRs workflow will now succeed for squad-branch PRs
+
+---
+
 ## Decision 18: Multi-Machine Ralph Coordination Architecture
 
 **Date:** 2026-03-12  
@@ -21723,4 +21893,446 @@ $staleThresholdMinutes = 15              # Stale work threshold
 - Machine config: `.squad/agents/data/350-closure-summary.md`
 - Multi-machine strategy: `.squad/decisions/inbox/data-350-closure.md`
 - Ralph implementation: `ralph-watch.ps1`
+
+# Decision: Adopt Copilot CLI v1.0.5 Features
+
+**Date:** 2026-03-13  
+**Decider:** Picard (Lead)  
+**Issue:** #454  
+**Context:** Copilot CLI v1.0.5 released with 25 features. Squad uses CLI extensively for agent orchestration.
+
+---
+
+## Summary
+
+Adopt 3 high-impact features immediately:
+1. **`write_agent` tool** — async messaging to background agents
+2. **Embedding-based MCP/skill retrieval** — dynamic context loading
+3. **`preCompact` hook** — preserve squad state during context compaction
+
+Secondary priority features (#2 this sprint, #3-5 next sprint).
+
+---
+
+## Features Evaluated
+
+### 🎯 Immediate Adoption (This Week)
+
+#### 1. `write_agent` Tool (Enhancement)
+
+**Feature:** Send follow-up messages to background agents without blocking.
+
+**Why:** 
+- Squad orchestrates 13+ agents (Data, B'Elanna, Worf, Seven, Q, Scribe, Ralph, Neelix, Kes, Troi, Podcaster, @copilot)
+- Current workflow: agents complete, return output, then follow-up happens in next session
+- `write_agent` tool enables mid-session guidance → faster convergence, better multi-turn workflows
+- Example: Ralph detects stale issues, sends alert via write_agent → Picard evaluates, sends routing decision to Ralph → Ralph closes issues
+
+**Owner:** Data (Code Expert)  
+**Scope:** 
+- Update squad-mcp server (PR #453 Phase 2) to expose write_agent capability
+- Document in orchestration patterns (.squad/orchestration-log.md)
+- Test with Ralph monitor + Scribe logging workflows
+
+**Impact:** High — unblocks sophisticated agent collaboration patterns  
+**Effort:** Low (tool already exists, just integrate into MCP server)  
+**Dependencies:** Squad MCP server (PR #453, under review)
+
+---
+
+#### 2. Embedding-Based MCP/Skill Instruction Retrieval (Experimental)
+
+**Feature:** Dynamic retrieval of MCP and skill instructions using embeddings instead of full context load.
+
+**Why:**
+- Squad has 13+ custom skills + 4+ MCP servers (squad-mcp, teams, azure-devops, github)
+- Current workflow: agents load full `.squad/agents/{name}/charter.md` + all skill docs → context bloat
+- Embedding-based retrieval: agent only gets relevant instructions for the current task
+- Example: Data working on bug fix loads only `csharp-scripts` skill docs, not Teams UI automation skill
+- Reduces context waste, improves token efficiency for long-running agent sessions
+
+**Owner:** Data (Code Expert)  
+**Scope:**
+- Enable experimental mode: `gh copilot --experimental on`
+- Test with agent sessions (run Data + B'Elanna agents, measure context savings)
+- Document embedding behavior in .squad/copilot-instructions.md
+
+**Impact:** High — saves tokens, improves session continuity  
+**Effort:** Very low (just toggle + monitor)  
+**Dependencies:** None (experimental feature built into Copilot CLI)
+
+---
+
+#### 3. `preCompact` Hook (Misc Feature)
+
+**Feature:** Run custom commands before context compaction starts.
+
+**Why:**
+- Squad state (decisions.md, board snapshot, agent assignments) can be lost during context compaction
+- Current workflow: long sessions → context gets pruned → critical squad context lost → agent confused
+- `preCompact` hook: snapshot `.squad/decisions.md` + board state before compaction kicks in
+- Preserves decision log and agent coordination metadata
+
+**Owner:** Picard (Lead) + Scribe (logging)  
+**Scope:**
+- Configure hook: `preCompact: snapshot_squad_state.ps1`
+- Script creates `.squad/sessions/{session-id}/pre-compact-snapshot.json` with:
+  - Active decisions (last 5)
+  - Board state (open issues, assignments)
+  - Active agent tasks
+- Scribe logs hook execution in session metadata
+
+**Impact:** Medium-High — improves multi-hour session continuity  
+**Effort:** Medium (design snapshot script, test hook timing)  
+**Dependencies:** Hook support in v1.0.5 (already available)
+
+---
+
+### 🟢 Secondary Priority (This Sprint)
+
+#### 4. `/pr` Command (New Command)
+
+**Feature:** Create, view, manage PRs; fix CI failures; resolve merge conflicts.
+
+**Why:**
+- Squad code reviews use gh CLI heavily (routing PRs, checking status)
+- `/pr` command provides unified interface for PR lifecycle
+- Useful for @copilot workflow (create PR, check CI, resolve conflicts) in `squad:copilot` issues
+- Simplifies lead review workflow for Data's code changes
+
+**Owner:** Data (Code Expert)  
+**Scope:**
+- Document in @copilot capability profile (.squad/team.md)
+- Test with Data's code review session
+- Update routing rules if `/pr` workflow changes triage flow
+
+**Impact:** Medium  
+**Effort:** Low (documentation + testing)
+
+---
+
+#### 5. Syntax Highlighting in `/diff` (Enhancement)
+
+**Feature:** `/diff` command now supports syntax highlighting for 17 programming languages.
+
+**Why:**
+- Improves readability of code diffs in agent output
+- Data's code review sessions will benefit (faster problem identification)
+- Windows rendering now correct (bug fix included)
+
+**Owner:** Data (Code Expert)  
+**Scope:**
+- Enable by default (already shipped)
+- Document in agent charter for code review workflows
+- Test with C# + Go diffs
+
+**Impact:** Low-Medium (UX improvement)  
+**Effort:** Very low (already implemented)
+
+---
+
+### ✅ Auto-Adopt (No Action Needed)
+
+- `@file` improvements (absolute, home, relative paths) — already working well
+- `/diff` view Windows fix — bug fix, adopt automatically
+- `/version` command — low priority, useful for debugging
+- Right-click paste improvements — operational quality, adopt
+- Memory storage error messages — operational quality, adopt
+- All bug fixes (Kitty, ghp_ token warning, backtick rendering) — zero friction, adopt
+
+---
+
+### 📋 Deferred (No Current Use)
+
+- `/extensions` command — not using CLI extensions in squad workflow yet
+- `/experimental` toggle — embedding retrieval strategy is what we need (Feature #2 above)
+
+---
+
+## Adoption Timeline
+
+| When | Feature | Owner | Status |
+|------|---------|-------|--------|
+| **This week** | `write_agent` tool | Data | Design + integrate into squad-mcp |
+| **This week** | Embedding retrieval | Data | Enable experimental, test + document |
+| **This sprint** | `preCompact` hook | Picard + Scribe | Design snapshot script, configure |
+| **Next sprint** | `/pr` command workflow | Data | Document + test @copilot routing |
+| **Next sprint** | `/diff` syntax highlighting | Data | Document in charters |
+
+---
+
+## Risks & Mitigations
+
+| Risk | Mitigation |
+|------|-----------|
+| `write_agent` adds complexity to orchestration | Test with controlled agent pairs first (Ralph + Scribe) |
+| Embedding retrieval changes behavior | Run A/B test: one agent with, one without; measure context savings |
+| `preCompact` hook timing issues | Test hook in long sessions (4+ hours); document required delay |
+
+---
+
+## Success Criteria
+
+1. ✅ `write_agent` integrated into squad-mcp by end of week
+2. ✅ Embedding retrieval tested; 20%+ context reduction measured
+3. ✅ `preCompact` hook configured; decision snapshots persist across 2+ compactions
+4. ✅ All squad members can articulate how new features improve their workflows
+
+---
+
+## Related Issues
+
+- #417 — Squad MCP Server (depends on write_agent integration)
+- #385 — Copilot Features Research (research phase, now adoption phase)
+- #340 — Agent architecture validation (benefits from write_agent, embedding retrieval)
+
+---
+
+## References
+
+- CLI v1.0.5 Release: https://github.com/github/copilot-cli/releases/tag/v1.0.5
+- Squad MCP PR #453: https://github.com/tamirdresher_microsoft/tamresearch1/pull/453
+
+
+---
+
+# Decision: Copilot CLI v1.0.5 Feature Adoption Strategy
+
+**Date:** 2026-03-13  
+**Decided By:** Picard  
+**Issue:** #454 — "New copilot cli features. Use them"  
+**Status:** ADOPTED (immediate + phased rollout)
+
+---
+
+## Executive Summary
+
+After analyzing Seven's research on Copilot CLI v1.0.5 (25 features total), we are adopting a **3-tier strategy**:
+
+1. **ADOPT NOW (Immediate):** 3 strategic features that amplify Squad orchestration
+2. **ADOPT THIS/NEXT SPRINT (Secondary):** 2 features for PR workflow improvements
+3. **AUTO-ADOPT (Zero friction):** All bug fixes
+4. **DEFER:** Experimental features not aligned with current Squad needs
+
+---
+
+## Feature Decisions
+
+### Tier 1: Adopt Now (Immediate)
+
+#### 1. **write_agent** — Background Agent Messaging Tool
+
+**Decision:** ✅ ADOPT NOW  
+**Priority:** HIGH (Strategic)  
+**Owner:** Data  
+**Impact:** Enables sophisticated multi-agent orchestration without session breaks
+
+**Why:**
+- Squad architecture depends on agent-to-agent coordination (13+ agents: Scribe, Ralph, Neelix, Troi, etc.)
+- Current pattern: Agent finishes → Ralph claims next work → Scribe orchestrates → workflow restarts
+- **With write_agent:** Agents guide each other mid-execution → faster convergence, better context reuse
+- Example: Scribe can send Ralph a prioritized todo list without waiting for new session
+
+**Integration Plan:**
+- File: `.squad/scripts/Squad-Orchestrate.ps1` (multi-agent dispatcher)
+- Usage: `write_agent -AgentId <id> -Message <text>` to send follow-ups
+- Test: Write integration test in `.squad/tests/Agent-Orchestration.ps1`
+- **Effort:** Low (minimal wrapper around new tool)
+
+**Success Criteria:**
+- Scribe successfully sends prioritized work to Ralph without session break
+- Ralph responds to Scribe's guidance → validates async flow
+- Session remains under context limit during multi-hour orchestration
+
+---
+
+#### 2. **Embedding-Based MCP/Skill Retrieval** — Dynamic Instruction Loading
+
+**Decision:** ✅ ADOPT NOW  
+**Priority:** HIGH (Strategic)  
+**Owner:** Data (coordinates with Scribe)  
+**Impact:** Reduces context bloat; enables 10+ hour sessions without manual pruning
+
+**Why:**
+- Current approach: Load ALL MCP docs + ALL skill definitions for every session
+- Problem: 50+ agent charters + multiple skill PDFs = massive token waste
+- **With embedding retrieval:** Only load relevant docs per task (50% context savings)
+- Example: When fixing a bug, load only relevant skill docs; when writing, load Writer-domain docs
+
+**Integration Plan:**
+- File: `.squad/config.json` (add `embeddingRetrieval` section)
+- Usage: Enable embedding-based filtering in MCP config
+- Test: Measure context tokens before/after (target: 40-50% reduction)
+- Coordinate with squad-mcp server work (Issue #417, PR #453)
+- **Effort:** Medium (config change + testing)
+
+**Success Criteria:**
+- Context usage drops 40-50% in multi-hour sessions
+- Quality of agent responses remains constant or improves
+- No false negatives (relevant docs are still loaded)
+
+---
+
+#### 3. **preCompact Hook** — State Preservation Before Context Compaction
+
+**Decision:** ✅ ADOPT NOW  
+**Priority:** MEDIUM-HIGH (Continuity)  
+**Owner:** Picard + Scribe  
+**Impact:** Preserves Squad state through long sessions; enables safe context resets
+
+**Why:**
+- Squad tracks state in `.squad/decisions.md` (active decisions), `board_snapshot.json` (work board)
+- When context compacts (≥100K tokens), state can be lost if not explicitly preserved
+- **With preCompact hook:** Save decisions + board state before compaction
+- Example: After 8-hour session, compact context but retain all decisions + work assignments
+
+**Integration Plan:**
+- File: `.squad/config.json` (add `preCompact` hook)
+- Hook action: Save `.squad/decisions.md` + `.squad/board_snapshot.json` to git
+- Implementation: `.squad/scripts/Preserve-Squad-State.ps1`
+- **Effort:** Low (config + simple PowerShell script)
+
+**Success Criteria:**
+- State files are committed before context compaction
+- Decisions + board remain queryable after context reset
+- No data loss during long multi-agent sessions
+
+---
+
+### Tier 2: Secondary Priority (This Sprint + Next Sprint)
+
+#### 4. **`/pr` Command** — Unified PR Lifecycle Management
+
+**Decision:** ✅ ADOPT NEXT SPRINT  
+**Priority:** MEDIUM  
+**Owner:** Data  
+**Impact:** Reduces boilerplate for PR creation, CI debugging, conflict resolution
+
+**Why:**
+- Squad creates many PRs for experimental work (e.g., Ralph prototypes, blog iterations)
+- Current workflow: `gh pr create`, wait for CI, manually debug failures
+- **With `/pr`:** One command creates + optionally fixes CI + resolves conflicts
+- Data already uses GitHub CLI extensively; this is a natural evolution
+
+**Integration Plan:**
+- File: None yet (planned for Issue #XXX)
+- Usage: `/pr create`, `/pr fix-ci`, `/pr resolve-conflicts`
+- Test: Create PR for squad decision record; validate CI integration
+- **Effort:** Low (just uses CLI command; no integration needed)
+
+**Success Criteria:**
+- Create a PR using `/pr` from within a session
+- Verify CI debugging works
+- Team adopts for standard workflow (not required immediately)
+
+---
+
+#### 5. **Syntax Highlighting in `/diff`** — Code Review Readability
+
+**Decision:** ✅ ADOPT NEXT SPRINT  
+**Priority:** LOW-MEDIUM  
+**Owner:** Data  
+**Impact:** Improves readability during code review sessions
+
+**Why:**
+- Data reviews code diffs frequently (PR reviews, debugging)
+- Current `/diff`: Shows raw text; hard to scan large diffs
+- **With highlighting:** 17 language support (Python, Go, TypeScript, PowerShell, etc.)
+- Nice-to-have; doesn't block any workflows
+
+**Integration Plan:**
+- File: None (CLI feature; no Squad integration needed)
+- Usage: `/diff <file>` automatically syntax highlights
+- **Effort:** Zero (built into CLI)
+
+---
+
+### Tier 3: Auto-Adopt (Zero Friction)
+
+**Decision:** ✅ ADOPT ALL IMMEDIATELY  
+**Features:**
+- ✅ Kitty keyboard protocol fix (terminal stability)
+- ✅ Authentication error handling (faster recovery vs. hanging)
+- ✅ `ghp_` legacy token detection (security warning)
+- ✅ Backtick-formatted PR descriptions rendering on Windows/PowerShell
+- ✅ @file mentions with absolute, home, relative paths
+- ✅ View tool partial content for large single-line files
+- ✅ /version command (CLI introspection)
+
+**Why:** These are bug fixes + non-breaking improvements. No decision needed; just benefit immediately from new CLI version.
+
+---
+
+### Tier 4: Defer (Low Alignment)
+
+**Decision:** ⏸️ DEFER  
+**Features:**
+- `/extensions` command (view/enable CLI extensions)
+- `/experimental` toggle (restart CLI for experimental features)
+- UNC path blocking (useful for security, not Squad-specific)
+
+**Why:** 
+- `/extensions` + `/experimental` are meta-CLI features; Squad doesn't use extensions today
+- Revisit if Copilot releases Squad-relevant extensions in future quarters
+- Not a blocker; can adopt later if needed
+
+---
+
+## Dependencies & Risks
+
+### Dependencies
+- **write_agent:** Requires squad-mcp server updates (Issue #417, PR #453)
+- **Embedding retrieval:** Requires MCP config schema update + performance testing
+- **preCompact hook:** Requires .squad/config.json update + state preservation script
+
+### Risks & Mitigations
+
+| Risk | Severity | Mitigation |
+|------|----------|-----------|
+| write_agent + squad-mcp conflicts | Medium | Data validates with existing squad-mcp (#417) before merging |
+| Embedding retrieval misses critical docs | High | Test with real agent workflows; measure F1 score on doc retrieval |
+| preCompact state conflicts with concurrent agents | Medium | Scribe coordinates timing; test with multi-agent scenarios |
+| /pr command breaks existing PR workflows | Low | Test in experimental PR; rollback if needed |
+
+---
+
+## Implementation Timeline
+
+| When | Feature | Owner | Effort |
+|------|---------|-------|--------|
+| **NOW** | write_agent integration | Data | 2-3h |
+| **NOW** | Embedding retrieval config | Data + Scribe | 4-6h |
+| **NOW** | preCompact state preservation | Picard + Scribe | 2-3h |
+| **This Sprint** | /pr command adoption | Data | 1-2h |
+| **Next Sprint** | /diff syntax highlighting | Data | 0h (automatic) |
+| **Continuous** | Auto-adopt bug fixes | All | 0h |
+
+---
+
+## Decision Record Housekeeping
+
+- **Closes:** Issue #454
+- **Related:** Issue #417 (squad-mcp server), PR #453 (MCP config updates)
+- **Creates:** (if needed) Issue #XXX for /pr workflow adoption
+- **Tags:** `squad:picard`, `cli-adoption`, `architecture`
+
+---
+
+## Questions for Tamir / Ralph Watch
+
+1. Should preCompact hook commit `.squad/decisions.md` automatically, or should Scribe manage commits?
+   - **Recommendation:** Scribe manages (cleaner commit messages, fewer WIP commits)
+
+2. Do we need feature flagging for write_agent adoption (gradual rollout)?
+   - **Recommendation:** No; test in non-critical paths first (e.g., Neelix digest generation)
+
+3. Should `/pr` be the squad default for all PR creation, or just for experimental work?
+   - **Recommendation:** Start with experimental; migrate to default after 1 sprint of validation
+
+---
+
+## Approved By
+
+**Picard** — 2026-03-13 10:28 UTC  
+Lead, Architecture & Decisions
 

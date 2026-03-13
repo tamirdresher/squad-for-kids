@@ -1,0 +1,128 @@
+[
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "blog-draft-ai-squad-productivity-audio.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "blog-draft-ai-squad-productivity-podcast.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "blog-part1-refresh-audio.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "blog-part1-refresh-seven-v2-audio.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "blog-part2-refresh-audio.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "EXECUTIVE_SUMMARY-audio.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "QUICK_REFERENCE-audio.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "QUICK_REFERENCE-conversational.mp3"
+  },
+  {
+    "url": {
+      "Exception": "System.Management.Automation.RemoteException: ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "TargetObject": "ERROR: incorrect usage: --expiry should be within 7 days from now",
+      "CategoryInfo": "NotSpecified: (ERROR: incorrect us…hin 7 days from now:String) [], RemoteException",
+      "FullyQualifiedErrorId": "NativeCommandError",
+      "ErrorDetails": null,
+      "InvocationInfo": "System.Management.Automation.InvocationInfo",
+      "ScriptStackTrace": "at <ScriptBlock>, <No file>: line 17\r\nat <ScriptBlock>, <No file>: line 1",
+      "PipelineIterationInfo": "0 0",
+      "PSMessageDetails": null
+    },
+    "name": "RESEARCH_REPORT-audio.mp3"
+  }
+]

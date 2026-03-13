@@ -1,0 +1,69 @@
+=============== REPORT 1: MISSION CONTROL ANALYSIS (#414) ===============
+
+TITLE: Copilot Coding Agent Mission Control — Research Report
+RESEARCHER: Geordi (Technology Scanner)
+STATUS: ✅ Complete
+ISSUE: tamresearch1#414
+
+EXECUTIVE SUMMARY:
+GitHub Copilot Mission Control is a centralized UI for assigning, steering, and tracking Copilot coding agent tasks. It consolidates task management at github.com/copilot/agents with real-time steering, multi-repo support, and session logs.
+
+KEY CAPABILITIES:
+• Centralized task view across repos
+• Real-time steering (mid-run guidance)
+• Multi-repo task assignment
+• Custom agent selection
+• Session logs with reasoning traces
+• Cross-platform sync
+• Third-party agent support
+• Model selection per task
+
+VERDICT FOR SQUAD:
+✅ ADOPT for interactive/ad-hoc tasks — superior for exploratory research needing human guidance
+⚠️  MONITOR for programmatic APIs — could replace Ralph's dispatch if APIs are released
+❌ DO NOT REPLACE Ralph's autonomous loop — Mission Control is human-centric
+
+KEY RECOMMENDATIONS:
+1. Publish squad personas as custom agents (agents.md format)
+2. Use Mission Control for manual squad oversight instead of raw CLI
+3. Watch for Mission Control API releases
+4. Integrate session logs into squad monitoring
+
+LINK: Research available at C:\temp\tamresearch1-research\research\active\copilot-mission-control\README.md
+
+
+=============== REPORT 2: COPILOT SPACES EVALUATION (#416) ===============
+
+TITLE: GitHub Copilot Features Evaluation for Research Squad
+RESEARCHER: Geordi (Technology Scanner)
+STATUS: Active
+ISSUE: tamresearch1#385 (coverage includes #416)
+
+EXECUTIVE SUMMARY:
+The Copilot platform has transformed into a full agentic development platform (2025-2026). Key new features evaluated: Hooks, Memory, A2A protocol, Agentic Actions, MCP v2, Copilot Spaces, Custom Agents, and Workspace.
+
+COPILOT SPACES ANALYSIS (Primary Focus):
+What it is: GA since Sept 2025. "Living knowledge hubs" that gather files, issues, docs, repos so Copilot has grounded context. Successor to Knowledge Bases.
+Current Status: ❌ Not using (we use .squad/ files instead)
+Applicability: 🟡 MEDIUM
+Effort: 🟢 LOW
+
+SQUAD-SPECIFIC OPPORTUNITIES:
+✅ Create "Research Squad" Space with agent charters, routing rules, docs
+✅ Share context between tamresearch1 and tamresearch1-research
+✅ Public Space for open-source squad framework sharing
+✅ Code viewer integration
+
+CAVEAT: Spaces are primarily for Copilot Chat enrichment, not agent-to-agent sharing. May not directly help Ralph operations.
+
+RECOMMENDATION: Create a Research Squad Space for knowledge sharing. Evaluate if it can supplement .squad/ context files.
+
+TOP PRIORITIES (Across all features):
+🔴 Copilot Hooks — HIGH priority, low effort (add .github/hooks/hooks.json)
+🔴 GitHub Memory — HIGH priority, low effort (enable in settings)
+🟡 Copilot Spaces — MEDIUM priority (knowledge sharing benefits)
+🟢 Custom Agents — ALREADY USING (audit format compliance)
+🟡 A2A Protocol — MEDIUM priority (monitor, prototype when needed)
+
+LINK: Full evaluation at C:\temp\tamresearch1-research\research\active\copilot-features-eval\README.md
+

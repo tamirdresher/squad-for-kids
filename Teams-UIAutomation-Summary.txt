@@ -1,0 +1,126 @@
+# Teams UI Automation with PowerShell - Research Summary
+
+## 1. FINDING THE TEAMS WINDOW
+Process: ms-teams.exe (NEW Teams, UWP-based)
+Window Class: TeamsWebView
+Finding Code:
+  \\ = Get-Process ms-teams | Where { \.MainWindowHandle -ne 0 }
+   \ = [System.Windows.Automation.AutomationElement]::FromHandle(\.MainWindowHandle)\
+
+## 2. ASSEMBLY LOADING
+Required:
+  Add-Type -AssemblyName UIAutomationClient
+  Add-Type -AssemblyName UIAutomationTypes
+  Add-Type -AssemblyName WindowsBase
+
+## 3. FINDING UI ELEMENTS
+
+By AutomationID (MOST RELIABLE):
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::AutomationIdProperty, "ID")
+  \ = \.FindFirst([System.Windows.Automation.TreeScope]::Descendants, \)
+
+By Name:
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::NameProperty, "Name")
+
+By ClassName:
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ClassNameProperty, "ClassName")
+
+## 4. INTERACTION PATTERNS
+
+Click Button (InvokePattern):
+  \ = \.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+  \.Invoke()
+
+Type Text (ValuePattern):
+  \ = \.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+  \.SetValue("text")
+
+Expand/Collapse (ExpandCollapsePattern):
+  \ = \.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern)
+  \.Expand()
+
+## 5. COMPLETE NAVIGATION EXAMPLE
+
+Navigate to Team/Channel:
+  \ = Find-ByName \ "Engineering"
+  Expand-Team \
+  Start-Sleep -Milliseconds 800  # CRITICAL: Wait for render!
+  \ = Find-ByName \ "general"
+  Click-Button \
+
+Send Message:
+  \ = Find-ByName \ "Message"
+  \.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue("Hello")
+  [System.Windows.Forms.SendKeys]::SendWait("^({ENTER})")
+
+## 6. KEYBOARD SHORTCUTS (MORE RELIABLE)
+
+Ctrl+K - Search/Command
+Ctrl+N - New Chat
+Ctrl+F - Find
+Ctrl+Enter - Send Message
+Ctrl+1-9 - Switch tabs
+
+[System.Windows.Forms.SendKeys]::SendWait("^k")
+
+## 7. DISCOVERY TOOLS
+
+Inspect.exe: C:\Program Files (x86)\Windows Kits\10\bin\x64\inspect.exe
+- Click "Inspect Elements" then click Teams UI
+- Shows exact AutomationID, ControlType, Name
+
+AccessibilityInsights: https://microsoft.com/en-us/download/details.aspx?id=49357
+- Better UI than Inspect
+- Shows complete element tree and patterns
+
+PowerShell Discovery:
+  \ = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+  \ = \.GetFirstChild(\)
+  while (\) {
+    Write-Host "[\] ID=\ Name=\"
+    \ = \.GetNextSibling(\)
+  }
+
+## 8. CRITICAL LIMITATIONS
+
+1. **Timing**: Teams is async - add 500-800ms delays after navigation
+2. **Element Names**: Localized, may change - use AutomationID instead
+3. **Deep Tree**: 10-20+ levels deep - limit MaxDepth in searches
+4. **Not All Patterns**: Not all elements support InvokePattern, check first
+5. **Frequent Updates**: Teams updates break automation IDs regularly
+6. **Single Window**: Only one MainWindowHandle != 0 per Teams process
+7. **Accessibility**: May require Admin, blocked in some corporate environments
+8. **RichEditBox**: Message compose is complex, may need special handling
+
+## 9. COMMON AUTOMATION IDs
+
+ChatMainContent
+MessageCompose / Message (text input)
+SendButton / SendMessageButton
+SearchBox
+NewChatButton
+TeamItemButton_* (teams)
+ChannelItemButton_* (channels)
+
+*Note: IDs change between Teams versions - always verify with Inspect.exe*
+
+## 10. GOTCHAS
+
+✗ Don't: Cache element references across multiple operations
+✓ Do: Get fresh root element each operation sequence
+
+✗ Don't: Rely on element names (different languages)
+✓ Do: Use AutomationID when available
+
+✗ Don't: Search without depth limits
+✓ Do: Use Show-ElementTree -MaxDepth 3
+
+✗ Don't: Assume InvokePattern exists
+✓ Do: Check GetCurrentPattern() before use
+
+✗ Don't: No delays between actions
+✓ Do: Add Start-Sleep -Milliseconds 500-800
+

@@ -1,0 +1,412 @@
+================================================================================
+                WINDOWS UI AUTOMATION FOR TEAMS - FINAL RESEARCH SUMMARY
+================================================================================
+
+This research covers using System.Windows.Automation (UIA) in PowerShell to
+control Microsoft Teams (ms-teams.exe) on Windows.
+
+================================================================================
+1. FINDING THE TEAMS WINDOW
+================================================================================
+
+NEW TEAMS APP DETAILS:
+  Process Name: ms-teams.exe (not old Electron multi-process)
+  Window Class: TeamsWebView (UWP framework)
+  Main Window: Single UI window (MainWindowHandle != 0)
+  Process Count: Multiple processes exist, only 1 with UI window
+
+FINDING CODE:
+  \ = Get-Process ms-teams | Where { \.MainWindowHandle -ne 0 }
+  \ = [System.Windows.Automation.AutomationElement]::FromHandle(\.MainWindowHandle)
+
+KEY INFO FROM RUNNING TEAMS:
+  Process Name: ms-teams
+  PID: 4712
+  Window Title: Chat | tamir-squads-notifications | Microsoft Teams
+  Window Handle: 0x5061E (decimal 329246)
+  Root Element ClassName: TeamsWebView
+  Root Element Type: ControlType.Window
+
+================================================================================
+2. ASSEMBLY LOADING
+================================================================================
+
+REQUIRED ASSEMBLIES:
+  Add-Type -AssemblyName UIAutomationClient
+  Add-Type -AssemblyName UIAutomationTypes
+  Add-Type -AssemblyName WindowsBase
+
+CORE CLASSES:
+  [System.Windows.Automation.AutomationElement] - UI element representation
+  [System.Windows.Automation.TreeWalker] - Navigate element hierarchy
+  [System.Windows.Automation.PropertyCondition] - Search criteria builder
+  [System.Windows.Automation.InvokePattern] - Click/activate elements
+  [System.Windows.Automation.ValuePattern] - Read/write text values
+  [System.Windows.Automation.ExpandCollapsePattern] - Expand/collapse tree items
+
+================================================================================
+3. FINDING UI ELEMENTS - FOUR METHODS
+================================================================================
+
+METHOD 1: BY AUTOMATION ID (MOST RELIABLE)
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::AutomationIdProperty, "ID")
+  \ = \.FindFirst([System.Windows.Automation.TreeScope]::Descendants, \)
+
+  ADVANTAGES:
+  - Stable across Teams updates
+  - Not localized (same in all languages)
+  - Set by developers, intentionally exposed
+  - RECOMMENDED for production code
+
+  HOW TO FIND IDs:
+  - Use Inspect.exe or AccessibilityInsights
+  - Click "Inspect Elements", then click Teams UI element
+  - See exact AutomationID property
+
+METHOD 2: BY NAME (ELEMENT LABEL)
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::NameProperty, "Send")
+  \ = \.FindFirst([System.Windows.Automation.TreeScope]::Descendants, \)
+
+  DISADVANTAGES:
+  - Localized (different text in different languages)
+  - Subject to change with Teams updates
+  - May not match exactly (whitespace, formatting)
+  - USE ONLY for testing/exploration
+
+METHOD 3: BY CLASS NAME (UWP COMPONENT TYPE)
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ClassNameProperty, "Button")
+  \ = \.FindAll([System.Windows.Automation.TreeScope]::Descendants, \)
+
+  NOTE: Returns ALL matching elements
+
+METHOD 4: BY CONTROL TYPE (STANDARD UI CONTROL)
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+    [System.Windows.Automation.ControlType]::Button)
+  \ = \.FindAll(...)
+
+  CONTROL TYPES:
+  - Button
+  - TextBox / Edit (text input)
+  - MenuItem
+  - TreeItem (hierarchy elements)
+  - Pane (containers)
+  - Window
+
+================================================================================
+4. CLICKING BUTTONS AND ELEMENTS
+================================================================================
+
+INVOKEPATTERN (RECOMMENDED):
+  \ = \.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+  if (\) {
+    \.Invoke()
+    Start-Sleep -Milliseconds 500  # Wait for UI response
+  }
+
+ADVANTAGES:
+  - Position-independent (not coordinate-based)
+  - Works even if element partially obscured
+  - Respects accessibility semantics
+  - More reliable than mouse clicks
+
+FALLBACK TO KEYBOARD:
+  If InvokePattern not supported, use keyboard shortcut instead
+  [System.Windows.Forms.SendKeys]::SendWait(\"^k\")  # Ctrl+K
+
+================================================================================
+5. TYPING TEXT INTO FIELDS
+================================================================================
+
+VALUEPATTERN:
+  \ = \.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+  if (\) {
+    \.SetValue(\"\")           # Clear first
+    Start-Sleep -Milliseconds 100
+    \.SetValue(\"Hello\")      # Set new text
+  }
+
+SUPPORTS:
+  - TextBox
+  - RichEditBox (message compose)
+  - Password fields
+  - Text input controls
+
+================================================================================
+6. EXPANDING/COLLAPSING TREE ITEMS
+================================================================================
+
+EXPANDCOLLAPSEPATTERN:
+  \ = \.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern)
+  if (\) {
+    \.Expand()      # or Collapse()
+    Start-Sleep -Milliseconds 600  # Wait for children to render
+  }
+
+TEAMS USE CASES:
+  - Expand Team folder to show Channels
+  - Expand channel group to show sub-channels
+  - Expand sidebar sections
+
+CRITICAL: Always wait after expand before searching for children!
+
+================================================================================
+7. COMPLETE NAVIGATION EXAMPLE
+================================================================================
+
+NAVIGATE TO CHANNEL AND SEND MESSAGE:
+
+  # 1. Get root element
+  \ = Get-Process ms-teams | Where { \.MainWindowHandle -ne 0 }
+  \ = [System.Windows.Automation.AutomationElement]::FromHandle(\.MainWindowHandle)
+
+  # 2. Find team
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::NameProperty, \"Engineering\")
+  \ = \.FindFirst([System.Windows.Automation.TreeScope]::Descendants, \)
+
+  # 3. Expand team
+  \ = \.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern)
+  \.Expand()
+  Start-Sleep -Milliseconds 800  # CRITICAL: Wait for channels to render
+
+  # 4. Find channel
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::NameProperty, \"general\")
+  \ = \.FindFirst([System.Windows.Automation.TreeScope]::Descendants, \)
+
+  # 5. Click channel
+  \ = \.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+  \.Invoke()
+  Start-Sleep -Milliseconds 500
+
+  # 6. Find message box and type
+  \ = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::NameProperty, \"Message\")
+  \ = \.FindFirst([System.Windows.Automation.TreeScope]::Descendants, \)
+
+  \ = \.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+  \.SetValue(\"Hello from automation!\")
+
+  # 7. Send message
+  Start-Sleep -Milliseconds 300
+  [System.Windows.Forms.SendKeys]::SendWait(\"^({ENTER})\")  # Ctrl+Enter
+
+================================================================================
+8. KEYBOARD SHORTCUTS (MOST RELIABLE APPROACH)
+================================================================================
+
+Keyboard shortcuts work even when UI elements not accessible:
+
+  [System.Windows.Forms.SendKeys]::SendWait(\"^k\")        # Ctrl+K: Search/Command
+  [System.Windows.Forms.SendKeys]::SendWait(\"^n\")        # Ctrl+N: New chat
+  [System.Windows.Forms.SendKeys]::SendWait(\"^f\")        # Ctrl+F: Find
+  [System.Windows.Forms.SendKeys]::SendWait(\"^({ENTER})\") # Ctrl+Enter: Send message
+  [System.Windows.Forms.SendKeys]::SendWait(\"%1\")        # Alt+1: Activity
+  [System.Windows.Forms.SendKeys]::SendWait(\"%2\")        # Alt+2: Chat
+  [System.Windows.Forms.SendKeys]::SendWait(\"%3\")        # Alt+3: Teams
+  [System.Windows.Forms.SendKeys]::SendWait(\"%4\")        # Alt+4: Calendar
+  [System.Windows.Forms.SendKeys]::SendWait(\"%5\")        # Alt+5: Files
+  [System.Windows.Forms.SendKeys]::SendWait(\"{ESC}\")     # Escape: Close dialog
+
+SENDKEYS FORMAT:
+  ^ = Ctrl
+  % = Alt
+  + = Shift
+  {ENTER} = Enter key
+  {ESC} = Escape key
+
+================================================================================
+9. DISCOVERY TOOLS
+================================================================================
+
+INSPECT.EXE (Windows SDK):
+  Location: C:\Program Files (x86)\Windows Kits\10\bin\x64\inspect.exe
+  
+  Usage:
+  1. Run Inspect.exe
+  2. Click \"Inspect Elements\" button (camera icon)
+  3. Click on Teams UI element
+  4. See properties: AutomationID, ControlType, Name, ClassName, etc.
+
+ACCESSIBILITY INSIGHTS (RECOMMENDED):
+  Download: https://microsoft.com/en-us/download/details.aspx?id=49357
+  
+  Features:
+  - Better UI than Inspect.exe
+  - Shows complete element tree
+  - Displays all supported patterns
+  - Shows element properties
+  - Accessibility compliance check
+
+POWERSHELL DISCOVERY:
+  
+  # Display element tree (limited depth)
+  \ = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+  \ = \.GetFirstChild(\)
+  
+  while (\ -and \ -lt 10) {
+    Write-Host \"[\] \" +
+               \"ID=\ \" +
+               \"Name=\\"
+    \ = \.GetNextSibling(\)
+    \++
+  }
+
+================================================================================
+10. COMMON AUTOMATION IDs IN TEAMS
+================================================================================
+
+SIDEBAR/NAVIGATION:
+  ChatMainContent
+  TeamItemButton_* (teams in sidebar)
+  ChannelItemButton_* (channels)
+  SearchBox / SearchInput
+
+MESSAGE COMPOSE:
+  MessageCompose / Message
+  SendButton / SendMessageButton
+  EmojiButton / ReactionButton
+  AttachmentButton
+
+TOP BAR:
+  NewChatButton
+  SearchButton
+  SettingsButton
+  ProfileButton
+  NotificationButton
+
+TABS:
+  ActivityTab
+  ChatTab
+  TeamsTab
+  CalendarTab
+
+NOTE: These IDs change frequently between Teams updates. ALWAYS verify with
+Inspect.exe before using in production code.
+
+================================================================================
+11. CRITICAL LIMITATIONS & GOTCHAS
+================================================================================
+
+1. TIMING AND ASYNC RENDERING
+   ✗ Problem: Elements not immediately available after navigation
+   ✓ Solution: Add Start-Sleep (500-800ms) after expand or navigation
+   
+2. ELEMENT NAMES ARE LOCALIZED
+   ✗ Problem: Name changes based on language/locale
+   ✓ Solution: Use AutomationID instead (not localized)
+
+3. DEEP UI TREE (10-20+ LEVELS)
+   ✗ Problem: FindAll() is slow on deep trees
+   ✓ Solution: Limit search depth, cache references, search from specific parent
+
+4. NOT ALL ELEMENTS SUPPORT ALL PATTERNS
+   ✗ Problem: InvokePattern might not exist on element
+   ✓ Solution: Check GetCurrentPattern() before use, catch exceptions
+
+5. AUTOMAT IONID INSTABILITY
+   ✗ Problem: Teams updates frequently break AutomationIDs
+   ✓ Solution: Test automation after every Teams update
+
+6. WINDOW HANDLE VALIDITY
+   ✗ Problem: MainWindowHandle becomes invalid if window closes
+   ✓ Solution: Check MainWindowHandle != 0 before use, wrap in try/catch
+
+7. MESSAGE COMPOSE BOX COMPLEXITY
+   ✗ Problem: Uses RichEditBox (not simple TextBox)
+   ✓ Solution: Use ValuePattern if available, verify with Inspect.exe
+
+8. ACCESSIBILITY RESTRICTIONS
+   ✗ Problem: Corporate environments may disable UI automation
+   ✓ Solution: May require admin, check with IT
+
+9. CACHING ELEMENT REFERENCES
+   ✗ Problem: Old element references become invalid
+   ✓ Solution: Always get fresh elements from root, don't cache
+
+10. KEYBOARD vs UI AUTOMATION
+    ✓ Keyboard shortcuts more reliable (position-independent)
+    ✓ UI automation more flexible (programmatic control)
+    ✗ Mix both: use shortcuts when possible, UI automation for complex tasks
+
+================================================================================
+12. BEST PRACTICES
+================================================================================
+
+DO:
+  ✓ Use AutomationID when available
+  ✓ Add timing delays (Start-Sleep) between actions
+  ✓ Verify element exists before interacting (if check)
+  ✓ Use keyboard shortcuts when available
+  ✓ Wrap in try/catch for robustness
+  ✓ Get fresh root element for new operation sequences
+  ✓ Limit tree search depth
+  ✓ Test after Teams updates
+
+DON'T:
+  ✗ Don't rely on element names (localized)
+  ✗ Don't forget timing delays
+  ✗ Don't assume all patterns supported
+  ✗ Don't cache element references across operations
+  ✗ Don't search entire tree without depth limits
+  ✗ Don't use mouse clicks (coordinate-dependent)
+  ✗ Don't ignore error handling
+
+================================================================================
+13. FILES CREATED
+================================================================================
+
+1. Teams-UIAutomation-Summary.txt
+   Quick reference of key concepts and code patterns
+
+2. Teams-Examples.ps1
+   Working PowerShell examples (commented out for safety)
+   - Finding elements
+   - Clicking buttons
+   - Typing text
+   - Navigation
+   - Tree discovery
+
+3. This file (comprehensive research guide)
+
+4. Created during research:
+   - Verified Teams process: ms-teams.exe (PID 4712)
+   - Verified window class: TeamsWebView
+   - Tested assembly loading: Successful
+   - Verified UI Automation access: Working
+
+================================================================================
+14. NEXT STEPS / RECOMMENDATIONS
+================================================================================
+
+1. IMMEDIATE TESTING:
+   - Copy Teams-Examples.ps1
+   - Uncomment examples one at a time
+   - Test with your Teams instance
+   - Update AutomationIDs based on your Teams version
+
+2. PRODUCTION USE:
+   - Always use AutomationID (verify with Inspect.exe)
+   - Add error handling and try/catch blocks
+   - Test after every Teams update
+   - Add timing delays (500-800ms minimum)
+   - Log all actions for debugging
+
+3. DISCOVERY:
+   - Download and install AccessibilityInsights
+   - Systematically map all Teams UI elements
+   - Build your own AutomationID registry
+   - Create helper functions module
+
+4. ALTERNATIVES:
+   - Consider Teams bot API if available
+   - Use Teams desktop app HTTP API (port 1313 local)
+   - Consider browser automation (Selenium) if UI automation insufficient
+
+================================================================================
+END OF RESEARCH SUMMARY
+================================================================================

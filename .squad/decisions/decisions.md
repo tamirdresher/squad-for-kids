@@ -2,6 +2,176 @@
 
 ## Active Decisions
 
+### 2026-03-14: Picard — Rework Rate Integration Proposal for bradygaster/squad (Issue #473)
+
+# Decision: Rework Rate Integration Proposal for bradygaster/squad
+
+**Author:** Picard (Lead)  
+**Date:** 2026-03-14  
+**Issue:** #473  
+**Status:** Proposed
+
+## Context
+
+Tamir asked us to continue the Rework Rate (5th DORA metric) integration proposal for bradygaster/squad and explicitly include Azure DevOps support.
+
+## Decision
+
+After thorough analysis of the bradygaster/squad codebase (v0.8.25), the integration path is clear:
+
+1. **Extend `PlatformAdapter`** with optional `getPullRequestReviews()` and `getPullRequestIterations()` methods
+2. **Create `ReworkCollector`** in `runtime/rework-collector.ts` for PR rework analysis
+3. **Add OTel metrics** under `squad.rework.*` namespace (rate, review_cycles, time, changes_requested, ai_retention_rate)
+4. **ADO gets first-class support** — ADO's native PR iterations API is actually superior to GitHub for rework tracking
+5. **4-phase rollout** — Core types → GitHub → ADO → AI retention → Dashboard
+
+## Key Findings
+
+- ADO adapter already exists (`platform/azure-devops.ts`) with work items, PRs, branches
+- OTel infrastructure is production-ready with no-op fallbacks
+- ADO's `_apis/git/pullRequests/{id}/iterations` API provides better rework tracking than GitHub
+- Platform auto-detection via git remote URL already works for both platforms
+
+## Impact
+
+- **All agents:** Should reference rework metrics when discussing PR quality
+- **Ralph:** Could integrate weekly rework rate reporting
+- **Data/Seven:** May need to implement the actual code changes on bradygaster/squad
+
+## Artifacts
+
+- Full proposal: `research/rework-rate-squad-integration.md`
+- Issue comment posted: #473
+
+---
+
+### 2026-03-13: Kes — Issue #471 Meeting Scheduled (Kind Aspire + Celestial Integration)
+
+# Decision: Issue #471 Meeting Scheduled
+
+**Date:** 2026-03-13  
+**Author:** Kes (Communications)  
+**Status:** Done
+
+## Context
+Tamir requested scheduling a meeting about the Kind Aspire resource / Celestial integration with all participants from the original email thread.
+
+## Decision
+- Meeting scheduled for **Monday March 23, 2026, 12:00–13:00 Israel Time**
+- Title: "Kind Aspire Resource Discussion — DK8S & Celestial Integration"
+- All 10 recipients from the email thread invited plus Tamir as organizer
+- Calendar invites sent via Outlook COM automation
+- GitHub issue #471 commented with full details
+
+## Attendees
+Andrey Noskov, Joshua Johnson, Moshe Peretz, Matt Kotsenas, IDP Leadership DL, Ofek Finkelstein, Adir Atias, Yadin Ben Kessous, Roy Mishael, Efi Shtain, Tamir Dresher (organizer)
+
+## Notes
+- Used Outlook COM (preferred method) — faster and more reliable than Playwright
+- WorkIQ could not surface the original email thread (only Reaction Digests); Outlook COM search was the reliable path
+- All recipients resolved successfully including the IDP Leadership distribution list
+
+---
+
+### 2026-03-13: Seven — nano-banana-mcp Integration Recommendation (Issue #375)
+
+# Decision: nano-banana-mcp Integration Recommendation
+
+**Issue:** #375  
+**Date:** 2026-03-28  
+**Author:** Seven (Research & Docs)  
+**Status:** Ready for Implementation
+
+## Summary
+
+**Question:** Can we use nano-banana-mcp without adding billing info or costs?
+
+**Answer:** ✅ **YES — Zero cost, zero billing setup required.**
+
+## Findings
+
+### Project Details
+- **Name:** nano-banana-mcp
+- **Repository:** https://github.com/pierceboggan/nano-banana-mcp
+- **Purpose:** MCP server for AI image generation via Google Gemini
+- **Language:** TypeScript/Node.js
+- **License:** ISC
+
+### Billing Analysis
+
+**Free Tier Access:**
+- Uses Google Gemini API via free tier (Google AI Studio)
+- No credit card required for API key
+- Free API keys are generated at https://aistudio.google.com/apikey
+- No billing info needed at any point
+
+**Code Transparency:**
+- Reviewed source code (11.5 KB)
+- Direct fetch calls to Google's generativelanguage.googleapis.com
+- Model used: `gemini-3.1-flash-image-preview` (free tier eligible)
+- No telemetry, tracking, or hidden data collection
+- Image generation only on explicit user request
+
+**Dependencies:**
+- @modelcontextprotocol/sdk (standard MCP)
+- zod (schema validation)
+- @types/node (dev only)
+- No proprietary or costly third-party services
+
+**Risks:** ⚠️ MINOR
+- Google free tier has quotas (generous for development)
+- Long-term cost if usage scales significantly
+- Google could change pricing model (unlikely for public API)
+
+## Recommendation
+
+**Status:** ✅ **APPROVED FOR ADOPTION**
+
+**Next Steps:**
+1. Test integration with squad MCP infrastructure
+2. Document setup: API key generation + GOOGLE_API_KEY environment variable
+3. Add to squad capabilities inventory
+4. Monitor usage (within free tier limits)
+
+**Acceptance Criteria:**
+- [ ] MCP server runs without errors in local environment
+- [ ] Image generation works end-to-end
+- [ ] Documentation posted to `.squad/implementations/`
+- [ ] Team notified in sync
+
+## Technical Notes
+
+**Usage Pattern:**
+```bash
+# Install
+npm install
+npm run build
+
+# Configure
+export GOOGLE_API_KEY="<free-api-key-from-google-ai-studio>"
+
+# Run
+npm start
+```
+
+**Integration Points:**
+- Works with VS Code Copilot, Claude Desktop, other MCP App clients
+- Images render inline as interactive viewer (MCP Apps feature)
+- Optional disk save for generated images
+
+**Scalability:**
+- Current: Development use (free tier)
+- Future: If production usage scales, evaluate dedicated billing account
+- Recommendation: Monitor quarterly API usage against free tier quotas
+
+## References
+- Issue: #375
+- GitHub: pierceboggan/nano-banana-mcp
+- Google AI Studio: https://aistudio.google.com/apikey
+
+
+
+
 ### 2026-03-13: Data — Conversational Podcast Generation (Issue #455)
 
 **Date:** 2026-03-13  
@@ -1500,4 +1670,35 @@ Chapter 1 established "why systems fail" (they need human maintenance). Chapter 
 ## Next Chapter Setup
 
 Chapter 3 will explain agent personas (Picard, Data, Worf, Seven, B'Elanna) as cognitive architectures, showing how different personalities shape AI reasoning and enable coordination.
+
+
+---
+
+# Podcaster Natural Speech Post-Processing Architecture
+
+**Date:** 2026-03-13  
+**Author:** Data  
+**Issue:** #464 — Podcaster quality improvements  
+**Status:** 🟡 Proposed
+
+## Decision
+
+Post-processing for natural speech (contractions, fillers, disfluencies, backchannels) runs as a separate pass AFTER script generation but BEFORE TTS rendering. Both features are opt-in via CLI flags (--natural-speech, --backchannels) and do not alter existing behavior when flags are omitted.
+
+## Rationale
+
+- **Separation of concerns**: Script generation (LLM or template) produces clean dialogue; speech naturalization is a distinct transformation step
+- **Backward compatibility**: All existing scripts, automation, and TTS pipelines work unchanged
+- **Composability**: Each post-processing step is independent — users can enable contractions without backchannels, or vice versa
+- **Randomization**: Filler/backchannel insertion uses random sampling (not deterministic) to avoid repetitive patterns across episodes
+
+## VibeVoice Integration
+
+VibeVoice wrapper (podcaster-vibevoice.py) is created but VibeVoice is not installed as a dependency. It requires CUDA GPU and the package availability on PyPI fluctuates. The wrapper is ready for use once the team has appropriate hardware.
+
+## Impact
+
+- generate-podcast-script.py: +200 lines (new functions, no existing code modified)
+- podcaster.ps1: +15 lines (new parameters, pipeline integration)
+- podcaster-vibevoice.py: New file, standalone wrapper
 

@@ -2,6 +2,12 @@
 
 > Your Squad roster. Star Trek TNG + Voyager universe.
 
+## 📚 Quick Links
+
+- **Knowledge Hub:** [Copilot Space "Research Squad"](https://github.com/copilot/spaces) — Cross-repo context & semantic search
+- **Setup Guide:** `.squad/COPILOT_SPACE_SETUP.md` — Manual setup instructions (if Space needs recreation)
+- **Knowledge Management:** `.squad/KNOWLEDGE_MANAGEMENT.md` — How we organize and search squad knowledge
+
 ## Members
 
 | Name | Role | Charter | Status |

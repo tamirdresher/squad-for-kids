@@ -16031,6 +16031,67 @@ Evaluation of Microsoft's dotnet/skills repository (https://github.com/dotnet/sk
 
 ---
 
+## Decision 23: Morning Dew RSS Source for Tech News Scanner
+
+**Author:** Data  
+**Date:** 2026-03-13  
+**Issue:** #461  
+**PR:** #462  
+**Status:** ✅ IMPLEMENTED
+
+### Context
+
+Tamir requested adding alvinashcraft.com (The Morning Dew) as a news source for the tech news scanner.
+
+### Decision
+
+- **RSS parsing via regex** — no new npm dependencies. The existing `httpsGet()` already returns raw text when JSON parsing fails, so it works for XML feeds out of the box.
+- **Base score of 50** for Morning Dew items since RSS has no upvote/score mechanism. This places RSS items below high-scoring HackerNews/Reddit stories but above low-engagement ones.
+- **CDATA handling** — WordPress RSS feeds often wrap titles in `<![CDATA[...]]>`. The regex handles both CDATA-wrapped and plain `<title>` tags.
+
+### Impact
+
+The tech news scanner now aggregates from 3 source types: HackerNews API, Reddit JSON, and Morning Dew RSS. The RSS pattern can be reused for other WordPress/RSS feeds in the future.
+
+---
+
+## Decision 24: Hebrew Podcast Generation Style Refinement Required
+
+**Author:** Copilot (User Feedback)  
+**Date:** 2026-03-13T15:02Z  
+**Issue:** #465  
+**Status:** 🟡 Pending Style Refinement
+
+### User Feedback
+
+The Hebrew podcasts delivered for #465 are "not even close" to the reference show. The target style is **"מפתחים מחוץ לקופסא"** (Developers Outside the Box) hosted by Dotan and Shahar (דותן ושחר).
+
+### Reference Style Characteristics
+
+- **Two cool dudes** having a natural Hebrew tech conversation
+- **Not robotic TTS** reading text
+- **Distinct personalities** — hosts have unique voices and perspectives
+- **Casual Hebrew slang** — natural language, not formal
+- **Conversational dynamics** — laugh, interrupt each other, feel like real friends talking tech
+- **Pacing and energy** — not monotone or scripted-sounding
+
+### Implication
+
+Squad must **study the reference show** directly before generating Hebrew podcasts. Current generation uses generic TTS with formal structure. Next iteration requires understanding the hosts' conversational style, humor patterns, interruption frequency, and casual language use.
+
+### Required Actions
+
+1. Listen to "מפתחים מחוץ לקופסא" reference episodes
+2. Document style characteristics (pacing, interruption patterns, slang phrases)
+3. Adjust Podcaster generation logic to emulate conversational flow
+4. Re-generate Hebrew Executive Summary with style-aware generation
+
+### Owner
+
+Podcaster + Data (Style refinement implementation)
+
+---
+
 # Decision: Azure RBAC Architecture Strategy for DK8S
 
 **Date:** 2026-03-10  

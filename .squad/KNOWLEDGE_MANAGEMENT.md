@@ -43,31 +43,59 @@ echo "# Seven — History\n\n## Current Quarter (2026-Q2)" > history.md
 
 ## 🔍 Search & Discovery
 
-### For Humans & Agents
+### Option 1: Copilot Space (RECOMMENDED — Implemented Q2 2026)
 
-**Option 1: GitHub Code Search (Recommended for now)**
+**GitHub Copilot Space: "Research Squad"**
+- **Location:** https://github.com/copilot/spaces (search for "Research Squad")
+- **Owner:** `tamirdresher_microsoft` organization
+- **Status:** ✅ Active (Issue #416)
+
+**What it contains:**
+- Core `.squad/` files (team.md, routing.md, charter.md, copilot-instructions.md)
+- All agent charters (13 active agents)
+- Decision log (decisions.md — semantic search enabled)
+- Cross-repo research (from tamresearch1-dk8s-investigations, tamresearch1-agent-analysis)
+
+**How to use:**
+1. **For humans:** Open Space in GitHub web UI → ask questions naturally
+   - Example: "Who handles infrastructure work?"
+   - Example: "What decisions were made about memory management?"
+2. **For agents:** Reference Space in spawn prompts via MCP server
+   - Tool: `github-mcp-server-get_copilot_space` (owner: "tamirdresher_microsoft", name: "Research Squad")
+   - Semantic search across all Space content automatically
+3. **Auto-sync:** Files linked from GitHub repos stay synced with main branch
+
+**Advantages over file-based search:**
+- Cross-repo context (spans multiple repos in one place)
+- Semantic search (finds conceptually related content, not just keywords)
+- No size limits on search (858KB decisions.md fully searchable)
+- Accessible from any GitHub Copilot interface (IDE, web, CLI)
+
+**Limitations:**
+- Read-only for agents (can't update Space content directly)
+- Curated content (~50 files) to stay within quota
+- IDE integration limited (repo-wide search only in web UI)
+
+> **Supplement, don't replace:** `.squad/` files remain source of truth. Space is the **read layer** for cross-repo discovery.
+
+---
+
+### Option 2: GitHub Code Search (Fallback)
 ```
 site:github.com/tamirdresher_microsoft/tamresearch1/blob/main/.squad
 path:.squad/decisions.md  "memory management"
 ```
 
-**Option 2: Local grep/ripgrep**
+### Option 3: Local grep/ripgrep
 ```bash
 rg "vector database" .squad/agents/  # Fast full-text search
 rg "Issue #321" .squad/decisions.md
 ```
 
-**Option 3: GitHub CLI**
+### Option 4: GitHub CLI
 ```bash
 gh search code --repo tamirdresher_microsoft/tamresearch1 "knowledge base" --match path -- .squad/
 ```
-
-### For Future: Vector Database Index (Phase 2)
-When Phase 2 is implemented:
-- Markdown source stays in git (source of truth)
-- Vector index (`ChromaDB`) regenerated on `git pull` (pre-commit hook)
-- Agents query: `vector_search("memory management")` → returns top results
-- See **Phase 2** section below
 
 ---
 
@@ -105,8 +133,9 @@ When Phase 2 is implemented:
 - [x] **Create fresh Q2 history files** with current-quarter header
 - [x] **Update `.gitignore`** to exclude build artifacts + future vector DB
 - [x] **Create this guide** (KNOWLEDGE_MANAGEMENT.md)
+- [x] **Create Copilot Space** "Research Squad" for cross-repo knowledge (Issue #416)
+- [x] **Add core .squad/ files to Space** (~20 curated files)
 - [ ] **Create INDEX.md files** in each major directory (TBD next sprint)
-- [ ] **Add GitHub saved searches** for common queries (TBD)
 - [ ] **Monitor growth:** Check `.squad/` size monthly; alert if >50MB
 
 ---
@@ -126,27 +155,82 @@ ls -d .squad -h  # Windows PowerShell: (gci .squad -r | measure -p length -sum).
 
 ---
 
-## 🔮 Phase 2: Vector Database (Future, If Needed)
+## 📦 Copilot Space Integration Details
 
-**When to activate:** When markdown corpus > 50MB OR semantic search becomes valuable
+### Files Included in Space (Curated for Quota)
 
-**Implementation:**
-1. Add ChromaDB indexing script (50 lines Python)
-2. Add pre-commit hook to regenerate index from markdown
-3. Agents query vector DB: `similar_to("memory optimization")` → context
-4. Index stored in `.squad/.db/` (gitignored, regenerated on pull)
+**Core Team Structure (4 files):**
+- `.squad/team.md` — Squad roster & capability profile
+- `.squad/routing.md` — Work routing rules & label system
+- `.squad/charter.md` — Mission & governance
+- `.squad/copilot-instructions.md` — Agent behavior guidelines
 
-**Benefits:**
-- Semantic search: "agent memory" finds discussions about caching, context windows, etc.
-- No reliance on GitHub search UI
-- Scalable to large corpora
+**Agent Charters (13 files):**
+- `.squad/agents/picard/charter.md` — Lead
+- `.squad/agents/belanna/charter.md` — Infrastructure Expert
+- `.squad/agents/worf/charter.md` — Security & Cloud
+- `.squad/agents/data/charter.md` — Code Expert
+- `.squad/agents/seven/charter.md` — Research & Docs
+- `.squad/agents/podcaster/charter.md` — Audio Content
+- `.squad/agents/q/charter.md` — Devil's Advocate
+- `.squad/agents/scribe/charter.md` — Session Logger
+- `.squad/agents/kes/charter.md` — Communications
+- `.squad/agents/ralph/charter.md` — Work Monitor
+- `.squad/agents/troi/charter.md` — Blogger
+- `.squad/agents/neelix/charter.md` — News Reporter
+- `.squad/agents/@copilot/capability-profile.md` (if exists)
 
-**Trade-offs:**
-- Requires Python environment
-- Index rebuild takes ~30s on large repo
-- Additional complexity
+**Knowledge & Decisions (3 files):**
+- `.squad/KNOWLEDGE_MANAGEMENT.md` — This file
+- `.squad/decisions.md` — Decision log (large, 858KB, high value)
+- `.squad/research-repos.md` — Research repo catalog
 
-See research findings in `.squad/decisions.md` → "Decision: Knowledge Management Strategy" for full technical analysis.
+**Total: ~20 files, ~3 MB** (well within Space quotas)
+
+### Custom Instructions (Configured in Space)
+```
+You are assisting the Research Squad — an AI agent team using Star Trek TNG/Voyager
+personas. The team includes Picard (Lead), Seven (Research & Docs), B'Elanna (Infrastructure),
+Worf (Security & Cloud), Data (Code), and others.
+
+Context files describe agent charters, routing rules, and team decisions. When answering:
+- Respect agent boundaries and routing rules in routing.md
+- Reference decisions.md for past team decisions
+- Use team.md roster for current member capabilities
+- Follow copilot-instructions.md for agent behavior standards
+
+This Space supplements the .squad/ file system in the repository — files here are read-only
+context. The source of truth for editable content remains in the git repository.
+```
+
+### Maintenance Protocol
+
+**When to update Space content:**
+1. **Major agent roster changes** (new agent added/removed) → update team.md in Space
+2. **Routing rule changes** → update routing.md in Space
+3. **Charter updates** → update relevant charter files in Space
+4. **Quarterly history rotation** → No action (Space excludes history files)
+
+**How to update:**
+- GitHub automatically syncs linked files from main branch
+- No manual refresh needed for files linked from repos
+- For uploaded files, re-upload via Space UI
+
+**Space lifecycle:**
+- **Created:** 2026-Q2 (Issue #416)
+- **Review cadence:** Quarterly (aligned with history rotation)
+- **Ownership:** Seven (Research & Docs)
+
+---
+
+## 🔮 Phase 3: Vector Database (Future, Deferred)
+
+**Status:** DEFERRED — Copilot Space semantic search (Phase 1, implemented) addresses the core need
+
+**Original Phase 2 plan (now Phase 3, if needed later):**
+- Add ChromaDB indexing for local/offline semantic search
+- Useful if: Space quotas become limiting OR offline access needed
+- See research findings in `.squad/decisions.md` → "Decision: Knowledge Management Strategy"
 
 ---
 

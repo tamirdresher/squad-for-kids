@@ -82,7 +82,11 @@ jobs:
               return;
             }
 
-            // Post assignment acknowledgment
+            // Post assignment acknowledgment (with dedup to avoid comment spam)
+            const marker = isCopilotAssignment
+              ? '### 🤖 Routed to @copilot'
+              : `### 📋 Assigned to ${assignedMember.name}`;
+
             let comment;
             if (isCopilotAssignment) {
               comment = [
@@ -109,12 +113,39 @@ jobs:
               ].join('\n');
             }
 
-            await github.rest.issues.createComment({
+            // Check for existing comments to avoid spam
+            const { data: existingComments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issue.number,
-              body: comment
+              issue_number: issue.number
             });
+
+            // If triage already posted a comment assigning this same member, skip
+            const triageAlreadyAssigned = existingComments.find(c =>
+              c.body.includes('🏗️ Squad Triage') &&
+              c.body.includes(`**Assigned to:** ${assignedMember.name}`)
+            );
+            if (triageAlreadyAssigned) {
+              core.info(`Triage already assigned ${assignedMember.name} — skipping duplicate assign comment`);
+            } else {
+              const existingAssign = existingComments.find(c => c.body.includes(marker));
+              if (existingAssign) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existingAssign.id,
+                  body: comment
+                });
+                core.info(`Updated existing assign comment for ${assignedMember.name}`);
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: comment
+                });
+              }
+            }
 
             core.info(`Issue #${issue.number} assigned to ${assignedMember.name} (${assignedMember.role})`);
 

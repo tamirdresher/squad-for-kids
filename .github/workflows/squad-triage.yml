@@ -255,11 +255,32 @@ jobs:
               `> To reassign, remove the current \`squad:*\` label and add the correct one.`,
             ].filter(Boolean).join('\n');
 
-            await github.rest.issues.createComment({
+            // Check for existing triage comment to avoid spam
+            const { data: existingComments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issue.number,
-              body: comment
+              issue_number: issue.number
             });
+
+            const existingTriage = existingComments.find(c =>
+              c.body.includes('🏗️ Squad Triage')
+            );
+
+            if (existingTriage) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingTriage.id,
+                body: comment
+              });
+              core.info(`Updated existing triage comment for issue #${issue.number}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
+            }
 
             core.info(`Triaged issue #${issue.number} → ${assignedMember.name} (${assignLabel})`);

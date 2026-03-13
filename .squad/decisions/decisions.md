@@ -619,6 +619,65 @@ Same pattern:
 - Simple and predictable failure modes
 - Aligns with Tamir's stated constraints
 
+---
+
+### 2026-06-26: B'Elanna — CodeQL Workflow Changed to Manual Trigger
+
+**Author:** B'Elanna (DevOps/Infrastructure)  
+**Date:** 2026-06-26  
+**Status:** Implemented
+
+**Context:** CodeQL Analysis workflow was running on every push to `main` and every PR, but failing each time because the repo has no root-level build process. The Autobuild step cannot find anything to build — repo is primarily markdown, PowerShell scripts, and config files with scattered JS/TS in `dashboard-ui/` and `scripts/`.
+
+**Decision:** Changed CodeQL from automatic triggers (push/PR) to `workflow_dispatch` only (manual trigger). This stops CI noise and email notifications while preserving on-demand CodeQL security scanning. Also created the missing `ai-assisted` label that `label-squad-prs.yml` depends on.
+
+**Impact:**
+- No more automatic CodeQL failure notifications
+- CodeQL can still be triggered manually from the Actions tab
+- Label Squad PRs workflow now succeeds for squad-branch PRs
+
+---
+
+### 2026-03-13: Data — Squad MCP Server Architecture Decision
+
+**Date:** 2026-03-13  
+**Author:** Data (Code Expert)  
+**Issue:** #417 — Build Squad MCP Server to expose squad operations (#385)  
+**PR:** #453  
+**Status:** Phase 1 Complete
+
+**Decision:** Build a dedicated Squad MCP Server using Node.js + TypeScript to expose squad operations (triage, routing, status, board health) as reusable MCP tools.
+
+**Architecture Decisions:**
+
+1. **Runtime:** Node.js + TypeScript
+   - Consistency with existing squad-cli ecosystem
+   - @modelcontextprotocol/sdk has excellent TypeScript support
+   - @octokit/rest for native GitHub API integration
+
+2. **State Integration:** Read `.squad/`, Write via GitHub API
+   - `.squad/` files are the source of truth
+   - MCP server is read-only observer for most operations
+   - Mutations (labels, assignees) go through GitHub API for audit trail
+   - Prevents file conflicts and maintains single-writer discipline
+
+3. **Configuration:** Environment Variables First, Config File Fallback
+   - Priority: GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO, SQUAD_ROOT env vars
+   - Fallback: Config file at `~/.config/squad-mcp/config.json`
+   - Auto-detect SQUAD_ROOT from current directory (`./.squad`)
+
+4. **Transport:** stdio (stdin/stdout) for Phase 1
+   - Best for local dev and DevBox deployment
+   - HTTP transport deferred for future container/serverless deployment
+
+**Phase 1 Implementation (PR #453):**
+- `get_squad_health` tool — read-only, fully functional
+- GitHub API client wrapper (Octokit)
+- Squad state file parsers (team.md, board_snapshot.json)
+- Configuration loader
+
+**Impact:** Enables external MCP clients to query squad health, other agents to evaluate routing, automation tools to triage issues, and board sync tools to check drift status.
+
 ## Next Steps
 
 1. File issue: "Multi-machine Ralph coordination" (GitHub issue)

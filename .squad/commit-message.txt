@@ -1,28 +1,7 @@
-chore(squad): Ralph round 1 — #198 ADR monitoring, #199 scheduler suggestion, #103 devbox tunnel
+feat(squad): reskill charters — extract 6 skills, slim 5 agents (#483)
 
-## Summary
-Three background agents completed infrastructure work:
-- Picard: Issue #198 — Daily ADR monitoring at 07:00 UTC weekdays, live ADR detected
-- B'Elanna: Issue #199 — Scheduler upstream suggestion (bradygaster/squad#296), Issue #103 — DevBox tunnel auth pattern
-- Data: Issue #1 — Upstream repo management cleanup and verification
-
-## Decisions Merged
-- Daily ADR Channel Monitoring (Issue #198) — read-only constraints established for all agents
-- Upstream Scheduler Suggestion (Issue #199) — filed upstream, local experimentation independent
-- DevBox Tunnel Access Pattern (Issue #103) — anonymous tunnels, time-boxed exposure
-- Daily BasePlatformRP Briefing (Issue #200) — ralph-watch integration at 9 AM weekdays
-- Upstream Repository Management — verification + cleanup patterns documented
-
-## Files
-- Orchestration logs: .squad/orchestration-log/2026-03-09T08-21-31Z-*.md
-- Session log: .squad/log/2026-03-09T08-21-31Z-ralph-round1.md
-- Decisions: merged inbox to .squad/decisions.md, deleted inbox files
-- Histories: updated .squad/agents/belanna/history.md, .squad/agents/picard/history.md
-
-## Board Status
-- Issue #198: In Progress
-- Issue #199: In Progress
-- Issue #103: Pending User (awaiting Azure AD auth)
-- Issue #200: Implemented (awaiting execution)
+Charters slimmed: kes (2666→1509), neelix (4538→1520), podcaster (3777→1271), q (3007→1620), troi (3463→1705)
+Skills created: news-broadcasting, voice-writing, blog-publishing, fact-checking, outlook-web-workflows, reskill
+Total savings: ~9.8KB
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

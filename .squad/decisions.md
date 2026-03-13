@@ -22448,3 +22448,37 @@ After analyzing Seven's research on Copilot CLI v1.0.5 (25 features total), we a
 **Picard** — 2026-03-13 10:28 UTC  
 Lead, Architecture & Decisions
 
+# Decision: Charter Reskilling — Procedural Knowledge Extraction
+
+**Date:** 2026-03-13
+**Author:** Picard
+**Issue:** #483
+**Status:** Implemented
+
+## Decision
+
+Extract procedural knowledge from oversized agent charters into shared skill files, keeping charters focused on identity, behavior, and boundaries (<1.5KB target).
+
+## Context
+
+Five charters exceeded ~1.5KB due to embedded procedures, code snippets, templates, and detailed guidelines. This inflates context windows and duplicates knowledge that could be shared across agents.
+
+## What Changed
+
+- **5 charters slimmed:** neelix (-66%), podcaster (-66%), troi (-51%), q (-46%), kes (-43%)
+- **6 skills created:** news-broadcasting, voice-writing, blog-publishing, fact-checking, outlook-web-workflows, reskill
+- **Total savings:** ~9.8KB across all charters
+- **Agent identity preserved:** Personality, voice, boundaries, model preferences untouched
+
+## Principles Applied
+
+1. Charters hold identity + behavior; skills hold procedures
+2. Shared skills are DRY — multiple agents can reference them
+3. Existing skills leveraged (tts-conversion for Podcaster)
+4. Reskill process itself documented as a skill for repeatability
+
+## Impact
+
+- Reduces token cost when loading agent charters
+- Makes procedures reusable across agents
+- Establishes pattern for future charter maintenance

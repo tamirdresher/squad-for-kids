@@ -2,6 +2,104 @@
 
 ## Active Decisions
 
+### 2026-03-13: Data — Conversational Podcast Generation (Issue #455)
+
+**Date:** 2026-03-13  
+**Agent:** Data (Code Expert)  
+**Issue:** #455 — "Improve podcaster conversation quality"  
+**Status:** 🟢 IMPLEMENTATION KICKED OFF  
+
+**Problem Statement:**
+Current podcaster sounds like "someone reading from a page" because it takes flat, linear scripts and renders with single voice using basic TTS. No dialogue, banter, or natural conversation dynamics.
+
+**Goal:** Make podcasts sound like real tech podcasts (.NET Rocks, NotebookLM, Syntax.fm) with natural two-host conversation.
+
+**Key Finding:** Script quality matters more than TTS quality. A great conversation script with decent TTS beats perfect TTS reading a flat script (reference: NotebookLM).
+
+**Recommended Architecture:**
+
+**Phase 1: LLM Conversation Script Generation**
+- Input: Topic, content, or source material
+- LLM Model: Claude 3.5 Sonnet, GPT-4, or Llama 3.1 70B
+- Output: Dialogue script with two hosts
+- Script includes: Natural back-and-forth, interruptions, filler words, disagreements, emotional shifts, topic transitions
+
+**Phase 2: Multi-Voice TTS with Prosody Control**
+- Input: Dialogue script marked with [HOST_A], [HOST_B]
+- Output: High-quality MP3 with natural conversation feel
+- Rendering includes: Distinct voices, prosody control, filler word handling, turn-taking cues, emotional range
+
+**TTS Model Selection:**
+- **Recommended:** Fish Speech S2 (open-source, free, self-hosted, production-ready)
+- **Alternative:** ElevenLabs v3 Turbo (industry standard if budget available)
+
+**Implementation Roadmap:**
+- MVP (Week 1): LLM script generation + Fish Speech integration, test with 2 sample podcasts
+- Phase 2 (Weeks 2-3): Prosody/emotion refinement, strategic filler word insertion, turn-taking markers
+- Phase 3 (Iteration): Fine-tune LLM prompts, A/B test host personalities, optimize for topics
+
+**Success Metrics:**
+1. MOS (Mean Opinion Score): Listeners rate naturalness (target: 4.5+)
+2. Engagement: Podcast completion rate, total time listened (target: +50% vs. current)
+3. Comparability: How similar to real tech podcasts
+4. Filler Words: Frequency and naturalness of placement
+5. Turn-Taking: Smooth speaker transitions, no awkward overlaps
+
+**Decision Points for Team:**
+1. TTS model: Fish Speech S2 (RECOMMENDATION) vs. ElevenLabs
+2. LLM: Claude 3.5 Sonnet or GPT-4 (RECOMMENDATION) vs. Llama 3.1 70B
+3. Timeline: MVP (1 week), Phase 2 (2 weeks), Full rollout (3-4 weeks)
+4. Backward compatibility: Yes — make script generation optional, support both modes
+
+**Research & References:**
+- Google NotebookLM: https://notebooklm.google.com (reference architecture)
+- Fish Speech GitHub: https://github.com/fishaudio/fish-speech (recommended open-source)
+- VibeVoice (Microsoft): https://vibevoice.art/ (multi-speaker dialogue)
+- FireRedTTS-2 (2025): https://arxiv.org/html/2509.02020v1 (long-form podcast synthesis)
+- ElevenLabs: https://elevenlabs.io (premium option)
+
+**Files to Modify:**
+- scripts/generate-podcast-script.py (new LLM dialogue script generation)
+- scripts/podcaster-conversational.py (multi-voice TTS rendering)
+- scripts/podcaster.ps1 (pipeline orchestration)
+
+**Next Steps:**
+1. Data implements Phase 1 (LLM script generation)
+2. Test with 2 sample podcasts
+3. Gather feedback on conversational feel and naturalness
+4. Schedule Phase 2 iteration
+
+**Status:** 🟢 Implementation kick-off  
+**Confidence:** HIGH (based on research by Seven, production validation via Google NotebookLM)
+
+---
+
+### 2026-03-13: User Directive — Podcast Quality Requirements
+
+**Date:** 2026-03-13  
+**Source:** Tamir Dresher (via Copilot)  
+**Related Issue:** #455  
+**Status:** CAPTURED FOR TEAM MEMORY  
+
+**Directive:** Podcasts must sound like real tech podcasts with genuine discussion between hosts — not someone reading from a page.
+
+**Reference Quality Standards:**
+- NotebookLM podcasts
+- .NET Rocks
+- Syntax.fm
+
+**Requirements:**
+- Research better TTS models
+- Research academic papers on conversational podcast generation
+- Improve podcaster implementation by end of day
+
+**Applies To:** Issue #455 implementation  
+**Next Steps:** Data team to implement based on Seven's research architecture
+
+**Status:** ✅ CAPTURED — Driving implementation of #455
+
+---
+
 ### 2026-03-10: Data — NuGet Publishing for squad-monitor
 
 **Date:** 2026-03-10  

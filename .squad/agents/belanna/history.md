@@ -544,3 +544,46 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 **Key Insight:** Repos that are primarily markdown/docs/config with scattered JS/TS scripts don't benefit from automatic CodeQL on every commit. Manual trigger is the right balance.
 
 **Status:** ✅ Complete. Committed and pushed.
+
+
+### 2026-06-27: Podcaster v2 Rebuild — Conversational Podcast Pipeline
+
+**Task:** Rebuild the podcaster to generate real conversational podcasts (like .NET Rocks / NotebookLM) instead of just reading text aloud.
+
+**Problem:** Existing podcaster scripts (`podcaster.ps1`, `podcaster-conversational.py`) just read markdown content aloud with one or two voices. There was no actual conversation — just section-by-section reading. The result sounded robotic.
+
+**Solution — Three-phase pipeline:**
+
+1. **Script Generation** (`scripts/generate-podcast-script.py` — NEW):
+   - Takes any markdown file, strips formatting, generates a two-host conversation script
+   - Uses [ALEX]/[SAM] tagged dialogue format
+   - Supports Azure OpenAI / OpenAI API for LLM-generated natural dialogue
+   - Built-in template engine as fallback (no API keys needed)
+   - Prompt engineered for natural speech: filler words, reactions, humor, varied turn lengths
+   - Filters out table-heavy sections, caps turns per section for focused output
+
+2. **Multi-Voice TTS Renderer** (`scripts/podcaster-conversational.py` — REWRITTEN):
+   - Parses [ALEX]/[SAM] (or [HOST_A]/[HOST_B]) tagged scripts
+   - Renders with distinct edge-tts neural voices (en-US-GuyNeural + en-US-JennyNeural)
+   - Slight rate variation between speakers (+2% / -1%) for natural feel
+   - Supports pydub+ffmpeg for pauses between turns; binary MP3 concat fallback
+   - Legacy mode preserved for backward compatibility
+
+3. **End-to-End Pipeline** (`scripts/podcaster.ps1` — UPDATED):
+   - New `-PodcastMode` flag chains script generation → TTS rendering
+   - Optional `-ScriptFile` to skip generation and use pre-made scripts
+   - Uses direct `& python` invocation instead of Start-Process for reliable output
+   - Sets PYTHONIOENCODING=utf-8 for cross-process Unicode safety
+
+**Key Technical Decisions:**
+- UTF-8 stdout wrapping in Python scripts (`io.TextIOWrapper`) to handle Windows cp1252 console
+- Template engine skips sections with >5% pipe characters (tables) for cleaner spoken output
+- Rate offsets per speaker create audible distinction beyond just voice timbre
+- All emoji removed from strip_markdown for better TTS rendering
+
+**Test Results:**
+- EXECUTIVE_SUMMARY.md → 53 turns, 1.8 MB podcast, rendered in 82s
+- ISSUE_42_SUMMARY.md → 52 turns, 1.8 MB podcast, rendered in 75s
+- Mini test (8 turns) → rendered in 10s
+
+**Status:** ✅ Complete. All three phases working end-to-end.

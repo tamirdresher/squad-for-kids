@@ -8,6 +8,8 @@
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Voice en-US-GuyNeural
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -ForceFallback
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -ConversationMode
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -ScriptFile my-script.txt
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Rate "+10%" -Volume "+50%"
 
 param(
@@ -17,6 +19,8 @@ param(
     [string]$Voice = "en-US-JennyNeural",
     [switch]$ForceFallback,
     [switch]$ConversationMode,
+    [switch]$PodcastMode,
+    [string]$ScriptFile,
     [string]$Rate = "+0%",
     [string]$Volume = "+0%"
 )
@@ -144,6 +148,7 @@ if ($ConversationMode) {
     $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
     $convScript = Join-Path $scriptDir "podcaster-conversational.py"
 
+    $env:PYTHONIOENCODING = "utf-8"
     $pyArgs = @("`"$convScript`"", "`"$inputPath`"", "--rate", $Rate, "--volume", $Volume)
     if ($Voice -ne "en-US-JennyNeural") {
         $pyArgs += @("--host-voice", $Voice)
@@ -151,6 +156,60 @@ if ($ConversationMode) {
 
     $proc = Start-Process -FilePath "python" -ArgumentList ($pyArgs -join " ") -NoNewWindow -Wait -PassThru
     exit $proc.ExitCode
+}
+
+# ============================================================================
+# PODCAST MODE — Full pipeline: generate conversation script → render audio
+# ============================================================================
+
+if ($PodcastMode) {
+    Write-Host "`n=== Podcast Mode (full pipeline) ===" -ForegroundColor Magenta
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $env:PYTHONIOENCODING = "utf-8"
+
+    # Step 1: Generate or use existing conversation script
+    $podcastScript = $ScriptFile
+    if (-not $podcastScript) {
+        Write-Host "`nPhase 1: Generating conversation script..." -ForegroundColor Cyan
+        $genScript = Join-Path $scriptDir "generate-podcast-script.py"
+        $podcastScript = [System.IO.Path]::ChangeExtension($inputPath, ".podcast-script.txt")
+
+        & python $genScript $inputPath -o $podcastScript
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "  Script generation failed" -ForegroundColor Red
+            exit 1
+        }
+        if (-not (Test-Path $podcastScript)) {
+            Write-Host "  Script file not created" -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "  Script: $podcastScript" -ForegroundColor Green
+    } else {
+        Write-Host "`nPhase 1: Using provided script: $podcastScript" -ForegroundColor Cyan
+    }
+
+    # Step 2: Render multi-voice audio
+    Write-Host "`nPhase 2: Rendering multi-voice audio..." -ForegroundColor Cyan
+    $convScript = Join-Path $scriptDir "podcaster-conversational.py"
+    if (-not $OutputFile) {
+        $OutputFile = Join-Path (Split-Path $inputPath) "$inputName-podcast.mp3"
+    }
+
+    & python $convScript --script $podcastScript -o $OutputFile --rate $Rate --volume $Volume
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  Audio rendering failed" -ForegroundColor Red
+        exit 1
+    }
+
+    if (Test-Path $OutputFile) {
+        $size = (Get-Item $OutputFile).Length
+        $sizeMB = [math]::Round($size / 1MB, 2)
+        Write-Host "`n Podcast generated: $OutputFile ($sizeMB MB)" -ForegroundColor Green
+    } else {
+        Write-Host "`n Failed to generate podcast" -ForegroundColor Red
+        exit 1
+    }
+    exit 0
 }
 
 # Read and strip markdown

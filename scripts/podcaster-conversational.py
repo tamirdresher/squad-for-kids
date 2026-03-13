@@ -1,357 +1,245 @@
 #!/usr/bin/env python3
 
 """
-Conversational Podcaster - Issue #237
-Converts markdown to two-voice conversational podcast using edge-tts
+Conversational Podcaster v2 - Multi-voice TTS renderer
+Renders [ALEX]/[SAM] podcast scripts OR markdown files into two-voice audio.
+
+Modes:
+  1. Script mode (--script): Renders a pre-generated .podcast-script.txt
+  2. Legacy mode: Reads markdown, generates template conversation, renders audio
+
+Usage:
+  python podcaster-conversational.py --script article.podcast-script.txt
+  python podcaster-conversational.py article.md
+  python podcaster-conversational.py --script script.txt -o my-podcast.mp3
 """
 
 import asyncio
 import argparse
+import io
+import os
+import random
 import re
 import sys
-import os
+import time
 from pathlib import Path
-import edge_tts
+
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr.encoding != 'utf-8':
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+try:
+    import edge_tts
+except ImportError:
+    print("edge-tts not installed. Run: pip install edge-tts")
+    sys.exit(1)
+
 import tempfile
 
+
 def strip_markdown(markdown):
-    """Strip markdown formatting to plain text"""
     text = markdown
-    
-    # Remove YAML frontmatter
     text = re.sub(r'^---\n[\s\S]*?\n---\n', '', text, flags=re.MULTILINE)
-    
-    # Remove HTML comments
     text = re.sub(r'<!--[\s\S]*?-->', '', text)
-    
-    # Remove code blocks
     text = re.sub(r'```[\s\S]*?```', '', text)
     text = re.sub(r'`[^`]+`', '', text)
-    
-    # Remove images but keep alt text
     text = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', text)
-    
-    # Remove links but keep text
     text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
-    
-    # Remove headers but keep text
     text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
-    
-    # Remove bold/italic
     text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)
     text = re.sub(r'\*([^*]+)\*', r'\1', text)
     text = re.sub(r'__([^_]+)__', r'\1', text)
     text = re.sub(r'_([^_]+)_', r'\1', text)
-    
-    # Remove horizontal rules
     text = re.sub(r'^[-*_]{3,}\s*$', '', text, flags=re.MULTILINE)
-    
-    # Remove blockquotes
     text = re.sub(r'^>\s+', '', text, flags=re.MULTILINE)
-    
-    # Remove list markers
     text = re.sub(r'^[\*\-\+]\s+', '', text, flags=re.MULTILINE)
     text = re.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)
-    
-    # Clean up multiple newlines
     text = re.sub(r'\n{3,}', '\n\n', text)
-    
-    # Trim whitespace
-    text = text.strip()
-    
-    return text
+    return text.strip()
 
-def parse_sections(markdown):
-    """Parse markdown into sections by headers"""
-    sections = []
-    
-    # Find all headers and their content
-    lines = markdown.split('\n')
-    current_section = {'title': None, 'content': []}
-    
-    for line in lines:
-        header_match = re.match(r'^(#{1,6})\s+(.+)$', line)
-        if header_match:
-            # Save previous section if it has content
-            if current_section['title'] or current_section['content']:
-                sections.append(current_section)
-            # Start new section
-            current_section = {
-                'title': header_match.group(2).strip(),
-                'level': len(header_match.group(1)),
-                'content': []
-            }
+
+def parse_podcast_script(script_text):
+    turns = []
+    script_text = script_text.replace('[HOST_A]', '[ALEX]').replace('[HOST_B]', '[SAM]')
+    script_text = script_text.replace('[HOST]', '[ALEX]').replace('[EXPERT]', '[SAM]')
+    for line in script_text.strip().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        m = re.match(r'^\[(ALEX|SAM)\]\s*(.+)$', line)
+        if m:
+            turns.append({'speaker': m.group(1), 'text': m.group(2).strip()})
+    return turns
+
+
+def generate_legacy_script(markdown):
+    script_gen = Path(__file__).parent / "generate-podcast-script.py"
+    if script_gen.exists():
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("gen", str(script_gen))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        title = mod.extract_title(markdown, "article")
+        raw = mod.generate_template_script(markdown, title)
+        return parse_podcast_script(raw)
+
+    plain = strip_markdown(markdown)
+    title_m = re.search(r'^#\s+(.+)$', markdown, re.MULTILINE)
+    title = title_m.group(1) if title_m else "this topic"
+    turns = [
+        {'speaker': 'ALEX', 'text': f'Hey everyone! Today we are covering {title}.'},
+        {'speaker': 'SAM', 'text': 'Let me walk you through the highlights.'},
+    ]
+    sentences = re.split(r'(?<=[.!?])\s+', plain)
+    chunk, wc, chunks = [], 0, []
+    for s in sentences:
+        sw = len(s.split())
+        if wc + sw > 80 and chunk:
+            chunks.append(' '.join(chunk)); chunk, wc = [s], sw
         else:
-            current_section['content'].append(line)
-    
-    # Add last section
-    if current_section['title'] or current_section['content']:
-        sections.append(current_section)
-    
-    return sections
+            chunk.append(s); wc += sw
+    if chunk: chunks.append(' '.join(chunk))
+    for i, c in enumerate(chunks):
+        turns.append({'speaker': 'SAM', 'text': c})
+        if i < len(chunks) - 1 and i % 3 == 1:
+            turns.append({'speaker': 'ALEX', 'text': 'Interesting, keep going.'})
+    turns.append({'speaker': 'ALEX', 'text': 'Thanks for listening!'})
+    return turns
 
-def generate_conversational_script(sections, doc_title):
-    """Generate conversational script between HOST and EXPERT"""
-    script = []
-    
-    # Introduction
-    script.append({
-        'speaker': 'HOST',
-        'text': f"Welcome to the Squad Briefing. I'm your host, and today we're diving into {doc_title}. I'm joined by our expert who's going to walk us through the key findings. Let's get started!"
-    })
-    
-    script.append({
-        'speaker': 'EXPERT',
-        'text': "Thanks for having me! I'm excited to share what we've discovered."
-    })
-    
-    # Process each section
-    for i, section in enumerate(sections):
-        if not section.get('title'):
-            continue
-            
-        title = section['title']
-        content = '\n'.join(section['content']).strip()
-        
-        if not content:
-            continue
-        
-        # Strip markdown from content
-        content_plain = strip_markdown(content)
-        
-        if not content_plain:
-            continue
-        
-        # Host introduces the section
-        if i == 0:
-            host_intro = f"Let's start with {title}. What can you tell us about this?"
-        elif i == len(sections) - 1:
-            host_intro = f"Finally, let's talk about {title}. What should our listeners know?"
-        else:
-            host_intro = f"Interesting! Now, what about {title}?"
-        
-        script.append({
-            'speaker': 'HOST',
-            'text': host_intro
-        })
-        
-        # Expert presents the content
-        # Split long content into smaller chunks for more natural flow
-        sentences = re.split(r'(?<=[.!?])\s+', content_plain)
-        chunks = []
-        current_chunk = []
-        word_count = 0
-        
-        for sentence in sentences:
-            sentence_words = len(sentence.split())
-            if word_count + sentence_words > 100 and current_chunk:
-                chunks.append(' '.join(current_chunk))
-                current_chunk = [sentence]
-                word_count = sentence_words
-            else:
-                current_chunk.append(sentence)
-                word_count += sentence_words
-        
-        if current_chunk:
-            chunks.append(' '.join(current_chunk))
-        
-        # Add expert responses with occasional host interjections
-        for j, chunk in enumerate(chunks):
-            script.append({
-                'speaker': 'EXPERT',
-                'text': chunk
-            })
-            
-            # Add host interjections occasionally
-            if j < len(chunks) - 1 and len(chunks) > 2:
-                if j == len(chunks) // 2:
-                    script.append({
-                        'speaker': 'HOST',
-                        'text': "That's really insightful. Please continue."
-                    })
-    
-    # Conclusion
-    script.append({
-        'speaker': 'HOST',
-        'text': "This has been incredibly informative. Any final thoughts before we wrap up?"
-    })
-    
-    script.append({
-        'speaker': 'EXPERT',
-        'text': "Just that this work represents a significant step forward, and I'm excited to see where it leads."
-    })
-    
-    script.append({
-        'speaker': 'HOST',
-        'text': "That wraps up today's Squad Briefing. Thanks for listening, and we'll catch you in the next episode!"
-    })
-    
-    return script
 
-def format_bytes(bytes_size):
-    """Format file size"""
-    if bytes_size < 1024:
-        return f"{bytes_size} B"
-    elif bytes_size < 1024 * 1024:
-        return f"{bytes_size / 1024:.2f} KB"
-    else:
-        return f"{bytes_size / (1024 * 1024):.2f} MB"
+def format_bytes(size):
+    if size < 1024: return f"{size} B"
+    elif size < 1024 * 1024: return f"{size / 1024:.1f} KB"
+    return f"{size / (1024 * 1024):.1f} MB"
 
-def estimate_duration(text):
-    """Estimate audio duration (rough: ~150 words per minute)"""
-    words = len(text.split())
-    minutes = words / 150
-    seconds = round(minutes * 60)
-    
-    if seconds < 60:
-        return f"{seconds}s"
-    mins = seconds // 60
-    secs = seconds % 60
-    return f"{mins}m {secs}s"
 
 async def generate_audio_segment(text, voice, output_path, rate="+0%", volume="+0%", max_retries=3):
-    """Generate audio for a single segment with retry logic"""
     for attempt in range(max_retries):
         try:
-            communicate = edge_tts.Communicate(text, voice, rate=rate, volume=volume)
-            await communicate.save(str(output_path))
-            return
+            comm = edge_tts.Communicate(text, voice, rate=rate, volume=volume)
+            await comm.save(str(output_path))
+            return True
         except Exception as e:
             if attempt < max_retries - 1:
-                print(f"\n   ⚠️  Retry {attempt + 1}/{max_retries - 1} after error: {str(e)[:50]}...")
-                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                print(f"   Retry {attempt + 1}: {str(e)[:60]}...")
+                await asyncio.sleep(2 ** attempt)
             else:
-                raise
+                print(f"   Failed: {e}")
+                return False
+
+
+async def render_podcast(turns, output_path, voice_alex, voice_sam, rate, volume):
+    total_words = sum(len(t['text'].split()) for t in turns)
+    est_min = round(total_words / 150)
+    print(f"Dialogue: {len(turns)} turns, ~{total_words} words (~{est_min} min)")
+
+    voices = {'ALEX': voice_alex, 'SAM': voice_sam}
+    rate_offsets = {'ALEX': "+2%", 'SAM': "-1%"} if rate == "+0%" else {'ALEX': rate, 'SAM': rate}
+
+    start_time = time.time()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        segment_files = []
+        for i, turn in enumerate(turns):
+            speaker = turn['speaker']
+            text = turn['text']
+            voice = voices.get(speaker, voice_alex)
+            seg_rate = rate_offsets.get(speaker, rate)
+            seg_path = tmp / f"seg_{i:04d}_{speaker}.mp3"
+            preview = text[:55] + ("..." if len(text) > 55 else "")
+            print(f"  [{i+1}/{len(turns)}] {speaker}: {preview}")
+            ok = await generate_audio_segment(text, voice, seg_path, rate=seg_rate, volume=volume)
+            if ok:
+                segment_files.append((seg_path, speaker))
+
+        if not segment_files:
+            print("No segments generated!"); sys.exit(1)
+
+        print(f"\nConcatenating {len(segment_files)} segments...")
+        concatenated = False
+        try:
+            from pydub import AudioSegment
+            combined = AudioSegment.empty()
+            prev_speaker = None
+            for seg_path, speaker in segment_files:
+                audio = AudioSegment.from_mp3(str(seg_path))
+                if prev_speaker is not None:
+                    pause_ms = random.randint(300, 500) if speaker != prev_speaker else random.randint(150, 250)
+                    combined += AudioSegment.silent(duration=pause_ms)
+                combined += audio
+                prev_speaker = speaker
+            combined.export(str(output_path), format="mp3", bitrate="192k")
+            concatenated = True
+            print("  High-quality concatenation with natural pauses")
+        except Exception as e:
+            print(f"  pydub/ffmpeg unavailable, using binary concatenation")
+
+        if not concatenated:
+            with open(output_path, 'wb') as out:
+                for seg_path, _ in segment_files:
+                    with open(seg_path, 'rb') as inp:
+                        out.write(inp.read())
+            print("  Binary concatenation complete")
+
+    elapsed = time.time() - start_time
+    file_size = output_path.stat().st_size
+    print(f"\nPodcast rendered in {elapsed:.1f}s")
+    print(f"   File: {output_path}")
+    print(f"   Size: {format_bytes(file_size)}")
+    print(f"   Voices: Alex ({voice_alex}) + Sam ({voice_sam})")
+    print(f"   Turns: {len(turns)}")
+
 
 async def main():
-    parser = argparse.ArgumentParser(description="Conversational Podcaster - converts markdown to two-voice podcast")
-    parser.add_argument("input_file", help="Path to the markdown file")
-    parser.add_argument("--rate", default="+0%", help="Speech rate adjustment (e.g., '+10%%', '-20%%')")
-    parser.add_argument("--volume", default="+0%", help="Volume adjustment (e.g., '+50%%', '-10%%')")
-    parser.add_argument("--host-voice", default="en-US-JennyNeural", help="Voice for HOST speaker")
-    parser.add_argument("--expert-voice", default="en-US-GuyNeural", help="Voice for EXPERT speaker")
+    parser = argparse.ArgumentParser(description="Conversational Podcaster v2")
+    parser.add_argument("input_file", nargs='?', help="Markdown file (legacy mode)")
+    parser.add_argument("--script", help="Pre-generated podcast script ([ALEX]/[SAM] format)")
+    parser.add_argument("-o", "--output", help="Output MP3 path")
+    parser.add_argument("--rate", default="+0%", help="Base speech rate")
+    parser.add_argument("--volume", default="+0%", help="Volume adjustment")
+    parser.add_argument("--alex-voice", default="en-US-GuyNeural", help="Voice for Alex")
+    parser.add_argument("--sam-voice", default="en-US-JennyNeural", help="Voice for Sam")
+    parser.add_argument("--host-voice", help="(Legacy) alias for --alex-voice")
+    parser.add_argument("--expert-voice", help="(Legacy) alias for --sam-voice")
     args = parser.parse_args()
 
-    input_path = Path(args.input_file).resolve()
-    input_filename = input_path.stem
-    output_path = Path(f"{input_filename}-conversational.mp3").resolve()
-    
-    print("🎙️  Conversational Podcaster - Issue #237\n")
-    print(f"📄 Input: {input_path}")
-    print(f"🔊 Output: {output_path}\n")
-    
-    try:
-        # Read markdown file
-        print("📖 Reading markdown file...")
-        with open(input_path, 'r', encoding='utf-8') as f:
-            markdown = f.read()
-        print(f"   Markdown size: {format_bytes(len(markdown.encode('utf-8')))}")
-        
-        # Extract document title (first H1)
-        title_match = re.search(r'^#\s+(.+)$', markdown, flags=re.MULTILINE)
-        doc_title = title_match.group(1) if title_match else input_filename.replace('-', ' ').replace('_', ' ')
-        
-        # Parse into sections
-        print("🔧 Parsing document sections...")
-        sections = parse_sections(markdown)
-        print(f"   Found {len(sections)} sections")
-        
-        # Generate conversational script
-        print("💬 Generating conversational script...")
-        script = generate_conversational_script(sections, doc_title)
-        print(f"   Generated {len(script)} dialogue turns")
-        
-        # Calculate total word count
-        total_words = sum(len(turn['text'].split()) for turn in script)
-        print(f"   Total words: {total_words}")
-        print(f"   Estimated duration: {estimate_duration(' '.join(turn['text'] for turn in script))}")
-        
-        # Generate audio segments
-        print("\n🎤 Generating audio segments...")
-        import time
-        start_time = time.time()
-        
-        # Voice configuration
-        voices = {
-            'HOST': args.host_voice,
-            'EXPERT': args.expert_voice
-        }
-        
-        # Create temporary directory for segments
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
-            segment_files = []
-            
-            for i, turn in enumerate(script):
-                speaker = turn['speaker']
-                text = turn['text']
-                voice = voices[speaker]
-                segment_path = temp_path / f"segment_{i:03d}_{speaker}.mp3"
-                
-                print(f"   [{i+1}/{len(script)}] {speaker}: {text[:50]}...")
-                await generate_audio_segment(text, voice, segment_path, rate=args.rate, volume=args.volume)
-                segment_files.append(segment_path)
-            
-            # Concatenate segments
-            print("\n🔗 Concatenating audio segments...")
-            
-            # Try using pydub if available and ffmpeg is present
-            use_pydub = False
-            try:
-                from pydub import AudioSegment
-                # Test if ffmpeg is available
-                test_audio = AudioSegment.from_mp3(str(segment_files[0]))
-                use_pydub = True
-            except (ImportError, FileNotFoundError):
-                use_pydub = False
-            
-            if use_pydub:
-                try:
-                    combined = AudioSegment.empty()
-                    pause = AudioSegment.silent(duration=400)  # 400ms pause between speakers
-                    
-                    for segment_file in segment_files:
-                        audio = AudioSegment.from_mp3(str(segment_file))
-                        combined += audio + pause
-                    
-                    combined.export(str(output_path), format="mp3")
-                    print("   Using pydub for high-quality concatenation")
-                except Exception as e:
-                    print(f"   pydub failed: {str(e)[:80]}, falling back to simple concatenation")
-                    use_pydub = False
-            
-            if not use_pydub:
-                # Fallback: simple binary concatenation (works for MP3)
-                print("   Using simple concatenation (pydub/ffmpeg not available)")
-                with open(output_path, 'wb') as outfile:
-                    for segment_file in segment_files:
-                        with open(segment_file, 'rb') as infile:
-                            outfile.write(infile.read())
-        
-        end_time = time.time()
-        conversion_time = end_time - start_time
-        
-        # Get output file stats
-        file_size = output_path.stat().st_size
-        
-        print(f"\n✅ Conversion complete in {conversion_time:.2f}s")
-        print(f"\n📊 Results:")
-        print(f"   Audio file: {output_path}")
-        print(f"   File size: {format_bytes(file_size)}")
-        print(f"   Format: MP3")
-        print(f"   Voices: HOST ({args.host_voice}) + EXPERT ({args.expert_voice})")
-        print(f"   Dialogue turns: {len(script)}")
-        print(f"   Quality: Neural (production-grade)")
-        print(f"\n✨ Success! Conversational podcast generated.")
-        
-    except FileNotFoundError:
-        print(f"\n❌ Error: File not found: {input_path}")
-        sys.exit(1)
-    except Exception as error:
-        print(f"\n❌ Error: {error}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    alex_voice = args.host_voice or args.alex_voice
+    sam_voice = args.expert_voice or args.sam_voice
+
+    if args.script:
+        script_path = Path(args.script).resolve()
+        if not script_path.exists():
+            print(f"Script file not found: {script_path}"); sys.exit(1)
+        stem = script_path.stem.replace('.podcast-script', '')
+        output_path = Path(args.output).resolve() if args.output else script_path.parent / f"{stem}-podcast.mp3"
+        print(f"Conversational Podcaster v2 - Script Mode")
+        print(f"Script: {script_path}")
+        print(f"Output: {output_path}")
+        print(f"Voices: Alex ({alex_voice}) + Sam ({sam_voice})\n")
+        raw = script_path.read_text(encoding='utf-8')
+        turns = parse_podcast_script(raw)
+        if not turns:
+            print("No dialogue turns found. Expected [ALEX]/[SAM] format."); sys.exit(1)
+
+    elif args.input_file:
+        input_path = Path(args.input_file).resolve()
+        if not input_path.exists():
+            print(f"File not found: {input_path}"); sys.exit(1)
+        output_path = Path(args.output).resolve() if args.output else input_path.with_name(f"{input_path.stem}-podcast.mp3")
+        print(f"Conversational Podcaster v2 - Legacy Mode")
+        print(f"Input:  {input_path}")
+        print(f"Output: {output_path}")
+        print(f"Voices: Alex ({alex_voice}) + Sam ({sam_voice})\n")
+        markdown = input_path.read_text(encoding='utf-8')
+        print("Generating conversation from markdown...")
+        turns = generate_legacy_script(markdown)
+    else:
+        parser.print_help(); sys.exit(1)
+
+    await render_podcast(turns, output_path, alex_voice, sam_voice, args.rate, args.volume)
+    print(f"\nDone! Podcast ready: {output_path}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

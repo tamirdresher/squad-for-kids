@@ -1,0 +1,40 @@
+{
+  "name": "@tamresearch/squad-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing squad operations (triage, routing, status, board)",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "squad-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@octokit/rest": "^21.0.2",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "squad",
+    "github",
+    "triage",
+    "project-management"
+  ],
+  "author": "Squad Team",
+  "license": "MIT"
+}

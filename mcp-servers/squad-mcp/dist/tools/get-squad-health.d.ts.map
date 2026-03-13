@@ -1,0 +1,1 @@
+{"version":3,"file":"get-squad-health.d.ts","sourceRoot":"","sources":["../../src/tools/get-squad-health.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAEH,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,oCAAoC,CAAC;AACzE,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,aAAa,CAAC;AAI/C,wBAAsB,cAAc,CAClC,MAAM,EAAE,WAAW,EACnB,IAAI,EAAE;IAAE,cAAc,CAAC,EAAE,OAAO,CAAA;CAAE,GACjC,OAAO,CAAC,cAAc,CAAC,CAuGzB"}

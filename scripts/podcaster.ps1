@@ -11,6 +11,8 @@
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -ScriptFile my-script.txt
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Rate "+10%" -Volume "+50%"
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -Deliver
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Deliver -DeliverTo user@example.com
 
 param(
     [Parameter(Mandatory=$true)]
@@ -22,7 +24,10 @@ param(
     [switch]$PodcastMode,
     [string]$ScriptFile,
     [string]$Rate = "+0%",
-    [string]$Volume = "+0%"
+    [string]$Volume = "+0%",
+    [switch]$Deliver,
+    [string]$DeliverTo,
+    [string]$PodcastTitle
 )
 
 $ErrorActionPreference = "Stop"
@@ -126,6 +131,37 @@ function Invoke-SystemSpeech {
 }
 
 # ============================================================================
+# DELIVERY
+# ============================================================================
+
+function Invoke-PodcastDelivery {
+    param(
+        [Parameter(Mandatory)][string]$AudioPath,
+        [string]$Title,
+        [string]$Recipient
+    )
+
+    if (-not (Test-Path $AudioPath)) {
+        Write-Host "`n  Delivery skipped — audio file not found at $AudioPath" -ForegroundColor Yellow
+        return
+    }
+
+    $deliverScript = Join-Path $PSScriptRoot "deliver-podcast.ps1"
+    if (-not (Test-Path $deliverScript)) {
+        Write-Host "`n  deliver-podcast.ps1 not found — run delivery manually:" -ForegroundColor Yellow
+        Write-Host "    ./scripts/deliver-podcast.ps1 -AudioFile `"$AudioPath`"" -ForegroundColor Gray
+        return
+    }
+
+    Write-Host "`n--- Delivering podcast ---" -ForegroundColor Cyan
+    $deliverParams = @{ AudioFile = $AudioPath }
+    if ($Title)     { $deliverParams.Title     = $Title }
+    if ($Recipient) { $deliverParams.Recipient = $Recipient }
+
+    & $deliverScript @deliverParams
+}
+
+# ============================================================================
 # MAIN
 # ============================================================================
 
@@ -136,7 +172,8 @@ Write-Host "=== Podcaster ===" -ForegroundColor Cyan
 $inputPath = Resolve-Path $InputFile -ErrorAction Stop
 $inputName = [System.IO.Path]::GetFileNameWithoutExtension($inputPath)
 if (-not $OutputFile) {
-    $OutputFile = Join-Path (Split-Path $inputPath) "$inputName-audio.mp3"
+    $suffix = if ($ConversationMode -or $PodcastMode) { "podcast" } else { "audio" }
+    $OutputFile = Join-Path (Split-Path $inputPath) "$inputName-$suffix.mp3"
 }
 
 Write-Host "Input:  $inputPath"
@@ -149,13 +186,18 @@ if ($ConversationMode) {
     $convScript = Join-Path $scriptDir "podcaster-conversational.py"
 
     $env:PYTHONIOENCODING = "utf-8"
-    $pyArgs = @("`"$convScript`"", "`"$inputPath`"", "--rate", $Rate, "--volume", $Volume)
+    $pyArgs = @("`"$convScript`"", "`"$inputPath`"", "-o", "`"$OutputFile`"", "--rate", $Rate, "--volume", $Volume)
     if ($Voice -ne "en-US-JennyNeural") {
         $pyArgs += @("--host-voice", $Voice)
     }
 
     $proc = Start-Process -FilePath "python" -ArgumentList ($pyArgs -join " ") -NoNewWindow -Wait -PassThru
-    exit $proc.ExitCode
+    if ($proc.ExitCode -ne 0) { exit $proc.ExitCode }
+
+    if ($Deliver -and (Test-Path $OutputFile)) {
+        Invoke-PodcastDelivery -AudioPath $OutputFile -Title $PodcastTitle -Recipient $DeliverTo
+    }
+    exit 0
 }
 
 # ============================================================================
@@ -205,6 +247,10 @@ if ($PodcastMode) {
         $size = (Get-Item $OutputFile).Length
         $sizeMB = [math]::Round($size / 1MB, 2)
         Write-Host "`n Podcast generated: $OutputFile ($sizeMB MB)" -ForegroundColor Green
+
+        if ($Deliver) {
+            Invoke-PodcastDelivery -AudioPath $OutputFile -Title $PodcastTitle -Recipient $DeliverTo
+        }
     } else {
         Write-Host "`n Failed to generate podcast" -ForegroundColor Red
         exit 1
@@ -244,6 +290,10 @@ if (Test-Path $OutputFile) {
     $size = (Get-Item $OutputFile).Length
     $sizeMB = [math]::Round($size / 1MB, 2)
     Write-Host "`n Audio generated: $OutputFile ($sizeMB MB)" -ForegroundColor Green
+
+    if ($Deliver) {
+        Invoke-PodcastDelivery -AudioPath $OutputFile -Title $PodcastTitle -Recipient $DeliverTo
+    }
 } else {
     Write-Host "`n Failed to generate audio" -ForegroundColor Red
     exit 1

@@ -1,0 +1,21 @@
+{
+  "name": "@tamresearch/kusto-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Azure Data Explorer (Kusto) — query clusters, list databases/tables, get schemas",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.6.0",
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

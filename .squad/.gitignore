@@ -31,3 +31,8 @@ sessions/**/*
 
 # Playwright generated files
 .playwright-cli/
+
+# Credentials and secrets (never commit)
+identity/*credentials*
+identity/*.secret
+identity/*.key

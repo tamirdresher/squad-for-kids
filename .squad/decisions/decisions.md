@@ -2,6 +2,105 @@
 
 ## Active Decisions
 
+### 2026-03-13: Seven — nano-banana-mcp Integration Recommendation (Issue #375)
+
+# Decision: nano-banana-mcp Integration Recommendation
+
+**Issue:** #375  
+**Date:** 2026-03-28  
+**Author:** Seven (Research & Docs)  
+**Status:** Ready for Implementation
+
+## Summary
+
+**Question:** Can we use nano-banana-mcp without adding billing info or costs?
+
+**Answer:** ✅ **YES — Zero cost, zero billing setup required.**
+
+## Findings
+
+### Project Details
+- **Name:** nano-banana-mcp
+- **Repository:** https://github.com/pierceboggan/nano-banana-mcp
+- **Purpose:** MCP server for AI image generation via Google Gemini
+- **Language:** TypeScript/Node.js
+- **License:** ISC
+
+### Billing Analysis
+
+**Free Tier Access:**
+- Uses Google Gemini API via free tier (Google AI Studio)
+- No credit card required for API key
+- Free API keys are generated at https://aistudio.google.com/apikey
+- No billing info needed at any point
+
+**Code Transparency:**
+- Reviewed source code (11.5 KB)
+- Direct fetch calls to Google's generativelanguage.googleapis.com
+- Model used: `gemini-3.1-flash-image-preview` (free tier eligible)
+- No telemetry, tracking, or hidden data collection
+- Image generation only on explicit user request
+
+**Dependencies:**
+- @modelcontextprotocol/sdk (standard MCP)
+- zod (schema validation)
+- @types/node (dev only)
+- No proprietary or costly third-party services
+
+**Risks:** ⚠️ MINOR
+- Google free tier has quotas (generous for development)
+- Long-term cost if usage scales significantly
+- Google could change pricing model (unlikely for public API)
+
+## Recommendation
+
+**Status:** ✅ **APPROVED FOR ADOPTION**
+
+**Next Steps:**
+1. Test integration with squad MCP infrastructure
+2. Document setup: API key generation + GOOGLE_API_KEY environment variable
+3. Add to squad capabilities inventory
+4. Monitor usage (within free tier limits)
+
+**Acceptance Criteria:**
+- [ ] MCP server runs without errors in local environment
+- [ ] Image generation works end-to-end
+- [ ] Documentation posted to `.squad/implementations/`
+- [ ] Team notified in sync
+
+## Technical Notes
+
+**Usage Pattern:**
+```bash
+# Install
+npm install
+npm run build
+
+# Configure
+export GOOGLE_API_KEY="<free-api-key-from-google-ai-studio>"
+
+# Run
+npm start
+```
+
+**Integration Points:**
+- Works with VS Code Copilot, Claude Desktop, other MCP App clients
+- Images render inline as interactive viewer (MCP Apps feature)
+- Optional disk save for generated images
+
+**Scalability:**
+- Current: Development use (free tier)
+- Future: If production usage scales, evaluate dedicated billing account
+- Recommendation: Monitor quarterly API usage against free tier quotas
+
+## References
+- Issue: #375
+- GitHub: pierceboggan/nano-banana-mcp
+- Google AI Studio: https://aistudio.google.com/apikey
+
+
+
+
 ### 2026-03-13: Data — Conversational Podcast Generation (Issue #455)
 
 **Date:** 2026-03-13  
@@ -1531,3 +1630,4 @@ VibeVoice wrapper (podcaster-vibevoice.py) is created but VibeVoice is not insta
 - generate-podcast-script.py: +200 lines (new functions, no existing code modified)
 - podcaster.ps1: +15 lines (new parameters, pipeline integration)
 - podcaster-vibevoice.py: New file, standalone wrapper
+

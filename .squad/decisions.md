@@ -4,6 +4,57 @@
 
 ---
 
+## Decision 22: nano-banana-mcp Evaluation & Adoption
+
+**Date:** 2026-03-13  
+**Evaluator:** Seven (Research & Docs)  
+**Issue:** #375 — "See if we can use this without adding billing info or costs to us"  
+**Status:** ✅ APPROVED FOR ADOPTION
+
+### Summary
+
+`nano-banana-mcp` is an open-source MCP (Model Context Protocol) server that wraps Google Gemini for AI image generation. **It incurs zero costs and requires no billing information from the project.**
+
+### What It Does
+
+- Generates images from text prompts via Google Gemini API
+- Supports reference images for editing, styling, or combining
+- Renders output as interactive viewers in VS Code Copilot, Claude Desktop, and other MCP clients
+- Can save generated images to disk
+
+### Billing & Cost Analysis
+
+| Aspect | Status |
+|--------|--------|
+| **Project costs** | Zero — it's open-source |
+| **Billing info required** | No |
+| **API dependency** | Google Gemini (free tier available) |
+| **Free tier availability** | Yes — no credit card required for initial API key |
+| **Cost control** | User controls via Google's billing settings |
+
+### Risk Assessment
+
+**Low Risk:**
+- No vendor lock-in — pure wrapper around public Google API
+- Well-documented, npm-based setup
+- Active repository with clear maintenance
+- Transparent dependency tree
+
+### Implementation
+
+1. Get free API key from [Google AI Studio](https://aistudio.google.com/apikey)
+2. Add to project via npm
+3. Configure as MCP server in VS Code or Claude Desktop
+4. Start generating images without billing concerns
+
+### Use Cases
+
+- Generate app icons, UI mockups, design concepts
+- Prototype visual features before implementation
+- Batch image generation for documentation or blogs
+
+---
+
 ## Decision 21: Squad MCP Server Architecture Decision
 
 **Date:** 2026-03-13  

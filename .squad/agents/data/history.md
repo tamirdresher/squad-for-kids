@@ -660,3 +660,47 @@ Generated a podcast showcasing the podcaster's own improvements (Issue #460, req
 - Updated podcaster.ps1 orchestrator with -NaturalSpeech and -BackchannelFrequency parameters
 - Architecture: post-processing runs AFTER script generation, BEFORE TTS — clean separation of concerns
 - Random seed not pinned — output varies per run, which is desirable for natural-sounding podcasts
+
+
+## 2026-03-13: Issue #465 — Hebrew Podcast Research (COMPLETE)
+
+Researched and analyzed implementation requirements for Hebrew podcast support targeting "מפתחים מחוץ לקופסא" (Developers Outside the Box) podcast style.
+
+**Deliverable:** esearch/hebrew-podcast-analysis.md (20KB comprehensive analysis)
+
+**Key Findings:**
+- Target podcast style: Casual, energetic Israeli tech talk with Shahar Polak & Dotan Talitman
+- Current state: Basic edge-tts Hebrew support (he-IL-AvriNeural/HilaNeural) but robotic quality
+- Gap analysis: Need style enhancement (LLM prompts), voice quality upgrade (ElevenLabs vs enhanced edge-tts), bilingual code-switching logic
+
+**Implementation Plan (3 Phases):**
+1. **Style Enhancement:** Update generate-podcast-script.py with Israeli tech podcast personality, Hebrew slang, code-switching guidance (2-3 days)
+2. **Voice Quality:** Either ElevenLabs API (production, \-99/mo) or enhanced edge-tts with SSML (free, quick win) (2-3 days)
+3. **Pipeline Integration:** End-to-end testing with podcaster.ps1 -Language he (1 day)
+
+**TTS Options Analyzed:**
+- edge-tts (current): 6/10 quality, FREE
+- edge-tts + SSML: 7/10 quality, FREE
+- ElevenLabs API: 9/10 quality, \-99/month
+- FineVoice: 8/10 quality, \-80/month
+- Voicestars, Robo-Shaul (open-source): Evaluated but not recommended
+
+**Recommendation:** Phase 1 + Phase 2B (enhanced edge-tts) for development/testing (3-4 days, no cost). Add Phase 2A (ElevenLabs) if publishing podcasts externally.
+
+**Target Style Characteristics:**
+- High energy, rapid exchanges, humor
+- Hebrew-first with English tech terms (API, React, Git) naturally embedded
+- Israeli slang ("לעוף על זה", "בננה" = bug)
+- Community-focused, no pretentiousness ("ללא פאתוס")
+
+**Research Sources:**
+- Web search: מפתחים מחוץ לקופסא podcast analysis (Spotify, outside-the-box.dev)
+- Web search: Hebrew TTS options 2024 (ElevenLabs, FineVoice, Voicestars, edge-tts comparisons)
+- Code review: podcaster-conversational.py (Hebrew support via --language he, VOICE_MAP with he-IL voices)
+- Code review: generate-podcast-script.py (SYSTEM_PROMPT_HE at line 133-150, basic Hebrew translation)
+- Code review: podcaster.ps1 (pipeline orchestrator with -Language parameter)
+- Existing: HEBREW_PODCAST_METHODS.md (prior edge-tts experiments with AVRI/HILA voices)
+
+**Status:** ✅ COMPLETE. Research document delivered, issue comment posted. Ready for Phase 1 implementation.
+
+**Next Owner:** Data (for Phase 1 style enhancement) → Podcaster Agent (for refinement)

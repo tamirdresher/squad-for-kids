@@ -603,3 +603,14 @@ Implemented Phase 1 podcast quality improvements based on Seven's research (rese
 - Consider Fish Speech S2 or ElevenLabs for even better TTS quality
 - Fine-tune prompts based on user feedback
 - A/B test different host personalities
+
+### Workflow Comment Dedup (Spam Fix) - 2026-07-15
+
+**Problem:** `squad-issue-assign.yml` and `squad-triage.yml` posted new comments on every label event without checking for duplicates, causing email notification spam.
+
+**Solution:** Added comment dedup to both workflows using the `listComments → find → updateComment` pattern from `drift-detection.yml`:
+- **Triage:** Checks for existing `🏗️ Squad Triage` comment; updates in-place if found
+- **Assign:** Checks for existing `📋 Assigned to {name}` comment; updates if found. Also skips entirely if triage already posted a comment with the same assignment.
+- Markers are emoji-prefixed headers, making them reliable dedup keys
+
+**Key Insight:** When workflows trigger each other (triage adds a `squad:member` label → assign fires), the assign workflow should detect the triage comment and skip rather than double-post.

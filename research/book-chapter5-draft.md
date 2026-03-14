@@ -177,7 +177,29 @@ Priya should own infrastructure decisions. Not B'Elanna. B'Elanna can update con
 
 And so on.
 
-> [DIAGRAM: Side-by-side comparison — "Personal Repo Squad" with AI Lead vs. "Work Team Squad" with Human Lead + AI assistants]
+**Figure 5.1: Personal Squad vs Work Team Squad**
+
+```mermaid
+graph TD
+    subgraph personal["Personal Repo Squad"]
+        A1["🎖️ Picard<br/>Lead (AI)"]
+        A1 --> A2["💻 Data"]
+        A1 --> A3["🛡️ Worf"]
+        A1 --> A4["📚 Seven"]
+        A1 --> A5["⚙️ B'Elanna"]
+    end
+    
+    subgraph work["Work Team Squad"]
+        B1["👤 Sarah<br/>Engineering Lead (Human)"]
+        B1 --> B2["🎖️ Picard (AI Assistant)"]
+        B1 --> B3["👤 Brady (Human Architect)"]
+        B1 --> B4["👤 Mike (Human Security)"]
+        B1 --> B5["👤 Priya (Human Infra)"]
+        B3 -.->|owns| B3a["💻 Data (AI)"]
+        B4 -.->|owns| B4a["🛡️ Worf (AI)"]
+        B5 -.->|owns| B5a["⚙️ B'Elanna (AI)"]
+    end
+```
 
 This isn't about AI **replacing** expertise. It's about AI **amplifying** the humans who already have expertise.
 
@@ -315,6 +337,85 @@ But not by copy-pasting my personal setup. And not by assuming the AI knows best
 It works by making the humans the leads and the AI the assistants. It works by capturing knowledge that compounds for everyone. It works by building trust through transparency and small wins.
 
 And it works because the team — the real humans with real expertise — stayed in charge the entire time.
+
+---
+
+## 🧪 Try It Yourself
+
+You've seen the question. Now prepare your own answer.
+
+### Experiment 1: Write Your "What We're NOT Doing" Document
+
+Before you bring AI tools to your team, write the trust document. This is the single most important thing you can do to avoid the pitchfork mob.
+
+```markdown
+# AI Integration Proposal for [Your Team Name]
+
+## What We're NOT Doing
+- [ ] Replacing code review with AI approval
+- [ ] Letting AI agents make architecture decisions alone
+- [ ] Auto-merging AI-generated code without human review
+- [ ] Reducing headcount
+- [ ] Changing who owns what
+
+## What We ARE Doing
+- [ ] Adding AI agents as assistants to existing team members
+- [ ] Automating systematic work (scans, checks, boilerplate)
+- [ ] Capturing institutional knowledge in decisions.md
+- [ ] Starting with low-risk work, scaling based on results
+- [ ] Running a 2-week experiment with clear success criteria
+
+## Success Criteria (2-week experiment)
+- [ ] AI PRs require fewer than 2 rounds of review on average
+- [ ] No AI-generated code merged without human approval
+- [ ] Team velocity for high-priority work unchanged or improved
+- [ ] Zero production incidents caused by AI-generated code
+
+## Failure Criteria (we stop immediately if)
+- [ ] AI PR requires more than 3 rounds of review consistently
+- [ ] Team members feel slowed down by the AI workflow
+- [ ] Any production incident caused by AI code
+```
+
+Save this as a document you can share. Customize it for your team's specific concerns. The goal isn't to sell AI — it's to make the experiment **safe enough to try**.
+
+### Experiment 2: Identify Your Team's "Safe Zone"
+
+Map your team's work into three risk buckets:
+
+```markdown
+# Risk Assessment for AI Work
+
+## 🟢 Safe to Delegate (Start Here)
+- Documentation updates
+- Dependency version bumps
+- Test scaffolding
+- Code formatting / linting fixes
+- README updates
+
+## 🟡 Delegate with Review (Week 2-3)
+- Bug fixes with clear repro steps
+- Small features with written specs
+- Code review first-pass
+- Security scan analysis
+
+## 🔴 Keep with Humans (Always)
+- Architecture decisions
+- Production deployment approvals
+- Security incident response
+- Customer-facing API changes
+- Anything touching user data
+```
+
+**Expected outcome:** A clear picture of where to start. Everyone's 🟢 list is different. The point is to start there — not in the 🔴 zone.
+
+### Experiment 3: Have the Conversation (For Real)
+
+Schedule a 30-minute meeting with your team lead. Share your risk assessment and your "What We're NOT Doing" document. Ask one question:
+
+> "Can we try this for two weeks on documentation and test scaffolding only? If it doesn't work, we stop."
+
+The answer might be "yes." It might be "not now." Either way, you've planted the seed. And you've done it with a plan, not with hype.
 
 ---
 

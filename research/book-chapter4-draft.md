@@ -189,7 +189,37 @@ The Borg metaphor isn't accidental. Watching four AI agents descend on a feature
 
 It's efficient. It's relentless. It's coordinated. And it's slightly unsettling.
 
-> [DIAGRAM: Four parallel execution streams — Data coding, Worf auditing, B'Elanna deploying, Seven documenting — all converging on a single merged feature]
+**Figure 4.1: Four Parallel Execution Streams Converging**
+
+```mermaid
+graph TD
+    A["📋 Issue #231<br/>Team: Implement Rate Limiting"]
+    A --> B["🎖️ Picard: Orchestrate"]
+    B --> D["💻 Data<br/>Code branch"]
+    B --> W["🛡️ Worf<br/>Security audit"]
+    B --> BE["⚙️ B'Elanna<br/>Deploy config"]
+    B --> S["📚 Seven<br/>Documentation"]
+    D --> M["GitHub Merge<br/>Coordination"]
+    W --> M
+    BE --> M
+    S --> M
+    M --> F["✅ Rate Limiting Shipped<br/>Issue Closed, Decision Documented"]
+```
+
+```
+PARALLEL EXECUTION TIMELINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[14:23] 🎖️ Picard: Task decomposition
+        ┌─ [14:24] 💻 Data: Implement middleware
+        │  [14:26] 🛡️ Worf: Security audit on PR
+P A R   │  [14:29] ⚙️ B'Elanna: Config update
+A L L   │  [14:30] 📚 Seven: Docs drafted
+E L     └─ [14:32] ✅ All streams complete
+L
+[14:32] ✨ All PRs merged, issue closed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total: ~9 minutes (vs ~3 hours sequential)
+```
 
 ---
 
@@ -716,6 +746,74 @@ And we'll see what happens when institutional knowledge compounds across **human
 That's where things get really interesting.
 
 Because the personal breakthrough was impressive. But the **team transformation**? That's the real story.
+
+---
+
+## 🧪 Try It Yourself
+
+You've watched the Borg work. Time to build your own collective.
+
+### Experiment 1: Simulate Parallel Execution
+
+You don't need a full Squad to experience parallel work streams. Simulate it with GitHub Issues:
+
+```bash
+# Create a parent task
+gh issue create \
+  --title "Team: Add user profile feature" \
+  --label "squad:picard" \
+  --body "Build a user profile page with avatar upload, bio editing, and activity history."
+
+# Now decompose it like Picard would — create subtasks
+gh issue create --title "Build profile API endpoint" --label "squad:data" \
+  --body "REST endpoint: GET /api/users/:id/profile. Return name, bio, avatar URL, joined date."
+
+gh issue create --title "Audit profile endpoint for data exposure" --label "squad:worf" \
+  --body "Check that private fields (email, phone) are NOT returned in the profile response."
+
+gh issue create --title "Document profile API" --label "squad:seven" \
+  --body "Add OpenAPI spec for profile endpoint. Include example responses."
+
+gh issue create --title "Add profile endpoint to API gateway" --label "squad:belanna" \
+  --body "Update deployment config to route /api/users/:id/profile through the gateway."
+```
+
+**Expected outcome:** Five issues in your repo. One parent, four children. Each assigned to a different specialist. This is task decomposition — the thing Picard does automatically. You just did it manually. Notice how some tasks can run in parallel (Worf's audit + B'Elanna's config) while others are sequential (Seven's docs need Data's API first).
+
+### Experiment 2: Track Coordination Through decisions.md
+
+As you "complete" each subtask (or imagine completing them), log the decisions:
+
+```bash
+cat >> .squad/decisions.md << 'EOF'
+
+## Decision: Profile API returns public fields only
+**Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+**Agent:** Worf (Security)
+**Context:** Profile endpoint audit for data exposure
+
+**Decision:** Profile response includes: name, bio, avatarUrl, joinedDate.
+Excluded: email, phone, internalId, passwordHash.
+
+**Rationale:** Principle of least privilege. Public profiles should not leak PII.
+**Cross-reference:** Data's implementation must match this field list.
+EOF
+```
+
+Now imagine Data reads this decision before building the API. He knows exactly which fields to include. No back-and-forth. No ambiguity. The knowledge flowed from Worf to Data through `decisions.md`.
+
+**Expected outcome:** You can trace how one agent's decision constrains another agent's implementation. That's coordination without meetings.
+
+### Experiment 3: Practice the Morning Routine
+
+Try the coffee-and-approvals workflow for one week. Each morning:
+
+1. Check your GitHub notifications (phone or laptop)
+2. Review any PRs that were opened overnight (or by your AI tools)
+3. Approve or leave comments in under 10 minutes
+4. File one new issue before your first meeting
+
+Track how it feels. After 5 days, compare: how much got done vs. your normal workflow? The shift from "I write code" to "I make decisions" starts here.
 
 ---
 

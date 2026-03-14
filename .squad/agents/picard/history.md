@@ -216,3 +216,107 @@ packages/squad-sdk/src/
   ralph/        → Work monitor
   streams/      → SubSquad definitions
 ```
+
+---
+
+### Continuous Model Evaluation Framework (Issue #509)
+
+**Context:** AI model landscape evolves rapidly (GPT-5.x, Claude updates, Gemini). Without systematic evaluation, squad risks missing better models, overspending on premium when mid-tier suffices, or using outdated models. Issue #509 requested continuous process to review models and update agent assignments.
+
+**Architecture Decision — Model Review Ceremony:**
+- **Trigger:** Quarterly scheduled (every 3 months) + ad-hoc (major releases, quality degradation, cost spikes)
+- **Integration:** Tech-news-scanner (Issue #255) detects announcements → Neelix flags → Picard evaluates within 1 week
+- **Process:** Review announcements → Benchmark new models → Cost/quality analysis → Recommend changes → Update configs
+- **Facilitator:** Lead (Picard) — approves model changes
+
+**Key Files Created:**
+- `.squad/ceremonies.md` — Added Model Review ceremony definition
+- `.squad/templates/model-evaluation.md` — Structured evaluation framework (benchmark tasks, cost analysis, decision format)
+- `.squad/model-assignments-snapshot.md` — Documents current agent→model assignments with rationale, cost estimates, change history
+- `.squad/routing.md` — Added Per-Agent Model Selection section with tier guidelines and override process
+- `.squad/decisions/inbox/picard-model-evaluation-process.md` — Full decision record
+
+**Current Model Strategy (as of 2026-03-13):**
+- **Standard Tier (claude-sonnet-4.5):** 8 agents — Picard, Data, Seven, B'Elanna, Worf, Q, Troi, Kes  
+  Use cases: Architecture, code generation, research, security, creative writing  
+  Rationale: Best quality/cost balance for complex reasoning (~$180-240/month)
+  
+- **Fast Tier (claude-haiku-4.5):** 4 agents — Neelix, Scribe, Podcaster, Ralph  
+  Use cases: Daily briefings, session logging, monitoring, TTS generation  
+  Rationale: Speed + cost efficiency for routine/high-volume work (~$20-30/month)
+  
+- **Premium Tier (Opus 4.6):** Not currently used  
+  Decision: Quality gap doesn't justify +$400-600/month over Sonnet 4.5  
+  Future: Consider for mission-critical decisions if justified
+
+**Total Est. Monthly Cost:** $200-270/month (within budget)
+
+**Evaluation Triggers (3 Categories):**
+1. **Scheduled:** Quarterly reviews (next: 2026-06-15) — full evaluation of all agents
+2. **Ad-Hoc:** Major model releases (GPT-6, Claude Opus 5, Sonnet 4.6) → evaluate within 1 week
+3. **Reactive:** Quality degradation, cost spike (+50%), capability gap → immediate evaluation
+
+**Integration with Tech News Scanner:**
+- Scanner monitors HackerNews, Reddit for model announcements
+- Neelix includes model releases in daily briefing with alert
+- Picard reviews announcement, decides if Model Review ceremony needed
+- SLA: 1 week from announcement to evaluation start (for major releases)
+
+**Evaluation Process (7 Phases):**
+1. **Trigger Detection:** Quarterly OR ad-hoc (release/issue/cost)
+2. **Scoping:** Identify models to test + affected agents
+3. **Benchmarking:** Representative tasks per agent role, score quality/speed/cost
+4. **Cost vs Quality:** Calculate monthly impact, assess quality delta, capability fit, risk
+5. **Recommendations:** Per-agent decision (Change/Keep/Defer) with justification
+6. **Decision & Documentation:** Update snapshot, record decision, update charters if needed
+7. **Monitoring:** Track first week quality + first billing cycle cost
+
+**Model Selection Criteria:**
+- **60% Quality:** Task completion, accuracy, reasoning depth, code quality, synthesis
+- **25% Cost:** Price per 1M tokens, monthly spend per agent, acceptable tradeoff
+- **15% Capability Fit:** Model strengths align with agent domain, context window, response speed
+
+**Key Insight — Tier Assignment Rationale:**
+- **Standard for Reasoning:** Architecture (Picard), security analysis (Worf), code generation (Data), research (Seven) need deep reasoning → Sonnet 4.5 justified
+- **Fast for Templates:** Daily briefings (Neelix), logging (Scribe), monitoring (Ralph), TTS scripts (Podcaster) are template-driven → Haiku 4.5 sufficient at 5x cost savings
+- **Premium Reserved:** Only justify if Sonnet quality insufficient for mission-critical work — currently not the case
+
+**Historical Changes (Baseline for Future):**
+- 2026-01-15: Squad genesis — All agents start on Sonnet 4.5
+- 2026-02-01: Neelix, Scribe, Ralph → Haiku 4.5 (routine work, ~$150/month savings)
+- 2026-02-15: Podcaster → Haiku 4.5 (TTS generation straightforward, 5x cost reduction)
+
+**Success Metrics (Track Over Time):**
+- Quarterly reviews on schedule (target: 100%)
+- Ad-hoc evaluations within 1 week of major releases (target: 100%)
+- Model changes yield quality improvement OR cost savings (target: 80%+)
+- No quality regressions from model changes (target: 0%)
+- Tech-news-scanner flags model announcements (target: 90%+ coverage)
+
+**Alternatives Considered:**
+- **Manual Ad-Hoc Only:** Reactive, easy to miss releases → Rejected (need proactive quarterly baseline)
+- **Automatic Model Switching:** Risk quality regressions, cost spikes → Rejected (need human judgment)
+- **Annual Review Only:** 12-month lag too long → Rejected (quarterly balances thoroughness with responsiveness)
+- **Continuous Automated Benchmarking:** High infrastructure cost → Deferred (quarterly manual sufficient for ~12 agents)
+
+**Dependencies:**
+- Tech-news-scanner (Issue #255) for automated model announcement detection
+- OTel metrics (existing) for token usage, latency tracking
+- Platform model catalog (current: Premium/Standard/Fast tiers with 18 models)
+
+**Risks & Mitigations:**
+- **Quality regression after switch:** Monitoring period (1 week) with rollback; keep previous config
+- **Cost spike from premium adoption:** Cost analysis required before approval; monthly spend alerts
+- **Missing announcements:** Tech-news-scanner + fallback to quarterly baseline
+- **Agent-specific preferences conflict:** Agent charters can override; routing.md documents process
+
+**Strategic Implication:** This framework positions the squad to continuously optimize model assignments as AI landscape evolves. Quarterly baseline ensures we don't miss incremental improvements; ad-hoc triggers catch major releases. Cost vs. quality framework prevents premature premium tier adoption while allowing justified upgrades. Template ensures consistent, data-driven evaluation across all agents.
+
+**Pattern for Future Squads:** Model Review ceremony + evaluation template + assignment snapshot = reusable pattern for any squad needing systematic model management. Especially valuable as model count grows (18+ models across 3 tiers currently).
+
+**Next Steps:**
+1. ✅ Ceremony, template, snapshot, routing guidance created
+2. Schedule first quarterly Model Review for 2026-06-15
+3. Integrate tech-news-scanner with model announcement detection
+4. Monitor monthly spend; alert if exceeds $300
+5. Track quality/cost metrics over Q2 2026 to validate current assignments

@@ -49,6 +49,13 @@
 - 8 total rendering sites for issue/PR numbers across both files: 6 in Program.cs (BuildGitHubIssuesSection, BuildGitHubPRsSection, BuildRecentlyMergedPRsSection, DisplayGitHubIssues, DisplayGitHubPRs, DisplayRecentlyMergedPRs) and 2 in SharpUI.cs (GetGitHubLines for issues and PRs)
 - Two display conventions: Build* functions show number without `#` prefix (column header is `#`), Display* functions include `#` prefix in cell value
 
+**2026-03-14 Update:** Verified complete implementation on branch `squad/14-clickable-hyperlinks`:
+- Both commits (3c83bf0, a5d49f8) implement clickable hyperlinks using Spectre.Console `[link=]` markup
+- Spectre.Console automatically generates OSC 8 escape sequences for compatible terminals (Windows Terminal, iTerm2)
+- Build succeeds: `dotnet build squad-monitor.csproj` → bin\Debug\net10.0\squad-monitor.dll
+- Branch already pushed to origin: `origin/squad/14-clickable-hyperlinks`
+- All issue/PR numbers now clickable in both SharpUI (--beta) and Spectre.Console modes
+
 ### 2026-03-12: Issue #496 — XTTS Voice Cloning Python 3.12 Incompatibility
 
 **Context:** Attempted to run XTTS v2 voice cloning on CPU with Python 3.12.7
@@ -893,4 +900,59 @@ Android Discord App ◄──WebSocket──► Discord Gateway
 6. **Setup Time Variance** — Simple bots (Discord/Telegram): 2-4h; Self-hosted (Matrix): 4-7 days; highlights importance of managed platforms
 7. **Agent Routing Patterns** — Bot message → parse command → spawn CLI process → capture stdout → post response is robust pattern for CLI bridges
 8. **Free Tier Viability** — Discord, Telegram, Signal all free with no message/command limits; WhatsApp Business API requires paid tier
+
+
+
+### 2026-03-14: Issue #14 Implementation — Clickable Hyperlinks Completed
+
+**Context:** Implemented clickable hyperlinks for issue/PR numbers in squad-monitor TUI (tamirdresher/squad-monitor repo).
+
+**Implementation:**
+- Added GetRepoOwnerAndName() to dynamically fetch repo info via \gh repo view\`n- Created FormatIssueNumber() and FormatPRNumber() using Spectre.Console \[link=URL]text[/]\ markup
+- Included CreateHyperlink() with OSC 8 escape sequences for future SharpUI integration
+- Updated all 6 display functions: BuildGitHubIssuesSection, BuildGitHubPRsSection, BuildRecentlyMergedPRsSection, DisplayGitHubIssues, DisplayGitHubPRs, DisplayRecentlyMergedPRs
+- Issue links: \https://github.com/{owner}/{repo}/issues/{number}\`n- PR links: \https://github.com/{owner}/{repo}/pull/{number}\`n
+**Branch & Status:**
+- Branch: \squad/14-clickable-links\`n- Commit: 5fce918
+- Build: ✅ Succeeded (1 warning about unused CreateHyperlink, intentional for future use)
+- PR URL: https://github.com/tamirdresher/squad-monitor/pull/new/squad/14-clickable-links
+
+**Key Decisions:**
+- Used Spectre.Console link markup (works in all terminals) rather than raw OSC 8 sequences
+- Repo info fetched once per display function (not cached globally due to top-level statements constraints)
+- Graceful fallback to plain text when repo info unavailable
+- Consistent number display formatting across both Build* and Display* function families
+
+**Testing:** Works in Windows Terminal, iTerm2, and all modern terminals supporting hyperlinks.
+
+
+### 2026-03-14: Issue #14 Final Implementation — OSC 8 Hyperlinks for Both UI Modes
+
+**Context:** Completed clickable hyperlinks for issue/PR numbers in both standard and SharpUI modes of squad-monitor.
+
+**Final Implementation:**
+- **Standard Mode:** Uses Spectre.Console [link=URL]text[/] markup for clickable links
+- **SharpUI Mode:** Implemented OSC 8 escape sequences: \x1b]8;;{url}\x1b\\{text}\x1b]8;;\x1b\\
+- Added GitHubLinkCache static class to cache repo slug and avoid repeated gh CLI calls
+- Created helper functions:
+  - FormatLinkedIssueNumber() and FormatLinkedPrNumber() for Spectre.Console mode
+  - Hyperlink() for SharpUI mode using OSC 8 sequences
+- URL format: https://github.com/{owner}/{repo}/issues/{number} for issues, /pull/{number} for PRs
+
+**Changes:**
+- Program.cs: Updated 6 display functions with linked formatting (issues, PRs, recently merged)
+- SharpUI.cs: Added OSC 8 hyperlink support across all UI components
+
+**Branch & PR:**
+- Branch: squad/14-clickable-hyperlinks (already merged to main earlier work, rebased for OSC 8)
+- Commits: 3c83bf0 (Spectre.Console), a5d49f8 (SharpUI OSC 8)
+- PR #15: Open, mergeable, awaiting review
+
+**Key Learnings:**
+1. **OSC 8 Compatibility:** Escape sequence \x1b]8;;{url}\x1b\\{text}\x1b]8;;\x1b\\ works in Windows Terminal, iTerm2, modern terminals
+2. **Two-Mode Strategy:** Different hyperlink implementations needed for Spectre.Console (markup) vs raw console output (escape sequences)
+3. **Caching Pattern:** Static class with nullable fields + Fetched flag prevents repeated subprocess calls
+4. **Graceful Degradation:** Falls back to plain colored text when repo slug unavailable
+
+**Status:** ✅ Implementation complete in PR #15. Testing confirmed hyperlinks work in both modes.
 

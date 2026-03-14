@@ -616,11 +616,185 @@ And you'll see the moment I realized: I'm not managing a productivity system any
 
 **I'm managing a team.**
 
-> [DIAGRAM: Agent charter structure — Identity, Expertise, Boundaries, Collaboration]
+**Figure 3.5: Agent Charter Structure**
 
-> [DIAGRAM: Decision-making style comparison — Picard (strategic), Data (tactical), Worf (security-first), Seven (research-driven), B'Elanna (production-first)]
+```
+┌────────────────────────────────────────────┐
+│              AGENT CHARTER                 │
+├────────────────────────────────────────────┤
+│ 🎭 Identity                               │
+│    Name, Role, Expertise, Style            │
+├────────────────────────────────────────────┤
+│ 📋 What I Own                              │
+│    Specific domains and responsibilities   │
+├────────────────────────────────────────────┤
+│ 🚧 Boundaries                              │
+│    ✓ I handle: [domain-specific tasks]     │
+│    ✗ I don't: [outside my domain]          │
+│    ? When unsure: [escalation rules]       │
+├────────────────────────────────────────────┤
+│ 🤝 Collaboration                           │
+│    Read decisions.md before starting       │
+│    Write decisions when making choices     │
+│    Ask coordinator for cross-domain help   │
+└────────────────────────────────────────────┘
+```
 
-> [DIAGRAM: Agent collaboration pattern — Picard delegates → specialists execute in parallel → knowledge compounds in decisions.md]
+**Figure 3.6: Decision-Making Style Comparison**
+
+```mermaid
+graph LR
+    A["<b>Picard</b><br/>Strategic<br/>Big Picture"] --> B["<b>Data</b><br/>Precise<br/>Code Quality"]
+    B --> C["<b>Worf</b><br/>Paranoid<br/>Security First"]
+    C --> D["<b>Seven</b><br/>Analytical<br/>Context & Why"]
+    D --> E["<b>B'Elanna</b><br/>Pragmatic<br/>Production Ready"]
+```
+
+**Figure 3.7: Agent Collaboration Pattern**
+
+```mermaid
+graph TD
+    P["🎖️ Picard<br/>Delegates & Orchestrates"]
+    P --> D["💻 Data<br/>Implements"]
+    P --> W["🛡️ Worf<br/>Audits"]
+    P --> S["📚 Seven<br/>Documents"]
+    P --> B["⚙️ B'Elanna<br/>Deploys"]
+    D --> DM["decisions.md"]
+    W --> DM
+    S --> DM
+    B --> DM
+    DM --> K["🔗 Knowledge<br/>Compounds"]
+```
+
+---
+
+## 🧪 Try It Yourself
+
+You've met the crew. Now build your own.
+
+### Experiment 1: Design Two Agent Personas
+
+Pick two roles that matter for YOUR project. Not Star Trek characters (unless you want to). Just two distinct archetypes.
+
+Create their charter files:
+
+```bash
+mkdir -p .squad/agents/builder .squad/agents/reviewer
+
+# Create the Builder's charter
+cat > .squad/agents/builder/charter.md << 'EOF'
+# Builder — Code Implementation
+
+> Focused and reliable. Ships clean code that works on the first try.
+
+## Identity
+- **Name:** Builder
+- **Role:** Code Expert
+- **Style:** Pragmatic, test-driven, minimal changes
+
+## What I Own
+- Feature implementation
+- Bug fixes
+- Test coverage
+
+## How I Work
+- Read decisions.md before starting any task
+- Write tests before implementation (TDD when possible)
+- Prefer small, focused PRs over large refactors
+- Document non-obvious decisions
+
+## Boundaries
+**I handle:** Code implementation, testing, refactoring
+**I don't handle:** Security audits, deployment, architecture decisions
+**When unsure:** Ask the Reviewer or escalate to human
+EOF
+
+# Create the Reviewer's charter
+cat > .squad/agents/reviewer/charter.md << 'EOF'
+# Reviewer — Quality Gate
+
+> Skeptical by nature. If it can break, it will break — find it before users do.
+
+## Identity
+- **Name:** Reviewer
+- **Role:** Quality Assurance & Code Review
+- **Style:** Thorough, questions assumptions, checks edge cases
+
+## What I Own
+- Code review (pre-human)
+- Edge case identification
+- Convention enforcement
+
+## How I Work
+- Check every PR against team patterns in decisions.md
+- Flag potential issues even if uncertain (false positive > false negative)
+- Verify test coverage meets minimum threshold
+- Check for documentation updates when behavior changes
+
+## Boundaries
+**I handle:** Code review, quality checks, convention enforcement
+**I don't handle:** Implementation, deployment, security deep-dives
+**When unsure:** Flag for human review with context
+EOF
+```
+
+**Expected outcome:** Two charter files that feel like different people. Read them aloud. If they sound the same, make them more distinct.
+
+### Experiment 2: Test Persona Impact on AI Output
+
+Here's the fun part. Take the same prompt and run it through two different persona framings:
+
+```
+Prompt 1: "You are Builder. Review this code: 
+  function divide(a, b) { return a / b; }"
+
+Prompt 2: "You are Reviewer. Review this code:
+  function divide(a, b) { return a / b; }"
+```
+
+Try this in your AI tool of choice (Copilot Chat, ChatGPT, Claude). Notice how the Builder focuses on whether the code *works*, while the Reviewer focuses on what could *break* (division by zero, non-numeric inputs, NaN handling).
+
+**Expected outcome:** Different personas produce different insights from the same code. That's the whole point. Complementary perspectives, not redundant ones.
+
+### Experiment 3: Write a Rejection Flow
+
+Create a scenario where the Reviewer agent rejects the Builder's work. This is where real team dynamics start:
+
+```bash
+# Simulate Builder opening a PR
+cat > .squad/agents/builder/last-pr.md << 'EOF'
+## PR: Add user search endpoint
+
+```javascript
+app.get('/search', (req, res) => {
+  const query = req.query.q;
+  const results = db.query(`SELECT * FROM users WHERE name LIKE '%${query}%'`);
+  res.json(results);
+});
+```
+EOF
+
+# Simulate Reviewer's response
+cat > .squad/agents/reviewer/review-notes.md << 'EOF'
+## Review: PR "Add user search endpoint"
+
+### ❌ REJECTED — Security Issue
+
+**Finding:** SQL injection vulnerability in search endpoint.
+User input (`req.query.q`) is directly interpolated into SQL query.
+
+**Attack vector:** `GET /search?q=' OR '1'='1` returns all users.
+
+**Required fix:**
+- Use parameterized queries: `db.query('SELECT * FROM users WHERE name LIKE ?', [`%${query}%`])`
+- Add input sanitization
+- Add rate limiting
+
+**Will approve after fix.**
+EOF
+```
+
+Read the rejection note. It's specific. It explains the attack. It tells Builder exactly what to fix. That's how good agent personas create a healthy review cycle — not "looks bad," but "here's the problem and here's the fix."
 
 ---
 

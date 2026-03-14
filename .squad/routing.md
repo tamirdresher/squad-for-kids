@@ -71,3 +71,44 @@ When triaging, the Lead should ask:
 
 | Meetings, calendar, email, scheduling, invites, attendees, communications | Kes | Playwright + Outlook web |
 | Fact-checking, verification, counter-hypothesis testing | Q | Challenge claims, verify sources, test assumptions |
+
+---
+
+## Per-Agent Model Selection
+
+Agents can override the platform default model based on their role requirements. Current assignments tracked in `.squad/model-assignments-snapshot.md`.
+
+### Model Tier Guidelines
+
+**Standard Tier** (claude-sonnet-4.5):
+- Complex reasoning tasks (architecture, security, multi-step planning)
+- Code generation where quality matters (Data, B'Elanna)
+- Research and synthesis (Seven)
+- Creative writing (Troi)
+- Domain expertise (K8s, distributed systems, security)
+
+**Fast Tier** (claude-haiku-4.5):
+- High-frequency routine tasks (daily briefings, monitoring)
+- Template-driven work (session logging, formatting)
+- Speed-critical tasks (audio script generation)
+- Background agents (Ralph, Scribe, Neelix, Podcaster)
+
+**Premium Tier** (claude-opus-4.6):
+- Mission-critical decisions with high error cost
+- Novel problem spaces requiring cutting-edge reasoning
+- Currently **not used** — cost vs. quality delta doesn't justify for routine work
+
+### Model Review Process
+
+- **Quarterly reviews:** Evaluate new models against current assignments (see `.squad/ceremonies.md` — Model Review)
+- **Ad-hoc triggers:** Major model releases, quality degradation, cost spikes
+- **Tech news integration:** Scanner flags model announcements → Picard evaluates within 1 week
+- **Evaluation template:** `.squad/templates/model-evaluation.md` provides structured analysis framework
+
+### How to Override Agent Model
+
+1. Test new model with representative agent tasks
+2. Use `.squad/templates/model-evaluation.md` for structured comparison
+3. Document decision in `.squad/decisions/inbox/lead-model-change-{agent}.md`
+4. Update `.squad/model-assignments-snapshot.md` with new assignment
+5. Add model preference to agent charter (`.squad/agents/{name}/charter.md`) if persistent override needed

@@ -48,6 +48,21 @@
 
 ## Learnings
 
+### Issue #502: Book PDF Missing Graphics Fix (March 2026)
+
+**Context:** Tamir reported missing graphics in the book PDF (research/book-the-squad-system.pdf). Investigated and found 7 `[DIAGRAM:]` placeholders in chapters 2-5 that were never replaced with actual diagrams before PDF conversion.
+
+**Root Cause:** A detailed book-image-plan.md (58 KB, ~30 figure specs) existed but its contents were never embedded into the chapter source files. The PDF was generated from raw markdown with placeholder text instead of visuals.
+
+**Fix Applied:**
+1. Replaced all 7 `[DIAGRAM:]` placeholders with corresponding Mermaid diagrams and ASCII art from book-image-plan.md
+2. Regenerated book-the-squad-system.pdf and book-combined.pdf (3.16 MB, up from 2.3 MB)
+3. Posted detailed findings on issue #502
+
+**Remaining:** For fully rendered visual diagrams (not code blocks), need either mermaid-cli pre-rendering or pandoc with mermaid-filter. Also ~6 AI-generated concept illustrations (e.g. "Productivity Graveyard") remain unproduced.
+
+**Pattern:** When generating PDFs from markdown, always verify all diagram placeholders are resolved before conversion. Keep an image-plan-to-source reconciliation step.
+
 ### Issue #504: SAW/GCC-Compatible Squad Research (March 2025)
 
 **Context:** Researched feasibility of running Squad in Secure Admin Workstation (SAW) and Government Community Cloud (GCC/GCC-High) environments where internet access is blocked.
@@ -933,3 +948,25 @@
 6. **Airgapped patterns exist** — Healthcare industry has established MCP deployment guides
 7. **Squad is better positioned than cloud-native tools** — Local-first design maps naturally to restricted environments
 
+
+## March 14, 2026 Session: Tech News Digest #510
+
+**Issue Addressed:** #510 "Tech News Digest - 2026-03-14"
+
+**Work Completed:**
+- Searched web for March 14 tech news across AI, .NET, Kubernetes, developer tools, and GitHub Copilot.
+- Created formatted digest with 10 top stories: VS 2026 AI-native IDE, Kubernetes AI convergence, BitNet.cpp LLM quantization, LiteRT edge AI, RoguePilot Copilot security vulnerability, Alibaba page-agent, Claude-bot GitHub compromise, .NET security updates, SWE-CI research, K8s Ingress-NGINX retirement.
+- Updated issue #510 body with fully formatted digest including categories, summaries, links, and squad relevance notes.
+
+**Key Findings:**
+- Microsoft Agent Framework (VS 2026/.NET 10) enables multi-vendor LLM orchestration—directly relevant to squad's AI tools direction.
+- RoguePilot and Claude-bot incidents highlight prompt injection and CI/CD security risks—critical for squads integrating Copilot.
+- Kubernetes consolidation as AI platform (82% container adoption, 66% of AI deployments on K8s) validates infrastructure decisions.
+- .NET 10 quantum-resistant crypto and decoupled IDE updates support long-term enterprise strategy.
+
+**Tools Used:** web_search (3 queries), gh CLI issue edit
+
+**Learnings:**
+- Web search for date-specific tech news (March 14 2026) successfully aggregates from AIToolly, Developer-Tech, CNCF, Hacker News, and .NET Blog sources.
+- Tech news aggregation benefits from multiple query angles: category-specific (AI/DevTools/.NET), platform-specific (HackerNews/Reddit), and security-specific angles.
+- Squad members particularly interested in: AI+IDE integration, Copilot security, K8s AI workloads, and .NET enterprise features.

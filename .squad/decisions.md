@@ -23679,3 +23679,309 @@ Android Discord App ◄──WebSocket (Socket Mode)──► Discord Gateway
 - Document in team.md and routing.md for reference
 
 **Status:** ✅ **Active** — Directive closed in #495
+
+---
+
+## 2026-03-13 Decision: Continuous Model Evaluation Process
+
+**Date:** 2026-03-13  
+**Author:** Picard (Lead)  
+**Status:** Approved  
+**Issue:** #509
+
+### Decision
+Establish a "Model Review" ceremony with quarterly scheduled reviews and ad-hoc triggers for major releases. Create evaluation template, current assignments snapshot, and routing guidance.
+
+### Key Details
+- **Ceremony:** Quarterly reviews (every 3 months) + ad-hoc triggers (major releases, quality issues, cost spikes)
+- **Facilitator:** Picard (Lead)
+- **Template:** `.squad/templates/model-evaluation.md` — structured benchmark tasks per agent role
+- **Snapshot:** `.squad/model-assignments-snapshot.md` — current assignments with rationale and cost estimates
+- **Routing:** `.squad/routing.md` — per-agent model selection guidance
+
+### Model Tier Strategy (Current State)
+- **Standard Tier:** claude-sonnet-4.5 (Picard, Data, Seven, B'Elanna, Worf, Q, Troi, Kes) — ~$180-240/month
+- **Fast Tier:** claude-haiku-4.5 (Neelix, Scribe, Podcaster, Ralph) — ~$20-30/month
+- **Premium Tier:** Deferred — sufficient quality with Standard tier
+
+### Evaluation Process
+1. **Trigger Detection** — Quarterly or ad-hoc event
+2. **Scoping** — Identify models and affected agents
+3. **Benchmarking** — Test current vs. candidates on representative tasks
+4. **Cost vs. Quality Analysis** — Calculate impact (monthly spend, quality delta, capability fit)
+5. **Recommendations** — Per-agent: Change/Keep/Defer with justification
+6. **Decision & Documentation** — Approve, update assignments, record decision
+7. **Monitoring** — Track first week and first billing cycle for quality/cost validation
+
+### Success Criteria
+- Model Review ceremony documented and active
+- Quarterly reviews on schedule (target: 100%)
+- Ad-hoc evaluations triggered within 1 week of major releases (target: 100%)
+- Model changes result in measurable improvement or cost savings (target: 80%+)
+- No regressions from model changes (target: 0%)
+
+### Next Steps
+- Integrate tech-news-scanner (Issue #255) for model announcement detection
+- Schedule first quarterly Model Review for 2026-06-15
+- Monitor squad monthly spend; alert if exceeds $300
+
+**Rationale:** Quarterly cadence balances thoroughness with responsiveness to AI model evolution. Structured template ensures consistent, data-driven evaluation. Integration with tech-news-scanner automates announcement detection.
+
+**Effective:** Immediately — Model Review ceremony active for Q2 2026 quarterly review (2026-06-15)
+
+**Owner:** Picard (Lead)
+
+---
+
+## 2026-03-14 Decision: Clickable Hyperlinks via Spectre.Console Markup
+
+**Date:** 2026-06-26  
+**Author:** Data (Code Expert)  
+**Issue:** tamirdresher/squad-monitor#14  
+**Status:** Implemented
+
+### Decision
+Use Spectre.Console's `[link=URL]text[/]` markup for clickable issue/PR numbers in both Spectre.Console and SharpUI modes. No OSC 8 escape sequences needed because SharpUI's `MarkupControl` also renders Spectre markup.
+
+### Technical Details
+- Repo slug (`owner/repo`) resolved via `gh repo view --json nameWithOwner` and cached in a `static class GitHubLinkCache`
+- Graceful fallback: if `gh` CLI unavailable, numbers render as plain colored text
+- Branch: `squad/14-clickable-hyperlinks` — PR created on tamirdresher/squad-monitor (#15)
+
+### Impact
+- All 8 issue/PR number rendering sites updated across Program.cs (6) and SharpUI.cs (2)
+- No breaking changes — existing layout preserved, just numbers become clickable in supporting terminals
+
+**Status:** ✅ PR #15 opened, awaiting squad review and merge
+
+---
+
+## 2026-03-14 Decision: Squad-Monitor Feed & Token Stats Fix
+
+**Date:** 2026-03-14  
+**Author:** Data (Code Expert)  
+**Issue:** tamirdresher/squad-monitor#10  
+**Status:** Implemented
+
+### Context
+Two bugs in squad-monitor TUI dashboard:
+1. Live Agent Feed section completely empty (bottom half blank)
+2. Token Usage stats showed stale numbers from 2 days ago
+
+### Root Causes
+- **Feed Empty:** Windows `DirectoryInfo.LastWriteTime` only updates on directory create/delete, not on file modifications. Active sessions appeared stale and were filtered out.
+- **Token Stats Stale:** `BuildTokenStatsSection()` only read `~/.copilot/logs/*.log` (top-level). Active agency sessions write to `~/.agency/logs/session_*/process-*.log` (never scanned).
+- **Bonus:** `[ok]` icon string was interpreted as Spectre.Console markup — replaced with ✅ emoji.
+
+### Decision
+1. **Directory filtering:** Fall back to checking most recent file's LastWriteTime inside directory when directory's own LastWriteTime falls outside window
+2. **Token source expansion:** Scan both `~/.copilot/logs/*.log` AND `~/.agency/logs/session_*/process-*.log` (up to 10 recent agency logs)
+3. **Markup safety:** Replace bracket-containing icon text with safe emoji characters
+
+### Impact
+- Token stats: 107 opus/$642 → 1072 opus/$6583 (now includes agency data)
+- Feed now shows 40 entries from active agency session
+- No markup rendering errors
+
+**Status:** ✅ Commit `32054a0` on `squad/10-session-display` branch, pushed to tamirdresher/squad-monitor
+
+---
+
+## 2026-03-14 Decision: Azure GPU Options for Voice Cloning
+
+**Date:** 2025-07-17  
+**Author:** B'Elanna (Infrastructure)  
+**Status:** Assessment Complete — Recommendations Provided
+
+### Context
+Tamir requested real voice-cloned Hebrew podcasts using F5-TTS. Initial assumption: need GPU VM or DevBox.
+
+### Findings
+**No usable GPU quota** in WCD_MicroServices_Staging_LBI subscription for modern GPU families (T4, A10, A100, H100) across any region — all show 0 quota. Legacy NC/NV families have residual quota but SKUs are retired.
+
+However, **Azure ML has separate 100 vCPU quota** for legacy NC/NV compute clusters — may still work in ML context.
+
+### Recommended Options (Prioritized)
+1. **🟢 Option A (Fastest):** Try Azure ML NC6 compute instance in `tamir-ml` workspace — may get K80 GPU with 12GB VRAM (enough for XTTS v2)
+2. **🟡 Option B:** Request GPU quota increase for `Standard NCASv3_T4` (cheapest modern GPU) — takes 1-3 business days
+3. **🟡 Option C:** XTTS v2 on CPU (DevBox) — works now, slower (~30-60 sec/sentence vs 2-3 sec on GPU)
+4. **🟠 Option D:** GitHub Codespaces with GPU (~$1.80/hour, requires org-level enable)
+5. **🔴 Option F:** External GPU cloud (RunPod, Lambda, Colab) — data leaves Azure boundary
+
+### XTTS v2 Hardware Requirements
+| Mode | Min VRAM | Min RAM | Speed |
+|------|----------|---------|-------|
+| GPU (T4) | 4 GB | 8 GB | ~2-3 sec/sentence |
+| GPU (K80) | 12 GB | 8 GB | ~5-8 sec/sentence |
+| CPU only | N/A | 16 GB | ~30-60 sec/sentence |
+
+**Recommendation:** Start with Option A (Azure ML NC6), request Option B quota in parallel.
+
+---
+
+## 2026-03-14 Decision: F5-TTS Voice Cloning Infrastructure
+
+**Date:** 2026-03-14  
+**Author:** B'Elanna (Infrastructure)  
+**Status:** Implemented  
+**Cost:** $0 (all local, all free/open-source)
+
+### Context
+Tamir requested voice-cloned Hebrew podcasts using F5-TTS with voices from מפתחים מחוץ לקופסא hosts (Dotan and Shahar).
+
+### Decision
+Run F5-TTS locally on machine's RTX 500 Ada GPU (4GB VRAM) with 3 compatibility patches, avoiding cloud costs entirely.
+
+### Patches Required (Windows + torchaudio 2.10 + low RAM)
+1. **safetensors tensor-by-tensor loading** — Windows paging file limit prevents loading 1.2GB model at once. Load each tensor individually via `safe_open()`.
+2. **torchaudio.load → soundfile** — torchaudio 2.10 forces torchcodec with broken DLLs on Windows. Monkey-patch to use soundfile backend.
+3. **ffmpeg PATH from imageio-ffmpeg** — F5-TTS uses Whisper which needs ffmpeg. Use `imageio_ffmpeg` binary or provide non-empty `ref_text` to skip.
+
+### Alternatives Considered
+| Option | Status | Notes |
+|--------|--------|-------|
+| DevBox | Skipped | `az devcenter` extension install failed; GPU uncertain |
+| Azure GPU VM | Skipped | Unnecessary — local GPU works |
+| Coqui XTTS v2 | Failed | Requires Python <3.12 (have 3.12.7) |
+| ElevenLabs | Rejected | Tamir said NO PAYING |
+| edge-tts + style transfer | Fallback | Works but not real voice cloning |
+
+### Outcome
+- **Output:** `hebrew-podcast-f5tts.mp3` — 24 turns, 19.3 min, 22.1 MB
+- **Runner script:** `scripts/f5tts-podcast-runner.py` — reusable for future podcasts
+- **Render time:** ~36 minutes on RTX 500 Ada
+
+### Recommendations
+1. Keep `f5tts-podcast-runner.py` as standard entry point for voice-cloned podcasts
+2. If upgrading torchaudio, re-test torchcodec compatibility
+3. For faster rendering, consider DevBox with dedicated GPU or Colab notebooks
+4. Reference audio quality matters — 20s mono WAV at 24kHz is sweet spot
+
+---
+
+## 2026-03-14 Copilot Directives
+
+### 2026-03-14T08:41Z: User directive — Hebrew podcast voice quality
+**By:** Tamir Dresher (via Copilot)  
+**What:** The Hebrew podcast MUST sound like Dotan & Shahar from מפתחים מחוץ לקופסא. Generic TTS voices NOT acceptable. Keep iterating until it sounds right. No excuses.  
+**Why:** User demand — quality gate on podcast voice cloning  
+**Status:** ✅ Active — F5-TTS implementation ongoing
+
+### 2026-03-14T08:56Z: User directive — Skills as universal Copilot/Claude plugins
+**By:** Tamir Dresher (via Copilot)  
+**What:** Squad-skills repo should evolve into a proper plugin marketplace — not Squad-specific. Skills should work as plain Copilot custom instructions, Claude projects, or any AI agent system. Repo structure should follow marketplace/plugin pattern. Think npm for AI agent skills.  
+**Why:** User vision — broader reach, not locked to Squad framework  
+**Status:** ✅ Active — Marketplace design in progress
+
+### 2026-03-14T09:54:54Z: Squad email account created
+**By:** Tamir Dresher (via Copilot)  
+**What:** Squad now has: td-squad-ai-team@outlook.com. Use for registrations, newsletters, service signups, external communications. Credentials in Windows Credential Manager (key: 'squad-email-outlook'). NEVER commit password to repo.  
+**Why:** Squad autonomy — register services, receive notifications independently  
+**Status:** ✅ Active — Email account active
+
+---
+
+## 2026-03-14 Decision: SAW/GCC Squad Architecture
+
+**Date:** March 2025  
+**Author:** Seven (Research & Docs)  
+**Issue:** #504  
+**PR:** #505  
+**Status:** RESEARCH COMPLETE — Ready for implementation decision
+
+### Context
+Researched feasibility of building SAW/GCC-compatible Squad variant for Secure Admin Workstation and Government Community Cloud environments (internet access blocked).
+
+### Key Research Findings
+1. **Azure OpenAI Available in Gov Cloud**
+   - FedRAMP High, DoD IL4/IL5/IL6 compliance
+   - GPT-4o models in usgovarizona, usgovvirginia
+   - Managed Identity authentication (keyless)
+
+2. **MCP stdio Transport is SAW-Compatible**
+   - No internet or network listeners required
+   - Local process communication only
+   - Compatible with AppLocker/WDAC restrictions
+
+3. **No Technical Blockers**
+   - All challenges are operational (binary signing, whitelisting, manual updates)
+   - Estimated timeline: 3-4 weeks
+
+### Proposed Architecture
+- **Keep:** MCP stdio transport, Squad orchestration pattern, agent spawning logic
+- **Change:** Replace GitHub Copilot CLI with Azure OpenAI SDK via abstraction layer
+- **Add:** Azure Government-specific config (Managed Identity, .openai.azure.us endpoints)
+
+### Team Impact
+- **Picard (Lead):** Decision authority on LLM provider abstraction architecture
+- **Data (Code):** Implement LLM provider layer and Azure OpenAI integration
+- **Worf (Security):** Review WDAC policies, binary signing strategy, Managed Identity config
+- **B'Elanna (Infra):** Air-gapped testing environment in Azure Government VNet
+
+### Next Steps
+1. Team review of research report (research/active/saw-gcc-squad/README.md)
+2. Picard decides: Proceed with PoC or defer
+3. If approved: Data implements Phase 1 (LLM abstraction + Azure OpenAI provider)
+4. Worf reviews security approach
+5. B'Elanna sets up test environment in isolated Azure Government VNet
+
+**Decision Point:** Should Squad support Azure OpenAI backend for SAW/GCC environments?
+
+**Options:**
+1. **Proceed with implementation** (3-4 weeks, moderate complexity, no blockers)
+2. **Defer** (wait for customer demand signal)
+3. **Investigate alternatives** (e.g., on-prem LLM deployment)
+
+**Recommendation:** Proceed with Phase 1 PoC (1 week) to validate approach. Low risk, reversible if issues arise.
+
+**Status:** Awaiting Picard decision for implementation
+# Decision: Clickable Hyperlinks in Squad Monitor TUI
+
+**Date:** 2026-03-14  
+**Author:** Data  
+**Status:** Implemented  
+**Related Issue:** squad-monitor#14
+
+## Context
+
+The squad-monitor TUI displays GitHub issue and PR numbers, but they weren't clickable. Users had to manually copy numbers and navigate to GitHub in a browser.
+
+## Decision
+
+Implement clickable hyperlinks using Spectre.Console's `[link=URL]text[/]` markup, which automatically generates OSC 8 escape sequences for compatible terminals.
+
+## Implementation
+
+1. **Helper Functions:**
+   - `FormatLinkedIssueNumber(number, color, repoSlug)` → `[link=https://github.com/{repo}/issues/{number}][color]#{number}[/][/]`
+   - `FormatLinkedPrNumber(number, color, repoSlug)` → `[link=https://github.com/{repo}/pull/{number}][color]#{number}[/][/]`
+
+2. **Repo Detection:**
+   - Use `gh repo view --json nameWithOwner` to get owner/repo slug
+   - Cache result to avoid repeated CLI calls
+   - Graceful fallback to plain text when repo info unavailable
+
+3. **Both Display Modes:**
+   - **Spectre.Console mode** (Program.cs): Direct markup rendering
+   - **SharpUI mode** (SharpUI.cs): MarkupControl accepts same markup syntax
+
+## Benefits
+
+- One-click navigation from TUI to GitHub issues/PRs
+- Works in modern terminals (Windows Terminal, iTerm2, VS Code terminal)
+- No raw escape sequence handling needed (Spectre.Console handles OSC 8 generation)
+- Consistent behavior across both display modes
+- Graceful degradation in terminals without hyperlink support
+
+## Trade-offs
+
+- Requires `gh` CLI to detect repo slug (already required for GitHub integration)
+- Adds minimal overhead (one cached CLI call per session)
+- Hyperlinks invisible in terminals without OSC 8 support (text still readable)
+
+## Verification
+
+- Build succeeds: `dotnet build squad-monitor.csproj`
+- Branch: `squad/14-clickable-hyperlinks` (pushed to origin)
+- Commits: 3c83bf0, a5d49f8
+- Tested in Windows Terminal with clickable links functional

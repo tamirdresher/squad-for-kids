@@ -57,7 +57,31 @@ I can't overstate how powerful this is. **The system runs whether I'm paying att
 
 Let me show you what happens under the hood when Ralph finds work.
 
-> [DIAGRAM: Ralph's 5-minute watch loop architecture — GitHub API polling, label detection, routing to agents, auto-merge flow]
+**Figure 2.1: Ralph's Architecture — The Watch Loop**
+
+```mermaid
+graph TD
+    A["🔴 Ralph: 5-Min Check"] --> B["📡 Poll GitHub API<br/>for new issues/PRs"]
+    B --> C{{"Issue Type?"}}
+    
+    C -->|New Issue| D["🏷️ Check Labels<br/>squad:*?"]
+    C -->|Open PR| E["✅ Check Merge Criteria<br/>Tests passing?<br/>Approved?"]
+    C -->|Stale Task| F["⏰ Mark for Escalation"]
+    
+    D -->|Label Found| G["📋 Read .squad/routing.md"]
+    G --> H["🔀 Route to Agent<br/>Create issue, assign"]
+    
+    E -->|Ready| I["✨ Auto-Merge<br/>Write decision log"]
+    E -->|Blocked| J["⚠️ Flag Blocker<br/>Notify team"]
+    
+    H --> K["⏚ Add to Assignment Tracker"]
+    I --> L["🔗 Link PR → Issue → Decision"]
+    
+    K --> M["⏰ Check Again<br/>in 5 minutes"]
+    L --> M
+    J --> M
+    F --> M
+```
 
 **Step 1: Detection**
 
@@ -496,7 +520,25 @@ Because that's what it is.
 
 Here's a graph I wish I could show you (but this is a book, so imagine it):
 
-> [DIAGRAM: Graph showing "AI Work Quality" over time — starts low, hockey-stick growth after ~3 weeks as decisions compound]
+**Figure 2.2: Decision Compounding — AI Work Quality Over Time**
+
+```
+AI Work Quality (% approved without corrections)
+100% ┤                                          ●━━━━━━━
+ 95% ┤                                    ●━━━━━
+ 90% ┤                              ●━━━━━
+ 80% ┤                        ●━━━━━
+ 60% ┤                  ●━━━━━
+ 40% ┤            ●━━━━━
+ 20% ┤      ●━━━━━
+     ┼──────┼──────┼──────┼──────┼──────┼──────┼──────┼──
+     Week 0  Week 1  Week 2  Week 3  Week 4  Week 6  Week 8
+
+     ◄── Learning Phase ──► ◄── Compounding Phase ──►
+     AI reads decisions.md    Knowledge compounds:
+     Builds context            every decision improves
+     Makes mistakes            future decisions
+```
 
 **X-axis:** Weeks using Squad  
 **Y-axis:** Percentage of AI work I approve without corrections
@@ -565,6 +607,112 @@ And once you've seen the collective work, we'll tackle the big question: can thi
 Spoiler: yes.
 
 But first, you need to meet the crew.
+
+---
+
+## 🧪 Try It Yourself
+
+You've seen how Ralph works and how decisions compound. Now build the knowledge layer yourself.
+
+### Experiment 1: Create Your First Decision Log
+
+Set up the compounding knowledge system from scratch. This takes about 10 minutes.
+
+```bash
+cd my-squad-experiment  # or your test repo from Chapter 1
+
+# Create the decisions.md with a real decision
+cat > .squad/decisions.md << 'EOF'
+# Team Decisions
+
+## Decision: Use conventional commits for all PRs
+**Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+**Agent:** You (Human)
+**Context:** Need consistent commit messages for changelog generation
+
+**Decision:** All commits follow conventional commit format:
+- `feat:` for new features
+- `fix:` for bug fixes  
+- `docs:` for documentation
+- `refactor:` for code restructuring
+
+**Rationale:** Makes automated changelog possible. Clear history.
+EOF
+
+git add .squad/decisions.md
+git commit -m "docs: initialize team decision log"
+```
+
+**Expected outcome:** You now have a living document that will grow with every decision. Read it. It's one entry. By the end of this book, you'll have dozens.
+
+### Experiment 2: Watch Knowledge Compound
+
+Now simulate what happens when a second agent references the first decision. Add a second entry:
+
+```bash
+cat >> .squad/decisions.md << 'EOF'
+
+## Decision: Use ESLint with Airbnb config for code style
+**Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+**Agent:** Data (Code Expert)
+**Context:** Need consistent code formatting
+
+**Decision:** ESLint with Airbnb base config, Prettier for formatting.
+
+**Rationale:** Industry standard. Reduces code review nitpicking.
+Aligns with conventional commits decision (see above) for consistent project hygiene.
+
+**Implementation:** .eslintrc.json, .prettierrc
+EOF
+
+git add .squad/decisions.md
+git commit -m "docs: add code style decision (references commit convention)"
+```
+
+See that line — "Aligns with conventional commits decision (see above)"? That's **compounding**. The second decision references the first. In a real Squad, agents do this automatically. Every new decision builds on the ones before it.
+
+### Experiment 3: Build and Run Squad Doctor (Manual Version)
+
+Create a simple diagnostic script that checks your Squad setup for common issues:
+
+```bash
+cat > squad-doctor.sh << 'EOF'
+#!/bin/bash
+echo "🩺 Running Squad diagnostics..."
+echo ""
+
+# Check directory structure
+[ -d ".squad" ] && echo "✓ .squad directory exists" || echo "✗ Missing .squad directory"
+[ -d ".squad/agents" ] && echo "✓ agents directory exists" || echo "✗ Missing agents directory"
+[ -f ".squad/decisions.md" ] && echo "✓ decisions.md exists" || echo "✗ Missing decisions.md"
+
+# Check decisions.md health
+if [ -f ".squad/decisions.md" ]; then
+  DECISION_COUNT=$(grep -c "^## Decision:" .squad/decisions.md 2>/dev/null || echo 0)
+  echo "✓ Decision log: $DECISION_COUNT entries"
+  
+  SIZE=$(wc -c < .squad/decisions.md)
+  echo "  File size: $SIZE bytes"
+  if [ "$SIZE" -gt 50000 ]; then
+    echo "  ⚠ Decision log is getting large. Consider pruning stale entries."
+  fi
+fi
+
+# Check git status
+if git status --porcelain | grep -q ".squad/"; then
+  echo "⚠ Uncommitted changes in .squad/ directory"
+else
+  echo "✓ .squad/ directory is clean"
+fi
+
+echo ""
+echo "Diagnostics complete."
+EOF
+chmod +x squad-doctor.sh
+./squad-doctor.sh
+```
+
+**Expected outcome:** You should see all green checkmarks and a count of your decisions. Run this after every config change — it catches the stupid mistakes before they waste your time.
 
 ---
 

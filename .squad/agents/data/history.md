@@ -38,6 +38,16 @@
 
 ## Learnings
 
+### 2026-07-18: Issue #543 — Telegram Bot Configuration
+
+**Context:** Configured @tamir_squad_bot via Telegram Bot API after Tamir created it via BotFather.
+
+**Findings:**
+- `Invoke-RestMethod` on PowerShell 7 can fail with 404 on Telegram API while `Invoke-WebRequest` with `-UseBasicParsing` works fine — likely a content-type negotiation issue. Use `Invoke-WebRequest` + `[System.Text.Encoding]::UTF8.GetBytes()` for reliable Telegram API calls.
+- Existing bot script (`scripts/squad-telegram-bot.py`) by B'Elanna already had full inbox/outbox architecture. Added token file support (`~/.squad/telegram-bot-token`) as source #2 in resolution chain.
+- Bot API methods used: `setMyDescription`, `setMyShortDescription`, `setMyCommands` — all return `{"ok":true,"result":true}` on success.
+- Token in issue body is a security concern even in private EMU repos; recommend `@BotFather /revoke` after confirming stored config works.
+
 ### 2026-06-26: Issue #14 — Clickable Hyperlinks in TUI
 
 **Context:** Made issue/PR numbers clickable in both Spectre.Console and SharpUI modes.

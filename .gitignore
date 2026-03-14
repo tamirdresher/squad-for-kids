@@ -1,5 +1,8 @@
 node_modules/
 
+# Telegram bot token (secret — never commit)
+telegram-bot-token
+
 # Squad Tier 1: Transaction memory (raw, high-volume, may contain PII)
 .squad/orchestration-log/
 .squad/log/

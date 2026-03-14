@@ -11,8 +11,9 @@ Usage:
 
 Token sources (checked in order):
     1. Environment variable TELEGRAM_BOT_TOKEN
-    2. ~/.squad/telegram-config.json  {"bot_token": "..."}
-    3. Windows Credential Manager: squad-telegram-bot
+    2. ~/.squad/telegram-bot-token  (plain text file)
+    3. ~/.squad/telegram-config.json  {"bot_token": "..."}
+    4. Windows Credential Manager: squad-telegram-bot
 
 Author: B'Elanna (Infrastructure)
 """
@@ -78,7 +79,15 @@ def get_token() -> str:
         log.info("Token loaded from environment variable")
         return token
 
-    # 2. Config file
+    # 2. Dedicated token file (~/.squad/telegram-bot-token)
+    token_file = SQUAD_DIR / "telegram-bot-token"
+    if token_file.exists():
+        token = token_file.read_text(encoding="utf-8").strip()
+        if token:
+            log.info("Token loaded from %s", token_file)
+            return token
+
+    # 3. Config file
     if CONFIG_FILE.exists():
         try:
             cfg = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
@@ -92,7 +101,7 @@ def get_token() -> str:
         except Exception as e:
             log.warning("Failed to read config: %s", e)
 
-    # 3. Windows Credential Manager (via cmdkey / PowerShell)
+    # 4. Windows Credential Manager (via cmdkey / PowerShell)
     if sys.platform == "win32":
         try:
             import subprocess

@@ -34,12 +34,86 @@
 
 ## Active Context
 
-**2026-Q2 Kickoff:**
-- Implementing Phase 1 knowledge management (Issue #321)
-- Rotating Q1 histories to archives
-- Establishing quarterly archival pattern
+**2026-Q2 Work:**
+- Issue #321: Phase 1 knowledge management ✅ COMPLETED
+- Issue #486: Agency Security Squad analysis (NEW)
+  - Analyzing March 12 "Agency Security Squad" meeting
+  - Deriving security tasks for multi-agent hardening
+  - Connecting blog/demo as case study for Microsoft Agency framework
+  - Drafting communication to Mitansh Shah (meeting organizer)
 
 ## Learnings
+
+### 2026-03-14: Seven — Agency Security Squad Meeting Analysis — Issue #486
+
+**Assignment:** Analyze Agency Security Squad meeting (March 12, 2026) and derive tasks for squad based on themes: chief-of-staff pattern, prompt injection/security concerns, architectural validation.
+
+**What I Did:**
+1. Researched "Agency" context — identified as Microsoft's internal agent framework/CLI
+2. Connected to Tamir's blog (*How an AI Squad Changed My Productivity*) as concrete implementation
+3. Cross-referenced existing security research from Worf (Issue #212: Codex Security Assessment)
+4. Identified key security gaps: prompt injection, data exfiltration, lateral escalation in multi-agent systems
+5. Derived 4 actionable tasks for squad
+
+**Key Findings:**
+
+1. **Agency = Chief of Staff Pattern**: Autonomous agents handling routine decisions, freeing humans for judgment work
+2. **Our Squad is the Proof-of-Concept**: 48-hour case study (14 PRs merged, 6 security findings, 3 infra improvements) demonstrates viability
+3. **Security Threats Are Real and Urgent**: 
+   - Prompt injection via GitHub comments, config files
+   - Credential exposure during autonomous execution
+   - Data exfiltration from sensitive business logic
+   - Chain-reaction cascades through multi-agent system
+
+4. **We Have Partial Mitigations But Gaps Exist**:
+   - ✅ Pre-flight secret scanning
+   - ✅ Role-based domain boundaries
+   - ✅ Audit logging via Scribe
+   - ❌ Formal attack surface documentation
+   - ❌ Multi-agent security architecture
+   - ❌ Prompt injection defenses integrated into Ralph watch loop
+
+**Derived Tasks:**
+
+1. **Task: Draft Communication to Mitansh Shah** (Owner: Seven)
+   - Showcase Tamir's blog + Squad as Agency case study
+   - Offer demo + collaboration opportunity
+   - Status: Ready to execute
+
+2. **Task: Prompt Injection Attack Surface Analysis** (Owner: Worf with Data, Picard support)
+   - Document 5+ attack vectors specific to agent frameworks
+   - Design mitigations (prompt filtering, isolation capsules, decision validation)
+   - PoC: test with adversarial GitHub issue comments
+   - Deliverable: `.squad/research/prompt-injection-attack-surface.md`
+
+3. **Task: Multi-Agent Security Architecture** (Owner: Worf with B'Elanna, Picard support)
+   - Threat model for lateral escalation, chain reactions, resource exhaustion, data poisoning
+   - 5-layer defense: network isolation, ephemeral credentials, signature verification, canary deployment, circuit breaker
+   - Deliverable: `.squad/standards/agent-security-architecture.md`
+
+4. **Task: Security Researcher Outreach** (Owner: Seven with Worf support)
+   - Contact OWASP, academia, Microsoft Research
+   - Propose collaboration on agent security hardening
+   - Collect external validation/feedback
+   - Deliverable: collaboration proposal + researcher contact list
+
+**Deliverable Posted:**
+- GitHub issue #486 comment with full analysis, 4 derived tasks, and roadmap
+- Added `squad:seven` label
+- Ready for squad assignment
+
+**Key Learning:**
+- **Multi-agent security is not "solved"** — need formal research + architectural patterns
+- **Prompt injection in agent frameworks requires different defense than traditional app security** — agents make decisions on external input, traditional web apps just render it
+- **Our Squad is positioned to become an internal case study** for Microsoft Agency adoption — but only if we harden security first
+- **Collaboration > competition** — sharing research with external researchers accelerates field maturity
+
+**Next Steps:**
+- Await Tamir input on Mitansh communication (time-sensitive if Agency team is planning implementation)
+- Schedule Worf + Data + B'Elanna kickoff for security architecture design
+- Create decision record documenting threat model + architectural choices
+
+**Decision Status:** Tasks derived and posted to issue #486. Awaiting squad assignment.
 
 ### 2026-Q2: Knowledge Management Phase 1 Implementation (Issue #321)
 

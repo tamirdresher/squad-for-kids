@@ -1,0 +1,39 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - main [ref=e4]:
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - button "Back" [ref=e62]:
+                - img [ref=e64]
+              - img "Microsoft" [ref=e66]
+            - generic [ref=e73]:
+              - generic "tamirdresher-squad@outlook.com" [ref=e75]:
+                - generic [ref=e76]: tamirdresher-squad@outlook.com
+              - status [ref=e77]:
+                - generic [ref=e78]:
+                  - heading "Create your password" [level=1] [ref=e79]
+                  - generic [ref=e81]: To keep your Microsoft account safe, choose a long password and avoid using real words.
+              - generic [ref=e83]:
+                - generic [ref=e84]:
+                  - generic [ref=e85]: Password
+                  - textbox "Password" [active] [ref=e86]:
+                    - /placeholder: ""
+                  - button "Show password" [ref=e88]:
+                    - img [ref=e90]
+                - generic [ref=e92]:
+                  - img [ref=e94]
+                  - text: Passwords must have at least 8 characters and include a mix of uppercase letters, lowercase letters, numbers, and symbols.
+              - button "Next" [ref=e97]
+        - contentinfo [ref=e36]:
+          - generic [ref=e37]:
+            - button "Help and feedback" [ref=e38] [cursor=pointer]
+            - link "Terms of use" [ref=e39] [cursor=pointer]:
+              - /url: https://www.microsoft.com/servicesagreement/en-us
+            - link "Privacy and cookies" [ref=e40] [cursor=pointer]:
+              - /url: https://privacy.microsoft.com/en-us
+          - generic [ref=e42]:
+            - text: Use private browsing if this is not your device.
+            - link "Learn more" [ref=e43] [cursor=pointer]:
+              - /url: https://go.microsoft.com/fwlink/?LinkID=2281649

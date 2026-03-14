@@ -1,0 +1,33 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - main [ref=e4]:
+          - generic [ref=e9]:
+            - img "Microsoft" [ref=e11]
+            - generic [ref=e18]:
+              - status [ref=e19]:
+                - generic [ref=e20]:
+                  - heading "Sign in" [level=1] [ref=e21]
+                  - generic [ref=e23]: Use your Microsoft account.
+              - generic [ref=e24]:
+                - generic [ref=e27]:
+                  - generic [ref=e28]: Email or phone number
+                  - textbox "Email or phone number" [active] [ref=e29]:
+                    - /placeholder: ""
+                - button "Forgot your username?" [ref=e31] [cursor=pointer]
+              - button "Next" [ref=e33]
+              - generic [ref=e35]:
+                - text: New to Microsoft?
+                - button "Create an account" [ref=e36] [cursor=pointer]
+        - contentinfo [ref=e38]:
+          - generic [ref=e39]:
+            - button "Help and feedback" [ref=e40] [cursor=pointer]
+            - link "Terms of use" [ref=e41] [cursor=pointer]:
+              - /url: https://www.microsoft.com/servicesagreement/
+            - link "Privacy and cookies" [ref=e42] [cursor=pointer]:
+              - /url: https://privacy.microsoft.com/-
+          - generic [ref=e44]:
+            - text: Use private browsing if this is not your device.
+            - link "Learn more" [ref=e45] [cursor=pointer]:
+              - /url: https://go.microsoft.com/fwlink/?LinkID=2281649

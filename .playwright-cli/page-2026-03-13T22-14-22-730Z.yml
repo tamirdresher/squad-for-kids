@@ -1,0 +1,30 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - main [ref=e4]:
+          - generic [ref=e8]:
+            - generic [ref=e215]:
+              - button "Back" [ref=e216]:
+                - img [ref=e218]
+              - img "Microsoft" [ref=e220]
+            - generic [ref=e227]:
+              - generic "tamirdresher-squad@outlook.com" [ref=e229]:
+                - generic [ref=e230]: tamirdresher-squad@outlook.com
+              - status [ref=e231]:
+                - heading "Let's prove you're human" [level=1] [ref=e233]
+              - generic [ref=e234]:
+                - generic [ref=e237]: Press and hold the button.
+                - iframe [ref=e238]:
+                  
+        - contentinfo [ref=e36]:
+          - generic [ref=e37]:
+            - button "Help and feedback" [ref=e38] [cursor=pointer]
+            - link "Terms of use" [ref=e39] [cursor=pointer]:
+              - /url: https://www.microsoft.com/servicesagreement/en-us
+            - link "Privacy and cookies" [ref=e40] [cursor=pointer]:
+              - /url: https://privacy.microsoft.com/en-us
+          - generic [ref=e42]:
+            - text: Use private browsing if this is not your device.
+            - link "Learn more" [ref=e43] [cursor=pointer]:
+              - /url: https://go.microsoft.com/fwlink/?LinkID=2281649

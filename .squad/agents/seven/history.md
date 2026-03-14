@@ -48,6 +48,34 @@
 
 ## Learnings
 
+### Issue #509: Model Monitoring Lifecycle & Benchmarks (March 2026)
+
+**Context:** Tamir assigned continuous model monitoring for the squad — track latest AI model releases (Claude, GPT, Gemini), benchmarks, evaluate if squad members should switch models or add new skills.
+
+**Investigation:**
+- Searched repo for `scripts/model-monitor.ps1` — NOT found anywhere
+- Git log shows no commits related to model-monitor
+- Last issue comment indicates script was created on CPC-tamir-WCBED but never committed to this repo
+- **Pattern:** Cross-machine development without repo synchronization loses work
+
+**Model Landscape (March 2026):**
+- **Claude Sonnet 4.6/5:** 77.2% SWE-bench (code leader), 200K–1M token context, extended thinking
+- **GPT-5.3-Codex:** ~75% SWE-bench, production automation, dynamic reasoning depth, 400K tokens
+- **Gemini 3.1 Pro:** 63–65% SWE-bench, 77.1% ARC-AGI (logic leader), 1M token context, strongest multimodal
+- **Cost Trend:** Gemini most economical at scale; Claude/GPT premium for code quality
+
+**Recommendation for Squad:**
+1. Copilot agents (code-focused) — Claude Sonnet 4.6 solid; consider 5 when GA
+2. Research/analysis agents — GPT-5.1 reasoning or Gemini 3.1 multimodal (needs audit)
+3. New skills: Multimodal document processing (Gemini), production CI/CD (GPT-5.3-Codex)
+
+**Deliverables:**
+- Commented on issue #509 with model status report
+- Flagged missing model-monitor.ps1 script and recovery action
+- Recommended quarterly benchmark review via GitHub Actions
+
+**Pattern:** Model evaluation needs automation + synchronization. Script created locally on one machine should trigger CI/CD sync to repo. Quarterly review cycle keeps agent assignments aligned with model capabilities.
+
 ### Issue #502: Book PDF Missing Graphics Fix (March 2026)
 
 **Context:** Tamir reported missing graphics in the book PDF (research/book-the-squad-system.pdf). Investigated and found 7 `[DIAGRAM:]` placeholders in chapters 2-5 that were never replaced with actual diagrams before PDF conversion.

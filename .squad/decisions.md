@@ -24213,3 +24213,169 @@ Researched feasibility of building a SAW/GCC-compatible Squad variant that can o
 
 **For Team Discussion:** Does this align with Squad's goals? Is the SAW/GCC use case important enough to justify the effort?
 
+
+---
+
+# Decision: Teams Board Dashboard Integration
+
+**Date:** 2025-01-27  
+**Author:** B'Elanna  
+**Status:** Implemented  
+**Issue:** #535
+
+## Context
+
+Tamir requested a way to view GitHub Project Board status directly in Microsoft Teams without manual checking. Requirements:
+- Visual board representation in Teams
+- No manual involvement from Tamir
+- Automated solution ready to use upon completion
+
+## Decision
+
+Implemented a PowerShell script (scripts/teams-board-dashboard.ps1) that:
+1. Fetches GitHub Project Board state using gh CLI
+2. Transforms data into Teams Adaptive Card format
+3. Posts to existing Teams webhook
+4. Groups issues by status column with emoji indicators
+5. Provides clickable links to GitHub issues
+
+## Architecture
+
+`
+GitHub Project Board
+   ↓ (gh CLI)
+PowerShell Script
+   ↓ (Adaptive Card JSON)
+Teams Webhook
+   ↓
+Teams Channel (Visual Dashboard)
+`
+
+**Key Components:**
+- **Script:** scripts/teams-board-dashboard.ps1
+- **Webhook URL:** Stored at $env:USERPROFILE\.squad\teams-webhook.url
+- **Data source:** GitHub Projects API via gh CLI
+- **Output format:** Adaptive Card v1.4
+
+**Design Choices:**
+- **Point-in-time snapshot:** Not real-time sync; run periodically
+- **Standalone script:** No dependencies beyond gh CLI and PowerShell
+- **Rich formatting:** Emoji indicators, clickable links, timestamp
+- **Automation-ready:** Can be triggered manually or via Ralph monitoring
+
+## Implementation Details
+
+**Column Status Mapping:**
+- 📋 Todo
+- 🔨 In Progress
+- 👀 Review
+- ✅ Done
+- 🚫 Blocked
+- ⏳ Pending User
+
+**Card Structure:**
+- Header: Board title + timestamp
+- Refresh note: Point-in-time snapshot
+- Columns: Grouped issues by status
+- Footer: "View Full Board" action button
+
+## Testing
+
+Successfully tested with live data:
+- Retrieved 1 board item
+- Generated valid Adaptive Card JSON
+- Posted to Teams webhook without errors
+- Card rendered correctly in Teams
+
+## Future Enhancements
+
+- Integration with Ralph's monitoring loop for periodic auto-posting
+- Filtering options (e.g., only open issues)
+- Issue age/staleness indicators
+- Assignment summaries
+
+## References
+
+- Issue: #535
+- Branch: squad/535-teams-board-dashboard
+- Commit: 92349290
+- Script: scripts/teams-board-dashboard.ps1
+
+---
+
+### 2026-03-14T18:46Z: User directive
+**By:** Tamir Dresher (via Copilot)
+**What:** Research institute website must only be accessible from the Microsoft internal network (EMU repo = internal only). Not public.
+**Why:** User request — research content is internal, not for public consumption
+
+---
+
+### 2026-03-14T19:29Z: User directive
+**By:** Tamir Dresher (via Copilot)
+**What:** Only send Teams messages to tamirdresher (Tamir's personal webhook/chat). Do NOT send to channels, other people, or shared spaces unless explicitly asked.
+**Why:** User request — prevent unwanted notifications to others
+
+---
+
+# Decision: Merge News Image Generation to Main (Issue #534)
+
+**Date:** 2026-03-14  
+**Decided by:** Data (Code Expert)  
+**Context:** Issue #534 — "news reporter with memes didn't work today"
+
+## Problem
+
+Neelix's news broadcasts were supposed to include AI-generated images (banners + memes) but the feature wasn't active. Investigation revealed the implementation existed on branch squad/526-neelix-images-CPC-tamir-WCBED but was never merged to main.
+
+## Decision
+
+**Merged image generation scripts from feature branch to main.**
+
+### What Was Merged
+
+1. **scripts/generate-news-image.ps1** (new file, 169 lines)
+   - Standalone PowerShell script that calls Google Gemini 2.0 Flash API
+   - Supports 3 image styles: banner (news header), meme (funny), status (infographic)
+   - Returns base64 data URI for inline Adaptive Card embedding
+   - Saves images to ~/Documents/nano-banana-images/neelix/
+
+2. **scripts/daily-rp-briefing.ps1** (updated)
+   - Added -SkipImages parameter for text-only fallback
+   - Generates 2 images per broadcast:
+     - Header banner based on top story (blockers, merged PRs, activity)
+     - Meme if there's good news (3+ merged PRs or 10+ commits)
+   - Embeds images inline in Adaptive Card sections
+
+### Technical Details
+
+- **API:** Google Gemini 2.0 Flash Exp with esponseModalities: ["TEXT", "IMAGE"]
+- **Authentication:** Requires GOOGLE_API_KEY environment variable
+- **Graceful Degradation:** Falls back to text-only if API key not set or API call fails
+- **Size Limit:** Warns if image >900KB (Adaptive Card inline limit ~1MB)
+
+### Why This Approach
+
+- **Optional by default:** Broadcasts work without images if GOOGLE_API_KEY not configured
+- **Standalone script:** Can be used independently or integrated into other workflows
+- **Minimal dependencies:** Pure PowerShell + REST API, no Python/Node required
+- **Cost-efficient:** Gemini 2.0 Flash is free tier eligible for moderate usage
+
+## Implications
+
+1. **Setup Required:** Users must set GOOGLE_API_KEY to enable image generation
+2. **Cost Awareness:** Gemini API usage applies (currently free tier, monitor if scaled)
+3. **Fallback Tested:** Script tested without API key — gracefully skips images
+4. **Ready for Prod:** Merged to main, available in all environments
+
+## Next Steps
+
+1. Document GOOGLE_API_KEY setup in .squad/ONBOARDING.md or equivalent
+2. Consider blob storage for images if inline embedding becomes problematic
+3. Monitor Gemini API quota usage if broadcasts scale up
+
+---
+
+**Related:**
+- Issue: #534
+- Feature branch: squad/526-neelix-images-CPC-tamir-WCBED
+- Commit: 466ad057 (main)

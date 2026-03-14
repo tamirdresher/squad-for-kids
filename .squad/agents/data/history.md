@@ -38,6 +38,17 @@
 
 ## Learnings
 
+### 2026-06-26: Issue #14 — Clickable Hyperlinks in TUI
+
+**Context:** Made issue/PR numbers clickable in both Spectre.Console and SharpUI modes.
+
+**Findings:**
+- Program.cs is a top-level statements file — can't use `static` on field declarations. Must use a helper `static class` for cached state (e.g., `GitHubLinkCache`)
+- SharpUI uses `MarkupControl.SetContent(List<string>)` which accepts Spectre.Console markup — so `[link=URL]text[/]` works in both modes without needing OSC 8 escape sequences directly
+- Repo slug (owner/repo) not stored anywhere in the data model — resolved via `gh repo view --json nameWithOwner -q .nameWithOwner`
+- 8 total rendering sites for issue/PR numbers across both files: 6 in Program.cs (BuildGitHubIssuesSection, BuildGitHubPRsSection, BuildRecentlyMergedPRsSection, DisplayGitHubIssues, DisplayGitHubPRs, DisplayRecentlyMergedPRs) and 2 in SharpUI.cs (GetGitHubLines for issues and PRs)
+- Two display conventions: Build* functions show number without `#` prefix (column header is `#`), Display* functions include `#` prefix in cell value
+
 ### 2026-03-12: Issue #496 — XTTS Voice Cloning Python 3.12 Incompatibility
 
 **Context:** Attempted to run XTTS v2 voice cloning on CPU with Python 3.12.7

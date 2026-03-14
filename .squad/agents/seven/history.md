@@ -48,6 +48,40 @@
 
 ## Learnings
 
+### Issue #504: SAW/GCC-Compatible Squad Research (March 2025)
+
+**Context:** Researched feasibility of running Squad in Secure Admin Workstation (SAW) and Government Community Cloud (GCC/GCC-High) environments where internet access is blocked.
+
+**Key Findings:**
+- **Azure OpenAI in Gov Cloud:** Fully available in GCC/GCC-High with FedRAMP High, DoD IL4/IL5/IL6 compliance; GPT-4o models available in usgovarizona and usgovvirginia regions
+- **MCP stdio Transport SAW-Compatible:** Local process communication (stdin/stdout) requires no internet, network listeners, or remote connections
+- **Managed Identity Auth:** Keyless authentication via Azure AD eliminates API key management; Cognitive Services OpenAI User RBAC role on VM/container
+- **AppLocker/WDAC Path:** Bundle Node.js apps as signed executables (pkg/nexe), create WDAC policies, test in audit mode before enforcement
+- **Network Isolation Testing:** Air-gapped testing requires isolated Azure VNet with private endpoints for Azure OpenAI and Azure AD; 5-day testing protocol established
+- **Implementation Effort:** 3-4 weeks (PoC: 1 week, SAW hardening: 2 weeks, validation: 1 week)
+- **No Technical Blockers:** All challenges are operational (signing, whitelisting, manual updates) and solvable with proper planning
+
+**Research Methodology:**
+- Web search for Azure OpenAI government cloud availability and compliance levels
+- MCP architecture review for SAW compatibility assessment
+- SAW security controls research (AppLocker, WDAC, network isolation best practices)
+- Air-gapped deployment patterns and testing procedures
+- Managed Identity authentication patterns for Azure Government
+
+**Architecture Proposal:**
+- Replace GitHub Copilot CLI LLM provider with Azure OpenAI SDK
+- Abstract LLM provider layer (AzureOpenAIProvider + CopilotProvider interfaces)
+- Keep MCP stdio transport unchanged (no network dependencies)
+- Keep Squad orchestration pattern and agent spawning logic
+- Add Azure Government-specific config (.openai.azure.us endpoints, Managed Identity)
+
+**Deliverables:**
+- Comprehensive research report: research/active/saw-gcc-squad/README.md
+- Branch: squad/504-saw-gcc-research
+- PR #505: Research findings and implementation roadmap
+
+**Pattern:** High-security government cloud research → feasibility assessment with concrete implementation path → architecture proposal that preserves existing patterns while adapting LLM backend
+
 ### 2026-03-14: Seven — Cross-Machine Agent Coordination Research — Issue #491
 
 **Assignment:** Research and propose how Copilot CLI squad agents on different machines (laptop, DevBox, Azure VMs) can communicate and collaborate securely.

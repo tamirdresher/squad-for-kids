@@ -619,3 +619,18 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 **Reference samples:** `voice_samples/dotan_ref.wav`, `voice_samples/shahar_ref.wav`
 
 **Status:** ✅ Complete. Decision written to inbox.
+
+
+### 2026-03-14: F5-TTS Voice Cloning on Local GPU
+
+**Task:** Run F5-TTS zero-shot voice cloning for Hebrew podcast using voice samples from Dotan and Shahar.
+
+**Key Challenges Solved:**
+1. Local RTX 500 Ada (4GB VRAM) discovered - no DevBox/Azure VM needed
+2. safetensors OOM - wrote tensor-by-tensor CUDA loading patch
+3. torchcodec DLL broken on Windows - patched torchaudio.load to use soundfile
+4. ffmpeg missing - used imageio_ffmpeg + placeholder ref_text to skip Whisper
+
+**Result:** 24-turn, 19.3min, 22.1MB podcast. Rendered in 36min locally. Emailed to Tamir.
+
+**Key File:** scripts/f5tts-podcast-runner.py (contains all 3 monkey-patches)

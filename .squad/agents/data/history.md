@@ -36,6 +36,27 @@
 
 *This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
 
+## Learnings
+
+### 2026-03-12: Issue #496 — XTTS Voice Cloning Python 3.12 Incompatibility
+
+**Context:** Attempted to run XTTS v2 voice cloning on CPU with Python 3.12.7
+
+**Findings:**
+- Coqui TTS (v0.27.5) has fundamental Python 3.12 incompatibilities
+- Package declares `transformers>=4.57` requirement but uses APIs removed in transformers 5.0+
+- Import errors: `isin_mps_friendly`, `is_torch_greater_or_equal` not found in newer transformers
+- Official support is Python <3.12 only
+
+**Solutions:**
+1. **Python 3.11 environment** — Proven compatibility with Coqui TTS
+2. **F5-TTS alternative** — Python 3.12 compatible, already installed, similar quality
+3. **GPU quota request** — XTTS optimized for GPU (5-10x faster than CPU)
+
+**Key Takeaway:** Always verify package Python version compatibility before extensive setup. Voice cloning packages often lag behind latest Python releases due to ML framework dependencies.
+
+**Files Created:** `run_xtts.py` (ready for Python 3.11), `issue496_outcome.md` (full analysis)
+
 ## Active Context
 
 ### 2026-03-12: Issue #350 — Machine Config Report Analysis (COMPLETE)
@@ -137,6 +158,9 @@ Built Squad MCP Server to expose squad operations as reusable MCP tools for AI a
 ## Learnings
 - Branch namespacing strategy: `squad/{issue}-{slug}-{machineid}` recommended
 - Hebrew podcast generation with edge-tts: Successfully generated Hebrew audio using voice-clone-podcast.py script with edge-tts backend (AVRI male/HILA female voices). Required imageio-ffmpeg for audio processing. Natural conversational Hebrew translation with technical terms in English worked well for tech podcast format.
+- **Windows directory LastWriteTime is unreliable for detecting active sessions.** `DirectoryInfo.LastWriteTime` on Windows only updates when files/directories are created or deleted directly inside it — NOT when existing files are modified. Active sessions with ongoing log writes can appear stale. Fix: always fall back to checking the most recent file's LastWriteTime inside the directory.
+- **Token stats must scan agency logs too.** `~/.copilot/logs/*.log` only contains CLI-initiated sessions. Active agency sessions write `assistant_usage` events to `~/.agency/logs/session_*/process-*.log`. Both sources must be scanned for accurate cost/token reporting.
+- **Spectre.Console markup in table cells:** Any string passed to `Table.AddRow()` is parsed as markup. Literal brackets like `[ok]` are interpreted as tags and cause `InvalidOperationException`. Use `Markup.Escape()` or replace with emoji/plain text.
 
 **Deliverables:**
 - Closure summary: `.squad/agents/data/350-closure-summary.md`

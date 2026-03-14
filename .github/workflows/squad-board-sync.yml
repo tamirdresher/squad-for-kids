@@ -6,13 +6,90 @@ name: Squad Board Sync
 
 on:
   issues:
-    types: [closed, reopened]
+    types: [opened, closed, reopened, labeled]
   schedule:
     # Weekly reconciliation every Sunday at 3:00 AM UTC
     - cron: '0 3 * * 0'
   workflow_dispatch: # Allow manual trigger for immediate reconciliation
 
 jobs:
+  # ── Job 0: Set Todo status on new issues added to board ──
+  set-todo-on-new:
+    if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
+    runs-on: self-hosted
+    permissions:
+      issues: read
+      contents: read
+
+    env:
+      PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
+      PROJECT_NUMBER: '1'
+      PROJECT_OWNER: 'tamirdresher_microsoft'
+      STATUS_FIELD_ID: 'PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc'
+      TODO_OPTION_ID: '0de780a1'
+
+    steps:
+      - name: Add to board and set Todo status
+        shell: pwsh
+        run: |
+          $issueNumber = ${{ github.event.issue.number }}
+          $action = '${{ github.event.action }}'
+          $labels = '${{ join(github.event.issue.labels.*.name, ',') }}'
+          Write-Host "📋 Issue #$issueNumber was $action (labels: $labels)"
+
+          # For 'labeled' events, only act if the squad label was just added
+          if ($action -eq 'labeled') {
+            $addedLabel = '${{ github.event.label.name }}'
+            if ($addedLabel -ne 'squad' -and -not $addedLabel.StartsWith('squad:')) {
+              Write-Host "ℹ️ Label '$addedLabel' is not squad-related — skipping"
+              exit 0
+            }
+          }
+
+          # For 'opened' events, only act if the issue has a squad label
+          if ($action -eq 'opened') {
+            if ($labels -notmatch 'squad') {
+              Write-Host "ℹ️ Issue #$issueNumber has no squad label — skipping"
+              exit 0
+            }
+          }
+
+          # Add issue to project board (idempotent — no error if already on board)
+          $issueUrl = '${{ github.event.issue.html_url }}'
+          Write-Host "➕ Adding issue #$issueNumber to board..."
+          $addResult = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $issueUrl 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Could not add to project: $addResult"
+            exit 0
+          }
+          Write-Host "✅ Added to board"
+
+          # Find the item on the board to get its item ID
+          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json --limit 300 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Could not list project items: $itemsJson"
+            exit 0
+          }
+
+          $data = $itemsJson | ConvertFrom-Json
+          $item = $data.items | Where-Object { $_.content.number -eq $issueNumber }
+
+          if (-not $item) {
+            Write-Host "⚠️ Issue #$issueNumber not found on board after adding — race condition?"
+            exit 0
+          }
+
+          $currentStatus = $item.status
+          if ($currentStatus) {
+            Write-Host "ℹ️ Issue #$issueNumber already has status '$currentStatus' — not overwriting"
+            exit 0
+          }
+
+          # Set status to Todo
+          Write-Host "📋 Setting #$issueNumber status → Todo"
+          gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
+          Write-Host "✅ Issue #$issueNumber is now Todo"
+
   # ── Job 1: Move item on issue close/reopen ──
   sync-on-close:
     if: github.event_name == 'issues'
@@ -138,6 +215,14 @@ jobs:
               gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
               $fixedCount++
               $issues += "#$num (OPEN in Done)"
+            }
+
+            # Rule 3: OPEN issue with no status should be set to Todo
+            if ($issueState -eq 'OPEN' -and -not $boardStatus) {
+              Write-Host "🔧 #$num: OPEN but no status → setting to Todo"
+              gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
+              $fixedCount++
+              $issues += "#$num (no status → Todo)"
             }
           }
 

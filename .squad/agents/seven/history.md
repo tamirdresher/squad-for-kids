@@ -76,6 +76,31 @@
 
 **Pattern:** Model evaluation needs automation + synchronization. Script created locally on one machine should trigger CI/CD sync to repo. Quarterly review cycle keeps agent assignments aligned with model capabilities.
 
+### Issue #509 Follow-up: model-monitor.ps1 Created (2026-03-14)
+
+**Context:** Previous session flagged that `scripts/model-monitor.ps1` was missing from the repo. Created the script and ran it successfully.
+
+**Script created:** `scripts/model-monitor.ps1`
+- Reads `.squad/agents/*/charter.md` for charter-level model preferences
+- Reads `.squad/model-assignments-snapshot.md` for actual assignments
+- Maintains a registry of all 18 platform-available models with release dates/tiers
+- Compares assignments vs available models and outputs upgrade recommendations
+- Supports `-OutputMarkdown` flag for CI/report integration
+- Designed for periodic execution by Ralph
+
+**Models discovered (March 2026 scan):**
+- **Claude Sonnet 4.6** — New standard tier from Anthropic (March 2026). Direct successor to Sonnet 4.5.
+- **GPT-5.4** — OpenAI's latest (March 2026). 1M context, native computer-use, 33% fewer hallucinations vs GPT-5.2.
+- **Claude Opus 4.6** — Anthropic premium (Feb 2026). Top SWE-bench, 1M context.
+- **GPT-5.3-Codex** — OpenAI code-specialized (Feb 2026).
+- **Gemini 3.1 Pro** — Google multimodal (Feb 2026). Large context, cost-effective.
+
+**Key recommendation:** All 8 standard-tier agents (currently on Sonnet 4.5) should evaluate upgrade to Sonnet 4.6. Fast-tier agents (Haiku 4.5) remain well-positioned — no change needed.
+
+**Deliverables:**
+- `scripts/model-monitor.ps1` created and tested ✅
+- GitHub issue #509 comment posted with full report ✅
+
 ### Issue #502: Book PDF Missing Graphics Fix (March 2026)
 
 **Context:** Tamir reported missing graphics in the book PDF (research/book-the-squad-system.pdf). Investigated and found 7 `[DIAGRAM:]` placeholders in chapters 2-5 that were never replaced with actual diagrams before PDF conversion.

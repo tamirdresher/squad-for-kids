@@ -587,3 +587,35 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 - Mini test (8 turns) → rendered in 10s
 
 **Status:** ✅ Complete. All three phases working end-to-end.
+
+### 2026-03-14: Hebrew Voice-Cloned Podcast from מפתחים מחוץ לקופסה
+
+**Task:** Generate Hebrew podcast using REAL voice samples from "מפתחים מחוץ לקופסה" podcast (Dotan Nahlisman & Shahar Polak). Requested urgently by Tamir.
+
+**Work Completed:**
+1. ✅ Found podcast on YouTube: `@outside-the-box` channel
+2. ✅ Downloaded episode audio via yt-dlp (episode: "מ-47 דקות ל-7 דקות")
+3. ✅ Extracted 20-second reference clips for each host using ffmpeg
+4. ✅ Wrote 24-turn Hebrew conversation script about Squad AI system
+5. ✅ Ran voice-clone-podcast.py with `--ref-avri` and `--ref-hila` pointing to real voice samples
+6. ✅ Pipeline extracted voice characteristics (F0, spectral centroid, energy) and applied DSP style transfer
+7. ✅ Generated complete podcast: 24/24 turns, 4.6 min, 5.2 MB
+8. ✅ Emailed to Tamir via Outlook COM
+
+**Voice Cloning Status:**
+- **F5-TTS:** Not available — requires PyTorch + CUDA GPU (this machine has neither)
+- **OpenVoice:** Not installed — also requires PyTorch
+- **Used:** edge-tts + reference-matched DSP style transfer (pitch, warmth, breathiness matched to real voice F0/centroid/energy)
+- **Upgrade path:** `pip install torch torchaudio f5-tts` on a CUDA-capable machine for true zero-shot cloning
+
+**Key Technical Details:**
+- yt-dlp needs ffmpeg binary named `ffmpeg.exe` (not the versioned imageio_ffmpeg name)
+- Copied imageio_ffmpeg binary as `ffmpeg.exe` to fix yt-dlp integration
+- `--download-sections "*0:00-3:00"` extracts only needed audio segment
+- Voice characteristics: AVRI(Dotan) F0=160Hz, HILA(Shahar) F0=169Hz
+
+**Output:** `hebrew-podcast-cloned.mp3` (5.2 MB, 4.6 min)
+**Script:** `hebrew-cloned-podcast.script.txt` (24 turns)
+**Reference samples:** `voice_samples/dotan_ref.wav`, `voice_samples/shahar_ref.wav`
+
+**Status:** ✅ Complete. Decision written to inbox.

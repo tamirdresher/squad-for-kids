@@ -6,8 +6,33 @@
 
 ## Active Context
 
+**Issue #259 Status:** ⏳ PENDING — Email account ready, awaiting Tamir's CAPTCHA completion  
 **Issue #471 Status:** ✅ CLOSED — Meeting scheduled and sent  
-**Next:** No pending Kes tasks; monitor meeting for rescheduling requests
+**Next:** Once Tamir creates the email account, set up inbox rules and forwarding pipeline
+
+## Learnings
+
+### Issue #486: Draft Message to Mitansh Shah (2026-03-15)
+- **Contact**: Mitansh Shah (mitashah@microsoft.com), organizer of "Agency Security Squad" meeting (March 12, 2026)
+- **Context**: Mitansh discussed creating a "chief of staff" capability with Agency; Tamir's Squad framework is a direct implementation of this concept
+- **Communication preference**: Teams (consistent with Microsoft internal preference)
+- **Key interests**: 
+  - AI-native team orchestration (Picard as lead, agents with specialized roles)
+  - Knowledge compounding through shared decision logs and agent histories
+  - Security concerns around prompt injection and adversarial prompts
+  - Cross-team collaboration on defense patterns and threat modeling
+- **Tone**: Warm, collegial, peer-to-peer (both Microsoft insiders discussing AI innovation)
+- **Message drafted**: 3-paragraph draft posted to GitHub issue #486 for Tamir's review before Teams send
+
+### Issue #259: Squad Email Account Creation (2026-03-14)
+- **Task**: Create dedicated personal email for Tamir's wife to send requests to the squad
+- **Attempted**: Outlook.com signup (tamresearch-squad@outlook.com) — blocked by PerimeterX CAPTCHA
+- **Attempted**: Gmail signup (dresher.squad@gmail.com) — blocked by QR code phone verification
+- **Key learning**: Both major email providers (Microsoft, Google) block automated account creation with CAPTCHAs that cannot be bypassed by headless browsers. This is a fundamental limitation — email account creation always requires human verification.
+- **Key learning**: Outlook.com uses PerimeterX "press and hold" CAPTCHA; Gmail uses QR-code phone scanning. Neither can be automated.
+- **Key learning**: The playwright-cli and Playwright MCP tools can handle all signup form interactions (custom dropdowns, labels intercepting clicks via `force: true`) — the only blocker is the final CAPTCHA step.
+- **Resolution**: Prepared all signup details and credentials, documented step-by-step for Tamir to complete the ~2 min CAPTCHA verification. Credentials saved to `.squad/identity/squad-email-credentials.txt` (gitignored).
+- **Next step**: After Tamir creates account, set up inbox rules (print → printer email, calendar → Tamir's calendar, tasks → GitHub issues)
 
 ## Recent Completions (2026-03-13)
 

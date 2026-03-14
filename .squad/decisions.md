@@ -22696,3 +22696,48 @@ Created comprehensive documentation:
 
 **Approval:** Free option approved by Tamir; מפתחים מחוץ לקופסא team gave permission for voice style matching.
 
+---
+
+## 2026-03-14: Squad Email Pipeline Architecture
+
+**Date:** 2026-03-14  
+**Author:** Kes (Communications & Scheduling)  
+**Issue:** #259  
+**Status:** Pending account creation
+
+**Decision:**
+- Email provider: Outlook.com (primary) / Gmail (backup)
+- Primary: \	amresearch-squad@outlook.com\ — native MS ecosystem integration
+- Pipeline: Print→HPEPrint, Calendar→Outlook, Tasks→GitHub (squad:incoming), Reminders→Kes
+- Implementation: Power Automate (Outlook) or Google Apps Script (Gmail)
+- Credentials stored at \.squad/identity/squad-email-credentials.txt\ (gitignored)
+
+---
+
+## 2026-03-14: Binary/Media File Storage Directive
+
+**Date:** 2026-03-14  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** Active
+
+**Decision:**
+- Do NOT store binary files (audio, video, images) in this repository
+- Use separate storage: dedicated repo, Azure Blob Storage, or OneDrive
+- Clean up temporary media files when no longer needed
+- Maintain Microsoft compliance — no security risks
+
+---
+
+## 2026-03-14: Voice-Cloned Hebrew Podcast Pipeline
+
+**Date:** 2026-03-14  
+**Author:** B'Elanna (DevOps/Infra)  
+**Status:** Proposed
+
+**Decision:**
+- Current backend: edge-tts + DSP style transfer (works, no GPU required)
+- True voice cloning upgrade requires: PyTorch + CUDA GPU + F5-TTS (~500MB model)
+- Reference samples stored: \oice_samples/dotan_ref.wav\, \oice_samples/shahar_ref.wav\
+- Output: \hebrew-podcast-cloned.mp3\ (5.2 MB, 4.6 min), script at \hebrew-cloned-podcast.script.txt\
+- Pipeline already supports \--f5tts\ flag for GPU upgrade path
+

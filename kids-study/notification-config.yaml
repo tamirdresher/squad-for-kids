@@ -1,0 +1,45 @@
+# הגדרות התראות - Notification Configuration
+# ==========================================
+# 
+# תיעוד בעברית:
+# זה הקובץ שבו אתם שומרים את הנתונים שלכם לשליחת התראות לילדים דרך Discord, Telegram או WhatsApp.
+# עדכנו את ה-URL וה-token שלכם בהוראות למטה.
+#
+# Documentation in English:
+# This is the configuration file for sending notifications via Discord, Telegram, or WhatsApp.
+# Update your URLs and tokens using the setup script: .\setup-notifications.ps1
+#
+
+discord:
+  # Discord webhook URL
+  # How to get it: https://discord.com/developers/applications
+  # This is the EASIEST option - just a URL, no bot needed!
+  webhook_url: ""
+
+telegram:
+  # Telegram bot token (from @BotFather)
+  # How to get it:
+  #   1. Open Telegram
+  #   2. Find @BotFather
+  #   3. Send /newbot
+  #   4. Follow instructions
+  bot_token: ""
+  
+  # Your Telegram chat ID
+  # How to get it:
+  #   1. After creating bot, send it a message
+  #   2. Open: https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+  #   3. Look for "chat": {"id": <THIS_IS_YOUR_CHAT_ID>}
+  chat_id: ""
+
+whatsapp:
+  # WhatsApp support (optional, not yet implemented)
+  # For now, use Discord or Telegram
+  account_sid: ""
+  auth_token: ""
+  phone_number: ""
+
+# ==========================================
+# המלצה: השתמשו ב-Discord (הפשוט ביותר!)
+# Recommendation: Use Discord (simplest!)
+# ==========================================

@@ -7,7 +7,7 @@
     1. Reads exam schedule
     2. Generates study plan
     3. Exports to Markdown
-    4. Optionally posts to Teams/GitHub
+    4. Optionally posts to Teams/GitHub or sends notifications
     
     Can be scheduled via Windows Task Scheduler or GitHub Actions.
 
@@ -20,9 +20,26 @@
 .PARAMETER PostToGitHub
     If set, posts the daily plan as a comment on a tracking issue.
 
+.PARAMETER NotifyDiscord
+    If set, sends daily plan to Discord webhook (requires configuration).
+
+.PARAMETER NotifyTelegram
+    If set, sends daily plan to Telegram bot (requires configuration).
+
+.PARAMETER ConfigPath
+    Path to notification-config.yaml. Defaults to notification-config.yaml in script directory.
+
 .EXAMPLE
     .\Start-DailyStudyRoutine.ps1
     Generates and displays the daily plan.
+
+.EXAMPLE
+    .\Start-DailyStudyRoutine.ps1 -NotifyDiscord
+    Generates plan and sends to Discord webhook.
+
+.EXAMPLE
+    .\Start-DailyStudyRoutine.ps1 -NotifyDiscord -NotifyTelegram
+    Generates plan and sends to both Discord and Telegram.
 
 .EXAMPLE
     .\Start-DailyStudyRoutine.ps1 -PostToTeams
@@ -41,7 +58,16 @@ param(
     [switch]$PostToGitHub,
     
     [Parameter()]
-    [string]$GitHubIssueNumber = "512"
+    [string]$GitHubIssueNumber = "512",
+    
+    [Parameter()]
+    [switch]$NotifyDiscord,
+    
+    [Parameter()]
+    [switch]$NotifyTelegram,
+    
+    [Parameter()]
+    [string]$ConfigPath = "$PSScriptRoot\notification-config.yaml"
 )
 
 $ErrorActionPreference = "Stop"
@@ -104,6 +130,63 @@ if ($PostToGitHub) {
     Write-Warning "      GitHub posting not yet implemented. Use 'gh issue comment $GitHubIssueNumber --body-file `"$planPath`"'"
 }
 
+# Load notification config if needed
+if ($NotifyDiscord -or $NotifyTelegram) {
+    if (-not (Test-Path $ConfigPath)) {
+        Write-Warning "      ⚠️  Notification config not found at $ConfigPath"
+        Write-Host "      💡 Run .\setup-notifications.ps1 to configure notifications`n" -ForegroundColor Cyan
+    }
+    else {
+        # Parse YAML config
+        $configContent = Get-Content -Path $ConfigPath -Raw
+        
+        # Extract Discord webhook
+        $discordWebhook = ""
+        if ($configContent -match "webhook_url:\s*[`"`"]?([^`"`"`n]+)[`"`"]?") {
+            $discordWebhook = $matches[1].Trim()
+        }
+        
+        # Extract Telegram config
+        $telegramToken = ""
+        $telegramChatId = ""
+        if ($configContent -match "bot_token:\s*[`"`"]?([^`"`"`n]+)[`"`"]?") {
+            $telegramToken = $matches[1].Trim()
+        }
+        if ($configContent -match "chat_id:\s*[`"`"]?([^`"`"`n]+)[`"`"]?") {
+            $telegramChatId = $matches[1].Trim()
+        }
+        
+        # Prepare notification message
+        $notificationMsg = "📚 תוכנית הלימוד ליום חדש / Daily Study Plan:`n`n" + $planContent
+        
+        if ($NotifyDiscord -and $discordWebhook) {
+            Write-Host "      → Sending to Discord..." -ForegroundColor Cyan
+            try {
+                & "$PSScriptRoot\Send-Notification.ps1" -Channel discord `
+                    -Message $notificationMsg `
+                    -Title "תוכנית לימוד יומית" `
+                    -WebhookUrl $discordWebhook -ErrorAction Stop
+            }
+            catch {
+                Write-Warning "      ⚠️  Failed to send Discord notification: $_"
+            }
+        }
+        
+        if ($NotifyTelegram -and $telegramToken -and $telegramChatId) {
+            Write-Host "      → Sending to Telegram..." -ForegroundColor Cyan
+            try {
+                & "$PSScriptRoot\Send-Notification.ps1" -Channel telegram `
+                    -Message $notificationMsg `
+                    -BotToken $telegramToken `
+                    -ChatId $telegramChatId -ErrorAction Stop
+            }
+            catch {
+                Write-Warning "      ⚠️  Failed to send Telegram notification: $_"
+            }
+        }
+    }
+}
+
 Write-Host "      ✓ Distribution complete`n" -ForegroundColor Green
 
 # Display summary
@@ -127,7 +210,10 @@ else {
 }
 
 Write-Host "`n📄 Daily plan saved to: $planPath"
-Write-Host "`n💡 To post to Teams: Set TEAMS_WEBHOOK_URL and run with -PostToTeams"
-Write-Host "💡 To post to GitHub: Run: gh issue comment $GitHubIssueNumber --body-file `"$planPath`"`n"
+Write-Host "💡 To notify via Discord: Add -NotifyDiscord flag"
+Write-Host "💡 To notify via Telegram: Add -NotifyTelegram flag"
+Write-Host "💡 To post to Teams: Set TEAMS_WEBHOOK_URL and run with -PostToTeams"
+Write-Host "💡 To post to GitHub: Run: gh issue comment $GitHubIssueNumber --body-file `"$planPath`""
+Write-Host "💡 Setup notifications: .\setup-notifications.ps1`n"
 
 Write-Host "✨ Daily routine complete!`n" -ForegroundColor Cyan

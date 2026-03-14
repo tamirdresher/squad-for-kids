@@ -1023,3 +1023,57 @@
 - Web search for date-specific tech news (March 14 2026) successfully aggregates from AIToolly, Developer-Tech, CNCF, Hacker News, and .NET Blog sources.
 - Tech news aggregation benefits from multiple query angles: category-specific (AI/DevTools/.NET), platform-specific (HackerNews/Reddit), and security-specific angles.
 - Squad members particularly interested in: AI+IDE integration, Copilot security, K8s AI workloads, and .NET enterprise features.
+
+### Issue #527: Hebrew Blog Translation (March 2026)
+
+**Context:** Tamir requested a full Hebrew translation of log-part1-refresh-seven-v2.md (Part 1 of "Scaling AI-Native Software Engineering" series).
+
+**Approach:**
+- Translated the full ~18KB English blog post into natural Hebrew prose
+- Maintained all markdown structure: headers, code blocks, images, frontmatter, links
+- Kept technical terms in English where appropriate (GitHub, Squad, PR, CI/CD, codebase, etc.)
+- Kept Star Trek character names in English (Picard, Data, Worf, Seven, B'Elanna)
+- Kept code blocks in English (they're code)
+- Added lang: he and direction: rtl to frontmatter for RTL rendering
+- Adapted frontmatter title and series name to Hebrew
+- Output saved as log-part1-hebrew.md in repo root
+
+**Learnings:**
+- Hebrew tech blog translation works best with a "keep technical terms English" approach — readers expect terms like codebase, deploy, pipeline, PR in English
+- Markdown RTL: adding direction: rtl in frontmatter helps RTL-aware renderers; code blocks naturally stay LTR
+- Star Trek references translate well culturally — the Borg metaphor ("ההתנגדות חסרת תועלת") is universally recognized
+- For Hebrew prose quality, avoid word-for-word translation; restructure sentences to flow naturally in Hebrew word order
+
+## Issue #545: GitAgent Standard Evaluation (March 2026)
+
+**Context:** Tamir asked whether Squad should adopt the GitAgent standard (https://www.gitagent.sh/) for agent configuration.
+
+**What GitAgent Is:**
+- Open standard for git-native AI agent definition
+- Framework-agnostic: works with Claude, OpenAI, CrewAI, Lyzr, etc.
+- Growing adoption: 4.9% of public repos, 13.7% of new repos (2025+)
+- File structure: agent.yaml, SOUL.md, RULES.md, DUTIES.md, skills/, tools/, memory/, compliance/
+
+**Key Findings:**
+- GitAgent is real, well-designed, and actively adopted (academic backing + community)
+- Squad already follows git-native philosophy but with custom structure
+- Squad's custom structure (charter.md + squad.config.ts) works well for GitHub Copilot CLI tight integration
+- Full migration not justified, but selective adoption adds value (SOUL.md for identity separation)
+
+**Recommendation: PARTIAL ADOPTION**
+- Keep charter.md as source of truth
+- Add SOUL.md to separate identity/voice from role definition
+- Add RULES.md where agents have safety boundaries
+- Keep squad.config.ts for model/routing governance
+- Pilot with one agent first (Seven)
+
+**Learnings:**
+- **GitAgent adoption is accelerating** — 13.7% of new repos (2025+) use agent standards; this validates agent-as-first-class-component thinking
+- **Framework-agnostic standards matter** — Even though Squad is tightly integrated with Copilot CLI, separating identity (SOUL.md) from orchestration (squad.config.ts) improves readability and portability
+- **SOUL.md is valuable** — Explicitly documenting agent voice/personality separately from charter reduces cognitive load; charter stays focused on "what I own" vs. "how I sound"
+- **Hybrid approach is pragmatic** — Not all standards fit all teams; Squad's custom + GitAgent selective integration = best of both
+- **Audit readiness** — DUTIES.md structure (segregation of duties, compliance mapping) aligns with enterprise requirements; Squad should adopt if audit/compliance becomes mandatory
+
+**Tools Used:** web_fetch, web_search, view (Squad config files), analysis
+
+**Next Session Action:** Propose SOUL.md template to Picard for architectural blessing.

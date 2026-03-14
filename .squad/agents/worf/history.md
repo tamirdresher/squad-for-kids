@@ -300,3 +300,68 @@ Squad's **foundational security is strong** (role boundaries, reviewer gates, au
 
 The future of agentic AI security is **continuous validation, not static defenses**. Squad needs operational excellence (R10-R12) — quarterly red team, vulnerability disclosure, threat intelligence — to maintain security posture as attack landscape evolves.
 
+### Issue #547 — Telegram Bot Token Rotation Assessment (2026-03-15)
+
+**Context:** GitHub Secret Scanning detected exposed Telegram bot token. Ralph performed initial remediation. Worf assigned to verify security posture and document findings.
+
+**Work Completed:**
+- ✅ Reviewed codebase for hardcoded tokens (none found in committed code)
+- ✅ Verified `.gitignore` properly excludes `telegram-bot-token` file
+- ✅ Confirmed token storage architecture uses secure resolution chain (env var → file → config → credential manager)
+- ✅ Validated Ralph's remediation actions (issue #543 redacted, secret scanning alert resolved, GitHub Actions secret created)
+- ✅ Verified no token patterns in current working tree or recent git history
+- ✅ Confirmed token file exists outside repo (`~/.squad/telegram-bot-token`)
+
+**Security Assessment:**
+
+**✅ Good Architecture:**
+1. Token storage follows defense-in-depth — multiple secure sources, priority resolution chain
+2. Token file in `~/.squad/` (outside repo) — no git commit risk
+3. `.gitignore` explicitly blocks `telegram-bot-token` — prevents accidental commits
+4. Scripts (`squad-telegram-bot.py`, `setup-telegram-bot.ps1`) never hardcode tokens
+5. GitHub Actions secret created for CI/CD workflows
+
+**⚠️ Attack Vector:**
+- Original token exposure was via **issue body paste** (issue #543)
+- This is a **human process failure**, not a code vulnerability
+- Ralph correctly redacted the exposed token from issue #543 body
+
+**🔴 Remaining Risk:**
+- **Old token still valid until manually revoked via BotFather**
+- Token was public for ~9 minutes (21:43:43Z detection → 22:32:58Z redaction)
+- Anyone who saw issue #543 during exposure window has the token
+- Telegram bot tokens don't expire — must be manually revoked
+
+**Required Actions (Manual — Requires Tamir):**
+1. **CRITICAL:** Revoke old token via @BotFather on Telegram:
+   - Open Telegram, search for @BotFather
+   - Send `/revoke`
+   - Select @tamir_squad_bot
+   - Confirm revocation
+2. Generate new token via @BotFather:
+   - Send `/newtoken`
+   - Select @tamir_squad_bot
+   - Copy new token
+3. Update GitHub Actions secret:
+   - `gh secret set TELEGRAM_BOT_TOKEN` (paste new token)
+4. Update local token file:
+   - Edit `~/.squad/telegram-bot-token` with new token
+5. Dismiss GitHub secret scanning alert after rotation:
+   - https://github.com/tamirdresher_microsoft/tamresearch1/security/secret-scanning
+
+**Code Review Results:**
+- ✅ No hardcoded tokens in Python scripts
+- ✅ No hardcoded tokens in PowerShell scripts
+- ✅ No hardcoded tokens in config files committed to repo
+- ✅ All token references use environment variables or external file reads
+- ✅ `.gitignore` properly configured
+
+**Lessons:**
+- **Issue bodies are public** in private EMU repos — treat as unsanitized user input
+- Secret scanning detection lag (~9 minutes) allows brief exposure window
+- **Telegram bot tokens are bearer credentials** — no additional auth required for API access
+- Token rotation must be **manual** — no automated BotFather API
+- GitHub secret scanning is **detective control**, not preventative — always redact secrets before posting
+
+**Status:** ✅ Code security posture verified. Issue closed by Ralph. Remaining action is human-performed token rotation via BotFather (documented above).
+

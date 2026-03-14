@@ -24406,3 +24406,208 @@ Neelix's news broadcasts were supposed to include AI-generated images (banners +
 - Issue: #534
 - Feature branch: squad/526-neelix-images-CPC-tamir-WCBED
 - Commit: 466ad057 (main)
+
+
+# Decision: Azure App Service Auth Cleanup for Public Sites
+
+**Date:** 2026-07-08
+**Author:** B'Elanna (Infrastructure Expert)
+**Issue:** #541
+
+## Context
+
+The tam-research-website App Service was returning intermittent 401 errors despite Easy Auth being "disabled" (platform.enabled=false). The v2 auth configuration retained stale AAD provider settings and unauthenticatedClientAction=RedirectToLoginPage.
+
+## Decision
+
+When an Azure App Service should be publicly accessible:
+
+1. Set `platform.enabled: false` in auth settings
+2. Set `globalValidation.unauthenticatedClientAction: AllowAnonymous`
+3. Clear stale identity provider configurations
+4. Verify no IP access restrictions block public traffic
+
+All four steps are required. Disabling only `platform.enabled` is insufficient — stale v2 auth config with `RedirectToLoginPage` can cause ghost 401s for users with cached AAD tokens.
+
+## Impact
+
+- Applies to any future public-facing Azure App Services in the tamirdev resource group
+- Current affected resource: tam-research-website (tamirdev, East US)
+
+
+---
+
+# Decision: GitHub OAuth App for Azure Easy Auth
+
+**Date:** 2026-03-15  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #542  
+
+## Context
+tam-research-website.azurewebsites.net needed GitHub OAuth authentication via Azure Easy Auth. The Auth V2 config had GitHub as the default provider but the client ID was empty.
+
+## Decision
+Created the OAuth App under the **user-level** EMU developer settings (`tamirdresher_microsoft` account) rather than the org-level settings. EMU orgs do not expose org-level OAuth App management — `/organizations/tamirdresher_microsoft/settings/applications/new` returns 404 even when authenticated via SSO.
+
+## Details
+- **OAuth App:** "Starfleet Research Labs Auth"
+- **Client ID:** `Ov23liKa785b7aIqLlVM`
+- **GitHub Settings:** https://github.com/settings/applications/3459083
+- **Secret stored as:** `GITHUB_CLIENT_SECRET` app setting
+- **Auth scopes:** `read:user`, `read:org`
+
+## Rationale
+- User-level OAuth Apps work identically for Azure Easy Auth — the callback URL and auth flow are the same regardless of whether the app is org-owned or user-owned.
+- EMU restrictions prevent org-level app creation, making user-level the only viable path.
+- The client secret is stored as an Azure App Setting (not hardcoded), following security best practices.
+
+## Impact
+- Visitors to the site will be prompted to authenticate via GitHub before accessing content.
+- The `read:user` and `read:org` scopes allow the app to verify the user's identity and org membership.
+
+
+---
+
+# Decision: Research Website Auth & Deployment
+
+**Date:** 2026-03-14
+**Author:** B'Elanna (Infrastructure Expert)
+**Issue:** #542
+
+## Decision
+
+Use Azure App Service built-in authentication (EasyAuth v2) with GitHub as the identity provider for the Starfleet Research Labs website. Deploy as a Node.js static server via zip deploy.
+
+## Context
+
+- The tam-research-website Azure Web App needed GitHub EMU authentication for internal-only access
+- The `authV2` Azure CLI extension has install issues; REST API (`az rest`) is the reliable fallback
+- GitHub OAuth Apps require manual browser creation — no API exists for this
+
+## Approach
+
+1. **Auth:** App Service EasyAuth v2 configured via REST API with GitHub provider, redirect on unauthenticated, token store enabled, scopes `read:user` + `read:org`
+2. **Deployment:** Simple Node.js http server serving static HTML, deployed via `az webapp deploy --type zip`
+3. **Branding:** LCARS/TNG aesthetic per SRL identity (deep space blue + amber)
+
+## Key Details
+
+- Resource group: `tamirdev`
+- Runtime: Node.js 20 LTS on Linux
+- Auth secret stored in app setting: `GITHUB_OAUTH_CLIENT_SECRET`
+- Callback URL: `https://tam-research-website.azurewebsites.net/.auth/login/github/callback`
+
+
+---
+
+# Decision: Telegram Bot Token Storage Strategy
+
+**Date:** 2026-07-18
+**Author:** Data (Code Expert)
+**Issue:** #543
+**Status:** Implemented
+
+## Context
+
+Tamir created @tamir_squad_bot via BotFather. The token was provided in the issue body. We needed a secure storage strategy compatible with the existing bot script architecture.
+
+## Decision
+
+Store the token in three locations with a priority resolution chain:
+
+1. `$env:TELEGRAM_BOT_TOKEN` — environment variable (CI/CD, ephemeral sessions)
+2. `~/.squad/telegram-bot-token` — plain text file (simple, direct, new)
+3. `~/.squad/telegram-config.json` — structured config (existing, includes `allowed_chat_ids`)
+4. Windows Credential Manager — (existing fallback)
+
+## Rationale
+
+- The token file approach (#2) is simplest for humans to inspect/update
+- The JSON config (#3) already existed and supports additional settings like `allowed_chat_ids`
+- Both are in `~/.squad/` which is outside the repo — no risk of git commit
+- Added `telegram-bot-token` to `.gitignore` as defense-in-depth
+
+## Action Items
+
+- [ ] Tamir: Consider `/revoke` via BotFather and re-issue token (it's in the issue body)
+- [ ] Tamir: Send a message to @tamir_squad_bot to get your chat ID, then add it to `allowed_chat_ids` in `~/.squad/telegram-config.json`
+
+
+---
+
+# Decision: Telegram Token Security — Issue Body Paste is Attack Vector
+
+**Date:** 2026-03-15
+**Author:** Worf (Security & Cloud)
+**Issue:** #547
+**Status:** Assessed — No code changes required
+
+## Context
+
+GitHub Secret Scanning detected exposed Telegram bot token (alert #1). Token was pasted in issue #543 body. Ralph performed initial remediation (redaction, GitHub Actions secret creation). Worf assessed codebase security posture.
+
+## Findings
+
+**✅ Code Security Posture: GOOD**
+- No hardcoded tokens in committed code (Python scripts, PowerShell scripts, configs)
+- Token resolution follows secure chain: env var → file → config → credential manager
+- Token file `~/.squad/telegram-bot-token` correctly placed outside repo
+- `.gitignore` properly excludes token file
+- Scripts designed with security best practices (no token literals)
+
+**🔴 Attack Vector: Issue Body Paste (Human Process)**
+- Token exposure occurred via **manual paste into issue #543 body**
+- Exposure window: ~9 minutes (21:43:43Z detection → 22:32:58Z redaction)
+- Issue bodies are public in private EMU repos — GitHub Secret Scanning is detective control, not preventative
+- This is a **human workflow vulnerability**, not a code flaw
+
+**⚠️ Remaining Risk:**
+- Old token still valid until manual revocation via @BotFather
+- Anyone who viewed issue #543 during exposure window has the token
+- Telegram bot tokens are bearer credentials — no additional auth layer
+
+## Decision
+
+**No code changes required.** Existing token storage architecture is secure.
+
+**Required Action:** Manual token rotation via @BotFather (human-performed, non-automatable):
+1. Revoke old token: `/revoke` → select @tamir_squad_bot
+2. Generate new token: `/newtoken` → select @tamir_squad_bot
+3. Update GitHub Actions secret: `gh secret set TELEGRAM_BOT_TOKEN`
+4. Update local token file: `~/.squad/telegram-bot-token`
+5. Dismiss GitHub secret scanning alert after rotation
+
+## Rationale
+
+- Codebase security posture is **already hardened** against token leakage
+- Token exposure was **operational security failure** (paste into issue body), not architectural weakness
+- GitHub Secret Scanning provided **detective control** — 9-minute detection lag is acceptable for non-critical bot tokens
+- Manual BotFather workflow is unavoidable — Telegram provides no token rotation API
+
+## Lessons Learned
+
+1. **Issue bodies are untrusted public spaces** — treat like Slack/Teams messages, not secure vaults
+2. **Secrets in issue bodies bypass preventative controls** — `.gitignore` and code review don't apply
+3. **Secret scanning is reactive** — assumes breach occurred, focuses on damage control
+4. **Bot tokens are bearer credentials** — possession = access, no additional verification
+5. **Manual rotation workflows must be documented** — no automation available for Telegram BotFather
+
+## Prevention Recommendations
+
+For future secret provisioning:
+- ✅ Use GitHub Secrets UI (`Settings → Secrets → Actions → New repository secret`)
+- ✅ Use `gh secret set SECRET_NAME` (stdin input, never echoed)
+- ✅ Use setup scripts with `Read-Host -AsSecureString` (PowerShell) or `getpass()` (Python)
+- ❌ Never paste secrets in issue bodies, PR comments, commit messages, or chat logs
+
+## References
+
+- Issue #543: Original token exposure (redacted by Ralph)
+- Issue #547: Secret scanning alert and remediation tracking
+- Data's decision: `.squad/decisions/inbox/data-telegram-bot.md` (token storage architecture)
+- Ralph's remediation comment: https://github.com/tamirdresher_microsoft/tamresearch1/issues/547#issuecomment-4061561560
+
+
+---
+
+

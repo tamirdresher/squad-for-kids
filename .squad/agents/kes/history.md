@@ -8,9 +8,19 @@
 
 **Issue #259 Status:** ⏳ PENDING — Email account ready, awaiting Tamir's CAPTCHA completion  
 **Issue #471 Status:** ✅ CLOSED — Meeting scheduled and sent  
+**Issue #546 Status:** ⚠️ PARTIAL — Meeting sent to 3/5 attendees; Avery Anderson & Carlo Rivera need manual add  
 **Next:** Once Tamir creates the email account, set up inbox rules and forwarding pipeline
 
 ## Learnings
+
+### Issue #546: Cross-team AI Agent Collaboration Meeting (2026-03-15)
+- **Meeting created**: "AI Agent Teams — Security & Collaboration Sync" — Monday March 16, 2026 at 19:00 IST / 10:00 AM PDT
+- **Attendees sent**: Max Bressler, Mitansh Shah, Brady Gaster (all resolved via Outlook GAL)
+- **Attendees NOT resolved**: Avery Anderson, Carlo Rivera — not found in Microsoft GAL. Posted to issue #546 requesting Tamir forward the invite or provide their email addresses.
+- **Key learning**: Not all meeting participants may be in the Microsoft Global Address List (e.g., external collaborators, contractors, or people from other orgs). Always check resolution status and have a fallback plan for unresolved recipients.
+- **Key learning**: Israel (IST/UTC+2) to US Pacific (PDT/UTC-7) = 9 hour gap. Sweet spot for cross-timezone meetings: 19:00-21:00 Israel = 10:00 AM-12:00 PM Pacific.
+- **Method**: Outlook COM automation with display name resolution via GAL. Sent to resolved recipients, commented on GitHub issue for unresolved ones.
+- **Duration chosen**: 45 minutes (compromise between 30-60 min range for a first cross-team sync with agenda)
 
 ### Issue #486: Draft Message to Mitansh Shah (2026-03-15)
 - **Contact**: Mitansh Shah (mitashah@microsoft.com), organizer of "Agency Security Squad" meeting (March 12, 2026)

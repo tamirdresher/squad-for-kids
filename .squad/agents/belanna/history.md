@@ -679,3 +679,28 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 **Key Learning:** When disabling Azure App Service Easy Auth, always clean up BOTH the platform.enabled flag AND the globalValidation.unauthenticatedClientAction setting. Stale RedirectToLoginPage + residual AAD config can cause ghost 401s even with auth "disabled".
 
 **Status:** Complete. Issue #541 commented and closed.
+
+---
+
+### 2026-03-14T23:00Z: GitHub OAuth App Creation for #542 (tam-research-website)
+
+**Task:** Create OAuth App for Azure Easy Auth on tam-research-website.azurewebsites.net
+
+**Success:** ✅ Complete
+
+**OAuth App Details:**
+- App Name: "Starfleet Research Labs Auth"
+- Client ID: Ov23liKa785b7aIqLlVM
+- GitHub Settings: https://github.com/settings/applications/3459083
+- Scopes: read:user, read:org
+- Secret stored as GITHUB_CLIENT_SECRET (Azure app setting)
+
+**Implementation:**
+- Used user-level OAuth App (EMU orgs don't expose org-level management)
+- Configured Azure App Service Easy Auth v2 via REST API
+- Redirect URL: https://tam-research-website.azurewebsites.net/.auth/login/github/callback
+- Unauthenticated traffic redirected to GitHub login
+- Site now requires GitHub authentication before content access
+
+**Issue:** #542 Closed
+**Decision Documented:** .squad/decisions/inbox/belanna-oauth-app.md

@@ -41,8 +41,76 @@
   - Deriving security tasks for multi-agent hardening
   - Connecting blog/demo as case study for Microsoft Agency framework
   - Drafting communication to Mitansh Shah (meeting organizer)
+- Issue #491: Cross-Machine Agent Coordination ✅ RESEARCH COMPLETE
+  - Evaluated 5 coordination approaches for agents on different machines
+  - Recommended: Git-based task queue + GitHub Issues supplement
+  - Deliverables: Research report, skill documentation, GitHub issue for implementation
 
 ## Learnings
+
+### 2026-03-14: Seven — Cross-Machine Agent Coordination Research — Issue #491
+
+**Assignment:** Research and propose how Copilot CLI squad agents on different machines (laptop, DevBox, Azure VMs) can communicate and collaborate securely.
+
+**What I Did:**
+1. Evaluated 5 approaches: Git-based, Dev Tunnels, Azure Service Bus, GitHub Issues, OneDrive
+2. Created comparison table with 9 evaluation criteria (setup, security, compliance, latency, cost, reliability)
+3. Recommended hybrid pattern: Git-based primary + GitHub Issues supplement + OneDrive for artifacts
+4. Authored detailed research report (18.5 KB) with threat model, compliance analysis, implementation sketch
+5. Created skill documentation (.squad/skills/cross-machine-coordination/SKILL.md) with usage patterns
+6. Created GitHub issue #491 for implementation (Phase 1-3 roadmap)
+7. Posted decision memo to inbox for squad review
+
+**Key Findings:**
+
+1. **Best Pattern: Git-Based Task Queue**
+   - Agents write YAML task files to `.squad/cross-machine/tasks/`
+   - Ralph polls every 5-10 min, executes, writes results to `.squad/cross-machine/results/`
+   - Zero new infrastructure, fully auditable, durable (survives network outages)
+
+2. **Why Others Were Rejected:**
+   - **Dev Tunnels:** Real-time but tunnel daemon fragile (RDP disconnect), token management burden
+   - **Azure Service Bus:** Overkill for 2-3 machines, adds billing + learning curve, DevBox auth difficult
+   - **OneDrive Only:** Sync non-deterministic, no audit trail, conflict handling via duplication
+
+3. **Hybrid Approach Wins:**
+   - **Git-based:** Scheduled workloads (GPU jobs, durable)
+   - **GitHub Issues:** Urgent/human-initiated tasks (already watched by Ralph)
+   - **OneDrive:** Large artifacts (logs, model weights, not blocking tasks)
+
+4. **Security Model is Solid:**
+   - Branch protection + PR review blocks malicious tasks
+   - Pre-commit secret scanning prevents credential leaks
+   - Command whitelist + no shell eval prevents code injection
+   - Git history is immutable audit trail (SOC2 compliant)
+   - Resource limits (timeout, memory, CPU) prevent exhaustion
+
+5. **Implementation is Achievable:**
+   - Phase 1 (Week 1): File format + Ralph integration
+   - Phase 2 (Week 2-3): Hardening (isolation, timeouts, signed commits)
+   - Phase 3 (Week 4): Adoption (pilot, training, retirement of manual workflow)
+
+**Technical Learnings:**
+- YAML over JSON for task files (human-readable, git-friendly)
+- Polling every 5-10 min is acceptable for scheduled workloads (GPU jobs are minutes+ duration)
+- File-based coordination scales better than API-based for isolated machines
+- Git commit history provides audit trail without additional logging infrastructure
+- Task uniqueness via timestamp + machine + task-id prevents collisions
+
+**Deliverables Posted:**
+- Research report: `research/active/cross-machine-agents/README.md` (18.5 KB)
+- Skill documentation: `.squad/skills/cross-machine-coordination/SKILL.md` (11.1 KB)
+- Decision memo: `.squad/decisions/inbox/seven-cross-machine-agents.md` (5.7 KB)
+- GitHub issue: #491 (Feature: Cross-Machine Agent Coordination)
+
+**Key Learning:**
+- **Cross-machine coordination is simpler when you accept polling latency** — 5-10 min beats trying to keep tunnels/queues open
+- **Git as a coordination layer is underutilized** — most systems reach for messaging queues, but git's immutability + audit trail is perfect for multi-machine state
+- **Hybrid patterns are best** — one transport for each task type (git for scheduled, issues for urgent, OneDrive for artifacts)
+- **Zero infrastructure is a feature** — adds adoption inertia (uses what already exists)
+- **Ralph watch loop as substrate** — all coordination ultimately goes through Ralph, so piggy-back on existing polling
+
+**Decision Status:** Research complete. Decision memo posted to inbox for Tamir/Picard review. Awaiting approval before Phase 1 implementation.
 
 ### 2026-03-14: Seven — Agency Security Squad Meeting Analysis — Issue #486
 
@@ -777,4 +845,57 @@
 - Useful for generating icons, screenshots, design mockups within team workflows
 
 **Status:** ✅ Issue comment posted and labeled for approval
+
+
+---
+
+### Issue #487: SAW/GCC Restricted Environment Research (2026-03-11)
+
+**Assignment:** Research how agentic AI systems (specifically Squad/Agency) can operate in SAW (Secure Admin Workstation), GCC (Government Community Cloud), and Torus restricted environments.
+
+**Research Conducted:**
+1. **Environment Analysis:** Documented restrictions in SAW/PAW, GCC High/DoD, and Microsoft Torus
+   - SAW: No internet, application whitelisting, isolated networks
+   - GCC High: Physical isolation, 3-week egress approval, US-only operations
+   - Torus: Network segmentation, zero trust, encrypted traffic
+2. **MCP Compatibility:** Analyzed MCP architecture for airgapped deployment
+   - stdio transport enables local-only operation (no network dependency)
+   - Local MCP servers run as subprocesses, communicate via stdin/stdout
+   - Reviewed healthcare AI airgapped deployment patterns
+3. **Squad Architecture Assessment:** Evaluated Squad's local-first design
+   - Strengths: CLI-based execution, stdio MCP, Git-based state, file system tools
+   - Challenges: LLM endpoint access, binary whitelisting, external API dependencies
+4. **Industry Patterns:** Researched agentic AI in restricted environments
+   - Local-first agent architecture, pre-approved tool inventory
+   - Airgapped model updates, security boundaries, audit trails
+
+**Key Findings:**
+- **MCP is well-suited for restricted environments** — stdio transport was designed for local execution
+- **Squad's architecture has strong advantages** — local-first execution, no cloud DB dependency
+- **Critical dependencies:** LLM endpoint access (requires approved egress or on-prem), binary whitelisting
+- **Recommended approach:** 4-phase implementation (restricted mode config, internal API adapters, on-prem LLM, compliance tooling)
+
+**Open Questions:**
+- Can Copilot CLI use custom LLM endpoints (Azure OpenAI GCC High)?
+- What is SAW binary approval process timeline?
+- Which FedRAMP controls apply to agentic systems?
+- Are there GCC High test environments available?
+
+**Deliverable:** Comprehensive research report posted to Issue #487 covering:
+- SAW/GCC/Torus restrictions and security models
+- MCP compatibility analysis (stdio transport advantages)
+- Squad architecture strengths/challenges
+- Recommended 4-phase implementation plan
+- Open questions for security squad/stakeholders
+
+**Status:** ✅ Research complete, report posted to GitHub issue
+
+**Technical Learnings:**
+1. **MCP stdio transport is the key enabler** — Enables local-only execution without network dependencies
+2. **Restricted ≠ impossible** — Local-first architectures can work in SAW/GCC with proper approvals
+3. **Binary whitelisting is the main friction** — All MCP server executables must be pre-approved
+4. **LLM endpoint is the critical dependency** — Requires either approved egress or on-prem deployment
+5. **GCC High has API limitations** — Not all commercial APIs available (3-week approval for new egress)
+6. **Airgapped patterns exist** — Healthcare industry has established MCP deployment guides
+7. **Squad is better positioned than cloud-native tools** — Local-first design maps naturally to restricted environments
 

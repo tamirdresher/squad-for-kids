@@ -22741,3 +22741,925 @@ Created comprehensive documentation:
 - Output: \hebrew-podcast-cloned.mp3\ (5.2 MB, 4.6 min), script at \hebrew-cloned-podcast.script.txt\
 - Pipeline already supports \--f5tts\ flag for GPU upgrade path
 
+
+---
+
+# Decision: Prompt Injection & Adversarial AI Defense Strategy
+
+**Date:** 2026-12-20  
+**Author:** Worf (Security & Cloud)  
+**Issue:** #488  
+**Status:** PROPOSED — Awaiting team review
+
+---
+
+## Context
+
+Multi-agent AI systems face fundamentally different security challenges than single-model deployments. Research on prompt injection, memory poisoning, and data exfiltration in agentic architectures (2025-2026) reveals persistent, propagating threats across agent boundaries.
+
+Analysis of Squad framework identified **8 critical attack vectors** and **6 critical security gaps**, with comprehensive defense roadmap spanning immediate (30-day) to strategic (90-day) mitigations.
+
+**Key Findings:**
+- Memory poisoning (28% of agentic attacks) can persist across sessions and agents
+- Squad's drop-box pattern (decisions/inbox/) is high-risk persistence vector
+- MCP tool access creates "lethal trifecta" exposure (private data + untrusted content + external tools)
+- Existing mitigations (role boundaries, reviewer gates) are strong but incomplete
+- OWASP Agentic AI Top 10 compliance: 6/10 controls present, 4 critical gaps
+
+---
+
+## Decision
+
+Adopt **prioritized defense-in-depth strategy** for hardening Squad against adversarial AI attacks:
+
+### Immediate (30 days) — Phase 1 + Phase 2
+
+**R1. Decision Review Gate (Human-in-the-Loop)**
+- Require human approval for decisions containing security-sensitive keywords
+- Keywords: `disable`, `bypass`, `ignore`, `expose`, `delete`, `permissions`, `admin`
+- Implementation: Update Squad coordinator prompt to flag high-risk decisions and block auto-merge
+
+**R2. MCP Tool Access Audit**
+- Document which agents currently access which MCP tools
+- Deliverable: Tool access matrix (agent × tool × operations)
+- Purpose: Baseline for implementing RBAC
+
+**R3. Session Store Query Logging**
+- Log all session store queries (who queried, what query, which results returned)
+- Purpose: Forensic capability to trace contamination vector post-incident
+
+**R4. Tool-Level RBAC (MCP Authorization)**
+- Implement agent-to-tool permission mapping
+- Start with high-risk tools (GitHub, Azure, Teams)
+- MCP server validates agent identity + operation before execution
+
+**R5. History Provenance Chain**
+- Add cryptographic signatures to agent history entries
+- Sign all new history entries with agent + timestamp + session ID
+
+**R6. Issue Content Sanitization**
+- Scan issue bodies for adversarial patterns before routing to agents
+- Flag (not strip) risky content; agent receives sanitized + warning
+
+### Strategic (90 days) — Phase 3
+
+**R7. Real-Time Behavioral Monitoring**
+- Deploy anomaly detection on agent tool calls and context writes
+- Monitor tool call patterns, context drift, output contamination
+- Consider new squad member: "Tuvok" (Security Monitor)
+
+**R8. Session Store Content Attestation**
+- Tag all session store content with trust score + provenance
+- Score based on source (user > agent > external), age, session reputation
+
+**R9. Drop-Box Decision Validation**
+- Semantic validation of decisions before merge to decisions.md
+- NLP-based detection of adversarial instructions
+
+### Ongoing — Phase 4
+
+**R10. Quarterly Red Team Exercises**
+- Simulate adversarial attacks against Squad infrastructure
+- Test all 8 attack vectors identified in research
+- Use Microsoft Foundry AI Red Teaming Agent
+
+**R11. Vulnerability Disclosure Program**
+- Establish responsible disclosure channel for Squad security issues
+- GitHub Security Advisory + SECURITY.md file
+
+**R12. Continuous Threat Intelligence**
+- Monitor OWASP Agentic AI Top 10, MCP CVE feeds, academic research
+- Monthly review of new attack vectors + mitigation techniques
+
+---
+
+## Risk Assessment
+
+**Current State (Without Mitigations):**
+- **Risk Level:** 🔴 HIGH
+- **Exposure:** Data exfiltration, persistent contamination, tool authority abuse
+- **Attack Vectors:** 8 critical vectors identified (4 CRITICAL, 2 HIGH, 2 MEDIUM severity)
+
+**After Phase 1+2 (30 days):**
+- **Risk Level:** 🟡 MEDIUM
+- **Mitigation:** Critical gaps addressed (MCP RBAC, history provenance, issue sanitization)
+- **Remaining Exposure:** Real-time monitoring, session store attestation pending
+
+**After Phase 3+4 (90 days + ongoing):**
+- **Risk Level:** 🟢 LOW
+- **Posture:** Defense-in-depth, continuous validation, proactive red teaming
+- **Maintenance:** Quarterly red team, vulnerability disclosure, threat intelligence
+
+---
+
+## Rationale
+
+**Why This Matters:**
+
+1. **Squad is multi-agent framework with 30k+ users (Agency platform)** — security failures have broad organizational impact
+
+2. **Memory poisoning is systemic risk** — drop-box pattern, history files, session store are trusted by default. Single compromised agent can poison all future agents persistently.
+
+3. **MCP tool authority escalation** — agents have full access to all tools. Calendar agent can delete GitHub repos. Need least-privilege RBAC.
+
+4. **"Lethal trifecta" exposure** — Squad agents have (1) private data access (repos, secrets), (2) untrusted content exposure (issues, PRs), (3) external tool access (GitHub, Azure, Teams). Research shows 67% exfiltration success rate for this combination.
+
+5. **Industry precedent** — CVE-2025-64439 (LangGraph RCE), CVE-2026-25536 (MCP server spoofing) demonstrate real-world exploitation of multi-agent vulnerabilities
+
+6. **OWASP compliance baseline** — Squad achieves 6/10 OWASP Agentic AI Top 10 coverage. 4 critical gaps (excessive agency, memory poisoning, tool authority escalation) require immediate attention.
+
+---
+
+## Alternatives Considered
+
+**Alternative 1: Do Nothing (Status Quo)**
+- **Pros:** No implementation effort
+- **Cons:** HIGH risk of data exfiltration, persistent contamination, tool authority abuse
+- **Rejected:** Unacceptable risk for 30k+ user platform
+
+**Alternative 2: Disable @copilot Autonomous Work**
+- **Pros:** Eliminates autonomous attack surface
+- **Cons:** Loses productivity gains of autonomous issue routing
+- **Rejected:** Doesn't address human-spawned agent vulnerabilities (memory poisoning, tool escalation)
+
+**Alternative 3: Full Rewrite with Security-First Architecture**
+- **Pros:** Clean slate, no legacy constraints
+- **Cons:** 6+ month timeline, breaks existing workflows
+- **Rejected:** Incremental hardening (R1-R12) addresses critical gaps in 30-90 days with no breaking changes
+
+---
+
+## Implementation Plan
+
+**Week 1-2:**
+- R1: Decision review gate (prompt update)
+- R2: MCP tool access audit (documentation)
+- R3: Session store query logging (instrumentation)
+
+**Week 3-4:**
+- R4: Tool-level RBAC (MCP server changes)
+- R5: History provenance chain (signing infrastructure)
+- R6: Issue content sanitization (pre-routing scan)
+
+**Month 2-3:**
+- R7: Real-time behavioral monitoring (agent development)
+- R8: Session store content attestation (schema migration)
+- R9: Drop-box decision validation (NLP integration)
+
+**Ongoing (Quarterly):**
+- R10: Red team exercises
+- R11: Vulnerability disclosure program
+- R12: Threat intelligence monitoring
+
+---
+
+## Success Metrics
+
+1. **Vulnerability Reduction:** 8 attack vectors → 0 exploitable vectors (validated via red team)
+2. **OWASP Compliance:** 6/10 → 10/10 OWASP Agentic AI Top 10 controls
+3. **Incident Response Time:** Post-incident forensics (current) → Real-time detection (Phase 3)
+4. **Risk Level:** HIGH → LOW (30-90 days)
+5. **Zero Security Incidents:** No data exfiltration, memory poisoning, or tool authority abuse in production
+
+---
+
+## Ownership
+
+**Coordinator:** Worf (Security & Cloud) — overall security strategy  
+**Phase 1 Execution:** Worf + Picard (Lead) — immediate mitigations  
+**Phase 2 Execution:** Worf + Data (Code Expert) — MCP RBAC, history provenance  
+**Phase 3 Execution:** Worf + B'Elanna (Infrastructure) — behavioral monitoring, session store attestation  
+**Ongoing Operations:** Worf — quarterly red team, vulnerability disclosure, threat intelligence
+
+---
+
+## Dependencies
+
+**Technical:**
+- MCP server support for agent identity validation (R4)
+- Cryptographic signing infrastructure (R5)
+- NLP library for semantic validation (R9)
+
+**Organizational:**
+- Human approval workflow for high-risk decisions (R1)
+- Dedicated time for quarterly red team exercises (R10)
+- Vulnerability disclosure policy approval (R11)
+
+---
+
+## Related Decisions
+
+- **Issue #376:** Adversarial Security Agent research (code review focus)
+- **Issue #488:** Prompt Injection & Adversarial AI Defense research (this decision)
+
+---
+
+## References
+
+**Research & Standards:**
+- OWASP Top 10 for LLM Applications 2025 (owasp.org)
+- CSA Agentic AI Red Teaming Guide (Cloud Security Alliance, 2026)
+- MDPI: Prompt Injection Attacks in LLM & AI Agent Systems (2026)
+- arXiv 2511.15759: Securing AI Agents Against Prompt Injection Attacks (2025)
+
+**Industry Research:**
+- Marmelab: MCP Security: Understanding Vulnerabilities (2026)
+- HiddenLayer: The Lethal Trifecta and How to Defend Against It (2025)
+- Trail of Bits: Hijacking Multi-Agent Systems in Your PajaMAS (2025)
+- Security Boulevard: Infectious Prompt Injection in Multi-Agent AI (2025)
+
+**CVE References:**
+- CVE-2025-64439 (LangGraph RCE via persistent memory poisoning)
+- CVE-2026-25536 (MCP server spoofing, cross-server data leak)
+- CVE-2026-23744 (MCP unauthenticated service endpoint)
+
+---
+
+**Decision Status:** PROPOSED — Awaiting team discussion  
+**Next Steps:**
+1. Review with Picard (Lead) — prioritize roadmap
+2. Assign Phase 1 tasks (R1, R2, R3) to squad members
+3. Schedule red team exercise for validation
+
+
+---
+
+# SAW/GCC Restricted Environment Research — Findings
+
+**Date:** 2026-03-11  
+**Agent:** Seven  
+**Issue:** #487  
+**Status:** Research complete, recommendations pending team decision
+
+---
+
+## Context
+
+Security squad identified SAW/Torus/GCC environments as #1 priority for Agency usability. These restricted environments currently block agentic AI due to network isolation and security controls.
+
+---
+
+## Research Findings
+
+### Environment Restrictions
+
+**SAW/PAW (Secure Admin Workstation):**
+- No internet access (outbound denied by default)
+- Application whitelisting (only approved binaries execute)
+- Network isolation (management protocols only)
+- MFA required, full audit logging
+
+**GCC High / DoD:**
+- Physical isolation (separate data centers)
+- 3-week security review for new egress endpoints
+- US-only operations (data, personnel, systems)
+- FedRAMP High / DoD IL5 compliance required
+
+**Torus (Secure Future Initiative):**
+- Network segmentation (dev ≠ prod)
+- Zero Trust architecture (explicit verification)
+- Encrypted internal traffic
+- No credential reuse across environments
+
+### MCP Compatibility
+
+**✅ What Works:**
+- **stdio transport** — Local subprocess communication, no network needed
+- **File system tools** — Standard OS operations
+- **Local Git operations** — If Git binary is whitelisted
+- **Internal API access** — If endpoints are pre-approved
+
+**❌ What Doesn't Work (Without Modification):**
+- Cloud-hosted MCP servers (network blocked)
+- External API calls (OpenAI, Anthropic, etc.)
+- Web search tools (internet blocked)
+- Dynamic package installation (binary controls)
+- OAuth/cloud auth (external IdP blocked)
+
+### Squad Architecture Strengths
+
+**Advantages for Restricted Environments:**
+1. Local-first execution (CLI runs on user machine)
+2. stdio MCP transport (subprocess communication)
+3. Git-based state (no cloud database)
+4. File system tools (standard OS operations)
+5. Extensible (custom internal-only MCPs)
+
+**Challenges:**
+1. LLM endpoint access (requires approved egress or on-prem)
+2. Binary whitelisting (all executables must be approved)
+3. External API dependencies (ADO, Teams, GitHub)
+
+---
+
+## Recommendations
+
+### Proposed: 4-Phase Implementation
+
+**Phase 1: Restricted Mode Configuration (2-3 weeks)**
+- Create `mcp-config-restricted.json` with only local/stdio servers
+- Document binary whitelisting requirements
+- Provide security review checklist
+
+**Phase 2: Internal API Adapters (4-6 weeks)**
+- Verify GCC High API endpoints (ADO, Graph, eng.ms)
+- Create restricted-mode MCP servers (no public internet)
+- Document network egress requirements
+
+**Phase 3: On-Prem LLM Support (6-8 weeks)**
+- Test Copilot CLI with custom LLM endpoints
+- Document model deployment and approval process
+- Benchmark performance
+
+**Phase 4: Compliance & Audit Tooling (4-6 weeks)**
+- Implement structured logging for MCP tool invocations
+- Create audit dashboard
+- Provide compliance report templates
+
+---
+
+## Open Questions for Team
+
+1. **Technical:**
+   - Can Copilot CLI use custom Azure OpenAI endpoints (GCC High)?
+   - Which Microsoft IT teams approve binaries for SAW deployment?
+   - Are all Graph APIs available in GCC High?
+
+2. **Compliance:**
+   - Which FedRAMP controls apply to agentic systems?
+   - What data classification applies to agent-generated content?
+
+3. **Organizational:**
+   - Does security squad have GCC High test environment access?
+   - Is there appetite for a restricted-environment pilot?
+   - What teams would benefit most?
+
+---
+
+## Decision Required
+
+**Should we proceed with Phase 1 (restricted mode configuration)?**
+
+This would involve:
+- Auditing current MCP servers for network dependencies
+- Creating restricted-mode MCP config profile
+- Engaging Microsoft IT security for approval process
+
+**Next Steps:**
+- Discuss with security squad (Issue #486 meeting)
+- Assign owner for Phase 1 implementation
+- Establish timeline and success metrics
+
+---
+
+**References:**
+- Full research report: Issue #487 comment
+- Related: Issue #440 (airgapped investigation - closed)
+- Related: Issue #486 (Agency Security Squad meeting)
+
+---
+
+# Decision: Cross-Machine Agent Coordination Architecture
+
+**Date:** 2026-03-14  
+**Author:** Seven (Research & Docs)  
+**Issue:** #491 — Feature request for cross-machine coordination  
+**Status:** 📋 Proposed for Squad Review
+
+---
+
+## Problem
+
+Squad agents run on isolated machines with **no direct communication**:
+- Laptop (CPC-tamir-WCBED) — Ralph watch, main squad
+- DevBox (Microsoft Dev Box) — GPU workloads
+- Azure VMs (temp) — Large-scale GPU jobs
+
+Current workflow: Tamir manually copy-pastes work between sessions (hours of latency, error-prone).
+
+---
+
+## Decision
+
+**Adopt Hybrid Git + GitHub Issues pattern for cross-machine coordination.**
+
+### Primary Mechanism: Git-Based Task Queue
+
+Agents write task files to `.squad/cross-machine/tasks/{timestamp}-{source}-{id}.yaml`:
+- YAML format (machine-readable, version-controlled)
+- Durable (survives RDP disconnect, network outages)
+- Auditable (git commit history, signed commits)
+- Scalable (no new infrastructure)
+
+Ralph on each machine:
+1. Polls `.squad/cross-machine/tasks/` every 5-10 minutes
+2. Filters for `target_machine=HOSTNAME` and `status=pending`
+3. Validates schema + command whitelist
+4. Executes task with resource limits
+5. Writes result to `.squad/cross-machine/results/{id}.yaml`
+6. Commits & pushes (signed)
+
+### Secondary Mechanism: GitHub Issues (Ad-Hoc)
+
+For urgent/human-initiated tasks:
+- Create issue with `squad:machine-{name}` label
+- Ralph detects, executes, comments with result
+- No new infrastructure (Ralph already watches issues)
+
+### Tertiary Mechanism: OneDrive (Artifact Sharing)
+
+For large results (logs, model weights):
+- Shared OneDrive folder syncs automatically
+- Doesn't block task coordination
+- Complements, doesn't replace git
+
+---
+
+## Rationale
+
+### Why NOT the other approaches?
+
+| Approach | Why Rejected |
+|----------|-------------|
+| **Dev Tunnels** | Real-time, but tunnel daemon fragile (RDP disconnect); requires token management |
+| **Azure Service Bus** | Over-engineered for 2-3 machines; adds billing & complexity; DevBox auth challenging |
+| **OneDrive Only** | Sync non-deterministic; no audit trail; conflict handling via duplicate files |
+
+### Why Git-Based?
+
+✅ **Zero new infrastructure** — uses existing repo  
+✅ **Enterprise security** — signed commits, branch protection, audit trail  
+✅ **MS compliance** — GitHub native, SOC2 aligned  
+✅ **Immediate adoption** — uses existing Ralph watch infrastructure  
+✅ **Scalable** — works with 2 machines or 20  
+✅ **Durable** — survives network outages, RDP disconnects  
+✅ **Auditable** — git commit history immutable  
+
+---
+
+## Implementation Scope
+
+### Phase 1: Foundation (Week 1)
+- Create `.squad/cross-machine/{tasks,results}/` directories
+- Document YAML schema (task + result formats)
+- Add schema validation to Ralph
+- Update Ralph watch loop
+
+### Phase 2: Hardening (Week 2-3)
+- Resource limits (timeout, memory, CPU)
+- Execution isolation (unprivileged user)
+- Signed commit enforcement (GPG)
+- Error handling (retries, stalled tasks)
+
+### Phase 3: Adoption (Week 4)
+- Pilot laptop ↔ DevBox
+- Evaluate latency/usability
+- Scale to Azure if needed
+
+---
+
+## Success Metrics
+
+| Metric | Target | Rationale |
+|--------|--------|-----------|
+| **Task round-trip latency** | <15 min | 5-10 min polling + git push |
+| **Reliability** | 100% task delivery | Git guarantees |
+| **Audit trail** | 100% logged in git | Compliance |
+| **Security incidents** | 0 unauthorized executions | Whitelist validation |
+| **Human intervention** | 0 for routine tasks | Fully automated |
+
+---
+
+## Security Posture
+
+### Threats Mitigated
+
+| Threat | Mitigation |
+|--------|-----------|
+| Malicious task injection | Branch protection + PR review |
+| Credential leakage | Pre-commit secret scan |
+| Resource exhaustion | Timeout + memory limits |
+| Code injection | Command whitelist only |
+| Result tampering | Git immutability + signatures |
+
+### Compliance
+
+- **SOC2 Type II:** Git audit trail + GitHub Actions logs
+- **FedRAMP:** Azure artifacts use FedRAMP-compliant regions
+- **Data residency:** All data GitHub/M365 (no 3rd party)
+
+---
+
+## Trade-Offs
+
+### Accepted Latency
+- ❌ Not real-time (5-10 min polling)
+- ✅ Acceptable for scheduled workloads (GPU jobs, batch processing)
+- ⚠️ For urgent tasks, use GitHub Issues instead (same infrastructure)
+
+### Limited Concurrency
+- Current design: Sequential task execution
+- Future: Parallel execution with priority queue (Phase 2+)
+
+### Network Dependency
+- Tasks queue locally if git push fails
+- No data loss
+- Retries automatically on reconnection
+
+---
+
+## Open Questions for Squad Review
+
+1. **Polling Interval:** 5 minutes default. Should this be configurable?
+2. **Task TTL:** How long to retain result files? (default: 30 days)
+3. **GPU Availability:** Should machine A check DevBox GPU before submitting?
+4. **Serial Pipelines:** Support Machine A → B → C task chains?
+5. **Notification:** Alert when task completes?
+
+---
+
+## Next Steps
+
+1. **Squad Review:** Feedback on Phase 1 scope + security model
+2. **Ralph Integration:** Data implements Ralph watch loop changes
+3. **Testing:** Pilot with laptop ↔ DevBox (Tamir + B'Elanna)
+4. **Documentation:** Finalize skill docs + team onboarding
+
+---
+
+## References
+
+- Research Report: `research/active/cross-machine-agents/README.md`
+- Skill Documentation: `.squad/skills/cross-machine-coordination/SKILL.md`
+- GitHub Issue: #491
+- Ralph Charter: `.squad/agents/ralph/charter.md`
+- Routing Logic: `.squad/routing.md`
+
+---
+
+# Decision: Agency Security Squad Tasks — Multi-Agent Hardening Initiative
+
+**Date:** 2026-03-14
+**Author:** Seven (Research & Docs)
+**Issue:** #486 (Agency Security Squad meeting analysis)
+**Status:** 🟡 **Proposed** — Awaiting squad assignment and Tamir prioritization decision
+**Requestor:** Tamir Dresher
+**Scope:** Security Research + Strategic Communication
+
+---
+
+## Problem
+
+Microsoft's Agency Security Squad met on 2026-03-12 to discuss implementing a "chief of staff" pattern — autonomous agents making routine decisions without human intervention. The meeting raised critical concerns:
+
+1. **How do multi-agent systems stay secure?** (Prompt injection, credential exposure, lateral escalation)
+2. **What's the research gap?** (No formal security architecture for agent frameworks)
+3. **Can this approach scale to enterprise?** (Requires proven mitigations)
+
+Our Squad has already built a working proof-of-concept (Tamir's blog: *How an AI Squad Changed My Productivity* — 48-hour case study with quantified results). Now we need to:
+- **Communicate success** to Mitansh Shah (organizer) with concrete demo
+- **Harden security** by researching + designing mitigations
+- **Validate externally** with security researchers
+- **Contribute to field** by publishing our findings
+
+---
+
+## Decision: Four Parallel Workstreams
+
+### Workstream 1: Strategic Communication (Owner: Seven)
+
+**Task:** Draft communication to Mitansh Shah (mitashah@microsoft.com)
+
+**What to Include:**
+- Tamir's blog as **concrete showcase** of chief-of-staff pattern working
+- Squad Monitor demo (real-time agent activity dashboard)
+- Reference to Brady's Squad + our Squad as **production implementations** of Agency principles
+- Offer: Demo session + collaboration opportunity on security hardening
+
+**Why:** Time-sensitive. Agency team may be planning Enterprise rollout. Positioning Tamir's Squad as reference implementation opens partnership opportunities.
+
+**Acceptance Criteria:**
+- ✅ Email drafted and approved by Tamir
+- ✅ Demo link provided (Squad Monitor dashboard)
+- ✅ Collaboration proposal included
+
+**Timeline:** This week (2026-03-14 to 2026-03-20)
+
+---
+
+### Workstream 2: Prompt Injection Attack Surface (Owner: Worf with Data + Picard)
+
+**Task:** Comprehensive attack surface analysis + mitigation design for prompt injection in agent frameworks
+
+**What to Research:**
+1. **Attack Vectors (5+ scenarios):**
+   - Malicious GitHub issue comments → SQLi in query builders
+   - Poisoned .squad/ config files → arbitrary decision override
+   - Hostile PR descriptions → prompt manipulation of code review agents
+   - Environment variable injection → credential exposure
+   - Supply chain: malicious dependencies → injected instructions at runtime
+
+2. **Why Agents Are Vulnerable (vs. Traditional Apps):**
+   - Agents take external input and **make decisions on it** (not just render it)
+   - Decisions cascade through system (one compromised agent → all downstream agents)
+   - No traditional "output encoding" defense (agent is both executor and decision-maker)
+
+3. **Mitigation Strategies:**
+   - **Input Sanitization Layer**: All external inputs validated + sanitized before agent processing
+   - **Isolation Capsule Pattern**: Each agent runs with minimal required permissions (least privilege)
+   - **Decision Validation**: Decisions must pass consistency checks (signature verification, anomaly detection)
+   - **Audit Trail**: Every decision + reasoning logged for post-incident analysis
+
+4. **Proof-of-Concept:**
+   - Inject adversarial prompts into test GitHub issues
+   - Verify Ralph watch loop blocks them
+   - Document successful blocks in test report
+
+**Deliverable:** `.squad/research/prompt-injection-attack-surface.md`
+- Problem statement
+- 5+ documented attack vectors with examples
+- 4 mitigation strategies with implementation guidance
+- PoC test results
+- Recommendations for Squad + Agency framework
+
+**Timeline:** 2-3 weeks (2026-03-21 to 2026-04-04)
+
+---
+
+### Workstream 3: Multi-Agent Security Architecture (Owner: Worf with B'Elanna + Picard)
+
+**Task:** Design comprehensive security architecture for multi-agent systems
+
+**Threat Model (What We're Defending Against):**
+
+1. **Lateral Escalation**: Agent A compromised → steal Agent B's credentials/scope
+2. **Chain Reaction**: Malicious decision cascades through connected agents (one bad decision triggers cascade of dependent decisions)
+3. **Resource Exhaustion**: Rogue agent spawns infinite task loops → DoS
+4. **Data Poisoning**: Corrupt .squad/decisions.md → all future decisions based on false data
+5. **Sandbox Escape**: Local vulnerabilities → arbitrary OS-level execution
+
+**Defense Architecture (5 Layers):**
+
+**Layer 1: Network Isolation**
+- Agents communicate via authenticated channels (not shared memory/files)
+- Each agent gets isolated namespace (scheduler-dependent: Kubernetes pods, Azure Container Instances, or local process groups)
+
+**Layer 2: Ephemeral Credentials**
+- Each agent gets scoped, time-limited tokens (15-min TTL)
+- Tokens have explicit capability scopes (e.g., "read GitHub issues", "write decisions")
+- No long-lived credentials stored locally
+
+**Layer 3: Signature Verification**
+- All decisions cryptographically signed by issuing agent
+- No decision execution without valid signature
+- Enables post-breach forensics ("Which agent made this decision?")
+
+**Layer 4: Canary Deployment**
+- New agents (or updated versions) start in **read-only mode** before full access
+- Monitor behavior for 24-48 hours
+- Automatic promotion to full access if no anomalies detected
+
+**Layer 5: Circuit Breaker**
+- Monitor each agent's decision rate, error rate, resource usage
+- Automatic kill switch if agent exceeds anomaly thresholds
+- Alert Scribe + Picard for immediate investigation
+
+**Implementation Standards:**
+- Design as `.squad/standards/agent-security-architecture.md`
+- Reference existing: OpenAI evals, OWASP Agent Security guidelines
+- Include deployment patterns (Kubernetes, local, Azure Container Apps)
+- Roadmap for integration into Squad framework
+
+**Deliverable:** `.squad/standards/agent-security-architecture.md`
+- Threat model (documented)
+- 5-layer defense architecture
+- Implementation guide per deployment scenario
+- Risk assessment (residual risks after mitigations)
+- Integration roadmap
+
+**Timeline:** 3-4 weeks (2026-03-21 to 2026-04-11)
+
+---
+
+### Workstream 4: Security Researcher Outreach (Owner: Seven with Worf)
+
+**Task:** Establish collaboration with academic + industry security researchers
+
+**Who to Contact:**
+- **OWASP**: Agent Security working group (if exists, or propose creation)
+- **Microsoft Research**: AI safety + agent security teams
+- **Academia**: CMU, Stanford, MIT labs focusing on AI agent security
+- **Industry**: OpenAI, Anthropic security researchers
+- **Internal**: Microsoft Defender team (MDE.ServiceModernization — Copilot CLI assets repo)
+
+**What to Propose:**
+- Open collaboration on multi-agent security hardening
+- Squad as **testbed** for agent security patterns
+- Joint research: publish findings on prompt injection, lateral escalation defenses
+- Validation: have external researchers audit our architecture
+
+**Deliverables:**
+- Collaboration proposal document (1-2 pages)
+- Researcher contact list (20-30 key contacts)
+- Meeting notes + feedback from initial outreach
+- Joint research roadmap (if partners agree)
+
+**Timeline:** 2-3 weeks (2026-03-21 to 2026-04-04)
+
+---
+
+## Consequences
+
+✅ **If adopted:**
+- Squad becomes **reference implementation** for Agency enterprise rollout
+- Security research contributes to **field maturity** (entire industry benefits)
+- Tamir + Brady positioned as **thought leaders** in agent security
+- Partnership with Agency team → institutional credibility
+
+⚠️ **If deferred:**
+- Agency team proceeds without proven security patterns → potential enterprise risks
+- Missed partnership opportunity with Microsoft internal adoption
+- Security gaps remain in our own Squad implementation
+
+---
+
+## Dependencies
+
+- **Workstream 1** (Communication) is time-sensitive — should start immediately
+- Workstreams 2-4 can run in parallel after Tamir prioritizes
+- Communication to Mitansh may inform priority/timeline (he may have Agency roadmap constraints)
+
+---
+
+## Status Tracking
+
+| Workstream | Owner | Status | ETA |
+|------------|-------|--------|-----|
+| 1. Communication | Seven | 🟡 Proposed | 2026-03-20 |
+| 2. Prompt Injection | Worf + Data | 🟡 Proposed | 2026-04-04 |
+| 3. Arch Design | Worf + B'Elanna | 🟡 Proposed | 2026-04-11 |
+| 4. Researcher Outreach | Seven + Worf | 🟡 Proposed | 2026-04-04 |
+
+---
+
+**Decision Status:** Proposed. Awaiting Tamir prioritization and squad assignment.
+**Next Action:** Tamir to confirm: (1) Priority ranking, (2) Approval to contact Mitansh Shah, (3) Resource allocation.
+
+---
+
+# Decision: Mobile Squad Access via Discord Bot
+
+**Decision ID:** data-489-mobile-access  
+**Date:** 2026-03-14  
+**Author:** Data (Code Expert)  
+**Context:** Issue #489 — Mobile Squad Access from Android without SSH  
+
+## Decision
+
+Implement **Discord Bot with Socket Mode** as the primary mobile access solution for Squad from Android devices.
+
+## Rationale
+
+After comprehensive research of 8 viable options (Discord, Telegram, Signal, ttyd, GitHub Issues, WhatsApp Business, Matrix/Element, Custom PWA), Discord Bot provides the optimal balance of:
+
+1. **Security** — Socket Mode eliminates public exposure (no inbound ports, no firewall holes)
+2. **Mobile UX** — Native Android app with rich features (9/10 rating): slash commands, threads, embeds, reactions, code highlighting
+3. **Development Time** — 2-4 hours to MVP (reasonable investment)
+4. **Agent Routing** — Natural mapping of slash commands to squad agents (`/picard`, `/data`, `/seven`)
+5. **Maintenance** — Low overhead (stable API, mature ecosystem, 25M discord.js downloads/month)
+6. **Cost** — Free tier with no message/command/bot limits
+
+## Architecture
+
+```
+Android Discord App ◄──WebSocket (Socket Mode)──► Discord Gateway
+                                                       │
+                                                  Discord Bot
+                                                  (Node.js)
+                                                       │
+                                                  Copilot CLI
+                                                  gh copilot
+```
+
+**Key Components:**
+- **Socket Mode:** Bot connects outbound to Discord (no public webhook endpoint)
+- **Slash Commands:** Discord native routing (`/picard <task>`, `/data <task>`)
+- **Threads:** Conversation session isolation
+- **User Whitelist:** Only authorized users (Tamir) can command agents
+- **Spawn-based Integration:** Bot spawns `gh copilot --agent=X --prompt=Y` processes
+
+## Implementation Plan
+
+**Phase 1 (MVP):** 3-4 hours
+- Basic slash commands for Picard and Data
+- User ID whitelist authorization
+- Response posting to Discord threads
+- Deploy alongside Ralph on DevBox
+
+**Phase 2 (Enhanced):** 4-5 hours
+- All squad agents registered
+- Response chunking (handle >2000 char messages)
+- Reaction-based interactions
+
+**Phase 3 (Advanced):** 7 hours
+- File upload support (logs, screenshots)
+- Voice message transcription
+- Conversation context preservation
+
+**Phase 4 (Production):** 4-5 hours
+- Structured logging
+- Health checks
+- Graceful shutdown
+- Auto-restart via PM2
+
+## Security Model
+
+| Aspect | Implementation |
+|--------|----------------|
+| Authentication | Bot token (stored in `.env`, never committed) |
+| Authorization | User ID whitelist (hardcoded, only Tamir) |
+| Transport | TLS (Discord-managed) |
+| Public Exposure | Zero (Socket Mode = outbound only) |
+| Input Sanitization | Remove shell metacharacters before CLI spawn |
+| Rate Limiting | 5s cooldown between commands |
+| Server Scope | Private Discord server only |
+
+## Alternatives Considered
+
+| Option | Verdict | Reason |
+|--------|---------|--------|
+| Telegram Bot | 🥈 Strong alternative | Excellent option if team prefers Telegram (2-3h setup, 9/10 UX) |
+| Signal Bot | Privacy-first | Best security but unofficial tooling, higher maintenance |
+| ttyd Web Terminal | Quick hack | 30min setup but poor mobile UX (6/10), not chat-like |
+| GitHub Issues | ❌ Rejected | Abysmal UX (3/10), not conversational, high latency |
+| WhatsApp Business | ❌ Rejected | Costs money, approval process, overkill for personal use |
+| Matrix/Element | ❌ Rejected | 4-7 days setup, high maintenance, unnecessary complexity |
+| Custom PWA | ❌ Rejected | 4-8h build time, high maintenance, reinventing the wheel |
+
+## Success Criteria
+
+- ✅ Tamir can invoke squad agents from Android Discord app
+- ✅ Responses appear in Discord threads within 5 seconds
+- ✅ No public exposure (Socket Mode, no firewall changes)
+- ✅ Zero downtime deployment alongside Ralph
+- ✅ User authorization prevents unauthorized access
+
+## Risks & Mitigations
+
+| Risk | Mitigation |
+|------|-----------|
+| Bot token leakage | Store in `.env`, add to `.gitignore`, rotate immediately if compromised |
+| Unauthorized access | User ID whitelist, private server only |
+| Discord API rate limits | Built-in rate limiting in discord.js, 5s user cooldown |
+| Bot process crash | PM2 auto-restart, health check monitoring |
+| Prompt injection attacks | Input sanitization, escape shell metacharacters |
+
+## Dependencies
+
+- Node.js (v18+)
+- discord.js npm package
+- Discord Developer Portal account (for bot creation)
+- Private Discord server (for bot deployment)
+- Copilot CLI installed on DevBox
+- `.env` file for bot token storage
+
+## Files to Create
+
+- `discord-bridge/discord-squad-bridge.ts` — Main bot logic
+- `discord-bridge/package.json` — Dependencies
+- `discord-bridge/.env.example` — Template for environment variables
+- `discord-bridge/README.md` — Setup instructions
+- `discord-bridge/ecosystem.config.js` — PM2 configuration (optional)
+- Update `start-all-ralphs.ps1` — Include Discord bridge startup
+
+## Team Implications
+
+- **Picard (Lead):** No action needed (research phase complete)
+- **Data (Code Expert):** Implement Phase 1 MVP (owner)
+- **B'Elanna (Infrastructure):** May assist with DevBox deployment (Phase 4)
+- **Worf (Security):** Review security model, whitelist implementation
+- **Seven (Research & Docs):** Document usage guide for squad members (Phase 2+)
+
+## Next Actions
+
+1. **Create Discord bot application** (10 min) — Data
+2. **Build MVP** (3-4h) — Data
+3. **Security review** (30 min) — Worf (recommended)
+4. **Test on Android** (30 min) — Tamir
+5. **Deploy to DevBox** (30 min) — Data or B'Elanna
+6. **Document usage** (1h) — Seven (Phase 2)
+
+## References
+
+- Full Research Report: `mobile-squad-access-report.md`
+- Issue #489: https://github.com/tamirdresher_microsoft/tamresearch1/issues/489
+- Discord.js Guide: https://discordjs.guide/
+- Discord Developer Portal: https://discord.com/developers/docs
+- Bot API Comparison: See research report Section 2 (Option Comparison Matrix)
+
+## Status
+
+✅ **Decision Made** — Discord Bot recommended  
+⏳ **Implementation Pending** — Awaiting approval to start Phase 1  
+📋 **Next Step** — Tamir approval → Data builds MVP → Deploy to DevBox
+

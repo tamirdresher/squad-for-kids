@@ -785,3 +785,77 @@ Researched and analyzed implementation requirements for Hebrew podcast support t
 2. **nano-banana-mcp architecture** — Single-file TypeScript MCP server, no provider abstraction, Gemini-hardcoded
 3. **Playwright for auth flows** — Successfully used Playwright browser tools to navigate Google AI Studio, accept TOS, and retrieve API keys
 4. **MCP config location** — Copilot CLI MCP servers configured at `~/.copilot/mcp-config.json`
+### 2026-03-14: Issue #489 — Mobile Squad Access Research (COMPLETE)
+
+**Task:** Research mobile access options for Squad from Android without SSH/DevTunnel. Compare 8 viable options (Discord, Telegram, Signal, ttyd, GitHub Issues, WhatsApp Business, Matrix, PWA) across security, UX, setup time, and maintenance.
+
+**Deliverable:** Comprehensive technical research report with option comparison matrix, architecture diagrams, security analysis, code sketches, and implementation roadmap.
+
+**Recommendation:** Discord Bot with Socket Mode
+- **Setup:** 2-4 hours to MVP
+- **Security:** Excellent (zero public exposure, Socket Mode = outbound only)
+- **Mobile UX:** 9/10 (slash commands, threads, rich embeds, reactions)
+- **Agent Routing:** Natural mapping (/picard, /data, /seven)
+- **Cost:** Free tier with no limits
+- **Maintenance:** Low (stable API, large ecosystem)
+
+**Alternatives Evaluated:**
+- 🥈 **Telegram Bot** (2-3h, 9/10 UX) — Excellent alternative, simpler API
+- 🔒 **Signal Bot** (3-4h, 9/10 security) — Best-in-class privacy, unofficial tooling
+- ⚡ **ttyd** (30min, 6/10 UX) — Quick hack, poor mobile experience
+- ❌ **GitHub Issues** (1h, 3/10 UX) — Abysmal UX, not conversational
+- 💸 **WhatsApp Business** (4-6h, 10/10 UX) — Costs money, approval process
+- 🛠️ **Matrix/Element** (4-7d, 8/10 UX) — Too complex, high maintenance
+- 🎨 **Custom PWA** (4-8h, 8/10 UX) — Overkill, unnecessary complexity
+
+**Architecture Designed:**
+`
+Android Discord App ◄──WebSocket──► Discord Gateway
+                                         │
+                                    Discord Bot (Node.js)
+                                    - Parse slash commands
+                                    - Route to squad agents
+                                    - Format responses
+                                         │
+                                    Copilot CLI
+                                    gh copilot --agent=...
+`
+
+**Key Technical Decisions:**
+1. **Socket Mode over Webhooks** — No inbound ports, no firewall holes, perfect for DevBox
+2. **Slash Commands for Agents** — Discord native routing: /picard, /data, /seven
+3. **Threads for Sessions** — Conversation isolation built-in
+4. **Node.js + discord.js** — 25M downloads/month, mature ecosystem, excellent docs
+5. **User ID Whitelist** — Hard-coded auth (only Tamir can command squad)
+6. **Spawn-based Integration** — spawn('gh', ['copilot', '--agent', ...]) for CLI invocation
+
+**Security Model:**
+- Bot token in .env (never commit)
+- User ID whitelist (authorized users only)
+- Input sanitization (remove shell metacharacters)
+- Rate limiting (5s cooldown between commands)
+- Private Discord server only
+- No public exposure (Socket Mode = outbound connections)
+
+**Implementation Roadmap:**
+- **Week 1 (MVP):** 3-4h — Basic slash commands, works from Android
+- **Week 2 (Enhanced):** 4-5h — Threads, all agents, response chunking
+- **Week 3 (Advanced):** 7h — File uploads, voice transcription, context
+- **Week 4 (Production):** 4-5h — Logging, health checks, auto-restart
+
+**Files Created:**
+- mobile-squad-access-report.md (23KB) — Full technical report
+- mobile-squad-access-summary.md (8KB) — Executive summary for issue comment
+
+**Status:** ✅ RESEARCH COMPLETE. Posted [summary to issue #489](https://github.com/tamirdresher_microsoft/tamresearch1/issues/489#issuecomment-4059816540). Full report available in repo. Ready to proceed with Phase 1 implementation (awaiting approval).
+
+**Key Learnings:**
+1. **Discord Socket Mode** — WebSocket-based bot connection eliminates need for public webhook endpoints; perfect for firewalled environments
+2. **Slash Commands** — Discord native feature maps naturally to squad agent routing; better UX than text parsing
+3. **Bot API Maturity** — Discord.js and Telegram bot APIs are production-ready, well-documented, stable; Signal/Matrix still experimental/complex
+4. **Mobile Bot UX** — Native mobile apps (Discord/Telegram) provide better experience than PWA/web terminal for chat-style interactions
+5. **Security Trade-offs** — All platforms provide TLS transport; only Signal has E2E encryption; for dev workflows, TLS + user whitelist sufficient
+6. **Setup Time Variance** — Simple bots (Discord/Telegram): 2-4h; Self-hosted (Matrix): 4-7 days; highlights importance of managed platforms
+7. **Agent Routing Patterns** — Bot message → parse command → spawn CLI process → capture stdout → post response is robust pattern for CLI bridges
+8. **Free Tier Viability** — Discord, Telegram, Signal all free with no message/command limits; WhatsApp Business API requires paid tier
+

@@ -169,3 +169,134 @@ Q2 work incoming: Issue #26 (Defender-Fleet Teams chat review)
 **Deliverable:** Posted rewritten message as issue #26 comment
 
 **Lesson:** When Tamir says "my tone and style," he means casual technical chat — first person, conversational transitions, natural language, no formal structure. Think "explaining to a colleague in Teams" not "writing a security doc." Keep the technical depth but strip the formality. Short is better — condense multi-section analyses into 3-4 flowing paragraphs.
+
+### Issue #488 — Prompt Injection & Adversarial AI Defense Research (2026-03-14)
+
+**Context:** Security research for agentic AI systems (Squad framework, Agency platform 30k+ users). Requested by Tamir to analyze prompt injection, data exfiltration, and adversarial testing for multi-agent architectures.
+
+**Work Completed:**
+- ✅ Researched latest prompt injection vectors for multi-agent AI systems (2025-2026)
+- ✅ Analyzed OWASP Top 10 for LLM Applications (focus: injection, data leakage, excessive agency)
+- ✅ Reviewed MCP (Model Context Protocol) security vulnerabilities and CVEs
+- ✅ Analyzed Squad framework attack surface (coordinator, drop-box pattern, MCP tool access, history files)
+- ✅ Identified 8 critical attack vectors specific to multi-agent systems
+- ✅ Documented existing mitigations in Squad (role boundaries, reviewer gates, audit logging)
+- ✅ Identified 6 critical gaps (memory poisoning, MCP RBAC, input sanitization, real-time monitoring)
+- ✅ Created prioritized defense roadmap (Phase 1-4, immediate to strategic)
+- ✅ Designed 8 adversarial test scenarios for validation
+- ✅ Mapped Squad to OWASP Agentic AI Top 10 compliance (6/10 controls present)
+- ✅ Comprehensive report posted to issue #488
+
+**Key Findings:**
+
+**Critical Attack Vectors:**
+1. **Indirect Prompt Injection via GitHub Issues/PRs** — Malicious issue bodies can inject adversarial instructions that agents execute autonomously (🔴 CRITICAL)
+2. **Memory Poisoning via Drop-Box Pattern** — `.squad/decisions/inbox/` is append-only, agent-writable, trusted by all agents. Single compromised agent can poison all future agents persistently (🔴 CRITICAL)
+3. **MCP Tool Authority Escalation** — Agents have full access to all MCP tools. Kes (calendar) can delete GitHub repos. No least-privilege RBAC (🔴 CRITICAL)
+4. **History File Manipulation** — Agent history files are trusted, no provenance or tamper detection (🟠 HIGH)
+5. **Cross-Agent Context Propagation** — Malicious content spreads via Scribe logs, orchestration logs, decisions.md ("infectious prompt injection") (🟠 HIGH)
+6. **Session Store Poisoning** — SQLite FTS5 session store ingests all content without sanitization. Historical contamination persists (🟡 MEDIUM)
+
+**Existing Mitigations (Strong Foundation):**
+- ✅ Role-Based Access Control — Domain boundaries enforced by coordinator
+- ✅ Reviewer Gating — Lockout semantics prevent adversarial optimization loops
+- ✅ Explicit Spawn Boundaries — No inline simulation, coordinator can't generate code
+- ✅ Audit Logging — Forensic capability via Scribe + orchestration logs
+- ✅ Human-in-the-Loop — @copilot capability profile prevents autonomous security-sensitive work
+
+**Critical Gaps:**
+1. 🔴 **No input sanitization** on drop-box pattern (decisions/inbox/)
+2. 🔴 **MCP tool permissions** — no least-privilege RBAC
+3. 🔴 **History files** — no provenance or tamper detection
+4. 🟠 **Session store** — no content sanitization
+5. 🟡 **Real-time anomaly detection** — logs only useful post-incident
+6. 🟡 **Issue/PR content validation** — treated as trusted user input
+
+**Recommended Defenses (Prioritized Roadmap):**
+
+**Phase 1 — Immediate (Zero-Code, 30 days):**
+- R1: Decision review gate (human approval for security-sensitive keywords)
+- R2: MCP tool access audit (document current access matrix)
+- R3: Session store query logging (forensic capability)
+
+**Phase 2 — Near-Term (30 days):**
+- R4: Tool-level RBAC (MCP authorization with agent-to-tool permission mapping)
+- R5: History provenance chain (cryptographic signatures on history entries)
+- R6: Issue content sanitization (pre-routing scan for adversarial patterns)
+
+**Phase 3 — Strategic (90 days):**
+- R7: Real-time behavioral monitoring (anomaly detection on tool calls, context writes)
+- R8: Session store content attestation (trust scoring + provenance tagging)
+- R9: Drop-box decision validation (semantic validation before merge)
+
+**Phase 4 — Ongoing:**
+- R10: Quarterly red team exercises (Microsoft Foundry AI Red Teaming Agent)
+- R11: Vulnerability disclosure program (responsible disclosure channel)
+- R12: Continuous threat intelligence (OWASP/MCP CVE monitoring)
+
+**Adversarial Test Plan:**
+- Test 1: Malicious issue injection (verify issue sanitization)
+- Test 2: Memory poisoning via drop-box (verify decision validation)
+- Test 3: Tool authority escalation (verify MCP RBAC)
+- Test 4: History file tampering (verify provenance detection)
+- Test 5: Cross-agent context propagation (verify output sanitization)
+- Test 6: Lethal trifecta detection (verify behavioral monitoring)
+- Test 7: Session store contamination (verify historical sanitization)
+- Test 8: Reviewer escalation gaming (verify lockout limits)
+
+**OWASP Agentic AI Top 10 Compliance:**
+- Squad achieves **6/10 controls present** (Good foundation)
+- 🟢 Strong: Sensitive info disclosure, model authorization, autonomous action risk
+- 🟡 Partial: Prompt injection, insecure tool use
+- 🔴 Critical Gaps: Excessive agency, memory poisoning, tool authority escalation
+
+**Research Sources:**
+- OWASP Top 10 for LLM Applications 2025 (owasp.org)
+- CSA Agentic AI Red Teaming Guide (Cloud Security Alliance, 2026)
+- MCP Security Research (Marmelab, Microsoft, HiddenLayer, 2026)
+- CVE-2025-64439 (LangGraph RCE via persistent memory poisoning)
+- CVE-2026-25536 (MCP server spoofing)
+- arXiv 2511.15759 (Securing AI Agents Against Prompt Injection Attacks)
+- Trail of Bits: "Hijacking Multi-Agent Systems in Your PajaMAS" (2025)
+- Security Boulevard: "Infectious Prompt Injection" (2025)
+
+**Deliverable:** Comprehensive security research report posted to issue #488 (https://github.com/tamirdresher_microsoft/tamresearch1/issues/488#issuecomment-4059827911)
+
+**Next Steps:**
+1. Review with Picard (Lead) — prioritize roadmap
+2. Assign Phase 1 tasks (R1, R2, R3) to squad members
+3. Schedule red team exercise for validation
+
+**Lesson — Multi-Agent Security Paradigm Shift:**
+
+Multi-agent systems require **fundamentally different security thinking** than single-model deployments:
+
+1. **Persistent Contamination:** Unlike single-model prompt injection (ephemeral, session-scoped), multi-agent memory poisoning **persists across sessions and propagates across agents**. Drop-box patterns, history files, and session stores are high-value persistence vectors.
+
+2. **The Lethal Trifecta:** Agents with (1) private data access + (2) untrusted content exposure + (3) external tool access achieve 67% data exfiltration success rate. Squad's MCP integrations (GitHub, Azure, Teams) create this exact exposure.
+
+3. **Infectious Injection:** Malicious content spreads via agent outputs (decisions, logs, orchestration context) like a virus — compromising one agent can "infect" downstream agents without direct prompt injection. Cross-agent context sharing is both Squad's strength (collaboration) and weakness (attack surface).
+
+4. **Tool Authority Escalation:** MCP tools have broad permissions with no least-privilege enforcement. Calendar agent (Kes) can delete GitHub repos. Security agent (Worf) can send Teams messages to entire org. Need agent-to-tool RBAC, not just agent-to-domain boundaries.
+
+5. **Memory as Attack Surface:** History files, decision inbox, session store are **trusted by default**. No provenance tracking, no tamper detection, no sanitization. Append-only patterns enable "exploits that wait" — injected content triggers hours/days later when context is retrieved.
+
+6. **Reviewer Gates ≠ Defense-in-Depth:** Lockout semantics prevent adversarial optimization loops (strong!), but reviewers only see code diffs, not context contamination. Need semantic validation of decisions/history, not just output artifacts.
+
+7. **OWASP Compliance is Baseline, Not Sufficient:** Squad's 6/10 OWASP Agentic AI Top 10 coverage is **good for foundational security**, but 4 critical gaps (memory poisoning, MCP RBAC, input sanitization, real-time monitoring) expose Squad to high-severity attacks documented in 2025-2026 research.
+
+**Security Design Principles for Multi-Agent Systems:**
+
+- **Zero Trust Memory:** Treat all persistent context (history, decisions, session store) as untrusted until provenance verified
+- **Defense-in-Depth:** Layer input sanitization + tool RBAC + behavioral monitoring + human gates
+- **Least Privilege Tools:** Agent-to-tool permission mapping, not blanket MCP access
+- **Provenance Chains:** Cryptographic signatures on history entries, decision attribution, session attestation
+- **Behavioral Baselines:** Real-time anomaly detection on tool calls, context writes, cross-agent propagation patterns
+- **Adversarial Testing as Routine:** Quarterly red team exercises, not one-time audits
+
+**Strategic Takeaway:**
+
+Squad's **foundational security is strong** (role boundaries, reviewer gates, audit logging), but **memory poisoning and tool authority escalation are systemic risks** in multi-agent architectures. The recommended defense roadmap (R1-R12) addresses these gaps with **immediate zero-code mitigations (30 days)** and **strategic architectural changes (90 days)**. Risk assessment: HIGH → MEDIUM (30 days) → LOW (90 days + ongoing).
+
+The future of agentic AI security is **continuous validation, not static defenses**. Squad needs operational excellence (R10-R12) — quarterly red team, vulnerability disclosure, threat intelligence — to maintain security posture as attack landscape evolves.
+

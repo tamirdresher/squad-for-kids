@@ -956,3 +956,32 @@ Android Discord App ◄──WebSocket──► Discord Gateway
 
 **Status:** ✅ Implementation complete in PR #15. Testing confirmed hyperlinks work in both modes.
 
+
+### 2026-03-14: Issue #534 — News Reporter with Memes
+
+**Context:** Investigated why Neelix's news memes feature wasn't working today.
+
+**Root Cause:** Feature was developed on branch squad/526-neelix-images-CPC-tamir-WCBED but never merged to main. The tech-news-scanner.js script works fine but lacks image generation.
+
+**Solution Implemented:**
+- Merged image generation scripts from feature branch to main
+- `scripts/generate-news-image.ps1` — Standalone Gemini API caller for banners/memes
+- Updated `scripts/daily-rp-briefing.ps1` — Auto-generates header banner + meme per broadcast
+- Graceful degradation: Falls back to text-only if `GOOGLE_API_KEY` not set
+
+**Key Files:**
+- `scripts/generate-news-image.ps1` — New file, 169 lines, Gemini 2.0 Flash API integration
+- `scripts/daily-rp-briefing.ps1` — Modified to call image script, adds images to Adaptive Card
+- `scripts/tech-news-scanner.js` — Scans HackerNews/Reddit/MorningDew, works correctly
+
+**Image Generation Flow:**
+1. Script generates headline based on briefing content (blockers, merged PRs, activity)
+2. Calls Gemini API with styled prompt (banner, meme, or status graphic)
+3. Returns base64 data URI for inline embedding in Teams Adaptive Card
+4. Images saved to `~\Documents\nano-banana-images\neelix\`
+5. Adaptive Cards limit: 900KB per inline image (script warns if exceeded)
+
+**Tech Stack:**
+- Google Gemini 2.0 Flash Exp model with multimodal generation (TEXT + IMAGE)
+- PowerShell REST API calls to `generativelanguage.googleapis.com`
+- Adaptive Card 1.4 spec for Teams webhook integration

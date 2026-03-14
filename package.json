@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "discord.js": "^14.25.1"
+  },
   "devDependencies": {
     "@bradygaster/squad-cli": "^0.8.18",
     "edge-tts": "^1.0.1",

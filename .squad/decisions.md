@@ -23663,3 +23663,19 @@ Android Discord App ◄──WebSocket (Socket Mode)──► Discord Gateway
 ⏳ **Implementation Pending** — Awaiting approval to start Phase 1  
 📋 **Next Step** — Tamir approval → Data builds MVP → Deploy to DevBox
 
+
+---
+
+## 2026-03-14 Copilot Directive: Teams Channels Only in "squads" Team
+
+### 2026-03-14 09:19: User directive
+**By:** Tamir Dresher (via GitHub Issue #495)
+**What:** NEVER create Teams channels in any team/workspace other than the "squads" team. All Squad-related channels must go in the designated "squads" team only.
+**Why:** User request — captured for team memory. Prevents accidental channel creation in wrong workspaces.
+**Scope:** Team-wide — All agents and humans must follow this constraint.
+**Implementation:** 
+- Ralph enforces this on channel creation requests
+- Squad members always route new channels to the squads team
+- Document in team.md and routing.md for reference
+
+**Status:** ✅ **Active** — Directive closed in #495

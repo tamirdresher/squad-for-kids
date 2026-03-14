@@ -42,7 +42,8 @@ try {
     exit 1
 }
 
-Write-Host "✅ Found $($projectData.Count) items on the board"
+$items = $projectData.items
+Write-Host "✅ Found $($items.Count) items on the board"
 
 # Column emoji mapping
 $columnEmoji = @{
@@ -55,7 +56,7 @@ $columnEmoji = @{
 }
 
 # Group items by status
-$grouped = $projectData | Group-Object -Property status | Sort-Object -Property Name
+$grouped = $items | Group-Object -Property status | Sort-Object -Property Name
 
 # Build Adaptive Card
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -74,9 +75,9 @@ foreach ($group in $grouped) {
     
     # Build issue list
     $issueList = $group.Group | ForEach-Object {
-        $issueNumber = $_.content
+        $issueNumber = $_.content.number
         $issueTitle = $_.title
-        $issueUrl = "https://github.com/$($_.repository)/issues/$issueNumber"
+        $issueUrl = "https://github.com/$($_.content.repository)/issues/$issueNumber"
         "- [#$issueNumber]($issueUrl) $issueTitle"
     }
     

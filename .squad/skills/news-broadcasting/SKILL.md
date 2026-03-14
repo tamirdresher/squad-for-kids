@@ -35,6 +35,44 @@ Invoke-RestMethod -Uri $webhookUrl -Method Post -ContentType "application/json" 
 
 Or use the `workiq-ask_work_iq` tool if available in the Copilot session.
 
+## Image Generation
+
+Neelix broadcasts can include generated images — banners, memes, and status visuals — using **nano-banana** (Google Gemini).
+
+### Copilot Agent Path
+
+Call the `nano-banana-generate_image` MCP tool during broadcast composition:
+```
+Tool: nano-banana-generate_image
+prompt: "Bold news banner about {topic}, modern flat design, blue and gold, 16:9"
+output_dir: "~/Documents/nano-banana-images/neelix"
+output_name: "neelix-banner"
+```
+
+Then embed in the Adaptive Card:
+```json
+{ "type": "Image", "url": "data:image/png;base64,<data>", "altText": "Banner", "size": "Stretch" }
+```
+
+### Standalone Script Path
+
+```powershell
+$imageUri = & .\scripts\generate-news-image.ps1 -Headline "Topic" -Style "banner"
+```
+
+Requires `$env:GOOGLE_API_KEY`. The daily briefing auto-generates images unless `-SkipImages` is set.
+
+### Image Styles
+
+- **banner** — Bold headline visual for top stories
+- **meme** — Office humor illustration for lighter items
+- **status** — Dashboard/infographic for metrics
+- **custom** — Supply your own prompt via `-Prompt`
+
+### Graceful Degradation
+
+Image generation never blocks delivery. If it fails, broadcast sends text-only.
+
 ## Message Style
 
 Use Adaptive Cards or rich markdown with:

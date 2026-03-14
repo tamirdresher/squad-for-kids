@@ -59,6 +59,55 @@ Invoke-RestMethod -Uri $webhookUrl -Method Post -ContentType "application/json" 
 
 Or use the `workiq-ask_work_iq` tool if available in the Copilot session.
 
+## Image Generation
+
+Neelix can generate images (banners, memes, status visuals) for broadcasts using **nano-banana** (Google Gemini image generation).
+
+### How to Generate Images (Copilot Agent Path)
+
+When composing a broadcast inside a Copilot session, call the `nano-banana-generate_image` MCP tool:
+
+```
+Tool: nano-banana-generate_image
+prompt: "A bold news broadcast banner about CI pipeline improvements, modern flat design, blue and gold"
+output_dir: "~/Documents/nano-banana-images/neelix"
+output_name: "neelix-banner"
+```
+
+Then read the generated file, base64-encode it, and embed as an Adaptive Card Image element:
+```json
+{
+  "type": "Image",
+  "url": "data:image/png;base64,<base64-data>",
+  "altText": "News banner",
+  "size": "Stretch"
+}
+```
+
+### How to Generate Images (Standalone Script Path)
+
+The `scripts/generate-news-image.ps1` helper calls the Gemini API directly:
+```powershell
+# Requires $env:GOOGLE_API_KEY
+$imageUri = & .\scripts\generate-news-image.ps1 -Headline "Sprint velocity up 20%" -Style "banner"
+# Returns a base64 data URI ready for Adaptive Card embedding
+```
+
+The daily briefing script (`scripts/daily-rp-briefing.ps1`) automatically generates images unless `-SkipImages` is passed.
+
+### Image Styles
+
+| Style | Use For | Prompt Theme |
+|-------|---------|-------------|
+| `banner` | Headline visual for top stories | Bold, professional, blue/gold |
+| `meme` | Lighter items, fun content | Office humor, cartoon style |
+| `status` | Sprint/pipeline summaries | Dashboard, infographic style |
+| `custom` | Anything else | Supply your own prompt |
+
+### Graceful Degradation
+
+Image generation is **always optional**. If it fails (API error, no API key, timeout), the broadcast sends as text-only. Never block a news delivery on image generation.
+
 ## Teams Message Style
 
 Use Adaptive Cards or rich markdown with:

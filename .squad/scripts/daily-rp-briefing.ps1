@@ -5,7 +5,8 @@
 param(
     [string]$TeamsWebhookFile = "$env:USERPROFILE\.squad\teams-webhook.url",
     [switch]$DryRun,
-    [switch]$SkipWeekends
+    [switch]$SkipWeekends,
+    [switch]$SkipImages
 )
 
 # Fix UTF-8 encoding
@@ -23,7 +24,7 @@ if ($SkipWeekends) {
     }
 }
 
-Write-Host "🔍 Generating BasePlatformRP Daily Briefing..." -ForegroundColor Cyan
+Write-Host "≡ƒöì Generating BasePlatformRP Daily Briefing..." -ForegroundColor Cyan
 
 # ==================== DATA COLLECTION ====================
 
@@ -31,31 +32,31 @@ Write-Host "🔍 Generating BasePlatformRP Daily Briefing..." -ForegroundColor C
 $repo = "mtp-microsoft/Infra.K8s.BasePlatformRP"
 
 # 1. Open PRs
-Write-Host "  → Fetching open PRs..." -ForegroundColor Gray
+Write-Host "  ΓåÆ Fetching open PRs..." -ForegroundColor Gray
 $openPRsJson = gh pr list --repo $repo --json number,title,author,createdAt,url --limit 50 2>&1
 $openPRs = @()
 if ($LASTEXITCODE -eq 0) {
     try {
         $openPRs = $openPRsJson | ConvertFrom-Json
     } catch {
-        Write-Host "    ⚠️  Failed to parse PRs: $_" -ForegroundColor Yellow
+        Write-Host "    ΓÜá∩╕Å  Failed to parse PRs: $_" -ForegroundColor Yellow
     }
 }
 
 # 2. Open Issues (grouped by labels)
-Write-Host "  → Fetching open issues..." -ForegroundColor Gray
+Write-Host "  ΓåÆ Fetching open issues..." -ForegroundColor Gray
 $openIssuesJson = gh issue list --repo $repo --json number,title,labels,createdAt,url --limit 50 2>&1
 $openIssues = @()
 if ($LASTEXITCODE -eq 0) {
     try {
         $openIssues = $openIssuesJson | ConvertFrom-Json
     } catch {
-        Write-Host "    ⚠️  Failed to parse issues: $_" -ForegroundColor Yellow
+        Write-Host "    ΓÜá∩╕Å  Failed to parse issues: $_" -ForegroundColor Yellow
     }
 }
 
 # 3. Recent Activity (last 24h commits)
-Write-Host "  → Fetching recent commits..." -ForegroundColor Gray
+Write-Host "  ΓåÆ Fetching recent commits..." -ForegroundColor Gray
 $since = (Get-Date).AddDays(-1).ToString("yyyy-MM-ddTHH:mm:ss")
 $recentCommitsJson = gh api "/repos/$repo/commits?since=$since&per_page=50" 2>&1
 $recentCommits = @()
@@ -63,12 +64,12 @@ if ($LASTEXITCODE -eq 0) {
     try {
         $recentCommits = $recentCommitsJson | ConvertFrom-Json
     } catch {
-        Write-Host "    ⚠️  Failed to parse commits: $_" -ForegroundColor Yellow
+        Write-Host "    ΓÜá∩╕Å  Failed to parse commits: $_" -ForegroundColor Yellow
     }
 }
 
 # 4. Recently closed PRs (last 24h)
-Write-Host "  → Fetching recently closed PRs..." -ForegroundColor Gray
+Write-Host "  ΓåÆ Fetching recently closed PRs..." -ForegroundColor Gray
 $closedPRsJson = gh pr list --repo $repo --state closed --json number,title,author,closedAt,url,mergedAt --limit 20 2>&1
 $recentClosedPRs = @()
 if ($LASTEXITCODE -eq 0) {
@@ -85,13 +86,63 @@ if ($LASTEXITCODE -eq 0) {
             }
         }
     } catch {
-        Write-Host "    ⚠️  Failed to parse closed PRs: $_" -ForegroundColor Yellow
+        Write-Host "    ΓÜá∩╕Å  Failed to parse closed PRs: $_" -ForegroundColor Yellow
     }
+}
+
+# ==================== IMAGE GENERATION ====================
+
+$headerImageUri = $null
+$memeImageUri = $null
+
+if (-not $SkipImages -and $env:GOOGLE_API_KEY) {
+    Write-Host "  → Generating news images..." -ForegroundColor Magenta
+    $imageScript = Join-Path $PSScriptRoot "generate-news-image.ps1"
+
+    if (Test-Path $imageScript) {
+        # Generate header banner based on top story
+        $topStory = if ($blockers.Count -gt 0) {
+            "Critical blockers need attention"
+        } elseif ($recentClosedPRs.Count -gt 0) {
+            "PRs merged and progress made"
+        } elseif ($openPRs.Count -gt 0) {
+            "$($openPRs.Count) PRs awaiting review"
+        } else {
+            "Daily engineering status update"
+        }
+
+        try {
+            $headerImageUri = & $imageScript -Headline $topStory -Style "banner" -ErrorAction SilentlyContinue
+        } catch {
+            Write-Host "    ⚠️  Header image generation failed: $_" -ForegroundColor Yellow
+        }
+
+        # Generate a meme for lighter content (only if there's good news)
+        if ($recentClosedPRs.Count -gt 0 -or $recentCommits.Count -gt 5) {
+            $memeTheme = if ($recentClosedPRs.Count -gt 3) {
+                "Team shipping features at warp speed"
+            } elseif ($recentCommits.Count -gt 10) {
+                "Developers committing code like there is no tomorrow"
+            } else {
+                "Another productive day in engineering"
+            }
+
+            try {
+                $memeImageUri = & $imageScript -Headline $memeTheme -Style "meme" -ErrorAction SilentlyContinue
+            } catch {
+                Write-Host "    ⚠️  Meme image generation failed: $_" -ForegroundColor Yellow
+            }
+        }
+    } else {
+        Write-Host "    ⚠️  Image script not found at $imageScript" -ForegroundColor Yellow
+    }
+} elseif (-not $SkipImages) {
+    Write-Host "  ⏭️  Skipping images (GOOGLE_API_KEY not set)" -ForegroundColor Yellow
 }
 
 # ==================== FORMAT ADAPTIVE CARD ====================
 
-Write-Host "  → Formatting Teams card..." -ForegroundColor Gray
+Write-Host "  ΓåÆ Formatting Teams card..." -ForegroundColor Gray
 
 # Build sections
 $sections = @()
@@ -113,6 +164,16 @@ $sections += @{
     facts = $headerFacts
 }
 
+# Header banner image (if generated)
+if ($headerImageUri) {
+    $sections += @{
+        type = "Image"
+        url = $headerImageUri
+        altText = "News broadcast banner"
+        size = "Stretch"
+    }
+}
+
 # Section 1: Blockers
 $blockerText = "No active blockers detected"
 $blockerColor = "good"
@@ -122,13 +183,13 @@ $blockers = $openIssues | Where-Object {
 }
 if ($blockers.Count -gt 0) {
     $blockerColor = "attention"
-    $blockerItems = $blockers | ForEach-Object { "• [#$($_.number) — $($_.title)]($($_.url))" }
+    $blockerItems = $blockers | ForEach-Object { "ΓÇó [#$($_.number) ΓÇö $($_.title)]($($_.url))" }
     $blockerText = ($blockerItems -join "`n")
 }
 
 $sections += @{
     type = "TextBlock"
-    text = "**🚨 Blockers & Critical Items**"
+    text = "**≡ƒÜ¿ Blockers & Critical Items**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -143,7 +204,7 @@ $sections += @{
 # Section 2: Open PRs
 $sections += @{
     type = "TextBlock"
-    text = "**🔄 Open Pull Requests ($($openPRs.Count))**"
+    text = "**≡ƒöä Open Pull Requests ($($openPRs.Count))**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -153,7 +214,7 @@ $sections += @{
 if ($openPRs.Count -gt 0) {
     $prText = ($openPRs | ForEach-Object {
         $age = [math]::Round(((Get-Date) - [datetime]$_.createdAt).TotalDays)
-        "• [#$($_.number) — $($_.title)]($($_.url))  " +
+        "ΓÇó [#$($_.number) ΓÇö $($_.title)]($($_.url))  " +
         "_by $($_.author.login), ${age}d old_"
     }) -join "`n`n"
     $sections += @{
@@ -173,7 +234,7 @@ if ($openPRs.Count -gt 0) {
 # Section 3: Open Issues (grouped by labels)
 $sections += @{
     type = "TextBlock"
-    text = "**📋 Key Open Issues ($($openIssues.Count))**"
+    text = "**≡ƒôï Key Open Issues ($($openIssues.Count))**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -189,7 +250,7 @@ if ($openIssues.Count -gt 0) {
     $issueText = ($grouped | ForEach-Object {
         $label = $_.Name
         $items = $_.Group | Select-Object -First 5 | ForEach-Object {
-            "  • [#$($_.number) — $($_.title)]($($_.url))"
+            "  ΓÇó [#$($_.number) ΓÇö $($_.title)]($($_.url))"
         }
         "**$label** ($($_.Count)):`n" + ($items -join "`n")
     }) -join "`n`n"
@@ -211,7 +272,7 @@ if ($openIssues.Count -gt 0) {
 # Section 4: Yesterday's Activity
 $sections += @{
     type = "TextBlock"
-    text = "**📈 Yesterday's Activity**"
+    text = "**≡ƒôê Yesterday's Activity**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -225,7 +286,7 @@ if ($recentCommits.Count -gt 0) {
     $commitList = ($recentCommits | Select-Object -First 5 | ForEach-Object {
         $shortSha = $_.sha.Substring(0, 7)
         $message = $_.commit.message -split "`n" | Select-Object -First 1
-        "  • [$shortSha]($($_.html_url)) — $message _by $($_.commit.author.name)_"
+        "  ΓÇó [$shortSha]($($_.html_url)) ΓÇö $message _by $($_.commit.author.name)_"
     }) -join "`n"
     $activityItems += "**Commits ($($recentCommits.Count)):**`n$commitList"
 } else {
@@ -236,7 +297,7 @@ if ($recentCommits.Count -gt 0) {
 if ($recentClosedPRs.Count -gt 0) {
     $prList = ($recentClosedPRs | ForEach-Object {
         $status = if ($_.mergedAt) { "merged" } else { "closed" }
-        "  • [#$($_.number) — $($_.title)]($($_.url)) _($status)_"
+        "  ΓÇó [#$($_.number) ΓÇö $($_.title)]($($_.url)) _($status)_"
     }) -join "`n"
     $activityItems += "`n`n**PRs closed/merged ($($recentClosedPRs.Count)):**`n$prList"
 }
@@ -254,7 +315,7 @@ $sections += @{
 # Section 5: Loop Doc Status (placeholder)
 $sections += @{
     type = "TextBlock"
-    text = "**📄 Loop Doc Status**"
+    text = "**≡ƒôä Loop Doc Status**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -262,7 +323,7 @@ $sections += @{
 }
 $sections += @{
     type = "TextBlock"
-    text = "📌 [Check Dk8sPlatform ARM RP Loop Doc manually](https://microsoft.sharepoint.com) — _WorkIQ integration pending_"
+    text = "≡ƒôî [Check Dk8sPlatform ARM RP Loop Doc manually](https://microsoft.sharepoint.com) ΓÇö _WorkIQ integration pending_"
     wrap = $true
     isSubtle = $true
 }
@@ -270,7 +331,7 @@ $sections += @{
 # Section 6: Teams/Email Discussions (placeholder)
 $sections += @{
     type = "TextBlock"
-    text = "**💬 Recent RP Discussions**"
+    text = "**≡ƒÆ¼ Recent RP Discussions**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -278,7 +339,7 @@ $sections += @{
 }
 $sections += @{
     type = "TextBlock"
-    text = "_WorkIQ integration pending — Teams chats, emails, and calendar will be added when WorkIQ MCP is available_"
+    text = "_WorkIQ integration pending ΓÇö Teams chats, emails, and calendar will be added when WorkIQ MCP is available_"
     wrap = $true
     isSubtle = $true
 }
@@ -286,7 +347,7 @@ $sections += @{
 # Section 7: Today's Meetings (placeholder)
 $sections += @{
     type = "TextBlock"
-    text = "**📅 Today's Meetings**"
+    text = "**≡ƒôà Today's Meetings**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -294,15 +355,33 @@ $sections += @{
 }
 $sections += @{
     type = "TextBlock"
-    text = "_Calendar integration pending — will show RP/provisioning/platform meetings_"
+    text = "_Calendar integration pending ΓÇö will show RP/provisioning/platform meetings_"
     wrap = $true
     isSubtle = $true
+}
+
+# Meme / fun image (if generated)
+if ($memeImageUri) {
+    $sections += @{
+        type = "TextBlock"
+        text = "**😂 Neelix's Meme of the Day**"
+        weight = "Bolder"
+        size = "Medium"
+        wrap = $true
+        separator = $true
+    }
+    $sections += @{
+        type = "Image"
+        url = $memeImageUri
+        altText = "Daily meme"
+        size = "Large"
+    }
 }
 
 # Section 8: Action Items
 $sections += @{
     type = "TextBlock"
-    text = "**✅ Action Items**"
+    text = "**Γ£à Action Items**"
     weight = "Bolder"
     size = "Medium"
     wrap = $true
@@ -315,7 +394,7 @@ $oldPRs = $openPRs | Where-Object {
     ((Get-Date) - [datetime]$_.createdAt).TotalDays -gt 3 
 }
 if ($oldPRs.Count -gt 0) {
-    $actionItems += "**PRs awaiting review (>3 days):** $($oldPRs.Count) — [View open PRs](https://github.com/$repo/pulls)"
+    $actionItems += "**PRs awaiting review (>3 days):** $($oldPRs.Count) ΓÇö [View open PRs](https://github.com/$repo/pulls)"
 }
 
 # Blockers need attention
@@ -355,7 +434,7 @@ $card = @{
 # ==================== SEND TO TEAMS ====================
 
 if ($DryRun) {
-    Write-Host "`n✅ Dry run — card generated successfully" -ForegroundColor Green
+    Write-Host "`nΓ£à Dry run ΓÇö card generated successfully" -ForegroundColor Green
     Write-Host "Card JSON:" -ForegroundColor Cyan
     $card | ConvertTo-Json -Depth 20
     exit 0
@@ -363,24 +442,24 @@ if ($DryRun) {
 
 # Send to Teams
 if (-not (Test-Path $TeamsWebhookFile)) {
-    Write-Host "❌ Teams webhook URL not found at $TeamsWebhookFile" -ForegroundColor Red
+    Write-Host "Γ¥î Teams webhook URL not found at $TeamsWebhookFile" -ForegroundColor Red
     exit 1
 }
 
 $webhookUrl = Get-Content -Path $TeamsWebhookFile -Raw -Encoding utf8 | ForEach-Object { $_.Trim() }
 
 if ([string]::IsNullOrWhiteSpace($webhookUrl)) {
-    Write-Host "❌ Teams webhook URL is empty" -ForegroundColor Red
+    Write-Host "Γ¥î Teams webhook URL is empty" -ForegroundColor Red
     exit 1
 }
 
 try {
     $body = $card | ConvertTo-Json -Depth 20 -Compress
     $response = Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json; charset=utf-8"
-    Write-Host "✅ Daily briefing sent successfully to Teams" -ForegroundColor Green
+    Write-Host "Γ£à Daily briefing sent successfully to Teams" -ForegroundColor Green
     exit 0
 } catch {
-    Write-Host "❌ Failed to send briefing to Teams: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Γ¥î Failed to send briefing to Teams: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "Response: $($_.Exception.Response)" -ForegroundColor Yellow
     exit 1
 }

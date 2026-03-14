@@ -5,7 +5,8 @@
 param(
     [string]$TeamsWebhookFile = "$env:USERPROFILE\.squad\teams-webhook.url",
     [switch]$DryRun,
-    [switch]$SkipWeekends
+    [switch]$SkipWeekends,
+    [switch]$SkipImages
 )
 
 # Fix UTF-8 encoding
@@ -89,6 +90,56 @@ if ($LASTEXITCODE -eq 0) {
     }
 }
 
+# ==================== IMAGE GENERATION ====================
+
+$headerImageUri = $null
+$memeImageUri = $null
+
+if (-not $SkipImages -and $env:GOOGLE_API_KEY) {
+    Write-Host "  → Generating news images..." -ForegroundColor Magenta
+    $imageScript = Join-Path $PSScriptRoot "generate-news-image.ps1"
+
+    if (Test-Path $imageScript) {
+        # Generate header banner based on top story
+        $topStory = if ($blockers.Count -gt 0) {
+            "Critical blockers need attention"
+        } elseif ($recentClosedPRs.Count -gt 0) {
+            "PRs merged and progress made"
+        } elseif ($openPRs.Count -gt 0) {
+            "$($openPRs.Count) PRs awaiting review"
+        } else {
+            "Daily engineering status update"
+        }
+
+        try {
+            $headerImageUri = & $imageScript -Headline $topStory -Style "banner" -ErrorAction SilentlyContinue
+        } catch {
+            Write-Host "    ⚠️  Header image generation failed: $_" -ForegroundColor Yellow
+        }
+
+        # Generate a meme for lighter content (only if there's good news)
+        if ($recentClosedPRs.Count -gt 0 -or $recentCommits.Count -gt 5) {
+            $memeTheme = if ($recentClosedPRs.Count -gt 3) {
+                "Team shipping features at warp speed"
+            } elseif ($recentCommits.Count -gt 10) {
+                "Developers committing code like there is no tomorrow"
+            } else {
+                "Another productive day in engineering"
+            }
+
+            try {
+                $memeImageUri = & $imageScript -Headline $memeTheme -Style "meme" -ErrorAction SilentlyContinue
+            } catch {
+                Write-Host "    ⚠️  Meme image generation failed: $_" -ForegroundColor Yellow
+            }
+        }
+    } else {
+        Write-Host "    ⚠️  Image script not found at $imageScript" -ForegroundColor Yellow
+    }
+} elseif (-not $SkipImages) {
+    Write-Host "  ⏭️  Skipping images (GOOGLE_API_KEY not set)" -ForegroundColor Yellow
+}
+
 # ==================== FORMAT ADAPTIVE CARD ====================
 
 Write-Host "  ΓåÆ Formatting Teams card..." -ForegroundColor Gray
@@ -111,6 +162,16 @@ $headerFacts = @(
 $sections += @{
     type = "FactSet"
     facts = $headerFacts
+}
+
+# Header banner image (if generated)
+if ($headerImageUri) {
+    $sections += @{
+        type = "Image"
+        url = $headerImageUri
+        altText = "News broadcast banner"
+        size = "Stretch"
+    }
 }
 
 # Section 1: Blockers
@@ -297,6 +358,24 @@ $sections += @{
     text = "_Calendar integration pending ΓÇö will show RP/provisioning/platform meetings_"
     wrap = $true
     isSubtle = $true
+}
+
+# Meme / fun image (if generated)
+if ($memeImageUri) {
+    $sections += @{
+        type = "TextBlock"
+        text = "**😂 Neelix's Meme of the Day**"
+        weight = "Bolder"
+        size = "Medium"
+        wrap = $true
+        separator = $true
+    }
+    $sections += @{
+        type = "Image"
+        url = $memeImageUri
+        altText = "Daily meme"
+        size = "Large"
+    }
 }
 
 # Section 8: Action Items

@@ -33,6 +33,28 @@
 
 Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish when Tamir creates a GitHub release.
 
+### 2026-03-14: Issue #542 — GitHub EMU Auth + SRL Website Deployment
+
+**Assignment:** Set up GitHub EMU authentication on tam-research-website Azure Web App, deploy Starfleet Research Labs landing page.
+
+**Work Completed:**
+- ✅ Deployed SRL landing page to `tam-research-website.azurewebsites.net` (Node.js 20, Linux)
+- ✅ LCARS/TNG aesthetic: deep space blue #1a1a2e, amber #f5a623, combadge SVG, starfield background
+- ✅ Configured Azure App Service auth v2 via REST API (authV2 CLI extension broken)
+- ✅ Auth platform enabled, redirect to GitHub provider, token store on, scopes: read:user + read:org
+- ⏳ Pending: Tamir must create GitHub OAuth App in tamirdresher_microsoft EMU org (no API for this)
+- ✅ Issue commented with exact manual steps, labeled `status:pending-user`
+
+**Key Learnings:**
+- `az webapp auth github` commands require `authV2` extension which may fail to install (pip issues)
+- Workaround: use `az rest --method PUT` with `--body @file.json` against the authsettingsV2 REST API
+- GitHub OAuth Apps cannot be created via API — must be done in browser at org settings
+- Azure App Service v2 auth config: `platform.enabled`, `globalValidation.redirectToProvider`, `identityProviders.gitHub.registration`
+- Deploy zip to Node.js App Service: `az webapp deploy --type zip --async false`
+- Resource group: `tamirdev`, subscription: WCD_MicroServices_Staging_LBI
+
+**Status:** ⏳ Pending user action (GitHub OAuth App creation). Issue #542 labeled `status:pending-user`.
+
 ### 2026-03-12: Issue #345 — NAP System Pod Isolation (Ralph Round 1)
 
 **Assignment:** Research NAP-managed node taints for workload isolation
@@ -634,3 +656,26 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 **Result:** 24-turn, 19.3min, 22.1MB podcast. Rendered in 36min locally. Emailed to Tamir.
 
 **Key File:** scripts/f5tts-podcast-runner.py (contains all 3 monkey-patches)
+
+
+### 2026-07-08: Issue #541 — Azure App Service 401 Fix (tam-research-website)
+
+**Task:** Fix 401 Unauthorized error on https://tam-research-website.azurewebsites.net/
+
+**Investigation:**
+- App Service: tam-research-website, RG: tamirdev, East US, Running
+- Auth v1: platform.enabled=false (disabled)
+- Auth v2: platform.enabled=false BUT unauthenticatedClientAction was RedirectToLoginPage with stale AAD provider config
+- Access restrictions: Allow All (no IP blocks)
+- Site was returning HTTP 200 with default Azure welcome page at time of investigation
+
+**Root Cause:** Stale v2 auth configuration had unauthenticatedClientAction=RedirectToLoginPage with AAD identity provider settings still registered. Even with platform.enabled=false, this residual config can cause intermittent 401 redirects for users with cached AAD cookies/tokens from the Microsoft tenant.
+
+**Fix Applied:**
+- Updated v2 auth settings: unauthenticatedClientAction -> AllowAnonymous
+- Cleared stale AAD identity provider configuration
+- Verified site returns HTTP 200
+
+**Key Learning:** When disabling Azure App Service Easy Auth, always clean up BOTH the platform.enabled flag AND the globalValidation.unauthenticatedClientAction setting. Stale RedirectToLoginPage + residual AAD config can cause ghost 401s even with auth "disabled".
+
+**Status:** Complete. Issue #541 commented and closed.

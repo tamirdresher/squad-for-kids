@@ -23985,3 +23985,231 @@ Implement clickable hyperlinks using Spectre.Console's `[link=URL]text[/]` marku
 - Branch: `squad/14-clickable-hyperlinks` (pushed to origin)
 - Commits: 3c83bf0, a5d49f8
 - Tested in Windows Terminal with clickable links functional
+
+---
+
+# Decision: F5-TTS Voice Cloning Infrastructure
+
+**Date:** 2026-03-14
+**Author:** B'Elanna (DevOps/Infrastructure)
+**Status:** Implemented
+
+## Context
+
+Tamir requested real voice-cloned Hebrew podcasts using F5-TTS with voice samples from the מפתחים מחוץ לקופסא hosts (Dotan and Shahar). Initial assumption was that a GPU VM or DevBox would be needed since "this machine has no GPU."
+
+## Decision
+
+Run F5-TTS locally on the machine's RTX 500 Ada GPU (4GB VRAM) with 3 compatibility patches, avoiding cloud costs entirely.
+
+## Patches Required (Windows + torchaudio 2.10 + low RAM)
+
+1. **safetensors tensor-by-tensor loading** — Windows paging file limit prevents loading 1.2GB model at once. Load each tensor individually via `safe_open()`.
+2. **torchaudio.load → soundfile** — torchaudio 2.10 forces torchcodec which has broken DLLs on Windows. Monkey-patch to use soundfile backend.
+3. **ffmpeg PATH from imageio-ffmpeg** — F5-TTS uses Whisper for auto-transcription which needs ffmpeg. Use `imageio_ffmpeg` binary or provide non-empty `ref_text` to skip.
+
+## Alternatives Considered
+
+| Option | Status | Notes |
+|--------|--------|-------|
+| DevBox | Skipped | `az devcenter` extension install failed; DevBox GPU uncertain |
+| Azure GPU VM | Skipped | Unnecessary — local GPU works |
+| Coqui XTTS v2 | Failed | Requires Python <3.12 (we have 3.12.7) |
+| ElevenLabs | Rejected | Tamir said NO PAYING |
+| edge-tts + style transfer | Fallback | Works but not real voice cloning |
+
+## Outcome
+
+- **Output:** `hebrew-podcast-f5tts.mp3` — 24 turns, 19.3 min, 22.1 MB
+- **Runner script:** `scripts/f5tts-podcast-runner.py` — reusable for future podcasts
+- **Cost:** $0 (all local, all free/open-source)
+- **Render time:** ~36 minutes on RTX 500 Ada
+
+## Recommendations
+
+1. Keep `f5tts-podcast-runner.py` as the standard entry point for voice-cloned podcasts
+2. If upgrading torchaudio, re-test torchcodec compatibility
+3. For faster rendering, consider DevBox with dedicated GPU or Colab notebooks
+4. Reference audio quality matters — 20s mono WAV at 24kHz is the sweet spot
+
+
+---
+
+### 2026-03-14T08:41Z: User directive — Hebrew podcast MUST sound like Dotan & Shahar
+**By:** Tamir Dresher (via Copilot)
+**What:** "Make it so!!!!!" — The Hebrew podcast MUST sound like Dotan and Shahar from מפתחים מחוץ לקופסא. Generic TTS voices are NOT acceptable. Keep iterating until it sounds right. No excuses.
+**Why:** User demand — quality gate on podcast voice cloning
+
+
+---
+
+### 2026-03-14T08:56Z: User directive — Skills as universal Copilot/Claude plugins
+**By:** Tamir Dresher (via Copilot)
+**What:** The squad-skills repo should evolve into a proper plugin marketplace — not Squad-specific. Skills should work as plain Copilot custom instructions, Claude projects, or any AI agent system. The repo structure should follow a marketplace/plugin pattern that anyone can browse, install, and contribute to. Think npm for AI agent skills.
+**Why:** User vision — broader reach, not locked to Squad framework. Skills are just structured knowledge that any AI can use.
+
+
+---
+
+# Decision: Clickable Hyperlinks via Spectre.Console Markup
+
+**Date:** 2026-06-26
+**Author:** Data
+**Issue:** tamirdresher/squad-monitor#14
+
+## Decision
+
+Use Spectre.Console's `[link=URL]text[/]` markup for clickable issue/PR numbers in both Spectre.Console and SharpUI modes. No OSC 8 escape sequences needed because SharpUI's `MarkupControl` also renders Spectre markup.
+
+## Key Details
+
+- Repo slug (`owner/repo`) resolved via `gh repo view --json nameWithOwner` and cached in a `static class GitHubLinkCache` (required because Program.cs uses top-level statements which don't allow `static` field declarations)
+- Graceful fallback: if `gh` CLI unavailable or repo info can't be resolved, numbers render as plain colored text
+- Branch pushed: `squad/14-clickable-hyperlinks` — PR needs to be created via GitHub web UI (EMU auth restriction prevents `gh pr create` on personal repos)
+
+## Impact
+
+- All 8 issue/PR number rendering sites updated across Program.cs (6) and SharpUI.cs (2)
+- No breaking changes — existing visual layout preserved, just numbers become clickable in supporting terminals
+
+
+---
+
+# Decision: Squad-Monitor Feed & Token Stats Fix
+
+**Date:** 2026-03-14
+**Author:** Data (Code Expert)
+**Status:** Implemented
+
+## Context
+
+The squad-monitor TUI dashboard had two visible bugs:
+1. Live Agent Feed section was completely empty (bottom half blank)
+2. Token Usage stats showed stale numbers from 2 days ago
+
+## Root Causes
+
+### Feed Empty — Windows directory LastWriteTime bug
+The session scanning code filtered directories by `DirectoryInfo.LastWriteTime`. On Windows, this property only updates when files/directories are created or deleted directly inside the directory — NOT when existing files are modified. Active sessions with ongoing log writes appeared stale and were filtered out by the 30-minute window.
+
+### Token Stats Stale — Missing agency log source
+`BuildTokenStatsSection()` only read `~/.copilot/logs/*.log` (top-level). Active agency sessions write their `assistant_usage` and `cli.model_call` events to `~/.agency/logs/session_*/process-*.log`, which were never scanned. This caused stats to reflect only old CLI sessions.
+
+### Bonus: Markup error
+The `[ok]` icon string was interpreted as a Spectre.Console markup tag, causing an `InvalidOperationException`. Replaced with ✅ emoji.
+
+## Decision
+
+1. **Directory filtering:** Fall back to checking the most recent file's LastWriteTime inside each directory when the directory's own LastWriteTime falls outside the window
+2. **Token source expansion:** Scan both `~/.copilot/logs/*.log` AND `~/.agency/logs/session_*/process-*.log` for usage data (up to 10 most recent agency logs)
+3. **Markup safety:** Replace bracket-containing icon text with safe emoji characters
+
+## Impact
+
+- Token stats jumped from 107 opus/$642 → 1072 opus/$6583 (now includes agency session data)
+- Feed now shows 40 entries from the active agency session
+- No more markup rendering errors
+
+## Commit
+
+`32054a0` on `squad/10-session-display` branch, pushed to `tamirdresher/squad-monitor`
+
+
+---
+
+# Decision: Book PDF Graphics — Embed Diagrams from Image Plan
+
+**Date:** 2026-03-14
+**Author:** Seven (Research & Docs)
+**Issue:** #502
+**Status:** Applied (partial — code blocks embedded, rendered images pending)
+
+## Context
+
+The book PDF (research/book-the-squad-system.pdf) was delivered without any visual diagrams. Seven `[DIAGRAM:]` placeholders in chapters 2–5 were left as raw text. A comprehensive image plan existed (book-image-plan.md, ~30 figures) but was never reconciled with the chapter source files.
+
+## Decision
+
+1. Embed Mermaid diagram code and ASCII art directly into chapter markdown files, replacing all placeholder comments
+2. Regenerate the PDF from the updated source
+3. For fully rendered visual diagrams, a follow-up step is needed (pre-render Mermaid to PNG/SVG, or use a Mermaid-aware PDF pipeline)
+
+## Rationale
+
+Diagram code blocks are better than empty placeholders — readers can at least see the structure. Full rendering requires tooling decisions (mermaid-cli, pandoc+mermaid-filter) that need Tamir's input on desired output quality.
+
+## Impact
+
+- Chapters 2, 3, 4, 5 updated with embedded diagrams
+- PDF regenerated (3.16 MB)
+- Chapters 6, 7, 8 still have "Diagram Note" sections that could benefit from similar treatment
+
+
+---
+
+# SAW/GCC Squad Architecture Decision
+
+**Date:** March 2025  
+**Author:** Seven  
+**Issue:** #504  
+**PR:** #505  
+**Status:** RESEARCH COMPLETE — Ready for implementation decision
+
+---
+
+## Decision Context
+
+Researched feasibility of building a SAW/GCC-compatible Squad variant that can operate in Secure Admin Workstation and Government Community Cloud environments where internet access is blocked.
+
+## Key Research Findings
+
+1. **Azure OpenAI is Available in Gov Cloud**
+   - FedRAMP High, DoD IL4/IL5/IL6 compliance
+   - GPT-4o models available in usgovarizona and usgovvirginia
+   - Managed Identity authentication (keyless)
+
+2. **MCP stdio Transport is SAW-Compatible**
+   - No internet or network listeners required
+   - Local process communication only
+   - Compatible with AppLocker/WDAC restrictions
+
+3. **No Technical Blockers Identified**
+   - All challenges are operational (binary signing, whitelisting, manual updates)
+   - 3-4 week implementation timeline
+
+## Proposed Architecture
+
+- **Keep:** MCP stdio transport, Squad orchestration pattern, agent spawning logic
+- **Change:** Replace GitHub Copilot CLI with Azure OpenAI SDK via abstraction layer
+- **Add:** Azure Government-specific config (Managed Identity, .openai.azure.us endpoints)
+
+## Team Impact
+
+- **Picard (Lead):** Decision authority on LLM provider abstraction architecture
+- **Data (Code):** Implementation of LLM provider layer and Azure OpenAI integration
+- **Worf (Security):** Review WDAC policies, binary signing strategy, Managed Identity config
+- **B'Elanna (Infra):** Air-gapped testing environment setup in Azure Government VNet
+
+## Next Steps
+
+1. Team review of research report (research/active/saw-gcc-squad/README.md)
+2. Picard decides: Proceed with PoC implementation or defer
+3. If approved: Data implements Phase 1 (LLM abstraction + Azure OpenAI provider)
+4. Worf reviews security approach (signing, WDAC, Managed Identity)
+5. B'Elanna sets up test environment in isolated Azure Government VNet
+
+## Decision Point
+
+**Question:** Should Squad support Azure OpenAI backend for SAW/GCC environments?
+
+**Options:**
+1. **Proceed with implementation** (3-4 weeks, moderate complexity, no blockers)
+2. **Defer** (wait for customer demand signal or different approach)
+3. **Investigate alternatives** (e.g., on-prem LLM deployment)
+
+**Recommendation:** Proceed with Phase 1 PoC (1 week) to validate approach. Low risk, reversible if issues arise.
+
+---
+
+**For Team Discussion:** Does this align with Squad's goals? Is the SAW/GCC use case important enough to justify the effort?
+

@@ -1,18 +1,127 @@
 name: Squad Board Sync
 
-# Automatically move project board items to "Done" when issues are closed,
-# and reconcile board state weekly to catch drift.
-# Created as a guardrail — see issue for context.
+# Automatically manage project board:
+# - Set "Todo" on new squad issues
+# - Move to "Done" when issues close
+# - Add PRs to board with "Review" status when review is requested
+# - Reconcile board state weekly
 
 on:
   issues:
     types: [opened, closed, reopened, labeled]
+  pull_request:
+    types: [opened, review_requested, ready_for_review]
+  pull_request_review:
+    types: [submitted]
   schedule:
     # Weekly reconciliation every Sunday at 3:00 AM UTC
     - cron: '0 3 * * 0'
   workflow_dispatch: # Allow manual trigger for immediate reconciliation
 
+env:
+  PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
+  PROJECT_NUMBER: '1'
+  PROJECT_OWNER: 'tamirdresher_microsoft'
+  STATUS_FIELD_ID: 'PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc'
+  DONE_OPTION_ID: '4830e3e3'
+  TODO_OPTION_ID: '0de780a1'
+  REVIEW_OPTION_ID: '1807f788'
+
 jobs:
+  # ── Job: Track PRs on the board ──
+  track-pr:
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+    runs-on: self-hosted
+    permissions:
+      issues: read
+      pull-requests: read
+      contents: read
+
+    steps:
+      - name: Add PR to board and set status
+        shell: pwsh
+        run: |
+          $prNumber = ${{ github.event.pull_request.number || github.event.review.pull_request_number || 0 }}
+          $eventName = '${{ github.event_name }}'
+          $action = '${{ github.event.action }}'
+
+          if ($prNumber -eq 0) {
+            Write-Host "No PR number found — skipping"
+            exit 0
+          }
+
+          Write-Host "🔄 PR #$prNumber — event: $eventName/$action"
+
+          # Add PR to project board (idempotent)
+          $prUrl = "https://github.com/${{ github.repository }}/pull/$prNumber"
+          $addResult = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $prUrl 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Could not add PR to project: $addResult"
+            exit 0
+          }
+          Write-Host "✅ PR added to board"
+
+          # Find the item on the board
+          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json --limit 300 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Could not list project items"
+            exit 0
+          }
+
+          $data = $itemsJson | ConvertFrom-Json
+          # Match by PR number — PRs show up as content type PullRequest
+          $item = $data.items | Where-Object {
+            $_.content.number -eq $prNumber -and $_.content.type -eq 'PullRequest'
+          }
+
+          if (-not $item) {
+            # Fallback: match by title containing PR number
+            $item = $data.items | Where-Object { $_.content.number -eq $prNumber }
+          }
+
+          if (-not $item) {
+            Write-Host "⚠️ PR #$prNumber not found on board after adding"
+            exit 0
+          }
+
+          # Determine target status based on event
+          $targetStatus = $null
+          $targetOptionId = $null
+
+          if ($eventName -eq 'pull_request') {
+            if ($action -in @('opened', 'review_requested', 'ready_for_review')) {
+              $targetStatus = 'Review'
+              $targetOptionId = $env:REVIEW_OPTION_ID
+            }
+          }
+          elseif ($eventName -eq 'pull_request_review') {
+            $reviewState = '${{ github.event.review.state }}'
+            if ($reviewState -eq 'approved') {
+              # Leave as Review or move to Done when merged (handled by reconciliation)
+              Write-Host "✅ PR #$prNumber approved — status stays until merged"
+              exit 0
+            }
+            elseif ($reviewState -eq 'changes_requested') {
+              $targetStatus = 'In Progress'
+              $targetOptionId = '238ff87a'  # In Progress option ID
+            }
+          }
+
+          if (-not $targetStatus) {
+            Write-Host "ℹ️ No status change needed for this event"
+            exit 0
+          }
+
+          $currentStatus = $item.status
+          if ($currentStatus -eq $targetStatus) {
+            Write-Host "ℹ️ PR #$prNumber already in '$currentStatus'"
+            exit 0
+          }
+
+          Write-Host "📋 Moving PR #$prNumber from '$currentStatus' → $targetStatus"
+          gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $targetOptionId 2>&1
+          Write-Host "✅ Done"
+
   # ── Job 0: Set Todo status on new issues added to board ──
   set-todo-on-new:
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')

@@ -1,0 +1,41 @@
+# Kids Exam Schedule
+# Update this file with upcoming exams. The Mentor agent reads it daily.
+#
+# Format:
+#   Each student has a name, grade, and list of exams.
+#   Each exam has: subject, date (YYYY-MM-DD), topics list, optional materials URL, optional notes.
+#
+# Hebrew subject names are encouraged — the system supports RTL content.
+
+students:
+  - name: "ילד 1"   # Child 1 — replace with actual name
+    grade: "כיתה ז'"        # e.g., "כיתה ז'" (7th grade)
+    exams:
+      - subject: "מתמטיקה"
+        date: "2026-03-25"
+        topics:
+          - "משוואות"
+          - "שברים"
+          - "גיאומטריה"
+        materials_url: ""
+        notes: "Chapters 5-7"
+
+      - subject: "אנגלית"
+        date: "2026-04-02"
+        topics:
+          - "Reading comprehension"
+          - "Past tense"
+          - "Vocabulary unit 8"
+        materials_url: ""
+        notes: "Focus on irregular verbs"
+
+  - name: "ילד 2"   # Child 2 — replace with actual name
+    grade: "כיתה ה'"
+    exams:
+      - subject: "מדעים"
+        date: "2026-03-28"
+        topics:
+          - "מערכת העיכול"
+          - "מערכת הנשימה"
+        materials_url: ""
+        notes: "Use textbook diagrams"

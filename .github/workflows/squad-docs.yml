@@ -1,4 +1,4 @@
-name: Squad Docs — Build & Deploy
+name: Squad Docs — Build & Validate
 
 on:
   push:
@@ -6,18 +6,17 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/squad-docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.build.outputs.skip }}
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -26,40 +25,21 @@ jobs:
           node-version: '22'
 
       - name: Install build dependencies
+        shell: pwsh
         run: npm install --no-save markdown-it markdown-it-anchor
 
       - name: Build docs site
-        id: build
-        shell: bash
+        shell: pwsh
         run: |
-          if ! test -f "docs/build.js"; then
-            echo "docs/build.js not found, skipping build"
-            echo "skip=true" >> $GITHUB_OUTPUT
+          if (-not (Test-Path "docs/build.js")) {
+            Write-Output "docs/build.js not found, skipping build"
             exit 0
-          fi
+          }
           node docs/build.js --out _site --base /squad
-          if test -d "_site"; then
-            echo "Build successful, _site directory created"
-            echo "skip=false" >> $GITHUB_OUTPUT
-          else
-            echo "Build completed but no _site directory created"
-            echo "skip=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Upload Pages artifact
-        if: steps.build.outputs.skip != 'true'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: needs.build.outputs.skip != 'true'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          if (Test-Path "_site") {
+            Write-Output "Build successful — _site directory created"
+            Get-ChildItem _site -Recurse | Measure-Object | ForEach-Object { Write-Output "$($_.Count) files generated" }
+          } else {
+            Write-Error "Build completed but no _site directory created"
+            exit 1
+          }

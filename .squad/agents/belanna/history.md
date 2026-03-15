@@ -658,3 +658,20 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 **Result:** 24-turn, 19.3min, 22.1MB podcast. Rendered in 36min locally. Emailed to Tamir.
 
 **Key File:** scripts/f5tts-podcast-runner.py (contains all 3 monkey-patches)
+
+### 2026-07-16: Issue #568 — Fix Squad Docs CI (PR #570)
+
+**Problem:** PR #567 switched docs workflow runner to `ubuntu-latest`, but EMU repos disable GitHub-hosted runners. Additionally, `actions/upload-pages-artifact` requires WSL (unavailable on Windows self-hosted) and GitHub Pages deployment is not available for EMU private repos.
+
+**Fix Applied:**
+1. Switched `runs-on` back to `self-hosted` (Windows runner)
+2. Removed GitHub Pages deployment entirely (`upload-pages-artifact` + `deploy-pages`)
+3. Converted all bash scripts to `pwsh` for Windows compatibility
+4. Added `pull_request` trigger for docs path changes
+5. Reduced permissions to `contents: read` only
+
+**Key Learnings:**
+- EMU repos CANNOT use GitHub-hosted runners — always use `self-hosted`
+- GitHub Pages is not available for EMU private repos — don't attempt deployment
+- Self-hosted runner is Windows — use `shell: pwsh`, not `shell: bash`
+- `actions/upload-pages-artifact` depends on Linux/WSL — incompatible with Windows self-hosted

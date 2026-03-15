@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "commonjs",
+  "description": "Squad docs build — CommonJS scope so build.js works regardless of parent package.json"
+}

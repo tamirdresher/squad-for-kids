@@ -2,7 +2,7 @@
 
 /**
  * Tech News Scanner
- * Scans HackerNews, Reddit, and Morning Dew (alvinashcraft.com) for relevant tech stories
+ * Scans HackerNews, Reddit, Morning Dew (alvinashcraft.com), and Architecture Notes (architecturenotes.co) for relevant tech stories
  * Filters by topics: AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools
  * 
  * Deduplication:
@@ -22,7 +22,8 @@ const KEYWORDS = [
   '.net', 'dotnet', 'c#', 'csharp', 'aspnet', 'blazor',
   'golang', 'go lang',
   'kubernetes', 'k8s', 'cloud native', 'cncf',
-  'developer tools', 'devtools', 'ide', 'vscode', 'github'
+  'developer tools', 'devtools', 'ide', 'vscode', 'github',
+  'architecture'
 ];
 
 // Setup state file path
@@ -203,16 +204,62 @@ async function fetchMorningDew() {
   }
 }
 
+async function fetchArchitectureNotes() {
+  console.error('Fetching Architecture Notes (architecturenotes.co)...');
+  try {
+    const xml = await httpsGet('https://architecturenotes.co/feed');
+
+    if (typeof xml !== 'string') {
+      console.error('Unexpected response from Architecture Notes feed');
+      return [];
+    }
+
+    // Parse RSS <item> entries with simple regex
+    const items = [];
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+    let match;
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const block = match[1];
+      const title = (block.match(/<title><!\[CDATA\[(.*?)\]\]>|<title>(.*?)<\/title>/) || [])[1]
+        || (block.match(/<title>(.*?)<\/title>/) || [])[1]
+        || '';
+      const link = (block.match(/<link>(.*?)<\/link>/) || [])[1] || '';
+      const pubDate = (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || '';
+
+      if (title && link) {
+        items.push({ title: title.trim(), url: link.trim(), pubDate });
+      }
+    }
+
+    // Filter by keywords
+    const filtered = items
+      .filter(item => matchesKeywords(item.title))
+      .map(item => ({
+        title: item.title,
+        url: item.url,
+        score: 50, // base score for RSS items (no upvote data)
+        source: 'Architecture Notes'
+      }));
+
+    console.error(`Found ${filtered.length} relevant Architecture Notes items`);
+    return filtered;
+  } catch (e) {
+    console.error(`Error fetching Architecture Notes: ${e.message}`);
+    return [];
+  }
+}
+
 async function scanAllSources() {
   const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_'];
   
-  const [hnStories, morningDew, ...redditResults] = await Promise.all([
+  const [hnStories, morningDew, archNotes, ...redditResults] = await Promise.all([
     fetchHackerNews(),
     fetchMorningDew(),
+    fetchArchitectureNotes(),
     ...subreddits.map(sub => fetchReddit(sub))
   ]);
   
-  const allStories = [...hnStories, ...morningDew, ...redditResults.flat()];
+  const allStories = [...hnStories, ...morningDew, ...archNotes, ...redditResults.flat()];
   
   // Sort by score descending
   allStories.sort((a, b) => b.score - a.score);
@@ -224,7 +271,7 @@ function formatDigest(stories) {
   const date = new Date().toISOString().split('T')[0];
   
   let digest = `# Tech News Digest - ${date}\n\n`;
-  digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, and Morning Dew.\n\n`;
+  digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, Morning Dew, and Architecture Notes.\n\n`;
   digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools\n\n`;
   digest += `---\n\n`;
   

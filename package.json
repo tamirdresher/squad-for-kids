@@ -1,0 +1,16 @@
+{
+  "name": "kids-squad-setup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Squad AI team setup for kids learning to code",
+  "type": "module",
+  "scripts": {
+    "ralph": "pwsh -NoProfile -ExecutionPolicy Bypass -File ralph-watch-kids.ps1"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1"
+  },
+  "devDependencies": {
+    "@bradygaster/squad-cli": "^0.8.18"
+  }
+}

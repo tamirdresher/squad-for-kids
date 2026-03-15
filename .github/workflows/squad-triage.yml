@@ -1,0 +1,117 @@
+name: Squad Triage — ילדים
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+
+jobs:
+  triage:
+    if: github.event.label.name == 'squad'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Triage issue
+        uses: actions/github-script@v7
+        with:
+          retries: 3
+          retry-exempt-status-codes: 400,401,403,404,422
+          script: |
+            const fs = require('fs');
+            const issue = context.payload.issue;
+
+            // Read team roster
+            let teamFile = '.squad/team.md';
+            if (!fs.existsSync(teamFile)) {
+              teamFile = '.github/copilot-instructions.md';
+            }
+            if (!fs.existsSync(teamFile)) {
+              core.warning('No team file found — cannot triage');
+              return;
+            }
+
+            const content = fs.readFileSync(teamFile, 'utf8');
+
+            // Simple keyword-based triage for kids
+            const issueText = `${issue.title}\n${issue.body || ''}`.toLowerCase();
+
+            let category = 'general';
+            let emoji = '📋';
+            let suggestion = '';
+
+            if (issueText.includes('bug') || issueText.includes('שגיאה') || issueText.includes('לא עובד')) {
+              category = 'bug';
+              emoji = '🐛';
+              suggestion = 'נראה כמו באג! בואו נבדוק מה קורה ונתקן.';
+            } else if (issueText.includes('feature') || issueText.includes('תכונה') || issueText.includes('רעיון')) {
+              category = 'feature';
+              emoji = '✨';
+              suggestion = 'רעיון מעולה! בואו נחשוב איך לממש את זה.';
+            } else if (issueText.includes('homework') || issueText.includes('שיעורי בית') || issueText.includes('לימודים')) {
+              category = 'homework';
+              emoji = '📚';
+              suggestion = 'בואו נעזור עם הלימודים! נסביר צעד אחרי צעד.';
+            } else if (issueText.includes('help') || issueText.includes('עזרה') || issueText.includes('שאלה')) {
+              category = 'question';
+              emoji = '❓';
+              suggestion = 'שאלה טובה! בואו נמצא תשובה ביחד.';
+            } else if (issueText.includes('game') || issueText.includes('משחק')) {
+              category = 'game';
+              emoji = '🎮';
+              suggestion = 'פרויקט משחק — כיף! בואו נבנה משהו מגניב.';
+            }
+
+            // Add labels
+            const labels = [`type:${category}`];
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: labels
+            });
+
+            // Post friendly triage comment
+            const comment = [
+              `### ${emoji} סיווג אוטומטי`,
+              '',
+              `**Issue:** #${issue.number} — ${issue.title}`,
+              `**סוג:** ${category}`,
+              '',
+              suggestion,
+              '',
+              '---',
+              '',
+              '> 🤖 ראלף סיווג את הבקשה הזו אוטומטית.',
+              '> אם הסיווג לא נכון, שנו את הלייבלים.'
+            ].join('\n');
+
+            // Avoid duplicate comments
+            const { data: existingComments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number
+            });
+
+            const existing = existingComments.find(c => c.body.includes('סיווג אוטומטי'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
+            }
+
+            core.info(`Triaged issue #${issue.number} → ${category}`);

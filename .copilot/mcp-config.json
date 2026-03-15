@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "EXAMPLE-mermaid": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/mcp-mermaid"
+      ],
+      "disabled": true,
+      "_comment": "Uncomment to enable Mermaid diagram rendering in Copilot"
+    },
+    "EXAMPLE-github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/mcp-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "disabled": true,
+      "_comment": "GitHub integration MCP server — uncomment and set token"
+    }
+  }
+}

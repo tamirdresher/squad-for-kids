@@ -251,8 +251,9 @@ async function fetchArchitectureNotes() {
 }
 
 async function fetchThoughtWorksRadar() {
-  console.error('Fetching ThoughtWorks Radar...');
+  console.error('Fetching ThoughtWorks Technology Radar...');
   const feedUrls = [
+    'https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/tw_radar.rss',
     'https://www.thoughtworks.com/rss',
     'https://www.thoughtworks.com/radar/rss',
     'https://feeds.feedburner.com/ThoughtworksRadar'
@@ -266,7 +267,7 @@ async function fetchThoughtWorksRadar() {
         continue;
       }
 
-      // Parse RSS <item> entries with simple regex
+      // Parse RSS <item> entries with simple regex (same approach as other RSS sources)
       const items = [];
       const itemRegex = /<item>([\s\S]*?)<\/item>/g;
       let match;
@@ -293,7 +294,7 @@ async function fetchThoughtWorksRadar() {
         .map(item => ({
           title: item.title,
           url: item.url,
-          score: 50,
+          score: 75, // higher base score — curated expert content
           source: 'ThoughtWorks Radar'
         }));
 

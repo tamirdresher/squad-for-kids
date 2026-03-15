@@ -655,6 +655,18 @@ while ($true) {
         }
     }
     
+    # Process cross-machine tasks
+    $crossMachineWatcher = Join-Path $PSScriptRoot "scripts/cross-machine-watcher.ps1"
+    if (Test-Path $crossMachineWatcher) {
+        try {
+            Write-Host "[$timestamp] 🔄 Processing cross-machine tasks..." -ForegroundColor Yellow
+            & $crossMachineWatcher -GitSync
+            Write-Host "[$timestamp] ✅ Cross-machine watcher completed" -ForegroundColor Green
+        } catch {
+            Write-Host "[$timestamp] ⚠️ Cross-machine watcher failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+
     # Step 1.6: Multi-machine coordination check (Issue #346)
     Write-Host "[$timestamp] Multi-machine coordination: Checking for stale work..." -ForegroundColor Yellow
     $staleIssues = Get-StaleIssues -MachineId $machineId -StaleThresholdMinutes $staleThresholdMinutes

@@ -361,6 +361,17 @@ function Start-TaskWatcher {
     # Clean old results
     Remove-OldResults -Config $config
 
+    # Pull latest changes so tasks pushed from other machines are picked up
+    try {
+        Push-Location $Script:RepoRoot
+        git pull --ff-only 2>$null | Out-Null
+        Write-Log "INFO" "Git pull completed before task scan"
+        Pop-Location
+    } catch {
+        Write-Log "WARN" "Git pull failed before task scan: $_"
+        try { Pop-Location } catch {}
+    }
+
     # Find pending task files
     $taskFiles = Get-ChildItem -Path $Script:TaskDir -Filter "*.yaml" -ErrorAction SilentlyContinue
     if (-not $taskFiles -or $taskFiles.Count -eq 0) {

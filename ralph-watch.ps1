@@ -583,6 +583,10 @@ while ($true) {
     # Step 1: Update the repo to ensure we have the latest code
     Write-Host "[$timestamp] Pulling latest changes..." -ForegroundColor Yellow
     try {
+        # Capture hash of this script BEFORE pull (for self-restart detection)
+        $scriptPath = $MyInvocation.MyCommand.Path
+        $preUpdateHash = if ($scriptPath -and (Test-Path $scriptPath)) { (Get-FileHash $scriptPath -Algorithm SHA256).Hash } else { "" }
+
         # Fetch latest changes
         git fetch 2>$null | Out-Null
         
@@ -612,6 +616,23 @@ while ($true) {
                 Write-Host "[$timestamp] Warning: Could not restore stashed changes. Use 'git stash list' to recover." -ForegroundColor Yellow
             }
         }
+
+        # Self-restart: if ralph-watch.ps1 changed, relaunch with new code
+        $postUpdateHash = if ($scriptPath -and (Test-Path $scriptPath)) { (Get-FileHash $scriptPath -Algorithm SHA256).Hash } else { "" }
+        if ($preUpdateHash -and $postUpdateHash -and ($preUpdateHash -ne $postUpdateHash)) {
+            Write-Host "[$timestamp] ralph-watch.ps1 updated! Restarting with new code..." -ForegroundColor Magenta
+            Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures 0 -Status "SELF-RESTART" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
+            # Clean up lockfile and mutex before restart
+            Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+            if ($mutex) { try { $mutex.ReleaseMutex() } catch {} ; $mutex.Dispose() }
+            # Relaunch self in a new window
+            Start-Process pwsh.exe -ArgumentList "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $scriptPath -WorkingDirectory (Get-Location).Path -WindowStyle Normal
+            Write-Host "[$timestamp] New Ralph instance launched. This instance exiting." -ForegroundColor Magenta
+            exit 0
+        }
+
+        # Also update start-all-ralphs.ps1 and other scripts automatically via the pull
+        # (already handled by git pull above — scripts are tracked in git)
     } catch {
         Write-Host "[$timestamp] Warning: Failed to update repository: $($_.Exception.Message)" -ForegroundColor Yellow
         Write-Host "[$timestamp] Continuing with existing code..." -ForegroundColor Yellow

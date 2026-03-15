@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "poll_interval_seconds": 300,
-  "this_machine_aliases": ["TAMIRDRESHER"],
+  "this_machine_aliases": ["TAMIRDRESHER", "CPC-tamir-WCBED"],
   "max_concurrent_tasks": 2,
   "task_timeout_minutes": 60,
   "command_whitelist_patterns": [

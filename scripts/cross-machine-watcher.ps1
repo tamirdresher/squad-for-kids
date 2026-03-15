@@ -143,25 +143,68 @@ function Write-SimpleYaml {
     $lines | Set-Content -Path $Path -Encoding UTF8
 }
 
+# --- Auto-register this machine in config ---
+function Register-ThisMachine {
+    param($Config, [string]$CfgPath)
+    $hostname = $env:COMPUTERNAME
+    $aliases = @($Config.this_machine_aliases)
+    
+    if ($hostname -notin $aliases) {
+        Write-Log "INFO" "Auto-registering machine '$hostname' in cross-machine config"
+        $aliases += $hostname
+        $Config.this_machine_aliases = $aliases
+        
+        try {
+            $Config | ConvertTo-Json -Depth 5 | Set-Content -Path $CfgPath -Encoding UTF8
+            Write-Log "INFO" "Config updated — aliases now: $($aliases -join ', ')"
+            
+            # Commit the config change so other machines see it
+            Push-Location $Script:RepoRoot
+            git add $CfgPath 2>$null
+            $status = git status --porcelain $CfgPath 2>$null
+            if ($status) {
+                git commit -m "chore: auto-register $hostname in cross-machine config [automated]`n`nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>" --no-verify 2>$null
+                git push 2>$null
+                Write-Log "INFO" "Config change pushed to remote"
+            }
+            Pop-Location
+        } catch {
+            Write-Log "WARN" "Failed to persist machine registration: $_"
+            try { Pop-Location } catch {}
+        }
+    }
+}
+
 # --- Load configuration ---
 function Get-WatcherConfig {
     $cfgPath = if ($ConfigPath) { $ConfigPath } else { $Script:DefaultConfigPath }
     if (-not (Test-Path $cfgPath)) {
-        Write-Log "WARN" "Config not found at $cfgPath, using defaults"
-        return @{
+        Write-Log "WARN" "Config not found at $cfgPath, creating default config"
+        $defaultConfig = @{
             enabled = $true
             this_machine_aliases = @($env:COMPUTERNAME)
+            poll_interval_seconds = 300
             max_concurrent_tasks = 2
             task_timeout_minutes = 60
             command_whitelist_patterns = @(
                 "python scripts/*", "node scripts/*", "pwsh scripts/*",
-                "gh *", "git *"
+                "gh *", "git *", "echo *"
             )
             result_ttl_days = 30
         }
+        # Create the config file and directory
+        $cfgDir = Split-Path $cfgPath -Parent
+        if (-not (Test-Path $cfgDir)) {
+            New-Item -ItemType Directory -Path $cfgDir -Force | Out-Null
+        }
+        $defaultConfig | ConvertTo-Json -Depth 5 | Set-Content -Path $cfgPath -Encoding UTF8
+        Write-Log "INFO" "Created default config at $cfgPath with hostname $($env:COMPUTERNAME)"
+        return $defaultConfig
     }
     try {
         $config = Get-Content -Path $cfgPath -Raw | ConvertFrom-Json
+        # Auto-register this machine if not already in aliases
+        Register-ThisMachine -Config $config -CfgPath $cfgPath
         return $config
     } catch {
         Write-Log "ERROR" "Failed to parse config: $_"
@@ -192,11 +235,12 @@ function Test-TaskTargetsThisMachine {
     $target = $Task['target_machine']
     if ($target -eq 'ANY') { return $true }
 
+    # Always include actual hostname + any configured aliases
     $aliases = @($env:COMPUTERNAME)
     if ($Config.this_machine_aliases) {
         $aliases += @($Config.this_machine_aliases)
     }
-    $aliases = $aliases | ForEach-Object { $_.ToLower() }
+    $aliases = $aliases | Sort-Object -Unique | ForEach-Object { $_.ToLower() }
 
     return ($target.ToLower() -in $aliases)
 }

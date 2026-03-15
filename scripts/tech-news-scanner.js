@@ -68,13 +68,15 @@ function getTodayDate() {
 // Check if an issue already exists for today
 function issueExistsForToday(date) {
   try {
-    const searchTerm = `Tech News Digest: ${date}`;
+    const searchTerm = `Tech News Digest: ${date} in:title`;
     const output = execSync(
-      `gh issue list --state all --search "${searchTerm}" --json number --jq length`,
+      `gh issue list --state all --search "${searchTerm}" --json number,title`,
       { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
     ).trim();
-    const count = parseInt(output, 10);
-    return count > 0;
+    const issues = JSON.parse(output || '[]');
+    // Exact title match to avoid false positives from fuzzy search
+    const exactMatch = issues.some(i => i.title && i.title.includes(`Tech News Digest: ${date}`));
+    return exactMatch;
   } catch (e) {
     console.error(`Warning: Could not check for existing issues: ${e.message}`);
     return false;

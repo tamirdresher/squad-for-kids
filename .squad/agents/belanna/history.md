@@ -54,6 +54,29 @@ Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish w
 - Resource group: `tamirdev`, subscription: WCD_MicroServices_Staging_LBI
 
 **Status:** ⏳ Pending user action (GitHub OAuth App creation). Issue #542 labeled `status:pending-user`.
+### 2026-07-15: Issue #558 — Ralph Self-Healing (PR #559)
+
+**Assignment:** Add self-healing capabilities to Ralph — auto gh auth refresh + GitHub error email monitoring.
+
+**Work Completed:**
+- ✅ Created `scripts/ralph-self-heal.ps1` — automated gh auth refresh via Playwright device flow
+- ✅ Created `scripts/ralph-email-monitor.ps1` — WorkIQ-based GitHub error email monitoring
+- ✅ Integrated self-heal as pre-round check (Step -1) in `ralph-watch.ps1`
+- ✅ Added GITHUB ERROR EMAIL MONITORING section to Ralph's agency prompt
+- ✅ PR #559 opened on branch `squad/558-ralph-self-healing`
+
+**Architecture Decisions:**
+- Self-heal runs as PowerShell in ralph-watch.ps1 (not inside copilot session) — faster, no token cost
+- Email monitoring runs inside copilot session via prompt — needs WorkIQ MCP tool access
+- Device flow automation delegates to agency copilot with Playwright MCP for browser interaction
+- Alert deduplication via `squad,github-alert,{type}` label matching before issue creation
+
+**Key Files:**
+- `scripts/ralph-self-heal.ps1` — gh auth self-healing with Playwright device code flow
+- `scripts/ralph-email-monitor.ps1` — Email monitoring with WorkIQ integration patterns
+- `ralph-watch.ps1` — Integration point (Step -1 + prompt addition)
+
+**Status:** ✅ Complete. PR #559 ready for review.
 
 ### 2026-03-12: Issue #345 — NAP System Pod Isolation (Ralph Round 1)
 
@@ -704,3 +727,19 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 
 **Issue:** #542 Closed
 **Decision Documented:** .squad/decisions/inbox/belanna-oauth-app.md
+### 2026-07-16: Issue #568 — Fix Squad Docs CI (PR #570)
+
+**Problem:** PR #567 switched docs workflow runner to `ubuntu-latest`, but EMU repos disable GitHub-hosted runners. Additionally, `actions/upload-pages-artifact` requires WSL (unavailable on Windows self-hosted) and GitHub Pages deployment is not available for EMU private repos.
+
+**Fix Applied:**
+1. Switched `runs-on` back to `self-hosted` (Windows runner)
+2. Removed GitHub Pages deployment entirely (`upload-pages-artifact` + `deploy-pages`)
+3. Converted all bash scripts to `pwsh` for Windows compatibility
+4. Added `pull_request` trigger for docs path changes
+5. Reduced permissions to `contents: read` only
+
+**Key Learnings:**
+- EMU repos CANNOT use GitHub-hosted runners — always use `self-hosted`
+- GitHub Pages is not available for EMU private repos — don't attempt deployment
+- Self-hosted runner is Windows — use `shell: pwsh`, not `shell: bash`
+- `actions/upload-pages-artifact` depends on Linux/WSL — incompatible with Windows self-hosted

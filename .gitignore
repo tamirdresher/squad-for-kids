@@ -41,3 +41,7 @@ obj/
 # Squad vector DB index — regenerated from markdown source
 .squad/.db/
 .squad/chroma/
+
+# Docs build output
+_site/
+

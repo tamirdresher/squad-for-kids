@@ -1,4 +1,4 @@
-name: Squad Docs — Build & Deploy
+name: Squad Docs — Build & Validate
 
 on:
   push:
@@ -6,18 +6,17 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/squad-docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
     runs-on: self-hosted
-    outputs:
-      skip: ${{ steps.build.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,39 +25,21 @@ jobs:
           node-version: '22'
 
       - name: Install build dependencies
+        shell: pwsh
         run: npm install --no-save markdown-it markdown-it-anchor
 
       - name: Build docs site
-        id: build
+        shell: pwsh
         run: |
-          if (-not (Test-Path "docs\build.js")) {
-            Write-Host "docs/build.js not found, skipping build"
-            "skip=true" >> $env:GITHUB_OUTPUT
+          if (-not (Test-Path "docs/build.js")) {
+            Write-Output "docs/build.js not found, skipping build"
             exit 0
           }
           node docs/build.js --out _site --base /squad
           if (Test-Path "_site") {
-            Write-Host "Build successful, _site directory created"
-            "skip=false" >> $env:GITHUB_OUTPUT
+            Write-Output "Build successful — _site directory created"
+            Get-ChildItem _site -Recurse | Measure-Object | ForEach-Object { Write-Output "$($_.Count) files generated" }
           } else {
-            Write-Host "Build completed but no _site directory created"
-            "skip=true" >> $env:GITHUB_OUTPUT
+            Write-Error "Build completed but no _site directory created"
+            exit 1
           }
-
-      - name: Upload Pages artifact
-        if: steps.build.outputs.skip != 'true'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: self-hosted
-    if: needs.build.outputs.skip != 'true'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

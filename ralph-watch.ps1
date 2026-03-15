@@ -503,7 +503,7 @@ function Send-TeamsAlert {
         "@context" = "https://schema.org/extensions"
         summary = "Ralph Watch Alert: $ConsecutiveFailures Consecutive Failures"
         themeColor = "FF0000"
-        title = "⚠️ Ralph Watch Alert"
+        title = "⚠️ Ralph Watch Alert — $env:COMPUTERNAME ($(Split-Path (Get-Location) -Leaf))"
         sections = @(
             @{
                 activityTitle = "Ralph watch has experienced $ConsecutiveFailures consecutive failures"

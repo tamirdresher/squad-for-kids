@@ -8,7 +8,8 @@ on:
 jobs:
   triage:
     if: github.event.label.name == 'squad'
-    runs-on: ubuntu-latest
+    runs-
+on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write

@@ -12,7 +12,8 @@ on:
     types: [opened, review_requested, ready_for_review]
   schedule:
     # סנכרון שבועי כל יום ראשון ב-8:00 בבוקר (שעון ישראל = 5:00 UTC)
-    - cron: '0 5 * * 0'
+    - cr
+on: '0 5 * * 0'
   workflow_dispatch:
 
 env:
@@ -30,7 +31,8 @@ jobs:
       github.event_name == 'issues' &&
       (github.event.action == 'opened' || github.event.action == 'labeled') &&
       env.PLACEHOLDER != 'true'
-    runs-on: ubuntu-latest
+    runs-
+on: ubuntu-latest
     permissions:
       issues: read
       contents: read
@@ -48,7 +50,8 @@ jobs:
       github.event_name == 'issues' &&
       github.event.action == 'closed' &&
       env.PLACEHOLDER != 'true'
-    runs-on: ubuntu-latest
+    runs-
+on: ubuntu-latest
     permissions:
       issues: read
       contents: read
@@ -65,7 +68,8 @@ jobs:
     if: >
       (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
       env.PLACEHOLDER != 'true'
-    runs-on: ubuntu-latest
+    runs-
+on: ubuntu-latest
     permissions:
       issues: read
       contents: read

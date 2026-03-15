@@ -3,12 +3,14 @@ name: Squad Heartbeat — ראלף בודק דופק 💓
 on:
   schedule:
     # כל 6 שעות — בודק שהכל בסדר
-    - cron: '0 */6 * * *'
+    - cr
+on: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
   heartbeat:
-    runs-on: ubuntu-latest
+    runs-
+on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write

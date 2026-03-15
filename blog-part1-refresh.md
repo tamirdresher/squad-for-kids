@@ -10,7 +10,7 @@ series_part: 1
 > *"You will be assimilated."*
 > — The Borg, Star Trek: The Next Generation
 
-Remember [how Squad became my first productivity system that actually worked](/2026/03/10/organized-by-ai.html)? Not because I changed — because the system doesn't need me to remember. Ralph watches the queue. Scribe captures decisions. The squad runs while I sleep.
+Remember [how Squad became my first productivity system that actually worked](/blog/2026/03/10/organized-by-ai)? Not because I changed — because the system doesn't need me to remember. Ralph watches the queue. Scribe captures decisions. The squad runs while I sleep.
 
 That was three weeks ago.
 
@@ -23,7 +23,7 @@ And teammates need structure.
 
 ## From "Hey AI, Fix This" to "Team, Here's the Plan"
 
-In my [first Squad post](/2026/03/10/organized-by-ai.html), I showed you Ralph's 5-minute watch loop — checking issues, merging PRs, documenting decisions. That's still running. Still works. But I realized I was treating Squad like a better todo list when it's actually something more.
+In my [first Squad post](/blog/2026/03/10/organized-by-ai), I showed you Ralph's 5-minute watch loop — checking issues, merging PRs, documenting decisions. That's still running. Still works. But I realized I was treating Squad like a better todo list when it's actually something more.
 
 The shift happened when I stopped saying "fix the auth bug" and started saying "Team: fix the auth bug."
 
@@ -90,14 +90,14 @@ All four agents start working **simultaneously**. Data is writing the search end
 
 The first time I saw this happen, I just sat there watching the terminal scroll. Four agents, four branches of work, all moving forward at once. The Borg assimilation metaphor isn't accidental — it really does feel like a collective consciousness descending on your codebase.
 
-And remember: [I didn't have to prompt this](/2026/03/10/organized-by-ai.html). Ralph's 5-minute loop already saw the GitHub issue labeled `squad:picard`, assigned it to the team, and kicked off the work. I just woke up to four PRs in review.
+And remember: [I didn't have to prompt this](/blog/2026/03/10/organized-by-ai). Ralph's 5-minute loop already saw the GitHub issue labeled `squad:picard`, assigned it to the team, and kicked off the work. I just woke up to four PRs in review.
 
 ![Parallel execution diagram](/assets/scaling-ai-part1-first-team/parallel-execution.png)
 *Squad's parallel execution flow: one task fans out to multiple agents working simultaneously.*
 
 ## Ralph — Still Relentless
 
-I covered Ralph in my [first post](/2026/03/10/organized-by-ai.html), but I want to emphasize this: **Ralph is what makes the system work without you.**
+I covered Ralph in my [first post](/blog/2026/03/10/organized-by-ai), but I want to emphasize this: **Ralph is what makes the system work without you.**
 
 Ralph's three-layer architecture:
 
@@ -107,14 +107,14 @@ Ralph's three-layer architecture:
 
 That third layer is the game changer. I've woken up to merged PRs I never touched. Ralph saw the issue, assigned it to Data, Data fixed it, tests passed, Ralph merged it. Zero human intervention.
 
-This is what I meant in [Part 0](/2026/03/10/organized-by-ai.html) when I said "AI doesn't forget, AI doesn't need willpower." Ralph runs every 5 minutes, forever, whether you're at your desk or not. Productivity systems fail when they require remembering. Ralph doesn't require remembering.
+This is what I meant in [Part 0](/blog/2026/03/10/organized-by-ai) when I said "AI doesn't forget, AI doesn't need willpower." Ralph runs every 5 minutes, forever, whether you're at your desk or not. Productivity systems fail when they require remembering. Ralph doesn't require remembering.
 
 ![Ralph monitoring loop](/assets/scaling-ai-part1-first-team/ralph-loop.png)
 *Ralph operates at three layers: in-session, local daemon, and GitHub Actions — from interactive to fully autonomous.*
 
 ## Decisions & Memory (Institutional Knowledge That Survives)
 
-I showed you `.squad/decisions.md` in my [first post](/2026/03/10/organized-by-ai.html) — the single file where every significant decision gets captured with full reasoning, not just conclusions.
+I showed you `.squad/decisions.md` in my [first post](/blog/2026/03/10/organized-by-ai) — the single file where every significant decision gets captured with full reasoning, not just conclusions.
 
 Here's what I didn't fully understand three weeks ago: **decisions.md isn't just a log. It's the team's shared brain.**
 
@@ -128,14 +128,14 @@ Each agent also has **history.md** — their individual learning log. Data's his
 
 Then there are **skills** — reusable patterns agents discover and share. When Data figures out your project's error handling convention, he captures it as a skill. Next time Seven needs to handle errors in documentation examples, that skill is available to her. Knowledge doesn't just persist — it **flows across the team**.
 
-This is what I meant when I said Squad became [the first productivity system I didn't abandon](/2026/03/10/organized-by-ai.html). Traditional systems rely on you maintaining them. Squad maintains **itself**. The knowledge compounds.
+This is what I meant when I said Squad became [the first productivity system I didn't abandon](/blog/2026/03/10/organized-by-ai). Traditional systems rely on you maintaining them. Squad maintains **itself**. The knowledge compounds.
 
 ![Decisions and memory system](/assets/scaling-ai-part1-first-team/decisions-memory.png)
 *Squad's knowledge system: shared decisions flow to all agents, individual history builds expertise, skills transfer across the team.*
 
 ## Human Squad Members (The Feature That Changes Everything)
 
-This is where the story turns. Everything I just showed you — Picard delegating tasks, Ralph's watch loop, agents working in parallel — that's what I described in [Part 0](/2026/03/10/organized-by-ai.html). My **personal repo**. Just me and my AI team.
+This is where the story turns. Everything I just showed you — Picard delegating tasks, Ralph's watch loop, agents working in parallel — that's what I described in [Part 0](/blog/2026/03/10/organized-by-ai). My **personal repo**. Just me and my AI team.
 
 But here's the question I couldn't stop thinking about:
 
@@ -178,7 +178,7 @@ And here's where the next chapter begins: What if I added my **actual teammates*
 
 What if the work team itself became a Squad — humans and AI working together, not in parallel?
 
-That's [Part 2](/2026/03/04/scaling-ai-part2-work-team.html). And it's where things get interesting.
+That's [Part 2](/blog/2026/03/12/scaling-ai-part2-collective). And it's where things get interesting.
 
 ## Features the Squad Blogs Don't Cover (From a User's Perspective)
 
@@ -210,7 +210,7 @@ decisions.md was getting huge. After three weeks, it ballooned in token count. S
 
 ### Remote Control
 
-`squad start --tunnel` exposes your session via a devtunnel URL. Open it on your phone, and you're controlling your AI team from the couch. I built this integration and [wrote about it here](/2026/02/26/squad-remote-control.html). It's become my default way to monitor Squad — kick off work at my desk, check progress from my phone during lunch.
+`squad start --tunnel` exposes your session via a devtunnel URL. Open it on your phone, and you're controlling your AI team from the couch. I built this integration and [wrote about it here](/blog/2026/02/26/squad-remote-control). It's become my default way to monitor Squad — kick off work at my desk, check progress from my phone during lunch.
 
 ## What's Next: From Personal to Production
 
@@ -222,7 +222,7 @@ The question that kept me up at night: **Can Squad work on a real engineering te
 
 The answer turned out to be yes. But not by copy-pasting my personal setup. The breakthrough wasn't teaching Squad to work **around** my team — it was teaching Squad to work **with** them.
 
-In [Part 2: "From Personal Repo to Work Team"](/2026/03/04/scaling-ai-part2-work-team.html), I'll show you what happened when I added my actual teammates — Brady, Worf, B'Elanna — as **human squad members** to the roster. Where the AI squad members handle grunt work and the human squad members handle judgment calls. Where routing rules define when AI pauses and escalates to humans.
+In [Part 2: "From Personal Repo to Work Team"](/blog/2026/03/12/scaling-ai-part2-collective), I'll show you what happened when I added my actual teammates — Brady, Worf, B'Elanna — as **human squad members** to the roster. Where the AI squad members handle grunt work and the human squad members handle judgment calls. Where routing rules define when AI pauses and escalates to humans.
 
 Where the work team itself became a Squad — humans and AI, together.
 
@@ -231,7 +231,7 @@ Resistance is futile. Your backlog will be assimilated. 🟩⬛
 ---
 
 > 📚 **Series: Scaling Your AI Development Team**
-> - **Part 0**: [Organized by AI — How Squad Changed My Daily Workflow](/2026/03/10/organized-by-ai.html)
+> - **Part 0**: [Organized by AI — How Squad Changed My Daily Workflow](/blog/2026/03/10/organized-by-ai)
 > - **Part 1**: Resistance is Futile — Your First AI Engineering Team ← You are here
-> - **Part 2**: [From Personal Repo to Work Team — Scaling Squad to Production](/2026/03/04/scaling-ai-part2-work-team.html)
+> - **Part 2**: [From Personal Repo to Work Team — Scaling Squad to Production](/blog/2026/03/12/scaling-ai-part2-collective)
 > - **Part 3**: Coming soon — Organizational Knowledge for AI Teams

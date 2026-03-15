@@ -7,7 +7,7 @@ series: "Scaling AI-Native Software Engineering"
 series_part: 2
 ---
 
-By now you know the story. In [Part 0](/2026/03/10/organized-by-ai.html), I told you how Squad became the first productivity system I didn't abandon after three days. In [Part 1](/2026/03/04/scaling-ai-part1-first-team.html), you saw how Ralph and my Star Trek crew assimilated my backlog while I slept.
+By now you know the story. In [Part 0](/blog/2026/03/10/organized-by-ai), I told you how Squad became the first productivity system I didn't abandon after three days. In [Part 1](/blog/2026/03/11/scaling-ai-part1-first-team), you saw how Ralph and my Star Trek crew assimilated my backlog while I slept.
 
 That was the personal repo. My playground. My experimental sandbox where Picard could make architecture decisions at 2 AM and nobody would complain.
 
@@ -318,7 +318,7 @@ But we're already seeing the next challenge:
 
 In Part 3, I'll cover **Squad upstreams** — how we're building a hierarchy of shared knowledge across teams, so that organizational context propagates down to every Squad without manual copy-paste.
 
-From personal repo ([Part 0: Organized by AI](/2026/03/10/organized-by-ai.html)) to personal AI team ([Part 1: Resistance is Futile](/2026/03/04/scaling-ai-part1-first-team.html)) to work team (this post) to organizational scale (coming next).
+From personal repo ([Part 0: Organized by AI](/blog/2026/03/10/organized-by-ai)) to personal AI team ([Part 1: Resistance is Futile](/blog/2026/03/11/scaling-ai-part1-first-team)) to work team (this post) to organizational scale (coming next).
 
 The assimilation continues. 🖖
 
@@ -328,7 +328,7 @@ The assimilation continues. 🖖
 ---
 
 > 📚 **Series: Scaling Your AI Development Team**
-> - **Part 0**: [Organized by AI — How Squad Changed My Daily Workflow](/2026/03/10/organized-by-ai.html)
-> - **Part 1**: [Resistance is Futile — Your First AI Engineering Team](/2026/03/04/scaling-ai-part1-first-team.html)
+> - **Part 0**: [Organized by AI — How Squad Changed My Daily Workflow](/blog/2026/03/10/organized-by-ai)
+> - **Part 1**: [Resistance is Futile — Your First AI Engineering Team](/blog/2026/03/11/scaling-ai-part1-first-team)
 > - **Part 2**: From Personal Repo to Work Team — Scaling Squad to Production ← You are here
 > - **Part 3**: Coming soon — Organizational Knowledge for AI Teams

@@ -7,7 +7,7 @@ series: "Scaling AI-Native Software Engineering"
 series_part: 1
 ---
 
-Remember [how Squad became my first productivity system that actually worked](/2026/03/10/organized-by-ai.html)? Not because I changed — because the system doesn't need me to remember. Ralph watches the queue. Decisions get captured. The squad runs while I sleep.
+Remember [how Squad became my first productivity system that actually worked](/blog/2026/03/10/organized-by-ai)? Not because I changed — because the system doesn't need me to remember. Ralph watches the queue. Decisions get captured. The squad runs while I sleep.
 
 That was my personal productivity breakthrough. AI that doesn't forget. AI that doesn't need willpower.
 
@@ -20,7 +20,7 @@ And teams need more than prompts. They need onboarding. Structure. Knowledge. Co
 
 ## From "Hey AI, Fix This" to "Team, Here's the Plan"
 
-In my [Part 0 post](/2026/03/10/organized-by-ai.html), I showed you Ralph's 5-minute watch loop — checking issues, merging PRs, documenting decisions. That's still running. Still works.
+In my [Part 0 post](/blog/2026/03/10/organized-by-ai), I showed you Ralph's 5-minute watch loop — checking issues, merging PRs, documenting decisions. That's still running. Still works.
 
 But I realized I was treating Squad like a better todo list when it's actually something more.
 
@@ -104,11 +104,11 @@ All four agents start working **simultaneously**. Data is writing the search end
 
 The first time I saw this happen, I just sat there watching the terminal scroll. Four agents, four branches of work, all moving forward at once. The Borg assimilation metaphor isn't accidental — it really does feel like a collective consciousness descending on your codebase.
 
-And remember: [I didn't have to prompt this](/2026/03/10/organized-by-ai.html). Ralph's 5-minute loop already saw the GitHub issue labeled `squad:picard`, assigned it to the team, and kicked off the work. I just woke up to four PRs in review.
+And remember: [I didn't have to prompt this](/blog/2026/03/10/organized-by-ai). Ralph's 5-minute loop already saw the GitHub issue labeled `squad:picard`, assigned it to the team, and kicked off the work. I just woke up to four PRs in review.
 
 ## Ralph — Still Relentless
 
-I covered Ralph in my [Part 0 post](/2026/03/10/organized-by-ai.html), but I want to emphasize this: **Ralph is what makes the system work without you.**
+I covered Ralph in my [Part 0 post](/blog/2026/03/10/organized-by-ai), but I want to emphasize this: **Ralph is what makes the system work without you.**
 
 Ralph's three-layer architecture:
 
@@ -118,11 +118,11 @@ Ralph's three-layer architecture:
 
 That third layer is the game changer. I've woken up to merged PRs I never touched. Ralph saw the issue, assigned it to Data, Data fixed it, tests passed, Ralph merged it. Zero human intervention.
 
-This is what I meant in [Part 0](/2026/03/10/organized-by-ai.html) when I said "AI doesn't forget, AI doesn't need willpower." Ralph runs every 5 minutes, forever, whether you're at your desk or not. Productivity systems fail when they require remembering. Ralph doesn't require remembering.
+This is what I meant in [Part 0](/blog/2026/03/10/organized-by-ai) when I said "AI doesn't forget, AI doesn't need willpower." Ralph runs every 5 minutes, forever, whether you're at your desk or not. Productivity systems fail when they require remembering. Ralph doesn't require remembering.
 
 ## Decisions & Memory (Institutional Knowledge That Survives)
 
-I showed you `.squad/decisions.md` in my [Part 0 post](/2026/03/10/organized-by-ai.html) — the single file where every significant decision gets captured with full reasoning, not just conclusions.
+I showed you `.squad/decisions.md` in my [Part 0 post](/blog/2026/03/10/organized-by-ai) — the single file where every significant decision gets captured with full reasoning, not just conclusions.
 
 Here's what I didn't fully understand at first: **decisions.md isn't just a log. It's the team's shared brain.**
 
@@ -136,7 +136,7 @@ Each agent also has **history.md** — their individual learning log. Data's his
 
 Then there are **skills** — reusable patterns agents discover and share. When Data figures out your project's error handling convention, he captures it as a skill. Next time Seven needs to handle errors in documentation examples, that skill is available to her. Knowledge doesn't just persist — it **flows across the team**.
 
-This is what I meant when I said Squad became [the first productivity system I didn't abandon](/2026/03/10/organized-by-ai.html). Traditional systems rely on you maintaining them. Squad maintains **itself**. The knowledge compounds.
+This is what I meant when I said Squad became [the first productivity system I didn't abandon](/blog/2026/03/10/organized-by-ai). Traditional systems rely on you maintaining them. Squad maintains **itself**. The knowledge compounds.
 
 ## Adding More Expertise (When the Defaults Aren't Enough)
 
@@ -179,7 +179,7 @@ Resistance is futile. Your backlog will be assimilated. 🟩⬛
 ---
 
 > 📚 **Series: Scaling Your AI Development Team**
-> - **Part 0**: [Organized by AI — How Squad Changed My Daily Workflow](/2026/03/10/organized-by-ai.html)
+> - **Part 0**: [Organized by AI — How Squad Changed My Daily Workflow](/blog/2026/03/10/organized-by-ai)
 > - **Part 1**: Resistance is Futile — Your First AI Engineering Team ← You are here
 > - **Part 2**: Coming soon — From Personal Repo to Work Team
 > - **Part 3**: Coming soon — Organizational Knowledge for AI Teams

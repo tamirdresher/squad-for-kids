@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 המשחק שלי — Kids Squad</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 { margin: 10px 0; font-size: 1.8em; }
+
+        .game-info {
+            display: flex;
+            gap: 30px;
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+
+        .game-info span {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+
+        canvas {
+            border: 3px solid #e94560;
+            border-radius: 10px;
+            background: #16213e;
+            margin: 10px 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .controls button:hover { background: #c23152; }
+
+        .instructions {
+            background: rgba(255,255,255,0.05);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .instructions kbd {
+            background: #e94560;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎮 מרוץ בחלל</h1>
+
+<div class="game-info">
+    <span>⭐ ניקוד: <strong id="score">0</strong></span>
+    <span>❤️ חיים: <strong id="lives">3</strong></span>
+    <span>🏆 שיא: <strong id="highScore">0</strong></span>
+</div>
+
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+
+<div class="controls">
+    <button onclick="startGame()">🚀 התחל משחק</button>
+    <button onclick="pauseGame()">⏸️ הפסקה</button>
+</div>
+
+<div class="instructions">
+    <strong>🎮 איך משחקים:</strong><br>
+    <kbd>←</kbd> <kbd>→</kbd> להזיז את החללית |
+    <kbd>רווח</kbd> לירות |
+    <kbd>P</kbd> הפסקה<br>
+    <br>
+    💡 <em>רוצה לשנות את המשחק? תגיד למתכנת: "מתכנת, תוסיף כוח-על לחללית!"</em>
+</div>
+
+<script>
+    // 🎮 שלד משחק — מרוץ בחלל
+    // אפשר לשנות הכל! תשאל את המתכנת לעזרה
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // ===== הגדרות משחק — שנה את המספרים! =====
+    const PLAYER_SPEED = 5;      // מהירות השחקן
+    const BULLET_SPEED = 7;      // מהירות הכדורים
+    const ENEMY_SPEED = 2;       // מהירות האויבים
+    const SPAWN_RATE = 60;       // כל כמה פריימים מופיע אויב (מספר קטן = יותר קשה)
+    const STAR_COUNT = 50;       // כמה כוכבים ברקע
+
+    // ===== אובייקטי משחק =====
+    let player = { x: 270, y: 350, width: 40, height: 40 };
+    let bullets = [];
+    let enemies = [];
+    let stars = [];
+    let score = 0;
+    let lives = 3;
+    let highScore = parseInt(localStorage.getItem('kidsSquadHighScore') || '0');
+    let gameRunning = false;
+    let gamePaused = false;
+    let frameCount = 0;
+
+    // מקשים שנלחצים
+    let keys = {};
+
+    // ===== יצירת כוכבים ברקע =====
+    function createStars() {
+        stars = [];
+        for (let i = 0; i < STAR_COUNT; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 1,
+                speed: Math.random() * 1 + 0.5
+            });
+        }
+    }
+
+    // ===== ציור =====
+    function drawStars() {
+        ctx.fillStyle = 'white';
+        for (const star of stars) {
+            ctx.fillRect(star.x, star.y, star.size, star.size);
+        }
+    }
+
+    function drawPlayer() {
+        // חללית פשוטה — אפשר לשנות לאימוג'י!
+        ctx.font = '35px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🚀', player.x + player.width / 2, player.y + player.height);
+    }
+
+    function drawBullets() {
+        ctx.fillStyle = '#00ff88';
+        for (const bullet of bullets) {
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function drawEnemies() {
+        ctx.font = '30px serif';
+        ctx.textAlign = 'center';
+        for (const enemy of enemies) {
+            // אויבים שונים — אפשר להוסיף עוד!
+            const enemyTypes = ['👾', '🛸', '☄️', '🌑'];
+            const emoji = enemyTypes[enemy.type % enemyTypes.length];
+            ctx.fillText(emoji, enemy.x + 15, enemy.y + 30);
+        }
+    }
+
+    function drawUI() {
+        document.getElementById('score').textContent = score;
+        document.getElementById('lives').textContent = lives;
+        document.getElementById('highScore').textContent = highScore;
+    }
+
+    // ===== לוגיקת משחק =====
+    function update() {
+        if (!gameRunning || gamePaused) return;
+        frameCount++;
+
+        // הזז כוכבים
+        for (const star of stars) {
+            star.y += star.speed;
+            if (star.y > canvas.height) {
+                star.y = 0;
+                star.x = Math.random() * canvas.width;
+            }
+        }
+
+        // הזז שחקן
+        if (keys['ArrowLeft'] && player.x > 0) player.x -= PLAYER_SPEED;
+        if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += PLAYER_SPEED;
+
+        // הזז כדורים
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            bullets[i].y -= BULLET_SPEED;
+            if (bullets[i].y < 0) bullets.splice(i, 1);
+        }
+
+        // צור אויבים
+        if (frameCount % SPAWN_RATE === 0) {
+            enemies.push({
+                x: Math.random() * (canvas.width - 30),
+                y: -30,
+                width: 30,
+                height: 30,
+                type: Math.floor(Math.random() * 4)
+            });
+        }
+
+        // הזז אויבים
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            enemies[i].y += ENEMY_SPEED;
+
+            // אויב יצא מהמסך
+            if (enemies[i].y > canvas.height) {
+                enemies.splice(i, 1);
+                lives--;
+                if (lives <= 0) gameOver();
+                continue;
+            }
+
+            // בדוק פגיעת כדור באויב
+            for (let j = bullets.length - 1; j >= 0; j--) {
+                if (
+                    bullets[j].x > enemies[i].x &&
+                    bullets[j].x < enemies[i].x + enemies[i].width &&
+                    bullets[j].y > enemies[i].y &&
+                    bullets[j].y < enemies[i].y + enemies[i].height
+                ) {
+                    enemies.splice(i, 1);
+                    bullets.splice(j, 1);
+                    score += 10;
+                    break;
+                }
+            }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawStars();
+
+        if (!gameRunning) {
+            // מסך פתיחה
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🚀 מרוץ בחלל', canvas.width / 2, 150);
+            ctx.font = '18px Arial';
+            ctx.fillText('לחץ "התחל משחק" כדי לשחק!', canvas.width / 2, 200);
+            ctx.fillText('⬅️ ➡️ להזיז | רווח לירות', canvas.width / 2, 240);
+            return;
+        }
+
+        if (gamePaused) {
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('⏸️ הפסקה', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+
+        drawPlayer();
+        drawBullets();
+        drawEnemies();
+        drawUI();
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+        player = { x: 270, y: 350, width: 40, height: 40 };
+        bullets = [];
+        enemies = [];
+        score = 0;
+        lives = 3;
+        frameCount = 0;
+        gameRunning = true;
+        gamePaused = false;
+    }
+
+    function pauseGame() {
+        gamePaused = !gamePaused;
+    }
+
+    function gameOver() {
+        gameRunning = false;
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('kidsSquadHighScore', highScore.toString());
+        }
+        alert(`🎮 המשחק נגמר!\n⭐ ניקוד: ${score}\n🏆 שיא: ${highScore}\n\nלחץ "התחל משחק" כדי לנסות שוב!`);
+    }
+
+    // ===== מקלדת =====
+    document.addEventListener('keydown', (e) => {
+        keys[e.key] = true;
+        if (e.key === ' ' && gameRunning && !gamePaused) {
+            e.preventDefault();
+            bullets.push({ x: player.x + player.width / 2, y: player.y });
+        }
+        if (e.key === 'p' || e.key === 'P') pauseGame();
+    });
+
+    document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+    // ===== התחלה =====
+    createStars();
+    document.getElementById('highScore').textContent = highScore;
+    gameLoop();
+
+    // 🎓 רוצה לשפר את המשחק? תגיד למתכנת:
+    // "מתכנת, תוסיף בוסים למשחק!"
+    // "מתכנת, תוסיף כוח-על שהורג את כל האויבים!"
+    // "מעצב, תשנה את הצבעים למשהו יותר מגניב!"
+</script>
+
+</body>
+</html>

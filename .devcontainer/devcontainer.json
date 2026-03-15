@@ -1,0 +1,70 @@
+{
+  "name": "Kids Squad 🎓 — סביבת פיתוח לילדים",
+  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "MS-CEINTL.vscode-language-pack-he",
+        "ritwickdey.LiveServer",
+        "esbenp.prettier-vscode",
+        "formulahendry.auto-rename-tag",
+        "ms-python.python",
+        "dbaeumer.vscode-eslint",
+        "PKief.material-icon-theme",
+        "oderwat.indent-rainbow",
+        "streetsidesoftware.code-spell-checker-hebrew"
+      ],
+      "settings": {
+        "editor.fontSize": 16,
+        "editor.fontFamily": "'Cascadia Code', 'Fira Code', Consolas, monospace",
+        "editor.fontLigatures": true,
+        "editor.minimap.enabled": false,
+        "editor.wordWrap": "on",
+        "editor.formatOnSave": true,
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": true,
+        "workbench.colorTheme": "Default Dark Modern",
+        "workbench.iconTheme": "material-icon-theme",
+        "terminal.integrated.fontSize": 15,
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000,
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "liveServer.settings.doNotShowInfoMsg": true,
+        "chat.welcomeMessage": "enabled"
+      }
+    }
+  },
+
+  "forwardPorts": [3000, 5500, 8080],
+  "portsAttributes": {
+    "3000": { "label": "🎮 המשחק שלי", "onAutoForward": "openBrowser" },
+    "5500": { "label": "🌐 Live Server", "onAutoForward": "openBrowser" },
+    "8080": { "label": "📡 שרת", "onAutoForward": "notify" }
+  },
+
+  "postCreateCommand": "bash .devcontainer/welcome.sh",
+
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "LANG": "he_IL.UTF-8"
+  },
+
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "16gb"
+  }
+}

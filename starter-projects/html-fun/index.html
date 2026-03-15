@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦸 דף גיבור-העל שלי!</title>
+    <style>
+        /* סגנונות — אפשר לשנות הכל! */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-emoji {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .powers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .power {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .power:hover {
+            transform: scale(1.1);
+        }
+
+        .story {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        /* ✏️ שנה את הצבעים! נסה לשנות את המספרים למעלה */
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- 🦸 שנה את האימוג'י לגיבור שלך! -->
+    <div class="hero-emoji" id="hero">🦸</div>
+
+    <!-- ✏️ שנה את השם לשם הגיבור שלך! -->
+    <h1 id="heroName">גיבור-העל שלי</h1>
+
+    <p class="subtitle">⚡ הגיבור הכי חזק בעולם!</p>
+
+    <!-- 🌟 הכוחות של הגיבור — אפשר להוסיף עוד! -->
+    <div class="powers">
+        <span class="power" onclick="usePower(this)">💪 כוח-על</span>
+        <span class="power" onclick="usePower(this)">🔥 אש</span>
+        <span class="power" onclick="usePower(this)">🧊 קרח</span>
+        <span class="power" onclick="usePower(this)">⚡ ברקים</span>
+        <span class="power" onclick="usePower(this)">🦅 תעופה</span>
+    </div>
+
+    <!-- 📖 הסיפור של הגיבור -->
+    <div class="story" id="story">
+        👆 לחץ על כוח כדי לראות את הגיבור משתמש בו!
+    </div>
+
+    <!-- 🎲 כפתור להחלפת גיבור -->
+    <button onclick="changeHero()">🎲 גיבור אחר!</button>
+</div>
+
+<script>
+    // 🎮 JavaScript — הקוד שמפעיל את הדף!
+
+    // רשימת גיבורים — אפשר להוסיף עוד!
+    const heroes = [
+        { emoji: '🦸', name: 'סופר-קיד', subtitle: 'הגיבור הכי חזק!' },
+        { emoji: '🦸‍♀️', name: 'גיבורת-העל', subtitle: 'חזקה ואמיצה!' },
+        { emoji: '🧙', name: 'הקוסם הגדול', subtitle: 'שולט בכל הכישופים!' },
+        { emoji: '🥷', name: 'נינג\'ה צללים', subtitle: 'מהיר כמו הרוח!' },
+        { emoji: '🤖', name: 'רובו-גיבור', subtitle: 'טכנולוגיה מתקדמת!' },
+        { emoji: '🧛', name: 'ערפד טוב', subtitle: 'שומר על הלילה!' },
+    ];
+
+    // סיפורי כוחות — אפשר לשנות!
+    const powerStories = {
+        '💪 כוח-על': '💪 הגיבור הרים בניין שלם ביד אחת! כולם מחאו כפיים! 🎉',
+        '🔥 אש': '🔥 להבות יצאו מהידיים! הדרקון ברח מפחד! 🐉',
+        '🧊 קרח': '🧊 הגיבור הקפיא את כל האוקיינוס! פינגווינים שמחו! 🐧',
+        '⚡ ברקים': '⚡ ברק ענק האיר את השמיים! כל הרשעים נבהלו! 😱',
+        '🦅 תעופה': '🦅 הגיבור עף מעל הרי הגולן! הנוף היה מדהים! 🏔️',
+    };
+
+    // פונקציה שמופעלת כשלוחצים על כוח
+    function usePower(element) {
+        const power = element.textContent;
+        const story = powerStories[power] || '✨ כוח מיוחד הופעל!';
+        document.getElementById('story').textContent = story;
+
+        // אנימציה קטנה
+        element.style.transform = 'scale(1.3)';
+        setTimeout(() => element.style.transform = 'scale(1)', 300);
+    }
+
+    // פונקציה להחלפת גיבור
+    function changeHero() {
+        const hero = heroes[Math.floor(Math.random() * heroes.length)];
+        document.getElementById('hero').textContent = hero.emoji;
+        document.getElementById('heroName').textContent = hero.name;
+        document.querySelector('.subtitle').textContent = '⚡ ' + hero.subtitle;
+        document.getElementById('story').textContent = '👆 לחץ על כוח כדי לראות את הגיבור משתמש בו!';
+    }
+
+    // 🎓 רוצה ללמוד עוד? תשאל את המורה:
+    // "מורה, תסביר לי מה זה JavaScript"
+</script>
+
+</body>
+</html>

@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.build.outputs.skip }}
     steps:
@@ -30,20 +30,21 @@ jobs:
 
       - name: Build docs site
         id: build
+        shell: bash
         run: |
-          if (-not (Test-Path "docs\build.js")) {
-            Write-Host "docs/build.js not found, skipping build"
-            "skip=true" >> $env:GITHUB_OUTPUT
+          if ! test -f "docs/build.js"; then
+            echo "docs/build.js not found, skipping build"
+            echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
-          }
+          fi
           node docs/build.js --out _site --base /squad
-          if (Test-Path "_site") {
-            Write-Host "Build successful, _site directory created"
-            "skip=false" >> $env:GITHUB_OUTPUT
-          } else {
-            Write-Host "Build completed but no _site directory created"
-            "skip=true" >> $env:GITHUB_OUTPUT
-          }
+          if test -d "_site"; then
+            echo "Build successful, _site directory created"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          else
+            echo "Build completed but no _site directory created"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Upload Pages artifact
         if: steps.build.outputs.skip != 'true'
@@ -53,7 +54,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: needs.build.outputs.skip != 'true'
     environment:
       name: github-pages

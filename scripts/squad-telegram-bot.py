@@ -19,12 +19,14 @@ Author: B'Elanna (Infrastructure)
 """
 
 import os
+import re
 import sys
 import json
 import time
 import glob
 import logging
 import hashlib
+import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -41,9 +43,13 @@ except ImportError:
 SQUAD_DIR = Path.home() / ".squad"
 INBOX_DIR = SQUAD_DIR / "mobile-inbox"
 OUTBOX_DIR = SQUAD_DIR / "mobile-outbox"
+HEARTBEAT_DIR = SQUAD_DIR / "heartbeats"
 CONFIG_FILE = SQUAD_DIR / "telegram-config.json"
 STATE_FILE = SQUAD_DIR / "telegram-bot-state.json"
 LOG_FILE = SQUAD_DIR / "telegram-bot.log"
+
+GITHUB_REPO = "tamirdresher_microsoft/tamresearch1"
+HEARTBEAT_STALE_SECONDS = 600  # 10 minutes
 
 POLL_INTERVAL = 2          # seconds between Telegram polls
 OUTBOX_SCAN_INTERVAL = 1   # seconds between outbox scans
@@ -239,8 +245,12 @@ HELP_TEXT = """🤖 *Squad Mobile Bot*
 Commands:
 /start — Welcome message
 /help — This help text
-/status — Check Squad status
+/status — Ralph status across all machines
 /ask <question> — Ask your Squad something
+/issues — List open GitHub issues
+/issues mine — Issues assigned to you
+/postpone N until DATE — Postpone issue N
+/snooze N until DATE — Same as /postpone
 
 Or just type any message — it goes to your Squad's inbox.
 
@@ -264,24 +274,20 @@ Type /help for commands.
 
 def handle_command(bot: TelegramBot, chat_id: int, user: str, text: str, message_id: int):
     """Handle bot commands."""
-    cmd = text.split()[0].lower()
+    parts = text.split()
+    cmd = parts[0].lower().split("@")[0]  # strip @botname suffix
 
     if cmd == "/start":
         bot.send_message(chat_id, WELCOME_TEXT)
     elif cmd == "/help":
         bot.send_message(chat_id, HELP_TEXT)
     elif cmd == "/status":
-        # Check for recent inbox/outbox activity
-        inbox_count = len(list(INBOX_DIR.glob("*.json")))
-        outbox_count = len(list(OUTBOX_DIR.glob("*.json")))
-        status = (
-            f"📊 *Squad Status*\n\n"
-            f"📥 Pending inbox: {inbox_count}\n"
-            f"📤 Pending outbox: {outbox_count}\n"
-            f"⏰ Bot uptime: running\n"
-            f"🔗 Connected: ✅"
-        )
-        bot.send_message(chat_id, status)
+        handle_status(bot, chat_id)
+    elif cmd == "/issues":
+        mine_only = len(parts) > 1 and parts[1].lower() == "mine"
+        handle_issues(bot, chat_id, mine_only)
+    elif cmd in ("/postpone", "/snooze"):
+        handle_postpone(bot, chat_id, text)
     elif cmd == "/ask":
         question = text[len("/ask"):].strip()
         if question:
@@ -291,6 +297,221 @@ def handle_command(bot: TelegramBot, chat_id: int, user: str, text: str, message
             bot.send_message(chat_id, "Usage: /ask <your question>")
     else:
         bot.send_message(chat_id, f"Unknown command: {cmd}\nType /help for available commands.")
+
+
+# ---------------------------------------------------------------------------
+# /status — Ralph heartbeat overview
+# ---------------------------------------------------------------------------
+
+def handle_status(bot: TelegramBot, chat_id: int):
+    """Show status of all Ralphs from heartbeat files plus inbox/outbox stats."""
+    inbox_count = len(list(INBOX_DIR.glob("*.json")))
+    outbox_count = len(list(OUTBOX_DIR.glob("*.json")))
+
+    lines = ["📊 *Squad Status*\n"]
+
+    # Bot connectivity
+    lines.append(f"📥 Pending inbox: {inbox_count}")
+    lines.append(f"📤 Pending outbox: {outbox_count}")
+    lines.append(f"🔗 Bot: ✅ connected\n")
+
+    # Ralph heartbeats
+    lines.append("🤖 *Ralph Agents*\n")
+
+    heartbeat_files = sorted(HEARTBEAT_DIR.glob("*.json")) if HEARTBEAT_DIR.exists() else []
+    if not heartbeat_files:
+        lines.append("_No Ralphs currently reporting._")
+        lines.append("_Run ralph-heartbeat.ps1 to start reporting._")
+    else:
+        now = datetime.now(timezone.utc)
+        for hb_file in heartbeat_files:
+            try:
+                hb = json.loads(hb_file.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+
+            machine = hb.get("machine", hb_file.stem)
+            status = hb.get("status", "unknown")
+            rnd = hb.get("round", "?")
+            last_ts = hb.get("last_activity", "")
+            failures = hb.get("failures", 0)
+
+            # Determine freshness
+            stale = True
+            age_str = "unknown"
+            if last_ts:
+                try:
+                    last_dt = datetime.fromisoformat(last_ts.replace("Z", "+00:00"))
+                    age_secs = (now - last_dt).total_seconds()
+                    stale = age_secs > HEARTBEAT_STALE_SECONDS
+                    if age_secs < 60:
+                        age_str = f"{int(age_secs)}s ago"
+                    elif age_secs < 3600:
+                        age_str = f"{int(age_secs // 60)}m ago"
+                    else:
+                        age_str = f"{int(age_secs // 3600)}h ago"
+                except Exception:
+                    pass
+
+            icon = "🟢" if not stale and status == "running" else "🟡" if not stale else "🔴"
+            fail_str = f" ⚠️ {failures} failures" if failures else ""
+
+            lines.append(f"{icon} *{machine}*")
+            lines.append(f"    Round {rnd} · {status} · {age_str}{fail_str}")
+
+    bot.send_message(chat_id, "\n".join(lines))
+
+
+# ---------------------------------------------------------------------------
+# /issues — GitHub issue list
+# ---------------------------------------------------------------------------
+
+def _run_gh(args: list[str], timeout: int = 30) -> tuple[bool, str]:
+    """Run a gh CLI command, return (success, output)."""
+    try:
+        result = subprocess.run(
+            ["gh"] + args,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if result.returncode == 0:
+            return True, result.stdout.strip()
+        return False, result.stderr.strip() or f"gh exited with code {result.returncode}"
+    except FileNotFoundError:
+        return False, "gh CLI not found — install from https://cli.github.com"
+    except subprocess.TimeoutExpired:
+        return False, "gh command timed out"
+    except Exception as e:
+        return False, str(e)
+
+
+def handle_issues(bot: TelegramBot, chat_id: int, mine_only: bool = False):
+    """List open GitHub issues."""
+    gh_args = [
+        "issue", "list",
+        "--repo", GITHUB_REPO,
+        "--search", "is:open",
+        "--json", "number,title,labels",
+        "--limit", "20",
+    ]
+    if mine_only:
+        gh_args.extend(["--assignee", "@me"])
+
+    bot.send_message(chat_id, "🔍 Fetching issues...")
+
+    ok, output = _run_gh(gh_args)
+    if not ok:
+        bot.send_message(chat_id, f"❌ Failed to fetch issues:\n`{output}`")
+        return
+
+    try:
+        issues = json.loads(output)
+    except json.JSONDecodeError:
+        bot.send_message(chat_id, f"❌ Unexpected gh output:\n`{output[:200]}`")
+        return
+
+    if not issues:
+        msg = "📋 No open issues found."
+        if mine_only:
+            msg = "📋 No open issues assigned to you."
+        bot.send_message(chat_id, msg)
+        return
+
+    header = "📋 *Your Open Issues*\n" if mine_only else "📋 *Open Issues*\n"
+    lines = [header]
+
+    for issue in issues:
+        num = issue.get("number", "?")
+        title = issue.get("title", "Untitled")
+        labels = issue.get("labels", [])
+        label_names = [lb.get("name", "") for lb in labels if lb.get("name")]
+
+        # Truncate long titles for mobile readability
+        if len(title) > 60:
+            title = title[:57] + "..."
+
+        label_str = ""
+        if label_names:
+            tags = " ".join(f"`{n}`" for n in label_names[:3])
+            label_str = f"\n    {tags}"
+
+        lines.append(f"• *#{num}* {title}{label_str}")
+
+    lines.append(f"\n_Showing {len(issues)} issue(s)_")
+    bot.send_message(chat_id, "\n".join(lines))
+
+
+# ---------------------------------------------------------------------------
+# /postpone | /snooze — Postpone an issue
+# ---------------------------------------------------------------------------
+
+# Matches: /postpone 42 until 2025-07-15
+#          /snooze 42 until next Monday
+#          /postpone 42 until tomorrow
+_POSTPONE_RE = re.compile(
+    r"^/(?:postpone|snooze)\s+#?(\d+)\s+until\s+(.+)$",
+    re.IGNORECASE,
+)
+
+
+def handle_postpone(bot: TelegramBot, chat_id: int, text: str):
+    """Postpone a GitHub issue by adding a label and comment."""
+    m = _POSTPONE_RE.match(text.strip())
+    if not m:
+        bot.send_message(
+            chat_id,
+            "Usage: /postpone <issue#> until <date>\n"
+            "Example: `/postpone 42 until 2025-07-15`",
+        )
+        return
+
+    issue_num = m.group(1)
+    date_str = m.group(2).strip()
+
+    bot.send_message(chat_id, f"⏳ Postponing issue #{issue_num}...")
+
+    # 1. Add label
+    ok, err = _run_gh([
+        "issue", "edit", issue_num,
+        "--repo", GITHUB_REPO,
+        "--add-label", "status:postponed",
+    ])
+    if not ok:
+        # Label might not exist yet — try to create it first
+        _run_gh([
+            "label", "create", "status:postponed",
+            "--repo", GITHUB_REPO,
+            "--description", "Issue postponed via Telegram",
+            "--color", "FBCA04",
+            "--force",
+        ])
+        ok, err = _run_gh([
+            "issue", "edit", issue_num,
+            "--repo", GITHUB_REPO,
+            "--add-label", "status:postponed",
+        ])
+        if not ok:
+            bot.send_message(chat_id, f"❌ Failed to add label: `{err}`")
+            return
+
+    # 2. Add comment
+    comment = f"⏸️ Postponed until {date_str} via Telegram"
+    ok, err = _run_gh([
+        "issue", "comment", issue_num,
+        "--repo", GITHUB_REPO,
+        "--body", comment,
+    ])
+    if not ok:
+        bot.send_message(chat_id, f"⚠️ Label added but comment failed: `{err}`")
+        return
+
+    bot.send_message(
+        chat_id,
+        f"✅ Issue *#{issue_num}* postponed until *{date_str}*\n"
+        f"🏷️ Label: `status:postponed`\n"
+        f"💬 Comment added",
+    )
 
 # ---------------------------------------------------------------------------
 # Main loop

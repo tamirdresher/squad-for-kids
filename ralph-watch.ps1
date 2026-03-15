@@ -108,6 +108,18 @@ TEAMS & EMAIL MONITORING (do this EVERY round):
 4. Do NOT create duplicate issues for things already tracked. Check existing open issues first.
 5. Do NOT spam — only surface items that genuinely need Tamir's attention.
 
+GITHUB ERROR EMAIL MONITORING (do this EVERY round):
+1. Use workiq-ask_work_iq to check: "Any emails to Tamir in the last hour from GitHub about: workflow failures, Dependabot alerts, security vulnerabilities, code scanning alerts, secret scanning, deployment failures, or branch protection violations?"
+2. For each GitHub alert email found:
+   a. Determine the alert type: ci-failure, dependency-vuln, security-alert, deploy-failure, or branch-protection
+   b. Check if a GitHub issue with labels 'squad,github-alert,{type}' already exists (use gh issue list --label)
+   c. If NO existing issue: create one with title '[Alert Type] YYYY-MM-DD — Detected by Ralph Email Monitor' and labels 'squad,github-alert,{type}'
+   d. If existing issue: add a comment with the new alert details
+3. For ci-failure alerts: attempt auto-remediation by re-running the failed workflow (gh run rerun)
+4. For security-alert or dependency-vuln: these need human review — mention in Teams notification that human decision is needed
+5. Log all findings to the console with prefix [email-monitor]
+6. Do NOT create duplicate issues — always check for existing ones first
+
 DONE ITEMS ARCHIVING: Check the project board for items in "Done" status that have been done for more than 3 days. Close the GitHub issue if still open and add a comment summarizing what was accomplished.
 
 BOARD RECONCILIATION (every round): After triaging issues, do a quick board health check. List all project items with `gh project item-list 1 --owner tamirdresher_microsoft --format json` and for any item where the issue is CLOSED but the board column is NOT "Done", move it to Done (4830e3e3). For any item where the issue is OPEN but the board column is "Done", move it to Todo (0de780a1). Log how many mismatches you fixed. This prevents board drift.
@@ -524,6 +536,31 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
+    # Step -1: Self-healing — check gh auth and fix missing scopes automatically
+    $selfHealScript = Join-Path (Get-Location) "scripts\ralph-self-heal.ps1"
+    if (Test-Path $selfHealScript) {
+        Write-Host "[$timestamp] Running gh auth self-healing check..." -ForegroundColor Yellow
+        try {
+            # Quick health check: can gh CLI talk to GitHub?
+            $ghHealthOutput = & gh api user 2>&1 | Out-String
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "[$timestamp] gh CLI error detected — invoking self-heal..." -ForegroundColor Yellow
+                # Dot-source to get functions, then call
+                . $selfHealScript
+                $healResult = Invoke-SelfHeal
+                if ($healResult.Healed) {
+                    Write-Host "[$timestamp] Self-heal: $($healResult.Details)" -ForegroundColor Green
+                } else {
+                    Write-Host "[$timestamp] Self-heal could not fix: $($healResult.Details)" -ForegroundColor Yellow
+                }
+            } else {
+                Write-Host "[$timestamp] gh CLI health check passed" -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "[$timestamp] Warning: Self-heal check failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+
     # Step 0: Run scheduled tasks via Squad Scheduler
     # The scheduler reads .squad/schedule.json and evaluates all triggers
     Write-Host "[$timestamp] Evaluating Squad schedule..." -ForegroundColor Yellow

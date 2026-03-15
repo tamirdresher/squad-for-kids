@@ -33,6 +33,30 @@
 
 Squad-monitor NuGet tool packaging verified complete. Ready for v1.0.0 publish when Tamir creates a GitHub release.
 
+### 2026-07-15: Issue #558 — Ralph Self-Healing (PR #559)
+
+**Assignment:** Add self-healing capabilities to Ralph — auto gh auth refresh + GitHub error email monitoring.
+
+**Work Completed:**
+- ✅ Created `scripts/ralph-self-heal.ps1` — automated gh auth refresh via Playwright device flow
+- ✅ Created `scripts/ralph-email-monitor.ps1` — WorkIQ-based GitHub error email monitoring
+- ✅ Integrated self-heal as pre-round check (Step -1) in `ralph-watch.ps1`
+- ✅ Added GITHUB ERROR EMAIL MONITORING section to Ralph's agency prompt
+- ✅ PR #559 opened on branch `squad/558-ralph-self-healing`
+
+**Architecture Decisions:**
+- Self-heal runs as PowerShell in ralph-watch.ps1 (not inside copilot session) — faster, no token cost
+- Email monitoring runs inside copilot session via prompt — needs WorkIQ MCP tool access
+- Device flow automation delegates to agency copilot with Playwright MCP for browser interaction
+- Alert deduplication via `squad,github-alert,{type}` label matching before issue creation
+
+**Key Files:**
+- `scripts/ralph-self-heal.ps1` — gh auth self-healing with Playwright device code flow
+- `scripts/ralph-email-monitor.ps1` — Email monitoring with WorkIQ integration patterns
+- `ralph-watch.ps1` — Integration point (Step -1 + prompt addition)
+
+**Status:** ✅ Complete. PR #559 ready for review.
+
 ### 2026-03-12: Issue #345 — NAP System Pod Isolation (Ralph Round 1)
 
 **Assignment:** Research NAP-managed node taints for workload isolation

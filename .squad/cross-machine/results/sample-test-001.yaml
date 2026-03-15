@@ -1,0 +1,9 @@
+status: completed
+started_at: "2026-03-15T22:28:10Z"
+completed_at: "2026-03-15T22:28:10Z"
+executing_machine: CPC-tamir-WCBED
+stdout: "Hello from cross-machine coordination!
+"
+exit_code: 0
+stderr: 
+task_id: sample-test-001

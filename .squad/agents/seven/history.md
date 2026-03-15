@@ -1077,3 +1077,52 @@
 **Tools Used:** web_fetch, web_search, view (Squad config files), analysis
 
 **Next Session Action:** Propose SOUL.md template to Picard for architectural blessing.
+
+## Issue #549: GitHub Agentic Workflows (gh-aw) Research (March 2026)
+
+**Context:** Tamir asked whether this squad/project should adopt GitHub Agentic Workflows (gh-aw), found at https://github.github.com/gh-aw/
+
+**What gh-aw (GitHub Agentic Workflows) Is:**
+- GitHub Next + Microsoft Research project, in technical preview (Feb 2026)
+- AI-powered automation written in Markdown instead of complex YAML
+- Supported AI agents: Copilot CLI, Claude, OpenAI Codex, Gemini, custom agents
+- Event-triggered (PR, issues, etc.) or scheduled workflows
+- Runs via GitHub Actions with security-first guardrails: sandboxed execution, minimal default permissions, explicit approval gates for write operations
+
+**EMU/Enterprise Availability:**
+- **YES—Available for EMU (Enterprise Managed Users)**
+- Agentic Workflows run entirely within GitHub Actions, which is fully supported in EMU environments
+- EMU provides enhanced governance: audit logs, identity provider integration (Azure AD), SSO/SAML, RBAC
+- Currently in technical preview; enterprises can activate now
+
+**Key Capabilities:**
+- Write automation in plain Markdown with YAML frontmatter for triggers/permissions
+- Deep GitHub integration: Issues, PRs, discussions, releases, Actions
+- Safe outputs: pre-approved operations with human review for sensitive actions
+- Multiple triggers: schedules, events, manual commands
+
+**Relevance to This Squad:**
+- **HIGH RELEVANCE** for a research-heavy team:
+  - Daily automation of research findings summaries
+  - Automated issue triage and routing
+  - Continuous documentation maintenance (critical for this team)
+  - AI-powered analysis of research work and CI failures
+  - Squad routing automation
+
+**Example Use Cases We Could Adopt:**
+1. Daily squad status report (synthesize all open research, track progress)
+2. Automated issue classification and routing (to squad members based on label/topic)
+3. Research finding updates in docs (sync repos/docs with new findings)
+4. CI failure analysis (root cause of pipeline breaks)
+5. Weekly squad health metrics (PRs, issue velocity, coverage)
+
+**Learnings:**
+- **gh-aw is production-ready for enterprises** — Technical preview but actively developed by GitHub/MSR; EMU support confirmed
+- **Markdown-first automation reduces barrier** — Squad members can author workflows without YAML/Python expertise
+- **Security-first design aligns with compliance** — Guardrails (sandboxing, approval gates, audit logs) fit enterprise requirements
+- **Natural fit for continuous AI enhancement** — Works alongside existing Copilot CLI integration; complements Squad's agent-first architecture
+- **Timing is strategic** — This team is already using Copilot CLI; gh-aw extends that into repository-level automation
+
+**Tools Used:** web_fetch, web_search, github CLI
+
+**Next Session Action:** Test gh-aw quick-start in a feature branch; document prototype workflow for squad review.

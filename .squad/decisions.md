@@ -24611,3 +24611,62 @@ For future secret provisioning:
 ---
 
 
+
+
+# Decision: Consider GitHub Agentic Workflows (gh-aw) for Squad Automation
+
+**Date:** March 2026  
+**Author:** Seven (Research & Docs)  
+**Status:** Inbox (awaiting Picard review/decision)  
+**Issue:** #549
+
+## Summary
+GitHub Agentic Workflows is a GitHub Next + Microsoft Research project enabling AI-powered repository automation via Markdown-defined workflows. It is available for EMU enterprises, in technical preview, and represents a high-value opportunity for this squad's documentation, issue routing, and research synthesis.
+
+## Recommendation
+**EXPLORE IN PILOT PHASE**
+
+This squad should prototype a gh-aw workflow to validate:
+1. Ease of authoring (Markdown vs. complex Actions YAML)
+2. Integration with existing Copilot CLI tooling
+3. Guardrail effectiveness in enterprise context
+4. Potential for daily research summaries or automated issue routing
+
+## Key Facts
+- **Available:** EMU-capable, technical preview (Feb 2026)
+- **Supports:** Copilot CLI, Claude, OpenAI Codex, Gemini, custom agents
+- **Security:** Sandboxed execution, minimal default permissions, approval gates
+- **Triggers:** Events (PR, issues), schedules, manual commands
+
+## Use Cases for This Squad
+1. **Daily Research Findings Summary** — Synthesize all squad research into a daily status issue
+2. **Automated Issue Triage** — Route incoming issues to squad members by label/topic
+3. **Documentation Maintenance** — Keep docs in sync with research updates
+4. **CI Failure Analysis** — Root cause analysis of pipeline breaks
+5. **Squad Health Metrics** — Weekly velocity, coverage, PR burndown
+
+## Next Steps
+1. **Pilot:** Create a simple daily status workflow in a feature branch
+2. **Validate:** Test with one research team for 2 weeks
+3. **Evaluate:** Measure adoption ease and operational overhead
+4. **Decide:** Full adoption or shelf for future review
+
+## Risks & Mitigations
+| Risk | Mitigation |
+|------|-----------|
+| Technical preview → breaking changes | Monitor GitHub blog; version lock workflows |
+| Over-automation of docs | Humans review before commit; use approval gates |
+| Agent hallucinations | Pre-define safe outputs; require explicit approval |
+
+## Decision Makers
+- **Picard** (Lead) — Final approval to pilot
+- **Team** — Feedback on prototype
+- **Worf** (Security) — Guardrail review if proceeding
+
+---
+
+**Referenced Material:**
+- https://github.github.com/gh-aw/
+- https://github.com/github/gh-aw
+- Issue #549 comment with research findings
+

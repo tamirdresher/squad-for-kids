@@ -1,0 +1,35 @@
+{
+  "teamId": "<YOUR_TEAM_GUID>",
+  "teamName": "<your-team-name>",
+  "channels": {
+    "general": {
+      "name": "General Notifications",
+      "channelId": "<CHANNEL_ID>",
+      "use": "catch-all, general notifications"
+    },
+    "tech-news": {
+      "name": "Tech News",
+      "channelId": "<CHANNEL_ID>",
+      "use": "daily tech briefings, industry news"
+    },
+    "wins": {
+      "name": "Wins and Celebrations",
+      "channelId": "<CHANNEL_ID>",
+      "use": "issues closed, PRs merged, milestones"
+    },
+    "pr-code": {
+      "name": "PR and Code",
+      "channelId": "<CHANNEL_ID>",
+      "use": "PR opened, reviews needed, CI failures, merges"
+    },
+    "alerts": {
+      "name": "Alerts",
+      "channelId": "<CHANNEL_ID>",
+      "use": "health alerts, errors, stalls, restarts"
+    }
+  },
+  "_routing_notes": {
+    "webhook_fallback": "The incoming webhook URL in $USERPROFILE\\.squad\\teams-webhook.url posts to the 'general' channel by default. When agents have Teams MCP tools, they should post directly to the correct channel using channelId.",
+    "neelix_channel_hint": "Neelix output should include 'CHANNEL: <key>' (e.g., CHANNEL: wins) so routing middleware or agent mode can direct the message to the right channel."
+  }
+}

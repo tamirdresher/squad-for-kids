@@ -41,6 +41,8 @@ jobs:
     steps:
       - name: Add PR to board and set status
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.SQUAD_PROJECT_TOKEN }}
         run: |
           $prNumber = ${{ github.event.pull_request.number || github.event.review.pull_request_number || 0 }}
           $eventName = '${{ github.event_name }}'
@@ -126,6 +128,8 @@ jobs:
     steps:
       - name: Add to board and set Todo status
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.SQUAD_PROJECT_TOKEN }}
         run: |
           $issueNumber = ${{ github.event.issue.number }}
           $action = '${{ github.event.action }}'
@@ -191,6 +195,8 @@ jobs:
     steps:
       - name: Sync board status on issue state change
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.SQUAD_PROJECT_TOKEN }}
         run: |
           $issueNumber = ${{ github.event.issue.number }}
           $action = '${{ github.event.action }}'
@@ -250,6 +256,8 @@ jobs:
 
       - name: Reconcile board state
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.SQUAD_PROJECT_TOKEN }}
         run: |
           Write-Host "🔍 Starting weekly board reconciliation"
 

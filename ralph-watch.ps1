@@ -72,6 +72,7 @@ trap {
 }
 
 $intervalMinutes = 5
+$roundTimeoutMinutes = 20  # Kill round if it exceeds this (prevents hangs)
 $round = 0
 $consecutiveFailures = 0
 $maxLogEntries = 500
@@ -775,14 +776,36 @@ while ($true) {
         $ErrorActionPreference = "SilentlyContinue"
         # Fresh session per round to prevent history accumulation (causes 400 Bad Request)
         $roundSessionId = [guid]::NewGuid().ToString()
-        agency copilot --yolo --autopilot --agent squad -p $prompt "--resume=$roundSessionId"
-        $exitCode = $LASTEXITCODE
+        
+        # Launch agency with timeout guard to prevent indefinite hangs
+        $agencyProc = Start-Process -FilePath "agency" `
+            -ArgumentList "copilot --yolo --autopilot --agent squad -p `"$prompt`" --resume=$roundSessionId" `
+            -PassThru -NoNewWindow
+        $timedOut = $false
+        $timeoutMs = $roundTimeoutMinutes * 60 * 1000
+        if (-not $agencyProc.WaitForExit($timeoutMs)) {
+            $timedOut = $true
+            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] TIMEOUT: Round $round exceeded ${roundTimeoutMinutes}m limit — killing agency process (PID $($agencyProc.Id))" -ForegroundColor Red
+            # Kill the agency process and its children
+            try {
+                $childProcs = Get-CimInstance Win32_Process | Where-Object { $_.ParentProcessId -eq $agencyProc.Id }
+                foreach ($child in $childProcs) {
+                    Stop-Process -Id $child.ProcessId -Force -ErrorAction SilentlyContinue
+                }
+                Stop-Process -Id $agencyProc.Id -Force -ErrorAction SilentlyContinue
+            } catch {
+                Write-Host "  Warning: Could not kill all child processes: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+        $exitCode = if ($timedOut) { 124 } else { $agencyProc.ExitCode }
         $ErrorActionPreference = $ErrorActionPreference_saved
         $agencyOutput = ""  # Can't capture without pipes — but that's OK
-        # Display output after completion
-        # No file cleanup needed — output streamed to console directly
         
-        if ($exitCode -eq 0) {
+        if ($timedOut) {
+            $consecutiveFailures++
+            $roundStatus = "timeout"
+            $logStatus = "TIMEOUT"
+        } elseif ($exitCode -eq 0) {
             $consecutiveFailures = 0
             $roundStatus = "idle"
             $logStatus = "SUCCESS"
@@ -833,9 +856,10 @@ while ($true) {
     # Rotate log if needed
     Invoke-LogRotation
     
-    # Send Teams alert if 3+ consecutive failures
-    if ($consecutiveFailures -ge 3) {
-        Write-Host "[$timestamp] Consecutive failures threshold reached ($consecutiveFailures), sending Teams alert..." -ForegroundColor Yellow
+    # Send Teams alert if 3+ consecutive failures or on timeout
+    if ($consecutiveFailures -ge 3 -or $logStatus -eq "TIMEOUT") {
+        $reason = if ($logStatus -eq "TIMEOUT") { "TIMEOUT (round exceeded ${roundTimeoutMinutes}m)" } else { "Consecutive failures threshold ($consecutiveFailures)" }
+        Write-Host "[$timestamp] $reason — sending Teams alert..." -ForegroundColor Yellow
         Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode -Metrics $metrics
     }
     

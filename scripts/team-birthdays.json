@@ -1,0 +1,51 @@
+{
+  "_comment": "TODO: Tamir - fill in real birthdays (MM-DD format only, no year for privacy)",
+  "teamDL": "dk8steam@microsoft.com",
+  "ccList": [
+    "dk8steam@microsoft.com"
+  ],
+  "members": [
+    {
+      "name": "Alice Contoso",
+      "email": "alicec@microsoft.com",
+      "birthday": "01-15",
+      "alias": "alicec",
+      "_todo": "Replace with real team member"
+    },
+    {
+      "name": "Bob Fabrikam",
+      "email": "bobf@microsoft.com",
+      "birthday": "04-22",
+      "alias": "bobf",
+      "_todo": "Replace with real team member"
+    },
+    {
+      "name": "Carol Northwind",
+      "email": "caroln@microsoft.com",
+      "birthday": "07-08",
+      "alias": "caroln",
+      "_todo": "Replace with real team member"
+    },
+    {
+      "name": "Dave Woodgrove",
+      "email": "davew@microsoft.com",
+      "birthday": "09-30",
+      "alias": "davew",
+      "_todo": "Replace with real team member"
+    },
+    {
+      "name": "Eve Proseware",
+      "email": "evep@microsoft.com",
+      "birthday": "11-05",
+      "alias": "evep",
+      "_todo": "Replace with real team member"
+    },
+    {
+      "name": "Frank Litware",
+      "email": "frankl@microsoft.com",
+      "birthday": "12-19",
+      "alias": "frankl",
+      "_todo": "Replace with real team member"
+    }
+  ]
+}

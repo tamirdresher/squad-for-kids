@@ -1,40 +1,68 @@
-# Ralph Watch v8 - Autonomous Squad Agent Monitor
+# Ralph Watch v9 - Autonomous Squad Agent Monitor
 # Launches a full Copilot session that can do actual work
 # To stop: Ctrl+C
+# IMPORTANT: Must be launched with pwsh (PowerShell 7+), NOT powershell.exe (5.1)
+#   PS 5.1 mangles multi-line strings passed to native executables, breaking prompts.
 # 
-# Observability Features (v8):
+# Observability Features (v9):
 # - Structured logging to $env:USERPROFILE\.squad\ralph-watch.log
-# - Heartbeat file at $env:USERPROFILE\.squad\ralph-heartbeat.json
+# - Per-machine heartbeat: $env:USERPROFILE\.squad\ralph-heartbeat-{COMPUTERNAME}.json
 # - Teams alerts on consecutive failures (>3)
 # - Exit code, duration, and round tracking
-# - Lockfile prevents duplicate instances per directory
+# - System-wide mutex prevents duplicate instances per repo
+# - Lockfile for external tools (monitor dashboard) to read status
 # - Log rotation: capped at 500 entries / 1MB
+# - Machine-specific branch naming for multi-machine coordination
+
+# Require PowerShell 7+ — PS 5.1 breaks multi-line native command arguments
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    Write-Host "ERROR: Ralph Watch requires PowerShell 7+ (pwsh). Current: $($PSVersionTable.PSVersion)" -ForegroundColor Red
+    Write-Host "Launch with: pwsh -NoProfile -ExecutionPolicy Bypass -File ralph-watch.ps1" -ForegroundColor Yellow
+    exit 1
+}
 
 # Fix UTF-8 rendering in Windows PowerShell console
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
 
-# --- Single-instance lockfile ---
+# Set window/tab title for easy identification in multi-Ralph setups
+$repoName = Split-Path (Get-Location) -Leaf
+$ralphTitle = "Ralph Watch - $repoName"
+$Host.UI.RawUI.WindowTitle = $ralphTitle
+[Console]::Title = $ralphTitle
+Write-Host "`e]0;$ralphTitle`a" -NoNewline  # OSC escape for Windows Terminal tabs
+
+# --- Single-instance guard (system-wide mutex + lockfile) ---
+
+# 1. System-wide named mutex — prevents ANY duplicate for this repo across the machine
+$mutexName = "Global\RalphWatch_$repoName"
+$mutex = New-Object System.Threading.Mutex($false, $mutexName)
+$acquired = $false
+try { $acquired = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $acquired = $true }
+if (-not $acquired) {
+    Write-Host "ERROR: Another Ralph instance is already running for this repo (mutex: $mutexName)" -ForegroundColor Red
+    Write-Host "Use Get-CimInstance Win32_Process | Where-Object { `$_.CommandLine -match 'ralph-watch' } to find it" -ForegroundColor Yellow
+    exit 1
+}
+
+# 2. Lockfile (for external tools like the squad-monitor dashboard to read)
 $lockFile = Join-Path (Get-Location) ".ralph-watch.lock"
 if (Test-Path $lockFile) {
-    $lockContent = Get-Content $lockFile -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-    if ($lockContent -and $lockContent.pid) {
-        $existing = Get-Process -Id $lockContent.pid -ErrorAction SilentlyContinue
-        if ($existing) {
-            Write-Host "ERROR: Ralph watch is already running in this directory (PID $($lockContent.pid), started $($lockContent.started))" -ForegroundColor Red
-            Write-Host "Kill it first: Stop-Process -Id $($lockContent.pid) -Force" -ForegroundColor Yellow
-            exit 1
-        }
-    }
-    # Stale lock — previous process died without cleanup
     Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
 }
-# Write lock
-[ordered]@{ pid = $PID; started = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss'); directory = (Get-Location).Path } | ConvertTo-Json | Out-File $lockFile -Encoding utf8 -Force
-# Clean up lock on exit
-Register-EngineEvent PowerShell.Exiting -Action { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue } | Out-Null
-trap { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue; break }
+[ordered]@{ pid = $PID; started = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss'); directory = (Get-Location).Path; machine = $env:COMPUTERNAME } | ConvertTo-Json | Out-File $lockFile -Encoding utf8 -Force
+
+# Clean up on exit
+Register-EngineEvent PowerShell.Exiting -Action {
+    Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+    if ($mutex) { $mutex.ReleaseMutex(); $mutex.Dispose() }
+} | Out-Null
+trap {
+    Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+    if ($mutex) { try { $mutex.ReleaseMutex() } catch {} ; $mutex.Dispose() }
+    break
+}
 
 $intervalMinutes = 5
 $round = 0
@@ -42,8 +70,20 @@ $consecutiveFailures = 0
 $maxLogEntries = 500
 $maxLogBytes = 1048576  # 1MB
 
+# Multi-machine coordination settings
+$machineId = $env:COMPUTERNAME
+
 $prompt = @'
 Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round.
+
+MULTI-MACHINE COORDINATION: Before spawning an agent for ANY issue, check if it's already assigned:
+1. Use `gh issue view <number> --json assignees` to check if issue is assigned
+2. If assigned to someone else — SKIP IT, another Ralph instance is working on it
+3. If NOT assigned — claim it: `gh issue edit <number> --add-assignee "@me"`
+4. Use branch naming: `squad/{issue}-{slug}-$env:COMPUTERNAME` for machine-specific branches
+5. This prevents duplicate work across multiple Ralph instances on different machines
+
+CROSS-MACHINE TASKS: Each round, also run `pwsh scripts/cross-machine-watcher.ps1 -GitSync` to process any pending tasks in the cross-machine task queue (.squad/cross-machine/tasks/).
 
 CRITICAL: Read .squad/skills/github-project-board/SKILL.md BEFORE starting — you MUST update the GitHub Project board status for every issue you touch (use gh project item-add and gh project item-edit commands from the skill). BOARD WORKFLOW: BEFORE spawning an agent for an issue, FIRST move that issue to "In Progress" on the board. When the agent completes and PR is merged, move to "Done". When blocked, move to "Blocked". The board must reflect what is CURRENTLY being worked on in real-time.
 
@@ -64,7 +104,8 @@ IMPORTANT: Only send a Teams message if there are important changes that require
 # Initialize observability paths
 $squadDir = Join-Path $env:USERPROFILE ".squad"
 $logFile = Join-Path $squadDir "ralph-watch.log"
-$heartbeatFile = Join-Path $squadDir "ralph-heartbeat.json"
+# Per-machine heartbeat: each machine writes its own heartbeat file
+$heartbeatFile = Join-Path $squadDir "ralph-heartbeat-$machineId.json"
 $teamsWebhookFile = Join-Path $squadDir "teams-webhook.url"
 
 # Ensure .squad directory exists
@@ -122,6 +163,8 @@ function Update-Heartbeat {
         round = $Round
         consecutiveFailures = $ConsecutiveFailures
         pid = $PID
+        machine = $machineId
+        repo = $repoName
     }
     
     $heartbeat | ConvertTo-Json | Out-File $heartbeatFile -Encoding utf8 -Force
@@ -144,7 +187,10 @@ function Send-TeamsAlert {
     }
 }
 
-Write-Host "🤖 Ralph Watch v8 Starting..." -ForegroundColor Cyan
+Write-Host "🤖 Ralph Watch v9 Starting..." -ForegroundColor Cyan
+Write-Host "   Machine: $machineId" -ForegroundColor Gray
+Write-Host "   Repo: $repoName" -ForegroundColor Gray
+Write-Host "   Mutex: $mutexName" -ForegroundColor Gray
 Write-Host "   Interval: $intervalMinutes minutes" -ForegroundColor Gray
 Write-Host "   Log: $logFile" -ForegroundColor Gray
 Write-Host "   Heartbeat: $heartbeatFile" -ForegroundColor Gray

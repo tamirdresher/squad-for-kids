@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "poll_interval_seconds": 300,
+  "this_machine_aliases": ["MY-LAPTOP", "MY-DEVBOX"],
+  "max_concurrent_tasks": 2,
+  "task_timeout_minutes": 60,
+  "command_whitelist_patterns": [
+    "python scripts/*",
+    "node scripts/*",
+    "pwsh scripts/*",
+    "gh *",
+    "git *",
+    "echo *"
+  ],
+  "result_ttl_days": 30
+}

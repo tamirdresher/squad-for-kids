@@ -30,9 +30,10 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Build
+        shell: pwsh
         run: |
           # No root-level build process; let CodeQL analyze source directly
-          echo "Skipping build — source-only analysis"
+          Write-Output "Skipping build — source-only analysis"
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

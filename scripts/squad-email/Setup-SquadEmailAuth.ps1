@@ -27,7 +27,7 @@ $CREDENTIAL_KEY = "squad-email-graph-token"
 $CLIENT_ID = "14d82eec-204b-4c2f-b7e8-296a70dab67e"
 $DEVICE_CODE_ENDPOINT = "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode"
 $TOKEN_ENDPOINT = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
-$SCOPE = "https://graph.microsoft.com/Mail.Send offline_access"
+$SCOPE = "https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/Mail.ReadWrite offline_access"
 
 # --- Credential Manager (same as Send-SquadEmail.ps1) ---
 Add-Type -TypeDefinition @"

@@ -50,7 +50,7 @@ $CREDENTIAL_KEY = "squad-email-graph-token"
 $CLIENT_ID = "14d82eec-204b-4c2f-b7e8-296a70dab67e"  # Microsoft Graph CLI (public client)
 $TOKEN_ENDPOINT = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
 $GRAPH_ENDPOINT = "https://graph.microsoft.com/v1.0/me/sendMail"
-$SCOPE = "https://graph.microsoft.com/Mail.Send offline_access"
+$SCOPE = "https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/Mail.ReadWrite offline_access"
 
 # --- Credential Manager helpers (pure P/Invoke, no module needed) ---
 Add-Type -TypeDefinition @"

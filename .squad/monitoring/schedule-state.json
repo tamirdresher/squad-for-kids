@@ -1,20 +1,20 @@
 {
-  "teams-message-monitor": {
-    "result": "success",
+  "whatsapp-check": {
     "provider": "local-polling",
-    "lastRun": "2026-03-16T19:50:52.6266744Z",
-    "error": null
+    "lastRun": "2026-03-16T17:57:41.4886954Z",
+    "error": null,
+    "result": "success"
   },
   "ralph-heartbeat": {
-    "result": "success",
     "provider": "local-polling",
-    "lastRun": "2026-03-16T19:50:52.6266744Z",
-    "error": null
+    "lastRun": "2026-03-16T17:57:41.4886954Z",
+    "error": null,
+    "result": "success"
   },
-  "whatsapp-check": {
-    "result": "success",
+  "teams-message-monitor": {
     "provider": "local-polling",
-    "lastRun": "2026-03-16T19:50:52.6266744Z",
-    "error": null
+    "lastRun": "2026-03-16T17:57:41.4886954Z",
+    "error": null,
+    "result": "success"
   }
 }

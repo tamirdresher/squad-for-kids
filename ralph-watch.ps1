@@ -854,7 +854,7 @@ while ($true) {
         $wrapperScript = Join-Path $env:TEMP "ralph-round-$round.ps1"
         @"
 `$p = [System.IO.File]::ReadAllText('$($promptFile.Replace("'","''"))')
-agency copilot --yolo --autopilot --agent squad -p `$p --resume=$roundSessionId
+agency copilot --yolo --autopilot --agent squad --mcp mail --mcp calendar -p `$p --resume=$roundSessionId
 exit `$LASTEXITCODE
 "@ | Out-File -FilePath $wrapperScript -Encoding utf8 -Force
         

@@ -9,14 +9,11 @@ on:
 
 permissions:
   issues: write
-  contents: read
+  contents: write
 
 jobs:
   check-marketplace:
-    runs-on: self-hosted
-    defaults:
-      run:
-        shell: bash
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

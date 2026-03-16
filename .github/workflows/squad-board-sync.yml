@@ -32,6 +32,7 @@ jobs:
   track-pr:
     if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
     runs-on: self-hosted
+    timeout-minutes: 5
     permissions:
       issues: read
       pull-requests: read
@@ -52,37 +53,21 @@ jobs:
 
           Write-Host "🔄 PR #$prNumber — event: $eventName/$action"
 
-          # Add PR to project board (idempotent)
+          # Add PR to project board and get item ID directly
           $prUrl = "https://github.com/${{ github.repository }}/pull/$prNumber"
-          $addResult = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $prUrl 2>&1
+          $addJson = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $prUrl --format json 2>&1
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "⚠️ Could not add PR to project: $addResult"
-            exit 0
-          }
-          Write-Host "✅ PR added to board"
-
-          # Find the item on the board
-          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json --limit 300 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "⚠️ Could not list project items"
+            Write-Host "⚠️ Could not add PR to project: $addJson"
             exit 0
           }
 
-          $data = $itemsJson | ConvertFrom-Json
-          # Match by PR number — PRs show up as content type PullRequest
-          $item = $data.items | Where-Object {
-            $_.content.number -eq $prNumber -and $_.content.type -eq 'PullRequest'
-          }
-
-          if (-not $item) {
-            # Fallback: match by title containing PR number
-            $item = $data.items | Where-Object { $_.content.number -eq $prNumber }
-          }
-
-          if (-not $item) {
-            Write-Host "⚠️ PR #$prNumber not found on board after adding"
+          $addData = $addJson | ConvertFrom-Json
+          $itemId = $addData.id
+          if (-not $itemId) {
+            Write-Host "⚠️ Could not get item ID from add response"
             exit 0
           }
+          Write-Host "✅ PR added to board (item: $itemId)"
 
           # Determine target status based on event
           $targetStatus = $null
@@ -112,20 +97,21 @@ jobs:
             exit 0
           }
 
-          $currentStatus = $item.status
+          $currentStatus = $addData.status
           if ($currentStatus -eq $targetStatus) {
             Write-Host "ℹ️ PR #$prNumber already in '$currentStatus'"
             exit 0
           }
 
           Write-Host "📋 Moving PR #$prNumber from '$currentStatus' → $targetStatus"
-          gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $targetOptionId 2>&1
+          gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $targetOptionId 2>&1
           Write-Host "✅ Done"
 
   # ── Job 0: Set Todo status on new issues added to board ──
   set-todo-on-new:
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
     runs-on: self-hosted
+    timeout-minutes: 5
     permissions:
       issues: read
       contents: read
@@ -163,46 +149,33 @@ jobs:
             }
           }
 
-          # Add issue to project board (idempotent — no error if already on board)
+          # Add issue to project board and get item ID directly (avoids expensive item-list)
           $issueUrl = '${{ github.event.issue.html_url }}'
           Write-Host "➕ Adding issue #$issueNumber to board..."
-          $addResult = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $issueUrl 2>&1
+          $addJson = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $issueUrl --format json 2>&1
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "⚠️ Could not add to project: $addResult"
-            exit 0
-          }
-          Write-Host "✅ Added to board"
-
-          # Find the item on the board to get its item ID
-          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json --limit 300 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "⚠️ Could not list project items: $itemsJson"
+            Write-Host "⚠️ Could not add to project: $addJson"
             exit 0
           }
 
-          $data = $itemsJson | ConvertFrom-Json
-          $item = $data.items | Where-Object { $_.content.number -eq $issueNumber }
-
-          if (-not $item) {
-            Write-Host "⚠️ Issue #$issueNumber not found on board after adding — race condition?"
+          $addData = $addJson | ConvertFrom-Json
+          $itemId = $addData.id
+          if (-not $itemId) {
+            Write-Host "⚠️ Could not get item ID from add response"
             exit 0
           }
-
-          $currentStatus = $item.status
-          if ($currentStatus) {
-            Write-Host "ℹ️ Issue #$issueNumber already has status '$currentStatus' — not overwriting"
-            exit 0
-          }
+          Write-Host "✅ Added to board (item: $itemId)"
 
           # Set status to Todo
           Write-Host "📋 Setting #$issueNumber status → Todo"
-          gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
+          gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
           Write-Host "✅ Issue #$issueNumber is now Todo"
 
   # ── Job 1: Move item on issue close/reopen ──
   sync-on-close:
     if: github.event_name == 'issues'
     runs-on: self-hosted
+    timeout-minutes: 5
     permissions:
       issues: read
       contents: read
@@ -223,47 +196,42 @@ jobs:
           $action = '${{ github.event.action }}'
           Write-Host "🔄 Issue #$issueNumber was $action"
 
-          # Find the item on the board
-          $itemsJson = gh project item-list $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --format json 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "⚠️ Could not list project items: $itemsJson"
-            exit 0  # Don't fail the workflow
-          }
-
-          $data = $itemsJson | ConvertFrom-Json
-          $item = $data.items | Where-Object { $_.content.number -eq $issueNumber }
-
-          if (-not $item) {
-            Write-Host "ℹ️ Issue #$issueNumber is not on the project board — skipping"
+          if ($action -ne 'closed' -and $action -ne 'reopened') {
+            Write-Host "ℹ️ Action '$action' doesn't need board sync"
             exit 0
           }
 
-          $currentStatus = $item.status
-          $itemId = $item.id
+          # Use item-add (idempotent) to get the item ID without listing all items
+          $issueUrl = '${{ github.event.issue.html_url }}'
+          $addJson = gh project item-add $env:PROJECT_NUMBER --owner $env:PROJECT_OWNER --url $issueUrl --format json 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️ Could not add/find item on board: $addJson"
+            exit 0
+          }
+
+          $addData = $addJson | ConvertFrom-Json
+          $itemId = $addData.id
+          if (-not $itemId) {
+            Write-Host "⚠️ Could not get item ID"
+            exit 0
+          }
 
           if ($action -eq 'closed') {
-            if ($currentStatus -eq 'Done') {
-              Write-Host "✅ Issue #$issueNumber already in Done — no change needed"
-              exit 0
-            }
-            Write-Host "📋 Moving #$issueNumber from '$currentStatus' → Done"
+            Write-Host "📋 Moving #$issueNumber → Done"
             gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:DONE_OPTION_ID 2>&1
             Write-Host "✅ Done"
           }
           elseif ($action -eq 'reopened') {
-            if ($currentStatus -eq 'Done') {
-              Write-Host "📋 Issue #$issueNumber was reopened — moving from Done → Todo"
-              gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
-              Write-Host "✅ Moved to Todo"
-            } else {
-              Write-Host "ℹ️ Issue #$issueNumber reopened but not in Done ('$currentStatus') — no change"
-            }
+            Write-Host "📋 Issue #$issueNumber was reopened → Todo"
+            gh project item-edit --project-id $env:PROJECT_ID --id $itemId --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
+            Write-Host "✅ Moved to Todo"
           }
 
   # ── Job 2: Weekly reconciliation of all board items ──
   reconcile-board:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: self-hosted
+    timeout-minutes: 10
     permissions:
       issues: read
       contents: read

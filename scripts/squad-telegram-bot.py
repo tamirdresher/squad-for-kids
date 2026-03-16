@@ -246,30 +246,118 @@ Commands:
 /start — Welcome message
 /help — This help text
 /status — Ralph status across all machines
-/ask <question> — Ask your Squad something
+/ask <question> — Ask your Squad a question (live response)
+/ralph — Trigger a Ralph round manually
 /issues — List open GitHub issues
 /issues mine — Issues assigned to you
 /postpone N until DATE — Postpone issue N
 /snooze N until DATE — Same as /postpone
 
-Or just type any message — it goes to your Squad's inbox.
+💬 *Two-way chat:*
+Just type any message — Squad will answer directly.
+Reply to any notification to send instructions back.
 
 🇮🇱 *בוט הסקוואד לנייד*
-פשוט כתוב הודעה — היא תגיע לצוות ה-AI שלך.
+פשוט כתוב הודעה — הסקוואד יענה ישירות.
 """
 
 WELCOME_TEXT = """👋 *Welcome to your Squad!*
 
 I'm your mobile gateway to your AI team.
-Send me any message and I'll relay it to your Squad.
+Send me any message and I'll chat with your Squad live.
 
-Type /help for commands.
+Type /help for commands, or just send a message.
 
 ---
 👋 *!ברוכים הבאים לסקוואד שלכם*
 אני הגשר הנייד לצוות ה-AI שלכם.
-שלחו לי כל הודעה ואני אעביר אותה לצוות.
+שלחו לי כל הודעה ואני אדבר עם הצוות בשבילכם.
 """
+
+# Maximum seconds to wait for a copilot response
+COPILOT_TIMEOUT = 120
+
+
+def run_copilot(prompt: str, timeout: int = COPILOT_TIMEOUT) -> tuple[bool, str]:
+    """Run a prompt through agency copilot and return the response."""
+    try:
+        result = subprocess.run(
+            ["agency", "copilot", "--yolo", "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=str(Path(__file__).resolve().parent.parent),  # repo root
+        )
+        output = result.stdout.strip()
+        if result.returncode == 0 and output:
+            return True, output
+        # If stdout empty, check stderr for info
+        if not output and result.stderr.strip():
+            return False, result.stderr.strip()[:1000]
+        return bool(output), output or "No response from Squad."
+    except subprocess.TimeoutExpired:
+        return False, f"⏱️ Squad took longer than {timeout}s to respond. Try again or check /status."
+    except FileNotFoundError:
+        return False, "❌ `agency` CLI not found on this machine."
+    except Exception as e:
+        return False, f"❌ Error: {e}"
+
+
+def handle_ask(bot: TelegramBot, chat_id: int, user: str, question: str, message_id: int):
+    """Handle /ask or free-text messages — live two-way chat with Squad."""
+    if not question:
+        bot.send_message(chat_id, "Usage: /ask <your question>\nOr just type a message directly.")
+        return
+
+    # Acknowledge receipt
+    bot.send_message(chat_id, "🤔 Thinking...")
+
+    # Log to inbox for audit trail
+    write_to_inbox(chat_id, user, question, message_id)
+
+    # Run through copilot for live response
+    ok, response = run_copilot(question)
+
+    if ok:
+        # Truncate very long responses for Telegram (4096 char limit)
+        if len(response) > 3800:
+            response = response[:3800] + "\n\n_...truncated (response too long for Telegram)_"
+        bot.send_message(chat_id, f"💬 *Squad says:*\n\n{response}")
+    else:
+        bot.send_message(chat_id, f"⚠️ {response}")
+
+
+def handle_ralph(bot: TelegramBot, chat_id: int):
+    """Trigger a Ralph round manually."""
+    bot.send_message(chat_id, "🔄 Triggering Ralph round...")
+
+    ralph_watch = Path(__file__).resolve().parent.parent / "ralph-watch.ps1"
+    if not ralph_watch.exists():
+        bot.send_message(chat_id, "❌ ralph-watch.ps1 not found in repo root.")
+        return
+
+    try:
+        result = subprocess.run(
+            ["pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass",
+             "-Command", f"& '{ralph_watch}' -SingleRound"],
+            capture_output=True,
+            text=True,
+            timeout=300,  # 5 min max for a Ralph round
+            cwd=str(ralph_watch.parent),
+        )
+        if result.returncode == 0:
+            output = result.stdout.strip()
+            summary = output[-1500:] if len(output) > 1500 else output
+            bot.send_message(chat_id, f"✅ Ralph round complete.\n\n```\n{summary}\n```")
+        else:
+            err = result.stderr.strip()[-500:] if result.stderr else "Unknown error"
+            bot.send_message(chat_id, f"⚠️ Ralph round finished with errors:\n```\n{err}\n```")
+    except subprocess.TimeoutExpired:
+        bot.send_message(chat_id, "⏱️ Ralph round timed out (5 min limit).")
+    except FileNotFoundError:
+        bot.send_message(chat_id, "❌ `pwsh` not found — can't run Ralph.")
+    except Exception as e:
+        bot.send_message(chat_id, f"❌ Error running Ralph: {e}")
 
 
 def handle_command(bot: TelegramBot, chat_id: int, user: str, text: str, message_id: int):
@@ -290,11 +378,9 @@ def handle_command(bot: TelegramBot, chat_id: int, user: str, text: str, message
         handle_postpone(bot, chat_id, text)
     elif cmd == "/ask":
         question = text[len("/ask"):].strip()
-        if question:
-            write_to_inbox(chat_id, user, question, message_id)
-            bot.send_message(chat_id, "📨 Question sent to Squad. I'll relay the answer when it's ready.")
-        else:
-            bot.send_message(chat_id, "Usage: /ask <your question>")
+        handle_ask(bot, chat_id, user, question, message_id)
+    elif cmd == "/ralph":
+        handle_ralph(bot, chat_id)
     else:
         bot.send_message(chat_id, f"Unknown command: {cmd}\nType /help for available commands.")
 
@@ -582,12 +668,8 @@ def main():
                 if text.startswith("/"):
                     handle_command(bot, chat_id, user, text, msg["message_id"])
                 else:
-                    # Regular message → inbox
-                    write_to_inbox(chat_id, user, text, msg["message_id"])
-                    bot.send_message(
-                        chat_id,
-                        "📨 Got it! Your message is in the Squad inbox."
-                    )
+                    # Free-text message → live two-way chat with Squad
+                    handle_ask(bot, chat_id, user, text, msg["message_id"])
 
             # Scan outbox for responses to send
             now = time.time()

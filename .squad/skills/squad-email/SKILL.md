@@ -1,77 +1,98 @@
 ---
 name: squad-email
-description: Squad's own email account for registrations, newsletters, service signups, and external communications. Use whenever the squad needs an email address for any purpose.
-triggers: ["register", "sign up", "newsletter", "subscribe", "email account", "create account", "verification email"]
+description: Unified Squad email with auto-routing. Gmail (tdsquadai@gmail.com) for external, Outlook (td-squad-ai-team@outlook.com) for Microsoft internal.
+triggers: ["register", "sign up", "newsletter", "subscribe", "email account", "create account", "verification email", "send email"]
 confidence: high
 ---
 
-# Squad Email Account
+# Squad Email — Unified Auto-Routing
 
-## Account Details
+## ⛔ CRITICAL RULE
+**NEVER send email from `tamirdresher@microsoft.com` via Outlook COM or any other method.**
+Only use the two Squad-owned addresses below.
 
-| Field | Value |
-|-------|-------|
-| **Email** | td-squad-ai-team@outlook.com |
-| **Display Name** | Squad AI Team |
-| **Provider** | Outlook.com (Microsoft Account) |
-| **Credentials** | Windows Credential Manager → key: `squad-email-outlook` |
+## Accounts
 
-## When to Use
+| Route | Email | Method | When |
+|-------|-------|--------|------|
+| **Internal** | td-squad-ai-team@outlook.com | Graph API (OAuth2) | Recipient is `@microsoft.com` |
+| **External** | tdsquadai@gmail.com | Gmail SMTP | All other recipients |
 
-✅ **USE THIS EMAIL FOR:**
-- Signing up to services, tools, newsletters, APIs
-- Receiving verification codes or confirmation emails
-- Any registration that requires an email address
-- Newsletter subscriptions (tech news, AI updates, etc.)
-- GitHub account registrations (if needed)
-- Service notifications and alerts
+Auto-routing is handled by `Send-SquadEmail.ps1` — just call it and the script picks the right backend based on recipient domain. Use `-Via outlook` or `-Via gmail` to force a specific route.
 
-❌ **DO NOT USE FOR:**
-- Internal Microsoft communications (use Tamir's work email)
-- Anything requiring Microsoft corporate identity
-- Communications that should come from Tamir personally
+## Quick Start
 
-## How to Access
-
-### Read emails (via Playwright)
-```
-1. Navigate to https://outlook.live.com
-2. Sign in with td-squad-ai-team@outlook.com
-3. Use credential from Windows Credential Manager
-```
-
-### Read emails (via Outlook COM — if added to Outlook desktop)
 ```powershell
-# Add as secondary account in Outlook, then:
-$outlook = New-Object -ComObject Outlook.Application
-$namespace = $outlook.GetNamespace("MAPI")
-# Find the squad account's inbox
-$squadStore = $namespace.Stores | Where-Object { $_.DisplayName -match "squad" }
-$inbox = $squadStore.GetDefaultFolder(6)  # olFolderInbox
-$inbox.Items | Select-Object -First 10 | ForEach-Object { $_.Subject }
+# Auto-routes to Outlook (recipient is @microsoft.com)
+.\scripts\squad-email\Send-SquadEmail.ps1 `
+  -To "someone@microsoft.com" `
+  -Subject "Hello" -Body "Internal message" `
+  -CallerIdentity "tamirdresher@microsoft.com"
+
+# Auto-routes to Gmail (external recipient)
+.\scripts\squad-email\Send-SquadEmail.ps1 `
+  -To "user@example.com" `
+  -Subject "Hello" -Body "External message" `
+  -CallerIdentity "tamir.dresher@gmail.com"
+
+# Force Gmail for a Microsoft recipient
+.\scripts\squad-email\Send-SquadEmail.ps1 `
+  -To "someone@microsoft.com" `
+  -Subject "Test" -Body "Forced Gmail" `
+  -Via gmail -CallerIdentity "tamir.dresher@gmail.com"
 ```
 
-### Retrieve password programmatically
+## Credential Setup (per machine)
+
+### Outlook (Graph API) — for internal
 ```powershell
-# From Windows Credential Manager
-cmdkey /list:squad-email-outlook
-# Or use CredentialManager module
-# Install-Module CredentialManager
-# Get-StoredCredential -Target squad-email-outlook
+# One-time device code auth
+.\scripts\squad-email\Setup-SquadEmailAuth.ps1
+# Stores refresh token in Credential Manager key: squad-email-graph-token
 ```
 
-## Security Rules
+### Gmail SMTP — for external
+```powershell
+# Store Gmail app password in Credential Manager
+cmdkey /generic:squad-email-gmail /user:tdsquadai@gmail.com /pass:<APP_PASSWORD>
 
-1. **NEVER** commit the password to any file in the repository
-2. **NEVER** include the password in agent spawn prompts, history.md, or decisions.md
-3. Always retrieve credentials from Windows Credential Manager at runtime
-4. If the password needs to be rotated, update Credential Manager and notify Tamir
-5. Monitor the inbox regularly for verification emails and important notifications
+# Or set environment variable
+$env:SQUAD_GMAIL_APP_PASSWORD = "<APP_PASSWORD>"
+
+# Get app password from GitHub Secret (if stored)
+# gh secret list -R tamirdresher/squad-personal-demo
+```
+
+### Credential lookup order (Gmail)
+1. Windows Credential Manager → key `squad-email-gmail`
+2. Environment variable `SQUAD_GMAIL_APP_PASSWORD`
+3. GitHub Secret check (prints setup instructions if found)
+
+## Security
+
+- **Authorized callers only**: `tamir.dresher@gmail.com`, `tamirdresher@microsoft.com`
+- All emails logged to `.squad/ralph-email-monitor.log` with timestamp, from, to, subject
+- Credentials never committed to source control
+- **NEVER use Outlook COM or tamirdresher@microsoft.com**
 
 ## Monitoring
 
-Agents should periodically check the inbox for:
-- Verification codes needed for signups
-- Newsletter content relevant to research
-- Service notifications or alerts
-- Expiring trial notifications
+- Check `.squad/ralph-email-monitor.log` for send history
+- Check Outlook inbox at https://outlook.live.com for verification emails
+- Check Gmail inbox at https://mail.google.com for external replies
+
+## Reading Emails
+
+### Outlook inbox (via Playwright)
+```
+1. Navigate to https://outlook.live.com
+2. Sign in with td-squad-ai-team@outlook.com
+3. Use credential from Credential Manager key: squad-email-outlook
+```
+
+### Gmail inbox (via Playwright)
+```
+1. Navigate to https://mail.google.com
+2. Sign in with tdsquadai@gmail.com
+3. Use credential from Credential Manager key: squad-email-gmail
+```

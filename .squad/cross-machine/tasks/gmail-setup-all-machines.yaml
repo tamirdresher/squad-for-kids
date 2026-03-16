@@ -1,0 +1,49 @@
+id: gmail-setup-all-machines
+title: "Set up Gmail SMTP credentials on all Ralph machines"
+description: |
+  Configure tdsquadai@gmail.com app password on every machine running Ralph
+  so Send-SquadEmail.ps1 can auto-route external emails via Gmail SMTP.
+priority: high
+created: 2025-07-22
+status: pending
+assigned_to: all-ralphs
+requires_human: true  # App password must be provided or fetched from GitHub Secret
+
+steps:
+  - name: "Get Gmail app password"
+    description: |
+      Get the app password from one of these sources:
+        Option A: Ask Tamir for the app password directly
+        Option B: Fetch from GitHub Secret (if stored):
+          gh secret get SQUAD_GMAIL_APP_PASSWORD -R tamirdresher/squad-personal-demo
+        Option C: Generate a new one at https://myaccount.google.com/apppasswords
+          (requires signing in as tdsquadai@gmail.com with 2FA)
+
+  - name: "Store in Windows Credential Manager"
+    command: |
+      cmdkey /generic:squad-email-gmail /user:tdsquadai@gmail.com /pass:APP_PASSWORD
+    note: "Replace APP_PASSWORD with the actual 16-character app password (no spaces)"
+
+  - name: "Verify SMTP connectivity"
+    command: |
+      python -c "import smtplib; s=smtplib.SMTP('smtp.gmail.com',587); s.starttls(); s.login('tdsquadai@gmail.com', 'APP_PASSWORD'); print('OK'); s.quit()"
+    note: "Replace APP_PASSWORD with actual password. Should print 'OK'."
+
+  - name: "Test Send-SquadEmail.ps1 via Gmail"
+    command: |
+      .\scripts\squad-email\Send-SquadEmail.ps1 `
+        -To "tamir.dresher@gmail.com" `
+        -Subject "Gmail SMTP Test from $(hostname)" `
+        -Body "Gmail route is working on this machine." `
+        -Via gmail `
+        -CallerIdentity "tamir.dresher@gmail.com"
+
+  - name: "Verify log entry"
+    command: |
+      Get-Content .squad\ralph-email-monitor.log | Select-Object -Last 1
+
+completion_criteria:
+  - "cmdkey /list:squad-email-gmail shows the credential"
+  - "Python SMTP test prints OK"
+  - "Send-SquadEmail.ps1 -Via gmail sends successfully"
+  - "ralph-email-monitor.log shows the test entry"

@@ -19,55 +19,52 @@ permissions:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - name: Sync dev branch
         id: sync
         env:
           GH_TOKEN: ${{ secrets.SQUAD_SYNC_PAT }}
         run: |
-          gh repo sync tamirdresher/squad --source bradygaster/squad --branch dev 2>&1 | tee sync-output.txt
-          echo "sync_status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          $output = gh repo sync tamirdresher/squad --source bradygaster/squad --branch dev 2>&1
+          $output | Out-File -FilePath sync-output.txt -Encoding utf8
+          Write-Host $output
+          if ($LASTEXITCODE -ne 0) { throw "Sync failed" }
 
       - name: Sync main branch
-        id: sync-main
         if: success()
         env:
           GH_TOKEN: ${{ secrets.SQUAD_SYNC_PAT }}
         run: |
-          gh repo sync tamirdresher/squad --source bradygaster/squad --branch main 2>&1 | tee sync-main-output.txt || true
+          $output = gh repo sync tamirdresher/squad --source bradygaster/squad --branch main 2>&1
+          Write-Host $output
 
       - name: Open issue on failure
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          SYNC_OUTPUT=$(cat sync-output.txt 2>/dev/null || echo "No output captured")
-          gh issue create \
-            --repo ${{ github.repository }} \
-            --title "Squad fork sync failed ($(date -u +%Y-%m-%d))" \
-            --body "## Fork sync failed
+          $syncOutput = if (Test-Path sync-output.txt) { Get-Content sync-output.txt -Raw } else { "No output captured" }
+          $date = Get-Date -Format "yyyy-MM-dd"
+          $body = @"
+          ## Fork sync failed
 
-          The daily sync of \`tamirdresher/squad\` from \`bradygaster/squad\` failed.
+          The daily sync of ``tamirdresher/squad`` from ``bradygaster/squad`` failed.
 
           **Branch:** dev
           **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           ### Output
-          \`\`\`
-          ${SYNC_OUTPUT}
-          \`\`\`
+          ``````
+          $syncOutput
+          ``````
 
           ### Resolution
-          1. Run \`scripts/sync-squad-fork.ps1\` locally to inspect the conflict
-          2. Or manually resolve with:
-             \`\`\`bash
-             cd /tmp && git clone https://github.com/tamirdresher/squad.git && cd squad
-             git remote add upstream https://github.com/bradygaster/squad.git
-             git fetch upstream
-             git checkout dev
-             git merge upstream/dev
-             # resolve conflicts, commit, push
-             \`\`\`
-          " \
-            --label "automation,squad-sync"
+          Run ``scripts/sync-squad-fork.ps1`` locally to inspect and resolve.
+          "@
+          $bodyFile = New-TemporaryFile
+          $body | Out-File -FilePath $bodyFile -Encoding utf8
+          gh issue create --repo ${{ github.repository }} --title "Squad fork sync failed ($date)" --body-file $bodyFile --label "automation,squad-sync"

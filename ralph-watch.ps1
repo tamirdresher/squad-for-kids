@@ -573,16 +573,31 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
-    # Step -1: Self-healing — check gh auth and fix missing scopes automatically
+    # Step -1: Self-healing — check gh auth and ensure correct account for this repo
+    # Detect required account from git remote (EMU repos need tamirdresher_microsoft)
+    try {
+        $remoteUrl = & git remote get-url origin 2>&1 | Out-String
+        $requiredAccount = if ($remoteUrl -match "tamirdresher_microsoft") { "tamirdresher_microsoft" } else { "tamirdresher" }
+        $currentAccount = & gh api user --jq '.login' 2>&1 | Out-String
+        $currentAccount = $currentAccount.Trim()
+        if ($currentAccount -ne $requiredAccount) {
+            Write-Host "[$timestamp] ⚠️ gh auth on '$currentAccount' but repo needs '$requiredAccount' — switching..." -ForegroundColor Yellow
+            & gh auth switch --user $requiredAccount 2>&1 | Out-Null
+            Write-Host "[$timestamp] ✅ Switched to $requiredAccount" -ForegroundColor Green
+        } else {
+            Write-Host "[$timestamp] gh auth OK ($currentAccount)" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "[$timestamp] Warning: gh auth check failed: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+
     $selfHealScript = Join-Path (Get-Location) "scripts\ralph-self-heal.ps1"
     if (Test-Path $selfHealScript) {
         Write-Host "[$timestamp] Running gh auth self-healing check..." -ForegroundColor Yellow
         try {
-            # Quick health check: can gh CLI talk to GitHub?
             $ghHealthOutput = & gh api user 2>&1 | Out-String
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "[$timestamp] gh CLI error detected — invoking self-heal..." -ForegroundColor Yellow
-                # Dot-source to get functions, then call
                 . $selfHealScript
                 $healResult = Invoke-SelfHeal
                 if ($healResult.Healed) {

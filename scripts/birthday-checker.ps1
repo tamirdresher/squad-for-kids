@@ -187,6 +187,33 @@ foreach ($person in $birthdayPeople) {
             -Send
 
         Write-Host "✅ Birthday email sent to $($person.name)!" -ForegroundColor Green
+
+        # --- Post birthday notification to Teams "Wins and Celebrations" channel ---
+        # Channel routing: birthday notifications go to the "wins" channel.
+        # When running with Teams MCP tools, use channelId from .squad/teams-channels.json.
+        # Fallback: post to general channel via webhook.
+        $channelsFile = Join-Path $repoRoot ".squad\teams-channels.json"
+        $webhookFile = Join-Path $env:USERPROFILE ".squad\teams-webhook.url"
+        if (Test-Path $webhookFile) {
+            try {
+                $webhookUrl = (Get-Content $webhookFile -Raw -Encoding utf8).Trim()
+                if (-not [string]::IsNullOrWhiteSpace($webhookUrl)) {
+                    $teamsMsg = @{
+                        "@type"    = "MessageCard"
+                        "@context" = "https://schema.org/extensions"
+                        summary    = "Birthday: $($person.name)"
+                        themeColor = "FF69B4"
+                        title      = "🎂 Happy Birthday $($person.name)!"
+                        text       = "CHANNEL: wins`n`n🎉 Today is **$($person.name)**'s birthday ($($person.role))! A birthday email has been sent. 🥳"
+                    }
+                    $body = $teamsMsg | ConvertTo-Json -Depth 5
+                    Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json" | Out-Null
+                    Write-Host "   Teams notification sent (CHANNEL: wins)" -ForegroundColor Yellow
+                }
+            } catch {
+                Write-Host "   Warning: Teams notification failed: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
     }
 }
 

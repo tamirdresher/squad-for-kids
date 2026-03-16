@@ -127,9 +127,18 @@ BOARD RECONCILIATION (every round): After triaging issues, do a quick board heal
 
 NEWS REPORTER (Neelix): When you find important updates worth reporting (PRs merged, issues completed, Teams messages needing attention, blockers resolved), send a styled Teams message via the webhook at $env:USERPROFILE\.squad\teams-webhook.url. Format it like a news broadcast — use emoji, bold headers, and make it scannable. Read .squad/agents/neelix/charter.md for the style guide. Only send when there is genuinely newsworthy activity — not every round.
 
+CHANNEL ROUTING: We have dedicated Teams channels under the "squads" team (see .squad/teams-channels.json for the full map). When composing a notification, prefix the message category so it can be routed to the right channel:
+  - "CHANNEL: wins" — for closed issues, merged PRs, milestones, birthdays
+  - "CHANNEL: pr-code" — for PRs opened, reviews needed, CI failures
+  - "CHANNEL: ralph-alerts" — for Ralph errors, stalls, restarts
+  - "CHANNEL: tech-news" — for daily tech briefings and industry news
+  - "CHANNEL: research" — for research outputs and paper summaries
+  - "CHANNEL: general" — catch-all / fallback
+The webhook currently always goes to the general channel. When running as an agent with Teams MCP tools, post directly to the correct channel using the channelId from .squad/teams-channels.json and teamId 5f93abfe-b968-44ea-bd0a-6f155046ccc7.
+
 PODCASTER: After any agent completes a significant deliverable (research report, blog draft, design doc, architecture proposal, or any document >500 words), run the podcaster to generate an audio version. Use: pwsh scripts/podcaster.ps1 -InputFile <path-to-deliverable>. The audio file will be saved next to the source file with -audio.wav suffix. Mention the audio file in the Teams notification so Tamir knows it's available to listen to. Read .squad/agents/podcaster/charter.md for details.
 
-TECH NEWS SCANNING (once per day, morning round only): On the first round after 7:00 AM local time, run: node scripts/tech-news-scanner.js. It scans HackerNews and Reddit for AI, .NET, Kubernetes, and developer tools news. If it finds relevant stories, create a GitHub issue titled "Tech News Digest: {date}" with label "squad,squad:seven" summarizing the top stories. Include links. Neelix should then send a Teams notification with the highlights.
+TECH NEWS SCANNING (once per day, morning round only): On the first round after 7:00 AM local time, run: node scripts/tech-news-scanner.js. It scans HackerNews and Reddit for AI, .NET, Kubernetes, and developer tools news. If it finds relevant stories, create a GitHub issue titled "Tech News Digest: {date}" with label "squad,squad:seven" summarizing the top stories. Include links. Neelix should then send a Teams notification with the highlights (use CHANNEL: tech-news for routing).
 
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
 '@
@@ -446,6 +455,33 @@ function Invoke-StaleWorkReclaim {
         return $false
     }
 }
+
+# -------------------------------------------------------------------
+# Channel Routing Strategy for Teams Notifications
+# -------------------------------------------------------------------
+# WEBHOOK (current):
+#   The incoming webhook URL (stored in $USERPROFILE\.squad\teams-webhook.url)
+#   always posts to the "tamir-squads-notifications" channel (general/catch-all).
+#   This is the fallback and works today for all alert types.
+#
+# AGENT MODE (future — Neelix with Teams MCP tools):
+#   When Neelix runs as a proper agent with Teams MCP, it should post directly
+#   to the correct channel via channelId using the Teams MCP PostChannelMessage tool.
+#   The channel routing map lives at: .squad/teams-channels.json
+#
+# Channel routing map (key → channel):
+#   general      → tamir-squads-notifications  (catch-all)
+#   tech-news    → Tech News                   (daily tech briefings)
+#   ralph-alerts → Ralph Alerts                (errors, stalls, health)
+#   wins         → Wins and Celebrations       (closed issues, merges, birthdays)
+#   pr-code      → PR and Code                 (PRs, reviews, CI)
+#   research     → Research Updates            (research outputs)
+#   roy          → Roy - Wizard                (Roy's dedicated channel)
+#
+# Neelix should include "CHANNEL: <key>" in its output so messages can be
+# routed to the right channel. The Send-TeamsAlert function below uses the
+# webhook (always general channel) as the reliable fallback.
+# -------------------------------------------------------------------
 
 # Function to send Teams alert
 function Send-TeamsAlert {

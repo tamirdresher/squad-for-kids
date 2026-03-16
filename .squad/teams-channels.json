@@ -1,0 +1,46 @@
+{
+  "teamId": "5f93abfe-b968-44ea-bd0a-6f155046ccc7",
+  "teamName": "squads",
+  "channels": {
+    "general": {
+      "name": "tamir-squads-notifications",
+      "channelId": "19:6gjjSHAUPHJlqyxeJemN9giR8HYZkWGpvsznRDSyagE1@thread.tacv2",
+      "use": "catch-all, general notifications"
+    },
+    "tech-news": {
+      "name": "Tech News",
+      "channelId": "19:bfe3224e8e764c2785e81e7cb3cc944d@thread.tacv2",
+      "use": "daily tech briefings, industry news"
+    },
+    "ralph-alerts": {
+      "name": "Ralph Alerts",
+      "channelId": "19:fdd6d4b44a434ffe80a9029e14b7c2c2@thread.tacv2",
+      "use": "Ralph errors, stalls, restarts, health issues"
+    },
+    "wins": {
+      "name": "Wins and Celebrations",
+      "channelId": "19:11bc8c3520284596b1ea2f6701b777fa@thread.tacv2",
+      "use": "issues closed, PRs merged, milestones, birthdays"
+    },
+    "pr-code": {
+      "name": "PR and Code",
+      "channelId": "19:4d7b7376bace4d42868f20a422fecc6f@thread.tacv2",
+      "use": "PR opened, reviews needed, CI failures, merges"
+    },
+    "research": {
+      "name": "Research Updates",
+      "channelId": "19:c89a41c726464637b17ae15e4473c4a3@thread.tacv2",
+      "use": "research squad outputs, paper summaries"
+    },
+    "roy": {
+      "name": "Roy - Wizard",
+      "channelId": "19:771f8079406143ef8622a70f02e48361@thread.tacv2",
+      "use": "Roy's dedicated channel"
+    }
+  },
+  "_routing_notes": {
+    "webhook_fallback": "The incoming webhook URL in $USERPROFILE\\.squad\\teams-webhook.url always posts to the 'general' channel (tamir-squads-notifications). When agents have Teams MCP tools, they should post directly to the correct channel using channelId.",
+    "neelix_channel_hint": "Neelix output should include 'CHANNEL: <key>' (e.g., CHANNEL: wins) so routing middleware or agent mode can direct the message to the right channel.",
+    "birthday_channel": "Birthday notifications should go to 'wins' (Wins and Celebrations)."
+  }
+}

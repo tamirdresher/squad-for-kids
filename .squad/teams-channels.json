@@ -41,6 +41,7 @@
   "_routing_notes": {
     "webhook_fallback": "The incoming webhook URL in $USERPROFILE\\.squad\\teams-webhook.url always posts to the 'general' channel (tamir-squads-notifications). When agents have Teams MCP tools, they should post directly to the correct channel using channelId.",
     "neelix_channel_hint": "Neelix output should include 'CHANNEL: <key>' (e.g., CHANNEL: wins) so routing middleware or agent mode can direct the message to the right channel.",
-    "birthday_channel": "Birthday notifications should go to 'wins' (Wins and Celebrations)."
+    "birthday_channel": "Birthday notifications should go to 'wins' (Wins and Celebrations).",
+    "brady_squad_team": "Brady's Squad product team also has a 'Squad Tech News' channel (teamId: 1de78cdf-3f73-4447-9601-a940bd98b80d, channelId: 19:c940af255e22486882c069d7b38a6204@thread.tacv2) that should receive the same tech news as squads/Tech News."
   }
 }

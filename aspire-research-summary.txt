@@ -1,0 +1,125 @@
+# .NET Aspire Research Summary for 1P AKS Deployment Question
+
+## What is .NET Aspire? (Context from Research)
+
+.NET Aspire is Microsoft's orchestration framework for distributed .NET applications. Key capabilities:
+
+### CURRENT ASPIRE CAPABILITIES:
+- **Local Development Orchestration**: Runs entire distributed systems (APIs, databases, caches, services) via single Program.cs
+- **Multi-language Support** (Aspire 13+): JavaScript, TypeScript, Python, Go, .NET as first-class citizens
+  - Native npm/yarn/pnpm support
+  - Vite integration with hot-reload
+  - React, Vue, Angular support
+  - Automatic TypeScript building
+- **Environment Variable Injection**: Pass config from Aspire to all app types
+- **Aspire Dashboard**: Web-based monitoring of all resources
+- **MCP Server Integration**: AI agents can programmatically query resource status, logs, traces
+- **Port Management**: Automatic allocation and conflict resolution
+- **Private NPM Feeds**: Authentication via lifecycle hooks (preinstall scripts)
+
+### CURRENT DEPLOYMENT TARGET SUPPORT:
+**Limited/In Development:**
+- Kubernetes support exists (AspireHostingKubernetes package in dotnet/aspire repo)
+  - Can deploy Kubernetes manifests
+  - Has DeploymentV1.cs and related K8s resource types
+- Docker containerization
+- File-based orchestration (AppHost models exported to YAML/compose)
+
+**Not Yet Production-Ready for Enterprise:**
+- NO native AKS integration
+- NO Geneva/MDM monitoring integration
+- NO KeyVault certificate management
+- NO Managed Identity / Workload Identity support
+- NO internal load balancer / private networking configs
+- NO compliance automation (FedRAMP, SOC2)
+- NO EV2 deployment pipeline integration
+- NO AKS Fleet Manager integration
+- NO Istio/service mesh support
+
+## What is "1P Needs" in Microsoft Context?
+
+**"1P" = First-Party (Microsoft internal/native features)**
+
+In Azure/Kubernetes context, 1P needs typically include:
+
+### SECURITY & IDENTITY:
+- ✅ Managed Identity (workload identity federation)
+- ✅ Azure KeyVault integration for secrets/certificates
+- ✅ Service Principal support
+- ✅ RBAC (Role-Based Access Control)
+
+### NETWORKING:
+- ✅ Internal load balancers (no public IPs)
+- ✅ Private networking configs
+- ✅ Network policies and security
+- ✅ Ingress controllers
+
+### OBSERVABILITY & COMPLIANCE:
+- ✅ Geneva/MDM (Microsoft Diagnostic Agent) integration
+- ✅ Application Insights integration
+- ✅ Structured logging
+- ✅ Distributed tracing (OpenTelemetry)
+- ✅ FedRAMP/SOC2 compliance controls
+- ✅ Audit logging
+
+### DEPLOYMENT & OPERATIONS:
+- ✅ EV2 (Extensible Versioning) deployment pipeline
+- ✅ Progressive ring deployment (Test → PPE → Prod → Sovereign)
+- ✅ AKS Fleet Manager for multi-cluster operations
+- ✅ Automatic node management
+- ✅ Service mesh integration (Istio)
+- ✅ Blue/green deployments
+
+## Key Research Findings from tamresearch1
+
+### From .squad/decisions.md:
+- Squad team has **Aspire MCP** available as first-party MCP server
+- Aspire MCP provides: ".NET app orchestration" capabilities
+- Listed alongside: GitHub MCP, Azure DevOps MCP, WorkIQ MCP, Playwright MCP
+- Status: "Pre-configured in ~/.copilot/mcp-config.json"
+
+### From Aspire Blog Posts (2025):
+1. **"Seamless Private NPM Feeds in .NET Aspire"** (2025-11-15):
+   - Shows Aspire 13's JavaScript support as first-class citizen
+   - Demonstrates local dev F5 experience
+   - NOT addressing production deployment
+
+2. **"Scaling AI Agents with Aspire: Isolation Layer"** (2025-12-16):
+   - Shows Aspire's excellent MCP capabilities for AI agents
+   - Demonstrates port isolation and multi-instance running
+   - Again, focused on LOCAL development, not AKS deployment
+   - Notes: "I hope the Aspire team will bake this capability directly"
+
+### From Aspire GitHub Repository:
+- Kubernetes support exists (DeploymentV1.cs found in repo)
+- HOWEVER: This is K8s manifest generation, not production-grade AKS integration
+- No evidence of 1P Azure integrations for production workloads
+
+## The Gap: Why This is a Great Question
+
+**Aspire excels at:**
+- Local development orchestration ✅
+- System-wide debugging with MCP ✅
+- Multi-language support ✅
+- Fast F5 experience ✅
+
+**Aspire lacks for AKS (1P) production:**
+- Managed Identity / Workload Identity Federation support
+- KeyVault certificate automation
+- Geneva/MDM observability integration
+- EV2 pipeline integration
+- AKS Fleet Manager orchestration
+- Progressive deployment patterns
+- Compliance/audit controls
+- Service mesh (Istio) integration
+- Network policy generation
+- RBAC automation
+
+## Perfect Question Framework
+
+This is ideal for the .NET Aspire 1P chat because:
+1. **It identifies a real gap**: Aspire is amazing for dev, silent on production AKS
+2. **It's specific**: Asks about concrete 1P features, not vague "cloud support"
+3. **It's relevant**: Many Microsoft teams need to deploy .NET apps to AKS with 1P compliance
+4. **It's actionable**: Can lead to roadmap discussions or pre-built integrations
+

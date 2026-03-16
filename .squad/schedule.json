@@ -216,7 +216,7 @@
         "news",
         "research"
       ],
-      "description": "Scan HackerNews and Reddit for relevant AI, .NET, Kubernetes, and developer tools news",
+      "description": "Scan HackerNews and Reddit for relevant AI, .NET, Kubernetes, and developer tools news. Also monitor bradygaster/squad repo for new releases, blog posts, and announcements. Posts to both squads/Tech News and Squad/Squad Tech News channels.",
       "timeout": 300,
       "providers": [
         "local-polling"

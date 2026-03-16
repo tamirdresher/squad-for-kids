@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "description": "Team member data for celebrations. All entries require explicit opt-in.",
+  "privacyNotice": "Birthday stores month/day only (no year). No ages are calculated or displayed. Members can remove themselves at any time.",
+  "members": [
+    {
+      "id": "alex-dev",
+      "displayName": "Alex",
+      "birthday": "03-15",
+      "startDate": "2022-06-01",
+      "optedIn": true,
+      "celebrationPreferences": {
+        "birthdayMessage": true,
+        "anniversaryMessage": true,
+        "milestoneMessage": true
+      }
+    },
+    {
+      "id": "jordan-eng",
+      "displayName": "Jordan",
+      "birthday": "11-28",
+      "startDate": "2021-01-10",
+      "optedIn": true,
+      "celebrationPreferences": {
+        "birthdayMessage": true,
+        "anniversaryMessage": true,
+        "milestoneMessage": false
+      }
+    },
+    {
+      "id": "sam-ops",
+      "displayName": "Sam",
+      "birthday": null,
+      "startDate": "2023-09-15",
+      "optedIn": true,
+      "celebrationPreferences": {
+        "birthdayMessage": false,
+        "anniversaryMessage": true,
+        "milestoneMessage": true
+      }
+    },
+    {
+      "id": "casey-design",
+      "displayName": "Casey",
+      "birthday": "07-04",
+      "startDate": "2020-03-22",
+      "optedIn": false,
+      "celebrationPreferences": {
+        "birthdayMessage": false,
+        "anniversaryMessage": false,
+        "milestoneMessage": false
+      }
+    }
+  ]
+}

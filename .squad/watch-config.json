@@ -1,0 +1,11 @@
+{
+  "checkIntervalMinutes": 15,
+  "issueLabel": "squad",
+  "repo": "owner/repo",
+  "maxConcurrentAgents": 1,
+  "healthCheckUrl": null,
+  "logRetentionDays": 7,
+  "roundTimeoutMinutes": 30,
+  "maxConsecutiveFailures": 5,
+  "retryBackoffBaseSeconds": 10
+}

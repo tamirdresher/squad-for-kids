@@ -1,0 +1,12 @@
+{
+  "repo": "bradygaster/squad",
+  "checkFrequency": "daily",
+  "trackReleases": true,
+  "trackCommits": true,
+  "trackDiscussions": true,
+  "trackIssues": true,
+  "commitLookbackDays": 7,
+  "maxCommits": 20,
+  "maxDiscussions": 10,
+  "maxIssues": 10
+}

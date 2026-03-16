@@ -1,0 +1,29 @@
+graph TD
+    subgraph personal["Personal Repo Squad"]
+        A1["🎖️ Picard<br/>Lead - AI"]
+        A1 --> A2["💻 Data"]
+        A1 --> A3["🛡️ Worf"]
+        A1 --> A4["📚 Seven"]
+        A1 --> A5["⚙️ B Elanna"]
+    end
+    
+    subgraph work["Work Team Squad - The Bridge"]
+        B1["👤 Sarah<br/>Engineering Lead<br/>Human"]
+        B1 --> B2["🎖️ Picard<br/>Assistant - AI"]
+        B1 --> B3["👤 Brady<br/>Architect - Human"]
+        B1 --> B4["👤 Mike<br/>Security Lead - Human"]
+        B1 --> B5["👤 Priya<br/>Infrastructure - Human"]
+        
+        B3 -.->|owns| B3a["🎖️ Data - AI<br/>Code execution"]
+        B4 -.->|owns| B4a["🛡️ Worf - AI<br/>Security scans"]
+        B5 -.->|owns| B5a["⚙️ B Elanna - AI<br/>Infrastructure code"]
+        
+        B2 -.->|assists| B1
+    end
+    
+    style A1 fill:#e8eaf6,color:#333
+    style B1 fill:#c8e6c9,color:#333
+    style B3 fill:#c8e6c9,color:#333
+    style B4 fill:#c8e6c9,color:#333
+    style B5 fill:#c8e6c9,color:#333
+    style B2 fill:#fff9c4,color:#333

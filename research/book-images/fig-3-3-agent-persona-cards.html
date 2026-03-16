@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 10px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card { border: 2px solid #ddd; border-radius: 12px; overflow: hidden; }
+.card-header { padding: 14px 16px; font-size: 18px; font-weight: 700; color: white; }
+.picard .card-header { background: #3f51b5; }
+.data .card-header { background: #7b1fa2; }
+.worf .card-header { background: #c62828; }
+.seven .card-header { background: #2e7d32; }
+.belanna .card-header { background: #e65100; }
+.ralph .card-header { background: #00695c; }
+.card-body { padding: 16px; }
+.card-body h4 { margin: 0 0 8px; color: #555; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+.card-body ul { margin: 0 0 12px; padding-left: 18px; font-size: 13px; color: #444; }
+.card-body ul li { margin-bottom: 4px; }
+.mindset { font-style: italic; color: #666; font-size: 13px; padding: 10px; background: #f5f5f5; border-radius: 6px; margin-bottom: 10px; }
+.meta { font-size: 12px; color: #888; }
+</style></head><body>
+<div class="container">
+<h2>Figure 3.3: Agent Persona Cards</h2>
+<p class="subtitle">Each agent has a distinct cognitive style that shapes their reasoning and output</p>
+<div class="cards">
+<div class="card picard">
+<div class="card-header">🎖️ Picard — Lead & Orchestrator</div>
+<div class="card-body">
+<h4>Charter</h4>
+<ul><li>Break down big tasks</li><li>Identify dependencies</li><li>Route to specialists</li><li>Make architectural calls</li></ul>
+<div class="mindset">"Big picture without losing sight of details."</div>
+<div class="meta">Decision Style: Strategic · Speed: Fast (but revisits)</div>
+</div></div>
+<div class="card data">
+<div class="card-header">💻 Data — Code Expert</div>
+<div class="card-body">
+<h4>Charter</h4>
+<ul><li>Implement clean code</li><li>Write comprehensive tests</li><li>Follow conventions precisely</li><li>Log decisions in decisions.md</li></ul>
+<div class="mindset">"Focused and reliable. Gets the job done without fanfare."</div>
+<div class="meta">Decision Style: Precise · Speed: Methodical</div>
+</div></div>
+<div class="card worf">
+<div class="card-header">🛡️ Worf — Security & Cloud</div>
+<div class="card-body">
+<h4>Charter</h4>
+<ul><li>Security-first analysis</li><li>Threat modeling</li><li>Audit configurations</li><li>Flag vulnerabilities</li></ul>
+<div class="mindset">"Paranoid by design. Every input is hostile until proven safe."</div>
+<div class="meta">Decision Style: Defensive · Speed: Thorough</div>
+</div></div>
+<div class="card seven">
+<div class="card-header">📚 Seven — Research & Docs</div>
+<div class="card-body">
+<h4>Charter</h4>
+<ul><li>Document the WHY</li><li>Write API documentation</li><li>Create presentations</li><li>Analyze and synthesize</li></ul>
+<div class="mindset">"Context is everything. Document not just what, but why."</div>
+<div class="meta">Decision Style: Analytical · Speed: Deliberate</div>
+</div></div>
+<div class="card belanna">
+<div class="card-header">⚙️ B'Elanna — Infrastructure</div>
+<div class="card-body">
+<h4>Charter</h4>
+<ul><li>Deployment automation</li><li>Helm charts & K8s</li><li>CI/CD pipelines</li><li>Production readiness</li></ul>
+<div class="mindset">"Pragmatic. If it doesn't run in production, it doesn't matter."</div>
+<div class="meta">Decision Style: Pragmatic · Speed: Fast</div>
+</div></div>
+<div class="card ralph">
+<div class="card-header">🔄 Ralph — Work Monitor</div>
+<div class="card-body">
+<h4>Charter</h4>
+<ul><li>5-minute watch loop</li><li>Route issues to agents</li><li>Track assignments</li><li>Auto-merge when ready</li></ul>
+<div class="mindset">"Persistent. Never forgets. Never sleeps. Never complains."</div>
+<div class="meta">Decision Style: Rule-based · Speed: Every 5 minutes</div>
+</div></div>
+</div>
+</div>
+</body></html>

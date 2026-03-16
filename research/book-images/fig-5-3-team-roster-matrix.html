@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 12px 16px; text-align: left; font-size: 14px; border-bottom: 2px solid #333; }
+td { padding: 10px 16px; border-bottom: 1px solid #e0e0e0; font-size: 14px; vertical-align: top; }
+.section-header { background: #f5f5f5; font-weight: 700; color: #333; font-size: 15px; }
+.section-header td { padding: 14px 16px; border-bottom: 2px solid #ddd; }
+.type-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.human { background: #c8e6c9; color: #1b5e20; }
+.ai { background: #e3f2fd; color: #1565c0; }
+.route-row td { font-size: 13px; color: #555; }
+</style></head><body>
+<div class="container">
+<h2>Figure 5.3: Team Roster Matrix — Human + AI Squad</h2>
+<p class="subtitle">Microsoft Platform Team — Unified roster showing roles, not hierarchy</p>
+<table>
+<tr><th>Name</th><th>Type</th><th>Role</th><th>Expertise</th></tr>
+<tr class="section-header"><td colspan="4">Human Members</td></tr>
+<tr><td>Sarah</td><td><span class="type-badge human">Human</span></td><td>Engineering Lead</td><td>Systems thinking, stakeholder management</td></tr>
+<tr><td>Brady</td><td><span class="type-badge human">Human</span></td><td>Platform Architect</td><td>Distributed systems, design patterns</td></tr>
+<tr><td>Mike</td><td><span class="type-badge human">Human</span></td><td>Security Lead</td><td>Threat modeling, compliance, audit</td></tr>
+<tr><td>Priya</td><td><span class="type-badge human">Human</span></td><td>Infrastructure</td><td>Kubernetes, Helm, deployment automation</td></tr>
+<tr><td>Elena</td><td><span class="type-badge human">Human</span></td><td>Integration Lead</td><td>API contracts, cross-team coordination</td></tr>
+<tr class="section-header"><td colspan="4">AI Members</td></tr>
+<tr><td>Picard</td><td><span class="type-badge ai">AI</span></td><td>Orchestrator</td><td>Task decomposition, dependency analysis</td></tr>
+<tr><td>Data</td><td><span class="type-badge ai">AI</span></td><td>Code Expert</td><td>Go operators, code quality, testing</td></tr>
+<tr><td>Worf</td><td><span class="type-badge ai">AI</span></td><td>Security Analyst</td><td>Automated scans, threat assessment, audit</td></tr>
+<tr><td>Seven</td><td><span class="type-badge ai">AI</span></td><td>Documentation</td><td>API docs, decision documentation, analysis</td></tr>
+<tr><td>B'Elanna</td><td><span class="type-badge ai">AI</span></td><td>Infrastructure</td><td>Helm charts, CI/CD, deployment validation</td></tr>
+<tr class="section-header"><td colspan="4">Routing Rules</td></tr>
+<tr class="route-row"><td colspan="2">Architecture decisions</td><td>→ Brady (human)</td><td>Strategic direction</td></tr>
+<tr class="route-row"><td colspan="2">Security sensitive</td><td>→ Mike (human)</td><td>Compliance, threat model</td></tr>
+<tr class="route-row"><td colspan="2">Production deployment</td><td>→ Priya (human)</td><td>Cluster impact</td></tr>
+<tr class="route-row"><td colspan="2">Code changes (routine)</td><td>→ Data (AI) + review</td><td>Standard workflows</td></tr>
+</table>
+</div>
+</body></html>

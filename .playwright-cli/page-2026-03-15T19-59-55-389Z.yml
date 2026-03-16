@@ -1,0 +1,5 @@
+- generic [ref=e3]:
+  - heading "Oops!" [level=1] [ref=e4]
+  - paragraph [ref=e5]:
+    - text: The page you have requested is not found on this server.
+    - text: Please return to the source site and try again.

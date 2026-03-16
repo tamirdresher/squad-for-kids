@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 30px; font-size: 24px; }
+table { width: 100%; border-collapse: collapse; border: 2px solid #333; }
+th { background: #e3f2fd; padding: 14px 16px; text-align: left; font-size: 15px; border-bottom: 2px solid #333; color: #1a237e; }
+td { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-size: 14px; vertical-align: top; }
+tr:nth-child(even) { background: #fafafa; }
+.label { font-family: 'Consolas', monospace; background: #f5f5f5; padding: 3px 8px; border-radius: 4px; font-weight: 600; color: #333; }
+.agent { font-weight: 700; }
+</style></head><body>
+<div class="container">
+<h2>Figure 2.3: Routing Rules Matrix</h2>
+<table>
+<tr><th>Label</th><th>Agent</th><th>Domain</th><th>Context Examples</th></tr>
+<tr>
+<td><span class="label">squad:data</span></td>
+<td class="agent">Data</td>
+<td>Code Implementation</td>
+<td>decisions.md, PRs, recent commits</td>
+</tr>
+<tr>
+<td><span class="label">squad:worf</span></td>
+<td class="agent">Worf</td>
+<td>Security, Cloud, Networking</td>
+<td>security decisions, auth patterns, network policies</td>
+</tr>
+<tr>
+<td><span class="label">squad:seven</span></td>
+<td class="agent">Seven</td>
+<td>Documentation, Presentations, Analysis</td>
+<td>API implementations, decisions.md, design rationale</td>
+</tr>
+<tr>
+<td><span class="label">squad:picard</span></td>
+<td class="agent">Picard</td>
+<td>Orchestration, Architecture, Decisions</td>
+<td>All context files, issue dependencies, team expertise areas</td>
+</tr>
+<tr>
+<td><span class="label">squad:belanna</span></td>
+<td class="agent">B'Elanna</td>
+<td>Infrastructure, Deployment, CI/CD</td>
+<td>Helm charts, deployment configs, pipeline definitions</td>
+</tr>
+<tr>
+<td><span class="label">squad:ralph</span></td>
+<td class="agent">Ralph</td>
+<td>Monitoring, Work Queue, Automation</td>
+<td>Open issues, stale PRs, assignment tracker</td>
+</tr>
+</table>
+</div>
+</body></html>

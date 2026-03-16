@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Consolas', 'Courier New', monospace; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; font-family: 'Segoe UI', sans-serif; margin-bottom: 6px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; font-family: 'Segoe UI', sans-serif; margin-bottom: 24px; font-size: 14px; }
+.pr-header { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.pr-title { font-family: 'Segoe UI', sans-serif; font-size: 20px; font-weight: 700; color: #333; }
+.pr-meta { font-size: 13px; color: #666; font-family: 'Segoe UI', sans-serif; margin-top: 4px; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.merged { background: #c8e6c9; color: #1b5e20; }
+.comment { border-left: 3px solid #ddd; padding: 12px 16px; margin: 12px 0; background: #fafafa; border-radius: 0 8px 8px 0; }
+.comment.review { border-left-color: #1976d2; }
+.comment.response { border-left-color: #7b1fa2; }
+.comment-author { font-family: 'Segoe UI', sans-serif; font-weight: 700; font-size: 14px; }
+.comment-time { font-family: 'Segoe UI', sans-serif; font-size: 12px; color: #888; }
+.comment-body { font-family: 'Segoe UI', sans-serif; font-size: 14px; margin-top: 8px; color: #444; }
+.result-box { background: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; padding: 16px; margin-top: 20px; }
+.result-box h4 { font-family: 'Segoe UI', sans-serif; margin: 0 0 8px; color: #1b5e20; }
+.result-box p { font-family: 'Segoe UI', sans-serif; font-size: 14px; margin: 4px 0; color: #333; }
+</style></head><body>
+<div class="container">
+<h2>Figure 6.4: The Integration Test Example — Real PR Flow</h2>
+<p class="subtitle">Showing the learning loop: AI opens PR → Human reviews → AI learns → Trust grows</p>
+
+<div class="pr-header">
+<div class="pr-title">PR #847: Add integration test for webhook validation <span class="badge merged">✅ Merged</span></div>
+<div class="pr-meta">Author: @data-agent · Opened 04:15 UTC · Merged 07:05 UTC</div>
+</div>
+
+<div class="comment">
+<div class="comment-author">🤖 Data <span class="comment-time">04:15 UTC</span></div>
+<div class="comment-body">Test coverage for admission webhooks was 42%. This adds comprehensive integration tests using testify assertions. Follows patterns from controller_test.go.</div>
+</div>
+
+<div class="comment review">
+<div class="comment-author">👤 Brady Gaster <span class="comment-time">06:32 UTC — Review</span></div>
+<div class="comment-body">
+💬 <strong>Comment 1:</strong> "Use t.Cleanup() instead of defer for cleanup — more idiomatic in Go 1.14+"<br><br>
+💬 <strong>Comment 2:</strong> "Add test case for webhook timeout behavior — we've had issues there before"<br><br>
+💬 <strong>Comment 3:</strong> "Great work on fixtures — this is exactly the pattern we should use going forward"
+</div>
+</div>
+
+<div class="comment response">
+<div class="comment-author">🤖 Data <span class="comment-time">06:52 UTC — 20 minutes later</span></div>
+<div class="comment-body">
+✅ Updated PR with all feedback<br>
+✅ Added timeout test case<br>
+✅ Changed to t.Cleanup()<br>
+✅ Updated decisions.md entry: "Test fixture pattern preferences"
+</div>
+</div>
+
+<div class="comment review">
+<div class="comment-author">👤 Brady Gaster <span class="comment-time">07:04 UTC — Approved</span></div>
+<div class="comment-body">✅ Approved. LGTM.</div>
+</div>
+
+<div class="result-box">
+<h4>Result</h4>
+<p>✨ Ralph auto-merged at 07:05 UTC</p>
+<p>📊 Test coverage: 42% → 94%</p>
+<p>📝 Decision logged: "Webhook integration test patterns"</p>
+</div>
+</div>
+</body></html>

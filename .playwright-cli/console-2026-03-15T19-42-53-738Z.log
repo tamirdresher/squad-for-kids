@@ -1,0 +1,12 @@
+[   14196ms] [WARNING] AbortFromContinueButtonClick @ https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:345
+[   14196ms] [ERROR] Unable to publish metrics Error: Expected field name to be a string, but it was a undefined
+    at c.default (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:142:83)
+    at b.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:162:216)
+    at b.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:167:386)
+    at https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:135:303
+    at a.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:134:161)
+    at a.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:135:50)
+    at a.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:138:169)
+    at a.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:19:245)
+    at a.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:423:232)
+    at a.value (https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:421:461) @ https://m.media-amazon.com/images/I/71DSCSLyZ5L.js?AUIClients/IdentityWebAuthnAssets:15

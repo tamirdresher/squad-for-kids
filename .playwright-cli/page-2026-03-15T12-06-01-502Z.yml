@@ -1,0 +1,24 @@
+- generic [ref=e1]:
+  - textbox "Ask Gemini 3" [active] [ref=e4]
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e11] [cursor=pointer]':
+    - img [ref=e13]
+    - img [ref=e19]
+  - main [ref=e21]:
+    - button "Main menu" [ref=e23] [cursor=pointer]:
+      - img [ref=e24]: menu
+    - generic [ref=e32]:
+      - button "PLUS" [disabled]:
+        - generic: PLUS
+    - generic [ref=e34]:
+      - navigation [ref=e35]:
+        - generic [ref=e39]:
+          - group [ref=e40]:
+            - link "New chat" [ref=e42] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e45]: edit_square
+          - group [ref=e48]:
+            - button "Settings & help" [ref=e50] [cursor=pointer]:
+              - img [ref=e53]: settings_2
+      - generic [ref=e64]:
+        - group
+        - paragraph [ref=e67]

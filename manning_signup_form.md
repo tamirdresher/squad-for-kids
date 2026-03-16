@@ -1,0 +1,192 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - strong [ref=e6]:
+        - link "Manning Publications" [ref=e7] [cursor=pointer]:
+          - /url: /
+      - navigation [ref=e10]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Home" [ref=e13] [cursor=pointer]:
+              - /url: /affiliates/
+          - listitem [ref=e14]:
+            - link "Sign up" [ref=e15] [cursor=pointer]:
+              - /url: /affiliates/signup.php#SignupForm
+          - listitem [ref=e16]:
+            - link "Login" [ref=e17] [cursor=pointer]:
+              - /url: /affiliates/login.php
+  - iframe
+  - generic [ref=e24]:
+    - generic [ref=e28]:
+      - heading "Personal Information" [level=4] [ref=e29]
+      - generic [ref=e31]:
+        - generic [ref=e33]:
+          - generic [ref=e35]: First Name
+          - textbox [ref=e39]
+        - generic [ref=e42]:
+          - generic [ref=e44]: Last Name
+          - textbox [ref=e48]
+        - generic [ref=e51]:
+          - generic [ref=e53]: Referral ID
+          - textbox [ref=e54]
+          - textbox [ref=e58]
+        - generic [ref=e61]:
+          - generic [ref=e63]: Username (Email)
+          - textbox [ref=e67]
+      - heading "Additional Information" [level=4] [ref=e73]
+      - generic [ref=e75]:
+        - generic [ref=e77]:
+          - generic [ref=e79]: Web Url
+          - textbox [ref=e83]
+        - generic [ref=e86]:
+          - generic [ref=e88]: Company name
+          - textbox [ref=e92]
+        - generic [ref=e95]:
+          - generic [ref=e97]: Street
+          - textbox [ref=e101]
+        - generic [ref=e104]:
+          - generic [ref=e106]: City
+          - textbox [ref=e110]
+        - generic [ref=e113]:
+          - generic [ref=e115]: State
+          - textbox [ref=e119]
+        - generic [ref=e122]:
+          - generic [ref=e124]: Country
+          - generic [ref=e127]:
+            - textbox [ref=e128]: United States
+            - img [ref=e129]
+        - generic [ref=e132]:
+          - generic [ref=e134]: Zipcode
+          - textbox [ref=e138]
+        - generic [ref=e141]:
+          - generic [ref=e143]: Phone
+          - textbox [ref=e147]
+        - generic [ref=e150]:
+          - generic [ref=e152]: Fax
+          - textbox [ref=e156]
+        - generic [ref=e159]:
+          - generic [ref=e161]: Tax ID
+          - textbox [ref=e165]
+      - generic [ref=e172]:
+        - heading "Payout Methods" [level=4] [ref=e173]
+        - generic [ref=e175]:
+          - generic [ref=e177]: Payout Method
+          - generic [ref=e180]:
+            - textbox [ref=e181]
+            - img [ref=e182]
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - textbox [ref=e187] [cursor=pointer]
+          - generic [ref=e189] [cursor=pointer]: I agree to the terms & conditions
+        - generic [ref=e192]:
+          - textbox [ref=e193]
+          - generic [ref=e200] [cursor=pointer]: Signup
+    - generic [ref=e202]:
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - heading "It's free" [level=4] [ref=e205]
+          - paragraph [ref=e206]: There's no charge to join our affiliate program.
+        - generic [ref=e207]:
+          - heading "Get started easily" [level=4] [ref=e208]
+          - paragraph [ref=e209]: We supply all the tools for you and handle all the fulfillment details, such as order processing, shipment, billing and support. All you have to do is to refer customer to us - and make money.
+        - generic [ref=e210]:
+          - heading "Commission rates" [level=4] [ref=e211]
+          - paragraph [ref=e212]: "TODO: Describe affiliate program commission structure"
+      - generic [ref=e213]:
+        - generic [ref=e214]:
+          - heading "Payouts" [level=4] [ref=e215]
+          - paragraph [ref=e216]:
+            - text: "TODO: Define custom conditions."
+            - text: We pay our affiliates always on 15th day of the month for sales referred in last month. Minimum payout is $100 and you have to refer minimum two separated customers. Accepted are also self-purchases!
+        - generic [ref=e217]:
+          - heading "Frequently asked questions" [level=4] [ref=e218]
+          - heading "Can foreign affiliates apply?" [level=5] [ref=e219]
+          - paragraph [ref=e220]: All affiliates are welcome in our affiliate program.
+          - heading "Why should I become an affiliate?" [level=5] [ref=e221]
+          - paragraph [ref=e222]: Do you have a web site with relevant traffic to our products? We can help you to monetize your traffic and turn it into profit.
+  - contentinfo [ref=e223]:
+    - generic [ref=e224]:
+      - generic [ref=e225]:
+        - generic [ref=e226]:
+          - heading "Post Affiliate Pro" [level=3] [ref=e227]
+          - list [ref=e228]:
+            - listitem [ref=e229]:
+              - link "Affiliate Software" [ref=e230] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/affiliate-software/?utm_source=referral&utm_medium=app&utm_campaign=footer
+            - listitem [ref=e231]:
+              - link "Company" [ref=e232] [cursor=pointer]:
+                - /url: https://www.qualityunit.com
+            - listitem [ref=e233]:
+              - link "Features" [ref=e234] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/features/?utm_source=referral&utm_medium=app&utm_campaign=footer
+            - listitem [ref=e235]:
+              - link "Privacy Policy" [ref=e236] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/privacy-policy/?utm_source=referral&utm_medium=app&utm_campaign=footer
+        - generic [ref=e237]:
+          - heading "Affiliates" [level=3] [ref=e238]
+          - list [ref=e239]:
+            - listitem [ref=e240]:
+              - link "Affiliates information" [ref=e241] [cursor=pointer]:
+                - /url: /affiliates/
+            - listitem [ref=e242]:
+              - link "Affiliates login" [ref=e243] [cursor=pointer]:
+                - /url: /affiliates/login.php
+            - listitem [ref=e244]:
+              - link "Affiliate link formats" [ref=e245] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/features/affiliate-link-styles/?utm_source=referral&utm_medium=app&utm_campaign=footer
+            - listitem [ref=e246]:
+              - link "FAQ" [ref=e247] [cursor=pointer]:
+                - /url: /affiliates/faq.php
+        - generic [ref=e248]:
+          - heading "Merchants" [level=3] [ref=e249]
+          - list [ref=e250]:
+            - listitem [ref=e251]:
+              - link "Merchants information" [ref=e252] [cursor=pointer]:
+                - /url: /merchants/home.php
+            - listitem [ref=e253]:
+              - link "Merchants login" [ref=e254] [cursor=pointer]:
+                - /url: /merchants/login.php
+            - listitem [ref=e255]:
+              - link "Integration methods" [ref=e256] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/integration-methods/?utm_source=referral&utm_medium=app&utm_campaign=footer
+            - listitem [ref=e257]:
+              - link "API Reference" [ref=e258] [cursor=pointer]:
+                - /url: https://support.qualityunit.com/712031-API
+            - listitem [ref=e259]:
+              - link "Samples and Tests" [ref=e260] [cursor=pointer]:
+                - /url: /samples_tests
+        - generic [ref=e261]:
+          - heading "Mobile apps" [level=3] [ref=e262]
+          - list [ref=e263]:
+            - listitem [ref=e264]:
+              - link [ref=e265] [cursor=pointer]:
+                - /url: https://itunes.apple.com/us/app/post-affiliate-pro-mobile/id1100644457
+            - listitem [ref=e266]:
+              - link [ref=e267] [cursor=pointer]:
+                - /url: https://play.google.com/store/apps/details?id=com.qualityunit.android.postaffiliatepro
+        - generic [ref=e268]:
+          - heading "Useful tools" [level=3] [ref=e269]
+          - list [ref=e270]:
+            - listitem [ref=e271]:
+              - link "Learning Center" [ref=e272] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/learning-center/?utm_medium=referral&utm_source=app&utm_campaign=footer
+            - listitem [ref=e273]:
+              - link "Affiliate Glossary" [ref=e274] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/affiliate-marketing-glossary/?utm_medium=referral&utm_source=app&utm_campaign=footer
+            - listitem [ref=e275]:
+              - link "Affiliate Blog" [ref=e276] [cursor=pointer]:
+                - /url: https://www.postaffiliatepro.com/blog/?utm_medium=referral&utm_source=app&utm_campaign=footer
+      - generic [ref=e277]:
+        - link [ref=e278] [cursor=pointer]:
+          - /url: https://www.facebook.com/PostAffiliatePro
+        - link [ref=e279] [cursor=pointer]:
+          - /url: https://twitter.com/pappro
+        - link [ref=e280] [cursor=pointer]:
+          - /url: https://www.instagram.com/postaffiliatepro/
+        - link [ref=e281] [cursor=pointer]:
+          - /url: https://www.linkedin.com/company/post-affiliate-pro
+        - link [ref=e282] [cursor=pointer]:
+          - /url: https://www.youtube.com/channel/UC1UGrbCyFlJ9h8eutLCqntw
+      - link "Best Affiliate Software by Post Affiliate Pro" [ref=e284] [cursor=pointer]:
+        - /url: https://www.postaffiliatepro.com/best-affiliate-software
+  - iframe

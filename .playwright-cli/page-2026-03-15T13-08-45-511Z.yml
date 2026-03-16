@@ -1,0 +1,35 @@
+- generic [ref=e2]:
+  - img "Authentication Logo" [ref=e3]
+  - img "Vertical Divider" [ref=e4]
+  - generic [ref=e5]:
+    - heading "Authentication Required" [level=1] [ref=e6]
+    - paragraph [ref=e7]:
+      - text: Select an identity provider below. For details on authenticating to IcM,
+      - link "visit our documentation" [ref=e8] [cursor=pointer]:
+        - /url: https://aka.ms/icmguide/loggingin
+      - text: .
+    - generic [ref=e9]:
+      - radio "Microsoft Entra ID Warning icon Formerly known as Azure Active Directory (AAD) Sign in with your Microsoft Entra account (e.g. @microsoft.com, @linkedin.biz)." [checked] [active] [ref=e10]
+      - generic [ref=e11]:
+        - generic [ref=e12]: Microsoft Entra ID
+        - generic [ref=e13]:
+          - img "Warning icon" [ref=e14]
+          - text: Formerly known as Azure Active Directory (AAD)
+        - generic [ref=e15]: Sign in with your Microsoft Entra account (e.g. @microsoft.com, @linkedin.biz).
+    - generic [ref=e16]:
+      - 'radio "Datacenter Security Token Service (dSTS) Warning icon Only accessible from SAW, Microsoft campus or via AzureVPN. Learn more This service includes the following providers: @ame.gbl, @pme.gbl, @gme.gbl, @usme.gbl, @msftgreen, @torus, ANME-ADFE-Federation, DCME-ADFS-Federation." [ref=e17]'
+      - generic [ref=e18]:
+        - generic [ref=e19]: Datacenter Security Token Service (dSTS)
+        - generic [ref=e20]:
+          - img "Warning icon" [ref=e21]
+          - text: Only accessible from SAW, Microsoft campus or via AzureVPN.
+          - link "Learn more" [ref=e22] [cursor=pointer]:
+            - /url: https://aka.ms/icmguide/loggingin
+        - generic [ref=e23]: "This service includes the following providers: @ame.gbl, @pme.gbl, @gme.gbl, @usme.gbl, @msftgreen, @torus, ANME-ADFE-Federation, DCME-ADFS-Federation."
+    - generic [ref=e24]:
+      - radio "Datacenter Security Token Service (dSTS) - China This service should be used for the @cme.gbl identity provider." [ref=e25]
+      - generic [ref=e26]:
+        - generic [ref=e27]: Datacenter Security Token Service (dSTS) - China
+        - generic [ref=e28]: This service should be used for the @cme.gbl identity provider.
+    - link "Sign in" [ref=e30] [cursor=pointer]:
+      - /url: /sso2?ReturnUrl=https%3A%2F%2Fportal.microsofticm.com%2Fimp%2Fv5%2Foncall%2Fcurrent&activeIdentityProviders=IcMdSTS%2CEntraID-OIDC%2CIcMdSTSMooncake&identityProvider=EntraID-OIDC

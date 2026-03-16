@@ -1,0 +1,27 @@
+graph TD
+    A["🎖️ PICARD: User Search Feature<br/>Issue #214 Received"] 
+    A --> B["📋 Analysis Phase<br/>- Identify dependencies<br/>- Risk assessment<br/>- Resource estimation"]
+    B --> C["🔄 Task Decomposition"]
+    
+    C --> D["Data: API Implementation<br/>squad/214-search-api"]
+    C --> E["Worf: Security Audit<br/>squad/214-security-review"]
+    C --> F["Seven: Documentation<br/>squad/214-search-docs"]
+    C --> G["B Elanna: Deployment Config<br/>squad/214-deployment"]
+    
+    D --> H["PR #XXX: Search API<br/>with filtering support"]
+    E --> I["Security Findings<br/>SQL injection mitigation"]
+    F --> J["API Docs<br/>with filter examples"]
+    G --> K["Helm config<br/>+ load test results"]
+    
+    H -->|References| H2["Worf findings<br/>in code review"]
+    I -->|Validates| H2
+    H2 -->|Complete| L["🔗 Coordinated Merge"]
+    
+    J -->|References| L
+    K -->|Validates| L
+    
+    L --> M["✅ Feature Shipped<br/>All tests passing<br/>All reviews approved"]
+    
+    style A fill:#e3f2fd,color:#333
+    style L fill:#c8e6c9,color:#333
+    style M fill:#a5d6a7,color:#333

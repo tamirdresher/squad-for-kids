@@ -1,0 +1,1245 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e14]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+      - search [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e22]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e25]
+      - button "Copilot" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Copilot
+      - generic [ref=e31]:
+        - button "Cloud Shell" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "Notifications" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - button "Settings" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - button "Support + Troubleshooting" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+        - button "Feedback" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e50] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e51]':
+          - generic [ref=e52]:
+            - generic [ref=e53]: tamirdresher@microsoft.com
+            - generic [ref=e54]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e57]
+    - main [ref=e62]:
+      - generic [ref=e63]:
+        - navigation "Breadcrumb" [ref=e67]:
+          - navigation "Breadcrumb" [ref=e70]:
+            - list [ref=e71]:
+              - listitem [ref=e72] [cursor=pointer]:
+                - link "Home" [ref=e73]:
+                  - /url: "#home"
+        - generic [ref=e75]:
+          - region "Resource groups Microsoft (microsoft.onmicrosoft.com)" [ref=e151]:
+            - generic "Resource groups Microsoft (microsoft.onmicrosoft.com)" [ref=e152]:
+              - generic [ref=e81]:
+                - generic [ref=e82]:
+                  - heading "Resource groups" [level=2] [ref=e153]: Resource groups
+                  - generic [ref=e83]:
+                    - button "More content actions" [ref=e85] [cursor=pointer]:
+                      - img [ref=e154]
+                    - group "Chat suggestions from Copilot" [ref=e92]:
+                      - generic [ref=e93]:
+                        - button "Chat suggestions from Copilot" [expanded] [ref=e94]:
+                          - img [ref=e97]
+                        - button "Summarize my costs by service" [ref=e157]
+                      - button "Export resource groups using Bicep or Terraform" [ref=e159]
+                      - button "How to manage changes with deployment tools?" [ref=e161]
+                    - button "Close content 'Resource groups'" [active] [ref=e162] [cursor=pointer]:
+                      - img [ref=e105]
+                - generic [ref=e163]: Microsoft (microsoft.onmicrosoft.com)
+          - iframe [ref=e127]:
+            - generic [active] [ref=f4e1]:
+              - generic [ref=f4e18]:
+                - menubar [ref=f4e22]:
+                  - group [ref=f4e23]:
+                    - menuitem "Create" [ref=f4e24] [cursor=pointer]:
+                      - generic [ref=f4e25]:
+                        - generic [ref=f4e26]: 
+                        - generic [ref=f4e28]: Create
+                    - menuitem "Manage view" [ref=f4e29] [cursor=pointer]:
+                      - generic [ref=f4e30]:
+                        - generic [ref=f4e31]: 
+                        - generic [ref=f4e33]: Manage view
+                        - generic [ref=f4e34]: 
+                    - menuitem "Refresh" [ref=f4e35] [cursor=pointer]:
+                      - generic [ref=f4e36]:
+                        - generic [ref=f4e37]: 
+                        - generic [ref=f4e39]: Refresh
+                    - menuitem "Export to CSV" [ref=f4e40] [cursor=pointer]:
+                      - generic [ref=f4e41]:
+                        - generic [ref=f4e42]: 
+                        - generic [ref=f4e44]: Export to CSV
+                    - menuitem "Open query" [ref=f4e45] [cursor=pointer]:
+                      - generic [ref=f4e46]:
+                        - generic [ref=f4e47]: 
+                        - generic [ref=f4e49]: Open query
+                    - generic [ref=f4e50]:
+                      - separator
+                    - menuitem "Assign tags" [disabled] [ref=f4e51]:
+                      - generic [ref=f4e52]:
+                        - generic [ref=f4e53]: 
+                        - generic [ref=f4e55]: Assign tags
+                    - menuitem "Add to service group" [disabled] [ref=f4e56]:
+                      - generic [ref=f4e57]:
+                        - generic [ref=f4e58]: 
+                        - generic [ref=f4e60]: Add to service group
+                        - generic [ref=f4e61]: 
+                  - group [ref=f4e62]:
+                    - menuitem "Group by none" [ref=f4e63] [cursor=pointer]:
+                      - generic [ref=f4e64]:
+                        - generic [ref=f4e65]: 
+                        - generic [ref=f4e67]: Group by none
+                        - generic [ref=f4e68]: 
+                - generic [ref=f4e69]:
+                  - generic [ref=f4e71]:
+                    - generic [ref=f4e72]:
+                      - generic [ref=f4e74]: 
+                      - searchbox "Filter for any field..." [ref=f4e75]
+                    - generic "Collection of filters for the resources." [ref=f4e76]:
+                      - list [ref=f4e77]:
+                        - generic [ref=f4e78]:
+                          - listitem [ref=f4e79]:
+                            - button "Editor to filter the results by subscriptions. Subscription equals 717 selected" [ref=f4e81]:
+                              - generic [ref=f4e83]:
+                                - generic [ref=f4e84]: Subscription
+                                - generic [ref=f4e85]: equals
+                                - generic [ref=f4e86]: 717 selected
+                          - listitem [ref=f4e87]:
+                            - generic [ref=f4e88]:
+                              - button "Editor to filter the results by column value. Location equals all" [ref=f4e89]:
+                                - generic [ref=f4e91]:
+                                  - generic [ref=f4e92]: Location
+                                  - generic [ref=f4e93]: equals
+                                  - generic [ref=f4e94]: all
+                              - button "Remove Location equals all" [ref=f4e95] [cursor=pointer]:
+                                - generic [ref=f4e96]: 
+                          - listitem [ref=f4e97]:
+                            - button "Button to add a new Pill with display text - Add filter" [ref=f4e99]:
+                              - generic [ref=f4e100]:
+                                - img [ref=f4e102]
+                                - generic [ref=f4e104]: Add filter
+                  - generic [ref=f4e105]:
+                    - grid [ref=f4e110]:
+                      - row "Select all rows Name Subscription Location" [ref=f4e111]:
+                        - columnheader "Select all rows" [ref=f4e112]:
+                          - checkbox "Select all rows" [ref=f4e114]:
+                            - generic [ref=f4e115]:
+                              - generic [ref=f4e116]: 
+                              - generic [ref=f4e117]: 
+                        - generic [ref=f4e118]: Select all rows
+                        - columnheader "Name" [ref=f4e119]:
+                          - button "Name" [ref=f4e121]:
+                            - generic [ref=f4e122]: Name
+                            - generic [ref=f4e123]: 
+                        - button [ref=f4e124]
+                        - columnheader "Subscription" [ref=f4e125]:
+                          - button "Subscription" [ref=f4e127]:
+                            - generic [ref=f4e128]: Subscription
+                        - button [ref=f4e129]
+                        - columnheader "Location" [ref=f4e130]:
+                          - button "Location" [ref=f4e132]:
+                            - generic [ref=f4e133]: Location
+                        - button [ref=f4e134]
+                      - generic [ref=f4e135]:
+                        - row "Select row 0006008bff9f7dad65c2b3c6f0d2379c1488a36c99393f619bbfc3e641fac208-dummy Open context menu MDC-SRE-Infra-Dev Australia East" [ref=f4e136]:
+                          - gridcell "Select row" [ref=f4e137]:
+                            - checkbox "Select row" [ref=f4e138]:
+                              - generic [ref=f4e139]:
+                                - generic [ref=f4e140]: 
+                                - generic [ref=f4e141]: 
+                          - gridcell "0006008bff9f7dad65c2b3c6f0d2379c1488a36c99393f619bbfc3e641fac208-dummy Open context menu" [ref=f4e142]:
+                            - generic [ref=f4e143]:
+                              - img [ref=f4e146]
+                              - link "0006008bff9f7dad65c2b3c6f0d2379c1488a36c99393f619bbfc3e641fac208-dummy" [ref=f4e148] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830/resourceGroups/0006008bff9f7dad65c2b3c6f0d2379c1488a36c99393f619bbfc3e641fac208-dummy
+                              - button "Open context menu" [ref=f4e149] [cursor=pointer]:
+                                - generic [ref=f4e151]: 
+                          - gridcell "MDC-SRE-Infra-Dev" [ref=f4e152]:
+                            - link "MDC-SRE-Infra-Dev" [ref=f4e153] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830
+                          - gridcell "Australia East" [ref=f4e154]
+                        - row "Select row 00ccc814-4d8b-4bd0-8c67-4f0da4da5d38.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e155]:
+                          - gridcell "Select row" [ref=f4e156]:
+                            - checkbox "Select row" [ref=f4e157]:
+                              - generic [ref=f4e158]:
+                                - generic [ref=f4e159]: 
+                                - generic [ref=f4e160]: 
+                          - gridcell "00ccc814-4d8b-4bd0-8c67-4f0da4da5d38.rg Open context menu" [ref=f4e161]:
+                            - generic [ref=f4e162]:
+                              - img [ref=f4e165]
+                              - link "00ccc814-4d8b-4bd0-8c67-4f0da4da5d38.rg" [ref=f4e167] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/00ccc814-4d8b-4bd0-8c67-4f0da4da5d38.rg
+                              - button "Open context menu" [ref=f4e168] [cursor=pointer]:
+                                - generic [ref=f4e170]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e171]:
+                            - link "AVNM-MSFT-01" [ref=f4e172] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e173]
+                        - row "Select row 018de116-6e7c-4b58-a590-784af65eb28f.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e174]:
+                          - gridcell "Select row" [ref=f4e175]:
+                            - checkbox "Select row" [ref=f4e176]:
+                              - generic [ref=f4e177]:
+                                - generic [ref=f4e178]: 
+                                - generic [ref=f4e179]: 
+                          - gridcell "018de116-6e7c-4b58-a590-784af65eb28f.rg Open context menu" [ref=f4e180]:
+                            - generic [ref=f4e181]:
+                              - img [ref=f4e184]
+                              - link "018de116-6e7c-4b58-a590-784af65eb28f.rg" [ref=f4e186] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/018de116-6e7c-4b58-a590-784af65eb28f.rg
+                              - button "Open context menu" [ref=f4e187] [cursor=pointer]:
+                                - generic [ref=f4e189]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e190]:
+                            - link "AVNM-MSFT-01" [ref=f4e191] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e192]
+                        - row "Select row 0199c3856b24638b114203f2a848e6ab4981ccee6c830ddc86f51c7e21a9b139-dummy Open context menu Defender for DevOps Test Australia East" [ref=f4e193]:
+                          - gridcell "Select row" [ref=f4e194]:
+                            - checkbox "Select row" [ref=f4e195]:
+                              - generic [ref=f4e196]:
+                                - generic [ref=f4e197]: 
+                                - generic [ref=f4e198]: 
+                          - gridcell "0199c3856b24638b114203f2a848e6ab4981ccee6c830ddc86f51c7e21a9b139-dummy Open context menu" [ref=f4e199]:
+                            - generic [ref=f4e200]:
+                              - img [ref=f4e203]
+                              - link "0199c3856b24638b114203f2a848e6ab4981ccee6c830ddc86f51c7e21a9b139-dummy" [ref=f4e205] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/89ecc633-9f4f-4b4f-9a5e-d5c6ed21eeac/resourceGroups/0199c3856b24638b114203f2a848e6ab4981ccee6c830ddc86f51c7e21a9b139-dummy
+                              - button "Open context menu" [ref=f4e206] [cursor=pointer]:
+                                - generic [ref=f4e208]: 
+                          - gridcell "Defender for DevOps Test" [ref=f4e209]:
+                            - link "Defender for DevOps Test" [ref=f4e210] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/89ecc633-9f4f-4b4f-9a5e-d5c6ed21eeac
+                          - gridcell "Australia East" [ref=f4e211]
+                        - row "Select row 02195375-5574-412d-b04c-87155a0c34ae.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e212]:
+                          - gridcell "Select row" [ref=f4e213]:
+                            - checkbox "Select row" [ref=f4e214]:
+                              - generic [ref=f4e215]:
+                                - generic [ref=f4e216]: 
+                                - generic [ref=f4e217]: 
+                          - gridcell "02195375-5574-412d-b04c-87155a0c34ae.rg Open context menu" [ref=f4e218]:
+                            - generic [ref=f4e219]:
+                              - img [ref=f4e222]
+                              - link "02195375-5574-412d-b04c-87155a0c34ae.rg" [ref=f4e224] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/02195375-5574-412d-b04c-87155a0c34ae.rg
+                              - button "Open context menu" [ref=f4e225] [cursor=pointer]:
+                                - generic [ref=f4e227]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e228]:
+                            - link "AVNM-MSFT-01" [ref=f4e229] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e230]
+                        - row "Select row 02b92c81-b266-486e-a120-490f68ccff55.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e231]:
+                          - gridcell "Select row" [ref=f4e232]:
+                            - checkbox "Select row" [ref=f4e233]:
+                              - generic [ref=f4e234]:
+                                - generic [ref=f4e235]: 
+                                - generic [ref=f4e236]: 
+                          - gridcell "02b92c81-b266-486e-a120-490f68ccff55.rg Open context menu" [ref=f4e237]:
+                            - generic [ref=f4e238]:
+                              - img [ref=f4e241]
+                              - link "02b92c81-b266-486e-a120-490f68ccff55.rg" [ref=f4e243] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/02b92c81-b266-486e-a120-490f68ccff55.rg
+                              - button "Open context menu" [ref=f4e244] [cursor=pointer]:
+                                - generic [ref=f4e246]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e247]:
+                            - link "AVNM-MSFT-01" [ref=f4e248] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e249]
+                        - row "Select row 02be0948-f2bd-43e0-9a7d-9f228f70e1b3.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e250]:
+                          - gridcell "Select row" [ref=f4e251]:
+                            - checkbox "Select row" [ref=f4e252]:
+                              - generic [ref=f4e253]:
+                                - generic [ref=f4e254]: 
+                                - generic [ref=f4e255]: 
+                          - gridcell "02be0948-f2bd-43e0-9a7d-9f228f70e1b3.rg Open context menu" [ref=f4e256]:
+                            - generic [ref=f4e257]:
+                              - img [ref=f4e260]
+                              - link "02be0948-f2bd-43e0-9a7d-9f228f70e1b3.rg" [ref=f4e262] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/02be0948-f2bd-43e0-9a7d-9f228f70e1b3.rg
+                              - button "Open context menu" [ref=f4e263] [cursor=pointer]:
+                                - generic [ref=f4e265]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e266]:
+                            - link "AVNM-MSFT-01" [ref=f4e267] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e268]
+                        - row "Select row 02dcb23a-a695-4e21-b0e4-3ecfffd2786f.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e269]:
+                          - gridcell "Select row" [ref=f4e270]:
+                            - checkbox "Select row" [ref=f4e271]:
+                              - generic [ref=f4e272]:
+                                - generic [ref=f4e273]: 
+                                - generic [ref=f4e274]: 
+                          - gridcell "02dcb23a-a695-4e21-b0e4-3ecfffd2786f.rg Open context menu" [ref=f4e275]:
+                            - generic [ref=f4e276]:
+                              - img [ref=f4e279]
+                              - link "02dcb23a-a695-4e21-b0e4-3ecfffd2786f.rg" [ref=f4e281] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/02dcb23a-a695-4e21-b0e4-3ecfffd2786f.rg
+                              - button "Open context menu" [ref=f4e282] [cursor=pointer]:
+                                - generic [ref=f4e284]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e285]:
+                            - link "AVNM-MSFT-01" [ref=f4e286] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e287]
+                        - row "Select row 02e1cbe829a84bb4a8bfb7f3ccab11eb5f159205672d3394f61b8b57a91380d9-dummy Open context menu Rome ILDC - Rome3 Dev3 East US 2" [ref=f4e288]:
+                          - gridcell "Select row" [ref=f4e289]:
+                            - checkbox "Select row" [ref=f4e290]:
+                              - generic [ref=f4e291]:
+                                - generic [ref=f4e292]: 
+                                - generic [ref=f4e293]: 
+                          - gridcell "02e1cbe829a84bb4a8bfb7f3ccab11eb5f159205672d3394f61b8b57a91380d9-dummy Open context menu" [ref=f4e294]:
+                            - generic [ref=f4e295]:
+                              - img [ref=f4e298]
+                              - link "02e1cbe829a84bb4a8bfb7f3ccab11eb5f159205672d3394f61b8b57a91380d9-dummy" [ref=f4e300] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/0c31dbc7-6367-45ba-9665-8ab6f2b8b9af/resourceGroups/02e1cbe829a84bb4a8bfb7f3ccab11eb5f159205672d3394f61b8b57a91380d9-dummy
+                              - button "Open context menu" [ref=f4e301] [cursor=pointer]:
+                                - generic [ref=f4e303]: 
+                          - gridcell "Rome ILDC - Rome3 Dev3" [ref=f4e304]:
+                            - link "Rome ILDC - Rome3 Dev3" [ref=f4e305] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/0c31dbc7-6367-45ba-9665-8ab6f2b8b9af
+                          - gridcell "East US 2" [ref=f4e306]
+                        - row "Select row 0354ff2c-81d2-4031-b429-d1a0f2432b36.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e307]:
+                          - gridcell "Select row" [ref=f4e308]:
+                            - checkbox "Select row" [ref=f4e309]:
+                              - generic [ref=f4e310]:
+                                - generic [ref=f4e311]: 
+                                - generic [ref=f4e312]: 
+                          - gridcell "0354ff2c-81d2-4031-b429-d1a0f2432b36.rg Open context menu" [ref=f4e313]:
+                            - generic [ref=f4e314]:
+                              - img [ref=f4e317]
+                              - link "0354ff2c-81d2-4031-b429-d1a0f2432b36.rg" [ref=f4e319] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0354ff2c-81d2-4031-b429-d1a0f2432b36.rg
+                              - button "Open context menu" [ref=f4e320] [cursor=pointer]:
+                                - generic [ref=f4e322]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e323]:
+                            - link "AVNM-MSFT-01" [ref=f4e324] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e325]
+                        - row "Select row 03ca6604-2070-45f8-a361-02dcab25aec0.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e326]:
+                          - gridcell "Select row" [ref=f4e327]:
+                            - checkbox "Select row" [ref=f4e328]:
+                              - generic [ref=f4e329]:
+                                - generic [ref=f4e330]: 
+                                - generic [ref=f4e331]: 
+                          - gridcell "03ca6604-2070-45f8-a361-02dcab25aec0.rg Open context menu" [ref=f4e332]:
+                            - generic [ref=f4e333]:
+                              - img [ref=f4e336]
+                              - link "03ca6604-2070-45f8-a361-02dcab25aec0.rg" [ref=f4e338] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/03ca6604-2070-45f8-a361-02dcab25aec0.rg
+                              - button "Open context menu" [ref=f4e339] [cursor=pointer]:
+                                - generic [ref=f4e341]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e342]:
+                            - link "AVNM-MSFT-01" [ref=f4e343] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e344]
+                        - row "Select row 03d09dbf72bd7c3cb4882902c3863f5fa0671a1ba45e3bd3a7059e3f423c0003-dummy Open context menu MDC-SRE-Infra-Dev Switzerland West" [ref=f4e345]:
+                          - gridcell "Select row" [ref=f4e346]:
+                            - checkbox "Select row" [ref=f4e347]:
+                              - generic [ref=f4e348]:
+                                - generic [ref=f4e349]: 
+                                - generic [ref=f4e350]: 
+                          - gridcell "03d09dbf72bd7c3cb4882902c3863f5fa0671a1ba45e3bd3a7059e3f423c0003-dummy Open context menu" [ref=f4e351]:
+                            - generic [ref=f4e352]:
+                              - img [ref=f4e355]
+                              - link "03d09dbf72bd7c3cb4882902c3863f5fa0671a1ba45e3bd3a7059e3f423c0003-dummy" [ref=f4e357] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830/resourceGroups/03d09dbf72bd7c3cb4882902c3863f5fa0671a1ba45e3bd3a7059e3f423c0003-dummy
+                              - button "Open context menu" [ref=f4e358] [cursor=pointer]:
+                                - generic [ref=f4e360]: 
+                          - gridcell "MDC-SRE-Infra-Dev" [ref=f4e361]:
+                            - link "MDC-SRE-Infra-Dev" [ref=f4e362] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830
+                          - gridcell "Switzerland West" [ref=f4e363]
+                        - row "Select row 0409e59f-7456-443c-a9c0-092ae9121f80.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e364]:
+                          - gridcell "Select row" [ref=f4e365]:
+                            - checkbox "Select row" [ref=f4e366]:
+                              - generic [ref=f4e367]:
+                                - generic [ref=f4e368]: 
+                                - generic [ref=f4e369]: 
+                          - gridcell "0409e59f-7456-443c-a9c0-092ae9121f80.rg Open context menu" [ref=f4e370]:
+                            - generic [ref=f4e371]:
+                              - img [ref=f4e374]
+                              - link "0409e59f-7456-443c-a9c0-092ae9121f80.rg" [ref=f4e376] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0409e59f-7456-443c-a9c0-092ae9121f80.rg
+                              - button "Open context menu" [ref=f4e377] [cursor=pointer]:
+                                - generic [ref=f4e379]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e380]:
+                            - link "AVNM-MSFT-01" [ref=f4e381] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e382]
+                        - row "Select row 043b74a1-9646-4af7-9dcc-4f36b0705de8.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e383]:
+                          - gridcell "Select row" [ref=f4e384]:
+                            - checkbox "Select row" [ref=f4e385]:
+                              - generic [ref=f4e386]:
+                                - generic [ref=f4e387]: 
+                                - generic [ref=f4e388]: 
+                          - gridcell "043b74a1-9646-4af7-9dcc-4f36b0705de8.rg Open context menu" [ref=f4e389]:
+                            - generic [ref=f4e390]:
+                              - img [ref=f4e393]
+                              - link "043b74a1-9646-4af7-9dcc-4f36b0705de8.rg" [ref=f4e395] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/043b74a1-9646-4af7-9dcc-4f36b0705de8.rg
+                              - button "Open context menu" [ref=f4e396] [cursor=pointer]:
+                                - generic [ref=f4e398]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e399]:
+                            - link "AVNM-MSFT-01" [ref=f4e400] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e401]
+                        - row "Select row 048c82de-d304-46ab-a7e2-432c75c4ccbb.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e402]:
+                          - gridcell "Select row" [ref=f4e403]:
+                            - checkbox "Select row" [ref=f4e404]:
+                              - generic [ref=f4e405]:
+                                - generic [ref=f4e406]: 
+                                - generic [ref=f4e407]: 
+                          - gridcell "048c82de-d304-46ab-a7e2-432c75c4ccbb.rg Open context menu" [ref=f4e408]:
+                            - generic [ref=f4e409]:
+                              - img [ref=f4e412]
+                              - link "048c82de-d304-46ab-a7e2-432c75c4ccbb.rg" [ref=f4e414] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/048c82de-d304-46ab-a7e2-432c75c4ccbb.rg
+                              - button "Open context menu" [ref=f4e415] [cursor=pointer]:
+                                - generic [ref=f4e417]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e418]:
+                            - link "AVNM-MSFT-01" [ref=f4e419] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e420]
+                        - row "Select row 04ba4e74-82cd-4c70-933d-787986f12d6c.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e421]:
+                          - gridcell "Select row" [ref=f4e422]:
+                            - checkbox "Select row" [ref=f4e423]:
+                              - generic [ref=f4e424]:
+                                - generic [ref=f4e425]: 
+                                - generic [ref=f4e426]: 
+                          - gridcell "04ba4e74-82cd-4c70-933d-787986f12d6c.rg Open context menu" [ref=f4e427]:
+                            - generic [ref=f4e428]:
+                              - img [ref=f4e431]
+                              - link "04ba4e74-82cd-4c70-933d-787986f12d6c.rg" [ref=f4e433] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/04ba4e74-82cd-4c70-933d-787986f12d6c.rg
+                              - button "Open context menu" [ref=f4e434] [cursor=pointer]:
+                                - generic [ref=f4e436]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e437]:
+                            - link "AVNM-MSFT-01" [ref=f4e438] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e439]
+                        - row "Select row 04ede63d-fa65-4d04-8a70-c6ed3aa7a336.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e440]:
+                          - gridcell "Select row" [ref=f4e441]:
+                            - checkbox "Select row" [ref=f4e442]:
+                              - generic [ref=f4e443]:
+                                - generic [ref=f4e444]: 
+                                - generic [ref=f4e445]: 
+                          - gridcell "04ede63d-fa65-4d04-8a70-c6ed3aa7a336.rg Open context menu" [ref=f4e446]:
+                            - generic [ref=f4e447]:
+                              - img [ref=f4e450]
+                              - link "04ede63d-fa65-4d04-8a70-c6ed3aa7a336.rg" [ref=f4e452] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/04ede63d-fa65-4d04-8a70-c6ed3aa7a336.rg
+                              - button "Open context menu" [ref=f4e453] [cursor=pointer]:
+                                - generic [ref=f4e455]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e456]:
+                            - link "AVNM-MSFT-01" [ref=f4e457] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e458]
+                        - row "Select row 051d8520-1d67-40d4-a029-fe6fb3b6cd87.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e459]:
+                          - gridcell "Select row" [ref=f4e460]:
+                            - checkbox "Select row" [ref=f4e461]:
+                              - generic [ref=f4e462]:
+                                - generic [ref=f4e463]: 
+                                - generic [ref=f4e464]: 
+                          - gridcell "051d8520-1d67-40d4-a029-fe6fb3b6cd87.rg Open context menu" [ref=f4e465]:
+                            - generic [ref=f4e466]:
+                              - img [ref=f4e469]
+                              - link "051d8520-1d67-40d4-a029-fe6fb3b6cd87.rg" [ref=f4e471] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/051d8520-1d67-40d4-a029-fe6fb3b6cd87.rg
+                              - button "Open context menu" [ref=f4e472] [cursor=pointer]:
+                                - generic [ref=f4e474]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e475]:
+                            - link "AVNM-MSFT-01" [ref=f4e476] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e477]
+                        - row "Select row 05e3c5cb-883c-4309-b6ec-c34fccb25dbc.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e478]:
+                          - gridcell "Select row" [ref=f4e479]:
+                            - checkbox "Select row" [ref=f4e480]:
+                              - generic [ref=f4e481]:
+                                - generic [ref=f4e482]: 
+                                - generic [ref=f4e483]: 
+                          - gridcell "05e3c5cb-883c-4309-b6ec-c34fccb25dbc.rg Open context menu" [ref=f4e484]:
+                            - generic [ref=f4e485]:
+                              - img [ref=f4e488]
+                              - link "05e3c5cb-883c-4309-b6ec-c34fccb25dbc.rg" [ref=f4e490] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/05e3c5cb-883c-4309-b6ec-c34fccb25dbc.rg
+                              - button "Open context menu" [ref=f4e491] [cursor=pointer]:
+                                - generic [ref=f4e493]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e494]:
+                            - link "AVNM-MSFT-01" [ref=f4e495] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e496]
+                        - row "Select row 066f112a-1259-42cf-9ba8-2f07bb41f91f.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e497]:
+                          - gridcell "Select row" [ref=f4e498]:
+                            - checkbox "Select row" [ref=f4e499]:
+                              - generic [ref=f4e500]:
+                                - generic [ref=f4e501]: 
+                                - generic [ref=f4e502]: 
+                          - gridcell "066f112a-1259-42cf-9ba8-2f07bb41f91f.rg Open context menu" [ref=f4e503]:
+                            - generic [ref=f4e504]:
+                              - img [ref=f4e507]
+                              - link "066f112a-1259-42cf-9ba8-2f07bb41f91f.rg" [ref=f4e509] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/066f112a-1259-42cf-9ba8-2f07bb41f91f.rg
+                              - button "Open context menu" [ref=f4e510] [cursor=pointer]:
+                                - generic [ref=f4e512]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e513]:
+                            - link "AVNM-MSFT-01" [ref=f4e514] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e515]
+                        - row "Select row 067a62e5-5e88-494b-8951-2d574b0dbe26.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e516]:
+                          - gridcell "Select row" [ref=f4e517]:
+                            - checkbox "Select row" [ref=f4e518]:
+                              - generic [ref=f4e519]:
+                                - generic [ref=f4e520]: 
+                                - generic [ref=f4e521]: 
+                          - gridcell "067a62e5-5e88-494b-8951-2d574b0dbe26.rg Open context menu" [ref=f4e522]:
+                            - generic [ref=f4e523]:
+                              - img [ref=f4e526]
+                              - link "067a62e5-5e88-494b-8951-2d574b0dbe26.rg" [ref=f4e528] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/067a62e5-5e88-494b-8951-2d574b0dbe26.rg
+                              - button "Open context menu" [ref=f4e529] [cursor=pointer]:
+                                - generic [ref=f4e531]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e532]:
+                            - link "AVNM-MSFT-01" [ref=f4e533] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e534]
+                        - row "Select row 06a89850-dc20-44b6-934d-119eba153156.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e535]:
+                          - gridcell "Select row" [ref=f4e536]:
+                            - checkbox "Select row" [ref=f4e537]:
+                              - generic [ref=f4e538]:
+                                - generic [ref=f4e539]: 
+                                - generic [ref=f4e540]: 
+                          - gridcell "06a89850-dc20-44b6-934d-119eba153156.rg Open context menu" [ref=f4e541]:
+                            - generic [ref=f4e542]:
+                              - img [ref=f4e545]
+                              - link "06a89850-dc20-44b6-934d-119eba153156.rg" [ref=f4e547] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/06a89850-dc20-44b6-934d-119eba153156.rg
+                              - button "Open context menu" [ref=f4e548] [cursor=pointer]:
+                                - generic [ref=f4e550]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e551]:
+                            - link "AVNM-MSFT-01" [ref=f4e552] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e553]
+                        - row "Select row 06c29a26-032b-4856-9996-aea70516a044.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e554]:
+                          - gridcell "Select row" [ref=f4e555]:
+                            - checkbox "Select row" [ref=f4e556]:
+                              - generic [ref=f4e557]:
+                                - generic [ref=f4e558]: 
+                                - generic [ref=f4e559]: 
+                          - gridcell "06c29a26-032b-4856-9996-aea70516a044.rg Open context menu" [ref=f4e560]:
+                            - generic [ref=f4e561]:
+                              - img [ref=f4e564]
+                              - link "06c29a26-032b-4856-9996-aea70516a044.rg" [ref=f4e566] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/06c29a26-032b-4856-9996-aea70516a044.rg
+                              - button "Open context menu" [ref=f4e567] [cursor=pointer]:
+                                - generic [ref=f4e569]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e570]:
+                            - link "AVNM-MSFT-01" [ref=f4e571] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e572]
+                        - row "Select row 06cfd8e7-6188-4b72-b67d-2e24c0d91a82.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e573]:
+                          - gridcell "Select row" [ref=f4e574]:
+                            - checkbox "Select row" [ref=f4e575]:
+                              - generic [ref=f4e576]:
+                                - generic [ref=f4e577]: 
+                                - generic [ref=f4e578]: 
+                          - gridcell "06cfd8e7-6188-4b72-b67d-2e24c0d91a82.rg Open context menu" [ref=f4e579]:
+                            - generic [ref=f4e580]:
+                              - img [ref=f4e583]
+                              - link "06cfd8e7-6188-4b72-b67d-2e24c0d91a82.rg" [ref=f4e585] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/06cfd8e7-6188-4b72-b67d-2e24c0d91a82.rg
+                              - button "Open context menu" [ref=f4e586] [cursor=pointer]:
+                                - generic [ref=f4e588]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e589]:
+                            - link "AVNM-MSFT-01" [ref=f4e590] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e591]
+                        - row "Select row 07703287-c8ee-44ec-a08d-ec878a734ddf.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e592]:
+                          - gridcell "Select row" [ref=f4e593]:
+                            - checkbox "Select row" [ref=f4e594]:
+                              - generic [ref=f4e595]:
+                                - generic [ref=f4e596]: 
+                                - generic [ref=f4e597]: 
+                          - gridcell "07703287-c8ee-44ec-a08d-ec878a734ddf.rg Open context menu" [ref=f4e598]:
+                            - generic [ref=f4e599]:
+                              - img [ref=f4e602]
+                              - link "07703287-c8ee-44ec-a08d-ec878a734ddf.rg" [ref=f4e604] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/07703287-c8ee-44ec-a08d-ec878a734ddf.rg
+                              - button "Open context menu" [ref=f4e605] [cursor=pointer]:
+                                - generic [ref=f4e607]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e608]:
+                            - link "AVNM-MSFT-01" [ref=f4e609] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e610]
+                        - row "Select row 079237fb-22ea-4cd0-98a4-57732a8481cd.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e611]:
+                          - gridcell "Select row" [ref=f4e612]:
+                            - checkbox "Select row" [ref=f4e613]:
+                              - generic [ref=f4e614]:
+                                - generic [ref=f4e615]: 
+                                - generic [ref=f4e616]: 
+                          - gridcell "079237fb-22ea-4cd0-98a4-57732a8481cd.rg Open context menu" [ref=f4e617]:
+                            - generic [ref=f4e618]:
+                              - img [ref=f4e621]
+                              - link "079237fb-22ea-4cd0-98a4-57732a8481cd.rg" [ref=f4e623] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/079237fb-22ea-4cd0-98a4-57732a8481cd.rg
+                              - button "Open context menu" [ref=f4e624] [cursor=pointer]:
+                                - generic [ref=f4e626]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e627]:
+                            - link "AVNM-MSFT-01" [ref=f4e628] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e629]
+                        - row "Select row 07e20cc0-5fd5-49cc-89c9-cb52245f1544.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e630]:
+                          - gridcell "Select row" [ref=f4e631]:
+                            - checkbox "Select row" [ref=f4e632]:
+                              - generic [ref=f4e633]:
+                                - generic [ref=f4e634]: 
+                                - generic [ref=f4e635]: 
+                          - gridcell "07e20cc0-5fd5-49cc-89c9-cb52245f1544.rg Open context menu" [ref=f4e636]:
+                            - generic [ref=f4e637]:
+                              - img [ref=f4e640]
+                              - link "07e20cc0-5fd5-49cc-89c9-cb52245f1544.rg" [ref=f4e642] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/07e20cc0-5fd5-49cc-89c9-cb52245f1544.rg
+                              - button "Open context menu" [ref=f4e643] [cursor=pointer]:
+                                - generic [ref=f4e645]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e646]:
+                            - link "AVNM-MSFT-01" [ref=f4e647] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e648]
+                        - row "Select row 08650d3b-9364-4578-9621-2232f391fdd4.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e649]:
+                          - gridcell "Select row" [ref=f4e650]:
+                            - checkbox "Select row" [ref=f4e651]:
+                              - generic [ref=f4e652]:
+                                - generic [ref=f4e653]: 
+                                - generic [ref=f4e654]: 
+                          - gridcell "08650d3b-9364-4578-9621-2232f391fdd4.rg Open context menu" [ref=f4e655]:
+                            - generic [ref=f4e656]:
+                              - img [ref=f4e659]
+                              - link "08650d3b-9364-4578-9621-2232f391fdd4.rg" [ref=f4e661] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/08650d3b-9364-4578-9621-2232f391fdd4.rg
+                              - button "Open context menu" [ref=f4e662] [cursor=pointer]:
+                                - generic [ref=f4e664]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e665]:
+                            - link "AVNM-MSFT-01" [ref=f4e666] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e667]
+                        - row "Select row 08ad0d15-a9f0-449e-b43b-4f93ad18c3c9.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e668]:
+                          - gridcell "Select row" [ref=f4e669]:
+                            - checkbox "Select row" [ref=f4e670]:
+                              - generic [ref=f4e671]:
+                                - generic [ref=f4e672]: 
+                                - generic [ref=f4e673]: 
+                          - gridcell "08ad0d15-a9f0-449e-b43b-4f93ad18c3c9.rg Open context menu" [ref=f4e674]:
+                            - generic [ref=f4e675]:
+                              - img [ref=f4e678]
+                              - link "08ad0d15-a9f0-449e-b43b-4f93ad18c3c9.rg" [ref=f4e680] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/08ad0d15-a9f0-449e-b43b-4f93ad18c3c9.rg
+                              - button "Open context menu" [ref=f4e681] [cursor=pointer]:
+                                - generic [ref=f4e683]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e684]:
+                            - link "AVNM-MSFT-01" [ref=f4e685] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e686]
+                        - row "Select row 08d652caf97863863af18ebfa0f883795e2888d3a7bd302b44de34d29fdbed74-dummy Open context menu Defender for DevOps Test North Europe" [ref=f4e687]:
+                          - gridcell "Select row" [ref=f4e688]:
+                            - checkbox "Select row" [ref=f4e689]:
+                              - generic [ref=f4e690]:
+                                - generic [ref=f4e691]: 
+                                - generic [ref=f4e692]: 
+                          - gridcell "08d652caf97863863af18ebfa0f883795e2888d3a7bd302b44de34d29fdbed74-dummy Open context menu" [ref=f4e693]:
+                            - generic [ref=f4e694]:
+                              - img [ref=f4e697]
+                              - link "08d652caf97863863af18ebfa0f883795e2888d3a7bd302b44de34d29fdbed74-dummy" [ref=f4e699] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/89ecc633-9f4f-4b4f-9a5e-d5c6ed21eeac/resourceGroups/08d652caf97863863af18ebfa0f883795e2888d3a7bd302b44de34d29fdbed74-dummy
+                              - button "Open context menu" [ref=f4e700] [cursor=pointer]:
+                                - generic [ref=f4e702]: 
+                          - gridcell "Defender for DevOps Test" [ref=f4e703]:
+                            - link "Defender for DevOps Test" [ref=f4e704] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/89ecc633-9f4f-4b4f-9a5e-d5c6ed21eeac
+                          - gridcell "North Europe" [ref=f4e705]
+                        - row "Select row 09104877-344e-4c2b-a056-e78b458068c9.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e706]:
+                          - gridcell "Select row" [ref=f4e707]:
+                            - checkbox "Select row" [ref=f4e708]:
+                              - generic [ref=f4e709]:
+                                - generic [ref=f4e710]: 
+                                - generic [ref=f4e711]: 
+                          - gridcell "09104877-344e-4c2b-a056-e78b458068c9.rg Open context menu" [ref=f4e712]:
+                            - generic [ref=f4e713]:
+                              - img [ref=f4e716]
+                              - link "09104877-344e-4c2b-a056-e78b458068c9.rg" [ref=f4e718] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/09104877-344e-4c2b-a056-e78b458068c9.rg
+                              - button "Open context menu" [ref=f4e719] [cursor=pointer]:
+                                - generic [ref=f4e721]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e722]:
+                            - link "AVNM-MSFT-01" [ref=f4e723] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e724]
+                        - row "Select row 0995785388c7def8f49aa999ebfd1af5258b62f34d78215347283b22831e6fee-dummy Open context menu MDC-SRE-Infra-Dev Switzerland North" [ref=f4e725]:
+                          - gridcell "Select row" [ref=f4e726]:
+                            - checkbox "Select row" [ref=f4e727]:
+                              - generic [ref=f4e728]:
+                                - generic [ref=f4e729]: 
+                                - generic [ref=f4e730]: 
+                          - gridcell "0995785388c7def8f49aa999ebfd1af5258b62f34d78215347283b22831e6fee-dummy Open context menu" [ref=f4e731]:
+                            - generic [ref=f4e732]:
+                              - img [ref=f4e735]
+                              - link "0995785388c7def8f49aa999ebfd1af5258b62f34d78215347283b22831e6fee-dummy" [ref=f4e737] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830/resourceGroups/0995785388c7def8f49aa999ebfd1af5258b62f34d78215347283b22831e6fee-dummy
+                              - button "Open context menu" [ref=f4e738] [cursor=pointer]:
+                                - generic [ref=f4e740]: 
+                          - gridcell "MDC-SRE-Infra-Dev" [ref=f4e741]:
+                            - link "MDC-SRE-Infra-Dev" [ref=f4e742] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830
+                          - gridcell "Switzerland North" [ref=f4e743]
+                        - row "Select row 099d7c99-7de8-4a98-b068-9fdcdfbbd705.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e744]:
+                          - gridcell "Select row" [ref=f4e745]:
+                            - checkbox "Select row" [ref=f4e746]:
+                              - generic [ref=f4e747]:
+                                - generic [ref=f4e748]: 
+                                - generic [ref=f4e749]: 
+                          - gridcell "099d7c99-7de8-4a98-b068-9fdcdfbbd705.rg Open context menu" [ref=f4e750]:
+                            - generic [ref=f4e751]:
+                              - img [ref=f4e754]
+                              - link "099d7c99-7de8-4a98-b068-9fdcdfbbd705.rg" [ref=f4e756] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/099d7c99-7de8-4a98-b068-9fdcdfbbd705.rg
+                              - button "Open context menu" [ref=f4e757] [cursor=pointer]:
+                                - generic [ref=f4e759]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e760]:
+                            - link "AVNM-MSFT-01" [ref=f4e761] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e762]
+                        - row "Select row 0a145467-41c4-4baa-896d-4d7b4b30a6e5.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e763]:
+                          - gridcell "Select row" [ref=f4e764]:
+                            - checkbox "Select row" [ref=f4e765]:
+                              - generic [ref=f4e766]:
+                                - generic [ref=f4e767]: 
+                                - generic [ref=f4e768]: 
+                          - gridcell "0a145467-41c4-4baa-896d-4d7b4b30a6e5.rg Open context menu" [ref=f4e769]:
+                            - generic [ref=f4e770]:
+                              - img [ref=f4e773]
+                              - link "0a145467-41c4-4baa-896d-4d7b4b30a6e5.rg" [ref=f4e775] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0a145467-41c4-4baa-896d-4d7b4b30a6e5.rg
+                              - button "Open context menu" [ref=f4e776] [cursor=pointer]:
+                                - generic [ref=f4e778]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e779]:
+                            - link "AVNM-MSFT-01" [ref=f4e780] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e781]
+                        - row "Select row 0a9fe4a7-5e82-4cdb-8dde-d78e3b9057c5.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e782]:
+                          - gridcell "Select row" [ref=f4e783]:
+                            - checkbox "Select row" [ref=f4e784]:
+                              - generic [ref=f4e785]:
+                                - generic [ref=f4e786]: 
+                                - generic [ref=f4e787]: 
+                          - gridcell "0a9fe4a7-5e82-4cdb-8dde-d78e3b9057c5.rg Open context menu" [ref=f4e788]:
+                            - generic [ref=f4e789]:
+                              - img [ref=f4e792]
+                              - link "0a9fe4a7-5e82-4cdb-8dde-d78e3b9057c5.rg" [ref=f4e794] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0a9fe4a7-5e82-4cdb-8dde-d78e3b9057c5.rg
+                              - button "Open context menu" [ref=f4e795] [cursor=pointer]:
+                                - generic [ref=f4e797]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e798]:
+                            - link "AVNM-MSFT-01" [ref=f4e799] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e800]
+                        - row "Select row 0ab2a10f-f0a6-40c7-8b24-f718d4c3cf88.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e801]:
+                          - gridcell "Select row" [ref=f4e802]:
+                            - checkbox "Select row" [ref=f4e803]:
+                              - generic [ref=f4e804]:
+                                - generic [ref=f4e805]: 
+                                - generic [ref=f4e806]: 
+                          - gridcell "0ab2a10f-f0a6-40c7-8b24-f718d4c3cf88.rg Open context menu" [ref=f4e807]:
+                            - generic [ref=f4e808]:
+                              - img [ref=f4e811]
+                              - link "0ab2a10f-f0a6-40c7-8b24-f718d4c3cf88.rg" [ref=f4e813] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0ab2a10f-f0a6-40c7-8b24-f718d4c3cf88.rg
+                              - button "Open context menu" [ref=f4e814] [cursor=pointer]:
+                                - generic [ref=f4e816]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e817]:
+                            - link "AVNM-MSFT-01" [ref=f4e818] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e819]
+                        - row "Select row 0bda9aee-f074-4b60-8afb-6403d94411f6.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e820]:
+                          - gridcell "Select row" [ref=f4e821]:
+                            - checkbox "Select row" [ref=f4e822]:
+                              - generic [ref=f4e823]:
+                                - generic [ref=f4e824]: 
+                                - generic [ref=f4e825]: 
+                          - gridcell "0bda9aee-f074-4b60-8afb-6403d94411f6.rg Open context menu" [ref=f4e826]:
+                            - generic [ref=f4e827]:
+                              - img [ref=f4e830]
+                              - link "0bda9aee-f074-4b60-8afb-6403d94411f6.rg" [ref=f4e832] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0bda9aee-f074-4b60-8afb-6403d94411f6.rg
+                              - button "Open context menu" [ref=f4e833] [cursor=pointer]:
+                                - generic [ref=f4e835]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e836]:
+                            - link "AVNM-MSFT-01" [ref=f4e837] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e838]
+                        - row "Select row 0c668a5a-9f44-420b-b60b-a75d85f59d8c.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e839]:
+                          - gridcell "Select row" [ref=f4e840]:
+                            - checkbox "Select row" [ref=f4e841]:
+                              - generic [ref=f4e842]:
+                                - generic [ref=f4e843]: 
+                                - generic [ref=f4e844]: 
+                          - gridcell "0c668a5a-9f44-420b-b60b-a75d85f59d8c.rg Open context menu" [ref=f4e845]:
+                            - generic [ref=f4e846]:
+                              - img [ref=f4e849]
+                              - link "0c668a5a-9f44-420b-b60b-a75d85f59d8c.rg" [ref=f4e851] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0c668a5a-9f44-420b-b60b-a75d85f59d8c.rg
+                              - button "Open context menu" [ref=f4e852] [cursor=pointer]:
+                                - generic [ref=f4e854]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e855]:
+                            - link "AVNM-MSFT-01" [ref=f4e856] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e857]
+                        - row "Select row 0cc95c27-e84a-4703-ba69-83f42db52b9a.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e858]:
+                          - gridcell "Select row" [ref=f4e859]:
+                            - checkbox "Select row" [ref=f4e860]:
+                              - generic [ref=f4e861]:
+                                - generic [ref=f4e862]: 
+                                - generic [ref=f4e863]: 
+                          - gridcell "0cc95c27-e84a-4703-ba69-83f42db52b9a.rg Open context menu" [ref=f4e864]:
+                            - generic [ref=f4e865]:
+                              - img [ref=f4e868]
+                              - link "0cc95c27-e84a-4703-ba69-83f42db52b9a.rg" [ref=f4e870] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0cc95c27-e84a-4703-ba69-83f42db52b9a.rg
+                              - button "Open context menu" [ref=f4e871] [cursor=pointer]:
+                                - generic [ref=f4e873]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e874]:
+                            - link "AVNM-MSFT-01" [ref=f4e875] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e876]
+                        - row "Select row 0cde6dcc-c669-4eee-897c-966cc9a16133.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e877]:
+                          - gridcell "Select row" [ref=f4e878]:
+                            - checkbox "Select row" [ref=f4e879]:
+                              - generic [ref=f4e880]:
+                                - generic [ref=f4e881]: 
+                                - generic [ref=f4e882]: 
+                          - gridcell "0cde6dcc-c669-4eee-897c-966cc9a16133.rg Open context menu" [ref=f4e883]:
+                            - generic [ref=f4e884]:
+                              - img [ref=f4e887]
+                              - link "0cde6dcc-c669-4eee-897c-966cc9a16133.rg" [ref=f4e889] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0cde6dcc-c669-4eee-897c-966cc9a16133.rg
+                              - button "Open context menu" [ref=f4e890] [cursor=pointer]:
+                                - generic [ref=f4e892]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e893]:
+                            - link "AVNM-MSFT-01" [ref=f4e894] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e895]
+                        - row "Select row 0d616125-b680-4ea3-8269-ebff3682ad70.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e896]:
+                          - gridcell "Select row" [ref=f4e897]:
+                            - checkbox "Select row" [ref=f4e898]:
+                              - generic [ref=f4e899]:
+                                - generic [ref=f4e900]: 
+                                - generic [ref=f4e901]: 
+                          - gridcell "0d616125-b680-4ea3-8269-ebff3682ad70.rg Open context menu" [ref=f4e902]:
+                            - generic [ref=f4e903]:
+                              - img [ref=f4e906]
+                              - link "0d616125-b680-4ea3-8269-ebff3682ad70.rg" [ref=f4e908] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0d616125-b680-4ea3-8269-ebff3682ad70.rg
+                              - button "Open context menu" [ref=f4e909] [cursor=pointer]:
+                                - generic [ref=f4e911]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e912]:
+                            - link "AVNM-MSFT-01" [ref=f4e913] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e914]
+                        - row "Select row 0dc1984a-7c38-4368-87ed-802d33219d5a.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e915]:
+                          - gridcell "Select row" [ref=f4e916]:
+                            - checkbox "Select row" [ref=f4e917]:
+                              - generic [ref=f4e918]:
+                                - generic [ref=f4e919]: 
+                                - generic [ref=f4e920]: 
+                          - gridcell "0dc1984a-7c38-4368-87ed-802d33219d5a.rg Open context menu" [ref=f4e921]:
+                            - generic [ref=f4e922]:
+                              - img [ref=f4e925]
+                              - link "0dc1984a-7c38-4368-87ed-802d33219d5a.rg" [ref=f4e927] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0dc1984a-7c38-4368-87ed-802d33219d5a.rg
+                              - button "Open context menu" [ref=f4e928] [cursor=pointer]:
+                                - generic [ref=f4e930]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e931]:
+                            - link "AVNM-MSFT-01" [ref=f4e932] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e933]
+                        - row "Select row 0dd9139d-3011-4ad0-bf6d-afa1da40cfcc.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e934]:
+                          - gridcell "Select row" [ref=f4e935]:
+                            - checkbox "Select row" [ref=f4e936]:
+                              - generic [ref=f4e937]:
+                                - generic [ref=f4e938]: 
+                                - generic [ref=f4e939]: 
+                          - gridcell "0dd9139d-3011-4ad0-bf6d-afa1da40cfcc.rg Open context menu" [ref=f4e940]:
+                            - generic [ref=f4e941]:
+                              - img [ref=f4e944]
+                              - link "0dd9139d-3011-4ad0-bf6d-afa1da40cfcc.rg" [ref=f4e946] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0dd9139d-3011-4ad0-bf6d-afa1da40cfcc.rg
+                              - button "Open context menu" [ref=f4e947] [cursor=pointer]:
+                                - generic [ref=f4e949]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e950]:
+                            - link "AVNM-MSFT-01" [ref=f4e951] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e952]
+                        - row "Select row 0e2ff4d0-c172-40ab-8e39-69034d0e4ecb.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e953]:
+                          - gridcell "Select row" [ref=f4e954]:
+                            - checkbox "Select row" [ref=f4e955]:
+                              - generic [ref=f4e956]:
+                                - generic [ref=f4e957]: 
+                                - generic [ref=f4e958]: 
+                          - gridcell "0e2ff4d0-c172-40ab-8e39-69034d0e4ecb.rg Open context menu" [ref=f4e959]:
+                            - generic [ref=f4e960]:
+                              - img [ref=f4e963]
+                              - link "0e2ff4d0-c172-40ab-8e39-69034d0e4ecb.rg" [ref=f4e965] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0e2ff4d0-c172-40ab-8e39-69034d0e4ecb.rg
+                              - button "Open context menu" [ref=f4e966] [cursor=pointer]:
+                                - generic [ref=f4e968]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e969]:
+                            - link "AVNM-MSFT-01" [ref=f4e970] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e971]
+                        - row "Select row 0e38ce2f246881e0e0d4136c65ab0a45ae60aa4b87e037c67a30e00ad58f31d6-dummy Open context menu MDC-SRE-Infra-Dev Australia Southeast" [ref=f4e972]:
+                          - gridcell "Select row" [ref=f4e973]:
+                            - checkbox "Select row" [ref=f4e974]:
+                              - generic [ref=f4e975]:
+                                - generic [ref=f4e976]: 
+                                - generic [ref=f4e977]: 
+                          - gridcell "0e38ce2f246881e0e0d4136c65ab0a45ae60aa4b87e037c67a30e00ad58f31d6-dummy Open context menu" [ref=f4e978]:
+                            - generic [ref=f4e979]:
+                              - img [ref=f4e982]
+                              - link "0e38ce2f246881e0e0d4136c65ab0a45ae60aa4b87e037c67a30e00ad58f31d6-dummy" [ref=f4e984] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830/resourceGroups/0e38ce2f246881e0e0d4136c65ab0a45ae60aa4b87e037c67a30e00ad58f31d6-dummy
+                              - button "Open context menu" [ref=f4e985] [cursor=pointer]:
+                                - generic [ref=f4e987]: 
+                          - gridcell "MDC-SRE-Infra-Dev" [ref=f4e988]:
+                            - link "MDC-SRE-Infra-Dev" [ref=f4e989] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/bf163a87-8506-4eb3-8d14-c2dc95908830
+                          - gridcell "Australia Southeast" [ref=f4e990]
+                        - row "Select row 0ee5b814-986a-4807-9b4d-77269207c397.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e991]:
+                          - gridcell "Select row" [ref=f4e992]:
+                            - checkbox "Select row" [ref=f4e993]:
+                              - generic [ref=f4e994]:
+                                - generic [ref=f4e995]: 
+                                - generic [ref=f4e996]: 
+                          - gridcell "0ee5b814-986a-4807-9b4d-77269207c397.rg Open context menu" [ref=f4e997]:
+                            - generic [ref=f4e998]:
+                              - img [ref=f4e1001]
+                              - link "0ee5b814-986a-4807-9b4d-77269207c397.rg" [ref=f4e1003] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0ee5b814-986a-4807-9b4d-77269207c397.rg
+                              - button "Open context menu" [ref=f4e1004] [cursor=pointer]:
+                                - generic [ref=f4e1006]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1007]:
+                            - link "AVNM-MSFT-01" [ref=f4e1008] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1009]
+                        - row "Select row 0fd3a468-d2f8-453d-a0a1-d314b641b69d.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1010]:
+                          - gridcell "Select row" [ref=f4e1011]:
+                            - checkbox "Select row" [ref=f4e1012]:
+                              - generic [ref=f4e1013]:
+                                - generic [ref=f4e1014]: 
+                                - generic [ref=f4e1015]: 
+                          - gridcell "0fd3a468-d2f8-453d-a0a1-d314b641b69d.rg Open context menu" [ref=f4e1016]:
+                            - generic [ref=f4e1017]:
+                              - img [ref=f4e1020]
+                              - link "0fd3a468-d2f8-453d-a0a1-d314b641b69d.rg" [ref=f4e1022] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/0fd3a468-d2f8-453d-a0a1-d314b641b69d.rg
+                              - button "Open context menu" [ref=f4e1023] [cursor=pointer]:
+                                - generic [ref=f4e1025]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1026]:
+                            - link "AVNM-MSFT-01" [ref=f4e1027] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1028]
+                        - row "Select row 102d0951-5e9b-4b5a-b0cd-4f0eaf3e08b8.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1029]:
+                          - gridcell "Select row" [ref=f4e1030]:
+                            - checkbox "Select row" [ref=f4e1031]:
+                              - generic [ref=f4e1032]:
+                                - generic [ref=f4e1033]: 
+                                - generic [ref=f4e1034]: 
+                          - gridcell "102d0951-5e9b-4b5a-b0cd-4f0eaf3e08b8.rg Open context menu" [ref=f4e1035]:
+                            - generic [ref=f4e1036]:
+                              - img [ref=f4e1039]
+                              - link "102d0951-5e9b-4b5a-b0cd-4f0eaf3e08b8.rg" [ref=f4e1041] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/102d0951-5e9b-4b5a-b0cd-4f0eaf3e08b8.rg
+                              - button "Open context menu" [ref=f4e1042] [cursor=pointer]:
+                                - generic [ref=f4e1044]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1045]:
+                            - link "AVNM-MSFT-01" [ref=f4e1046] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1047]
+                        - row "Select row 103ea64e-a25b-49c8-9626-852065b32685.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1048]:
+                          - gridcell "Select row" [ref=f4e1049]:
+                            - checkbox "Select row" [ref=f4e1050]:
+                              - generic [ref=f4e1051]:
+                                - generic [ref=f4e1052]: 
+                                - generic [ref=f4e1053]: 
+                          - gridcell "103ea64e-a25b-49c8-9626-852065b32685.rg Open context menu" [ref=f4e1054]:
+                            - generic [ref=f4e1055]:
+                              - img [ref=f4e1058]
+                              - link "103ea64e-a25b-49c8-9626-852065b32685.rg" [ref=f4e1060] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/103ea64e-a25b-49c8-9626-852065b32685.rg
+                              - button "Open context menu" [ref=f4e1061] [cursor=pointer]:
+                                - generic [ref=f4e1063]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1064]:
+                            - link "AVNM-MSFT-01" [ref=f4e1065] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1066]
+                        - row "Select row 107e1def-7b78-40fe-9e90-a3c74ca745f4.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1067]:
+                          - gridcell "Select row" [ref=f4e1068]:
+                            - checkbox "Select row" [ref=f4e1069]:
+                              - generic [ref=f4e1070]:
+                                - generic [ref=f4e1071]: 
+                                - generic [ref=f4e1072]: 
+                          - gridcell "107e1def-7b78-40fe-9e90-a3c74ca745f4.rg Open context menu" [ref=f4e1073]:
+                            - generic [ref=f4e1074]:
+                              - img [ref=f4e1077]
+                              - link "107e1def-7b78-40fe-9e90-a3c74ca745f4.rg" [ref=f4e1079] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/107e1def-7b78-40fe-9e90-a3c74ca745f4.rg
+                              - button "Open context menu" [ref=f4e1080] [cursor=pointer]:
+                                - generic [ref=f4e1082]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1083]:
+                            - link "AVNM-MSFT-01" [ref=f4e1084] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1085]
+                        - row "Select row 10932f96386588a0c963d52a4499f107e393703a8b05f290f49f06caf9ca1fc0-dummy Open context menu Rome ILDC - Detection Dev Central US" [ref=f4e1086]:
+                          - gridcell "Select row" [ref=f4e1087]:
+                            - checkbox "Select row" [ref=f4e1088]:
+                              - generic [ref=f4e1089]:
+                                - generic [ref=f4e1090]: 
+                                - generic [ref=f4e1091]: 
+                          - gridcell "10932f96386588a0c963d52a4499f107e393703a8b05f290f49f06caf9ca1fc0-dummy Open context menu" [ref=f4e1092]:
+                            - generic [ref=f4e1093]:
+                              - img [ref=f4e1096]
+                              - link "10932f96386588a0c963d52a4499f107e393703a8b05f290f49f06caf9ca1fc0-dummy" [ref=f4e1098] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4009f3ee-43c4-4f19-97e4-32b6f2285a68/resourceGroups/10932f96386588a0c963d52a4499f107e393703a8b05f290f49f06caf9ca1fc0-dummy
+                              - button "Open context menu" [ref=f4e1099] [cursor=pointer]:
+                                - generic [ref=f4e1101]: 
+                          - gridcell "Rome ILDC - Detection Dev" [ref=f4e1102]:
+                            - link "Rome ILDC - Detection Dev" [ref=f4e1103] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4009f3ee-43c4-4f19-97e4-32b6f2285a68
+                          - gridcell "Central US" [ref=f4e1104]
+                        - row "Select row 10aa5c19-06a0-42d5-96b9-35f52ff01829.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1105]:
+                          - gridcell "Select row" [ref=f4e1106]:
+                            - checkbox "Select row" [ref=f4e1107]:
+                              - generic [ref=f4e1108]:
+                                - generic [ref=f4e1109]: 
+                                - generic [ref=f4e1110]: 
+                          - gridcell "10aa5c19-06a0-42d5-96b9-35f52ff01829.rg Open context menu" [ref=f4e1111]:
+                            - generic [ref=f4e1112]:
+                              - img [ref=f4e1115]
+                              - link "10aa5c19-06a0-42d5-96b9-35f52ff01829.rg" [ref=f4e1117] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/10aa5c19-06a0-42d5-96b9-35f52ff01829.rg
+                              - button "Open context menu" [ref=f4e1118] [cursor=pointer]:
+                                - generic [ref=f4e1120]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1121]:
+                            - link "AVNM-MSFT-01" [ref=f4e1122] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1123]
+                        - row "Select row 112b775e-bd8c-4b9a-b6ff-d5b8712aaefa.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1124]:
+                          - gridcell "Select row" [ref=f4e1125]:
+                            - checkbox "Select row" [ref=f4e1126]:
+                              - generic [ref=f4e1127]:
+                                - generic [ref=f4e1128]: 
+                                - generic [ref=f4e1129]: 
+                          - gridcell "112b775e-bd8c-4b9a-b6ff-d5b8712aaefa.rg Open context menu" [ref=f4e1130]:
+                            - generic [ref=f4e1131]:
+                              - img [ref=f4e1134]
+                              - link "112b775e-bd8c-4b9a-b6ff-d5b8712aaefa.rg" [ref=f4e1136] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/112b775e-bd8c-4b9a-b6ff-d5b8712aaefa.rg
+                              - button "Open context menu" [ref=f4e1137] [cursor=pointer]:
+                                - generic [ref=f4e1139]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1140]:
+                            - link "AVNM-MSFT-01" [ref=f4e1141] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1142]
+                        - row "Select row 1133d904-aa0f-4023-8151-39ea4ef1ff50.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1143]:
+                          - gridcell "Select row" [ref=f4e1144]:
+                            - checkbox "Select row" [ref=f4e1145]:
+                              - generic [ref=f4e1146]:
+                                - generic [ref=f4e1147]: 
+                                - generic [ref=f4e1148]: 
+                          - gridcell "1133d904-aa0f-4023-8151-39ea4ef1ff50.rg Open context menu" [ref=f4e1149]:
+                            - generic [ref=f4e1150]:
+                              - img [ref=f4e1153]
+                              - link "1133d904-aa0f-4023-8151-39ea4ef1ff50.rg" [ref=f4e1155] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/1133d904-aa0f-4023-8151-39ea4ef1ff50.rg
+                              - button "Open context menu" [ref=f4e1156] [cursor=pointer]:
+                                - generic [ref=f4e1158]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1159]:
+                            - link "AVNM-MSFT-01" [ref=f4e1160] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1161]
+                        - row "Select row 11740117-8e51-48c2-8846-60b0485afde3.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1162]:
+                          - gridcell "Select row" [ref=f4e1163]:
+                            - checkbox "Select row" [ref=f4e1164]:
+                              - generic [ref=f4e1165]:
+                                - generic [ref=f4e1166]: 
+                                - generic [ref=f4e1167]: 
+                          - gridcell "11740117-8e51-48c2-8846-60b0485afde3.rg Open context menu" [ref=f4e1168]:
+                            - generic [ref=f4e1169]:
+                              - img [ref=f4e1172]
+                              - link "11740117-8e51-48c2-8846-60b0485afde3.rg" [ref=f4e1174] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/11740117-8e51-48c2-8846-60b0485afde3.rg
+                              - button "Open context menu" [ref=f4e1175] [cursor=pointer]:
+                                - generic [ref=f4e1177]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1178]:
+                            - link "AVNM-MSFT-01" [ref=f4e1179] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1180]
+                        - row "Select row 119bb9a991987fbdb36787422871d21fb40d001a3083b944957b14894100953e-dummy Open context menu Rome ILDC - Rome3 Dev3 West Europe" [ref=f4e1181]:
+                          - gridcell "Select row" [ref=f4e1182]:
+                            - checkbox "Select row" [ref=f4e1183]:
+                              - generic [ref=f4e1184]:
+                                - generic [ref=f4e1185]: 
+                                - generic [ref=f4e1186]: 
+                          - gridcell "119bb9a991987fbdb36787422871d21fb40d001a3083b944957b14894100953e-dummy Open context menu" [ref=f4e1187]:
+                            - generic [ref=f4e1188]:
+                              - img [ref=f4e1191]
+                              - link "119bb9a991987fbdb36787422871d21fb40d001a3083b944957b14894100953e-dummy" [ref=f4e1193] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/0c31dbc7-6367-45ba-9665-8ab6f2b8b9af/resourceGroups/119bb9a991987fbdb36787422871d21fb40d001a3083b944957b14894100953e-dummy
+                              - button "Open context menu" [ref=f4e1194] [cursor=pointer]:
+                                - generic [ref=f4e1196]: 
+                          - gridcell "Rome ILDC - Rome3 Dev3" [ref=f4e1197]:
+                            - link "Rome ILDC - Rome3 Dev3" [ref=f4e1198] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/0c31dbc7-6367-45ba-9665-8ab6f2b8b9af
+                          - gridcell "West Europe" [ref=f4e1199]
+                        - row "Select row 11bb17dd-16a8-4420-805b-98873fa208d9.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1200]:
+                          - gridcell "Select row" [ref=f4e1201]:
+                            - checkbox "Select row" [ref=f4e1202]:
+                              - generic [ref=f4e1203]:
+                                - generic [ref=f4e1204]: 
+                                - generic [ref=f4e1205]: 
+                          - gridcell "11bb17dd-16a8-4420-805b-98873fa208d9.rg Open context menu" [ref=f4e1206]:
+                            - generic [ref=f4e1207]:
+                              - img [ref=f4e1210]
+                              - link "11bb17dd-16a8-4420-805b-98873fa208d9.rg" [ref=f4e1212] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/11bb17dd-16a8-4420-805b-98873fa208d9.rg
+                              - button "Open context menu" [ref=f4e1213] [cursor=pointer]:
+                                - generic [ref=f4e1215]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1216]:
+                            - link "AVNM-MSFT-01" [ref=f4e1217] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1218]
+                        - row "Select row 124a8895-7273-4ade-ba23-cc3a02023e87.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1219]:
+                          - gridcell "Select row" [ref=f4e1220]:
+                            - checkbox "Select row" [ref=f4e1221]:
+                              - generic [ref=f4e1222]:
+                                - generic [ref=f4e1223]: 
+                                - generic [ref=f4e1224]: 
+                          - gridcell "124a8895-7273-4ade-ba23-cc3a02023e87.rg Open context menu" [ref=f4e1225]:
+                            - generic [ref=f4e1226]:
+                              - img [ref=f4e1229]
+                              - link "124a8895-7273-4ade-ba23-cc3a02023e87.rg" [ref=f4e1231] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/124a8895-7273-4ade-ba23-cc3a02023e87.rg
+                              - button "Open context menu" [ref=f4e1232] [cursor=pointer]:
+                                - generic [ref=f4e1234]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1235]:
+                            - link "AVNM-MSFT-01" [ref=f4e1236] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1237]
+                        - row "Select row 12713bf2-b8b3-4c62-a737-5bd8e3e2e130.rg Open context menu AVNM-MSFT-01 East US" [ref=f4e1238]:
+                          - gridcell "Select row" [ref=f4e1239]:
+                            - checkbox "Select row" [ref=f4e1240]:
+                              - generic [ref=f4e1241]:
+                                - generic [ref=f4e1242]: 
+                                - generic [ref=f4e1243]: 
+                          - gridcell "12713bf2-b8b3-4c62-a737-5bd8e3e2e130.rg Open context menu" [ref=f4e1244]:
+                            - generic [ref=f4e1245]:
+                              - img [ref=f4e1248]
+                              - link "12713bf2-b8b3-4c62-a737-5bd8e3e2e130.rg" [ref=f4e1250] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29/resourceGroups/12713bf2-b8b3-4c62-a737-5bd8e3e2e130.rg
+                              - button "Open context menu" [ref=f4e1251] [cursor=pointer]:
+                                - generic [ref=f4e1253]: 
+                          - gridcell "AVNM-MSFT-01" [ref=f4e1254]:
+                            - link "AVNM-MSFT-01" [ref=f4e1255] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/2c505610-a5dd-473e-aa33-b31aac398e29
+                          - gridcell "East US" [ref=f4e1256]
+                        - row "Select row 13620cedf290f31b6654aff6156f21c2b8ba854ca2eb237a30b9a2afc8c88508-dummy Open context menu Rome ILDC - Rome3 Dev3 West US 3" [ref=f4e1257]:
+                          - gridcell "Select row" [ref=f4e1258]:
+                            - checkbox "Select row" [ref=f4e1259]:
+                              - generic [ref=f4e1260]:
+                                - generic [ref=f4e1261]: 
+                                - generic [ref=f4e1262]: 
+                          - gridcell "13620cedf290f31b6654aff6156f21c2b8ba854ca2eb237a30b9a2afc8c88508-dummy Open context menu" [ref=f4e1263]:
+                            - generic [ref=f4e1264]:
+                              - img [ref=f4e1267]
+                              - link "13620cedf290f31b6654aff6156f21c2b8ba854ca2eb237a30b9a2afc8c88508-dummy" [ref=f4e1269] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/0c31dbc7-6367-45ba-9665-8ab6f2b8b9af/resourceGroups/13620cedf290f31b6654aff6156f21c2b8ba854ca2eb237a30b9a2afc8c88508-dummy
+                              - button "Open context menu" [ref=f4e1270] [cursor=pointer]:
+                                - generic [ref=f4e1272]: 
+                          - gridcell "Rome ILDC - Rome3 Dev3" [ref=f4e1273]:
+                            - link "Rome ILDC - Rome3 Dev3" [ref=f4e1274] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/0c31dbc7-6367-45ba-9665-8ab6f2b8b9af
+                          - gridcell "West US 3" [ref=f4e1275]
+                    - generic [ref=f4e1276]:
+                      - status:
+                        - generic [ref=f4e1277]: 21025 results found
+                      - generic [ref=f4e1278]:
+                        - generic [ref=f4e1280]:
+                          - generic [ref=f4e1281]: "Showing 1 - 200 of 21025. Display count:"
+                          - combobox "Showing 1 - 200 of 21025. Display count:" [ref=f4e1283]:
+                            - generic [ref=f4e1284] [cursor=pointer]: "200"
+                            - generic [ref=f4e1285] [cursor=pointer]:
+                              - generic: 
+                        - navigation "Pagination" [ref=f4e1287]:
+                          - list [ref=f4e1288]:
+                            - listitem [ref=f4e1289]:
+                              - button "Previous" [disabled] [ref=f4e1290]:
+                                - img [ref=f4e1292]
+                            - listitem [ref=f4e1294]:
+                              - button "Page 1" [ref=f4e1295]: "1"
+                            - listitem [ref=f4e1296]:
+                              - button "Page 2" [ref=f4e1297]: "2"
+                            - listitem [ref=f4e1298]:
+                              - button "Page 3" [ref=f4e1299]: "3"
+                            - listitem [ref=f4e1300]:
+                              - button "Page 4" [ref=f4e1301]: "4"
+                            - listitem [ref=f4e1302]:
+                              - button "Page 5" [ref=f4e1303]: "5"
+                            - listitem [ref=f4e1304]:
+                              - button "Next" [ref=f4e1305]:
+                                - img [ref=f4e1307]
+                        - generic [ref=f4e1311]:
+                          - img [ref=f4e1313]
+                          - button "Give feedback" [ref=f4e1315] [cursor=pointer]
+              - img
+              - img
+              - img
+              - img
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is loading.
+      - generic: Microsoft Azure portal is ready.
+    - generic:
+      - generic: Content is loading.
+      - generic: Content is ready.
+      - generic: Content is ready.
+  - img [ref=e128]
+  - img [ref=e129]
+  - img [ref=e130]
+  - img [ref=e131]
+  - img [ref=e132]
+  - img [ref=e133]
+  - img [ref=e134]
+  - img [ref=e135]
+  - img [ref=e136]
+  - img [ref=e137]
+  - img [ref=e138]
+  - img [ref=e139]
+  - img [ref=e140]
+  - img [ref=e141]
+  - img [ref=e142]
+  - img [ref=e143]
+  - img [ref=e144]
+  - img [ref=e145]
+  - img [ref=e146]
+  - img [ref=e147]
+  - img [ref=e148]
+  - img [ref=e149]
+  - img [ref=e150]

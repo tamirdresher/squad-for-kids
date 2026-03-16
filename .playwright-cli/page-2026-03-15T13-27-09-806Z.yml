@@ -1,0 +1,638 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - button "Open menu" [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+          - link "Homepage (g then d)" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+        - generic [ref=e18]:
+          - navigation "Breadcrumbs" [ref=e19]:
+            - list [ref=e20]:
+              - listitem [ref=e21]:
+                - link "Settings" [ref=e22] [cursor=pointer]:
+                  - /url: /settings
+                  - generic [ref=e23]: Settings
+          - button "Search or jump to…" [ref=e26] [cursor=pointer]:
+            - generic [ref=e27]:
+              - generic:
+                - img
+              - generic [ref=e28]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e32]:
+              - link "Chat with Copilot" [ref=e34] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e35]
+              - button "Open Copilot…" [ref=e39] [cursor=pointer]:
+                - generic:
+                  - img
+            - button "Create new..." [ref=e41] [cursor=pointer]:
+              - generic [ref=e42]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues (g then i)" [ref=e43] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e44]
+            - link "Pull requests (g then p)" [ref=e47] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e48]
+            - link "Repositories" [ref=e50] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e51]
+          - link "You have no unread notifications (g then n)" [ref=e53] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e54]
+          - button "Open user navigation menu" [ref=e57] [cursor=pointer]:
+            - img "Yonatan Dresher" [ref=e58]
+  - main [ref=e61]:
+    - generic [ref=e62]:
+      - generic "Yonatan Dresher (yonatandresher) settings" [ref=e63]:
+        - generic [ref=e64]:
+          - img "@yonatandresher" [ref=e65]
+          - generic [ref=e66]:
+            - heading "Yonatan Dresher (yonatandresher) settings" [level=1] [ref=e67]:
+              - link "Yonatan Dresher (yonatandresher)" [ref=e68] [cursor=pointer]:
+                - /url: /yonatandresher
+              - generic [ref=e69]: settings
+            - paragraph [ref=e71]: Your personal account
+        - link "Go to your personal profile" [ref=e73] [cursor=pointer]:
+          - /url: /yonatandresher
+      - generic [ref=e74]:
+        - navigation "User settings" [ref=e78]:
+          - list [ref=e80]:
+            - listitem [ref=e81]:
+              - link "Public profile" [ref=e82] [cursor=pointer]:
+                - /url: /settings/profile
+                - generic:
+                  - img
+                - generic [ref=e83]: Public profile
+            - listitem [ref=e84]:
+              - link "Account" [ref=e85] [cursor=pointer]:
+                - /url: /settings/admin
+                - generic:
+                  - img
+                - generic [ref=e86]: Account
+            - listitem [ref=e87]:
+              - link "Appearance" [ref=e88] [cursor=pointer]:
+                - /url: /settings/appearance
+                - generic:
+                  - img
+                - generic [ref=e89]: Appearance
+            - listitem [ref=e90]:
+              - link "Accessibility" [ref=e91] [cursor=pointer]:
+                - /url: /settings/accessibility
+                - generic:
+                  - img
+                - generic [ref=e92]: Accessibility
+            - listitem [ref=e93]:
+              - link "Notifications" [ref=e94] [cursor=pointer]:
+                - /url: /settings/notifications
+                - generic:
+                  - img
+                - generic [ref=e95]: Notifications
+            - listitem [ref=e96]
+            - listitem [ref=e97]:
+              - generic [ref=e100]:
+                - heading "Access" [level=2] [ref=e102]
+                - list "Access" [ref=e103]:
+                  - listitem [ref=e104]:
+                    - button "Billing and licensing" [expanded] [ref=e105] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e106]: Billing and licensing
+                      - generic:
+                        - img
+                    - list "Billing and licensing" [ref=e107]:
+                      - listitem [ref=e108]:
+                        - link "Overview" [ref=e109] [cursor=pointer]:
+                          - /url: https://github.com/settings/billing
+                          - generic [ref=e110]: Overview
+                      - listitem [ref=e111]:
+                        - link "Usage" [ref=e112] [cursor=pointer]:
+                          - /url: https://github.com/settings/billing/usage
+                          - generic [ref=e113]: Usage
+                      - listitem [ref=e114]:
+                        - link "Premium request analytics" [ref=e115] [cursor=pointer]:
+                          - /url: /settings/billing/premium_requests_usage
+                          - generic [ref=e116]: Premium request analytics
+                      - listitem [ref=e117]:
+                        - link "Budgets and alerts" [ref=e118] [cursor=pointer]:
+                          - /url: https://github.com/settings/billing/budgets
+                          - generic [ref=e119]: Budgets and alerts
+                      - listitem [ref=e120]:
+                        - link "Licensing" [ref=e121] [cursor=pointer]:
+                          - /url: /settings/billing/licensing
+                          - generic [ref=e122]: Licensing
+                      - listitem [ref=e123]:
+                        - link "Payment information" [ref=e124] [cursor=pointer]:
+                          - /url: /settings/billing/payment_information
+                          - generic [ref=e125]: Payment information
+                      - listitem [ref=e126]:
+                        - link "Payment history" [ref=e127] [cursor=pointer]:
+                          - /url: https://github.com/account/billing/history
+                          - generic [ref=e128]: Payment history
+                      - listitem [ref=e129]:
+                        - link "Additional billing details" [ref=e130] [cursor=pointer]:
+                          - /url: /settings/billing/subscriptions
+                          - generic [ref=e131]: Additional billing details
+                      - listitem [ref=e132]:
+                        - link "Education benefits" [ref=e133] [cursor=pointer]:
+                          - /url: /settings/education/benefits
+                          - generic [ref=e134]: Education benefits
+                  - listitem [ref=e135]:
+                    - link "Emails" [ref=e136] [cursor=pointer]:
+                      - /url: /settings/emails
+                      - generic:
+                        - img
+                      - generic [ref=e137]: Emails
+                  - listitem [ref=e138]:
+                    - link "Password and authentication" [ref=e139] [cursor=pointer]:
+                      - /url: /settings/security
+                      - generic:
+                        - img
+                      - generic [ref=e140]: Password and authentication
+                  - listitem [ref=e141]:
+                    - link "Sessions" [ref=e142] [cursor=pointer]:
+                      - /url: /settings/sessions
+                      - generic:
+                        - img
+                      - generic [ref=e143]: Sessions
+                  - listitem [ref=e144]:
+                    - link "SSH and GPG keys" [ref=e145] [cursor=pointer]:
+                      - /url: /settings/keys
+                      - generic:
+                        - img
+                      - generic [ref=e146]: SSH and GPG keys
+                  - listitem [ref=e147]:
+                    - link "Organizations" [ref=e148] [cursor=pointer]:
+                      - /url: /settings/organizations
+                      - generic:
+                        - img
+                      - generic [ref=e149]: Organizations
+                  - listitem [ref=e150]:
+                    - link "Enterprises" [ref=e151] [cursor=pointer]:
+                      - /url: /settings/enterprises
+                      - generic:
+                        - generic:
+                          - img
+                      - generic [ref=e152]: Enterprises
+                  - listitem [ref=e153]:
+                    - button "Moderation" [ref=e154] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e155]: Moderation
+                      - generic:
+                        - img
+            - listitem [ref=e156]
+            - listitem [ref=e157]:
+              - generic [ref=e160]:
+                - heading "Code, planning, and automation" [level=2] [ref=e162]
+                - list "Code, planning, and automation" [ref=e163]:
+                  - listitem [ref=e164]:
+                    - link "Repositories" [ref=e165] [cursor=pointer]:
+                      - /url: /settings/repositories
+                      - generic:
+                        - img
+                      - generic [ref=e166]: Repositories
+                  - listitem [ref=e167]:
+                    - link "Codespaces" [ref=e168] [cursor=pointer]:
+                      - /url: /settings/codespaces
+                      - generic:
+                        - img
+                      - generic [ref=e169]: Codespaces
+                  - listitem [ref=e170]:
+                    - link "Models Preview feature" [ref=e171] [cursor=pointer]:
+                      - /url: /settings/models
+                      - generic:
+                        - img
+                      - generic [ref=e172]: Models
+                      - generic:
+                        - generic "Preview feature": Preview
+                  - listitem [ref=e173]:
+                    - link "Packages" [ref=e174] [cursor=pointer]:
+                      - /url: /settings/packages
+                      - generic:
+                        - img
+                      - generic [ref=e175]: Packages
+                  - listitem [ref=e176]:
+                    - button "Copilot" [ref=e177] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e178]: Copilot
+                      - generic:
+                        - img
+                  - listitem [ref=e179]:
+                    - link "Pages" [ref=e180] [cursor=pointer]:
+                      - /url: /settings/pages
+                      - generic:
+                        - img
+                      - generic [ref=e181]: Pages
+                  - listitem [ref=e182]:
+                    - link "Saved replies" [ref=e183] [cursor=pointer]:
+                      - /url: /settings/replies
+                      - generic:
+                        - img
+                      - generic [ref=e184]: Saved replies
+            - listitem [ref=e185]
+            - listitem [ref=e186]:
+              - generic [ref=e189]:
+                - heading "Security" [level=2] [ref=e191]
+                - list "Security" [ref=e192]:
+                  - listitem [ref=e193]:
+                    - link "Code security" [ref=e194] [cursor=pointer]:
+                      - /url: /settings/security_analysis
+                      - generic:
+                        - img
+                      - generic [ref=e195]: Code security
+            - listitem [ref=e196]
+            - listitem [ref=e197]:
+              - generic [ref=e200]:
+                - heading "Integrations" [level=3] [ref=e202]
+                - list "Integrations" [ref=e203]:
+                  - listitem [ref=e204]:
+                    - link "Applications" [ref=e205] [cursor=pointer]:
+                      - /url: /settings/installations
+                      - generic:
+                        - img
+                      - generic [ref=e206]: Applications
+                  - listitem [ref=e207]:
+                    - link "Scheduled reminders" [ref=e208] [cursor=pointer]:
+                      - /url: /settings/reminders
+                      - generic:
+                        - img
+                      - generic [ref=e209]: Scheduled reminders
+            - listitem [ref=e210]
+            - listitem [ref=e211]:
+              - generic [ref=e214]:
+                - heading "Archives" [level=2] [ref=e216]
+                - list "Archives" [ref=e217]:
+                  - listitem [ref=e218]:
+                    - link "Security log" [ref=e219] [cursor=pointer]:
+                      - /url: /settings/security-log
+                      - generic:
+                        - img
+                      - generic [ref=e220]: Security log
+                  - listitem [ref=e221]:
+                    - link "Sponsorship log" [ref=e222] [cursor=pointer]:
+                      - /url: /settings/sponsors-log
+                      - generic:
+                        - img
+                      - generic [ref=e223]: Sponsorship log
+            - listitem [ref=e224]
+            - listitem [ref=e225]:
+              - link "Developer settings" [ref=e226] [cursor=pointer]:
+                - /url: /settings/apps
+                - generic:
+                  - img
+                - generic [ref=e227]: Developer settings
+        - generic [ref=e232]:
+          - heading "Payment information" [level=2] [ref=e234]
+          - generic [ref=e237]:
+            - heading "Billing information" [level=3] [ref=e238]
+            - generic [ref=e239]:
+              - paragraph [ref=e240]: Add your information to show on every invoice
+              - generic [ref=e244]:
+                - generic [ref=e245]:
+                  - generic [ref=e246]:
+                    - generic [ref=e247]: First name *
+                    - textbox "First name" [ref=e249]: Yonatan
+                  - generic [ref=e250]:
+                    - generic [ref=e251]: Last name *
+                    - textbox "Last name" [ref=e253]: Dresher
+                - generic [ref=e255]:
+                  - generic [ref=e256]: Address (Street, P.O. box) *
+                  - textbox "Address (Street, P.O. box)" [ref=e258]: Petah Tikva
+                - generic [ref=e260]:
+                  - generic [ref=e261]: Address line 2 (Apartment, suite, unit)
+                  - textbox "Address line 2 (Apartment, suite, unit)" [ref=e263]
+                - generic [ref=e265]:
+                  - generic [ref=e266]: City *
+                  - textbox "City" [active] [ref=e268]: Petah Tikva
+                - generic [ref=e270]:
+                  - generic [ref=e271]: Country/Region *
+                  - combobox "Country/Region" [ref=e273]:
+                    - option "Choose your country/region"
+                    - option "Afghanistan"
+                    - option "Åland"
+                    - option "Albania"
+                    - option "Algeria"
+                    - option "American Samoa"
+                    - option "Andorra"
+                    - option "Angola"
+                    - option "Anguilla"
+                    - option "Antarctica"
+                    - option "Antigua and Barbuda"
+                    - option "Argentina"
+                    - option "Armenia"
+                    - option "Aruba"
+                    - option "Australia"
+                    - option "Austria"
+                    - option "Azerbaijan"
+                    - option "Bahamas"
+                    - option "Bahrain"
+                    - option "Bangladesh"
+                    - option "Barbados"
+                    - option "Belarus"
+                    - option "Belgium"
+                    - option "Belize"
+                    - option "Benin"
+                    - option "Bermuda"
+                    - option "Bhutan"
+                    - option "Bolivia"
+                    - option "Bonaire, Sint Eustatius and Saba"
+                    - option "Bosnia and Herzegovina"
+                    - option "Botswana"
+                    - option "Bouvet Island"
+                    - option "Brazil"
+                    - option "British Indian Ocean Territory"
+                    - option "Brunei Darussalam"
+                    - option "Bulgaria"
+                    - option "Burkina Faso"
+                    - option "Burundi"
+                    - option "Cambodia"
+                    - option "Cameroon"
+                    - option "Canada"
+                    - option "Cape Verde"
+                    - option "Cayman Islands"
+                    - option "Central African Republic"
+                    - option "Chad"
+                    - option "Chile"
+                    - option "China"
+                    - option "Christmas Island"
+                    - option "Cocos (Keeling) Islands"
+                    - option "Colombia"
+                    - option "Comoros"
+                    - option "Congo (Brazzaville)"
+                    - option "Congo (Kinshasa)"
+                    - option "Cook Islands"
+                    - option "Costa Rica"
+                    - option "Côte d'Ivoire"
+                    - option "Croatia"
+                    - option "Curaçao"
+                    - option "Cyprus"
+                    - option "Czech Republic"
+                    - option "Denmark"
+                    - option "Djibouti"
+                    - option "Dominica"
+                    - option "Dominican Republic"
+                    - option "Ecuador"
+                    - option "Egypt"
+                    - option "El Salvador"
+                    - option "Equatorial Guinea"
+                    - option "Eritrea"
+                    - option "Estonia"
+                    - option "Ethiopia"
+                    - option "Falkland Islands"
+                    - option "Faroe Islands"
+                    - option "Fiji"
+                    - option "Finland"
+                    - option "France"
+                    - option "French Guiana"
+                    - option "French Polynesia"
+                    - option "French Southern Lands"
+                    - option "Gabon"
+                    - option "Gambia"
+                    - option "Georgia"
+                    - option "Germany"
+                    - option "Ghana"
+                    - option "Gibraltar"
+                    - option "Greece"
+                    - option "Greenland"
+                    - option "Grenada"
+                    - option "Guadeloupe"
+                    - option "Guam"
+                    - option "Guatemala"
+                    - option "Guernsey"
+                    - option "Guinea"
+                    - option "Guinea-Bissau"
+                    - option "Guyana"
+                    - option "Haiti"
+                    - option "Heard and McDonald Islands"
+                    - option "Honduras"
+                    - option "Hong Kong"
+                    - option "Hungary"
+                    - option "Iceland"
+                    - option "India"
+                    - option "Indonesia"
+                    - option "Iran"
+                    - option "Iraq"
+                    - option "Ireland"
+                    - option "Isle of Man"
+                    - option "Israel" [selected]
+                    - option "Italy"
+                    - option "Jamaica"
+                    - option "Japan"
+                    - option "Jersey"
+                    - option "Jordan"
+                    - option "Kazakhstan"
+                    - option "Kenya"
+                    - option "Kiribati"
+                    - option "Korea, South"
+                    - option "Kuwait"
+                    - option "Kyrgyzstan"
+                    - option "Laos"
+                    - option "Latvia"
+                    - option "Lebanon"
+                    - option "Lesotho"
+                    - option "Liberia"
+                    - option "Libya"
+                    - option "Liechtenstein"
+                    - option "Lithuania"
+                    - option "Luxembourg"
+                    - option "Macau"
+                    - option "Macedonia"
+                    - option "Madagascar"
+                    - option "Malawi"
+                    - option "Malaysia"
+                    - option "Maldives"
+                    - option "Mali"
+                    - option "Malta"
+                    - option "Marshall Islands"
+                    - option "Martinique"
+                    - option "Mauritania"
+                    - option "Mauritius"
+                    - option "Mayotte"
+                    - option "Mexico"
+                    - option "Micronesia"
+                    - option "Moldova"
+                    - option "Monaco"
+                    - option "Mongolia"
+                    - option "Montenegro"
+                    - option "Montserrat"
+                    - option "Morocco"
+                    - option "Mozambique"
+                    - option "Myanmar"
+                    - option "Namibia"
+                    - option "Nauru"
+                    - option "Nepal"
+                    - option "Netherlands"
+                    - option "New Caledonia"
+                    - option "New Zealand"
+                    - option "Nicaragua"
+                    - option "Niger"
+                    - option "Nigeria"
+                    - option "Niue"
+                    - option "Norfolk Island"
+                    - option "Northern Mariana Islands"
+                    - option "Norway"
+                    - option "Oman"
+                    - option "Pakistan"
+                    - option "Palau"
+                    - option "Palestine"
+                    - option "Panama"
+                    - option "Papua New Guinea"
+                    - option "Paraguay"
+                    - option "Peru"
+                    - option "Philippines"
+                    - option "Pitcairn"
+                    - option "Poland"
+                    - option "Portugal"
+                    - option "Puerto Rico"
+                    - option "Qatar"
+                    - option "Reunion"
+                    - option "Romania"
+                    - option "Russian Federation"
+                    - option "Rwanda"
+                    - option "Saint Barthélemy"
+                    - option "Saint Helena"
+                    - option "Saint Kitts and Nevis"
+                    - option "Saint Lucia"
+                    - option "Saint Martin (French part)"
+                    - option "Saint Pierre and Miquelon"
+                    - option "Saint Vincent and the Grenadines"
+                    - option "Samoa"
+                    - option "San Marino"
+                    - option "Sao Tome and Principe"
+                    - option "Saudi Arabia"
+                    - option "Senegal"
+                    - option "Serbia"
+                    - option "Seychelles"
+                    - option "Sierra Leone"
+                    - option "Singapore"
+                    - option "Sint Maarten (Dutch part)"
+                    - option "Slovakia"
+                    - option "Slovenia"
+                    - option "Solomon Islands"
+                    - option "Somalia"
+                    - option "South Africa"
+                    - option "South Georgia and South Sandwich Islands"
+                    - option "South Sudan"
+                    - option "Spain"
+                    - option "Sri Lanka"
+                    - option "Sudan"
+                    - option "Suriname"
+                    - option "Svalbard and Jan Mayen Islands"
+                    - option "Swaziland"
+                    - option "Sweden"
+                    - option "Switzerland"
+                    - option "Syria"
+                    - option "Taiwan"
+                    - option "Tajikistan"
+                    - option "Tanzania"
+                    - option "Thailand"
+                    - option "Timor-Leste"
+                    - option "Togo"
+                    - option "Tokelau"
+                    - option "Tonga"
+                    - option "Trinidad and Tobago"
+                    - option "Tunisia"
+                    - option "Türkiye"
+                    - option "Turkmenistan"
+                    - option "Turks and Caicos Islands"
+                    - option "Tuvalu"
+                    - option "Uganda"
+                    - option "Ukraine"
+                    - option "United Arab Emirates"
+                    - option "United Kingdom"
+                    - option "United States Minor Outlying Islands"
+                    - option "United States of America"
+                    - option "Uruguay"
+                    - option "Uzbekistan"
+                    - option "Vanuatu"
+                    - option "Vatican City"
+                    - option "Venezuela"
+                    - option "Vietnam"
+                    - option "Virgin Islands, British"
+                    - option "Virgin Islands, U.S."
+                    - option "Wallis and Futuna Islands"
+                    - option "Western Sahara"
+                    - option "Yemen"
+                    - option "Zambia"
+                    - option "Zimbabwe"
+                - generic [ref=e274]:
+                  - generic [ref=e275]:
+                    - text: State/Province
+                    - textbox "State/Province" [ref=e278]
+                    - text: Required for certain countries
+                  - generic [ref=e279]:
+                    - generic [ref=e280]: Postal/Zip code (9-digit zip code for US)
+                    - textbox "Postal/Zip code (9-digit zip code for US)" [ref=e282]
+                    - text: Required for certain countries
+                - generic [ref=e286]:
+                  - text: VAT/GST ID
+                  - textbox "VAT/GST ID" [ref=e288]
+                - button "Save billing information" [ref=e290] [cursor=pointer]:
+                  - generic [ref=e292]: Save billing information
+          - generic [ref=e293]:
+            - generic [ref=e294]:
+              - heading "Coupon" [level=3] [ref=e295]
+              - paragraph [ref=e296]: You don't have an active coupon.
+            - link "Redeem a coupon" [ref=e298] [cursor=pointer]:
+              - /url: /redeem
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - generic [ref=e301]:
+                - heading "Additional information" [level=3] [ref=e302]
+                - button "Additional information" [ref=e303] [cursor=pointer]:
+                  - img
+              - paragraph [ref=e304]: No additional information added to your receipts.
+            - button "Add information" [ref=e307] [cursor=pointer]:
+              - generic [ref=e309]: Add information
+  - contentinfo [ref=e310]:
+    - heading "Footer" [level=2] [ref=e311]
+    - generic [ref=e312]:
+      - generic [ref=e313]:
+        - link "GitHub Homepage" [ref=e314] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e315]
+        - generic [ref=e317]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e318]:
+        - heading "Footer navigation" [level=3] [ref=e319]
+        - list "Footer navigation" [ref=e320]:
+          - listitem [ref=e321]:
+            - link "Terms" [ref=e322] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e323]:
+            - link "Privacy" [ref=e324] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e325]:
+            - link "Security" [ref=e326] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e327]:
+            - link "Status" [ref=e328] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e329]:
+            - link "Community" [ref=e330] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e331]:
+            - link "Docs" [ref=e332] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e333]:
+            - link "Contact" [ref=e334] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e335]:
+            - button "Manage cookies" [ref=e337] [cursor=pointer]
+          - listitem [ref=e338]:
+            - button "Do not share my personal information" [ref=e340] [cursor=pointer]

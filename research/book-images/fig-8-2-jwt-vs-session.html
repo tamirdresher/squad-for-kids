@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+.comparison { display: flex; gap: 30px; }
+.side { flex: 1; border: 2px solid #ddd; border-radius: 12px; overflow: hidden; }
+.ai-header { background: #e3f2fd; color: #1565c0; padding: 14px 16px; font-weight: 700; font-size: 16px; text-align: center; }
+.human-header { background: #c8e6c9; color: #1b5e20; padding: 14px 16px; font-weight: 700; font-size: 16px; text-align: center; }
+.subsection { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
+.subsection h4 { margin: 0 0 8px; font-size: 14px; color: #555; }
+.pro { color: #2e7d32; }
+.con { color: #c62828; }
+.subsection ul { margin: 0; padding-left: 18px; font-size: 13px; }
+.subsection li { margin-bottom: 4px; }
+.cant-know { background: #fff3e0; margin: 0; padding: 12px 16px; }
+.cant-know h4 { margin: 0 0 8px; font-size: 14px; color: #e65100; }
+.cant-know ul { margin: 0; padding-left: 18px; font-size: 13px; }
+.decision { background: #e8f5e9; padding: 16px; }
+.decision h4 { margin: 0 0 8px; color: #1b5e20; font-size: 15px; }
+.decision ol { margin: 0; padding-left: 18px; font-size: 13px; }
+.human-insight { padding: 14px 16px; font-style: italic; color: #555; font-size: 14px; background: #fafafa; border-top: 1px solid #e0e0e0; }
+</style></head><body>
+<div class="container">
+<h2>Figure 8.2: Architecture Trade-Off — JWT vs Session</h2>
+<p class="subtitle">AI provides perfect analysis. Humans add context AI literally cannot access.</p>
+<div class="comparison">
+<div class="side">
+<div class="ai-header">🎖️ AI Analysis (Picard)</div>
+<div class="subsection">
+<h4 class="pro">JWT Pros</h4>
+<ul><li>✓ Stateless (horizontal scale)</li><li>✓ Works cross-domain</li><li>✓ Industry standard</li><li>✓ Reduces DB load</li></ul>
+</div>
+<div class="subsection">
+<h4 class="con">JWT Cons</h4>
+<ul><li>✗ Can't revoke easily</li><li>✗ Larger payload (mobile)</li><li>✗ Complex refresh logic</li><li>✗ More secret management</li></ul>
+</div>
+<div class="subsection">
+<h4 class="pro">Session Pros</h4>
+<ul><li>✓ Simple</li><li>✓ Easy revoke</li><li>✓ Small cookies</li><li>✓ Server controls everything</li></ul>
+</div>
+<div class="subsection">
+<h4 class="con">Session Cons</h4>
+<ul><li>✗ DB lookup every request</li><li>✗ No horizontal scale</li><li>✗ Cross-domain issues</li><li>✗ Tight coupling</li></ul>
+</div>
+</div>
+<div class="side">
+<div class="human-header">👤 Human Judgment (Tamir)</div>
+<div class="cant-know">
+<h4>❌ What AI Can't Know</h4>
+<ul><li>Roadmap (hiring DevOps Q2)</li><li>Mobile team bandwidth</li><li>CEO's priorities this quarter</li><li>Security mandate scope</li><li>Demo timing constraints</li></ul>
+</div>
+<div class="decision">
+<h4>✅ Decision: JWT</h4>
+<ol><li>Mobile team has bandwidth</li><li>DevOps hiring Q2 → scale ready</li><li>Security mandate: admin only</li><li>Demo in 2 weeks → JWT ready</li><li>No admin session revoke need</li></ol>
+</div>
+<div class="human-insight">
+"Picard gave me perfect data. But only I know our constraints. I picked JWT because of context he literally cannot access."
+</div>
+</div>
+</div>
+</div>
+</body></html>

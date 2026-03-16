@@ -1,0 +1,16 @@
+graph TD
+    A["PR Ready for Merge?"] --> B{{"Tests<br/>Passing?"}}
+    B -->|No| C["❌ Block PR<br/>CI Pipeline"]
+    B -->|Yes| D{{"Approvals<br/>Met?"}}
+    D -->|No| E["⏳ Wait for Review"]
+    D -->|Yes| F{{"Conflicts<br/>Detected?"}}
+    F -->|Yes| G["⚠️ Notify Author<br/>Resolve Conflicts"]
+    F -->|No| H{{"Decision<br/>Documented?"}}
+    H -->|No| I["📝 Request Decision Entry"]
+    H -->|Yes| J{{"needs-human-review<br/>Label?"}}
+    J -->|Yes| K["👤 Flag for Human Review"]
+    J -->|No| L["✅ AUTO-MERGE<br/>Close Issue<br/>Update decisions.md"]
+    
+    style L fill:#c8e6c9,color:#333
+    style C fill:#ffcdd2,color:#333
+    style K fill:#fff9c4,color:#333

@@ -1,0 +1,198 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - link "Home" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Home" [ref=e8]
+      - list [ref=e11]:
+        - listitem [ref=e12]:
+          - link "Download" [ref=e13] [cursor=pointer]:
+            - /url: /download
+        - listitem [ref=e14]:
+          - link "Nitro" [ref=e15] [cursor=pointer]:
+            - /url: /nitro
+        - listitem [ref=e16]:
+          - link "Discover" [ref=e17] [cursor=pointer]:
+            - /url: /servers
+        - listitem [ref=e18]:
+          - button "Safety" [ref=e20] [cursor=pointer]:
+            - generic [ref=e21]: Safety
+            - img [ref=e24]
+        - listitem [ref=e26]:
+          - button "Quests" [ref=e28] [cursor=pointer]:
+            - generic [ref=e29]: Quests
+            - img [ref=e32]
+        - listitem [ref=e34]:
+          - button "Support" [ref=e36] [cursor=pointer]:
+            - generic [ref=e37]: Support
+            - img [ref=e40]
+        - listitem [ref=e42]:
+          - button "Blog" [ref=e44] [cursor=pointer]:
+            - generic [ref=e45]: Blog
+            - img [ref=e48]
+        - listitem [ref=e50]:
+          - button "Developers" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: Developers
+            - img [ref=e56]
+        - listitem [ref=e58]:
+          - link "Careers" [ref=e59] [cursor=pointer]:
+            - /url: /careers
+      - link "Log In" [ref=e61] [cursor=pointer]:
+        - /url: https://discord.com/login
+  - generic [ref=e64]:
+    - generic [ref=e66]:
+      - heading "Group chat that’s all fun & games" [level=1] [ref=e69]
+      - paragraph [ref=e71]: Discord is great for playing games and chilling with friends, or even building a worldwide community. Customize your own space to talk, play, and hang out.
+    - complementary [ref=e78]:
+      - generic [ref=e79]:
+        - link "Download for Windows" [ref=e80] [cursor=pointer]:
+          - /url: //discord.com/api/downloads/distributions/app/installers/latest?channel=stable&platform=win&arch=x64
+          - img [ref=e81]
+          - text: Download for Windows
+        - button "Open Discord in your browser" [ref=e85] [cursor=pointer]
+  - generic [ref=e96]:
+    - heading "MAKE YOUR GROUP CHATS MORE FUN" [level=2] [ref=e97]
+    - paragraph [ref=e98]: Use custom emoji, stickers, soundboard effects and more to add your personality to your voice, video, or text chat. Set your avatar and a custom status, and write your own profile to show up in chat your way.
+  - generic [ref=e106]:
+    - heading "stream like you’re in the same room" [level=2] [ref=e107]
+    - paragraph [ref=e108]: High quality and low latency streaming makes it feel like you're hanging out on the couch with friends while playing a game, watching shows, looking at photos, or idk doing homework or something.
+  - generic [ref=e124]:
+    - heading "Hop in when you're free, no need to call" [level=2] [ref=e125]
+    - paragraph [ref=e126]: Easily hop in and out of voice or text chats without having to call or invite anyone, so your party chat lasts before, during, and after your game session.
+  - generic [ref=e129]:
+    - generic [ref=e130]:
+      - generic [ref=e131]: talk
+      - generic [ref=e132]: play
+      - generic [ref=e133]: chat
+      - generic [ref=e134]: hang out
+    - generic [ref=e135]:
+      - generic [ref=e136]: talk
+      - generic [ref=e137]: play
+      - generic [ref=e138]: chat
+      - generic [ref=e139]: hang out
+    - generic [ref=e140]:
+      - generic [ref=e141]: talk
+      - generic [ref=e142]: play
+      - generic [ref=e143]: chat
+      - generic [ref=e144]: hang out
+    - generic [ref=e145]:
+      - generic [ref=e146]: talk
+      - generic [ref=e147]: play
+      - generic [ref=e148]: chat
+      - generic [ref=e149]: hang out
+  - generic [ref=e153]:
+    - generic:
+      - img
+    - generic [ref=e156]:
+      - heading "See who's around to chill" [level=2] [ref=e158]
+      - paragraph [ref=e159]: See who's around, playing games, or just hanging out. For supported games, you can see what modes or characters your friends are playing and directly join up.
+  - generic [ref=e174]:
+    - heading "always have something to do together" [level=2] [ref=e175]
+    - paragraph [ref=e176]: Watch videos, play built-in games, listen to music, or just scroll together and spam memes. Seamlessly text, call, video chat, and play games, all in one group chat.
+  - generic [ref=e183]:
+    - heading "wherever YOU GAME, HANG OUT HERE" [level=2] [ref=e184]
+    - paragraph [ref=e186]: On your PC, phone, or console, you can still hang out on Discord. Easily switch between devices and use tools to manage multiple group chats with friends.
+  - generic [ref=e191]:
+    - generic [ref=e194]:
+      - heading "YOU CAN'T SCROLL ANYMORE. BETTER GO CHAT." [level=2] [ref=e196]:
+        - text: YOU CAN'T SCROLL ANYMORE.
+        - text: BETTER GO CHAT.
+      - link "Download for Windows" [ref=e198] [cursor=pointer]:
+        - /url: //discord.com/api/downloads/distributions/app/installers/latest?channel=stable&platform=win&arch=x64
+    - generic [ref=e199]:
+      - img "YOU CAN'T SCROLL ANYMORE.BETTER GO CHAT." [ref=e200]
+      - generic:
+        - generic:
+          - contentinfo
+  - generic [ref=e203]:
+    - generic [ref=e205]:
+      - generic [ref=e206]:
+        - link "Home page":
+          - /url: /
+          - img "Home page"
+        - generic [ref=e207]: Language
+        - button "English" [ref=e210] [cursor=pointer]:
+          - generic [ref=e211]: English
+        - generic [ref=e212]:
+          - generic [ref=e213]: Social
+          - generic [ref=e214]:
+            - link "Twitter" [ref=e215] [cursor=pointer]:
+              - /url: https://twitter.com/discord
+              - img "Twitter"
+            - link "Instagram" [ref=e216] [cursor=pointer]:
+              - /url: https://www.instagram.com/discord/
+              - img "Instagram"
+            - link "Facebook" [ref=e217] [cursor=pointer]:
+              - /url: https://www.facebook.com/discord/
+              - img "Facebook"
+            - link "Youtube" [ref=e218] [cursor=pointer]:
+              - /url: https://www.youtube.com/discord
+              - img "Youtube"
+            - link "Tiktok" [ref=e219] [cursor=pointer]:
+              - /url: https://www.tiktok.com/@discord
+              - img "Tiktok"
+      - generic [ref=e221]:
+        - button "Product":
+          - generic: Product
+        - navigation "Product" [ref=e222]:
+          - link "Download" [ref=e223] [cursor=pointer]:
+            - /url: /download
+          - link "Nitro" [ref=e224] [cursor=pointer]:
+            - /url: /nitro
+          - link "Status" [ref=e225] [cursor=pointer]:
+            - /url: https://discordstatus.com/
+          - link "App Directory" [ref=e226] [cursor=pointer]:
+            - /url: /application-directory
+      - generic [ref=e228]:
+        - button "Company":
+          - generic: Company
+        - navigation "Company" [ref=e229]:
+          - link "About" [ref=e230] [cursor=pointer]:
+            - /url: /company
+          - link "Jobs" [ref=e231] [cursor=pointer]:
+            - /url: /careers
+          - link "Brand" [ref=e232] [cursor=pointer]:
+            - /url: /branding
+          - link "Newsroom" [ref=e233] [cursor=pointer]:
+            - /url: /newsroom
+      - generic [ref=e235]:
+        - button "Resources":
+          - generic: Resources
+        - navigation "Resources" [ref=e236]:
+          - link "Support" [ref=e237] [cursor=pointer]:
+            - /url: https://support.discord.com/hc
+          - link "Safety" [ref=e238] [cursor=pointer]:
+            - /url: /safety
+          - link "Blog" [ref=e239] [cursor=pointer]:
+            - /url: /blog
+          - link "Creators" [ref=e240] [cursor=pointer]:
+            - /url: /creators
+          - link "Community" [ref=e241] [cursor=pointer]:
+            - /url: /community
+          - link "Developers" [ref=e242] [cursor=pointer]:
+            - /url: /developers
+          - link "Quests" [ref=e243] [cursor=pointer]:
+            - /url: /ads/quests
+          - link "Official 3rd Party Merch" [ref=e244] [cursor=pointer]:
+            - /url: https://discordmerch.com/evergreenfooter
+          - link "Feedback" [ref=e245] [cursor=pointer]:
+            - /url: https://support.discord.com/hc/en-us/community/topics
+      - generic [ref=e247]:
+        - button "Policies":
+          - generic: Policies
+        - navigation "Policies" [ref=e248]:
+          - link "Terms" [ref=e249] [cursor=pointer]:
+            - /url: /terms
+          - link "Privacy" [ref=e250] [cursor=pointer]:
+            - /url: /privacy
+          - link "Cookie Settings" [ref=e251] [cursor=pointer]:
+            - /url: "#"
+          - link "Guidelines" [ref=e252] [cursor=pointer]:
+            - /url: /guidelines
+          - link "Acknowledgements" [ref=e253] [cursor=pointer]:
+            - /url: /acknowledgements
+          - link "Licenses" [ref=e254] [cursor=pointer]:
+            - /url: /licenses
+          - link "Company Information" [ref=e255] [cursor=pointer]:
+            - /url: /company-information
+    - img "Discord" [ref=e257]

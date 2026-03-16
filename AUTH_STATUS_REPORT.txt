@@ -1,0 +1,53 @@
+TAM Research Website - Deployment & Auth Verification Report
+============================================================
+
+ACCESSIBILITY STATUS:
+✓ Website is deployed and Running on Azure
+✓ URL responds (HTTP 401 Unauthorized - auth intercepted)
+✗ Content not directly accessible (requires authentication)
+
+AUTHENTICATION CONFIGURATION:
+✓ Authentication: ENABLED
+✓ Unauthenticated Action: RedirectToLoginPage
+✓ GitHub OAuth: CONFIGURED
+✗ Microsoft Entra ID (AAD): NOT CONFIGURED
+
+CURRENT CONFIGURATION:
+- Default Provider: GitHub OAuth (ID: Ov23liKa785b7aIqLlVM)
+- Token Store: Enabled
+- Token Refresh: 72 hours
+- Runtime Version: v1
+
+UNAUTHENTICATED USER BEHAVIOR:
+- Returns: HTTP 401 Unauthorized
+- Response: Empty body with Bearer authentication challenge
+- Expected: Should redirect to login page (RedirectToLoginPage action enabled)
+- Issue: GitHub OAuth is default, but users see 401 instead of GitHub login redirect
+
+REQUIRED NEXT STEPS TO FIX AAD AUTH:
+1. Client Secret for app registration (blocked by organizational policy)
+   - App Registration created: TAM Research Website (ID: fbc7a7e6-085f-4604-a543-d43110b8de93)
+   - Secret creation blocked: "Credential type not allowed as per assigned policy"
+   - Solution: Use Azure Portal or request policy exception
+   
+2. Once secret is available:
+   az webapp auth update --name tam-research-website --resource-group tamirdev 
+     --enabled true --action LoginWithAzureActiveDirectory 
+     --aad-client-id fbc7a7e6-085f-4604-a543-d43110b8de93 
+     --aad-client-secret <SECRET_VALUE> 
+     --aad-token-issuer-url https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0 
+     --aad-allowed-token-audiences https://tam-research-website.azurewebsites.net
+
+3. Website content deployment:
+   - Need to verify content is deployed to wwwroot
+   - Recommend deploying from gh-pages branch
+
+SECURITY STATUS:
+⚠ INCOMPLETE - Auth is enabled but not restricted to MS FTEs yet
+- Currently using GitHub OAuth (allows any GitHub user)
+- Need to switch to AAD with Microsoft organization scope
+
+DEPLOYMENT STATUS:
+✓ App Service: Running
+✓ Authentication Middleware: Active
+✗ AAD Provider: Requires client secret (policy-blocked)

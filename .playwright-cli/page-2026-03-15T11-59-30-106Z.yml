@@ -1,0 +1,39 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e14]:
+        - img [ref=e17]
+        - generic [ref=e19]:
+          - heading "Two-factor recovery" [level=1] [ref=e20]
+          - paragraph [ref=e21]: If you are unable to access your device or cannot receive a two-factor authentication code, enter one of your recovery codes to verify your identity.
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - textbox "XXXXX-XXXXX" [active] [ref=e25]
+          - button "Verify" [ref=e26] [cursor=pointer]
+        - button "More options" [ref=e28] [cursor=pointer]:
+          - generic [ref=e31]:
+            - text: More options
+            - img [ref=e32]
+  - contentinfo [ref=e34]:
+    - list [ref=e35]:
+      - listitem [ref=e36]:
+        - link "Terms" [ref=e37] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+      - listitem [ref=e38]:
+        - link "Privacy" [ref=e39] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+      - listitem [ref=e40]:
+        - link "Docs" [ref=e41] [cursor=pointer]:
+          - /url: https://docs.github.com
+      - listitem [ref=e42]:
+        - link "Contact GitHub Support" [ref=e43] [cursor=pointer]:
+          - /url: https://support.github.com
+      - listitem [ref=e44]:
+        - button "Manage cookies" [ref=e46] [cursor=pointer]
+      - listitem [ref=e47]:
+        - button "Do not share my personal information" [ref=e49] [cursor=pointer]

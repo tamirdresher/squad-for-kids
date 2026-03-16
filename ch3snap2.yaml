@@ -1,0 +1,102 @@
+- generic [ref=e1]:
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e8] [cursor=pointer]':
+    - img [ref=e10]
+    - img [ref=e16]
+  - main [ref=e18]:
+    - generic:
+      - button "Main menu" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]: menu
+      - button "New chat" [ref=e25] [cursor=pointer]:
+        - generic [ref=e27]: Gemini
+    - generic [ref=e29]:
+      - generic [ref=e258]: "Generate an image: A dramatic crew assembly scene on a futuristic bridge showing five distinct AI entities materializing as holographic projections, each with a unique visual identity. Center: a gold-uniformed commander figure radiating authority and strategy. Left: a precise blue android studying lines of code with laser focus. Far left: an armored red warrior scanning for threats with shields up. Right: a purple robed analyst surrounded by floating research documents and data visualizations. Far right: an orange-suited engineer with mechanical arms maintaining glowing infrastructure. Below them, a shared holographic table displays their collective brain. Star Trek TNG meets Tron Legacy aesthetic. Dramatic rim lighting, each character lit in their signature color."
+      - generic [ref=e30]:
+        - link "Upgrade to Google AI Pro" [ref=e203]:
+          - img [ref=e204]: spark
+          - generic [ref=e206]: Upgrade to Google AI Pro
+        - generic [ref=e32]:
+          - button "Share conversation" [ref=e260] [cursor=pointer]:
+            - img [ref=e261]: share
+          - button "Open menu for conversation actions." [ref=e210] [cursor=pointer]:
+            - img [ref=e211]: more_vert
+    - generic [ref=e43]:
+      - navigation [ref=e44]:
+        - generic [ref=e48]:
+          - group [ref=e49]:
+            - link "New chat" [ref=e51] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e54]: edit_square
+          - group [ref=e57]:
+            - button "Settings & help" [ref=e59] [cursor=pointer]:
+              - img [ref=e62]: settings_2
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - heading "Conversation with Gemini" [level=1] [ref=e73]
+          - generic [ref=e214]:
+            - generic [ref=e219]:
+              - button "Copy prompt" [ref=e221] [cursor=pointer]:
+                - img [ref=e222]: content_copy
+              - button "Edit" [ref=e264] [cursor=pointer]:
+                - img [ref=e265]: edit
+              - generic [ref=e227]:
+                - 'heading "You said Generate an image: A dramatic crew assembly scene on a futuristic bridge showing five distinct AI entities materializing as holographic projections, each with a unique visual identity. Center: a gold-uniformed commander figure radiating authority and strategy. Left: a precise blue android studying lines of code with laser focus. Far left: an armored red warrior scanning for threats with shields up. Right: a purple robed analyst surrounded by floating research documents and data visualizations. Far right: an orange-suited engineer with mechanical arms maintaining glowing infrastructure. Below them, a shared holographic table displays their collective brain. Star Trek TNG meets Tron Legacy aesthetic. Dramatic rim lighting, each character lit in their signature color." [level=2] [ref=e228]':
+                  - generic [ref=e229]: You said
+                  - paragraph [ref=e230]: "Generate an image: A dramatic crew assembly scene on a futuristic bridge showing five distinct AI entities materializing as holographic projections, each with a unique visual identity. Center: a gold-uniformed commander figure radiating authority and strategy. Left: a precise blue android studying lines of code with laser focus. Far left: an armored red warrior scanning for threats with shields up. Right: a purple robed analyst surrounded by floating research documents and data visualizations. Far right: an orange-suited engineer with mechanical arms maintaining glowing infrastructure. Below them, a shared holographic table displays their collective brain. Star Trek TNG meets Tron Legacy aesthetic. Dramatic rim lighting, each character lit in their signature color."
+                - button "Expand" [ref=e231] [cursor=pointer]:
+                  - img [ref=e232]: expand_more
+            - generic [ref=e238]:
+              - generic:
+                - generic:
+                  - generic:
+                    - menu
+              - generic [ref=e239]:
+                - generic [ref=e244]:
+                  - generic:
+                    - generic:
+                      - img
+                - generic [ref=e268]:
+                  - heading "Gemini said" [level=2] [ref=e249]
+                  - paragraph [ref=e273]:
+                    - generic [ref=e280]:
+                      - button ", AI generated" [ref=e281] [cursor=pointer]:
+                        - img ", AI generated" [ref=e282]
+                      - generic [ref=e283]:
+                        - button "Share image" [ref=e285] [cursor=pointer]:
+                          - img [ref=e286]: share
+                        - button "Copy image" [ref=e290] [cursor=pointer]:
+                          - img [ref=e291]: content_copy
+                        - button "Download full size image" [ref=e295]:
+                          - img [ref=e298]: download
+              - generic [ref=e304]:
+                - button "Good response" [ref=e306] [cursor=pointer]:
+                  - img [ref=e307]: thumb_up
+                - button "Bad response" [ref=e311] [cursor=pointer]:
+                  - img [ref=e312]: thumb_down
+                - button "Redo" [ref=e317] [cursor=pointer]:
+                  - img [ref=e318]: refresh
+                - button "Share image" [ref=e322] [cursor=pointer]:
+                  - img [ref=e323]: share
+                - button "Show more options" [ref=e329]:
+                  - img [ref=e330]: more_vert
+        - generic [ref=e115]:
+          - group [ref=e116]:
+            - generic [ref=e119]:
+              - textbox "Enter a prompt for Gemini" [active] [ref=e124]:
+                - text: Ask Gemini 3
+                - paragraph [ref=e250]
+              - generic [ref=e126]:
+                - button "Open upload file menu" [ref=e177] [cursor=pointer]:
+                  - img [ref=e178]: add_2
+                - button "Tools" [ref=e184]:
+                  - img [ref=e185]: page_info
+                  - generic [ref=e188]: Tools
+              - generic [ref=e127]:
+                - button "Open mode picker" [ref=e130]:
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: Fast
+                    - img [ref=e134]: keyboard_arrow_down
+                - generic [ref=e137]:
+                  - button "Microphone" [ref=e140] [cursor=pointer]:
+                    - img [ref=e142]: mic
+                  - text: send
+          - paragraph [ref=e254]: Gemini is AI and can make mistakes.

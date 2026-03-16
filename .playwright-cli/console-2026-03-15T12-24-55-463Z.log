@@ -1,0 +1,13 @@
+[      57ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
+[      57ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
+[     163ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
+[     163ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
+[     243ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
+[     243ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
+[    2147ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
+[    2148ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
+[    4174ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://ms.portal.azure.com/#browse/resourcegroups:0
+[    7678ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
+[    7678ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
+[    8188ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://hosting-ms.portal.azure.net/copilotmetadata/Content/1.300.03322.379/generated/Loc/en/extensions/hubsextension_browseresourcegroups_reactview_prompts.json:0
+[    8521ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://hosting-ms.portal.azure.net/copilotmetadata/Content/1.300.03322.379/generated/Loc/en/extensions/hubsextension_defaultprompts.json:0

@@ -1,0 +1,91 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e14]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+      - search [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e22]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e25]
+      - button "Copilot" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Copilot
+      - generic [ref=e31]:
+        - button "Cloud Shell" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "Notifications" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - button "Settings" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - button "Support + Troubleshooting" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+        - button "Feedback" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e50] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e51]':
+          - generic [ref=e52]:
+            - generic [ref=e53]: tamirdresher@microsoft.com
+            - generic [ref=e54]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e57]
+    - main [ref=e62]:
+      - generic [ref=e63]:
+        - navigation "Breadcrumb" [ref=e67]:
+          - navigation "Breadcrumb" [ref=e70]:
+            - list [ref=e71]:
+              - listitem [ref=e72] [cursor=pointer]:
+                - link "Home" [ref=e73]:
+                  - /url: "#home"
+        - region [ref=e76]:
+          - generic [ref=e82]:
+            - heading [level=2]
+            - generic [ref=e83]:
+              - button "Add service to favorites" [ref=e84] [cursor=pointer]:
+                - img [ref=e87]
+              - button "More content actions" [ref=e90] [cursor=pointer]:
+                - img [ref=e93]
+              - group "Chat suggestions from Copilot" [ref=e97]:
+                - button "Chat suggestions from Copilot" [expanded] [ref=e99]:
+                  - img [ref=e102]
+                - button "Loading prompts..." [ref=e104]:
+                  - progressbar [ref=e105]
+              - button "Close content 'undefined'" [ref=e107] [cursor=pointer]:
+                - img [ref=e110]
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is loading.
+      - generic: Microsoft Azure portal is ready.
+    - generic:
+      - generic: Content is loading.
+  - img [ref=e132]
+  - img [ref=e133]
+  - img [ref=e134]
+  - img [ref=e135]
+  - img [ref=e136]
+  - img [ref=e137]
+  - img [ref=e138]
+  - img [ref=e139]
+  - img [ref=e140]
+  - img [ref=e141]
+  - img [ref=e142]
+  - img [ref=e143]
+  - img [ref=e144]
+  - img [ref=e145]
+  - img [ref=e146]
+  - img [ref=e147]
+  - img [ref=e148]
+  - img [ref=e149]
+  - img [ref=e150]
+  - img [ref=e151]
+  - img [ref=e152]
+  - img [ref=e153]
+  - img [ref=e154]
+  - img [ref=e155]

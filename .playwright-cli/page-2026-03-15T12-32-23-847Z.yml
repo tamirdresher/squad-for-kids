@@ -1,0 +1,88 @@
+- generic [ref=e1]:
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e8] [cursor=pointer]':
+    - img [ref=e10]
+    - img [ref=e16]
+  - main [ref=e18]:
+    - generic:
+      - button "Main menu" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]: menu
+      - button "New chat" [disabled] [ref=e25]:
+        - generic [ref=e27]: Gemini
+    - generic [ref=e32]:
+      - button "Temporary chat" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+      - generic [ref=e41]:
+        - button "PLUS" [disabled]:
+          - generic: PLUS
+    - generic [ref=e43]:
+      - navigation [ref=e44]:
+        - generic [ref=e48]:
+          - group [ref=e49]:
+            - link "New chat" [ref=e51] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e54]: edit_square
+          - group [ref=e57]:
+            - button "Settings & help" [ref=e59] [cursor=pointer]:
+              - img [ref=e62]: settings_2
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - heading "Conversation with Gemini" [level=1] [ref=e73]
+          - generic [ref=e75]:
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e82]: Level-up your Gemini app experience
+                - generic [ref=e84]: Get more access to new and powerful features in the Google AI Pro plan for ₪74.90 ₪0/month for 1 month
+              - generic "Call to action button for users to continue to Google One" [ref=e87]:
+                - generic [ref=e88]: Try now
+              - button "Close" [ref=e92] [cursor=pointer]:
+                - img [ref=e93]: close
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - generic [ref=e103]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                  - generic "user greeting" [ref=e104]:
+                    - generic: Hi tamir
+                - generic [ref=e108]:
+                  - generic:
+                    - generic:
+                      - heading "Where should we start?" [level=1]
+              - generic [ref=e114]:
+                - generic:
+                  - generic:
+                    - generic:
+                      - button "🖼️ Create image, button, tap to use tool":
+                        - generic: 🖼️ Create image
+                    - generic:
+                      - button "🎸 Create music, button, tap to use tool":
+                        - generic: 🎸 Create music
+                    - generic:
+                      - button "Write anything, button, tap to use tool":
+                        - generic: Write anything
+                    - generic:
+                      - button "Help me learn, button, tap to use tool":
+                        - generic: Help me learn
+                    - generic:
+                      - button "Boost my day, button, tap to use tool":
+                        - generic: Boost my day
+                    - generic:
+                      - button "Create video, button, tap to use tool":
+                        - generic: Create video
+        - generic [ref=e115]:
+          - group [ref=e116]:
+            - generic [ref=e119]:
+              - textbox "Enter a prompt for Gemini" [active] [ref=e124]:
+                - text: Ask Gemini 3
+                - paragraph [ref=e125]
+              - generic [ref=e127]:
+                - button "Open mode picker" [ref=e130]:
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: Fast
+                    - img [ref=e134]: keyboard_arrow_down
+                - generic [ref=e137]:
+                  - button "Microphone" [ref=e140] [cursor=pointer]:
+                    - img [ref=e142]: mic
+                  - text: send
+          - paragraph [ref=e147]

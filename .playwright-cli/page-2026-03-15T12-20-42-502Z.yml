@@ -1,0 +1,315 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e14]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+      - search [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e22]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e25]
+      - button "Copilot" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Copilot
+      - generic [ref=e31]:
+        - button "Cloud Shell" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "Notifications" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - button "Settings" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - button "Support + Troubleshooting" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+        - button "Feedback" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e50] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e51]':
+          - generic [ref=e52]:
+            - generic [ref=e53]: tamirdresher@microsoft.com
+            - generic [ref=e54]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e57]
+    - main [ref=e62]:
+      - generic [ref=e65]:
+        - heading "Azure services" [level=3] [ref=e66]
+        - grid "Azure services" [ref=e67]:
+          - row "Create a resource Dev centers Microsoft Entra ID Front Doors Resource groups Durable Task Scheduler Microsoft Foundry Managed Identities Kubernetes services More services" [ref=e68]:
+            - gridcell "Create a resource" [ref=e69] [cursor=pointer]:
+              - link "Create a resource" [ref=e70]:
+                - /url: "#create/hub"
+                - img [ref=e72]
+                - generic [ref=e75]: Create a resource
+            - gridcell "Dev centers" [ref=e76] [cursor=pointer]:
+              - link "Dev centers" [ref=e77]:
+                - /url: "#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.DevCenter%2Fdevcenters"
+                - img [ref=e79]
+                - generic [ref=e81]: Dev centers
+            - gridcell "Microsoft Entra ID" [ref=e82] [cursor=pointer]:
+              - link "Microsoft Entra ID" [ref=e83]:
+                - /url: "#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade"
+                - img [ref=e85]
+                - generic [ref=e87]: Microsoft Entra ID
+            - gridcell "Front Doors" [ref=e88] [cursor=pointer]:
+              - link "Front Doors" [ref=e89]:
+                - /url: "#view/HubsExtension/AssetMenuBlade/~/azureFrontDoors/assetName/LoadBalancerAndContentDelivery/extensionName/Microsoft_Azure_Network"
+                - img [ref=e91]
+                - generic [ref=e93]: Front Doors
+            - gridcell "Resource groups" [ref=e94] [cursor=pointer]:
+              - link "Resource groups" [ref=e95]:
+                - /url: "#view/HubsExtension/ServiceMenuBlade/extension/Microsoft_Azure_Resources/menuId/ResourceManager/itemId/resourcegroups"
+                - img [ref=e97]
+                - generic [ref=e99]: Resource groups
+            - gridcell "Durable Task Scheduler" [ref=e100] [cursor=pointer]:
+              - link "Durable Task Scheduler" [ref=e101]:
+                - /url: "#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.DurableTask%2FSchedulers"
+                - img [ref=e103]
+                - generic [ref=e105]: Durable Task Scheduler
+            - gridcell "Microsoft Foundry" [ref=e106] [cursor=pointer]:
+              - link "Microsoft Foundry" [ref=e107]:
+                - /url: "#blade/Microsoft_Azure_ProjectOxford/CognitiveServicesHub"
+                - img [ref=e109]
+                - generic [ref=e111]: Microsoft Foundry
+            - gridcell "Managed Identities" [ref=e112] [cursor=pointer]:
+              - link "Managed Identities" [ref=e113]:
+                - /url: "#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.ManagedIdentity%2FuserAssignedIdentities"
+                - img [ref=e115]
+                - generic [ref=e117]: Managed Identities
+            - gridcell "Kubernetes services" [ref=e118] [cursor=pointer]:
+              - link "Kubernetes services" [ref=e119]:
+                - /url: "#view/Microsoft_Azure_KubernetesFleet/KubernetesHub.MenuView/~/clusters"
+                - img [ref=e121]
+                - generic [ref=e123]: Kubernetes services
+            - gridcell "More services" [ref=e124] [cursor=pointer]:
+              - link "More services" [ref=e125]:
+                - /url: "#allservices"
+                - img [ref=e127]
+                - generic [ref=e130]: More services
+        - heading "Resources" [level=3] [ref=e131]
+        - generic [ref=e133]:
+          - tablist [ref=e135]:
+            - tab "Recent" [selected] [ref=e136] [cursor=pointer]:
+              - generic [ref=e138]: Recent
+            - tab "Favorite" [ref=e139] [cursor=pointer]:
+              - generic [ref=e141]: Favorite
+          - tabpanel [ref=e142]:
+            - grid "Resources" [ref=e145]:
+              - row "Name Type Last Viewed" [ref=e146]:
+                - columnheader "Name" [ref=e147]
+                - columnheader "Type" [ref=e148]
+                - columnheader "Last Viewed" [ref=e149]
+              - row "MRG_tamir-test-workspace Resource group 5 days ago" [ref=e150]:
+                - gridcell "MRG_tamir-test-workspace" [ref=e151]:
+                  - img [ref=e154]
+                  - link "MRG_tamir-test-workspace" [ref=e157] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/HubsExtension/ResourceGroups/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/MRG_tamir-test-workspace"
+                - gridcell "Resource group" [ref=e158]
+                - gridcell "5 days ago" [ref=e159]
+              - row "WCD_MicroServices_Staging_LBI Subscription 5 days ago" [ref=e160]:
+                - gridcell "WCD_MicroServices_Staging_LBI" [ref=e161]:
+                  - img [ref=e164]
+                  - link "WCD_MicroServices_Staging_LBI" [ref=e167] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_Billing/Subscription/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1"
+                - gridcell "Subscription" [ref=e168]
+                - gridcell "5 days ago" [ref=e169]
+              - row "MRG_tamir-test-ws1 Resource group 5 days ago" [ref=e170]:
+                - gridcell "MRG_tamir-test-ws1" [ref=e171]:
+                  - img [ref=e174]
+                  - link "MRG_tamir-test-ws1" [ref=e177] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/HubsExtension/ResourceGroups/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/MRG_tamir-test-ws1"
+                - gridcell "Resource group" [ref=e178]
+                - gridcell "5 days ago" [ref=e179]
+              - row "dts-dk8s-cus-stg Durable Task Scheduler 4 weeks ago" [ref=e180]:
+                - gridcell "dts-dk8s-cus-stg" [ref=e181]:
+                  - img [ref=e184]
+                  - link "dts-dk8s-cus-stg" [ref=e187] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_PaasServerless/DurableTaskScheduler/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/dk8s-durabletask-cus-stg-rg/providers/Microsoft.DurableTask/schedulers/dts-dk8s-cus-stg"
+                - gridcell "Durable Task Scheduler" [ref=e188]
+                - gridcell "4 weeks ago" [ref=e189]
+              - row "rg-dk8s-test-shared Resource group a month ago" [ref=e190]:
+                - gridcell "rg-dk8s-test-shared" [ref=e191]:
+                  - img [ref=e194]
+                  - link "rg-dk8s-test-shared" [ref=e197] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/HubsExtension/ResourceGroups/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-shared"
+                - gridcell "Resource group" [ref=e198]
+                - gridcell "a month ago" [ref=e199]
+              - row "rg-dk8s-test-eastus2 Resource group a month ago" [ref=e200]:
+                - gridcell "rg-dk8s-test-eastus2" [ref=e201]:
+                  - img [ref=e204]
+                  - link "rg-dk8s-test-eastus2" [ref=e207] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/HubsExtension/ResourceGroups/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2"
+                - gridcell "Resource group" [ref=e208]
+                - gridcell "a month ago" [ref=e209]
+              - row "stdk8stesteastus2umiv Storage account a month ago" [ref=e210]:
+                - gridcell "stdk8stesteastus2umiv" [ref=e211]:
+                  - img [ref=e214]
+                  - link "stdk8stesteastus2umiv" [ref=e217] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_Storage/StorageAccount/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Storage/storageAccounts/stdk8stesteastus2umiv"
+                - gridcell "Storage account" [ref=e218]
+                - gridcell "a month ago" [ref=e219]
+              - row "stdk8stestshared5gvw Storage account a month ago" [ref=e220]:
+                - gridcell "stdk8stestshared5gvw" [ref=e221]:
+                  - img [ref=e224]
+                  - link "stdk8stestshared5gvw" [ref=e227] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_Storage/StorageAccount/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-shared/providers/Microsoft.Storage/storageAccounts/stdk8stestshared5gvw"
+                - gridcell "Storage account" [ref=e228]
+                - gridcell "a month ago" [ref=e229]
+              - row "Ev2_K8s_Deployment_MI Managed Identity 2 months ago" [ref=e230]:
+                - gridcell "Ev2_K8s_Deployment_MI" [ref=e231]:
+                  - img [ref=e234]
+                  - link "Ev2_K8s_Deployment_MI" [ref=e237] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_ManagedServiceIdentity/UserAssignedIdentity/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/Ev2_K8s_Deployment_MI_RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/Ev2_K8s_Deployment_MI"
+                - gridcell "Managed Identity" [ref=e238]
+                - gridcell "2 months ago" [ref=e239]
+              - row "mps-dk8s-k8s-stg-cus-9901 Kubernetes service 2 months ago" [ref=e240]:
+                - gridcell "mps-dk8s-k8s-stg-cus-9901" [ref=e241]:
+                  - img [ref=e244]
+                  - link "mps-dk8s-k8s-stg-cus-9901" [ref=e247] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_ContainerService/ManagedClusters/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/mps-dk8s-k8s-stg-cus-9901/providers/Microsoft.ContainerService/managedClusters/mps-dk8s-k8s-stg-cus-9901"
+                - gridcell "Kubernetes service" [ref=e248]
+                - gridcell "2 months ago" [ref=e249]
+              - row "dk8s-dk8sonboardingwizard-eus2-stg-rg Resource group 2 months ago" [ref=e250]:
+                - gridcell "dk8s-dk8sonboardingwizard-eus2-stg-rg" [ref=e251]:
+                  - img [ref=e254]
+                  - link "dk8s-dk8sonboardingwizard-eus2-stg-rg" [ref=e257] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/HubsExtension/ResourceGroups/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/dk8s-dk8sonboardingwizard-eus2-stg-rg"
+                - gridcell "Resource group" [ref=e258]
+                - gridcell "2 months ago" [ref=e259]
+              - row "tamir-durable-scheduler Durable Task Scheduler 2 months ago" [ref=e260]:
+                - gridcell "tamir-durable-scheduler" [ref=e261]:
+                  - img [ref=e264]
+                  - link "tamir-durable-scheduler" [ref=e267] [cursor=pointer]:
+                    - /url: "#@microsoft.onmicrosoft.com/asset/Microsoft_Azure_PaasServerless/DurableTaskScheduler/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/tamir-durable-tasks/providers/Microsoft.DurableTask/schedulers/tamir-durable-scheduler"
+                - gridcell "Durable Task Scheduler" [ref=e268]
+                - gridcell "2 months ago" [ref=e269]
+              - link "See all" [ref=e270] [cursor=pointer]:
+                - /url: "#view/HubsExtension/ServiceMenuBlade/extension/Microsoft_Azure_Resources/menuId/ResourceManager/itemId/recents"
+        - heading "Navigate" [level=3] [ref=e271]
+        - grid "Navigate" [ref=e272]:
+          - row "Subscriptions Resource groups All resources Dashboard" [ref=e273]:
+            - gridcell "Subscriptions" [ref=e274]:
+              - link "Subscriptions" [ref=e275] [cursor=pointer]:
+                - /url: "#view/HubsExtension/ServiceMenuBlade/extension/Microsoft_Azure_Resources/menuId/ResourceManager/itemId/subscriptions"
+                - img [ref=e277]
+                - generic [ref=e279]: Subscriptions
+            - gridcell "Resource groups" [ref=e280]:
+              - link "Resource groups" [ref=e281] [cursor=pointer]:
+                - /url: "#view/HubsExtension/ServiceMenuBlade/extension/Microsoft_Azure_Resources/menuId/ResourceManager/itemId/resourcegroups"
+                - img [ref=e283]
+                - generic [ref=e285]: Resource groups
+            - gridcell "All resources" [ref=e286]:
+              - link "All resources" [ref=e287] [cursor=pointer]:
+                - /url: "#view/HubsExtension/ServiceMenuBlade/extension/Microsoft_Azure_Resources/menuId/ResourceManager/itemId/browseAll"
+                - img [ref=e289]
+                - generic [ref=e291]: All resources
+            - gridcell "Dashboard" [ref=e292]:
+              - link "Dashboard" [ref=e293] [cursor=pointer]:
+                - /url: "#dashboard"
+                - img [ref=e295]
+                - generic [ref=e297]: Dashboard
+        - heading "Tools" [level=3] [ref=e298]
+        - grid "Tools" [ref=e299]:
+          - row "Microsoft Learn Azure Monitor Microsoft Defender for Cloud Cost Management" [ref=e300]:
+            - gridcell "Microsoft Learn" [ref=e301]:
+              - link "Microsoft Learn" [ref=e302] [cursor=pointer]:
+                - /url: https://aka.ms/homemslearn
+                - img [ref=e305]
+                - generic [ref=e307]:
+                  - generic [ref=e308]:
+                    - text: Microsoft Learn
+                    - img [ref=e310]
+                  - generic [ref=e313]: Learn Azure with free online training from Microsoft
+            - gridcell "Azure Monitor" [ref=e314]:
+              - link "Azure Monitor" [ref=e315] [cursor=pointer]:
+                - /url: "#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade"
+                - img [ref=e318]
+                - generic [ref=e320]:
+                  - generic [ref=e321]: Azure Monitor
+                  - generic [ref=e323]: Monitor your apps and infrastructure
+            - gridcell "Microsoft Defender for Cloud" [ref=e324]:
+              - link "Microsoft Defender for Cloud" [ref=e325] [cursor=pointer]:
+                - /url: "#blade/Microsoft_Azure_Security/SecurityMenuBlade"
+                - img [ref=e328]
+                - generic [ref=e330]:
+                  - generic [ref=e331]: Microsoft Defender for Cloud
+                  - generic [ref=e333]: Secure your apps and infrastructure
+            - gridcell "Cost Management" [ref=e334]:
+              - link "Cost Management" [ref=e335] [cursor=pointer]:
+                - /url: "#blade/Microsoft_Azure_CostManagement/Menu/openedBy/AzurePortal"
+                - img [ref=e338]
+                - generic [ref=e340]:
+                  - generic [ref=e341]: Cost Management
+                  - generic [ref=e343]: Analyze and optimize your cloud spend for free
+        - generic [ref=e344]:
+          - generic [ref=e345]:
+            - heading "Useful links" [level=3] [ref=e346]
+            - generic [ref=e347]:
+              - link "Technical Documentation" [ref=e349] [cursor=pointer]:
+                - /url: https://ms.portal.azure.com/verifyLink?href=https%3A%2F%2Faka.ms%2Fhometechnicaldocumentation&id=fx&viewUsed=defaultView
+                - text: Technical Documentation
+                - img [ref=e351]
+              - link "Azure Services" [ref=e354] [cursor=pointer]:
+                - /url: https://ms.portal.azure.com/verifyLink?href=https%3A%2F%2Fgo.microsoft.com%2Ffwlink%2F%3Flinkid%3D2009591&id=fx&viewUsed=defaultView
+                - text: Azure Services
+                - img [ref=e356]
+              - link "Recent Azure Updates" [ref=e359] [cursor=pointer]:
+                - /url: https://ms.portal.azure.com/verifyLink?href=https%3A%2F%2Fgo.microsoft.com%2Ffwlink%2F%3Flinkid%3D2043134&id=fx&viewUsed=defaultView
+                - text: Recent Azure Updates
+                - img [ref=e361]
+              - link "Azure Migration Tools" [ref=e364] [cursor=pointer]:
+                - /url: "#blade/Microsoft_Azure_Migrate/AmhResourceMenuBlade/overview"
+              - link "Find an Azure expert" [ref=e366] [cursor=pointer]:
+                - /url: "#blade/Microsoft_Azure_CustomerHub/ServiceProvidersBlade/overview"
+              - link "Quickstart Center" [ref=e368] [cursor=pointer]:
+                - /url: "#blade/Microsoft_Azure_Resources/QuickstartCenterBlade"
+          - generic [ref=e369]:
+            - heading "Azure mobile app" [level=3] [ref=e370]
+            - generic [ref=e371]:
+              - link "Download on the App Store" [ref=e372] [cursor=pointer]:
+                - /url: https://ms.portal.azure.com/verifyLink?href=https%3A%2F%2Fitunes.apple.com%2Fapp%2Fmicrosoft-azure%2Fid1219013620%3Fls%3D1%26mt%3D8&id=fx&viewUsed=defaultView
+                - img "Download on the App Store" [ref=e373]
+              - link "Get it on Google Play" [ref=e374] [cursor=pointer]:
+                - /url: https://ms.portal.azure.com/verifyLink?href=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.microsoft.azure&id=fx&viewUsed=defaultView
+                - img "Get it on Google Play" [ref=e375]
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is loading.
+      - generic: Microsoft Azure portal is ready.
+  - img [ref=e376]
+  - img [ref=e377]
+  - img [ref=e378]
+  - img [ref=e379]
+  - img [ref=e380]
+  - img [ref=e381]
+  - img [ref=e382]
+  - img [ref=e383]
+  - img [ref=e384]
+  - img [ref=e385]
+  - img [ref=e386]
+  - img [ref=e387]
+  - img [ref=e388]
+  - img [ref=e389]
+  - img [ref=e390]
+  - img [ref=e391]
+  - img [ref=e392]
+  - img [ref=e393]
+  - img [ref=e394]
+  - img [ref=e395]
+  - img [ref=e396]
+  - img [ref=e397]
+  - img [ref=e398]
+  - img [ref=e399]
+  - img [ref=e400]
+  - img [ref=e401]
+  - img [ref=e402]
+  - img [ref=e403]
+  - img [ref=e404]
+  - img [ref=e405]
+  - img [ref=e406]
+  - img [ref=e407]

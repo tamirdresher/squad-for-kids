@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+.options { display: flex; gap: 20px; margin-bottom: 30px; }
+.option { flex: 1; border: 2px solid #ddd; border-radius: 12px; overflow: hidden; }
+.option-header { padding: 14px 16px; font-weight: 700; font-size: 16px; text-align: center; }
+.opt-a .option-header { background: #ffcdd2; color: #b71c1c; }
+.opt-b .option-header { background: #fff9c4; color: #f57f17; }
+.opt-c .option-header { background: #c8e6c9; color: #1b5e20; }
+.option-body { padding: 16px; }
+.metric-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.metric-row span:first-child { color: #555; }
+.metric-row span:last-child { font-weight: 600; color: #333; }
+.experience { padding: 10px 0; font-style: italic; color: #666; font-size: 13px; }
+.decision-matrix { border: 2px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+.decision-matrix h3 { margin: 0; padding: 14px 16px; background: #f5f5f5; font-size: 16px; }
+.matrix-table { width: 100%; border-collapse: collapse; }
+.matrix-table td { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.matrix-table td:first-child { width: 50%; color: #555; }
+.matrix-table td:last-child { font-weight: 600; color: #333; }
+</style></head><body>
+<div class="container">
+<h2>Figure 8.4: Cost Equation — Squad vs Alternatives</h2>
+<p class="subtitle">Real costs per month for a solo developer or small team</p>
+<div class="options">
+<div class="option opt-a">
+<div class="option-header">Option A: DIY</div>
+<div class="option-body">
+<div class="metric-row"><span>Tool cost</span><span>$0</span></div>
+<div class="metric-row"><span>Human time</span><span>~60 hrs/month</span></div>
+<div class="metric-row"><span>PRs/month</span><span>8–12</span></div>
+<div class="metric-row"><span>Cost per PR</span><span>~$240</span></div>
+<div class="experience">Burned out, nights/weekends</div>
+</div>
+</div>
+<div class="option opt-b">
+<div class="option-header">Option B: Hire Junior Dev</div>
+<div class="option-body">
+<div class="metric-row"><span>Salary + benefits</span><span>~$5,000/mo</span></div>
+<div class="metric-row"><span>Human time (mentoring)</span><span>20 hrs/month</span></div>
+<div class="metric-row"><span>PRs/month</span><span>15–20</span></div>
+<div class="metric-row"><span>Cost per PR</span><span>~$333</span></div>
+<div class="experience">Mentorship overhead, but teammates</div>
+</div>
+</div>
+<div class="option opt-c">
+<div class="option-header">Option C: Squad (AI Team)</div>
+<div class="option-body">
+<div class="metric-row"><span>GitHub Copilot (6 agents)</span><span>$234/mo</span></div>
+<div class="metric-row"><span>API costs</span><span>~$120/mo</span></div>
+<div class="metric-row"><span>Human time (decisions)</span><span>16 hrs/month</span></div>
+<div class="metric-row"><span>PRs/month</span><span>20–25</span></div>
+<div class="metric-row"><span>Cost per PR</span><span>~$17</span></div>
+<div class="experience">Low overhead, compounding knowledge</div>
+</div>
+</div>
+</div>
+<div class="decision-matrix">
+<h3>Decision Matrix</h3>
+<table class="matrix-table">
+<tr><td>Small side project (&lt;10 issues)</td><td>DIY + Editor AI</td></tr>
+<tr><td>Growing startup (200 issues)</td><td>Squad (saves money)</td></tr>
+<tr><td>Bootstrapped (low budget)</td><td>Squad (lowest cost)</td></tr>
+<tr><td>Enterprise (compliance heavy)</td><td>Hire dev + evaluate Squad</td></tr>
+<tr><td>Large team (many projects)</td><td>Squad for each project</td></tr>
+</table>
+</div>
+</div>
+</body></html>

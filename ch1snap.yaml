@@ -1,0 +1,102 @@
+- generic [ref=e1]:
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e11] [cursor=pointer]':
+    - img [ref=e13]
+    - img [ref=e19]
+  - main [ref=e21]:
+    - generic:
+      - button "Main menu" [ref=e34] [cursor=pointer]:
+        - img [ref=e35]: menu
+      - button "New chat" [ref=e39] [cursor=pointer]:
+        - generic [ref=e41]: Gemini
+    - generic [ref=e23]:
+      - generic [ref=e241]: "Generate an image: A hauntingly beautiful and slightly humorous digital illustration of a moonlit graveyard where the tombstones are shaped like app icons and productivity tools. Tombstones read RIP Pomodoro 2019-2020, Here Lies GTD, Time Blocking Gone Too Soon, with recognizable app icon shapes like checkmarks, timers, kanban boards as grave markers. Soft glowing ghost notifications float upward from each grave. A developer sits among the tombstones on a bench, laptop open, looking contemplative rather than sad, realizing the pattern. Atmospheric fog, purple-blue moonlight, fireflies. Digital art style mixing whimsy with melancholy."
+      - generic [ref=e24]:
+        - link "Upgrade to Google AI Pro" [ref=e186]:
+          - img [ref=e187]: spark
+          - generic [ref=e189]: Upgrade to Google AI Pro
+        - generic [ref=e43]:
+          - button "Share conversation" [ref=e243] [cursor=pointer]:
+            - img [ref=e244]: share
+          - button "Open menu for conversation actions." [ref=e193] [cursor=pointer]:
+            - img [ref=e194]: more_vert
+    - generic [ref=e26]:
+      - navigation [ref=e53]:
+        - generic [ref=e57]:
+          - group [ref=e58]:
+            - link "New chat" [ref=e60] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e63]: edit_square
+          - group [ref=e66]:
+            - button "Settings & help" [ref=e68] [cursor=pointer]:
+              - img [ref=e71]: settings_2
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - heading "Conversation with Gemini" [level=1] [ref=e77]
+          - generic [ref=e197]:
+            - generic [ref=e202]:
+              - button "Copy prompt" [ref=e204] [cursor=pointer]:
+                - img [ref=e205]: content_copy
+              - button "Edit" [ref=e247] [cursor=pointer]:
+                - img [ref=e248]: edit
+              - generic [ref=e210]:
+                - 'heading "You said Generate an image: A hauntingly beautiful and slightly humorous digital illustration of a moonlit graveyard where the tombstones are shaped like app icons and productivity tools. Tombstones read RIP Pomodoro 2019-2020, Here Lies GTD, Time Blocking Gone Too Soon, with recognizable app icon shapes like checkmarks, timers, kanban boards as grave markers. Soft glowing ghost notifications float upward from each grave. A developer sits among the tombstones on a bench, laptop open, looking contemplative rather than sad, realizing the pattern. Atmospheric fog, purple-blue moonlight, fireflies. Digital art style mixing whimsy with melancholy." [level=2] [ref=e211]':
+                  - generic [ref=e212]: You said
+                  - paragraph [ref=e213]: "Generate an image: A hauntingly beautiful and slightly humorous digital illustration of a moonlit graveyard where the tombstones are shaped like app icons and productivity tools. Tombstones read RIP Pomodoro 2019-2020, Here Lies GTD, Time Blocking Gone Too Soon, with recognizable app icon shapes like checkmarks, timers, kanban boards as grave markers. Soft glowing ghost notifications float upward from each grave. A developer sits among the tombstones on a bench, laptop open, looking contemplative rather than sad, realizing the pattern. Atmospheric fog, purple-blue moonlight, fireflies. Digital art style mixing whimsy with melancholy."
+                - button "Expand" [ref=e214] [cursor=pointer]:
+                  - img [ref=e215]: expand_more
+            - generic [ref=e221]:
+              - generic:
+                - generic:
+                  - generic:
+                    - menu
+              - generic [ref=e222]:
+                - generic [ref=e227]:
+                  - generic:
+                    - generic:
+                      - img
+                - generic [ref=e251]:
+                  - heading "Gemini said" [level=2] [ref=e232]
+                  - paragraph [ref=e256]:
+                    - generic [ref=e263]:
+                      - button ", AI generated" [ref=e264] [cursor=pointer]:
+                        - img ", AI generated" [ref=e265]
+                      - generic [ref=e266]:
+                        - button "Share image" [ref=e268] [cursor=pointer]:
+                          - img [ref=e269]: share
+                        - button "Copy image" [ref=e273] [cursor=pointer]:
+                          - img [ref=e274]: content_copy
+                        - button "Download full size image" [ref=e278]:
+                          - img [ref=e281]: download
+              - generic [ref=e287]:
+                - button "Good response" [ref=e289] [cursor=pointer]:
+                  - img [ref=e290]: thumb_up
+                - button "Bad response" [ref=e294] [cursor=pointer]:
+                  - img [ref=e295]: thumb_down
+                - button "Redo" [ref=e300] [cursor=pointer]:
+                  - img [ref=e301]: refresh
+                - button "Share image" [ref=e305] [cursor=pointer]:
+                  - img [ref=e306]: share
+                - button "Show more options" [ref=e312]:
+                  - img [ref=e313]: more_vert
+        - generic [ref=e123]:
+          - group [ref=e124]:
+            - generic [ref=e127]:
+              - textbox "Enter a prompt for Gemini" [active] [ref=e132]:
+                - text: Ask Gemini 3
+                - paragraph [ref=e233]
+              - generic [ref=e134]:
+                - button "Open upload file menu" [ref=e139] [cursor=pointer]:
+                  - img [ref=e140]: add_2
+                - button "Tools" [ref=e146]:
+                  - img [ref=e147]: page_info
+                  - generic [ref=e150]: Tools
+              - generic [ref=e153]:
+                - button "Open mode picker" [ref=e156]:
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: Fast
+                    - img [ref=e160]: keyboard_arrow_down
+                - generic [ref=e163]:
+                  - button "Microphone" [ref=e166] [cursor=pointer]:
+                    - img [ref=e168]: mic
+                  - text: send
+          - paragraph [ref=e237]: Gemini is AI and can make mistakes.

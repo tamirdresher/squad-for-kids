@@ -1,0 +1,34 @@
+sequenceDiagram
+    actor T as Tamir
+    participant Q as Squad
+    participant W as Worf
+    participant D as Data
+    
+    T->>Q: File issue: Rate limiting for API
+    Q->>W: Route to Worf (security)
+    activate W
+    W->>W: Analyze threats
+    W->>Q: Create analysis PR
+    Q->>Q: Notification to Tamir
+    deactivate W
+    
+    note over Q: PAUSED<br/>Waiting for human decision
+    
+    T->>T: At lunch, check phone
+    T->>Q: Read Worf analysis (5 min)
+    T->>Q: Comment: Approved, use Redis
+    
+    note over Q: RESUME<br/>Human input received
+    
+    Q->>D: Route to Data + context
+    activate D
+    D->>D: Implement middleware
+    D->>D: Add tests
+    D->>Q: Open PR #236
+    deactivate D
+    
+    T->>T: Back at desk
+    T->>Q: Review Data code (10 min)
+    T->>Q: Approve PR
+    Q->>Q: Auto-merge
+    Q->>Q: Log decision

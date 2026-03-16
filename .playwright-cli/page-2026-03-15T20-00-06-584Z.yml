@@ -1,0 +1,120 @@
+- generic [ref=e2]:
+  - generic [ref=e6]:
+    - link "Home" [ref=e9] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e11]:
+      - button "EN" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]: EN
+      - link "Sign in" [ref=e19] [cursor=pointer]:
+        - /url: /login
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: Recommend Products. Earn Commissions.
+        - link "Sign up" [ref=e33] [cursor=pointer]:
+          - /url: /signup
+      - generic [ref=e35]:
+        - generic [ref=e36]: Amazon Associates - Amazon’s affiliate marketing program
+        - generic [ref=e37]: Welcome to one of the largest affiliate marketing programs in the world. The Amazon Associates Program helps content creators, publishers and bloggers monetize their traffic. With millions of products and programs available on Amazon, associates use easy link-building tools to direct their audience to their recommendations, and earn from qualifying purchases and programs.
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - img "Sign up" [ref=e41]
+            - generic [ref=e42]: "1"
+            - generic [ref=e43]: Sign up
+            - generic [ref=e44]: Join tens of thousands of creators, publishers and bloggers who are earning with the Amazon Associates Program.
+          - generic [ref=e45]:
+            - img "Sign up" [ref=e47]
+            - generic [ref=e48]: "2"
+            - generic [ref=e49]: Recommend
+            - generic [ref=e50]: Share millions of products with your audience. We have customized linking tools for large publishers, individual bloggers and social media influencers.
+          - generic [ref=e51]:
+            - img "Sign up" [ref=e53]
+            - generic [ref=e54]: "3"
+            - generic [ref=e55]: Earn
+            - generic [ref=e56]: Earn up to 10% in associate commissions from qualifying purchases and programs. Our competitive conversion rates help maximize earnings.
+      - generic [ref=e59]:
+        - group [ref=e60]:
+          - group [ref=e64]:
+            - list [ref=e65]:
+              - listitem [ref=e66]:
+                - generic [ref=e67]:
+                  - generic [ref=e68]: Amazon Associates has been a critical driver of our commerce initiatives and has enabled BuzzFeed to build a business that first and foremost services our audience.
+                  - generic [ref=e69]: BuzzFeed
+              - listitem [ref=e70]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]: “We're able to find all of the products on Amazon that we want to recommend to our audience. We value being able to help our audience find and purchase what they need.”
+                  - generic [ref=e73]: Fire Food Chef
+              - listitem [ref=e74]:
+                - generic [ref=e75]:
+                  - generic [ref=e76]: “Since we have a global audience, the Associates Program has helped us to scale our earnings internationally. It's been simple to sign up, expand and use!”
+                  - generic [ref=e77]: Impremedia
+              - listitem [ref=e78]:
+                - generic [ref=e79]:
+                  - generic [ref=e80]: “The Associates Program has given us all of the tools and data that we need to quickly make content decisions and continually grow our earnings.”
+                  - generic [ref=e81]: Domino
+        - radiogroup [ref=e82]:
+          - button "1" [ref=e83]:
+            - button "1" [ref=e87] [cursor=pointer]
+          - button "1" [ref=e89]:
+            - button "1" [ref=e93] [cursor=pointer]
+          - button "1" [ref=e95]:
+            - button "1" [ref=e99] [cursor=pointer]
+          - button "1" [ref=e101]:
+            - button "1" [ref=e105] [cursor=pointer]
+      - generic [ref=e107]:
+        - heading "Frequently Asked Questions" [level=2] [ref=e108]
+        - generic [ref=e109]:
+          - list [ref=e110]:
+            - listitem [ref=e111]:
+              - generic [ref=e112]: How does the Associates Program work?
+              - generic [ref=e113]: You can share products and available programs on Amazon with your audience through customized linking tools and earn money on qualifying purchases and customer actions like signing up for a free trial program.
+            - listitem [ref=e114]:
+              - generic [ref=e115]: How do I qualify for this program?
+              - generic [ref=e116]:
+                - text: Bloggers, publishers and content creators with a qualifying website or mobile app can participate in this program.
+                - link "Learn more." [ref=e117] [cursor=pointer]:
+                  - /url: https://affiliate-program.amazon.com/help/operating/policies?ref_=amb_link_0SCmvU4qQnOltlh4q-t01g_1&pf_rd_p=22197818-8f80-48ce-8862-6f691c22539c&ac-ms-src=ac-nav%23Associates%2520Program%2520Participation%2520Requirements&pf_rd_r=6EKAG6SV70FW87DGEGVS
+                - generic [ref=e118]:
+                  - text: If you are an influencer with an established social media following,
+                  - link "learn about the Amazon Influencer Program." [ref=e119] [cursor=pointer]:
+                    - /url: https://affiliate-program.amazon.com/influencers?pf_rd_p=22197818-8f80-48ce-8862-6f691c22539c&ref_=amb_link_0SCmvU4qQnOltlh4q-t01g_2&pf_rd_r=6EKAG6SV70FW87DGEGVS
+          - list [ref=e120]:
+            - listitem [ref=e121]:
+              - generic [ref=e122]: How do I earn in this program?
+              - generic [ref=e123]:
+                - text: "You earn from qualifying purchases and programs through the traffic you drive to Amazon. Commission income for qualifying purchases and programs differ based on product category. Note: Commission income is paid approximately 60 days after the end of the month in which it was earned."
+                - link "Learn more." [ref=e124] [cursor=pointer]:
+                  - /url: https://www.amazon.com/b?node=53623819011
+            - listitem [ref=e125]:
+              - generic [ref=e126]: How do I sign up to the program?
+              - generic [ref=e127]:
+                - text: Sign up to the program
+                - link "here." [ref=e128] [cursor=pointer]:
+                  - /url: https://affiliate-program.amazon.com/signup?pf_rd_p=22197818-8f80-48ce-8862-6f691c22539c&ref_=amb_link_0SCmvU4qQnOltlh4q-t01g_4&pf_rd_r=6EKAG6SV70FW87DGEGVS
+                - generic [ref=e129]:
+                  - text: We will review your application and approve it if you meet the qualifying criteria.
+                  - link "Learn more." [ref=e130] [cursor=pointer]:
+                    - /url: https://affiliate-program.amazon.com/help/node/topic/G8TW5AE9XL2VX9VM?pf_rd_p=22197818-8f80-48ce-8862-6f691c22539c&ref_=amb_link_0SCmvU4qQnOltlh4q-t01g_5&pf_rd_r=6EKAG6SV70FW87DGEGVS
+      - generic [ref=e134]:
+        - generic [ref=e135]: Recommend Products. Earn Commissions.
+        - link "Sign up" [ref=e140] [cursor=pointer]:
+          - /url: /signup
+    - generic [ref=e143]:
+      - generic:
+        - list [ref=e145]:
+          - listitem [ref=e146]:
+            - link "Operating agreement" [ref=e147] [cursor=pointer]:
+              - /url: https://affiliate-program.amazon.com/help/operating/agreement/?pf_rd_p=1bc82604-94f5-4f61-9e69-a6a780150b1e&ref_=amb_link_Ej00m9pwQOiij74PjxIJcw_1&pf_rd_r=6EKAG6SV70FW87DGEGVS
+        - list [ref=e149]:
+          - listitem [ref=e150]:
+            - link "Program policies" [ref=e151] [cursor=pointer]:
+              - /url: https://affiliate-program.amazon.com/help/operating/policies?pf_rd_p=1bc82604-94f5-4f61-9e69-a6a780150b1e&ref_=amb_link_Ej00m9pwQOiij74PjxIJcw_2&pf_rd_r=6EKAG6SV70FW87DGEGVS
+        - list [ref=e153]:
+          - listitem [ref=e154]:
+            - link "Conditions of use" [ref=e155] [cursor=pointer]:
+              - /url: https://amazon.com/gp/help/customer/display.html?ie=UTF8&nodeId=508088
+        - list [ref=e157]:
+          - listitem [ref=e158]:
+            - link "Contact us" [ref=e159] [cursor=pointer]:
+              - /url: https://affiliate-program.amazon.com/home/contact?ref_=amb_link_Ej00m9pwQOiij74PjxIJcw_4&pf_rd_p=1bc82604-94f5-4f61-9e69-a6a780150b1e&_encoding=UTF8%2F&pf_rd_r=6EKAG6SV70FW87DGEGVS
+        - generic [ref=e160]: © 1996-2025, Amazon.com, Inc.

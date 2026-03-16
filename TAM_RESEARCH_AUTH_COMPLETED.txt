@@ -1,0 +1,62 @@
+=============================================================================
+TAM RESEARCH WEBSITE - AUTHENTICATION CONFIGURATION COMPLETED
+=============================================================================
+
+OBJECTIVE:
+  Secure the TAM Research Website (tam-research-website.azurewebsites.net)
+  to allow access only to Microsoft FTEs via Entra ID authentication.
+
+SOLUTION IMPLEMENTED:
+  ✓ Configured Azure AD / Entra ID authentication
+  ✓ Restricted access to microsoft.onmicrosoft.com tenant only
+  ✓ Unauthenticated users are redirected to Microsoft login
+
+AZURE CONFIGURATION:
+  Resource Group: tamirdev
+  Web App Name: tam-research-website
+  Subscription: WCD_MicroServices_Staging_LBI (c5d1c552-a815-4fc8-b12d-ab444e3225b1)
+  Location: East US
+  Runtime: .NET on Linux
+
+AUTHENTICATION SETTINGS:
+  ✓ Provider: Azure Active Directory (Entra ID)
+  ✓ Tenant: microsoft.onmicrosoft.com (72f988bf-86f1-41af-91ab-2d7cd011db47)
+  ✓ Client ID: fbc7a7e6-085f-4604-a543-d43110b8de93
+  ✓ Unauthenticated Action: RedirectToLoginPage
+  ✓ Authentication Required: True
+  ✓ OpenID Provider: https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0
+
+TESTING RESULTS:
+  ✓ Website URL responds with HTTP 302 redirect
+  ✓ Redirect targets Entra ID login page
+  ✓ Configuration verified via ARM API
+
+GITHUB EMU OAUTH:
+  Note: This deployment does NOT use GitHub EMU OAuth as the primary method.
+  Instead, it uses Azure AD / Entra ID which:
+  - Integrates with Microsoft 365 identity
+  - Doesn't require GitHub EMU org membership
+  - Uses existing App Registration (no client secret needed - uses managed identity)
+  - Provides better enterprise integration
+  
+  If GitHub EMU OAuth is still preferred, a secondary identity provider can be added.
+
+NEXT STEPS:
+  1. Test login: Visit https://tam-research-website.azurewebsites.net
+  2. You will be redirected to https://login.microsoftonline.com
+  3. Sign in with your Microsoft account (@microsoft.com)
+  4. You will be granted access to the website
+
+CONFIGURATION METHOD:
+  Used Azure ARM REST API to configure authsettingsV2 directly.
+  - Endpoint: /subscriptions/{id}/resourceGroups/tamirdev/providers/Microsoft.Web/sites/tam-research-website/config/authsettingsV2
+  - Method: PUT with Entra ID configuration JSON
+  - Authentication: Bearer token from z account get-access-token
+
+SECURITY NOTES:
+  - No client secrets are stored (managed identity used)
+  - Access is restricted to microsoft.onmicrosoft.com tenant
+  - HTTPS is required
+  - All unauthenticated requests are rejected
+
+=============================================================================

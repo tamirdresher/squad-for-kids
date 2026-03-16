@@ -1,0 +1,25 @@
+graph LR
+    subgraph sequential["❌ Sequential - Old Way - 3 Hours"]
+        A1["Issue Filed"] --> A2["Data: Code"]
+        A2 --> A3["Worf: Security"]
+        A3 --> A4["B Elanna: Deploy"]
+        A4 --> A5["Seven: Docs"]
+        A5 --> A6["Done"]
+    end
+    
+    subgraph parallel["✅ Parallel Team - New Way - 30 Minutes"]
+        B1["Issue Filed"] --> B2["Picard:<br/>Orchestrate"]
+        B2 --> B3a["Data:<br/>Code"]
+        B2 --> B3b["Worf:<br/>Security"]
+        B2 --> B3c["B Elanna:<br/>Deploy"]
+        B2 --> B3d["Seven:<br/>Docs"]
+        B3a --> B4["Coordination<br/>via GitHub"]
+        B3b --> B4
+        B3c --> B4
+        B3d --> B4
+        B4 --> B5["Done"]
+    end
+    
+    style A6 fill:#ffcdd2,color:#333
+    style B5 fill:#c8e6c9,color:#333
+    style B2 fill:#fff9c4,color:#333

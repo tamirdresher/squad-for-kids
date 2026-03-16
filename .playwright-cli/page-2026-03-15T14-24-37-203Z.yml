@@ -1,0 +1,174 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "דילוג לתוכן ראשי" [ref=e4] [cursor=pointer]:
+      - /url: /students/main/home
+    - link "דילוג לתפריט ראשי" [ref=e5] [cursor=pointer]:
+      - /url: /students/main/home
+    - generic [ref=e8]:
+      - button "תפריט ראשי" [expanded] [ref=e9] [cursor=pointer]:
+        - img [ref=e10]:
+          - img [ref=e11]
+      - img "משו\"ב תלמידים והורים" [ref=e16] [cursor=pointer]
+      - generic [ref=e18]: משו"ב
+      - button "עזרה" [ref=e19] [cursor=pointer]:
+        - img [ref=e20]:
+          - img [ref=e21]
+      - button "התראות" [disabled]:
+        - img:
+          - img
+      - generic [ref=e26]:
+        - text: דרשר תמיר [יונתן ז6, שירה ט2]
+        - text: תשפ"ו - 2026
+      - generic [ref=e28]:
+        - text: תיכון אחד העם פתח - תקווה
+        - text: "440107"
+      - button "התנתק/י" [ref=e30] [cursor=pointer]:
+        - img [ref=e31]:
+          - img [ref=e32]
+    - generic [ref=e36]:
+      - navigation [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e42]:
+            - img "דרשר יונתן" [ref=e44]
+            - generic [ref=e45]:
+              - button "בחירת תלמיד לצפייה" [ref=e46]:
+                - img [ref=e47]:
+                  - img [ref=e48]
+                - generic [ref=e50]: יונתן
+              - button "בחירת טווח תאריכים לצפייה" [ref=e53]:
+                - img [ref=e54]:
+                  - img [ref=e55]
+                - generic [ref=e57]: כל השנה
+          - list [ref=e60]:
+            - listitem [ref=e61]:
+              - button "לוח מידע" [ref=e62]:
+                - generic "לוח מידע" [ref=e66]
+            - listitem [ref=e69]:
+              - button "קוד לזיהוי" [ref=e70]:
+                - generic "קוד לזיהוי" [ref=e74]
+            - listitem [ref=e77]:
+              - button "שחרורית חדש" [ref=e78]:
+                - generic [ref=e80]:
+                  - generic "שחרורית" [ref=e82]
+                  - generic [ref=e83]: חדש
+            - listitem [ref=e86]:
+              - button "דואר ומסרונים (sms) 85" [ref=e87]:
+                - generic [ref=e89]:
+                  - generic "דואר ומסרונים (sms)" [ref=e90]
+                  - generic [ref=e91]: "85"
+                  - img [ref=e92]:
+                    - img [ref=e93]
+            - listitem [ref=e97]:
+              - button "ציונים שוטפים" [ref=e98]:
+                - generic "ציונים שוטפים" [ref=e102]
+            - listitem [ref=e105]:
+              - button "ציונים תקופתיים" [ref=e106]:
+                - generic "ציונים תקופתיים" [ref=e110]
+            - listitem [ref=e113]:
+              - button "תעודות" [ref=e114]:
+                - generic "תעודות" [ref=e118]
+            - listitem [ref=e121]:
+              - button "התנהגות בשיעור" [ref=e122]:
+                - generic "התנהגות בשיעור" [ref=e126]
+            - listitem [ref=e129]:
+              - button "מבט על חדש" [ref=e130]:
+                - generic [ref=e132]:
+                  - generic "מבט על" [ref=e134]
+                  - generic [ref=e135]: חדש
+            - listitem [ref=e138]:
+              - button "מרחב קבצים" [ref=e139]:
+                - generic "מרחב קבצים" [ref=e143]
+            - listitem [ref=e146]:
+              - button "בקשות הצדקה" [ref=e147]:
+                - generic "בקשות הצדקה" [ref=e151]
+            - listitem [ref=e154]:
+              - button "אירועי התנהגות יומיים" [ref=e155]:
+                - generic "אירועי התנהגות יומיים" [ref=e159]
+            - listitem [ref=e162]:
+              - button "התנהגות מחוץ לשיעור" [ref=e163]:
+                - generic "התנהגות מחוץ לשיעור" [ref=e167]
+            - listitem [ref=e170]:
+              - button "מונה אירועים" [ref=e171]:
+                - generic "מונה אירועים" [ref=e175]
+            - listitem [ref=e178]:
+              - button "שעות פרטניות" [ref=e179]:
+                - generic "שעות פרטניות" [ref=e183]
+            - listitem [ref=e186]:
+              - button "הערות מעקב" [ref=e187]:
+                - generic "הערות מעקב" [ref=e191]
+            - listitem [ref=e194]:
+              - button "מערכת שעות" [ref=e195]:
+                - generic "מערכת שעות" [ref=e199]
+            - listitem [ref=e202]:
+              - button "חומרי לימוד" [ref=e203]:
+                - generic "חומרי לימוד" [ref=e207]
+            - listitem [ref=e210]:
+              - button "שיעורי בית" [ref=e211]:
+                - generic "שיעורי בית" [ref=e215]
+            - listitem [ref=e218]:
+              - button "אלפון" [ref=e219]:
+                - generic "אלפון" [ref=e223]
+            - listitem [ref=e226]:
+              - button "טפסים מקוונים" [ref=e227]:
+                - generic "טפסים מקוונים" [ref=e231]
+            - listitem [ref=e234]:
+              - button "שאלוני הורים מקוונים" [ref=e235]:
+                - generic "שאלוני הורים מקוונים" [ref=e239]
+            - listitem [ref=e242]:
+              - button "אישורי הורים לפעילות" [ref=e243]:
+                - generic "אישורי הורים לפעילות" [ref=e247]
+            - listitem [ref=e250]:
+              - button "ניהול ימי הורים חדש" [ref=e251]:
+                - generic [ref=e253]:
+                  - generic "ניהול ימי הורים" [ref=e255]
+                  - generic [ref=e256]: חדש
+            - listitem [ref=e259]:
+              - button "התאמות" [ref=e260]:
+                - generic "התאמות" [ref=e264]
+            - listitem [ref=e267]:
+              - button "התאמות בגרות" [ref=e268]:
+                - generic "התאמות בגרות" [ref=e272]
+            - listitem [ref=e275]:
+              - button "לוח מודעות" [ref=e276]:
+                - generic "לוח מודעות" [ref=e280]
+            - listitem [ref=e283]:
+              - button "כיתה מקוונת" [ref=e284]:
+                - generic "כיתה מקוונת" [ref=e288]
+            - listitem [ref=e291]:
+              - button "הקלטות" [ref=e292]:
+                - generic "הקלטות" [ref=e296]
+            - listitem [ref=e299]:
+              - button "משימות Moodle" [ref=e300]:
+                - generic "משימות Moodle" [ref=e304]
+            - listitem [ref=e307]:
+              - button "פרופיל אישי" [ref=e308]:
+                - generic "פרופיל אישי" [ref=e312]
+            - listitem [ref=e315]:
+              - button "אתר בית הספר" [ref=e316]:
+                - generic "אתר בית הספר" [ref=e319]
+            - listitem [ref=e322]:
+              - button "כניסה ל-Moodle" [ref=e323]:
+                - generic "Moodle" [ref=e326]: כניסה ל-Moodle
+            - listitem [ref=e329]:
+              - button "לוח מבחנים ואירועים (שחף)" [ref=e330]:
+                - generic "לוח מבחנים ואירועים (שחף)" [ref=e333]
+          - generic [ref=e336]:
+            - text: עברית | العربية | English | Українська | Русский
+            - text: "גרסה: 3.20210425"
+            - text: משו"ב תלמידים והורים
+            - text: © 2026 - משו"ב
+      - main [ref=e338]:
+        - generic [ref=e341]:
+          - heading "מה ברצונך לעשות? (יונתן)" [level=2] [ref=e342]
+          - generic [ref=e343]:
+            - generic [ref=e345] [cursor=pointer]:
+              - text: דואר נכנס
+              - generic [ref=e346]: (85 הודעות חדשות)
+            - generic [ref=e348] [cursor=pointer]: מערכת שעות
+            - generic [ref=e350] [cursor=pointer]: שיעורי בית
+            - generic [ref=e352] [cursor=pointer]: ציונים שוטפים
+            - generic [ref=e354] [cursor=pointer]: התנהגות בשיעור
+            - generic [ref=e356] [cursor=pointer]: משימות Moodle
+            - generic [ref=e358] [cursor=pointer]: אישורי הורים לפעילות
+            - generic [ref=e360] [cursor=pointer]: שחרורית
+  - generic [ref=e361]: סיסמה חד פעמית נשלחה בהצלחה!

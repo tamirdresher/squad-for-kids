@@ -1,0 +1,21 @@
+graph TB
+    A["💻 Data: Implements bcrypt<br/>Logs decision to decisions.md"] 
+    
+    A -->|Feb 18| B["📋 Decision Logged<br/>Use bcrypt for<br/>password hashing"]
+    
+    B -->|reads| C["📚 Seven: Writes API Docs"]
+    B -->|reads| D["🛡️ Worf: Security Audit"]
+    B -->|reads| E["⚙️ B Elanna: Deployment Config"]
+    
+    C --> C2["Documentation automatically<br/>explains WHY bcrypt<br/>references decision"]
+    
+    D --> D2["Security audit validates<br/>bcrypt configuration<br/>matches security policy"]
+    
+    E --> E2["Deployment config sets<br/>correct work factor<br/>based on decision"]
+    
+    C2 -->|compound value| F["🔗 Institutional Memory<br/>One decision, multiple contexts,<br/>automatic alignment"]
+    D2 -->|compound value| F
+    E2 -->|compound value| F
+    
+    style B fill:#fff9c4,color:#333
+    style F fill:#c8e6c9,color:#333

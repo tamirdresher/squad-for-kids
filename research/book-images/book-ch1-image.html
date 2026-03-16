@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 700px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  .scene {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+  /* Desk */
+  .desk {
+    position: absolute;
+    bottom: 100px;
+    left: 100px;
+    right: 100px;
+    height: 300px;
+    background: linear-gradient(180deg, #2d1f11 0%, #3d2914 100%);
+    border-radius: 8px 8px 0 0;
+    border-top: 4px solid #4a3520;
+  }
+  .desk-surface {
+    position: absolute;
+    top: 0; left: 20px; right: 20px;
+    height: 8px;
+    background: linear-gradient(90deg, #5a4230, #6b5240, #5a4230);
+    border-radius: 2px;
+  }
+  /* Monitor */
+  .monitor {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    height: 250px;
+    background: #111;
+    border: 3px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .monitor-screen {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a1628, #0d2137);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4a6fa5;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.5;
+    padding: 20px;
+  }
+  .monitor-stand {
+    position: absolute;
+    top: 330px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 40px;
+    background: #444;
+    border-radius: 0 0 4px 4px;
+  }
+  .monitor-base {
+    position: absolute;
+    top: 365px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 8px;
+    background: #555;
+    border-radius: 4px;
+  }
+  
+  /* Abandoned tools scattered on desk */
+  .tool {
+    position: absolute;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: bold;
+    opacity: 0.6;
+    transform-origin: center;
+  }
+  .tool-notion {
+    top: 400px; left: 160px;
+    background: #2d2d2d;
+    color: #999;
+    border: 1px solid #444;
+    transform: rotate(-15deg);
+  }
+  .tool-trello {
+    top: 430px; left: 350px;
+    background: #1a3a4a;
+    color: #5ba4cf;
+    border: 1px solid #2a5a7a;
+    transform: rotate(8deg);
+  }
+  .tool-asana {
+    top: 390px; right: 250px;
+    background: #3a2a3a;
+    color: #e8578a;
+    border: 1px solid #5a3a5a;
+    transform: rotate(-5deg);
+  }
+  .tool-journal {
+    top: 440px; right: 160px;
+    background: #3a3520;
+    color: #b8a060;
+    border: 1px solid #5a5030;
+    transform: rotate(12deg);
+  }
+  .tool-monday {
+    top: 460px; left: 520px;
+    background: #2a1a2a;
+    color: #ff6a6a;
+    border: 1px solid #4a2a4a;
+    transform: rotate(-8deg);
+  }
+  .tool-timer {
+    top: 415px; left: 700px;
+    background: #1a2a2a;
+    color: #6ac;
+    border: 1px solid #2a4a4a;
+    transform: rotate(20deg);
+  }
+  
+  /* Dust particles */
+  .dust {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(200,200,180,0.15);
+    border-radius: 50%;
+  }
+  
+  /* Sticky notes */
+  .sticky {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    padding: 8px;
+    font-size: 9px;
+    line-height: 1.3;
+    transform-origin: top center;
+  }
+  .sticky-yellow {
+    background: #e8d44d;
+    color: #665c20;
+    top: 60px; left: 180px;
+    transform: rotate(-3deg);
+    opacity: 0.4;
+  }
+  .sticky-pink {
+    background: #e87d9f;
+    color: #6b2840;
+    top: 75px; left: 270px;
+    transform: rotate(5deg);
+    opacity: 0.35;
+  }
+  .sticky-blue {
+    background: #7db8e8;
+    color: #2a4a6b;
+    top: 55px; right: 280px;
+    transform: rotate(-7deg);
+    opacity: 0.3;
+  }
+  .sticky-green {
+    background: #7de8a3;
+    color: #2a6b40;
+    top: 80px; right: 180px;
+    transform: rotate(4deg);
+    opacity: 0.35;
+  }
+  
+  /* Cobweb effect */
+  .cobweb {
+    position: absolute;
+    top: 20px;
+    right: 120px;
+    width: 80px;
+    height: 80px;
+    border-right: 1px solid rgba(200,200,200,0.08);
+    border-bottom: 1px solid rgba(200,200,200,0.08);
+    border-radius: 0 0 80px 0;
+  }
+  
+  /* Caption */
+  .caption {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(200,200,220,0.5);
+    font-size: 14px;
+    font-style: italic;
+    letter-spacing: 2px;
+  }
+  
+  /* X marks on tools */
+  .tool::after {
+    content: '✗';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    color: #e53935;
+    font-size: 16px;
+    opacity: 0.7;
+  }
+  
+  /* Dim moody lighting */
+  .light-cone {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(ellipse at center top, rgba(255,220,150,0.08) 0%, transparent 70%);
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="light-cone"></div>
+  
+  <!-- Sticky notes on wall -->
+  <div class="sticky sticky-yellow">TODO:<br>Set up system<br>✓ Day 1<br>✗ Day 4</div>
+  <div class="sticky sticky-pink">Sprint<br>backlog<br>...<br>(empty)</div>
+  <div class="sticky sticky-blue">Review<br>template<br>v3<br>(unused)</div>
+  <div class="sticky sticky-green">Weekly<br>retrospective<br>...<br>never</div>
+  
+  <div class="cobweb"></div>
+  
+  <!-- Desk -->
+  <div class="desk">
+    <div class="desk-surface"></div>
+  </div>
+  
+  <!-- Monitor -->
+  <div class="monitor">
+    <div class="monitor-screen">
+      <div>
+        <div style="font-size:20px; margin-bottom:10px;">📋 TODO List</div>
+        <div style="opacity:0.5; text-decoration: line-through;">☐ Update Notion workspace</div>
+        <div style="opacity:0.4; text-decoration: line-through;">☐ Review Trello board</div>
+        <div style="opacity:0.3; text-decoration: line-through;">☐ Write daily standup notes</div>
+        <div style="opacity:0.2;">☐ ...</div>
+        <div style="color:#e53935; margin-top:15px; font-size:12px;">Last updated: 3 weeks ago</div>
+      </div>
+    </div>
+  </div>
+  <div class="monitor-stand"></div>
+  <div class="monitor-base"></div>
+  
+  <!-- Abandoned productivity tools on desk -->
+  <div class="tool tool-notion">📝 Notion</div>
+  <div class="tool tool-trello">📋 Trello</div>
+  <div class="tool tool-asana">🎯 Asana</div>
+  <div class="tool tool-journal">📓 Bullet Journal</div>
+  <div class="tool tool-monday">📊 Monday.com</div>
+  <div class="tool tool-timer">⏱️ Pomodoro</div>
+  
+  <!-- Dust particles -->
+  <div class="dust" style="top:420px;left:200px;"></div>
+  <div class="dust" style="top:445px;left:380px;"></div>
+  <div class="dust" style="top:410px;right:270px;"></div>
+  <div class="dust" style="top:455px;left:550px;"></div>
+  <div class="dust" style="top:430px;right:190px;"></div>
+  
+  <div class="caption">Figure 1.1 — The Productivity System Graveyard</div>
+</div>
+</body>
+</html>

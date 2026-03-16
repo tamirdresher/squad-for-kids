@@ -1,0 +1,307 @@
+Mobile Squad Chat Architecture — Visual Reference
+================================================
+
+OPTION A (RECOMMENDED): Azure Static Web App + Functions + SignalR PWA
+-----------------------------------------------------------------------
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                        📱 ANDROID PHONE                              │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  Squad Chat PWA (Add to Home Screen)                         │  │
+│  │  ┌────────────────────────────────────────────────────────┐  │  │
+│  │  │  @picard What's the status of #489?                    │  │  │
+│  │  │  ────────────────────────────────────────────────────  │  │  │
+│  │  │  [Picard] Issue #489 is pending user input. Seven...  │  │  │
+│  │  │  [Seven] Research complete. See mobile-squad-arch...   │  │  │
+│  │  │  [You] Thanks! What about the DevBox tunnel?          │  │  │
+│  │  │  [B'Elanna] DevBox tunnel is currently stopped...     │  │  │
+│  │  └────────────────────────────────────────────────────────┘  │  │
+│  │  [@picard] [@data] [@seven] [@belanna] [Send 📤]           │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+│                  │                                    ▲              │
+│                  │ POST /api/send                    │ SignalR Push │
+│                  │ (HTTPS + JWT)                     │ (WebSocket)  │
+└──────────────────┼───────────────────────────────────┼──────────────┘
+                   │                                   │
+                   │                                   │
+┌──────────────────▼───────────────────────────────────┼──────────────┐
+│                    ☁️  AZURE CLOUD                                   │
+│                                                       │              │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │  Azure Static Web App (FREE TIER)                             │ │
+│  │  • Hosts PWA (React + TypeScript)                             │ │
+│  │  • Auto-deploy from GitHub                                    │ │
+│  │  • Azure AD SSO built-in                                      │ │
+│  │  • URL: https://squad-chat.azurestaticapps.net               │ │
+│  └─────────────────────────┬──────────────────────────────────────┘ │
+│                            │                                        │
+│                            │ Routes API calls                       │
+│                            │                                        │
+│  ┌─────────────────────────▼──────────────────────────────────────┐ │
+│  │  Azure Functions (Consumption Plan — FREE TIER)               │ │
+│  │  ┌──────────────────────────────────────────────────────────┐ │ │
+│  │  │  [SendMessage] HTTP Trigger                              │ │ │
+│  │  │  1. Validate JWT token (Azure AD)                        │ │ │
+│  │  │  2. Parse message → detect agent routing                 │ │ │
+│  │  │  3. Spawn: `gh copilot --agent=picard "message"`        │ │ │
+│  │  │  4. Push response via SignalR                            │ │ │
+│  │  └──────────────────────────────────────────────────────────┘ │ │
+│  │  ┌──────────────────────────────────────────────────────────┐ │ │
+│  │  │  [GetHistory] HTTP Trigger                               │ │ │
+│  │  │  Retrieves chat log from CosmosDB                        │ │ │
+│  │  └──────────────────────────────────────────────────────────┘ │ │
+│  │  ┌──────────────────────────────────────────────────────────┐ │ │
+│  │  │  [SignalRNegotiate] SignalR Binding                      │ │ │
+│  │  │  Connection handshake for real-time push                 │ │ │
+│  │  └──────────────────────────────────────────────────────────┘ │ │
+│  └─────┬──────────────────────┬────────────────────────┬─────────┘ │
+│        │                      │                        │           │
+│        │ spawn CLI            │ read/write             │ push      │
+│        │                      │                        │           │
+│        ▼                      ▼                        ▼           │
+│  ┌──────────────┐  ┌─────────────────────┐  ┌──────────────────┐  │
+│  │  Copilot CLI │  │  CosmosDB Serverless│  │  Azure SignalR   │  │
+│  │  ----------- │  │  ------------------- │  │  Service (FREE)  │  │
+│  │  • npm pkg   │  │  • Chat history     │  │  • 20 concurrent │  │
+│  │  • .squad/   │  │  • User sessions    │  │  • 20k msg/day   │  │
+│  │    access    │  │  • Message log      │  │  • Bidirectional │  │
+│  └──────┬───────┘  └─────────────────────┘  └──────────────────┘  │
+│         │                                                           │
+│         │ GitHub API (reads .squad/ files)                         │
+└─────────┼───────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  📂 GITHUB REPOSITORY (tamirdresher_microsoft/tamresearch1)         │
+│  .squad/                                                             │
+│    ├── team.md              (agent roster)                          │
+│    ├── routing.md           (work assignment rules)                 │
+│    ├── agents/                                                       │
+│    │   ├── picard/          (Lead charter)                          │
+│    │   ├── data/            (Code Expert charter)                   │
+│    │   ├── seven/           (Research charter)                      │
+│    │   └── belanna/         (Infrastructure charter)                │
+│    └── orchestration-log/   (agent activity log)                    │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+DATA FLOW: User Sends "@picard status check"
+---------------------------------------------
+
+Step 1: Message Sent
+  User types in PWA → POST /api/send
+  Headers: { Authorization: "Bearer <JWT>" }
+  Body: { message: "@picard status check", agent: "picard" }
+
+Step 2: Authentication
+  Azure Function validates JWT token
+  • Signature check against Azure AD public key
+  • Expiration check
+  • Extract user identity: tamir@microsoft.com
+  • Check role: "squad.user" ✅
+
+Step 3: Agent Routing
+  Parse message for @mention or keywords
+  • "@picard" detected → route to picard agent
+  • Alternative: keyword match (bug → data, research → seven)
+
+Step 4: Spawn Copilot CLI
+  Azure Function spawns process:
+  ```bash
+  gh copilot --agent=picard "status check" \
+    --squad-root=".squad" \
+    --context="team.md,routing.md,agents/picard/charter.md"
+  ```
+  Timeout: 30 seconds
+
+Step 5: CLI Executes
+  Copilot CLI:
+  • Reads .squad/ files via GitHub API
+  • Loads Picard charter
+  • Processes query → generates response
+  • Returns: "All systems nominal. Issue #489 awaiting user input."
+
+Step 6: Response Push
+  Azure Function:
+  • Stores message + response in CosmosDB
+  • Pushes to SignalR:
+    ```javascript
+    signalR.send('receiveMessage', {
+      agent: 'picard',
+      text: 'All systems nominal...',
+      timestamp: '2025-03-11T19:30:00Z'
+    });
+    ```
+
+Step 7: Real-time Update
+  SignalR → Android phone (instant push)
+  PWA displays message in chat window with Picard avatar
+  Total latency: ~2-5 seconds
+
+
+AUTHENTICATION FLOW
+-------------------
+
+┌──────────────┐
+│ User opens   │
+│ PWA on phone │
+└──────┬───────┘
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ Check auth cookie                      │
+│ (Azure Static Web App auto-checks)    │
+└──┬──────────────────────────┬──────────┘
+   │ No cookie                │ Has cookie
+   │                          │
+   ▼                          ▼
+┌─────────────────────┐  ┌──────────────────┐
+│ Redirect to         │  │ Load chat UI     │
+│ Azure AD login      │  │ with cached      │
+│ (Microsoft SSO)     │  │ JWT token        │
+└──────┬──────────────┘  └──────────────────┘
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ User signs in: tamir@microsoft.com    │
+│ Azure AD returns JWT token            │
+└──────┬─────────────────────────────────┘
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ Redirect back to PWA with token       │
+│ Token stored in sessionStorage        │
+│ JWT format: { sub, email, roles }     │
+└──────┬─────────────────────────────────┘
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ All API calls include:                │
+│ Authorization: Bearer <JWT>           │
+│                                        │
+│ Function validates on each request    │
+└────────────────────────────────────────┘
+
+
+COST BREAKDOWN (Monthly Estimate)
+----------------------------------
+
+Service                 | Free Tier Limit      | Usage        | Cost
+------------------------|----------------------|--------------|-------
+Static Web App          | 100 GB bandwidth     | 1 GB         | $0
+Azure Functions         | 1M requests          | 10k requests | $0
+                       | 400k GB-s execution  | 50k GB-s     | $0
+Azure SignalR          | 20 concurrent        | 1 user       | $0
+                       | 20k messages/day     | 1k msg/day   | $0
+CosmosDB (Serverless)  | 1000 RU/s throughput | 100 RU/s     | $0
+                       | 25 GB storage        | 1 GB         | $0
+Azure AD (Entra)       | Included with MS     | N/A          | $0
+------------------------|----------------------|--------------|-------
+TOTAL MONTHLY COST:                                          | $0
+
+Scaling to 10 Users:
+  • Static Web App: Still $0 (5 GB bandwidth)
+  • Functions: Still $0 (100k requests)
+  • SignalR: Need Basic tier ($49/mo) for 1000 concurrent
+  • CosmosDB: Still $0 (1000 RU/s)
+  • TOTAL: ~$50/month for 10 users
+
+
+MVP BUILD TIMELINE (5 Days to Production)
+------------------------------------------
+
+Day 1: Frontend PWA
+  ✅ Create React PWA with TypeScript
+  ✅ Build chat UI components (ChatWindow, MessageInput, AgentSelector)
+  ✅ Add PWA manifest (installable on Android)
+  ✅ Deploy to GitHub Pages for testing
+  ✅ Test "Add to Home Screen" on Android
+
+Day 2: Backend Azure Functions
+  ✅ Create Function App (SendMessage, GetHistory, SignalRNegotiate)
+  ✅ Implement Copilot CLI spawning logic
+  ✅ Configure SignalR bindings
+  ✅ Deploy to Azure
+
+Day 3: Integration
+  ✅ Connect PWA to Azure Functions via SignalR client
+  ✅ Test end-to-end: message → CLI → response → phone
+  ✅ Add CosmosDB for chat history persistence
+  ✅ Implement message caching/offline support
+
+Day 4: Agent Routing
+  ✅ Parse .squad/routing.md for smart routing rules
+  ✅ Implement keyword-based agent detection
+  ✅ Add visual indicators (agent avatars, colors)
+  ✅ Test routing: @picard, @data, @seven, @belanna
+
+Day 5: Production Deploy
+  ✅ Configure custom domain (squad.tamirdresher.dev)
+  ✅ Enable Azure AD auth in Static Web App
+  ✅ Set up GitHub Actions CI/CD
+  ✅ Security hardening (rate limiting, input validation)
+  ✅ Final testing on Android in production
+  ✅ Documentation & handoff
+
+
+PRAGMATIC ALTERNATIVE: Telegram Bot Hybrid
+-------------------------------------------
+
+If dropping "Azure native frontend" requirement:
+
+┌───────────────┐
+│ Telegram App  │  (Already on Android phone)
+│ (on Android)  │
+└───────┬───────┘
+        │ Telegram Bot API (HTTPS)
+        ▼
+┌────────────────────────────────────────┐
+│  Telegram Bot (@TamirSquadBot)        │
+│  • Polling or webhook mode             │
+│  • Receives: /picard status check      │
+│  • Sends: markdown formatted response  │
+└───────┬────────────────────────────────┘
+        │ HTTPS POST
+        ▼
+┌────────────────────────────────────────┐
+│  Azure Function (Bot Bridge)          │
+│  • Validates Telegram bot token       │
+│  • Routes message to Copilot CLI      │
+│  • Returns response to Telegram       │
+└───────┬────────────────────────────────┘
+        │ spawn CLI
+        ▼
+┌────────────────────────────────────────┐
+│  Copilot CLI (same as Option A)       │
+│  • Reads .squad/ files                 │
+│  • Processes with agent context        │
+└────────────────────────────────────────┘
+
+PROS:
+  ✅ Build time: 4 hours (vs. 2 days for PWA)
+  ✅ UX: Best-in-class (Telegram is highly polished)
+  ✅ Rich media: Voice, files, markdown native
+  ✅ Cost: $0 (Telegram Bot API is free)
+  ✅ Still uses Azure backend (Function bridge)
+
+CONS:
+  ❌ Not 100% Azure (Telegram is external)
+  ⚠️  Security: Bot token auth (not Azure AD)
+
+VERDICT: Build this first as 4-hour prototype to validate UX,
+         then migrate to PWA if corporate compliance requires.
+
+
+SUMMARY
+-------
+
+✅ RECOMMENDED: Azure Static Web App + Functions + SignalR (PWA)
+  • Best balance: Azure native, great UX, $0 cost, low maintenance
+  • MVP in 1-2 days, production in 5 days
+  • Scales to 10+ users for ~$50/month
+
+🤔 PRAGMATIC: Telegram Bot + Azure Function Bridge
+  • Fastest (4 hours), best UX, still uses Azure backend
+  • Trade-off: Not 100% Azure frontend
+
+📄 Full architecture doc: research/active/mobile-squad-architecture.md

@@ -1,0 +1,2 @@
+[   82212ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://portal.microsofticm.com/imp/v5/oncall/current:0
+[   82503ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://portal.microsofticm.com/favicon.ico:0

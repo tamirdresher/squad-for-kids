@@ -1,0 +1,477 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e77]:
+      - navigation "Site header" [ref=e78]:
+        - button "Skip to Main Content" [ref=e79] [cursor=pointer]
+        - generic [ref=e80]:
+          - button "Applications" [ref=e82] [cursor=pointer]:
+            - img [ref=e83]
+            - generic [ref=e85]: Applications
+          - link "IcM" [ref=e86] [cursor=pointer]:
+            - /url: /imp
+            - generic "Incident Management" [ref=e87]: IcM
+        - menu [ref=e88]:
+          - text: 
+          - menuitem " Search" [ref=e89]:
+            - generic [ref=e91]:
+              - textbox "Incident search bar input" [ref=e92]:
+                - /placeholder: Search by incident ID or other fields...
+              - button " Search" [ref=e93] [cursor=pointer]:
+                - generic [ref=e94]: 
+                - generic [ref=e95]: Search
+          - menuitem "IcM Assistant" [ref=e96]:
+            - button "IcM Assistant" [ref=e97] [cursor=pointer]:
+              - img [ref=e98]
+              - generic [ref=e105]: IcM Assistant
+          - menuitem "Help & Support " [ref=e106]:
+            - generic [ref=e107]:
+              - button "Help & Support " [ref=e108] [cursor=pointer]:
+                - generic [ref=e109]: Help & Support
+                - generic [ref=e110]: 
+              - text:  
+          - menuitem "Report a Bug " [ref=e111]:
+            - link "Report a Bug " [ref=e112] [cursor=pointer]:
+              - /url: https://aka.ms/icmbug
+              - generic [ref=e113]: Report a Bug
+              - generic [ref=e114]: 
+          - menuitem " Toggle feedback" [ref=e115]:
+            - generic [ref=e117]:
+              - button " Toggle feedback" [ref=e118] [cursor=pointer]:
+                - generic [ref=e119]: 
+                - generic [ref=e120]: Toggle feedback
+              - text:  
+          - menuitem "Time zone preferences. Currently displaying times in" [ref=e121]:
+            - generic [ref=e122]:
+              - button "Time zone preferences. Currently displaying times in" [ref=e123] [cursor=pointer]:
+                - generic [ref=e124]: 
+                - generic [ref=e125]: Time zone preferences. Currently displaying times in
+              - text: 
+          - menuitem " Breaking News" [ref=e126]:
+            - generic [ref=e128]:
+              - button " Breaking News" [ref=e129] [cursor=pointer]:
+                - generic [ref=e130]: 
+                - generic [ref=e131]: Breaking News
+              - text:   
+          - menuitem "My Profile Tamir Dresher" [ref=e132]:
+            - generic [ref=e134]:
+              - button "My Profile Tamir Dresher" [ref=e135] [cursor=pointer]:
+                - generic [ref=e136]: My Profile
+                - generic:
+                  - generic:
+                    - generic: Tamir Dresher
+              - text: 
+      - generic: 
+    - generic [ref=e3]:
+      - navigation "Main left navigation" [ref=e138]:
+        - button " Collapse menu" [ref=e139] [cursor=pointer]:
+          - generic [ref=e140]: 
+          - generic [ref=e141]: Collapse menu
+        - menu [ref=e142]:
+          - menuitem "Dashboard" [ref=e143] [cursor=pointer]:
+            - img [ref=e145]
+            - generic [ref=e147]: Dashboard
+          - menuitem "Incidents " [ref=e148] [cursor=pointer]:
+            - img [ref=e150]
+            - generic [ref=e152]: Incidents
+            - generic [ref=e153]: 
+          - menuitem "Outages " [ref=e154] [cursor=pointer]:
+            - img [ref=e156]
+            - generic [ref=e158]: Outages
+            - generic [ref=e159]: 
+          - menuitem "Retrospectives" [ref=e160] [cursor=pointer]:
+            - img [ref=e162]
+            - generic [ref=e164]: Retrospectives
+          - menuitem "On call lists " [ref=e165] [cursor=pointer]:
+            - img [ref=e167]
+            - generic [ref=e169]: On call lists
+            - generic [ref=e170]: 
+          - menu [ref=e171]:
+            - menuitem "Contact search" [ref=e172] [cursor=pointer]:
+              - generic [ref=e173]: Contact search
+            - menuitem "Who's on call" [ref=e174] [cursor=pointer]:
+              - generic [ref=e175]: Who's on call
+            - menuitem "My on call schedule" [ref=e176] [cursor=pointer]:
+              - generic [ref=e177]: My on call schedule
+          - menuitem "Agent Studio (Automation)" [ref=e178] [cursor=pointer]:
+            - img [ref=e180]
+            - generic [ref=e182]: Agent Studio (Automation)
+          - menuitem "Reporting " [ref=e183] [cursor=pointer]:
+            - img [ref=e185]
+            - generic [ref=e187]: Reporting
+            - generic [ref=e188]: 
+          - menuitem "Administration " [ref=e189] [cursor=pointer]:
+            - img [ref=e191]
+            - generic [ref=e193]: Administration
+            - generic [ref=e194]: 
+          - menuitem "Playbooks" [ref=e195] [cursor=pointer]:
+            - img [ref=e197]
+            - generic [ref=e199]: Playbooks
+      - main [ref=e5]:
+        - generic [ref=e8]:
+          - button " Show" [ref=e10] [cursor=pointer]:
+            - text: 
+            - generic [ref=e11]: Show
+          - generic [ref=e12]:
+            - text: Service/Team(s)
+            - button [ref=e13] [cursor=pointer]:
+              - generic [ref=e14]: "?"
+          - generic [ref=e15]: "Find team by:"
+          - tablist [ref=e16]:
+            - generic [ref=e18]:
+              - tab [selected] [ref=e19]:
+                - generic [ref=e20] [cursor=pointer]: Service
+              - tab [ref=e21]:
+                - generic [ref=e22] [cursor=pointer]: Contact
+              - tab [ref=e23]:
+                - generic [ref=e24] [cursor=pointer]: All
+          - link [ref=e27] [cursor=pointer]:
+            - /url: "#"
+            - text: 
+          - combobox [ref=e29]
+          - text: 
+          - textbox [ref=e30]:
+            - /placeholder: Search services or teams
+          - button [disabled] [ref=e32]:
+            - generic [ref=e33]: 
+            - generic [ref=e34]: Search
+          - listitem [ref=e200]:
+            - strong [ref=e201]:
+              - button [ref=e202] [cursor=pointer]: 
+              - button [ref=e203] [cursor=pointer]:
+                - generic [ref=e204]: 
+                - generic [ref=e205]: Remove this service
+            - listitem [ref=e206]:
+              - button [ref=e207] [cursor=pointer]:
+                - generic [ref=e208]: 
+                - generic [ref=e209]: Remove this team
+          - radio [checked] [ref=e35]
+          - radio [ref=e36]
+          - radio [ref=e37]
+          - radio [checked] [ref=e38]
+          - button [ref=e39] [cursor=pointer]: Run
+          - generic [ref=e40]:
+            - generic [ref=e42]:
+              - button " Export to Excel" [ref=e43] [cursor=pointer]:
+                - generic [ref=e44]: 
+                - generic [ref=e45]: Export to Excel
+              - generic [ref=e211]:
+                - button " Email DRIs" [ref=e212] [cursor=pointer]:
+                  - text: 
+                  - generic [ref=e213]: Email DRIs
+                - text:  
+            - generic [ref=e46]:
+              - tablist
+              - generic [ref=e47]:
+                - generic: 
+                - generic [ref=e48]:
+                  - generic [ref=e214]:
+                    - treegrid [ref=e216]:
+                      - rowgroup [ref=e220]:
+                        - 'row "Collapse TeamName Team: Incident Manager  Email team View team''s incidents, click to open a new browser tab to view" [ref=e221]':
+                          - gridcell "Collapse" [ref=e222]:
+                            - link "Collapse" [expanded] [ref=e223] [cursor=pointer]:
+                              - /url: "#"
+                              - text: 
+                          - 'gridcell "TeamName Team: Incident Manager  Email team View team''s incidents, click to open a new browser tab to view" [ref=e224]':
+                            - generic [ref=e225]: TeamName
+                            - generic [ref=e226]:
+                              - generic [ref=e227]: "Team:"
+                              - generic "Incident Manager" [ref=e228]
+                              - link " Email team" [ref=e229] [cursor=pointer]:
+                                - /url: mailto:defenderk8s@service.microsoft.com
+                                - generic [ref=e230]: 
+                                - text: Email team
+                              - link "View team's incidents, click to open a new browser tab to view" [ref=e231] [cursor=pointer]:
+                                - /url: incidents/search/advanced?serviceCategories=0&services=0&teams=88835
+                                - text: View team's incidents 
+                        - row [ref=e232]:
+                          - gridcell [ref=e233]
+                          - gridcell [ref=e234]:
+                            - grid [ref=e237]:
+                              - rowgroup [ref=e247]:
+                                - row "Team Shift (IST) Role Alias Name Work Cell Home" [ref=e248]:
+                                  - columnheader "Team" [ref=e249]
+                                  - columnheader "Shift (IST)" [ref=e250]
+                                  - columnheader "Role" [ref=e251]
+                                  - columnheader "Alias" [ref=e252]
+                                  - columnheader "Name" [ref=e253]
+                                  - columnheader "Work" [ref=e254]:
+                                    - link "Work" [ref=e255] [cursor=pointer]:
+                                      - /url: "#"
+                                  - columnheader "Cell" [ref=e256]:
+                                    - link "Cell" [ref=e257] [cursor=pointer]:
+                                      - /url: "#"
+                                  - columnheader "Home" [ref=e258]:
+                                    - link "Home" [ref=e259] [cursor=pointer]:
+                                      - /url: "#"
+                              - rowgroup [ref=e260]:
+                                - row "TeamName Incident Manager ShiftName Primary (08:30-08:30) Role Primary Alias mosheperetz LastName Moshe Peretz WorkNumber Call Moshe at Work +972528231711 CellNumber HomeNumber Call Moshe at Home +972544838386" [ref=e261]:
+                                  - gridcell "TeamName Incident Manager" [ref=e262]:
+                                    - generic [ref=e263]: TeamName
+                                    - generic [ref=e264]: Incident Manager
+                                  - gridcell "ShiftName Primary (08:30-08:30)" [ref=e265]:
+                                    - generic [ref=e266]: ShiftName
+                                    - generic [ref=e267]: Primary (08:30-08:30)
+                                  - gridcell "Role Primary" [ref=e268]:
+                                    - generic [ref=e269]: Role
+                                    - generic [ref=e270]: Primary
+                                  - gridcell "Alias mosheperetz" [ref=e271]:
+                                    - generic [ref=e272]: Alias
+                                    - generic "mosheperetz" [ref=e273]
+                                  - gridcell "LastName Moshe Peretz" [ref=e274]:
+                                    - generic [ref=e275]: LastName
+                                    - generic "Moshe Peretz" [ref=e276]
+                                  - gridcell "WorkNumber Call Moshe at Work +972528231711" [ref=e277]:
+                                    - generic [ref=e278]: WorkNumber
+                                    - link "Call Moshe at Work +972528231711" [ref=e279] [cursor=pointer]:
+                                      - /url: tel:+972528231711
+                                      - text: "+972528231711"
+                                  - gridcell "CellNumber" [ref=e280]:
+                                    - generic [ref=e281]: CellNumber
+                                  - gridcell "HomeNumber Call Moshe at Home +972544838386" [ref=e282]:
+                                    - generic [ref=e283]: HomeNumber
+                                    - link "Call Moshe at Home +972544838386" [ref=e284] [cursor=pointer]:
+                                      - /url: tel:+972544838386
+                                      - text: "+972544838386"
+                                - row "TeamName Incident Manager ShiftName Primary (08:30-08:30) Role Backup Alias tamirdresher LastName tamirdresher tamirdresher WorkNumber Call tamirdresher at Work +972524772946 CellNumber Call tamirdresher at Cell +972524772946 HomeNumber" [ref=e285]:
+                                  - gridcell "TeamName Incident Manager" [ref=e286]:
+                                    - generic [ref=e287]: TeamName
+                                    - generic [ref=e288]: Incident Manager
+                                  - gridcell "ShiftName Primary (08:30-08:30)" [ref=e289]:
+                                    - generic [ref=e290]: ShiftName
+                                    - generic [ref=e291]: Primary (08:30-08:30)
+                                  - gridcell "Role Backup" [ref=e292]:
+                                    - generic [ref=e293]: Role
+                                    - generic [ref=e294]: Backup
+                                  - gridcell "Alias tamirdresher" [ref=e295]:
+                                    - generic [ref=e296]: Alias
+                                    - generic "tamirdresher" [ref=e297]
+                                  - gridcell "LastName tamirdresher tamirdresher" [ref=e298]:
+                                    - generic [ref=e299]: LastName
+                                    - generic "tamirdresher tamirdresher" [ref=e300]
+                                  - gridcell "WorkNumber Call tamirdresher at Work +972524772946" [ref=e301]:
+                                    - generic [ref=e302]: WorkNumber
+                                    - link "Call tamirdresher at Work +972524772946" [ref=e303] [cursor=pointer]:
+                                      - /url: tel:+972524772946
+                                      - text: "+972524772946"
+                                  - gridcell "CellNumber Call tamirdresher at Cell +972524772946" [ref=e304]:
+                                    - generic [ref=e305]: CellNumber
+                                    - link "Call tamirdresher at Cell +972524772946" [ref=e306] [cursor=pointer]:
+                                      - /url: tel:+972524772946
+                                      - text: "+972524772946"
+                                  - gridcell "HomeNumber" [ref=e307]:
+                                    - generic [ref=e308]: HomeNumber
+                                - row "TeamName Triage ShiftName Primary1 (08:00-08:00) Role Primary Alias saurabhbali LastName saurabhbali saurabhbali WorkNumber Call saurabhbali at Work +919910156721 CellNumber Call saurabhbali at Cell +919910156721 HomeNumber" [ref=e309]:
+                                  - gridcell "TeamName Triage" [ref=e310]:
+                                    - generic [ref=e311]: TeamName
+                                    - generic [ref=e312]: Triage
+                                  - gridcell "ShiftName Primary1 (08:00-08:00)" [ref=e313]:
+                                    - generic [ref=e314]: ShiftName
+                                    - generic [ref=e315]: Primary1 (08:00-08:00)
+                                  - gridcell "Role Primary" [ref=e316]:
+                                    - generic [ref=e317]: Role
+                                    - generic [ref=e318]: Primary
+                                  - gridcell "Alias saurabhbali" [ref=e319]:
+                                    - generic [ref=e320]: Alias
+                                    - generic "saurabhbali" [ref=e321]
+                                  - gridcell "LastName saurabhbali saurabhbali" [ref=e322]:
+                                    - generic [ref=e323]: LastName
+                                    - generic "saurabhbali saurabhbali" [ref=e324]
+                                  - gridcell "WorkNumber Call saurabhbali at Work +919910156721" [ref=e325]:
+                                    - generic [ref=e326]: WorkNumber
+                                    - link "Call saurabhbali at Work +919910156721" [ref=e327] [cursor=pointer]:
+                                      - /url: tel:+919910156721
+                                      - text: "+919910156721"
+                                  - gridcell "CellNumber Call saurabhbali at Cell +919910156721" [ref=e328]:
+                                    - generic [ref=e329]: CellNumber
+                                    - link "Call saurabhbali at Cell +919910156721" [ref=e330] [cursor=pointer]:
+                                      - /url: tel:+919910156721
+                                      - text: "+919910156721"
+                                  - gridcell "HomeNumber" [ref=e331]:
+                                    - generic [ref=e332]: HomeNumber
+                                - row "TeamName Triage ShiftName Primary1 (08:00-08:00) Role Backup Alias anandkuma LastName Anand Kumar WorkNumber Call Anand at Work +917903001982 CellNumber Call Anand at Cell +917903001982 HomeNumber Call Anand at Home +917903001982" [ref=e333]:
+                                  - gridcell "TeamName Triage" [ref=e334]:
+                                    - generic [ref=e335]: TeamName
+                                    - generic [ref=e336]: Triage
+                                  - gridcell "ShiftName Primary1 (08:00-08:00)" [ref=e337]:
+                                    - generic [ref=e338]: ShiftName
+                                    - generic [ref=e339]: Primary1 (08:00-08:00)
+                                  - gridcell "Role Backup" [ref=e340]:
+                                    - generic [ref=e341]: Role
+                                    - generic [ref=e342]: Backup
+                                  - gridcell "Alias anandkuma" [ref=e343]:
+                                    - generic [ref=e344]: Alias
+                                    - generic "anandkuma" [ref=e345]
+                                  - gridcell "LastName Anand Kumar" [ref=e346]:
+                                    - generic [ref=e347]: LastName
+                                    - generic "Anand Kumar" [ref=e348]
+                                  - gridcell "WorkNumber Call Anand at Work +917903001982" [ref=e349]:
+                                    - generic [ref=e350]: WorkNumber
+                                    - link "Call Anand at Work +917903001982" [ref=e351] [cursor=pointer]:
+                                      - /url: tel:+917903001982
+                                      - text: "+917903001982"
+                                  - gridcell "CellNumber Call Anand at Cell +917903001982" [ref=e352]:
+                                    - generic [ref=e353]: CellNumber
+                                    - link "Call Anand at Cell +917903001982" [ref=e354] [cursor=pointer]:
+                                      - /url: tel:+917903001982
+                                      - text: "+917903001982"
+                                  - gridcell "HomeNumber Call Anand at Home +917903001982" [ref=e355]:
+                                    - generic [ref=e356]: HomeNumber
+                                    - link "Call Anand at Home +917903001982" [ref=e357] [cursor=pointer]:
+                                      - /url: tel:+917903001982
+                                      - text: "+917903001982"
+                                - row "TeamName Triage ShiftName Primary1 (08:00-08:00) Role Primary Alias saurabhbali LastName saurabhbali saurabhbali WorkNumber Call saurabhbali at Work +919910156721 CellNumber Call saurabhbali at Cell +919910156721 HomeNumber" [ref=e358]:
+                                  - gridcell "TeamName Triage" [ref=e359]:
+                                    - generic [ref=e360]: TeamName
+                                    - generic [ref=e361]: Triage
+                                  - gridcell "ShiftName Primary1 (08:00-08:00)" [ref=e362]:
+                                    - generic [ref=e363]: ShiftName
+                                    - generic [ref=e364]: Primary1 (08:00-08:00)
+                                  - gridcell "Role Primary" [ref=e365]:
+                                    - generic [ref=e366]: Role
+                                    - generic [ref=e367]: Primary
+                                  - gridcell "Alias saurabhbali" [ref=e368]:
+                                    - generic [ref=e369]: Alias
+                                    - generic "saurabhbali" [ref=e370]
+                                  - gridcell "LastName saurabhbali saurabhbali" [ref=e371]:
+                                    - generic [ref=e372]: LastName
+                                    - generic "saurabhbali saurabhbali" [ref=e373]
+                                  - gridcell "WorkNumber Call saurabhbali at Work +919910156721" [ref=e374]:
+                                    - generic [ref=e375]: WorkNumber
+                                    - link "Call saurabhbali at Work +919910156721" [ref=e376] [cursor=pointer]:
+                                      - /url: tel:+919910156721
+                                      - text: "+919910156721"
+                                  - gridcell "CellNumber Call saurabhbali at Cell +919910156721" [ref=e377]:
+                                    - generic [ref=e378]: CellNumber
+                                    - link "Call saurabhbali at Cell +919910156721" [ref=e379] [cursor=pointer]:
+                                      - /url: tel:+919910156721
+                                      - text: "+919910156721"
+                                  - gridcell "HomeNumber" [ref=e380]:
+                                    - generic [ref=e381]: HomeNumber
+                                - row "TeamName Triage ShiftName Primary1 (08:00-08:00) Role Backup Alias anandkuma LastName Anand Kumar WorkNumber Call Anand at Work +917903001982 CellNumber Call Anand at Cell +917903001982 HomeNumber Call Anand at Home +917903001982" [ref=e382]:
+                                  - gridcell "TeamName Triage" [ref=e383]:
+                                    - generic [ref=e384]: TeamName
+                                    - generic [ref=e385]: Triage
+                                  - gridcell "ShiftName Primary1 (08:00-08:00)" [ref=e386]:
+                                    - generic [ref=e387]: ShiftName
+                                    - generic [ref=e388]: Primary1 (08:00-08:00)
+                                  - gridcell "Role Backup" [ref=e389]:
+                                    - generic [ref=e390]: Role
+                                    - generic [ref=e391]: Backup
+                                  - gridcell "Alias anandkuma" [ref=e392]:
+                                    - generic [ref=e393]: Alias
+                                    - generic "anandkuma" [ref=e394]
+                                  - gridcell "LastName Anand Kumar" [ref=e395]:
+                                    - generic [ref=e396]: LastName
+                                    - generic "Anand Kumar" [ref=e397]
+                                  - gridcell "WorkNumber Call Anand at Work +917903001982" [ref=e398]:
+                                    - generic [ref=e399]: WorkNumber
+                                    - link "Call Anand at Work +917903001982" [ref=e400] [cursor=pointer]:
+                                      - /url: tel:+917903001982
+                                      - text: "+917903001982"
+                                  - gridcell "CellNumber Call Anand at Cell +917903001982" [ref=e401]:
+                                    - generic [ref=e402]: CellNumber
+                                    - link "Call Anand at Cell +917903001982" [ref=e403] [cursor=pointer]:
+                                      - /url: tel:+917903001982
+                                      - text: "+917903001982"
+                                  - gridcell "HomeNumber Call Anand at Home +917903001982" [ref=e404]:
+                                    - generic [ref=e405]: HomeNumber
+                                    - link "Call Anand at Home +917903001982" [ref=e406] [cursor=pointer]:
+                                      - /url: tel:+917903001982
+                                      - text: "+917903001982"
+                                - row "TeamName Incident Manager ShiftName Primary (08:30-08:30) Role Primary Alias mosheperetz LastName Moshe Peretz WorkNumber Call Moshe at Work +972528231711 CellNumber HomeNumber Call Moshe at Home +972544838386" [ref=e407]:
+                                  - gridcell "TeamName Incident Manager" [ref=e408]:
+                                    - generic [ref=e409]: TeamName
+                                    - generic [ref=e410]: Incident Manager
+                                  - gridcell "ShiftName Primary (08:30-08:30)" [ref=e411]:
+                                    - generic [ref=e412]: ShiftName
+                                    - generic [ref=e413]: Primary (08:30-08:30)
+                                  - gridcell "Role Primary" [ref=e414]:
+                                    - generic [ref=e415]: Role
+                                    - generic [ref=e416]: Primary
+                                  - gridcell "Alias mosheperetz" [ref=e417]:
+                                    - generic [ref=e418]: Alias
+                                    - generic "mosheperetz" [ref=e419]
+                                  - gridcell "LastName Moshe Peretz" [ref=e420]:
+                                    - generic [ref=e421]: LastName
+                                    - generic "Moshe Peretz" [ref=e422]
+                                  - gridcell "WorkNumber Call Moshe at Work +972528231711" [ref=e423]:
+                                    - generic [ref=e424]: WorkNumber
+                                    - link "Call Moshe at Work +972528231711" [ref=e425] [cursor=pointer]:
+                                      - /url: tel:+972528231711
+                                      - text: "+972528231711"
+                                  - gridcell "CellNumber" [ref=e426]:
+                                    - generic [ref=e427]: CellNumber
+                                  - gridcell "HomeNumber Call Moshe at Home +972544838386" [ref=e428]:
+                                    - generic [ref=e429]: HomeNumber
+                                    - link "Call Moshe at Home +972544838386" [ref=e430] [cursor=pointer]:
+                                      - /url: tel:+972544838386
+                                      - text: "+972544838386"
+                                - row "TeamName Incident Manager ShiftName Primary (08:30-08:30) Role Backup Alias tamirdresher LastName tamirdresher tamirdresher WorkNumber Call tamirdresher at Work +972524772946 CellNumber Call tamirdresher at Cell +972524772946 HomeNumber" [ref=e431]:
+                                  - gridcell "TeamName Incident Manager" [ref=e432]:
+                                    - generic [ref=e433]: TeamName
+                                    - generic [ref=e434]: Incident Manager
+                                  - gridcell "ShiftName Primary (08:30-08:30)" [ref=e435]:
+                                    - generic [ref=e436]: ShiftName
+                                    - generic [ref=e437]: Primary (08:30-08:30)
+                                  - gridcell "Role Backup" [ref=e438]:
+                                    - generic [ref=e439]: Role
+                                    - generic [ref=e440]: Backup
+                                  - gridcell "Alias tamirdresher" [ref=e441]:
+                                    - generic [ref=e442]: Alias
+                                    - generic "tamirdresher" [ref=e443]
+                                  - gridcell "LastName tamirdresher tamirdresher" [ref=e444]:
+                                    - generic [ref=e445]: LastName
+                                    - generic "tamirdresher tamirdresher" [ref=e446]
+                                  - gridcell "WorkNumber Call tamirdresher at Work +972524772946" [ref=e447]:
+                                    - generic [ref=e448]: WorkNumber
+                                    - link "Call tamirdresher at Work +972524772946" [ref=e449] [cursor=pointer]:
+                                      - /url: tel:+972524772946
+                                      - text: "+972524772946"
+                                  - gridcell "CellNumber Call tamirdresher at Cell +972524772946" [ref=e450]:
+                                    - generic [ref=e451]: CellNumber
+                                    - link "Call tamirdresher at Cell +972524772946" [ref=e452] [cursor=pointer]:
+                                      - /url: tel:+972524772946
+                                      - text: "+972524772946"
+                                  - gridcell "HomeNumber" [ref=e453]:
+                                    - generic [ref=e454]: HomeNumber
+                                - row "TeamName Executive Incident Manager ShiftName Executive Incident Manager24Shift (20:30-20:30) Role Primary Alias sharmashiv LastName Shiv Sharma WorkNumber Call Shiv at Work +918800622840 CellNumber HomeNumber Call Shiv at Home +918800622840" [ref=e455]:
+                                  - gridcell "TeamName Executive Incident Manager" [ref=e456]:
+                                    - generic [ref=e457]: TeamName
+                                    - generic [ref=e458]: Executive Incident Manager
+                                  - gridcell "ShiftName Executive Incident Manager24Shift (20:30-20:30)" [ref=e459]:
+                                    - generic [ref=e460]: ShiftName
+                                    - generic [ref=e461]: Executive Incident Manager24Shift (20:30-20:30)
+                                  - gridcell "Role Primary" [ref=e462]:
+                                    - generic [ref=e463]: Role
+                                    - generic [ref=e464]: Primary
+                                  - gridcell "Alias sharmashiv" [ref=e465]:
+                                    - generic [ref=e466]: Alias
+                                    - generic "sharmashiv" [ref=e467]
+                                  - gridcell "LastName Shiv Sharma" [ref=e468]:
+                                    - generic [ref=e469]: LastName
+                                    - generic "Shiv Sharma" [ref=e470]
+                                  - gridcell "WorkNumber Call Shiv at Work +918800622840" [ref=e471]:
+                                    - generic [ref=e472]: WorkNumber
+                                    - link "Call Shiv at Work +918800622840" [ref=e473] [cursor=pointer]:
+                                      - /url: tel:+918800622840
+                                      - text: "+918800622840"
+                                  - gridcell "CellNumber" [ref=e474]:
+                                    - generic [ref=e475]: CellNumber
+                                  - gridcell "HomeNumber Call Shiv at Home +918800622840" [ref=e476]:
+                                    - generic [ref=e477]: HomeNumber
+                                    - link "Call Shiv at Home +918800622840" [ref=e478] [cursor=pointer]:
+                                      - /url: tel:+918800622840
+                                      - text: "+918800622840"
+                    - text:    
+                  - text:      
+            - generic [ref=e65]:
+              - term [ref=e66]: 
+              - definition [ref=e67]: "Add Substitute: click on the on call DRI name to add substitution. Substitutions are allowed only for current and future rotations."
+              - term [ref=e68]: 
+              - definition [ref=e69]: "Edit Substitute: click on the substituting on call DRI name (one with a red dot) to edit substitution."
+              - term [ref=e70]: 
+              - definition [ref=e71]: "Remove Substitute: click on the substituting on call DRI name (one with a red dot) to delete substitution."
+              - term [ref=e72]: 
+              - definition [ref=e73]: Indicates an effective on-call substitution.
+  - status [ref=e74]

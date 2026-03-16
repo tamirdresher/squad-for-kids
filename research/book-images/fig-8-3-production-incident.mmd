@@ -1,0 +1,27 @@
+graph TD
+    A["🚨 Production Down<br/>02:14 AM"] --> B["Ralph: Incident Detected<br/>Error logs, metrics, recent changes"]
+    
+    B --> C["🎖️ Picard: Analysis Complete<br/>3 Hypotheses:"]
+    
+    C --> H1["📊 Hypothesis 1<br/>DB connection pool exhausted<br/>Symptoms: connection timeout<br/>Fix: Bounce DB pool<br/>Cost: 30-sec full outage"]
+    
+    C --> H2["⚡ Hypothesis 2<br/>Caching race condition<br/>Symptoms: stale data<br/>Fix: Disable cache<br/>Cost: Degraded performance<br/>slower but works"]
+    
+    C --> H3["📡 Hypothesis 3<br/>API rate limit exceeded<br/>Symptoms: vendor timeout<br/>Fix: Contact vendor<br/>Cost: Wake vendor at 2 AM<br/>timezone +5"]
+    
+    H1 --> D{{"Human Decision<br/>Which to test first?"}}
+    H2 --> D
+    H3 --> D
+    
+    D -->|Risk 1| D1["30-sec outage?<br/>Current impact:<br/>1,000 users"]
+    D -->|Risk 2| D2["Degraded perf?<br/>Current impact:<br/>All users slow"]
+    D -->|Risk 3| D3["Vendor 2 AM call?<br/>Relationship impact:<br/>Unknown"]
+    
+    D1 -->|Human chooses| E["👤 Tamir: Test H2 first<br/>minimize blast radius"]
+    
+    E --> F["Disable cache<br/>Users slow but online<br/>02:15-02:16"]
+    
+    F --> G["✅ Issue resolved<br/>30s degraded performance<br/>Total impact: acceptable<br/>Debug race condition next day"]
+    
+    style D fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#333
+    style E fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#333

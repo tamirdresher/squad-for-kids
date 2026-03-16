@@ -1,0 +1,128 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e15]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e16] [cursor=pointer]:
+        - img [ref=e18]
+      - search [ref=e21]:
+        - generic [ref=e22]:
+          - img [ref=e24]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e27]
+      - button "Copilot" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - generic [ref=e32]: Copilot
+      - generic [ref=e33]:
+        - button "Cloud Shell" [ref=e34] [cursor=pointer]:
+          - img [ref=e35]
+        - button "Notifications" [ref=e38] [cursor=pointer]:
+          - img [ref=e39]
+        - button "Settings" [ref=e41] [cursor=pointer]:
+          - img [ref=e42]
+        - button "Support + Troubleshooting" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+        - button "Feedback" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e52] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e53]':
+          - generic [ref=e54]:
+            - generic [ref=e55]: tamirdresher@microsoft.com
+            - generic [ref=e56]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e59]
+    - main [ref=e64]:
+      - generic [ref=e65]:
+        - navigation "Breadcrumb" [ref=e135]:
+          - navigation "Breadcrumb" [ref=e138]:
+            - list [ref=e139]:
+              - listitem [ref=e140] [cursor=pointer]:
+                - link "Home" [ref=e141]:
+                  - /url: "#home"
+        - region "Error" [ref=e143]:
+          - generic "Error" [ref=e144]:
+            - generic [ref=e146]:
+              - heading "Error" [level=2] [ref=e147]: Error
+              - generic [ref=e148]:
+                - button "More content actions" [ref=e150] [cursor=pointer]:
+                  - img [ref=e153]
+                - button "Close content 'Error'" [ref=e156] [cursor=pointer]:
+                  - img [ref=e159]
+          - generic [ref=e164]:
+            - img [ref=e167]
+            - generic [ref=e169]: Error displaying your content
+            - toolbar [ref=e171]:
+              - button "Leave preview" [ref=e172] [cursor=pointer]:
+                - img [ref=e174]
+                - generic [ref=e176]: Leave preview
+              - button "Get support" [ref=e177] [cursor=pointer]:
+                - img [ref=e179]
+                - generic [ref=e181]: Get support
+              - button "Perform self-diagnostics" [ref=e182] [cursor=pointer]:
+                - img [ref=e184]
+                - generic [ref=e186]: Perform self-diagnostics
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - heading "Summary" [level=4] [ref=e189]
+                - button "Copy to clipboard the value for Copy error summary to clipboard" [ref=e194] [cursor=pointer]:
+                  - img [ref=e196]
+              - list [ref=e198]:
+                - listitem [ref=e199]:
+                  - text: Session ID
+                  - generic [ref=e200]: c6601bd83a0c4e97a95ec5f59a8c38a7
+                - listitem [ref=e201]:
+                  - text: Resource ID
+                  - generic [ref=e202]: Not available
+                - listitem [ref=e203]:
+                  - text: Extension
+                  - generic [ref=e204]: Microsoft_Azure_Compute
+                - listitem [ref=e205]:
+                  - text: Content
+                  - generic [ref=e206]: CreateWebAppBlade
+                - listitem [ref=e207]:
+                  - text: Error code
+                  - generic [ref=e208]: "--"
+                - listitem [ref=e209]:
+                  - text: Error reason
+                  - generic [ref=e210]: ErrorLoadingExtensionAndDefinition
+              - generic [ref=e211]:
+                - text: Details
+                - generic [ref=e212]: "Error: Failed to retrieve the blade definition for 'CreateWebAppBlade' from the server. Couldn't load \"_generated/Blades/CreateWebAppBlade\"; error code 404"
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is loading.
+      - generic: Microsoft Azure portal is ready.
+    - generic:
+      - generic: Content transitioned to error state.
+  - img [ref=e110]
+  - img [ref=e111]
+  - img [ref=e112]
+  - img [ref=e113]
+  - img [ref=e114]
+  - img [ref=e115]
+  - img [ref=e116]
+  - img [ref=e117]
+  - img [ref=e118]
+  - img [ref=e119]
+  - img [ref=e120]
+  - img [ref=e121]
+  - img [ref=e122]
+  - img [ref=e123]
+  - img [ref=e124]
+  - img [ref=e125]
+  - img [ref=e126]
+  - img [ref=e127]
+  - img [ref=e128]
+  - img [ref=e129]
+  - img [ref=e130]
+  - img [ref=e131]
+  - img [ref=e132]
+  - img [ref=e213]
+  - img [ref=e214]
+  - img [ref=e215]
+  - img [ref=e216]

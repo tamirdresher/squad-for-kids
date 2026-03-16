@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 30px; font-size: 24px; }
+.comparison { display: flex; gap: 30px; }
+.column { flex: 1; border: 2px solid #ddd; border-radius: 12px; overflow: hidden; }
+.before .header { background: #ffcdd2; color: #b71c1c; padding: 14px; text-align: center; font-weight: 700; font-size: 16px; }
+.after .header { background: #c8e6c9; color: #1b5e20; padding: 14px; text-align: center; font-weight: 700; font-size: 16px; }
+.timeline-row { display: flex; padding: 10px 16px; border-bottom: 1px solid #f0f0f0; align-items: center; }
+.time { width: 90px; font-weight: 600; color: #555; font-size: 14px; }
+.event { flex: 1; font-size: 14px; }
+.emoji { font-size: 18px; margin-right: 8px; }
+.result { padding: 14px 16px; font-weight: 700; font-size: 14px; }
+.before .result { background: #fff3e0; color: #e65100; }
+.after .result { background: #e8f5e9; color: #1b5e20; }
+</style></head><body>
+<div class="container">
+<h2>Figure 4.4: My Morning Routine — Before vs After</h2>
+<div class="comparison">
+<div class="column before">
+<div class="header">BEFORE SQUAD (Anxiety Pattern)</div>
+<div class="timeline-row"><div class="time">7:00 AM</div><div class="event"><span class="emoji">⚠️</span>Wake up with anxiety</div></div>
+<div class="timeline-row"><div class="time">7:05 AM</div><div class="event"><span class="emoji">😰</span>Check GitHub immediately</div></div>
+<div class="timeline-row"><div class="time">7:15 AM</div><div class="event"><span class="emoji">😞</span>Count open issues (23)</div></div>
+<div class="timeline-row"><div class="time">7:20 AM</div><div class="event"><span class="emoji">🤦</span>Feel guilty about backlog</div></div>
+<div class="timeline-row"><div class="time">7:30 AM</div><div class="event"><span class="emoji">📋</span>Plan attack for the day</div></div>
+<div class="timeline-row"><div class="time">8:00 AM</div><div class="event"><span class="emoji">😑</span>Status quo — nothing shipped yet</div></div>
+<div class="result">RESULT: Burnout + backlog anxiety</div>
+</div>
+<div class="column after">
+<div class="header">AFTER SQUAD (Approval Pattern)</div>
+<div class="timeline-row"><div class="time">7:14 AM</div><div class="event"><span class="emoji">✓</span>Wake up naturally</div></div>
+<div class="timeline-row"><div class="time">7:18 AM</div><div class="event"><span class="emoji">✅</span>Approve 3 PRs from overnight</div></div>
+<div class="timeline-row"><div class="time">7:25 AM</div><div class="event"><span class="emoji">☕</span>Coffee — no anxiety</div></div>
+<div class="timeline-row"><div class="time">8:30 AM</div><div class="event"><span class="emoji">✓</span>Quick standup review</div></div>
+<div class="timeline-row"><div class="time">8:45 AM</div><div class="event"><span class="emoji">📝</span>File one new task</div></div>
+<div class="timeline-row"><div class="time">10:00 AM</div><div class="event"><span class="emoji">🎖️</span>Picard has broken it down</div></div>
+<div class="result">RESULT: Backlog shrinking + deep focus</div>
+</div>
+</div>
+</div>
+</body></html>

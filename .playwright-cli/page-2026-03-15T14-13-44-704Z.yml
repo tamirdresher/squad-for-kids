@@ -1,0 +1,367 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - button "Open menu" [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+          - link "Homepage (g then d)" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+        - generic [ref=e18]:
+          - navigation "Breadcrumbs" [ref=e19]:
+            - list [ref=e20]:
+              - listitem [ref=e21]:
+                - link "Settings" [ref=e22] [cursor=pointer]:
+                  - /url: /settings
+                  - generic [ref=e23]: Settings
+          - button "Search or jump to…" [ref=e26] [cursor=pointer]:
+            - generic [ref=e27]:
+              - generic:
+                - img
+              - generic [ref=e28]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e32]:
+              - link "Chat with Copilot" [ref=e34] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e35]
+              - button "Open Copilot…" [ref=e39] [cursor=pointer]:
+                - generic:
+                  - img
+            - button "Create new..." [ref=e41] [cursor=pointer]:
+              - generic [ref=e42]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues (g then i)" [ref=e43] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e44]
+            - link "Pull requests (g then p)" [ref=e47] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e48]
+            - link "Repositories" [ref=e50] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e51]
+          - link "You have no unread notifications (g then n)" [ref=e53] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e54]
+          - button "Open user navigation menu" [ref=e57] [cursor=pointer]:
+            - img "Yonatan Dresher" [ref=e58]
+  - generic [ref=e62]:
+    - button "Dismiss this message" [active] [ref=e63] [cursor=pointer]:
+      - img [ref=e64]
+    - alert [ref=e66]: We sent a verification email to yonatandra@pte.org.il. Please follow the instructions in it.
+  - main [ref=e69]:
+    - generic [ref=e70]:
+      - generic "Yonatan Dresher (yonatandresher) settings" [ref=e71]:
+        - generic [ref=e72]:
+          - img "@yonatandresher" [ref=e73]
+          - generic [ref=e74]:
+            - heading "Yonatan Dresher (yonatandresher) settings" [level=1] [ref=e75]:
+              - link "Yonatan Dresher (yonatandresher)" [ref=e76] [cursor=pointer]:
+                - /url: /yonatandresher
+              - generic [ref=e77]: settings
+            - paragraph [ref=e79]: Your personal account
+        - link "Go to your personal profile" [ref=e81] [cursor=pointer]:
+          - /url: /yonatandresher
+      - generic [ref=e82]:
+        - navigation "User settings" [ref=e86]:
+          - list [ref=e88]:
+            - listitem [ref=e89]:
+              - link "Public profile" [ref=e90] [cursor=pointer]:
+                - /url: /settings/profile
+                - generic:
+                  - img
+                - generic [ref=e91]: Public profile
+            - listitem [ref=e92]:
+              - link "Account" [ref=e93] [cursor=pointer]:
+                - /url: /settings/admin
+                - generic:
+                  - img
+                - generic [ref=e94]: Account
+            - listitem [ref=e95]:
+              - link "Appearance" [ref=e96] [cursor=pointer]:
+                - /url: /settings/appearance
+                - generic:
+                  - img
+                - generic [ref=e97]: Appearance
+            - listitem [ref=e98]:
+              - link "Accessibility" [ref=e99] [cursor=pointer]:
+                - /url: /settings/accessibility
+                - generic:
+                  - img
+                - generic [ref=e100]: Accessibility
+            - listitem [ref=e101]:
+              - link "Notifications" [ref=e102] [cursor=pointer]:
+                - /url: /settings/notifications
+                - generic:
+                  - img
+                - generic [ref=e103]: Notifications
+            - listitem [ref=e104]
+            - listitem [ref=e105]:
+              - generic [ref=e108]:
+                - heading "Access" [level=2] [ref=e110]
+                - list "Access" [ref=e111]:
+                  - listitem [ref=e112]:
+                    - button "Billing and licensing" [ref=e113] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e114]: Billing and licensing
+                      - generic:
+                        - img
+                  - listitem [ref=e115]:
+                    - link "Emails" [ref=e116] [cursor=pointer]:
+                      - /url: /settings/emails
+                      - generic:
+                        - img
+                      - generic [ref=e117]: Emails
+                  - listitem [ref=e118]:
+                    - link "Password and authentication" [ref=e119] [cursor=pointer]:
+                      - /url: /settings/security
+                      - generic:
+                        - img
+                      - generic [ref=e120]: Password and authentication
+                  - listitem [ref=e121]:
+                    - link "Sessions" [ref=e122] [cursor=pointer]:
+                      - /url: /settings/sessions
+                      - generic:
+                        - img
+                      - generic [ref=e123]: Sessions
+                  - listitem [ref=e124]:
+                    - link "SSH and GPG keys" [ref=e125] [cursor=pointer]:
+                      - /url: /settings/keys
+                      - generic:
+                        - img
+                      - generic [ref=e126]: SSH and GPG keys
+                  - listitem [ref=e127]:
+                    - link "Organizations" [ref=e128] [cursor=pointer]:
+                      - /url: /settings/organizations
+                      - generic:
+                        - img
+                      - generic [ref=e129]: Organizations
+                  - listitem [ref=e130]:
+                    - link "Enterprises" [ref=e131] [cursor=pointer]:
+                      - /url: /settings/enterprises
+                      - generic:
+                        - generic:
+                          - img
+                      - generic [ref=e132]: Enterprises
+                  - listitem [ref=e133]:
+                    - button "Moderation" [ref=e134] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e135]: Moderation
+                      - generic:
+                        - img
+            - listitem [ref=e136]
+            - listitem [ref=e137]:
+              - generic [ref=e140]:
+                - heading "Code, planning, and automation" [level=2] [ref=e142]
+                - list "Code, planning, and automation" [ref=e143]:
+                  - listitem [ref=e144]:
+                    - link "Repositories" [ref=e145] [cursor=pointer]:
+                      - /url: /settings/repositories
+                      - generic:
+                        - img
+                      - generic [ref=e146]: Repositories
+                  - listitem [ref=e147]:
+                    - link "Codespaces" [ref=e148] [cursor=pointer]:
+                      - /url: /settings/codespaces
+                      - generic:
+                        - img
+                      - generic [ref=e149]: Codespaces
+                  - listitem [ref=e150]:
+                    - link "Models Preview feature" [ref=e151] [cursor=pointer]:
+                      - /url: /settings/models
+                      - generic:
+                        - img
+                      - generic [ref=e152]: Models
+                      - generic:
+                        - generic "Preview feature": Preview
+                  - listitem [ref=e153]:
+                    - link "Packages" [ref=e154] [cursor=pointer]:
+                      - /url: /settings/packages
+                      - generic:
+                        - img
+                      - generic [ref=e155]: Packages
+                  - listitem [ref=e156]:
+                    - button "Copilot" [ref=e157] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e158]: Copilot
+                      - generic:
+                        - img
+                  - listitem [ref=e159]:
+                    - link "Pages" [ref=e160] [cursor=pointer]:
+                      - /url: /settings/pages
+                      - generic:
+                        - img
+                      - generic [ref=e161]: Pages
+                  - listitem [ref=e162]:
+                    - link "Saved replies" [ref=e163] [cursor=pointer]:
+                      - /url: /settings/replies
+                      - generic:
+                        - img
+                      - generic [ref=e164]: Saved replies
+            - listitem [ref=e165]
+            - listitem [ref=e166]:
+              - generic [ref=e169]:
+                - heading "Security" [level=2] [ref=e171]
+                - list "Security" [ref=e172]:
+                  - listitem [ref=e173]:
+                    - link "Code security" [ref=e174] [cursor=pointer]:
+                      - /url: /settings/security_analysis
+                      - generic:
+                        - img
+                      - generic [ref=e175]: Code security
+            - listitem [ref=e176]
+            - listitem [ref=e177]:
+              - generic [ref=e180]:
+                - heading "Integrations" [level=3] [ref=e182]
+                - list "Integrations" [ref=e183]:
+                  - listitem [ref=e184]:
+                    - link "Applications" [ref=e185] [cursor=pointer]:
+                      - /url: /settings/installations
+                      - generic:
+                        - img
+                      - generic [ref=e186]: Applications
+                  - listitem [ref=e187]:
+                    - link "Scheduled reminders" [ref=e188] [cursor=pointer]:
+                      - /url: /settings/reminders
+                      - generic:
+                        - img
+                      - generic [ref=e189]: Scheduled reminders
+            - listitem [ref=e190]
+            - listitem [ref=e191]:
+              - generic [ref=e194]:
+                - heading "Archives" [level=2] [ref=e196]
+                - list "Archives" [ref=e197]:
+                  - listitem [ref=e198]:
+                    - link "Security log" [ref=e199] [cursor=pointer]:
+                      - /url: /settings/security-log
+                      - generic:
+                        - img
+                      - generic [ref=e200]: Security log
+                  - listitem [ref=e201]:
+                    - link "Sponsorship log" [ref=e202] [cursor=pointer]:
+                      - /url: /settings/sponsors-log
+                      - generic:
+                        - img
+                      - generic [ref=e203]: Sponsorship log
+            - listitem [ref=e204]
+            - listitem [ref=e205]:
+              - link "Developer settings" [ref=e206] [cursor=pointer]:
+                - /url: /settings/apps
+                - generic:
+                  - img
+                - generic [ref=e207]: Developer settings
+        - generic [ref=e211]:
+          - heading "Emails" [level=2] [ref=e213]
+          - generic [ref=e214]:
+            - paragraph [ref=e215]: Emails you can use to sign in to your account. Verified emails can be used as the author or committer addresses for web-based Git operations, e.g. edits and merges.
+            - list [ref=e217]:
+              - listitem [ref=e218]:
+                - generic [ref=e219]:
+                  - text: yonatandresher@gmail.com
+                  - generic [ref=e220]:
+                    - generic [ref=e221]: Primary
+                    - generic [ref=e222]: Verified
+                    - generic [ref=e223]: Connected to Google
+                  - generic [ref=e224]: This email address is the default for GitHub notifications, such as replies to issues, pull requests, and similar activity.
+                - button "Manage email yonatandresher@gmail.com" [ref=e228] [cursor=pointer]:
+                  - img
+              - listitem [ref=e229]:
+                - generic [ref=e230]:
+                  - text: yonatandra@pte.org.il
+                  - generic [ref=e232]: Unverified
+                - button "Manage email yonatandra@pte.org.il" [ref=e236] [cursor=pointer]:
+                  - img
+          - form "Add email address" [ref=e237]:
+            - generic [ref=e238]:
+              - term [ref=e239]:
+                - generic [ref=e240]: Add email address *
+              - definition [ref=e241]:
+                - textbox "Add email address" [ref=e242]:
+                  - /placeholder: Email address
+                - button "Add" [ref=e243] [cursor=pointer]:
+                  - generic [ref=e245]: Add
+          - form "Primary email address" [ref=e248]:
+            - generic [ref=e249]:
+              - text: Primary email address
+              - paragraph [ref=e250]: Select an email to be used for account-related notifications and can be used for password reset.
+            - generic [ref=e252]:
+              - generic [ref=e253]: Select email to become primary
+              - combobox "Primary email address Select email to become primary" [ref=e255]:
+                - option "yonatandresher@gmail.com" [selected]
+          - generic [ref=e256]:
+            - form "Backup email address" [ref=e259]:
+              - generic [ref=e260]:
+                - text: Backup email address
+                - paragraph [ref=e261]: Your backup GitHub email address will be used as an additional destination for security-relevant account notifications and can also be used for password resets.
+              - generic [ref=e263]:
+                - generic [ref=e264]: Select email to become backup
+                - combobox "Backup email address Select email to become backup" [ref=e266]:
+                  - option "Allow all verified emails" [selected]
+                  - option "Only allow primary email"
+            - generic [ref=e269]:
+              - generic [ref=e270]:
+                - paragraph [ref=e271]: Keep my email addresses private
+                - paragraph [ref=e272]:
+                  - text: We’ll remove your public profile email and use
+                  - strong [ref=e273]: 268165261+yonatandresher@users.noreply.github.com
+                  - text: when performing web-based Git operations (e.g. edits and merges) and sending email on your behalf. If you want command line Git operations to use your private email you must
+                  - link "set your email in Git" [ref=e274] [cursor=pointer]:
+                    - /url: https://docs.github.com/articles/setting-your-email-in-git
+                  - text: .
+                - paragraph [ref=e275]: Previously authored commits associated with a public email will remain public.
+              - generic [ref=e276]:
+                - generic [ref=e278]: "Off"
+                - button "Keep my email addresses private" [ref=e279] [cursor=pointer]:
+                  - generic [ref=e280]:
+                    - img [ref=e282]
+                    - img [ref=e285]
+  - contentinfo [ref=e288]:
+    - heading "Footer" [level=2] [ref=e289]
+    - generic [ref=e290]:
+      - generic [ref=e291]:
+        - link "GitHub Homepage" [ref=e292] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e293]
+        - generic [ref=e295]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e296]:
+        - heading "Footer navigation" [level=3] [ref=e297]
+        - list "Footer navigation" [ref=e298]:
+          - listitem [ref=e299]:
+            - link "Terms" [ref=e300] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e301]:
+            - link "Privacy" [ref=e302] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e303]:
+            - link "Security" [ref=e304] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e305]:
+            - link "Status" [ref=e306] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e307]:
+            - link "Community" [ref=e308] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e309]:
+            - link "Docs" [ref=e310] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e311]:
+            - link "Contact" [ref=e312] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e313]:
+            - button "Manage cookies" [ref=e315] [cursor=pointer]
+          - listitem [ref=e316]:
+            - button "Do not share my personal information" [ref=e318] [cursor=pointer]

@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - link "Amazon" [ref=e6] [cursor=pointer]:
+        - /url: /ref=ap_frn_logo
+        - img "Amazon" [ref=e7]
+      - generic [ref=e12]:
+        - heading "Looks like you're new to Amazon" [level=1] [ref=e13]
+        - paragraph [ref=e14]:
+          - generic [ref=e15]:
+            - text: tamirdresher@gmail.com
+            - link "Change" [ref=e16] [cursor=pointer]:
+              - /url: /ap/signin?arb=e7053a43-5f0c-4af0-b1c8-ba8a823d8f4d&ref=uica_ic
+        - paragraph [ref=e17]: Let's create an account using your email
+        - generic [ref=e21] [cursor=pointer]:
+          - button "Proceed to create an account" [ref=e22]
+          - generic [ref=e23]: Proceed to create an account
+        - separator [ref=e24]
+        - paragraph [ref=e25]: Already a customer?
+        - paragraph [ref=e26]:
+          - link "Sign in with another email or mobile" [ref=e27] [cursor=pointer]:
+            - /url: /ap/signin?ref=uica_is&openid.return_to=https%3A%2F%2Faffiliate-program.amazon.com%2Fhome&openid.assoc_handle=amzn_associates_us&openid.mode=checkid_setup&policy_handle=Retail-Checkout&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0
+    - generic [ref=e28]:
+      - generic [ref=e31]:
+        - link "Conditions of Use" [ref=e32] [cursor=pointer]:
+          - /url: /gp/help/customer/display.html/ref=ap_desktop_footer_cou?ie=UTF8&nodeId=508088
+        - link "Privacy Notice" [ref=e33] [cursor=pointer]:
+          - /url: /gp/help/customer/display.html/ref=ap_desktop_footer_privacy_notice?ie=UTF8&nodeId=468496
+        - link "Help" [ref=e34] [cursor=pointer]:
+          - /url: /help
+      - generic [ref=e35]: © 1996-2026, Amazon.com, Inc. or its affiliates
+  - generic: "Test: amzn-nv-flyout-healthy-choice"
+  - generic: "Test: .nav-sprite-v1"
+  - generic: "Test: nav-rufus-disc-txt"
+  - generic: "Test: a-truncate-cut"
+  - generic: "Test: sp-cc-wrapper"
+  - generic: "Test: .mo-wp"
+  - generic: "Test: .a-image-container"
+  - generic: "Test: sp-cc"
+  - generic: "Test: .amzn-box-inner"
+  - generic: "Test: .js-order-card"
+  - generic: "Test: pldn-deep-link"
+  - generic: "Test: add-to-cart-btn"
+  - generic: "Test: amzn-nav-app-banner-container"
+  - generic: "Test: .sparkle-container"

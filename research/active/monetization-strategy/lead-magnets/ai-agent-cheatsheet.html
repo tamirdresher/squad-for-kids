@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Architecture Cheatsheet — tamirdresher.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+  @media print {
+    body { background: #0f172a; }
+    .page { padding: 20px; }
+    .page-break { page-break-before: always; }
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-bottom: 2px solid #3b82f6;
+    margin-bottom: 30px;
+  }
+  .header-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .header p {
+    color: #94a3b8;
+    font-size: 14px;
+  }
+  .header .author {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+  }
+  .header .author strong { color: #94a3b8; }
+
+  /* Section Headers */
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .section-number {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+
+  /* Cards */
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+  .card-highlight {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #1e293b 0%, #172554 100%);
+  }
+
+  /* Architecture Diagram */
+  .arch-diagram {
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+    color: #94a3b8;
+  }
+  .arch-diagram .hl-blue { color: #60a5fa; }
+  .arch-diagram .hl-green { color: #4ade80; }
+  .arch-diagram .hl-purple { color: #a78bfa; }
+  .arch-diagram .hl-yellow { color: #fbbf24; }
+  .arch-diagram .hl-red { color: #f87171; }
+
+  /* Grid layouts */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 600px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* Agent cards */
+  .agent-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .agent-emoji { font-size: 24px; margin-bottom: 6px; }
+  .agent-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #f1f5f9;
+    margin-bottom: 2px;
+  }
+  .agent-role {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .agent-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+
+  /* Pattern boxes */
+  .pattern-box {
+    background: #1e293b;
+    border-left: 3px solid #3b82f6;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .pattern-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #60a5fa;
+    margin-bottom: 4px;
+  }
+  .pattern-desc {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .pattern-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #4ade80;
+    background: #0f172a;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: 6px;
+    display: block;
+  }
+
+  /* Warning/Tip boxes */
+  .tip-box {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .tip-box.warning { background: #451a03; border: 1px solid #92400e; }
+  .tip-box.success { background: #052e16; border: 1px solid #166534; }
+  .tip-box.info { background: #172554; border: 1px solid #1e40af; }
+  .tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .tip-text { color: #e2e8f0; line-height: 1.5; }
+  .tip-text strong { color: #fbbf24; }
+
+  /* Flow diagram */
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .flow-arrow {
+    color: #3b82f6;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+  }
+  .flow-label {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    flex-grow: 1;
+  }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .compare-table th {
+    background: #1e293b;
+    color: #60a5fa;
+    font-weight: 600;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 2px solid #3b82f6;
+  }
+  .compare-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #334155;
+    color: #cbd5e1;
+  }
+  .compare-table tr:hover { background: #1e293b; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid #334155;
+    color: #475569;
+    font-size: 11px;
+  }
+  .footer a { color: #60a5fa; text-decoration: none; }
+
+  /* Small text */
+  .small { font-size: 11px; color: #64748b; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-badge">Free Cheatsheet</div>
+    <h1>AI Agent Architecture Cheatsheet</h1>
+    <p>Build multi-agent systems that ship code while you sleep</p>
+    <div class="author">By <strong>Tamir Dresher</strong> · Principal Engineer, Microsoft · Author of Rx.NET in Action</div>
+  </div>
+
+  <!-- SECTION 1: Architecture Overview -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <div class="section-title">System Architecture — The Big Picture</div>
+    </div>
+    <div class="arch-diagram"><span class="hl-yellow">┌─────────────────────────────────────────────────────────────┐</span>
+<span class="hl-yellow">│</span>                    <span class="hl-blue">HUMAN INTERFACE</span>                          <span class="hl-yellow">│</span>
+<span class="hl-yellow">│</span>         GitHub Issues  ←→  CLI Commands  ←→  Chat          <span class="hl-yellow">│</span>
+<span class="hl-yellow">└────────────────────────────┬────────────────────────────────┘</span>
+                             │
+                    <span class="hl-green">┌────────▼────────┐</span>
+                    <span class="hl-green">│   ORCHESTRATOR  │</span>  Picard (Lead Agent)
+                    <span class="hl-green">│  Task Decompose  │</span>  Routes work to specialists
+                    <span class="hl-green">│  + Route + Fan   │</span>  Monitors completion
+                    <span class="hl-green">└──┬──┬──┬──┬──┬──┘</span>
+                       │  │  │  │  │
+          <span class="hl-purple">┌────────┐</span> <span class="hl-blue">┌──▼──┐</span> <span class="hl-red">┌──▼──┐</span> <span class="hl-green">┌──▼──┐</span> <span class="hl-yellow">┌──▼──┐</span>
+          <span class="hl-purple">│  Data  │</span> <span class="hl-blue">│Seven│</span> <span class="hl-red">│Worf │</span> <span class="hl-green">│B'Ela│</span> <span class="hl-yellow">│Troi │</span>
+          <span class="hl-purple">│  Code  │</span> <span class="hl-blue">│ Docs│</span> <span class="hl-red">│ Sec │</span> <span class="hl-green">│Infra│</span> <span class="hl-yellow">│Write│</span>
+          <span class="hl-purple">└────────┘</span> <span class="hl-blue">└─────┘</span> <span class="hl-red">└─────┘</span> <span class="hl-green">└─────┘</span> <span class="hl-yellow">└─────┘</span>
+                       │  │  │  │  │
+                    <span class="hl-green">┌──▼──▼──▼──▼──▼──┐</span>
+                    <span class="hl-green">│  SHARED MEMORY   │</span>  decisions.md, .squad/
+                    <span class="hl-green">│  Git-Native State │</span>  Version-controlled
+                    <span class="hl-green">└────────┬─────────┘</span>
+                             │
+                    <span class="hl-red">┌────────▼────────┐</span>
+                    <span class="hl-red">│  RALPH (Monitor) │</span>  5-min watch loop
+                    <span class="hl-red">│  Auto-merge PRs  │</span>  Never sleeps
+                    <span class="hl-red">│  Detect new work │</span>  Never forgets
+                    <span class="hl-red">└─────────────────┘</span></div>
+  </div>
+
+  <!-- SECTION 2: The Agent Roster -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <div class="section-title">Agent Roster — Specialized Roles</div>
+    </div>
+    <div class="grid-3">
+      <div class="agent-card">
+        <div class="agent-emoji">🎖️</div>
+        <div class="agent-name">Picard</div>
+        <div class="agent-role">Lead / Orchestrator</div>
+        <div class="agent-desc">Architecture decisions, task decomposition, cross-agent coordination</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-emoji">🤖</div>
+        <div class="agent-name">Data</div>
+        <div class="agent-role">Code Expert</div>
+        <div class="agent-desc">C#, Go, .NET internals, code review, bug fixes, test writing</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-emoji">⚔️</div>
+        <div class="agent-name">Worf</div>
+        <div class="agent-role">Security & Cloud</div>
+        <div class="agent-desc">Security analysis, Azure networking, compliance, threat modeling</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-emoji">📡</div>
+        <div class="agent-name">Seven</div>
+        <div class="agent-role">Research & Docs</div>
+        <div class="agent-desc">Documentation, analysis, research synthesis, technical writing</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-emoji">🔧</div>
+        <div class="agent-name">B'Elanna</div>
+        <div class="agent-role">Infrastructure</div>
+        <div class="agent-desc">K8s, Helm, ArgoCD, CI/CD, cloud provisioning, deployment</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-emoji">📝</div>
+        <div class="agent-name">Ralph</div>
+        <div class="agent-role">Background Monitor</div>
+        <div class="agent-desc">5-min watch loop, auto-merge, issue triage, never sleeps</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Core Patterns -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <div class="section-title">Core Architecture Patterns</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="pattern-box">
+        <div class="pattern-name">🔄 Continuous Watch Loop</div>
+        <div class="pattern-desc">Agent polls issue queue on a fixed interval. No human trigger needed.</div>
+        <span class="pattern-code">while(true) { scan(); act(); sleep(5min); }</span>
+      </div>
+      <div class="pattern-box">
+        <div class="pattern-name">🌳 Task Decomposition</div>
+        <div class="pattern-desc">Lead agent breaks complex tasks into parallel sub-tasks for specialists.</div>
+        <span class="pattern-code">task → analyze → fan-out → parallel → merge</span>
+      </div>
+      <div class="pattern-box">
+        <div class="pattern-name">📋 Routing Table</div>
+        <div class="pattern-desc">Work-type → agent mapping. Clear ownership prevents conflicts.</div>
+        <span class="pattern-code">security? → Worf | code? → Data | docs? → Seven</span>
+      </div>
+      <div class="pattern-box">
+        <div class="pattern-name">🧠 Shared Memory (Git-Native)</div>
+        <div class="pattern-desc">decisions.md captures every choice. Agents read past decisions before acting.</div>
+        <span class="pattern-code">.squad/decisions.md → version-controlled brain</span>
+      </div>
+      <div class="pattern-box">
+        <div class="pattern-name">📦 Drop-Box Pattern</div>
+        <div class="pattern-desc">Agents leave artifacts for others in known locations. Async coordination.</div>
+        <span class="pattern-code">Data → writes code → Seven reads → writes docs</span>
+      </div>
+      <div class="pattern-box">
+        <div class="pattern-name">🔁 Auto-Recovery</div>
+        <div class="pattern-desc">Failed tasks re-enter the queue. Ralph retries with context from failure.</div>
+        <span class="pattern-code">fail → log reason → re-queue → retry with context</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Implementation Checklist -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <div class="section-title">Implementation Checklist</div>
+    </div>
+    <div class="card">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:30px">✓</th>
+            <th>Step</th>
+            <th>Time</th>
+            <th>Key File</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>☐</td><td>Install GitHub Copilot CLI</td><td>5 min</td><td><span class="mono">~/.copilot/</span></td></tr>
+          <tr><td>☐</td><td>Create <span class="mono">.squad/team.md</span> with agent roster</td><td>15 min</td><td><span class="mono">.squad/team.md</span></td></tr>
+          <tr><td>☐</td><td>Define routing table (work type → agent)</td><td>10 min</td><td><span class="mono">.squad/routing.md</span></td></tr>
+          <tr><td>☐</td><td>Create agent charters (persona + boundaries)</td><td>20 min</td><td><span class="mono">.squad/agents/*.md</span></td></tr>
+          <tr><td>☐</td><td>Initialize decisions.md for shared memory</td><td>2 min</td><td><span class="mono">.squad/decisions.md</span></td></tr>
+          <tr><td>☐</td><td>Set up Ralph's watch loop (PowerShell/bash)</td><td>15 min</td><td><span class="mono">ralph-watch.ps1</span></td></tr>
+          <tr><td>☐</td><td>Create first issue labeled <span class="mono">squad:copilot</span></td><td>2 min</td><td>GitHub Issues</td></tr>
+          <tr><td>☐</td><td>Test: assign issue → agent picks up → PR created</td><td>5 min</td><td>—</td></tr>
+          <tr><td>☐</td><td>Add MCP servers for external integrations</td><td>30 min</td><td><span class="mono">mcp-config.json</span></td></tr>
+          <tr><td>☐</td><td>Set up Scribe for decision logging</td><td>10 min</td><td><span class="mono">.squad/agents/scribe.md</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 5: Anti-Patterns -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <div class="section-title">Anti-Patterns — What NOT to Do</div>
+    </div>
+    <div class="tip-box warning">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-text"><strong>One-agent-does-everything:</strong> A single general-purpose agent can't maintain context across security, code, docs, and infrastructure. Specialize.</div>
+    </div>
+    <div class="tip-box warning">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-text"><strong>No shared memory:</strong> Without decisions.md, agents repeat mistakes and contradict each other. Git-native state is non-negotiable.</div>
+    </div>
+    <div class="tip-box warning">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-text"><strong>Manual triggering only:</strong> If you must remember to start agents, you've built a better CLI — not a team. Add Ralph.</div>
+    </div>
+    <div class="tip-box success">
+      <div class="tip-icon">✅</div>
+      <div class="tip-text"><strong>Do this instead:</strong> Specialized agents + routing table + shared memory + continuous monitoring = autonomous team.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Quick Reference -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <div class="section-title">Quick Reference — Key Commands</div>
+    </div>
+    <div class="card" style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+      <div style="margin-bottom: 8px; color: #64748b;"># Start a squad session</div>
+      <div style="color: #4ade80; margin-bottom: 12px;">$ copilot-cli --squad</div>
+
+      <div style="margin-bottom: 8px; color: #64748b;"># Give work to the team (Picard orchestrates)</div>
+      <div style="color: #4ade80; margin-bottom: 12px;">Team, build the user search feature with pagination</div>
+
+      <div style="margin-bottom: 8px; color: #64748b;"># Direct an agent</div>
+      <div style="color: #4ade80; margin-bottom: 12px;">@data review the authentication flow for security issues</div>
+
+      <div style="margin-bottom: 8px; color: #64748b;"># Start Ralph (background monitor)</div>
+      <div style="color: #4ade80; margin-bottom: 12px;">$ ./ralph-watch.ps1  # Runs every 5 minutes, forever</div>
+
+      <div style="margin-bottom: 8px; color: #64748b;"># Export squad knowledge to new repo</div>
+      <div style="color: #4ade80;">$ cp -r .squad/ ../new-project/.squad/</div>
+    </div>
+  </div>
+
+  <!-- Results Box -->
+  <div class="section">
+    <div class="card card-highlight">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <span style="font-size: 20px; font-weight: 800; color: #60a5fa;">Real Results — First 48 Hours</span>
+      </div>
+      <div class="grid-3" style="text-align: center;">
+        <div>
+          <div style="font-size: 32px; font-weight: 800; color: #4ade80;">14</div>
+          <div class="small">PRs Merged</div>
+        </div>
+        <div>
+          <div style="font-size: 32px; font-weight: 800; color: #fbbf24;">6</div>
+          <div class="small">Security Findings</div>
+        </div>
+        <div>
+          <div style="font-size: 32px; font-weight: 800; color: #f87171;">0</div>
+          <div class="small">Manual Prompts</div>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #94a3b8;">
+        All work completed autonomously while the author slept.
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>tamirdresher.com</strong> · <a href="https://tamirdresher.com">tamirdresher.com</a></p>
+    <p style="margin-top: 6px;">
+      Tamir Dresher · Principal Engineer, Microsoft · Author of <em>Rx.NET in Action</em> (Manning)
+    </p>
+    <p style="margin-top: 6px;">
+      📖 Full book: <em>The Squad System: Scaling AI-Native Software Engineering</em> — Coming Soon
+    </p>
+    <p style="margin-top: 10px; font-size: 10px; color: #334155;">
+      © 2025 Tamir Dresher. Free to share with attribution.
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

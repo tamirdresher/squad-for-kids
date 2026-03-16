@@ -1,0 +1,39 @@
+graph TD
+    A["📋 Issue #231<br/>Team: Implement Rate Limiting"]
+    
+    A --> B["🎖️ Picard: Orchestrate<br/>Break into 4 tasks"]
+    
+    B --> D["💻 Data"]
+    B --> W["🛡️ Worf"]
+    B --> BE["⚙️ B Elanna"]
+    B --> S["📚 Seven"]
+    
+    D --> D1["Code branch<br/>squad/232-middleware"]
+    D --> D2["PR #236 opened"]
+    D2 --> D3["Tests passing<br/>Implementation ready"]
+    
+    W --> W1["Security branch<br/>squad/233-audit"]
+    W --> W2["Comment on D2<br/>Header spoofing risk"]
+    D3 -->|Updated| W2
+    W2 --> W3["Audit complete ✓"]
+    
+    BE --> BE1["Deploy branch<br/>squad/235-config"]
+    D3 -->|Referenced| BE1
+    BE1 --> BE2["Config validated<br/>Ready for merge"]
+    
+    S --> S1["Docs branch<br/>squad/234-docs"]
+    D3 -->|Referenced| S1
+    W3 -->|Referenced| S1
+    S1 --> S2["API docs drafted<br/>Security notes integrated"]
+    
+    D3 --> MERGE["GitHub Merge Coordination"]
+    W3 --> MERGE
+    BE2 --> MERGE
+    S2 --> MERGE
+    
+    MERGE --> FINAL["✅ Rate Limiting Shipped<br/>Issue Closed<br/>Decision Documented"]
+    
+    style A fill:#fff3e0,color:#333
+    style B fill:#fff9c4,color:#333
+    style MERGE fill:#fff9c4,color:#333
+    style FINAL fill:#c8e6c9,color:#333

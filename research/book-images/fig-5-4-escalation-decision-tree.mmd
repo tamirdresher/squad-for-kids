@@ -1,0 +1,28 @@
+graph TD
+    A["New Issue<br/>Received by Squad"] --> B{{"Breaking<br/>Change?"}}
+    
+    B -->|Yes| B1["→ Route to Brady<br/>Architect"]
+    B -->|No| C{{"Security<br/>Sensitive?"}}
+    
+    C -->|Auth/Secrets/Network| C1["→ Route to Mike<br/>Security Lead"]
+    C -->|No| D{{"Production<br/>Deployment?"}}
+    
+    D -->|Prod change| D1["→ Route to Priya<br/>Infrastructure"]
+    D -->|Dev/Test| E{{"Compliance<br/>Gate?"}}
+    
+    E -->|Yes| E1["→ Route to Elena<br/>Integration Lead"]
+    E -->|No| F{{"Needs Human<br/>Judgment?"}}
+    
+    F -->|Yes| F1["→ Flag for appropriate<br/>human review"]
+    F -->|No| G["→ AI Execution<br/>Data/Worf/Seven/B Elanna"]
+    
+    B1 --> HUMAN["⏸️ PAUSE<br/>Wait for human input"]
+    C1 --> HUMAN
+    D1 --> HUMAN
+    E1 --> HUMAN
+    F1 --> HUMAN
+    
+    G --> AI["▶️ AI PROCEEDS<br/>Execute work"]
+    
+    style HUMAN fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:#333
+    style AI fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#333

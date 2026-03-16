@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 30px; font-size: 24px; }
+.comparison { display: flex; gap: 40px; align-items: flex-start; }
+.column { flex: 1; }
+.column h3 { text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 18px; }
+.before h3 { background: #ffcdd2; color: #b71c1c; }
+.after h3 { background: #c8e6c9; color: #1b5e20; }
+.arrow { display: flex; align-items: center; justify-content: center; font-size: 48px; color: #666; padding-top: 60px; }
+table { width: 100%; border-collapse: collapse; }
+td { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-size: 16px; }
+td:first-child { font-weight: 600; color: #555; width: 45%; }
+.before td:last-child { color: #c62828; font-weight: 600; }
+.after td:last-child { color: #2e7d32; font-weight: 600; }
+.check { color: #2e7d32; font-weight: bold; }
+</style></head><body>
+<div class="container">
+<h2>Figure 1.2: Personal Repo Stats — Before & After Squad</h2>
+<div class="comparison">
+<div class="column before">
+<h3>BEFORE SQUAD</h3>
+<table>
+<tr><td>Open Issues</td><td>23</td></tr>
+<tr><td>Test Coverage</td><td>34%</td></tr>
+<tr><td>Documentation</td><td>6 weeks stale</td></tr>
+<tr><td>Decisions Log</td><td>Empty</td></tr>
+<tr><td>PR Review Time</td><td>3–5 days</td></tr>
+</table>
+</div>
+<div class="arrow">→</div>
+<div class="column after">
+<h3>AFTER SQUAD (3 months)</h3>
+<table>
+<tr><td>Open Issues</td><td>0 <span class="check">✓</span></td></tr>
+<tr><td>Test Coverage</td><td>89% <span class="check">✓</span></td></tr>
+<tr><td>Documentation</td><td>Current <span class="check">✓</span></td></tr>
+<tr><td>Decisions Log</td><td>147 entries <span class="check">✓</span></td></tr>
+<tr><td>PR Review Time</td><td>&lt;1 hour <span class="check">✓</span></td></tr>
+</table>
+</div>
+</div>
+</div>
+</body></html>

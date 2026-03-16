@@ -1,0 +1,1771 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e14]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+      - search [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e22]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e25]
+      - button "Copilot" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Copilot
+      - generic [ref=e31]:
+        - button "Cloud Shell" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "Notifications" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - button "Settings" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - button "Support + Troubleshooting" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+        - button "Feedback" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e50] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e51]':
+          - generic [ref=e52]:
+            - generic [ref=e53]: tamirdresher@microsoft.com
+            - generic [ref=e54]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e57]
+    - main [ref=e62]:
+      - generic [ref=e63]:
+        - navigation "Breadcrumb" [ref=e67]:
+          - navigation "Breadcrumb" [ref=e70]:
+            - list [ref=e71]:
+              - listitem [ref=e72] [cursor=pointer]:
+                - link "Home" [ref=e73]:
+                  - /url: "#home"
+        - generic [ref=e75]:
+          - region "App Services Microsoft (microsoft.onmicrosoft.com)" [ref=e156]:
+            - generic "App Services Microsoft (microsoft.onmicrosoft.com)" [ref=e157]:
+              - generic [ref=e81]:
+                - generic [ref=e82]:
+                  - heading "App Services" [level=2] [ref=e158]: App Services
+                  - generic [ref=e83]:
+                    - button "Add service to favorites" [ref=e84] [cursor=pointer]:
+                      - img [ref=e159]
+                    - button "More content actions" [ref=e90] [cursor=pointer]:
+                      - img [ref=e161]
+                    - button "Close content 'App Services'" [active] [ref=e163] [cursor=pointer]:
+                      - img [ref=e110]
+                - generic [ref=e164]: Microsoft (microsoft.onmicrosoft.com)
+          - iframe [ref=e165]:
+            - generic [active] [ref=f3e1]:
+              - generic [ref=f3e10]:
+                - menubar [ref=f3e14]:
+                  - group [ref=f3e15]:
+                    - menuitem "Create" [ref=f3e16] [cursor=pointer]:
+                      - generic [ref=f3e17]:
+                        - img [ref=f3e20]
+                        - generic [ref=f3e23]: Create
+                        - generic [ref=f3e24]: 
+                    - menuitem "Manage Deleted Apps" [ref=f3e25] [cursor=pointer]:
+                      - generic [ref=f3e26]:
+                        - img [ref=f3e29]
+                        - generic [ref=f3e32]: Manage Deleted Apps
+                    - menuitem "Manage view" [ref=f3e33] [cursor=pointer]:
+                      - generic [ref=f3e34]:
+                        - generic [ref=f3e35]: 
+                        - generic [ref=f3e37]: Manage view
+                        - generic [ref=f3e38]: 
+                    - menuitem "Refresh" [ref=f3e39] [cursor=pointer]:
+                      - generic [ref=f3e40]:
+                        - generic [ref=f3e41]: 
+                        - generic [ref=f3e43]: Refresh
+                    - menuitem "Export to CSV" [ref=f3e44] [cursor=pointer]:
+                      - generic [ref=f3e45]:
+                        - generic [ref=f3e46]: 
+                        - generic [ref=f3e48]: Export to CSV
+                    - menuitem "Open query" [ref=f3e49] [cursor=pointer]:
+                      - generic [ref=f3e50]:
+                        - generic [ref=f3e51]: 
+                        - generic [ref=f3e53]: Open query
+                    - generic [ref=f3e54]:
+                      - separator
+                    - menuitem "Assign tags" [disabled] [ref=f3e55]:
+                      - generic [ref=f3e56]:
+                        - generic [ref=f3e57]: 
+                        - generic [ref=f3e59]: Assign tags
+                    - menuitem "Start" [disabled] [ref=f3e60]:
+                      - generic [ref=f3e61]:
+                        - img [ref=f3e64]
+                        - generic [ref=f3e67]: Start
+                    - menuitem "Restart" [disabled] [ref=f3e68]:
+                      - generic [ref=f3e69]:
+                        - img [ref=f3e72]
+                        - generic [ref=f3e75]: Restart
+                    - menuitem "Stop" [disabled] [ref=f3e76]:
+                      - generic [ref=f3e77]:
+                        - img [ref=f3e80]
+                        - generic [ref=f3e83]: Stop
+                    - menuitem "More commands" [ref=f3e85] [cursor=pointer]:
+                      - generic [ref=f3e87]: 
+                  - group [ref=f3e88]:
+                    - menuitem "Group by none" [ref=f3e89] [cursor=pointer]:
+                      - generic [ref=f3e90]:
+                        - generic [ref=f3e91]: 
+                        - generic [ref=f3e93]: Group by none
+                        - generic [ref=f3e94]: 
+                - generic [ref=f3e95]:
+                  - generic [ref=f3e97]:
+                    - generic [ref=f3e98]:
+                      - generic [ref=f3e100]: 
+                      - searchbox "Filter for any field..." [ref=f3e101]
+                    - generic "Collection of filters for the resources." [ref=f3e102]:
+                      - list [ref=f3e103]:
+                        - generic [ref=f3e104]:
+                          - listitem [ref=f3e105]:
+                            - button "Editor to filter the results by subscriptions. Subscription equals 717 selected" [ref=f3e107]:
+                              - generic [ref=f3e109]:
+                                - generic [ref=f3e110]: Subscription
+                                - generic [ref=f3e111]: equals
+                                - generic [ref=f3e112]: 717 selected
+                          - listitem [ref=f3e113]:
+                            - generic [ref=f3e114]:
+                              - button "Editor to filter the results by column value. Resource Group equals all" [ref=f3e115]:
+                                - generic [ref=f3e117]:
+                                  - generic [ref=f3e118]: Resource Group
+                                  - generic [ref=f3e119]: equals
+                                  - generic [ref=f3e120]: all
+                              - button "Remove Resource Group equals all" [ref=f3e121] [cursor=pointer]:
+                                - generic [ref=f3e122]: 
+                          - listitem [ref=f3e123]:
+                            - generic [ref=f3e124]:
+                              - button "Editor to filter the results by column value. Type equals all" [ref=f3e125]:
+                                - generic [ref=f3e127]:
+                                  - generic [ref=f3e128]: Type
+                                  - generic [ref=f3e129]: equals
+                                  - generic [ref=f3e130]: all
+                              - button "Remove Type equals all" [ref=f3e131] [cursor=pointer]:
+                                - generic [ref=f3e132]: 
+                          - listitem [ref=f3e133]:
+                            - generic [ref=f3e134]:
+                              - button "Editor to filter the results by column value. Location equals all" [ref=f3e135]:
+                                - generic [ref=f3e137]:
+                                  - generic [ref=f3e138]: Location
+                                  - generic [ref=f3e139]: equals
+                                  - generic [ref=f3e140]: all
+                              - button "Remove Location equals all" [ref=f3e141] [cursor=pointer]:
+                                - generic [ref=f3e142]: 
+                          - listitem [ref=f3e143]:
+                            - button "Button to add a new Pill with display text - Add filter" [ref=f3e145]:
+                              - generic [ref=f3e146]:
+                                - img [ref=f3e148]
+                                - generic [ref=f3e150]: Add filter
+                  - generic [ref=f3e151]:
+                    - grid [ref=f3e156]:
+                      - row "Select all rows Name Status Location Pricing Tier App Service Plan Subscription App Type" [ref=f3e157]:
+                        - columnheader "Select all rows" [ref=f3e158]:
+                          - checkbox "Select all rows" [ref=f3e160]:
+                            - generic [ref=f3e161]:
+                              - generic [ref=f3e162]: 
+                              - generic [ref=f3e163]: 
+                        - generic [ref=f3e164]: Select all rows
+                        - columnheader "Name" [ref=f3e165]:
+                          - button "Name" [ref=f3e167]:
+                            - generic [ref=f3e168]: Name
+                            - generic [ref=f3e169]: 
+                        - button [ref=f3e170]
+                        - columnheader "Status" [ref=f3e171]:
+                          - button "Status" [ref=f3e173]:
+                            - generic [ref=f3e174]: Status
+                        - button [ref=f3e175]
+                        - columnheader "Location" [ref=f3e176]:
+                          - button "Location" [ref=f3e178]:
+                            - generic [ref=f3e179]: Location
+                        - button [ref=f3e180]
+                        - columnheader "Pricing Tier" [ref=f3e181]:
+                          - button "Pricing Tier" [ref=f3e183]:
+                            - generic [ref=f3e184]: Pricing Tier
+                        - button [ref=f3e185]
+                        - columnheader "App Service Plan" [ref=f3e186]:
+                          - button "App Service Plan" [ref=f3e188]:
+                            - generic [ref=f3e189]: App Service Plan
+                        - button [ref=f3e190]
+                        - columnheader "Subscription" [ref=f3e191]:
+                          - button "Subscription" [ref=f3e193]:
+                            - generic [ref=f3e194]: Subscription
+                        - button [ref=f3e195]
+                        - columnheader "App Type" [ref=f3e196]:
+                          - button "App Type" [ref=f3e198]:
+                            - generic [ref=f3e199]: App Type
+                        - button [ref=f3e200]
+                      - generic [ref=f3e201]:
+                        - row "Select row 68cloud4est235vmqzng Open context menu Stopped East US Dynamic aws-iam-4est235vmqzng SentinelCAT Eco Dev Function App" [ref=f3e202]:
+                          - gridcell "Select row" [ref=f3e203]:
+                            - checkbox "Select row" [ref=f3e204]:
+                              - generic [ref=f3e205]:
+                                - generic [ref=f3e206]: 
+                                - generic [ref=f3e207]: 
+                          - gridcell "68cloud4est235vmqzng Open context menu" [ref=f3e208]:
+                            - generic [ref=f3e209]:
+                              - img [ref=f3e212]
+                              - link "68cloud4est235vmqzng" [ref=f3e214] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/sites/68cloud4est235vmqzng
+                              - button "Open context menu" [ref=f3e215] [cursor=pointer]:
+                                - generic [ref=f3e217]: 
+                          - gridcell "Stopped" [ref=f3e218]
+                          - gridcell "East US" [ref=f3e219]
+                          - gridcell "Dynamic" [ref=f3e220]
+                          - gridcell "aws-iam-4est235vmqzng" [ref=f3e221]:
+                            - generic [ref=f3e222]:
+                              - img [ref=f3e225]
+                              - link "aws-iam-4est235vmqzng" [ref=f3e227] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/serverfarms/aws-iam-4est235vmqzng
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e228]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e229] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e230]
+                        - row "Select row A7rInfo Open context menu Stopped East US Dynamic A7rInfo SentinelCAT Eco Dev Function App" [ref=f3e231]:
+                          - gridcell "Select row" [ref=f3e232]:
+                            - checkbox "Select row" [ref=f3e233]:
+                              - generic [ref=f3e234]:
+                                - generic [ref=f3e235]: 
+                                - generic [ref=f3e236]: 
+                          - gridcell "A7rInfo Open context menu" [ref=f3e237]:
+                            - generic [ref=f3e238]:
+                              - img [ref=f3e241]
+                              - link "A7rInfo" [ref=f3e243] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test/providers/Microsoft.Web/sites/A7rInfo
+                              - button "Open context menu" [ref=f3e244] [cursor=pointer]:
+                                - generic [ref=f3e246]: 
+                          - gridcell "Stopped" [ref=f3e247]
+                          - gridcell "East US" [ref=f3e248]
+                          - gridcell "Dynamic" [ref=f3e249]
+                          - gridcell "A7rInfo" [ref=f3e250]:
+                            - generic [ref=f3e251]:
+                              - img [ref=f3e254]
+                              - link "A7rInfo" [ref=f3e256] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test/providers/Microsoft.Web/serverfarms/A7rInfo
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e257]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e258] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e259]
+                        - row "Select row AADInfo1 Open context menu Stopped East US Dynamic AADInfo1 SentinelCAT Eco Dev Function App" [ref=f3e260]:
+                          - gridcell "Select row" [ref=f3e261]:
+                            - checkbox "Select row" [ref=f3e262]:
+                              - generic [ref=f3e263]:
+                                - generic [ref=f3e264]: 
+                                - generic [ref=f3e265]: 
+                          - gridcell "AADInfo1 Open context menu" [ref=f3e266]:
+                            - generic [ref=f3e267]:
+                              - img [ref=f3e270]
+                              - link "AADInfo1" [ref=f3e272] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/sites/AADInfo1
+                              - button "Open context menu" [ref=f3e273] [cursor=pointer]:
+                                - generic [ref=f3e275]: 
+                          - gridcell "Stopped" [ref=f3e276]
+                          - gridcell "East US" [ref=f3e277]
+                          - gridcell "Dynamic" [ref=f3e278]
+                          - gridcell "AADInfo1" [ref=f3e279]:
+                            - generic [ref=f3e280]:
+                              - img [ref=f3e283]
+                              - link "AADInfo1" [ref=f3e285] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/serverfarms/AADInfo1
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e286]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e287] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e288]
+                        - row "Select row abnormal6lxpqhk4fr4wy Open context menu Stopped East US 2 Dynamic EastUS2LinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e289]:
+                          - gridcell "Select row" [ref=f3e290]:
+                            - checkbox "Select row" [ref=f3e291]:
+                              - generic [ref=f3e292]:
+                                - generic [ref=f3e293]: 
+                                - generic [ref=f3e294]: 
+                          - gridcell "abnormal6lxpqhk4fr4wy Open context menu" [ref=f3e295]:
+                            - generic [ref=f3e296]:
+                              - img [ref=f3e299]
+                              - link "abnormal6lxpqhk4fr4wy" [ref=f3e301] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/abnormal6lxpqhk4fr4wy
+                              - button "Open context menu" [ref=f3e302] [cursor=pointer]:
+                                - generic [ref=f3e304]: 
+                          - gridcell "Stopped" [ref=f3e305]
+                          - gridcell "East US 2" [ref=f3e306]
+                          - gridcell "Dynamic" [ref=f3e307]
+                          - gridcell "EastUS2LinuxDynamicPlan" [ref=f3e308]:
+                            - generic [ref=f3e309]:
+                              - img [ref=f3e312]
+                              - link "EastUS2LinuxDynamicPlan" [ref=f3e314] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/EastUS2LinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e315]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e316] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e317]
+                        - row "Select row ADOAutomation20240617163045 Open context menu Running East US Elastic Premium AutomationEP1plan SentinelCAT Eco Dev Function App" [ref=f3e318]:
+                          - gridcell "Select row" [ref=f3e319]:
+                            - checkbox "Select row" [ref=f3e320]:
+                              - generic [ref=f3e321]:
+                                - generic [ref=f3e322]: 
+                                - generic [ref=f3e323]: 
+                          - gridcell "ADOAutomation20240617163045 Open context menu" [ref=f3e324]:
+                            - generic [ref=f3e325]:
+                              - img [ref=f3e328]
+                              - link "ADOAutomation20240617163045" [ref=f3e330] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/atul-automation/providers/Microsoft.Web/sites/ADOAutomation20240617163045
+                              - button "Open context menu" [ref=f3e331] [cursor=pointer]:
+                                - generic [ref=f3e333]: 
+                          - gridcell "Running" [ref=f3e334]
+                          - gridcell "East US" [ref=f3e335]
+                          - gridcell "Elastic Premium" [ref=f3e336]
+                          - gridcell "AutomationEP1plan" [ref=f3e337]:
+                            - generic [ref=f3e338]:
+                              - img [ref=f3e341]
+                              - link "AutomationEP1plan" [ref=f3e343] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/atul-automation/providers/Microsoft.Web/serverfarms/AutomationEP1plan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e344]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e345] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e346]
+                        - row "Select row ADOAutomationsab Open context menu Running East US 2 Standard ADOAutomationsabPlan SentinelCAT Eco Dev Function App" [ref=f3e347]:
+                          - gridcell "Select row" [ref=f3e348]:
+                            - checkbox "Select row" [ref=f3e349]:
+                              - generic [ref=f3e350]:
+                                - generic [ref=f3e351]: 
+                                - generic [ref=f3e352]: 
+                          - gridcell "ADOAutomationsab Open context menu" [ref=f3e353]:
+                            - generic [ref=f3e354]:
+                              - img [ref=f3e357]
+                              - link "ADOAutomationsab" [ref=f3e359] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/ADOAutomationsab
+                              - button "Open context menu" [ref=f3e360] [cursor=pointer]:
+                                - generic [ref=f3e362]: 
+                          - gridcell "Running" [ref=f3e363]
+                          - gridcell "East US 2" [ref=f3e364]
+                          - gridcell "Standard" [ref=f3e365]
+                          - gridcell "ADOAutomationsabPlan" [ref=f3e366]:
+                            - generic [ref=f3e367]:
+                              - img [ref=f3e370]
+                              - link "ADOAutomationsabPlan" [ref=f3e372] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/ADOAutomationsabPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e373]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e374] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e375]
+                        - row "Select row adosabflex Open context menu Running East US Flex Consumption ASP-atulautomation-9d78 SentinelCAT Eco Dev Function App" [ref=f3e376]:
+                          - gridcell "Select row" [ref=f3e377]:
+                            - checkbox "Select row" [ref=f3e378]:
+                              - generic [ref=f3e379]:
+                                - generic [ref=f3e380]: 
+                                - generic [ref=f3e381]: 
+                          - gridcell "adosabflex Open context menu" [ref=f3e382]:
+                            - generic [ref=f3e383]:
+                              - img [ref=f3e386]
+                              - link "adosabflex" [ref=f3e388] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/atul-automation/providers/Microsoft.Web/sites/adosabflex
+                              - button "Open context menu" [ref=f3e389] [cursor=pointer]:
+                                - generic [ref=f3e391]: 
+                          - gridcell "Running" [ref=f3e392]
+                          - gridcell "East US" [ref=f3e393]
+                          - gridcell "Flex Consumption" [ref=f3e394]
+                          - gridcell "ASP-atulautomation-9d78" [ref=f3e395]:
+                            - generic [ref=f3e396]:
+                              - img [ref=f3e399]
+                              - link "ASP-atulautomation-9d78" [ref=f3e401] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/atul-automation/providers/Microsoft.Web/serverfarms/ASP-atulautomation-9d78
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e402]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e403] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e404]
+                        - row "Select row alicloud224est235vmqzng Open context menu Stopped East US Dynamic aws-iam-4est235vmqzng SentinelCAT Eco Dev Function App" [ref=f3e405]:
+                          - gridcell "Select row" [ref=f3e406]:
+                            - checkbox "Select row" [ref=f3e407]:
+                              - generic [ref=f3e408]:
+                                - generic [ref=f3e409]: 
+                                - generic [ref=f3e410]: 
+                          - gridcell "alicloud224est235vmqzng Open context menu" [ref=f3e411]:
+                            - generic [ref=f3e412]:
+                              - img [ref=f3e415]
+                              - link "alicloud224est235vmqzng" [ref=f3e417] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/sites/alicloud224est235vmqzng
+                              - button "Open context menu" [ref=f3e418] [cursor=pointer]:
+                                - generic [ref=f3e420]: 
+                          - gridcell "Stopped" [ref=f3e421]
+                          - gridcell "East US" [ref=f3e422]
+                          - gridcell "Dynamic" [ref=f3e423]
+                          - gridcell "aws-iam-4est235vmqzng" [ref=f3e424]:
+                            - generic [ref=f3e425]:
+                              - img [ref=f3e428]
+                              - link "aws-iam-4est235vmqzng" [ref=f3e430] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/serverfarms/aws-iam-4est235vmqzng
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e431]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e432] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e433]
+                        - row "Select row alicloudbtod4akvb2k2m Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e434]:
+                          - gridcell "Select row" [ref=f3e435]:
+                            - checkbox "Select row" [ref=f3e436]:
+                              - generic [ref=f3e437]:
+                                - generic [ref=f3e438]: 
+                                - generic [ref=f3e439]: 
+                          - gridcell "alicloudbtod4akvb2k2m Open context menu" [ref=f3e440]:
+                            - generic [ref=f3e441]:
+                              - img [ref=f3e444]
+                              - link "alicloudbtod4akvb2k2m" [ref=f3e446] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/sites/alicloudbtod4akvb2k2m
+                              - button "Open context menu" [ref=f3e447] [cursor=pointer]:
+                                - generic [ref=f3e449]: 
+                          - gridcell "Stopped" [ref=f3e450]
+                          - gridcell "East US" [ref=f3e451]
+                          - gridcell "Dynamic" [ref=f3e452]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e453]:
+                            - generic [ref=f3e454]:
+                              - img [ref=f3e457]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e459] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e460]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e461] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e462]
+                        - row "Select row alicloudlmqafmze2xlbg Open context menu Running East US 2 Dynamic EastUS2LinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e463]:
+                          - gridcell "Select row" [ref=f3e464]:
+                            - checkbox "Select row" [ref=f3e465]:
+                              - generic [ref=f3e466]:
+                                - generic [ref=f3e467]: 
+                                - generic [ref=f3e468]: 
+                          - gridcell "alicloudlmqafmze2xlbg Open context menu" [ref=f3e469]:
+                            - generic [ref=f3e470]:
+                              - img [ref=f3e473]
+                              - link "alicloudlmqafmze2xlbg" [ref=f3e475] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/CATTesting/providers/Microsoft.Web/sites/alicloudlmqafmze2xlbg
+                              - button "Open context menu" [ref=f3e476] [cursor=pointer]:
+                                - generic [ref=f3e478]: 
+                          - gridcell "Running" [ref=f3e479]
+                          - gridcell "East US 2" [ref=f3e480]
+                          - gridcell "Dynamic" [ref=f3e481]
+                          - gridcell "EastUS2LinuxDynamicPlan" [ref=f3e482]:
+                            - generic [ref=f3e483]:
+                              - img [ref=f3e486]
+                              - link "EastUS2LinuxDynamicPlan" [ref=f3e488] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/CATTesting/providers/Microsoft.Web/serverfarms/EastUS2LinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e489]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e490] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e491]
+                        - row "Select row amtabony-hackathon-sensestg Open context menu Running East US Premium V3 asp-amtabony-hackathon-sensestg WCD_Sense_Staging_EUS_LBI Web App" [ref=f3e492]:
+                          - gridcell "Select row" [ref=f3e493]:
+                            - checkbox "Select row" [ref=f3e494]:
+                              - generic [ref=f3e495]:
+                                - generic [ref=f3e496]: 
+                                - generic [ref=f3e497]: 
+                          - gridcell "amtabony-hackathon-sensestg Open context menu" [ref=f3e498]:
+                            - generic [ref=f3e499]:
+                              - img [ref=f3e502]
+                              - link "amtabony-hackathon-sensestg" [ref=f3e504] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/16a6c94a-cac2-4e68-bd0b-64daa28f428f/resourceGroups/amtabony-sensestg-resources/providers/Microsoft.Web/sites/amtabony-hackathon-sensestg
+                              - button "Open context menu" [ref=f3e505] [cursor=pointer]:
+                                - generic [ref=f3e507]: 
+                          - gridcell "Running" [ref=f3e508]
+                          - gridcell "East US" [ref=f3e509]
+                          - gridcell "Premium V3" [ref=f3e510]
+                          - gridcell "asp-amtabony-hackathon-sensestg" [ref=f3e511]:
+                            - generic [ref=f3e512]:
+                              - img [ref=f3e515]
+                              - link "asp-amtabony-hackathon-sensestg" [ref=f3e517] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/16a6c94a-cac2-4e68-bd0b-64daa28f428f/resourceGroups/amtabony-sensestg-resources/providers/Microsoft.Web/serverfarms/asp-amtabony-hackathon-sensestg
+                          - gridcell "WCD_Sense_Staging_EUS_LBI" [ref=f3e518]:
+                            - link "WCD_Sense_Staging_EUS_LBI" [ref=f3e519] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/16a6c94a-cac2-4e68-bd0b-64daa28f428f
+                          - gridcell "Web App" [ref=f3e520]
+                        - row "Select row amtabony-rangers-sensestg Open context menu Running East US Standard asp-amtabony-rangers-sensestg WCD_Sense_Staging_EUS_LBI Web App" [ref=f3e521]:
+                          - gridcell "Select row" [ref=f3e522]:
+                            - checkbox "Select row" [ref=f3e523]:
+                              - generic [ref=f3e524]:
+                                - generic [ref=f3e525]: 
+                                - generic [ref=f3e526]: 
+                          - gridcell "amtabony-rangers-sensestg Open context menu" [ref=f3e527]:
+                            - generic [ref=f3e528]:
+                              - img [ref=f3e531]
+                              - link "amtabony-rangers-sensestg" [ref=f3e533] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/16a6c94a-cac2-4e68-bd0b-64daa28f428f/resourceGroups/amtabony-sensestg-resources/providers/Microsoft.Web/sites/amtabony-rangers-sensestg
+                              - button "Open context menu" [ref=f3e534] [cursor=pointer]:
+                                - generic [ref=f3e536]: 
+                          - gridcell "Running" [ref=f3e537]
+                          - gridcell "East US" [ref=f3e538]
+                          - gridcell "Standard" [ref=f3e539]
+                          - gridcell "asp-amtabony-rangers-sensestg" [ref=f3e540]:
+                            - generic [ref=f3e541]:
+                              - img [ref=f3e544]
+                              - link "asp-amtabony-rangers-sensestg" [ref=f3e546] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/16a6c94a-cac2-4e68-bd0b-64daa28f428f/resourceGroups/amtabony-sensestg-resources/providers/Microsoft.Web/serverfarms/asp-amtabony-rangers-sensestg
+                          - gridcell "WCD_Sense_Staging_EUS_LBI" [ref=f3e547]:
+                            - link "WCD_Sense_Staging_EUS_LBI" [ref=f3e548] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/16a6c94a-cac2-4e68-bd0b-64daa28f428f
+                          - gridcell "Web App" [ref=f3e549]
+                        - row "Select row apigeexsm25jui5jpf6y Open context menu Running East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e550]:
+                          - gridcell "Select row" [ref=f3e551]:
+                            - checkbox "Select row" [ref=f3e552]:
+                              - generic [ref=f3e553]:
+                                - generic [ref=f3e554]: 
+                                - generic [ref=f3e555]: 
+                          - gridcell "apigeexsm25jui5jpf6y Open context menu" [ref=f3e556]:
+                            - generic [ref=f3e557]:
+                              - img [ref=f3e560]
+                              - link "apigeexsm25jui5jpf6y" [ref=f3e562] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-gsrihitha/providers/Microsoft.Web/sites/apigeexsm25jui5jpf6y
+                              - button "Open context menu" [ref=f3e563] [cursor=pointer]:
+                                - generic [ref=f3e565]: 
+                          - gridcell "Running" [ref=f3e566]
+                          - gridcell "East US" [ref=f3e567]
+                          - gridcell "Dynamic" [ref=f3e568]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e569]:
+                            - generic [ref=f3e570]:
+                              - img [ref=f3e573]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e575] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-gsrihitha/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e576]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e577] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e578]
+                        - row "Select row aposumbre16lxpqhk4fr4wy Open context menu Running East US 2 Dynamic EastUS2LinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e579]:
+                          - gridcell "Select row" [ref=f3e580]:
+                            - checkbox "Select row" [ref=f3e581]:
+                              - generic [ref=f3e582]:
+                                - generic [ref=f3e583]: 
+                                - generic [ref=f3e584]: 
+                          - gridcell "aposumbre16lxpqhk4fr4wy Open context menu" [ref=f3e585]:
+                            - generic [ref=f3e586]:
+                              - img [ref=f3e589]
+                              - link "aposumbre16lxpqhk4fr4wy" [ref=f3e591] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/aposumbre16lxpqhk4fr4wy
+                              - button "Open context menu" [ref=f3e592] [cursor=pointer]:
+                                - generic [ref=f3e594]: 
+                          - gridcell "Running" [ref=f3e595]
+                          - gridcell "East US 2" [ref=f3e596]
+                          - gridcell "Dynamic" [ref=f3e597]
+                          - gridcell "EastUS2LinuxDynamicPlan" [ref=f3e598]:
+                            - generic [ref=f3e599]:
+                              - img [ref=f3e602]
+                              - link "EastUS2LinuxDynamicPlan" [ref=f3e604] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/EastUS2LinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e605]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e606] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e607]
+                        - row "Select row apoumbrella6lxpqhk4fr4wy Open context menu Running East US 2 Dynamic EastUS2LinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e608]:
+                          - gridcell "Select row" [ref=f3e609]:
+                            - checkbox "Select row" [ref=f3e610]:
+                              - generic [ref=f3e611]:
+                                - generic [ref=f3e612]: 
+                                - generic [ref=f3e613]: 
+                          - gridcell "apoumbrella6lxpqhk4fr4wy Open context menu" [ref=f3e614]:
+                            - generic [ref=f3e615]:
+                              - img [ref=f3e618]
+                              - link "apoumbrella6lxpqhk4fr4wy" [ref=f3e620] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/apoumbrella6lxpqhk4fr4wy
+                              - button "Open context menu" [ref=f3e621] [cursor=pointer]:
+                                - generic [ref=f3e623]: 
+                          - gridcell "Running" [ref=f3e624]
+                          - gridcell "East US 2" [ref=f3e625]
+                          - gridcell "Dynamic" [ref=f3e626]
+                          - gridcell "EastUS2LinuxDynamicPlan" [ref=f3e627]:
+                            - generic [ref=f3e628]:
+                              - img [ref=f3e631]
+                              - link "EastUS2LinuxDynamicPlan" [ref=f3e633] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/EastUS2LinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e634]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e635] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e636]
+                        - row "Select row app-dk8s-test-eastus2-umiv Open context menu Running East US 2 Premium V2 plan-dk8s-test-eastus2-umiv WCD_MicroServices_Staging_LBI Web App" [ref=f3e637]:
+                          - gridcell "Select row" [ref=f3e638]:
+                            - checkbox "Select row" [ref=f3e639]:
+                              - generic [ref=f3e640]:
+                                - generic [ref=f3e641]: 
+                                - generic [ref=f3e642]: 
+                          - gridcell "app-dk8s-test-eastus2-umiv Open context menu" [ref=f3e643]:
+                            - generic [ref=f3e644]:
+                              - img [ref=f3e647]
+                              - link "app-dk8s-test-eastus2-umiv" [ref=f3e649] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Web/sites/app-dk8s-test-eastus2-umiv
+                              - button "Open context menu" [ref=f3e650] [cursor=pointer]:
+                                - generic [ref=f3e652]: 
+                          - gridcell "Running" [ref=f3e653]
+                          - gridcell "East US 2" [ref=f3e654]
+                          - gridcell "Premium V2" [ref=f3e655]
+                          - gridcell "plan-dk8s-test-eastus2-umiv" [ref=f3e656]:
+                            - generic [ref=f3e657]:
+                              - img [ref=f3e660]
+                              - link "plan-dk8s-test-eastus2-umiv" [ref=f3e662] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Web/serverfarms/plan-dk8s-test-eastus2-umiv
+                          - gridcell "WCD_MicroServices_Staging_LBI" [ref=f3e663]:
+                            - link "WCD_MicroServices_Staging_LBI" [ref=f3e664] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1
+                          - gridcell "Web App" [ref=f3e665]
+                        - row "Select row app-worker-dk8s-test-eastus2-umiv Open context menu Running East US 2 Premium V2 plan-dk8s-test-eastus2-umiv WCD_MicroServices_Staging_LBI Web App" [ref=f3e666]:
+                          - gridcell "Select row" [ref=f3e667]:
+                            - checkbox "Select row" [ref=f3e668]:
+                              - generic [ref=f3e669]:
+                                - generic [ref=f3e670]: 
+                                - generic [ref=f3e671]: 
+                          - gridcell "app-worker-dk8s-test-eastus2-umiv Open context menu" [ref=f3e672]:
+                            - generic [ref=f3e673]:
+                              - img [ref=f3e676]
+                              - link "app-worker-dk8s-test-eastus2-umiv" [ref=f3e678] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Web/sites/app-worker-dk8s-test-eastus2-umiv
+                              - button "Open context menu" [ref=f3e679] [cursor=pointer]:
+                                - generic [ref=f3e681]: 
+                          - gridcell "Running" [ref=f3e682]
+                          - gridcell "East US 2" [ref=f3e683]
+                          - gridcell "Premium V2" [ref=f3e684]
+                          - gridcell "plan-dk8s-test-eastus2-umiv" [ref=f3e685]:
+                            - generic [ref=f3e686]:
+                              - img [ref=f3e689]
+                              - link "plan-dk8s-test-eastus2-umiv" [ref=f3e691] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Web/serverfarms/plan-dk8s-test-eastus2-umiv
+                          - gridcell "WCD_MicroServices_Staging_LBI" [ref=f3e692]:
+                            - link "WCD_MicroServices_Staging_LBI" [ref=f3e693] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1
+                          - gridcell "Web App" [ref=f3e694]
+                        - row "Select row app-worker1-dk8s-test-eastus2-umiv Open context menu Stopped East US 2 Premium V2 plan-dk8s-test-eastus2-umiv-w WCD_MicroServices_Staging_LBI Web App" [ref=f3e695]:
+                          - gridcell "Select row" [ref=f3e696]:
+                            - checkbox "Select row" [ref=f3e697]:
+                              - generic [ref=f3e698]:
+                                - generic [ref=f3e699]: 
+                                - generic [ref=f3e700]: 
+                          - gridcell "app-worker1-dk8s-test-eastus2-umiv Open context menu" [ref=f3e701]:
+                            - generic [ref=f3e702]:
+                              - img [ref=f3e705]
+                              - link "app-worker1-dk8s-test-eastus2-umiv" [ref=f3e707] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Web/sites/app-worker1-dk8s-test-eastus2-umiv
+                              - button "Open context menu" [ref=f3e708] [cursor=pointer]:
+                                - generic [ref=f3e710]: 
+                          - gridcell "Stopped" [ref=f3e711]
+                          - gridcell "East US 2" [ref=f3e712]
+                          - gridcell "Premium V2" [ref=f3e713]
+                          - gridcell "plan-dk8s-test-eastus2-umiv-w" [ref=f3e714]:
+                            - generic [ref=f3e715]:
+                              - img [ref=f3e718]
+                              - link "plan-dk8s-test-eastus2-umiv-w" [ref=f3e720] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/rg-dk8s-test-eastus2/providers/Microsoft.Web/serverfarms/plan-dk8s-test-eastus2-umiv-w
+                          - gridcell "WCD_MicroServices_Staging_LBI" [ref=f3e721]:
+                            - link "WCD_MicroServices_Staging_LBI" [ref=f3e722] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1
+                          - gridcell "Web App" [ref=f3e723]
+                        - row "Select row apponbrd-staging Open context menu Running Central US Basic plan-onboardme-staging WCD_TIMNA_Staging_LBI Web App" [ref=f3e724]:
+                          - gridcell "Select row" [ref=f3e725]:
+                            - checkbox "Select row" [ref=f3e726]:
+                              - generic [ref=f3e727]:
+                                - generic [ref=f3e728]: 
+                                - generic [ref=f3e729]: 
+                          - gridcell "apponbrd-staging Open context menu" [ref=f3e730]:
+                            - generic [ref=f3e731]:
+                              - img [ref=f3e734]
+                              - link "apponbrd-staging" [ref=f3e736] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/99d06da1-455b-4a23-b2df-3181e98fe7bf/resourceGroups/rg-onboardme-staging/providers/Microsoft.Web/sites/apponbrd-staging
+                              - button "Open context menu" [ref=f3e737] [cursor=pointer]:
+                                - generic [ref=f3e739]: 
+                          - gridcell "Running" [ref=f3e740]
+                          - gridcell "Central US" [ref=f3e741]
+                          - gridcell "Basic" [ref=f3e742]
+                          - gridcell "plan-onboardme-staging" [ref=f3e743]:
+                            - generic [ref=f3e744]:
+                              - img [ref=f3e747]
+                              - link "plan-onboardme-staging" [ref=f3e749] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/99d06da1-455b-4a23-b2df-3181e98fe7bf/resourceGroups/rg-onboardme-staging/providers/Microsoft.Web/serverfarms/plan-onboardme-staging
+                          - gridcell "WCD_TIMNA_Staging_LBI" [ref=f3e750]:
+                            - link "WCD_TIMNA_Staging_LBI" [ref=f3e751] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/99d06da1-455b-4a23-b2df-3181e98fe7bf
+                          - gridcell "Web App" [ref=f3e752]
+                        - row "Select row ARMPortalFunctions Open context menu Running East US 2 Dynamic EastUS2Plan SentinelCAT Eco Dev Function App" [ref=f3e753]:
+                          - gridcell "Select row" [ref=f3e754]:
+                            - checkbox "Select row" [ref=f3e755]:
+                              - generic [ref=f3e756]:
+                                - generic [ref=f3e757]: 
+                                - generic [ref=f3e758]: 
+                          - gridcell "ARMPortalFunctions Open context menu" [ref=f3e759]:
+                            - generic [ref=f3e760]:
+                              - img [ref=f3e763]
+                              - link "ARMPortalFunctions" [ref=f3e765] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/AzSa-SolutionTelemetry/providers/Microsoft.Web/sites/ARMPortalFunctions
+                              - button "Open context menu" [ref=f3e766] [cursor=pointer]:
+                                - generic [ref=f3e768]: 
+                          - gridcell "Running" [ref=f3e769]
+                          - gridcell "East US 2" [ref=f3e770]
+                          - gridcell "Dynamic" [ref=f3e771]
+                          - gridcell "EastUS2Plan" [ref=f3e772]:
+                            - generic [ref=f3e773]:
+                              - img [ref=f3e776]
+                              - link "EastUS2Plan" [ref=f3e778] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/AzSa-SolutionTelemetry/providers/Microsoft.Web/serverfarms/EastUS2Plan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e779]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e780] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e781]
+                        - row "Select row asjce6lxpqhk4fr4wy Open context menu Stopped East US 2 Dynamic asjce6lxpqhk4fr4wy SentinelCAT Eco Dev Function App" [ref=f3e782]:
+                          - gridcell "Select row" [ref=f3e783]:
+                            - checkbox "Select row" [ref=f3e784]:
+                              - generic [ref=f3e785]:
+                                - generic [ref=f3e786]: 
+                                - generic [ref=f3e787]: 
+                          - gridcell "asjce6lxpqhk4fr4wy Open context menu" [ref=f3e788]:
+                            - generic [ref=f3e789]:
+                              - img [ref=f3e792]
+                              - link "asjce6lxpqhk4fr4wy" [ref=f3e794] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/asjce6lxpqhk4fr4wy
+                              - button "Open context menu" [ref=f3e795] [cursor=pointer]:
+                                - generic [ref=f3e797]: 
+                          - gridcell "Stopped" [ref=f3e798]
+                          - gridcell "East US 2" [ref=f3e799]
+                          - gridcell "Dynamic" [ref=f3e800]
+                          - gridcell "asjce6lxpqhk4fr4wy" [ref=f3e801]:
+                            - generic [ref=f3e802]:
+                              - img [ref=f3e805]
+                              - link "asjce6lxpqhk4fr4wy" [ref=f3e807] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/asjce6lxpqhk4fr4wy
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e808]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e809] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e810]
+                        - row "Select row asjumpcloudbtod4akvb2k2m Open context menu Stopped East US Dynamic asjumpcloudbtod4akvb2k2m SentinelCAT Eco Dev Function App" [ref=f3e811]:
+                          - gridcell "Select row" [ref=f3e812]:
+                            - checkbox "Select row" [ref=f3e813]:
+                              - generic [ref=f3e814]:
+                                - generic [ref=f3e815]: 
+                                - generic [ref=f3e816]: 
+                          - gridcell "asjumpcloudbtod4akvb2k2m Open context menu" [ref=f3e817]:
+                            - generic [ref=f3e818]:
+                              - img [ref=f3e821]
+                              - link "asjumpcloudbtod4akvb2k2m" [ref=f3e823] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/sites/asjumpcloudbtod4akvb2k2m
+                              - button "Open context menu" [ref=f3e824] [cursor=pointer]:
+                                - generic [ref=f3e826]: 
+                          - gridcell "Stopped" [ref=f3e827]
+                          - gridcell "East US" [ref=f3e828]
+                          - gridcell "Dynamic" [ref=f3e829]
+                          - gridcell "asjumpcloudbtod4akvb2k2m" [ref=f3e830]:
+                            - generic [ref=f3e831]:
+                              - img [ref=f3e834]
+                              - link "asjumpcloudbtod4akvb2k2m" [ref=f3e836] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/serverfarms/asjumpcloudbtod4akvb2k2m
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e837]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e838] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e839]
+                        - row "Select row atuldmpulsez6c3crgtpscda Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e840]:
+                          - gridcell "Select row" [ref=f3e841]:
+                            - checkbox "Select row" [ref=f3e842]:
+                              - generic [ref=f3e843]:
+                                - generic [ref=f3e844]: 
+                                - generic [ref=f3e845]: 
+                          - gridcell "atuldmpulsez6c3crgtpscda Open context menu" [ref=f3e846]:
+                            - generic [ref=f3e847]:
+                              - img [ref=f3e850]
+                              - link "atuldmpulsez6c3crgtpscda" [ref=f3e852] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/sites/atuldmpulsez6c3crgtpscda
+                              - button "Open context menu" [ref=f3e853] [cursor=pointer]:
+                                - generic [ref=f3e855]: 
+                          - gridcell "Stopped" [ref=f3e856]
+                          - gridcell "East US" [ref=f3e857]
+                          - gridcell "Dynamic" [ref=f3e858]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e859]:
+                            - generic [ref=f3e860]:
+                              - img [ref=f3e863]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e865] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e866]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e867] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e868]
+                        - row "Select row atulexhopz6c3crgtpscda Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e869]:
+                          - gridcell "Select row" [ref=f3e870]:
+                            - checkbox "Select row" [ref=f3e871]:
+                              - generic [ref=f3e872]:
+                                - generic [ref=f3e873]: 
+                                - generic [ref=f3e874]: 
+                          - gridcell "atulexhopz6c3crgtpscda Open context menu" [ref=f3e875]:
+                            - generic [ref=f3e876]:
+                              - img [ref=f3e879]
+                              - link "atulexhopz6c3crgtpscda" [ref=f3e881] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/atul-cat-sub/providers/Microsoft.Web/sites/atulexhopz6c3crgtpscda
+                              - button "Open context menu" [ref=f3e882] [cursor=pointer]:
+                                - generic [ref=f3e884]: 
+                          - gridcell "Stopped" [ref=f3e885]
+                          - gridcell "East US" [ref=f3e886]
+                          - gridcell "Dynamic" [ref=f3e887]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e888]:
+                            - generic [ref=f3e889]:
+                              - img [ref=f3e892]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e894] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e895]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e896] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e897]
+                        - row "Select row atullocz6c3crgtpscda Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e898]:
+                          - gridcell "Select row" [ref=f3e899]:
+                            - checkbox "Select row" [ref=f3e900]:
+                              - generic [ref=f3e901]:
+                                - generic [ref=f3e902]: 
+                                - generic [ref=f3e903]: 
+                          - gridcell "atullocz6c3crgtpscda Open context menu" [ref=f3e904]:
+                            - generic [ref=f3e905]:
+                              - img [ref=f3e908]
+                              - link "atullocz6c3crgtpscda" [ref=f3e910] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/sites/atullocz6c3crgtpscda
+                              - button "Open context menu" [ref=f3e911] [cursor=pointer]:
+                                - generic [ref=f3e913]: 
+                          - gridcell "Stopped" [ref=f3e914]
+                          - gridcell "East US" [ref=f3e915]
+                          - gridcell "Dynamic" [ref=f3e916]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e917]:
+                            - generic [ref=f3e918]:
+                              - img [ref=f3e921]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e923] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e924]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e925] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e926]
+                        - row "Select row atulnewboxz6c3crgtpscda Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e927]:
+                          - gridcell "Select row" [ref=f3e928]:
+                            - checkbox "Select row" [ref=f3e929]:
+                              - generic [ref=f3e930]:
+                                - generic [ref=f3e931]: 
+                                - generic [ref=f3e932]: 
+                          - gridcell "atulnewboxz6c3crgtpscda Open context menu" [ref=f3e933]:
+                            - generic [ref=f3e934]:
+                              - img [ref=f3e937]
+                              - link "atulnewboxz6c3crgtpscda" [ref=f3e939] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/sites/atulnewboxz6c3crgtpscda
+                              - button "Open context menu" [ref=f3e940] [cursor=pointer]:
+                                - generic [ref=f3e942]: 
+                          - gridcell "Stopped" [ref=f3e943]
+                          - gridcell "East US" [ref=f3e944]
+                          - gridcell "Dynamic" [ref=f3e945]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e946]:
+                            - generic [ref=f3e947]:
+                              - img [ref=f3e950]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e952] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e953]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e954] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e955]
+                        - row "Select row atulrubrikz6c3crgtpscda Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e956]:
+                          - gridcell "Select row" [ref=f3e957]:
+                            - checkbox "Select row" [ref=f3e958]:
+                              - generic [ref=f3e959]:
+                                - generic [ref=f3e960]: 
+                                - generic [ref=f3e961]: 
+                          - gridcell "atulrubrikz6c3crgtpscda Open context menu" [ref=f3e962]:
+                            - generic [ref=f3e963]:
+                              - img [ref=f3e966]
+                              - link "atulrubrikz6c3crgtpscda" [ref=f3e968] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/atul-cat-sub/providers/Microsoft.Web/sites/atulrubrikz6c3crgtpscda
+                              - button "Open context menu" [ref=f3e969] [cursor=pointer]:
+                                - generic [ref=f3e971]: 
+                          - gridcell "Stopped" [ref=f3e972]
+                          - gridcell "East US" [ref=f3e973]
+                          - gridcell "Dynamic" [ref=f3e974]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e975]:
+                            - generic [ref=f3e976]:
+                              - img [ref=f3e979]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e981] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e982]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e983] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e984]
+                        - row "Select row atulsophoepz6c3crgtpscda Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e985]:
+                          - gridcell "Select row" [ref=f3e986]:
+                            - checkbox "Select row" [ref=f3e987]:
+                              - generic [ref=f3e988]:
+                                - generic [ref=f3e989]: 
+                                - generic [ref=f3e990]: 
+                          - gridcell "atulsophoepz6c3crgtpscda Open context menu" [ref=f3e991]:
+                            - generic [ref=f3e992]:
+                              - img [ref=f3e995]
+                              - link "atulsophoepz6c3crgtpscda" [ref=f3e997] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/sites/atulsophoepz6c3crgtpscda
+                              - button "Open context menu" [ref=f3e998] [cursor=pointer]:
+                                - generic [ref=f3e1000]: 
+                          - gridcell "Stopped" [ref=f3e1001]
+                          - gridcell "East US" [ref=f3e1002]
+                          - gridcell "Dynamic" [ref=f3e1003]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e1004]:
+                            - generic [ref=f3e1005]:
+                              - img [ref=f3e1008]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e1010] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/Atul-Cat-Sub/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1011]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1012] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1013]
+                        - row "Select row audit4est235vmqzng Open context menu Stopped East US Dynamic ASP-audit4est235vmqzng SentinelCAT Eco Dev Function App" [ref=f3e1014]:
+                          - gridcell "Select row" [ref=f3e1015]:
+                            - checkbox "Select row" [ref=f3e1016]:
+                              - generic [ref=f3e1017]:
+                                - generic [ref=f3e1018]: 
+                                - generic [ref=f3e1019]: 
+                          - gridcell "audit4est235vmqzng Open context menu" [ref=f3e1020]:
+                            - generic [ref=f3e1021]:
+                              - img [ref=f3e1024]
+                              - link "audit4est235vmqzng" [ref=f3e1026] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/sites/audit4est235vmqzng
+                              - button "Open context menu" [ref=f3e1027] [cursor=pointer]:
+                                - generic [ref=f3e1029]: 
+                          - gridcell "Stopped" [ref=f3e1030]
+                          - gridcell "East US" [ref=f3e1031]
+                          - gridcell "Dynamic" [ref=f3e1032]
+                          - gridcell "ASP-audit4est235vmqzng" [ref=f3e1033]:
+                            - generic [ref=f3e1034]:
+                              - img [ref=f3e1037]
+                              - link "ASP-audit4est235vmqzng" [ref=f3e1039] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/serverfarms/ASP-audit4est235vmqzng
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1040]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1041] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1042]
+                        - row "Select row audit6lxpqhk4fr4wy Open context menu Stopped East US 2 Dynamic ASP-audit6lxpqhk4fr4wy SentinelCAT Eco Dev Function App" [ref=f3e1043]:
+                          - gridcell "Select row" [ref=f3e1044]:
+                            - checkbox "Select row" [ref=f3e1045]:
+                              - generic [ref=f3e1046]:
+                                - generic [ref=f3e1047]: 
+                                - generic [ref=f3e1048]: 
+                          - gridcell "audit6lxpqhk4fr4wy Open context menu" [ref=f3e1049]:
+                            - generic [ref=f3e1050]:
+                              - img [ref=f3e1053]
+                              - link "audit6lxpqhk4fr4wy" [ref=f3e1055] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/audit6lxpqhk4fr4wy
+                              - button "Open context menu" [ref=f3e1056] [cursor=pointer]:
+                                - generic [ref=f3e1058]: 
+                          - gridcell "Stopped" [ref=f3e1059]
+                          - gridcell "East US 2" [ref=f3e1060]
+                          - gridcell "Dynamic" [ref=f3e1061]
+                          - gridcell "ASP-audit6lxpqhk4fr4wy" [ref=f3e1062]:
+                            - generic [ref=f3e1063]:
+                              - img [ref=f3e1066]
+                              - link "ASP-audit6lxpqhk4fr4wy" [ref=f3e1068] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/ASP-audit6lxpqhk4fr4wy
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1069]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1070] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1071]
+                        - row "Select row auth0emb33leqczgcbku Open context menu Stopped East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e1072]:
+                          - gridcell "Select row" [ref=f3e1073]:
+                            - checkbox "Select row" [ref=f3e1074]:
+                              - generic [ref=f3e1075]:
+                                - generic [ref=f3e1076]: 
+                                - generic [ref=f3e1077]: 
+                          - gridcell "auth0emb33leqczgcbku Open context menu" [ref=f3e1078]:
+                            - generic [ref=f3e1079]:
+                              - img [ref=f3e1082]
+                              - link "auth0emb33leqczgcbku" [ref=f3e1084] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-muuppugund/providers/Microsoft.Web/sites/auth0emb33leqczgcbku
+                              - button "Open context menu" [ref=f3e1085] [cursor=pointer]:
+                                - generic [ref=f3e1087]: 
+                          - gridcell "Stopped" [ref=f3e1088]
+                          - gridcell "East US" [ref=f3e1089]
+                          - gridcell "Dynamic" [ref=f3e1090]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e1091]:
+                            - generic [ref=f3e1092]:
+                              - img [ref=f3e1095]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e1097] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-muuppugund/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1098]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1099] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1100]
+                        - row "Select row auth0emkasbtod4akvb2k2m Open context menu Running East US Dynamic EastUSLinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e1101]:
+                          - gridcell "Select row" [ref=f3e1102]:
+                            - checkbox "Select row" [ref=f3e1103]:
+                              - generic [ref=f3e1104]:
+                                - generic [ref=f3e1105]: 
+                                - generic [ref=f3e1106]: 
+                          - gridcell "auth0emkasbtod4akvb2k2m Open context menu" [ref=f3e1107]:
+                            - generic [ref=f3e1108]:
+                              - img [ref=f3e1111]
+                              - link "auth0emkasbtod4akvb2k2m" [ref=f3e1113] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/sites/auth0emkasbtod4akvb2k2m
+                              - button "Open context menu" [ref=f3e1114] [cursor=pointer]:
+                                - generic [ref=f3e1116]: 
+                          - gridcell "Running" [ref=f3e1117]
+                          - gridcell "East US" [ref=f3e1118]
+                          - gridcell "Dynamic" [ref=f3e1119]
+                          - gridcell "EastUSLinuxDynamicPlan" [ref=f3e1120]:
+                            - generic [ref=f3e1121]:
+                              - img [ref=f3e1124]
+                              - link "EastUSLinuxDynamicPlan" [ref=f3e1126] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/serverfarms/EastUSLinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1127]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1128] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1129]
+                        - row "Select row auth0emlmqafmze2xlbg Open context menu Running East US 2 Dynamic EastUS2LinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e1130]:
+                          - gridcell "Select row" [ref=f3e1131]:
+                            - checkbox "Select row" [ref=f3e1132]:
+                              - generic [ref=f3e1133]:
+                                - generic [ref=f3e1134]: 
+                                - generic [ref=f3e1135]: 
+                          - gridcell "auth0emlmqafmze2xlbg Open context menu" [ref=f3e1136]:
+                            - generic [ref=f3e1137]:
+                              - img [ref=f3e1140]
+                              - link "auth0emlmqafmze2xlbg" [ref=f3e1142] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/CATTesting/providers/Microsoft.Web/sites/auth0emlmqafmze2xlbg
+                              - button "Open context menu" [ref=f3e1143] [cursor=pointer]:
+                                - generic [ref=f3e1145]: 
+                          - gridcell "Running" [ref=f3e1146]
+                          - gridcell "East US 2" [ref=f3e1147]
+                          - gridcell "Dynamic" [ref=f3e1148]
+                          - gridcell "EastUS2LinuxDynamicPlan" [ref=f3e1149]:
+                            - generic [ref=f3e1150]:
+                              - img [ref=f3e1153]
+                              - link "EastUS2LinuxDynamicPlan" [ref=f3e1155] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/CATTesting/providers/Microsoft.Web/serverfarms/EastUS2LinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1156]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1157] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1158]
+                        - row "Select row AuthProbe Open context menu Running East US 2 Dynamic EastUS2Plan WCD_Monitoring_Staging_LBI Function App" [ref=f3e1159]:
+                          - gridcell "Select row" [ref=f3e1160]:
+                            - checkbox "Select row" [ref=f3e1161]:
+                              - generic [ref=f3e1162]:
+                                - generic [ref=f3e1163]: 
+                                - generic [ref=f3e1164]: 
+                          - gridcell "AuthProbe Open context menu" [ref=f3e1165]:
+                            - generic [ref=f3e1166]:
+                              - img [ref=f3e1169]
+                              - link "AuthProbe" [ref=f3e1171] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/authprobe/providers/Microsoft.Web/sites/AuthProbe
+                              - button "Open context menu" [ref=f3e1172] [cursor=pointer]:
+                                - generic [ref=f3e1174]: 
+                          - gridcell "Running" [ref=f3e1175]
+                          - gridcell "East US 2" [ref=f3e1176]
+                          - gridcell "Dynamic" [ref=f3e1177]
+                          - gridcell "EastUS2Plan" [ref=f3e1178]:
+                            - generic [ref=f3e1179]:
+                              - img [ref=f3e1182]
+                              - link "EastUS2Plan" [ref=f3e1184] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/AuthProbe/providers/Microsoft.Web/serverfarms/EastUS2Plan
+                          - gridcell "WCD_Monitoring_Staging_LBI" [ref=f3e1185]:
+                            - link "WCD_Monitoring_Staging_LBI" [ref=f3e1186] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3
+                          - gridcell "Function App" [ref=f3e1187]
+                        - row "Select row automate-email-creation Open context menu Running East US Dynamic ASP-mpsengineeringsystem-8ee3 WCD_MicroServices_Staging_LBI Function App" [ref=f3e1188]:
+                          - gridcell "Select row" [ref=f3e1189]:
+                            - checkbox "Select row" [ref=f3e1190]:
+                              - generic [ref=f3e1191]:
+                                - generic [ref=f3e1192]: 
+                                - generic [ref=f3e1193]: 
+                          - gridcell "automate-email-creation Open context menu" [ref=f3e1194]:
+                            - generic [ref=f3e1195]:
+                              - img [ref=f3e1198]
+                              - link "automate-email-creation" [ref=f3e1200] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/mps-engineering-system/providers/Microsoft.Web/sites/automate-email-creation
+                              - button "Open context menu" [ref=f3e1201] [cursor=pointer]:
+                                - generic [ref=f3e1203]: 
+                          - gridcell "Running" [ref=f3e1204]
+                          - gridcell "East US" [ref=f3e1205]
+                          - gridcell "Dynamic" [ref=f3e1206]
+                          - gridcell "ASP-mpsengineeringsystem-8ee3" [ref=f3e1207]:
+                            - generic [ref=f3e1208]:
+                              - img [ref=f3e1211]
+                              - link "ASP-mpsengineeringsystem-8ee3" [ref=f3e1213] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/mps-engineering-system/providers/Microsoft.Web/serverfarms/ASP-mpsengineeringsystem-8ee3
+                          - gridcell "WCD_MicroServices_Staging_LBI" [ref=f3e1214]:
+                            - link "WCD_MicroServices_Staging_LBI" [ref=f3e1215] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1
+                          - gridcell "Function App" [ref=f3e1216]
+                        - row "Select row aws-iam-4est235vmqzng Open context menu Stopped East US Dynamic aws-iam-4est235vmqzng SentinelCAT Eco Dev Function App" [ref=f3e1217]:
+                          - gridcell "Select row" [ref=f3e1218]:
+                            - checkbox "Select row" [ref=f3e1219]:
+                              - generic [ref=f3e1220]:
+                                - generic [ref=f3e1221]: 
+                                - generic [ref=f3e1222]: 
+                          - gridcell "aws-iam-4est235vmqzng Open context menu" [ref=f3e1223]:
+                            - generic [ref=f3e1224]:
+                              - img [ref=f3e1227]
+                              - link "aws-iam-4est235vmqzng" [ref=f3e1229] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/sites/aws-iam-4est235vmqzng
+                              - button "Open context menu" [ref=f3e1230] [cursor=pointer]:
+                                - generic [ref=f3e1232]: 
+                          - gridcell "Stopped" [ref=f3e1233]
+                          - gridcell "East US" [ref=f3e1234]
+                          - gridcell "Dynamic" [ref=f3e1235]
+                          - gridcell "aws-iam-4est235vmqzng" [ref=f3e1236]:
+                            - generic [ref=f3e1237]:
+                              - img [ref=f3e1240]
+                              - link "aws-iam-4est235vmqzng" [ref=f3e1242] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/serverfarms/aws-iam-4est235vmqzng
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1243]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1244] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1245]
+                        - row "Select row aws-iam-a4aebg2t2zbdy Open context menu Stopped East US Dynamic aws-iam-a4aebg2t2zbdy SentinelCAT Eco Dev Function App" [ref=f3e1246]:
+                          - gridcell "Select row" [ref=f3e1247]:
+                            - checkbox "Select row" [ref=f3e1248]:
+                              - generic [ref=f3e1249]:
+                                - generic [ref=f3e1250]: 
+                                - generic [ref=f3e1251]: 
+                          - gridcell "aws-iam-a4aebg2t2zbdy Open context menu" [ref=f3e1252]:
+                            - generic [ref=f3e1253]:
+                              - img [ref=f3e1256]
+                              - link "aws-iam-a4aebg2t2zbdy" [ref=f3e1258] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test/providers/Microsoft.Web/sites/aws-iam-a4aebg2t2zbdy
+                              - button "Open context menu" [ref=f3e1259] [cursor=pointer]:
+                                - generic [ref=f3e1261]: 
+                          - gridcell "Stopped" [ref=f3e1262]
+                          - gridcell "East US" [ref=f3e1263]
+                          - gridcell "Dynamic" [ref=f3e1264]
+                          - gridcell "aws-iam-a4aebg2t2zbdy" [ref=f3e1265]:
+                            - generic [ref=f3e1266]:
+                              - img [ref=f3e1269]
+                              - link "aws-iam-a4aebg2t2zbdy" [ref=f3e1271] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test/providers/Microsoft.Web/serverfarms/aws-iam-a4aebg2t2zbdy
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1272]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1273] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1274]
+                        - row "Select row aws-iam-functionappconnector4est235vmqzng Open context menu Running East US Dynamic aws-iam-functionappconnector4est235vmqzng SentinelCAT Eco Dev Function App" [ref=f3e1275]:
+                          - gridcell "Select row" [ref=f3e1276]:
+                            - checkbox "Select row" [ref=f3e1277]:
+                              - generic [ref=f3e1278]:
+                                - generic [ref=f3e1279]: 
+                                - generic [ref=f3e1280]: 
+                          - gridcell "aws-iam-functionappconnector4est235vmqzng Open context menu" [ref=f3e1281]:
+                            - generic [ref=f3e1282]:
+                              - img [ref=f3e1285]
+                              - link "aws-iam-functionappconnector4est235vmqzng" [ref=f3e1287] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/sites/aws-iam-functionappconnector4est235vmqzng
+                              - button "Open context menu" [ref=f3e1288] [cursor=pointer]:
+                                - generic [ref=f3e1290]: 
+                          - gridcell "Running" [ref=f3e1291]
+                          - gridcell "East US" [ref=f3e1292]
+                          - gridcell "Dynamic" [ref=f3e1293]
+                          - gridcell "aws-iam-functionappconnector4est235vmqzng" [ref=f3e1294]:
+                            - generic [ref=f3e1295]:
+                              - img [ref=f3e1298]
+                              - link "aws-iam-functionappconnector4est235vmqzng" [ref=f3e1300] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sab-connector-test2/providers/Microsoft.Web/serverfarms/aws-iam-functionappconnector4est235vmqzng
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1301]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1302] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1303]
+                        - row "Select row awsathenabtod4akvb2k2m Open context menu Running East US Dynamic awsathenabtod4akvb2k2m SentinelCAT Eco Dev Function App" [ref=f3e1304]:
+                          - gridcell "Select row" [ref=f3e1305]:
+                            - checkbox "Select row" [ref=f3e1306]:
+                              - generic [ref=f3e1307]:
+                                - generic [ref=f3e1308]: 
+                                - generic [ref=f3e1309]: 
+                          - gridcell "awsathenabtod4akvb2k2m Open context menu" [ref=f3e1310]:
+                            - generic [ref=f3e1311]:
+                              - img [ref=f3e1314]
+                              - link "awsathenabtod4akvb2k2m" [ref=f3e1316] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/sites/awsathenabtod4akvb2k2m
+                              - button "Open context menu" [ref=f3e1317] [cursor=pointer]:
+                                - generic [ref=f3e1319]: 
+                          - gridcell "Running" [ref=f3e1320]
+                          - gridcell "East US" [ref=f3e1321]
+                          - gridcell "Dynamic" [ref=f3e1322]
+                          - gridcell "awsathenabtod4akvb2k2m" [ref=f3e1323]:
+                            - generic [ref=f3e1324]:
+                              - img [ref=f3e1327]
+                              - link "awsathenabtod4akvb2k2m" [ref=f3e1329] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/serverfarms/awsathenabtod4akvb2k2m
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1330]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1331] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1332]
+                        - row "Select row awss3ingestionbtod4akvb2k2m Open context menu Running East US Elastic Premium ASP-awss3ingestionbtod4akv SentinelCAT Eco Dev Function App" [ref=f3e1333]:
+                          - gridcell "Select row" [ref=f3e1334]:
+                            - checkbox "Select row" [ref=f3e1335]:
+                              - generic [ref=f3e1336]:
+                                - generic [ref=f3e1337]: 
+                                - generic [ref=f3e1338]: 
+                          - gridcell "awss3ingestionbtod4akvb2k2m Open context menu" [ref=f3e1339]:
+                            - generic [ref=f3e1340]:
+                              - img [ref=f3e1343]
+                              - link "awss3ingestionbtod4akvb2k2m" [ref=f3e1345] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/sites/awss3ingestionbtod4akvb2k2m
+                              - button "Open context menu" [ref=f3e1346] [cursor=pointer]:
+                                - generic [ref=f3e1348]: 
+                          - gridcell "Running" [ref=f3e1349]
+                          - gridcell "East US" [ref=f3e1350]
+                          - gridcell "Elastic Premium" [ref=f3e1351]
+                          - gridcell "ASP-awss3ingestionbtod4akv" [ref=f3e1352]:
+                            - generic [ref=f3e1353]:
+                              - img [ref=f3e1356]
+                              - link "ASP-awss3ingestionbtod4akv" [ref=f3e1358] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/serverfarms/ASP-awss3ingestionbtod4akv
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1359]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1360] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1361]
+                        - row "Select row awss3ingestiontestbtod4akvb2k2m Open context menu Stopped East US Elastic Premium ASP-awss3ingestiontestbtod SentinelCAT Eco Dev Function App" [ref=f3e1362]:
+                          - gridcell "Select row" [ref=f3e1363]:
+                            - checkbox "Select row" [ref=f3e1364]:
+                              - generic [ref=f3e1365]:
+                                - generic [ref=f3e1366]: 
+                                - generic [ref=f3e1367]: 
+                          - gridcell "awss3ingestiontestbtod4akvb2k2m Open context menu" [ref=f3e1368]:
+                            - generic [ref=f3e1369]:
+                              - img [ref=f3e1372]
+                              - link "awss3ingestiontestbtod4akvb2k2m" [ref=f3e1374] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/sites/awss3ingestiontestbtod4akvb2k2m
+                              - button "Open context menu" [ref=f3e1375] [cursor=pointer]:
+                                - generic [ref=f3e1377]: 
+                          - gridcell "Stopped" [ref=f3e1378]
+                          - gridcell "East US" [ref=f3e1379]
+                          - gridcell "Elastic Premium" [ref=f3e1380]
+                          - gridcell "ASP-awss3ingestiontestbtod" [ref=f3e1381]:
+                            - generic [ref=f3e1382]:
+                              - img [ref=f3e1385]
+                              - link "ASP-awss3ingestiontestbtod" [ref=f3e1387] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/v-rusraut/providers/Microsoft.Web/serverfarms/ASP-awss3ingestiontestbtod
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1388]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1389] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1390]
+                        - row "Select row awssecurityhub6lxpqhk4fr4wy Open context menu Stopped East US 2 Dynamic EastUS2LinuxDynamicPlan SentinelCAT Eco Dev Function App" [ref=f3e1391]:
+                          - gridcell "Select row" [ref=f3e1392]:
+                            - checkbox "Select row" [ref=f3e1393]:
+                              - generic [ref=f3e1394]:
+                                - generic [ref=f3e1395]: 
+                                - generic [ref=f3e1396]: 
+                          - gridcell "awssecurityhub6lxpqhk4fr4wy Open context menu" [ref=f3e1397]:
+                            - generic [ref=f3e1398]:
+                              - img [ref=f3e1401]
+                              - link "awssecurityhub6lxpqhk4fr4wy" [ref=f3e1403] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/sites/awssecurityhub6lxpqhk4fr4wy
+                              - button "Open context menu" [ref=f3e1404] [cursor=pointer]:
+                                - generic [ref=f3e1406]: 
+                          - gridcell "Stopped" [ref=f3e1407]
+                          - gridcell "East US 2" [ref=f3e1408]
+                          - gridcell "Dynamic" [ref=f3e1409]
+                          - gridcell "EastUS2LinuxDynamicPlan" [ref=f3e1410]:
+                            - generic [ref=f3e1411]:
+                              - img [ref=f3e1414]
+                              - link "EastUS2LinuxDynamicPlan" [ref=f3e1416] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/sabrg/providers/Microsoft.Web/serverfarms/EastUS2LinuxDynamicPlan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1417]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1418] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Function App" [ref=f3e1419]
+                        - row "Select row AzSentinelDevTesting Open context menu Running Central US Standard AzSentinelMockApi20230420090317Plan SentinelCAT Eco Dev Web App" [ref=f3e1420]:
+                          - gridcell "Select row" [ref=f3e1421]:
+                            - checkbox "Select row" [ref=f3e1422]:
+                              - generic [ref=f3e1423]:
+                                - generic [ref=f3e1424]: 
+                                - generic [ref=f3e1425]: 
+                          - gridcell "AzSentinelDevTesting Open context menu" [ref=f3e1426]:
+                            - generic [ref=f3e1427]:
+                              - img [ref=f3e1430]
+                              - link "AzSentinelDevTesting" [ref=f3e1432] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/CTTTesting/providers/Microsoft.Web/sites/AzSentinelDevTesting
+                              - button "Open context menu" [ref=f3e1433] [cursor=pointer]:
+                                - generic [ref=f3e1435]: 
+                          - gridcell "Running" [ref=f3e1436]
+                          - gridcell "Central US" [ref=f3e1437]
+                          - gridcell "Standard" [ref=f3e1438]
+                          - gridcell "AzSentinelMockApi20230420090317Plan" [ref=f3e1439]:
+                            - generic [ref=f3e1440]:
+                              - img [ref=f3e1443]
+                              - link "AzSentinelMockApi20230420090317Plan" [ref=f3e1445] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/CTTTesting/providers/Microsoft.Web/serverfarms/AzSentinelMockApi20230420090317Plan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1446]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1447] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Web App" [ref=f3e1448]
+                        - row "Select row AzSentinelMockApi Open context menu Running East US Standard AzSentinelMockApi20230224150625Plan SentinelCAT Eco Dev Web App" [ref=f3e1449]:
+                          - gridcell "Select row" [ref=f3e1450]:
+                            - checkbox "Select row" [ref=f3e1451]:
+                              - generic [ref=f3e1452]:
+                                - generic [ref=f3e1453]: 
+                                - generic [ref=f3e1454]: 
+                          - gridcell "AzSentinelMockApi Open context menu" [ref=f3e1455]:
+                            - generic [ref=f3e1456]:
+                              - img [ref=f3e1459]
+                              - link "AzSentinelMockApi" [ref=f3e1461] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/rg_SyslogandCEFTesting/providers/Microsoft.Web/sites/AzSentinelMockApi
+                              - button "Open context menu" [ref=f3e1462] [cursor=pointer]:
+                                - generic [ref=f3e1464]: 
+                          - gridcell "Running" [ref=f3e1465]
+                          - gridcell "East US" [ref=f3e1466]
+                          - gridcell "Standard" [ref=f3e1467]
+                          - gridcell "AzSentinelMockApi20230224150625Plan" [ref=f3e1468]:
+                            - generic [ref=f3e1469]:
+                              - img [ref=f3e1472]
+                              - link "AzSentinelMockApi20230224150625Plan" [ref=f3e1474] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97/resourceGroups/rg_SyslogandCEFTesting/providers/Microsoft.Web/serverfarms/AzSentinelMockApi20230224150625Plan
+                          - gridcell "SentinelCAT Eco Dev" [ref=f3e1475]:
+                            - link "SentinelCAT Eco Dev" [ref=f3e1476] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/4383ac89-7cd1-48c1-8061-b0b3c5ccfd97
+                          - gridcell "Web App" [ref=f3e1477]
+                        - row "Select row Azure-Bootcamp-LogicApp Open context menu Running East US Standard ASP-AzureBootcampLogicAppgroup966d-918e WCD_INE_Staging_DPFT_LBI Logic App (Standard)" [ref=f3e1478]:
+                          - gridcell "Select row" [ref=f3e1479]:
+                            - checkbox "Select row" [ref=f3e1480]:
+                              - generic [ref=f3e1481]:
+                                - generic [ref=f3e1482]: 
+                                - generic [ref=f3e1483]: 
+                          - gridcell "Azure-Bootcamp-LogicApp Open context menu" [ref=f3e1484]:
+                            - generic [ref=f3e1485]:
+                              - img [ref=f3e1488]
+                              - link "Azure-Bootcamp-LogicApp" [ref=f3e1493] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/73efafab-6b23-4a89-ab3e-fe6e36370f1a/resourceGroups/Azure-Bootcamp-LogicApp_group-966d/providers/Microsoft.Web/sites/Azure-Bootcamp-LogicApp
+                              - button "Open context menu" [ref=f3e1494] [cursor=pointer]:
+                                - generic [ref=f3e1496]: 
+                          - gridcell "Running" [ref=f3e1497]
+                          - gridcell "East US" [ref=f3e1498]
+                          - gridcell "Standard" [ref=f3e1499]
+                          - gridcell "ASP-AzureBootcampLogicAppgroup966d-918e" [ref=f3e1500]:
+                            - generic [ref=f3e1501]:
+                              - img [ref=f3e1504]
+                              - link "ASP-AzureBootcampLogicAppgroup966d-918e" [ref=f3e1506] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/73efafab-6b23-4a89-ab3e-fe6e36370f1a/resourceGroups/Azure-Bootcamp-LogicApp_group-966d/providers/Microsoft.Web/serverfarms/ASP-AzureBootcampLogicAppgroup966d-918e
+                          - gridcell "WCD_INE_Staging_DPFT_LBI" [ref=f3e1507]:
+                            - link "WCD_INE_Staging_DPFT_LBI" [ref=f3e1508] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/73efafab-6b23-4a89-ab3e-fe6e36370f1a
+                          - gridcell "Logic App (Standard)" [ref=f3e1509]
+                        - row "Select row BarakTest Open context menu Running North Europe Dynamic ASP-BarakTest-8735 WCD_Monitoring_Staging_LBI Function App" [ref=f3e1510]:
+                          - gridcell "Select row" [ref=f3e1511]:
+                            - checkbox "Select row" [ref=f3e1512]:
+                              - generic [ref=f3e1513]:
+                                - generic [ref=f3e1514]: 
+                                - generic [ref=f3e1515]: 
+                          - gridcell "BarakTest Open context menu" [ref=f3e1516]:
+                            - generic [ref=f3e1517]:
+                              - img [ref=f3e1520]
+                              - link "BarakTest" [ref=f3e1522] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/baraktest/providers/Microsoft.Web/sites/BarakTest
+                              - button "Open context menu" [ref=f3e1523] [cursor=pointer]:
+                                - generic [ref=f3e1525]: 
+                          - gridcell "Running" [ref=f3e1526]
+                          - gridcell "North Europe" [ref=f3e1527]
+                          - gridcell "Dynamic" [ref=f3e1528]
+                          - gridcell "ASP-BarakTest-8735" [ref=f3e1529]:
+                            - generic [ref=f3e1530]:
+                              - img [ref=f3e1533]
+                              - link "ASP-BarakTest-8735" [ref=f3e1535] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/BarakTest/providers/Microsoft.Web/serverfarms/ASP-BarakTest-8735
+                          - gridcell "WCD_Monitoring_Staging_LBI" [ref=f3e1536]:
+                            - link "WCD_Monitoring_Staging_LBI" [ref=f3e1537] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3
+                          - gridcell "Function App" [ref=f3e1538]
+                        - row "Select row baraktest2 Open context menu Running East US 2 Flex Consumption ASP-BarakTest-bc62 WCD_Monitoring_Staging_LBI Function App" [ref=f3e1539]:
+                          - gridcell "Select row" [ref=f3e1540]:
+                            - checkbox "Select row" [ref=f3e1541]:
+                              - generic [ref=f3e1542]:
+                                - generic [ref=f3e1543]: 
+                                - generic [ref=f3e1544]: 
+                          - gridcell "baraktest2 Open context menu" [ref=f3e1545]:
+                            - generic [ref=f3e1546]:
+                              - img [ref=f3e1549]
+                              - link "baraktest2" [ref=f3e1551] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/BarakTest/providers/Microsoft.Web/sites/baraktest2
+                              - button "Open context menu" [ref=f3e1552] [cursor=pointer]:
+                                - generic [ref=f3e1554]: 
+                          - gridcell "Running" [ref=f3e1555]
+                          - gridcell "East US 2" [ref=f3e1556]
+                          - gridcell "Flex Consumption" [ref=f3e1557]
+                          - gridcell "ASP-BarakTest-bc62" [ref=f3e1558]:
+                            - generic [ref=f3e1559]:
+                              - img [ref=f3e1562]
+                              - link "ASP-BarakTest-bc62" [ref=f3e1564] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/BarakTest/providers/Microsoft.Web/serverfarms/ASP-BarakTest-bc62
+                          - gridcell "WCD_Monitoring_Staging_LBI" [ref=f3e1565]:
+                            - link "WCD_Monitoring_Staging_LBI" [ref=f3e1566] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3
+                          - gridcell "Function App" [ref=f3e1567]
+                        - row "Select row bi-agent-private-app Open context menu Running West Europe Basic bi-agent-simple-plan WCD_Monitoring_Staging_LBI Web App" [ref=f3e1568]:
+                          - gridcell "Select row" [ref=f3e1569]:
+                            - checkbox "Select row" [ref=f3e1570]:
+                              - generic [ref=f3e1571]:
+                                - generic [ref=f3e1572]: 
+                                - generic [ref=f3e1573]: 
+                          - gridcell "bi-agent-private-app Open context menu" [ref=f3e1574]:
+                            - generic [ref=f3e1575]:
+                              - img [ref=f3e1578]
+                              - link "bi-agent-private-app" [ref=f3e1580] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/FE-Infra-resources/providers/Microsoft.Web/sites/bi-agent-private-app
+                              - button "Open context menu" [ref=f3e1581] [cursor=pointer]:
+                                - generic [ref=f3e1583]: 
+                          - gridcell "Running" [ref=f3e1584]
+                          - gridcell "West Europe" [ref=f3e1585]
+                          - gridcell "Basic" [ref=f3e1586]
+                          - gridcell "bi-agent-simple-plan" [ref=f3e1587]:
+                            - generic [ref=f3e1588]:
+                              - img [ref=f3e1591]
+                              - link "bi-agent-simple-plan" [ref=f3e1593] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/FE-Infra-resources/providers/Microsoft.Web/serverfarms/bi-agent-simple-plan
+                          - gridcell "WCD_Monitoring_Staging_LBI" [ref=f3e1594]:
+                            - link "WCD_Monitoring_Staging_LBI" [ref=f3e1595] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3
+                          - gridcell "Web App" [ref=f3e1596]
+                        - row "Select row bi-agent-simple Open context menu Running West Europe Basic bi-agent-simple-plan WCD_Monitoring_Staging_LBI Web App" [ref=f3e1597]:
+                          - gridcell "Select row" [ref=f3e1598]:
+                            - checkbox "Select row" [ref=f3e1599]:
+                              - generic [ref=f3e1600]:
+                                - generic [ref=f3e1601]: 
+                                - generic [ref=f3e1602]: 
+                          - gridcell "bi-agent-simple Open context menu" [ref=f3e1603]:
+                            - generic [ref=f3e1604]:
+                              - img [ref=f3e1607]
+                              - link "bi-agent-simple" [ref=f3e1609] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/FE-Infra-resources/providers/Microsoft.Web/sites/bi-agent-simple
+                              - button "Open context menu" [ref=f3e1610] [cursor=pointer]:
+                                - generic [ref=f3e1612]: 
+                          - gridcell "Running" [ref=f3e1613]
+                          - gridcell "West Europe" [ref=f3e1614]
+                          - gridcell "Basic" [ref=f3e1615]
+                          - gridcell "bi-agent-simple-plan" [ref=f3e1616]:
+                            - generic [ref=f3e1617]:
+                              - img [ref=f3e1620]
+                              - link "bi-agent-simple-plan" [ref=f3e1622] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/FE-Infra-resources/providers/Microsoft.Web/serverfarms/bi-agent-simple-plan
+                          - gridcell "WCD_Monitoring_Staging_LBI" [ref=f3e1623]:
+                            - link "WCD_Monitoring_Staging_LBI" [ref=f3e1624] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3
+                          - gridcell "Web App" [ref=f3e1625]
+                        - row "Select row biagent-app Open context menu Running East US Basic biagent-plan WCD_Monitoring_Staging_LBI Web App" [ref=f3e1626]:
+                          - gridcell "Select row" [ref=f3e1627]:
+                            - checkbox "Select row" [ref=f3e1628]:
+                              - generic [ref=f3e1629]:
+                                - generic [ref=f3e1630]: 
+                                - generic [ref=f3e1631]: 
+                          - gridcell "biagent-app Open context menu" [ref=f3e1632]:
+                            - generic [ref=f3e1633]:
+                              - img [ref=f3e1636]
+                              - link "biagent-app" [ref=f3e1638] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/biagent-rg/providers/Microsoft.Web/sites/biagent-app
+                              - button "Open context menu" [ref=f3e1639] [cursor=pointer]:
+                                - generic [ref=f3e1641]: 
+                          - gridcell "Running" [ref=f3e1642]
+                          - gridcell "East US" [ref=f3e1643]
+                          - gridcell "Basic" [ref=f3e1644]
+                          - gridcell "biagent-plan" [ref=f3e1645]:
+                            - generic [ref=f3e1646]:
+                              - img [ref=f3e1649]
+                              - link "biagent-plan" [ref=f3e1651] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3/resourceGroups/biagent-rg/providers/Microsoft.Web/serverfarms/biagent-plan
+                          - gridcell "WCD_Monitoring_Staging_LBI" [ref=f3e1652]:
+                            - link "WCD_Monitoring_Staging_LBI" [ref=f3e1653] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/294592bd-2dcb-45aa-aafd-16ff2f5c6cf3
+                          - gridcell "Web App" [ref=f3e1654]
+                        - row "Select row billbmsstgeusfunc Open context menu Running East US Premium V3 bill-main-stg-eus-asp SentinelUS.Billing.Staging Function App" [ref=f3e1655]:
+                          - gridcell "Select row" [ref=f3e1656]:
+                            - checkbox "Select row" [ref=f3e1657]:
+                              - generic [ref=f3e1658]:
+                                - generic [ref=f3e1659]: 
+                                - generic [ref=f3e1660]: 
+                          - gridcell "billbmsstgeusfunc Open context menu" [ref=f3e1661]:
+                            - generic [ref=f3e1662]:
+                              - img [ref=f3e1665]
+                              - link "billbmsstgeusfunc" [ref=f3e1667] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/sites/billbmsstgeusfunc
+                              - button "Open context menu" [ref=f3e1668] [cursor=pointer]:
+                                - generic [ref=f3e1670]: 
+                          - gridcell "Running" [ref=f3e1671]
+                          - gridcell "East US" [ref=f3e1672]
+                          - gridcell "Premium V3" [ref=f3e1673]
+                          - gridcell "bill-main-stg-eus-asp" [ref=f3e1674]:
+                            - generic [ref=f3e1675]:
+                              - img [ref=f3e1678]
+                              - link "bill-main-stg-eus-asp" [ref=f3e1680] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-eus-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1681]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1682] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1683]
+                        - row "Select row billbmsstgwus3func Open context menu Running West US 3 Premium V3 bill-main-stg-wus3-asp SentinelUS.Billing.Staging Function App" [ref=f3e1684]:
+                          - gridcell "Select row" [ref=f3e1685]:
+                            - checkbox "Select row" [ref=f3e1686]:
+                              - generic [ref=f3e1687]:
+                                - generic [ref=f3e1688]: 
+                                - generic [ref=f3e1689]: 
+                          - gridcell "billbmsstgwus3func Open context menu" [ref=f3e1690]:
+                            - generic [ref=f3e1691]:
+                              - img [ref=f3e1694]
+                              - link "billbmsstgwus3func" [ref=f3e1696] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/sites/billbmsstgwus3func
+                              - button "Open context menu" [ref=f3e1697] [cursor=pointer]:
+                                - generic [ref=f3e1699]: 
+                          - gridcell "Running" [ref=f3e1700]
+                          - gridcell "West US 3" [ref=f3e1701]
+                          - gridcell "Premium V3" [ref=f3e1702]
+                          - gridcell "bill-main-stg-wus3-asp" [ref=f3e1703]:
+                            - generic [ref=f3e1704]:
+                              - img [ref=f3e1707]
+                              - link "bill-main-stg-wus3-asp" [ref=f3e1709] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-wus3-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1710]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1711] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1712]
+                        - row "Select row billbwsstgeusfunc Open context menu Running East US Premium V3 bill-main-stg-eus-asp SentinelUS.Billing.Staging Function App" [ref=f3e1713]:
+                          - gridcell "Select row" [ref=f3e1714]:
+                            - checkbox "Select row" [ref=f3e1715]:
+                              - generic [ref=f3e1716]:
+                                - generic [ref=f3e1717]: 
+                                - generic [ref=f3e1718]: 
+                          - gridcell "billbwsstgeusfunc Open context menu" [ref=f3e1719]:
+                            - generic [ref=f3e1720]:
+                              - img [ref=f3e1723]
+                              - link "billbwsstgeusfunc" [ref=f3e1725] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/sites/billbwsstgeusfunc
+                              - button "Open context menu" [ref=f3e1726] [cursor=pointer]:
+                                - generic [ref=f3e1728]: 
+                          - gridcell "Running" [ref=f3e1729]
+                          - gridcell "East US" [ref=f3e1730]
+                          - gridcell "Premium V3" [ref=f3e1731]
+                          - gridcell "bill-main-stg-eus-asp" [ref=f3e1732]:
+                            - generic [ref=f3e1733]:
+                              - img [ref=f3e1736]
+                              - link "bill-main-stg-eus-asp" [ref=f3e1738] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-eus-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1739]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1740] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1741]
+                        - row "Select row billbwsstgwus3func Open context menu Running West US 3 Premium V3 bill-main-stg-wus3-asp SentinelUS.Billing.Staging Function App" [ref=f3e1742]:
+                          - gridcell "Select row" [ref=f3e1743]:
+                            - checkbox "Select row" [ref=f3e1744]:
+                              - generic [ref=f3e1745]:
+                                - generic [ref=f3e1746]: 
+                                - generic [ref=f3e1747]: 
+                          - gridcell "billbwsstgwus3func Open context menu" [ref=f3e1748]:
+                            - generic [ref=f3e1749]:
+                              - img [ref=f3e1752]
+                              - link "billbwsstgwus3func" [ref=f3e1754] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/sites/billbwsstgwus3func
+                              - button "Open context menu" [ref=f3e1755] [cursor=pointer]:
+                                - generic [ref=f3e1757]: 
+                          - gridcell "Running" [ref=f3e1758]
+                          - gridcell "West US 3" [ref=f3e1759]
+                          - gridcell "Premium V3" [ref=f3e1760]
+                          - gridcell "bill-main-stg-wus3-asp" [ref=f3e1761]:
+                            - generic [ref=f3e1762]:
+                              - img [ref=f3e1765]
+                              - link "bill-main-stg-wus3-asp" [ref=f3e1767] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-wus3-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1768]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1769] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1770]
+                        - row "Select row billslsstgeusfunc Open context menu Running East US Premium V3 bill-main-stg-eus-asp SentinelUS.Billing.Staging Function App" [ref=f3e1771]:
+                          - gridcell "Select row" [ref=f3e1772]:
+                            - checkbox "Select row" [ref=f3e1773]:
+                              - generic [ref=f3e1774]:
+                                - generic [ref=f3e1775]: 
+                                - generic [ref=f3e1776]: 
+                          - gridcell "billslsstgeusfunc Open context menu" [ref=f3e1777]:
+                            - generic [ref=f3e1778]:
+                              - img [ref=f3e1781]
+                              - link "billslsstgeusfunc" [ref=f3e1783] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/sites/billslsstgeusfunc
+                              - button "Open context menu" [ref=f3e1784] [cursor=pointer]:
+                                - generic [ref=f3e1786]: 
+                          - gridcell "Running" [ref=f3e1787]
+                          - gridcell "East US" [ref=f3e1788]
+                          - gridcell "Premium V3" [ref=f3e1789]
+                          - gridcell "bill-main-stg-eus-asp" [ref=f3e1790]:
+                            - generic [ref=f3e1791]:
+                              - img [ref=f3e1794]
+                              - link "bill-main-stg-eus-asp" [ref=f3e1796] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-eus-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1797]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1798] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1799]
+                        - row "Select row billslsstgwus3func Open context menu Running West US 3 Premium V3 bill-main-stg-wus3-asp SentinelUS.Billing.Staging Function App" [ref=f3e1800]:
+                          - gridcell "Select row" [ref=f3e1801]:
+                            - checkbox "Select row" [ref=f3e1802]:
+                              - generic [ref=f3e1803]:
+                                - generic [ref=f3e1804]: 
+                                - generic [ref=f3e1805]: 
+                          - gridcell "billslsstgwus3func Open context menu" [ref=f3e1806]:
+                            - generic [ref=f3e1807]:
+                              - img [ref=f3e1810]
+                              - link "billslsstgwus3func" [ref=f3e1812] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/sites/billslsstgwus3func
+                              - button "Open context menu" [ref=f3e1813] [cursor=pointer]:
+                                - generic [ref=f3e1815]: 
+                          - gridcell "Running" [ref=f3e1816]
+                          - gridcell "West US 3" [ref=f3e1817]
+                          - gridcell "Premium V3" [ref=f3e1818]
+                          - gridcell "bill-main-stg-wus3-asp" [ref=f3e1819]:
+                            - generic [ref=f3e1820]:
+                              - img [ref=f3e1823]
+                              - link "bill-main-stg-wus3-asp" [ref=f3e1825] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-wus3-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1826]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1827] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1828]
+                        - row "Select row billsrsstgeusfunc Open context menu Running East US Premium V3 bill-main-stg-eus-asp SentinelUS.Billing.Staging Function App" [ref=f3e1829]:
+                          - gridcell "Select row" [ref=f3e1830]:
+                            - checkbox "Select row" [ref=f3e1831]:
+                              - generic [ref=f3e1832]:
+                                - generic [ref=f3e1833]: 
+                                - generic [ref=f3e1834]: 
+                          - gridcell "billsrsstgeusfunc Open context menu" [ref=f3e1835]:
+                            - generic [ref=f3e1836]:
+                              - img [ref=f3e1839]
+                              - link "billsrsstgeusfunc" [ref=f3e1841] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/sites/billsrsstgeusfunc
+                              - button "Open context menu" [ref=f3e1842] [cursor=pointer]:
+                                - generic [ref=f3e1844]: 
+                          - gridcell "Running" [ref=f3e1845]
+                          - gridcell "East US" [ref=f3e1846]
+                          - gridcell "Premium V3" [ref=f3e1847]
+                          - gridcell "bill-main-stg-eus-asp" [ref=f3e1848]:
+                            - generic [ref=f3e1849]:
+                              - img [ref=f3e1852]
+                              - link "bill-main-stg-eus-asp" [ref=f3e1854] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-eus-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1855]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1856] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1857]
+                        - row "Select row billsrsstgwus3func Open context menu Running West US 3 Premium V3 bill-main-stg-wus3-asp SentinelUS.Billing.Staging Function App" [ref=f3e1858]:
+                          - gridcell "Select row" [ref=f3e1859]:
+                            - checkbox "Select row" [ref=f3e1860]:
+                              - generic [ref=f3e1861]:
+                                - generic [ref=f3e1862]: 
+                                - generic [ref=f3e1863]: 
+                          - gridcell "billsrsstgwus3func Open context menu" [ref=f3e1864]:
+                            - generic [ref=f3e1865]:
+                              - img [ref=f3e1868]
+                              - link "billsrsstgwus3func" [ref=f3e1870] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/sites/billsrsstgwus3func
+                              - button "Open context menu" [ref=f3e1871] [cursor=pointer]:
+                                - generic [ref=f3e1873]: 
+                          - gridcell "Running" [ref=f3e1874]
+                          - gridcell "West US 3" [ref=f3e1875]
+                          - gridcell "Premium V3" [ref=f3e1876]
+                          - gridcell "bill-main-stg-wus3-asp" [ref=f3e1877]:
+                            - generic [ref=f3e1878]:
+                              - img [ref=f3e1881]
+                              - link "bill-main-stg-wus3-asp" [ref=f3e1883] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-wus3-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1884]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1885] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1886]
+                        - row "Select row billsurastgeusfunc Open context menu Running East US Premium V3 bill-main-stg-eus-asp SentinelUS.Billing.Staging Function App" [ref=f3e1887]:
+                          - gridcell "Select row" [ref=f3e1888]:
+                            - checkbox "Select row" [ref=f3e1889]:
+                              - generic [ref=f3e1890]:
+                                - generic [ref=f3e1891]: 
+                                - generic [ref=f3e1892]: 
+                          - gridcell "billsurastgeusfunc Open context menu" [ref=f3e1893]:
+                            - generic [ref=f3e1894]:
+                              - img [ref=f3e1897]
+                              - link "billsurastgeusfunc" [ref=f3e1899] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/sites/billsurastgeusfunc
+                              - button "Open context menu" [ref=f3e1900] [cursor=pointer]:
+                                - generic [ref=f3e1902]: 
+                          - gridcell "Running" [ref=f3e1903]
+                          - gridcell "East US" [ref=f3e1904]
+                          - gridcell "Premium V3" [ref=f3e1905]
+                          - gridcell "bill-main-stg-eus-asp" [ref=f3e1906]:
+                            - generic [ref=f3e1907]:
+                              - img [ref=f3e1910]
+                              - link "bill-main-stg-eus-asp" [ref=f3e1912] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-eus-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-eus-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1913]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1914] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1915]
+                        - row "Select row billsurastgwus3func Open context menu Running West US 3 Premium V3 bill-main-stg-wus3-asp SentinelUS.Billing.Staging Function App" [ref=f3e1916]:
+                          - gridcell "Select row" [ref=f3e1917]:
+                            - checkbox "Select row" [ref=f3e1918]:
+                              - generic [ref=f3e1919]:
+                                - generic [ref=f3e1920]: 
+                                - generic [ref=f3e1921]: 
+                          - gridcell "billsurastgwus3func Open context menu" [ref=f3e1922]:
+                            - generic [ref=f3e1923]:
+                              - img [ref=f3e1926]
+                              - link "billsurastgwus3func" [ref=f3e1928] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/sites/billsurastgwus3func
+                              - button "Open context menu" [ref=f3e1929] [cursor=pointer]:
+                                - generic [ref=f3e1931]: 
+                          - gridcell "Running" [ref=f3e1932]
+                          - gridcell "West US 3" [ref=f3e1933]
+                          - gridcell "Premium V3" [ref=f3e1934]
+                          - gridcell "bill-main-stg-wus3-asp" [ref=f3e1935]:
+                            - generic [ref=f3e1936]:
+                              - img [ref=f3e1939]
+                              - link "bill-main-stg-wus3-asp" [ref=f3e1941] [cursor=pointer]:
+                                - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63/resourceGroups/bill-dc-stg-wus3-rg/providers/Microsoft.Web/serverfarms/bill-main-stg-wus3-asp
+                          - gridcell "SentinelUS.Billing.Staging" [ref=f3e1942]:
+                            - link "SentinelUS.Billing.Staging" [ref=f3e1943] [cursor=pointer]:
+                              - /url: https://ms.portal.azure.com#resource/subscriptions/927b5eaf-9948-43ca-80d7-f8894c661d63
+                          - gridcell "Function App" [ref=f3e1944]
+                    - generic [ref=f3e1945]:
+                      - status:
+                        - generic [ref=f3e1946]: 487 results found
+                      - generic [ref=f3e1947]:
+                        - generic [ref=f3e1949]:
+                          - generic [ref=f3e1950]: "Showing 1 - 200 of 487. Display count:"
+                          - combobox "Showing 1 - 200 of 487. Display count:" [ref=f3e1952]:
+                            - generic [ref=f3e1953] [cursor=pointer]: "200"
+                            - generic [ref=f3e1954] [cursor=pointer]:
+                              - generic: 
+                        - navigation "Pagination" [ref=f3e1956]:
+                          - list [ref=f3e1957]:
+                            - listitem [ref=f3e1958]:
+                              - button "Previous" [disabled] [ref=f3e1959]:
+                                - img [ref=f3e1961]
+                            - listitem [ref=f3e1963]:
+                              - button "Page 1" [ref=f3e1964]: "1"
+                            - listitem [ref=f3e1965]:
+                              - button "Page 2" [ref=f3e1966]: "2"
+                            - listitem [ref=f3e1967]:
+                              - button "Page 3" [ref=f3e1968]: "3"
+                            - listitem [ref=f3e1969]:
+                              - button "Next" [ref=f3e1970]:
+                                - img [ref=f3e1972]
+                        - generic [ref=f3e1976]:
+                          - img [ref=f3e1978]
+                          - button "Give feedback" [ref=f3e1980] [cursor=pointer]
+              - img
+              - img
+              - img
+              - img
+              - img
+              - img
+              - img
+              - img
+              - img
+              - img
+              - img
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is ready.
+    - generic:
+      - generic: Content is loading.
+      - generic: Content is ready.
+      - generic: Content is ready.
+  - img [ref=e132]
+  - img [ref=e133]
+  - img [ref=e134]
+  - img [ref=e135]
+  - img [ref=e136]
+  - img [ref=e137]
+  - img [ref=e138]
+  - img [ref=e139]
+  - img [ref=e140]
+  - img [ref=e141]
+  - img [ref=e142]
+  - img [ref=e143]
+  - img [ref=e144]
+  - img [ref=e145]
+  - img [ref=e146]
+  - img [ref=e147]
+  - img [ref=e148]
+  - img [ref=e149]
+  - img [ref=e150]
+  - img [ref=e151]
+  - img [ref=e152]
+  - img [ref=e153]
+  - img [ref=e154]
+  - img [ref=e155]

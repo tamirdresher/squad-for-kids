@@ -1,0 +1,377 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - button "Open menu" [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+          - link "Homepage (g then d)" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+        - generic [ref=e18]:
+          - navigation "Breadcrumbs" [ref=e19]:
+            - list [ref=e20]:
+              - listitem [ref=e21]:
+                - link "Settings" [ref=e22] [cursor=pointer]:
+                  - /url: /settings
+                  - generic [ref=e23]: Settings
+          - button "Search or jump to…" [ref=e26] [cursor=pointer]:
+            - generic [ref=e27]:
+              - generic:
+                - img
+              - generic [ref=e28]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e32]:
+              - link "Chat with Copilot" [ref=e34] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e35]
+              - button "Open Copilot…" [ref=e39] [cursor=pointer]:
+                - generic:
+                  - img
+            - button "Create new..." [ref=e41] [cursor=pointer]:
+              - generic [ref=e42]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues (g then i)" [ref=e43] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e44]
+            - link "Pull requests (g then p)" [ref=e47] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e48]
+            - link "Repositories" [ref=e50] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e51]
+          - link "You have no unread notifications (g then n)" [ref=e53] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e54]
+          - button "Open user navigation menu" [ref=e57] [cursor=pointer]:
+            - img "User avatar" [ref=e58]
+  - main [ref=e61]:
+    - generic [ref=e62]:
+      - generic "yonatan-dresher (yonatan-dresher) settings" [ref=e63]:
+        - generic [ref=e64]:
+          - img "@yonatan-dresher" [ref=e65]
+          - generic [ref=e66]:
+            - heading "yonatan-dresher (yonatan-dresher) settings" [level=1] [ref=e67]:
+              - link "yonatan-dresher (yonatan-dresher)" [ref=e68] [cursor=pointer]:
+                - /url: /yonatan-dresher
+              - generic [ref=e69]: settings
+            - paragraph [ref=e71]: Your personal account
+        - link "Go to your personal profile" [ref=e73] [cursor=pointer]:
+          - /url: /yonatan-dresher
+      - generic [ref=e74]:
+        - navigation "User settings" [ref=e78]:
+          - list [ref=e80]:
+            - listitem [ref=e81]:
+              - link "Public profile" [ref=e82] [cursor=pointer]:
+                - /url: /settings/profile
+                - generic:
+                  - img
+                - generic [ref=e83]: Public profile
+            - listitem [ref=e84]:
+              - link "Account" [ref=e85] [cursor=pointer]:
+                - /url: /settings/admin
+                - generic:
+                  - img
+                - generic [ref=e86]: Account
+            - listitem [ref=e87]:
+              - link "Appearance" [ref=e88] [cursor=pointer]:
+                - /url: /settings/appearance
+                - generic:
+                  - img
+                - generic [ref=e89]: Appearance
+            - listitem [ref=e90]:
+              - link "Accessibility" [ref=e91] [cursor=pointer]:
+                - /url: /settings/accessibility
+                - generic:
+                  - img
+                - generic [ref=e92]: Accessibility
+            - listitem [ref=e93]:
+              - link "Notifications" [ref=e94] [cursor=pointer]:
+                - /url: /settings/notifications
+                - generic:
+                  - img
+                - generic [ref=e95]: Notifications
+            - listitem [ref=e96]
+            - listitem [ref=e97]:
+              - generic [ref=e100]:
+                - heading "Access" [level=2] [ref=e102]
+                - list "Access" [ref=e103]:
+                  - listitem [ref=e104]:
+                    - button "Billing and licensing" [ref=e105] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e106]: Billing and licensing
+                      - generic:
+                        - img
+                  - listitem [ref=e107]:
+                    - link "Emails" [ref=e108] [cursor=pointer]:
+                      - /url: /settings/emails
+                      - generic:
+                        - img
+                      - generic [ref=e109]: Emails
+                  - listitem [ref=e110]:
+                    - link "Password and authentication" [ref=e111] [cursor=pointer]:
+                      - /url: /settings/security
+                      - generic:
+                        - img
+                      - generic [ref=e112]: Password and authentication
+                  - listitem [ref=e113]:
+                    - link "Sessions" [ref=e114] [cursor=pointer]:
+                      - /url: /settings/sessions
+                      - generic:
+                        - img
+                      - generic [ref=e115]: Sessions
+                  - listitem [ref=e116]:
+                    - link "SSH and GPG keys" [ref=e117] [cursor=pointer]:
+                      - /url: /settings/keys
+                      - generic:
+                        - img
+                      - generic [ref=e118]: SSH and GPG keys
+                  - listitem [ref=e119]:
+                    - link "Organizations" [ref=e120] [cursor=pointer]:
+                      - /url: /settings/organizations
+                      - generic:
+                        - img
+                      - generic [ref=e121]: Organizations
+                  - listitem [ref=e122]:
+                    - link "Enterprises" [ref=e123] [cursor=pointer]:
+                      - /url: /settings/enterprises
+                      - generic:
+                        - generic:
+                          - img
+                      - generic [ref=e124]: Enterprises
+                  - listitem [ref=e125]:
+                    - button "Moderation" [ref=e126] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e127]: Moderation
+                      - generic:
+                        - img
+            - listitem [ref=e128]
+            - listitem [ref=e129]:
+              - generic [ref=e132]:
+                - heading "Code, planning, and automation" [level=2] [ref=e134]
+                - list "Code, planning, and automation" [ref=e135]:
+                  - listitem [ref=e136]:
+                    - link "Repositories" [ref=e137] [cursor=pointer]:
+                      - /url: /settings/repositories
+                      - generic:
+                        - img
+                      - generic [ref=e138]: Repositories
+                  - listitem [ref=e139]:
+                    - link "Codespaces" [ref=e140] [cursor=pointer]:
+                      - /url: /settings/codespaces
+                      - generic:
+                        - img
+                      - generic [ref=e141]: Codespaces
+                  - listitem [ref=e142]:
+                    - link "Models Preview feature" [ref=e143] [cursor=pointer]:
+                      - /url: /settings/models
+                      - generic:
+                        - img
+                      - generic [ref=e144]: Models
+                      - generic:
+                        - generic "Preview feature": Preview
+                  - listitem [ref=e145]:
+                    - link "Packages" [ref=e146] [cursor=pointer]:
+                      - /url: /settings/packages
+                      - generic:
+                        - img
+                      - generic [ref=e147]: Packages
+                  - listitem [ref=e148]:
+                    - button "Copilot" [ref=e149] [cursor=pointer]:
+                      - generic:
+                        - img
+                      - generic [ref=e150]: Copilot
+                      - generic:
+                        - img
+                  - listitem [ref=e151]:
+                    - link "Pages" [ref=e152] [cursor=pointer]:
+                      - /url: /settings/pages
+                      - generic:
+                        - img
+                      - generic [ref=e153]: Pages
+                  - listitem [ref=e154]:
+                    - link "Saved replies" [ref=e155] [cursor=pointer]:
+                      - /url: /settings/replies
+                      - generic:
+                        - img
+                      - generic [ref=e156]: Saved replies
+            - listitem [ref=e157]
+            - listitem [ref=e158]:
+              - generic [ref=e161]:
+                - heading "Security" [level=2] [ref=e163]
+                - list "Security" [ref=e164]:
+                  - listitem [ref=e165]:
+                    - link "Code security" [ref=e166] [cursor=pointer]:
+                      - /url: /settings/security_analysis
+                      - generic:
+                        - img
+                      - generic [ref=e167]: Code security
+            - listitem [ref=e168]
+            - listitem [ref=e169]:
+              - generic [ref=e172]:
+                - heading "Integrations" [level=3] [ref=e174]
+                - list "Integrations" [ref=e175]:
+                  - listitem [ref=e176]:
+                    - link "Applications" [ref=e177] [cursor=pointer]:
+                      - /url: /settings/installations
+                      - generic:
+                        - img
+                      - generic [ref=e178]: Applications
+                  - listitem [ref=e179]:
+                    - link "Scheduled reminders" [ref=e180] [cursor=pointer]:
+                      - /url: /settings/reminders
+                      - generic:
+                        - img
+                      - generic [ref=e181]: Scheduled reminders
+            - listitem [ref=e182]
+            - listitem [ref=e183]:
+              - generic [ref=e186]:
+                - heading "Archives" [level=2] [ref=e188]
+                - list "Archives" [ref=e189]:
+                  - listitem [ref=e190]:
+                    - link "Security log" [ref=e191] [cursor=pointer]:
+                      - /url: /settings/security-log
+                      - generic:
+                        - img
+                      - generic [ref=e192]: Security log
+                  - listitem [ref=e193]:
+                    - link "Sponsorship log" [ref=e194] [cursor=pointer]:
+                      - /url: /settings/sponsors-log
+                      - generic:
+                        - img
+                      - generic [ref=e195]: Sponsorship log
+            - listitem [ref=e196]
+            - listitem [ref=e197]:
+              - link "Developer settings" [ref=e198] [cursor=pointer]:
+                - /url: /settings/apps
+                - generic:
+                  - img
+                - generic [ref=e199]: Developer settings
+        - generic [ref=e203]:
+          - heading "Change username" [level=2] [ref=e205]
+          - paragraph [ref=e206]:
+            - text: Changing your username can have
+            - link "unintended side effects" [ref=e207] [cursor=pointer]:
+              - /url: https://docs.github.com/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-user-account-settings/changing-your-github-username
+            - text: .
+          - button "Change username" [ref=e208] [cursor=pointer]:
+            - generic [ref=e210]: Change username
+          - paragraph [ref=e211]:
+            - img [ref=e212]
+            - text: Looking to manage account security settings? You can find them in the
+            - link "Password and authentication" [ref=e214] [cursor=pointer]:
+              - /url: /settings/security
+            - text: page.
+          - heading "Link Patreon account" [level=2] [ref=e216]
+          - paragraph [ref=e217]:
+            - text: Connect a Patreon account for
+            - strong [ref=e218]: "@yonatan-dresher"
+            - text: to sponsor maintainers with. Get recognition on GitHub for sponsorships made on Patreon when the sponsored person has linked Patreon and GitHub, too, and has a public GitHub Sponsors profile.
+          - link "Connect with Patreon" [ref=e219] [cursor=pointer]:
+            - /url: /sponsors/accounts/patreon/connect?sponsor=yonatan-dresher
+            - generic [ref=e220]:
+              - generic:
+                - img:
+                  - img
+              - generic [ref=e221]: Connect with Patreon
+          - heading "Export account data" [level=2] [ref=e223]
+          - paragraph [ref=e224]:
+            - text: Export all repositories and profile metadata for
+            - strong [ref=e225]: "@yonatan-dresher"
+            - text: . Exports will be available for 7 days.
+          - button "Start export" [ref=e227] [cursor=pointer]
+          - heading "Successor settings" [level=2] [ref=e229]
+          - paragraph [ref=e230]:
+            - text: By clicking "Add Successor" below, I acknowledge that I am the owner of the @yonatan-dresher account, and am authorizing GitHub to transfer content within that account to my GitHub Successor, designated below, in the event of my death. I understand that this appointment of a successor does not override legally binding next-of-kin rules or estate laws of any relevant jurisdiction, and does not create a binding will.
+            - link "Learn more about account successors." [ref=e231] [cursor=pointer]:
+              - /url: https://docs.github.com/github/setting-up-and-managing-your-github-user-account/maintaining-ownership-continuity-of-your-user-accounts-repositories
+          - search "Designate Successor" [ref=e232]:
+            - text: Search by username, full name, or email address
+            - generic [ref=e234]:
+              - combobox "Search by username, full name, or email address" [ref=e236]
+              - img [ref=e237]
+              - button "Add Successor" [disabled] [ref=e240]
+          - heading "You have not designated a successor." [level=2] [ref=e244]
+          - heading "Delete account" [level=2] [ref=e246]
+          - paragraph [ref=e247]: Once you delete your account, there is no going back. Please be certain.
+          - button "Delete your account" [ref=e248] [cursor=pointer]:
+            - generic [ref=e250]: Delete your account
+          - dialog "Are you sure you want to do this?" [ref=e284]:
+            - generic [ref=e286]:
+              - heading "Are you sure you want to do this?" [level=1] [ref=e288]
+              - button "Close" [active] [ref=e290] [cursor=pointer]:
+                - img [ref=e291]
+            - generic [ref=e294]:
+              - generic [ref=e295]:
+                - img [ref=e296]
+                - text: This is extremely important.
+              - generic [ref=e298]:
+                - paragraph [ref=e299]:
+                  - text: We will
+                  - strong [ref=e300]: immediately delete all of your repositories (0)
+                  - text: ", along with all of your forks, wikis, issues, pull requests, and GitHub Pages sites."
+                - paragraph [ref=e301]: You will no longer be billed, and after 90 days your username will be available to anyone on GitHub.
+                - paragraph [ref=e302]:
+                  - text: For more help, read our article "
+                  - link "Deleting your user account" [ref=e303] [cursor=pointer]:
+                    - /url: https://docs.github.com/articles/deleting-your-user-account
+                  - text: "\"."
+                - separator [ref=e304]
+                - form "Delete account" [ref=e305]:
+                  - paragraph [ref=e306]:
+                    - text: "Your username or email:"
+                    - textbox "Your username or email:" [ref=e307]
+                  - paragraph [ref=e308]:
+                    - generic [ref=e309]: "To verify, type delete my account exactly as it appears:"
+                    - textbox "To verify, type delete my account exactly as it appears:" [ref=e310]
+                  - paragraph [ref=e311]: You'll be prompted to verify your identity before account deletion.
+                  - button "Cancel plan and delete this account" [disabled] [ref=e312]
+  - contentinfo [ref=e251]:
+    - heading "Footer" [level=2] [ref=e252]
+    - generic [ref=e253]:
+      - generic [ref=e254]:
+        - link "GitHub Homepage" [ref=e255] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e256]
+        - generic [ref=e258]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e259]:
+        - heading "Footer navigation" [level=3] [ref=e260]
+        - list "Footer navigation" [ref=e261]:
+          - listitem [ref=e262]:
+            - link "Terms" [ref=e263] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e264]:
+            - link "Privacy" [ref=e265] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e266]:
+            - link "Security" [ref=e267] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e268]:
+            - link "Status" [ref=e269] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e270]:
+            - link "Community" [ref=e271] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e272]:
+            - link "Docs" [ref=e273] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e274]:
+            - link "Contact" [ref=e275] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e276]:
+            - button "Manage cookies" [ref=e278] [cursor=pointer]
+          - listitem [ref=e279]:
+            - button "Do not share my personal information" [ref=e281] [cursor=pointer]

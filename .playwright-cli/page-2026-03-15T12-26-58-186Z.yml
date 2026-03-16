@@ -1,0 +1,158 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e14]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+      - search [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e22]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e25]
+      - button "Copilot" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Copilot
+      - generic [ref=e31]:
+        - button "Cloud Shell" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "Notifications" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - button "Settings" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - button "Support + Troubleshooting" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+        - button "Feedback" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e50] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e51]':
+          - generic [ref=e52]:
+            - generic [ref=e53]: tamirdresher@microsoft.com
+            - generic [ref=e54]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e57]
+    - main [ref=e62]:
+      - generic [ref=e63]:
+        - navigation "Breadcrumb" [ref=e67]:
+          - navigation "Breadcrumb" [ref=e70]:
+            - list [ref=e71]:
+              - listitem [ref=e72] [cursor=pointer]:
+                - link "Home" [ref=e73]:
+                  - /url: "#home"
+        - generic [ref=e75]:
+          - region [ref=e76]:
+            - generic [ref=e82]:
+              - heading [level=2]
+              - generic [ref=e83]:
+                - button "More content actions" [ref=e85] [cursor=pointer]:
+                  - img [ref=e88]
+                - group "Chat suggestions from Copilot" [ref=e92]:
+                  - button "Chat suggestions from Copilot" [expanded] [ref=e94]:
+                    - img [ref=e97]
+                  - button "Loading prompts..." [ref=e99]:
+                    - progressbar [ref=e100]
+                - button "Close content 'undefined'" [ref=e102] [cursor=pointer]:
+                  - img [ref=e105]
+          - iframe [ref=e127]:
+            - generic [active] [ref=f8e1]:
+              - generic [ref=f8e10]:
+                - menubar [ref=f8e14]:
+                  - group [ref=f8e15]:
+                    - menuitem "Manage view" [ref=f8e16] [cursor=pointer]:
+                      - generic [ref=f8e17]:
+                        - generic [ref=f8e18]: 
+                        - generic [ref=f8e20]: Manage view
+                        - generic [ref=f8e21]: 
+                    - menuitem "Refresh" [ref=f8e22] [cursor=pointer]:
+                      - generic [ref=f8e23]:
+                        - generic [ref=f8e24]: 
+                        - generic [ref=f8e26]: Refresh
+                    - menuitem "Export to CSV" [ref=f8e27] [cursor=pointer]:
+                      - generic [ref=f8e28]:
+                        - generic [ref=f8e29]: 
+                        - generic [ref=f8e31]: Export to CSV
+                    - menuitem "Open query" [disabled] [ref=f8e32]:
+                      - generic [ref=f8e33]:
+                        - generic [ref=f8e34]: 
+                        - generic [ref=f8e36]: Open query
+                    - generic [ref=f8e37]:
+                      - separator
+                    - menuitem "Assign tags" [disabled] [ref=f8e38]:
+                      - generic [ref=f8e39]:
+                        - generic [ref=f8e40]: 
+                        - generic [ref=f8e42]: Assign tags
+                    - menuitem "Add to service group" [disabled] [ref=f8e43]:
+                      - generic [ref=f8e44]:
+                        - generic [ref=f8e45]: 
+                        - generic [ref=f8e47]: Add to service group
+                        - generic [ref=f8e48]: 
+                  - group [ref=f8e49]:
+                    - menuitem "Group by none" [ref=f8e50] [cursor=pointer]:
+                      - generic [ref=f8e51]:
+                        - generic [ref=f8e52]: 
+                        - generic [ref=f8e54]: Group by none
+                        - generic [ref=f8e55]: 
+                - generic [ref=f8e56]:
+                  - generic [ref=f8e59]:
+                    - generic [ref=f8e61]: 
+                    - searchbox "Filter for any field..." [ref=f8e62]
+                  - generic [ref=f8e63]:
+                    - grid [ref=f8e68]:
+                      - row "Select all rows" [ref=f8e69]:
+                        - columnheader "Select all rows" [ref=f8e70]:
+                          - checkbox "Select all rows" [ref=f8e72]:
+                            - generic [ref=f8e73]:
+                              - generic [ref=f8e74]: 
+                              - generic [ref=f8e75]: 
+                        - generic [ref=f8e76]: Select all rows
+                    - generic [ref=f8e86]:
+                      - status:
+                        - generic [ref=f8e87]: 0 results found
+                      - generic [ref=f8e88]:
+                        - generic [ref=f8e90]:
+                          - generic [ref=f8e91]: "Showing 1 - 0 of 0. Display count:"
+                          - combobox "Showing 1 - 0 of 0. Display count:" [ref=f8e93]:
+                            - generic [ref=f8e94] [cursor=pointer]: "100"
+                            - generic [ref=f8e95] [cursor=pointer]:
+                              - generic: 
+                        - generic [ref=f8e96]:
+                          - navigation "Pagination":
+                            - list
+                        - generic [ref=f8e99]:
+                          - img [ref=f8e101]
+                          - button "Give feedback" [ref=f8e103] [cursor=pointer]
+              - img
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is loading.
+      - generic: Microsoft Azure portal is ready.
+    - generic:
+      - generic: Content is loading.
+  - img [ref=e128]
+  - img [ref=e129]
+  - img [ref=e130]
+  - img [ref=e131]
+  - img [ref=e132]
+  - img [ref=e133]
+  - img [ref=e134]
+  - img [ref=e135]
+  - img [ref=e136]
+  - img [ref=e137]
+  - img [ref=e138]
+  - img [ref=e139]
+  - img [ref=e140]
+  - img [ref=e141]
+  - img [ref=e142]
+  - img [ref=e143]
+  - img [ref=e144]
+  - img [ref=e145]
+  - img [ref=e146]
+  - img [ref=e147]
+  - img [ref=e148]
+  - img [ref=e149]
+  - img [ref=e150]

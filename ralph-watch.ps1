@@ -607,6 +607,22 @@ while ($true) {
             Write-Host "[$timestamp] Repository updated successfully" -ForegroundColor Green
         } else {
             Write-Host "[$timestamp] Warning: git pull failed: $pullResult" -ForegroundColor Yellow
+            # Auto-resolve merge conflicts by accepting theirs (remote wins)
+            $unmerged = git diff --name-only --diff-filter=U 2>$null
+            if ($unmerged) {
+                Write-Host "[$timestamp] Auto-resolving merge conflicts (accepting theirs)..." -ForegroundColor Yellow
+                foreach ($file in $unmerged) {
+                    git checkout --theirs $file 2>$null
+                    git add $file 2>$null
+                    Write-Host "[$timestamp]   Resolved: $file" -ForegroundColor DarkYellow
+                }
+                git commit -m "auto-resolve merge conflict [ralph-watch]" 2>$null
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "[$timestamp] Merge conflicts resolved and committed" -ForegroundColor Green
+                } else {
+                    Write-Host "[$timestamp] Warning: Could not commit merge resolution" -ForegroundColor Yellow
+                }
+            }
         }
         
         # Restore stashed changes if any

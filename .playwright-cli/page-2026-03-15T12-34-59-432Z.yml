@@ -1,0 +1,81 @@
+- generic [ref=e1]:
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e11] [cursor=pointer]':
+    - img [ref=e13]
+    - img [ref=e19]
+  - main [ref=e21]:
+    - generic:
+      - button "Main menu" [ref=e23] [cursor=pointer]:
+        - img [ref=e24]: menu
+      - button "New chat" [ref=e64] [cursor=pointer]:
+        - generic [ref=e66]: Gemini
+    - generic [ref=e69]:
+      - link "Upgrade to Google AI Pro" [ref=e187]:
+        - img [ref=e188]: spark
+        - generic [ref=e190]: Upgrade to Google AI Pro
+      - button "Open menu for conversation actions." [ref=e194] [cursor=pointer]:
+        - img [ref=e195]: more_vert
+    - generic [ref=e28]:
+      - navigation [ref=e29]:
+        - generic [ref=e33]:
+          - group [ref=e34]:
+            - link "New chat" [ref=e36] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e39]: edit_square
+          - group [ref=e42]:
+            - button "Settings & help" [ref=e44] [cursor=pointer]:
+              - img [ref=e47]: settings_2
+      - generic [ref=e56]:
+        - generic [ref=e81]:
+          - heading "Conversation with Gemini" [level=1] [ref=e82]
+          - generic [ref=e198]:
+            - generic [ref=e203]:
+              - button "Copy prompt" [ref=e205] [cursor=pointer]:
+                - img [ref=e206]: content_copy
+              - generic [ref=e209]:
+                - button "Edit" [disabled]:
+                  - img: edit
+              - generic [ref=e211]:
+                - 'heading "You said Generate an image: A dramatic comic-book style split panel illustration. LEFT PANEL labeled BEFORE: A stressed developer with literal flames coming from their hair, drowning in a tsunami of floating Jira tickets, Slack notifications, pull request reviews, email alerts, and calendar invites. Their desk has 6 monitors all showing red alerts. Coffee is spilling. Clock shows 2 AM. Chaotic warm red and orange lighting. RIGHT PANEL labeled AFTER: The same developer relaxed in a comfortable chair, feet up, sipping coffee with a smile. Behind them, 7 friendly glowing AI agents like helpful spirits are autonomously handling all the work, one writing code, one reviewing PRs, one scanning security, one updating docs, one monitoring systems. Cool calm blue and green lighting. Clock shows 9 AM. The contrast is comedic and aspirational." [level=2] [ref=e212]':
+                  - generic [ref=e213]: You said
+                  - paragraph [ref=e214]: "Generate an image: A dramatic comic-book style split panel illustration. LEFT PANEL labeled BEFORE: A stressed developer with literal flames coming from their hair, drowning in a tsunami of floating Jira tickets, Slack notifications, pull request reviews, email alerts, and calendar invites. Their desk has 6 monitors all showing red alerts. Coffee is spilling. Clock shows 2 AM. Chaotic warm red and orange lighting. RIGHT PANEL labeled AFTER: The same developer relaxed in a comfortable chair, feet up, sipping coffee with a smile. Behind them, 7 friendly glowing AI agents like helpful spirits are autonomously handling all the work, one writing code, one reviewing PRs, one scanning security, one updating docs, one monitoring systems. Cool calm blue and green lighting. Clock shows 9 AM. The contrast is comedic and aspirational."
+                - button "Expand" [ref=e215] [cursor=pointer]:
+                  - img [ref=e216]: expand_more
+            - generic [ref=e223]:
+              - generic [ref=e226]:
+                - generic [ref=e228]:
+                  - generic:
+                    - generic:
+                      - img
+                - generic:
+                  - img
+              - generic [ref=e229]:
+                - generic [ref=e232]:
+                  - button "Loading Nano Banana 2...":
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Loading Nano Banana 2...
+                - heading "Gemini said" [level=2] [ref=e233]
+        - generic [ref=e58]:
+          - group [ref=e128]:
+            - generic [ref=e131]:
+              - textbox "Enter a prompt for Gemini" [active] [ref=e136]:
+                - text: Ask Gemini 3
+                - paragraph [ref=e234]
+              - generic [ref=e138]:
+                - button "Open upload file menu" [ref=e143] [cursor=pointer]:
+                  - img [ref=e144]: add_2
+                - button "Tools" [ref=e150]:
+                  - img [ref=e151]: page_info
+                  - generic [ref=e154]: Tools
+              - generic [ref=e157]:
+                - button "Open mode picker" [ref=e160]:
+                  - generic [ref=e162]:
+                    - generic [ref=e163]: Fast
+                    - img [ref=e164]: keyboard_arrow_down
+                - generic [ref=e167]:
+                  - text: mic
+                  - button "Stop response" [ref=e235] [cursor=pointer]:
+                    - text: send
+                    - img [ref=e237]: stop
+          - paragraph [ref=e238]: Gemini is AI and can make mistakes.

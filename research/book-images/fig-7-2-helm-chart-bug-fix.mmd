@@ -1,0 +1,25 @@
+graph TD
+    A["🎖️ Issue Filed<br/>Update Helm chart for new CRD schema"] --> B["⚙️ B Elanna<br/>AI Infrastructure"]
+    
+    B --> B1["PR #XXX Opened<br/>Helm chart updated"]
+    
+    B1 --> C["👤 Brady Reviews<br/>Architect/Domain Expert"]
+    
+    C -->|Issue 1| C1["❌ Missing migration path<br/>for existing resources<br/>B Elanna did not know<br/>we had existing state"]
+    
+    C -->|Issue 2| C2["❌ Hardcoded namespace<br/>breaks multi-tenant mode<br/>B Elanna did not know<br/>multi-tenant requirement"]
+    
+    C -->|Issue 3| C3["❌ Timing issue in<br/>resource creation<br/>Brady caught edge case<br/>from 3 months ago"]
+    
+    C1 --> LEARN["🧠 Learning Opportunity"]
+    C2 --> LEARN
+    C3 --> LEARN
+    
+    LEARN --> FIX["Update decisions.md<br/>Document context<br/>AI learns for next time"]
+    
+    style B fill:#fff9c4,color:#333
+    style C fill:#c8e6c9,color:#333
+    style C1 fill:#ffcdd2,color:#333
+    style C2 fill:#ffcdd2,color:#333
+    style C3 fill:#ffcdd2,color:#333
+    style FIX fill:#c8e6c9,color:#333

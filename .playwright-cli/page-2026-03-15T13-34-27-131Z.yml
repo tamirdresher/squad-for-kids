@@ -1,0 +1,49 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e14]:
+        - img [ref=e17]
+        - generic [ref=e19]:
+          - heading "Reset your password" [level=1] [ref=e20]
+          - paragraph [ref=e21]: Enter your user account's verified email address and we will send you a password reset link.
+      - generic [ref=e24]:
+        - generic [ref=e25]: Email
+        - textbox "Email" [active] [ref=e26]:
+          - /placeholder: Enter your email address
+          - text: yonatandra@pte.org.il
+        - generic [ref=e27]:
+          - heading "Verify your account" [level=2] [ref=e28]
+          - iframe [ref=e51]:
+            - iframe [ref=f4e4]:
+              - iframe [ref=f5e5]:
+                - generic [ref=f6e3]:
+                  - generic [ref=f6e4]:
+                    - img [ref=f6e5]
+                    - paragraph [ref=f6e6]: Please solve this puzzle so we know you are a real person
+                    - button "Verify" [ref=f6e7] [cursor=pointer]
+                  - button "Audio" [ref=f6e9] [cursor=pointer]:
+                    - paragraph [ref=f6e10]: Audio
+        - button "Send password reset email" [disabled] [ref=e32]
+  - contentinfo [ref=e33]:
+    - list [ref=e34]:
+      - listitem [ref=e35]:
+        - link "Terms" [ref=e36] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+      - listitem [ref=e37]:
+        - link "Privacy" [ref=e38] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+      - listitem [ref=e39]:
+        - link "Docs" [ref=e40] [cursor=pointer]:
+          - /url: https://docs.github.com
+      - listitem [ref=e41]:
+        - link "Contact GitHub Support" [ref=e42] [cursor=pointer]:
+          - /url: https://support.github.com
+      - listitem [ref=e43]:
+        - button "Manage cookies" [ref=e45] [cursor=pointer]
+      - listitem [ref=e46]:
+        - button "Do not share my personal information" [ref=e48] [cursor=pointer]

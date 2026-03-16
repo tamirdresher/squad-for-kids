@@ -1,0 +1,26 @@
+graph TD
+    A["🎖️ Squad Leads"]
+    
+    A --> H1["👤 Brady<br/>Human Architect"]
+    A --> H2["👤 Worf<br/>Human Security"]
+    A --> H3["👤 B Elanna<br/>Human Infrastructure"]
+    
+    H1 --> A1["🎖️ Picard<br/>AI Orchestrator"]
+    H1 --> A2["💻 Data<br/>AI Code Expert"]
+    
+    H2 --> A3["🛡️ Worf<br/>AI Security"]
+    
+    H3 --> A4["⚙️ B Elanna<br/>AI Infrastructure"]
+    
+    A1 -.->|Assistant to| H1
+    A2 -.->|Executes for| H1
+    A3 -.->|Scans and reports to| H2
+    A4 -.->|Deploys per spec from| H3
+    
+    style H1 fill:#c8e6c9,color:#333
+    style H2 fill:#c8e6c9,color:#333
+    style H3 fill:#c8e6c9,color:#333
+    style A1 fill:#fff9c4,color:#333
+    style A2 fill:#e3f2fd,color:#333
+    style A3 fill:#fce4ec,color:#333
+    style A4 fill:#fff3e0,color:#333

@@ -1,0 +1,136 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Skip to main content"
+    - banner "Microsoft Azure" [ref=e3]:
+      - button "Show Microsoft Cloud menu" [ref=e5] [cursor=pointer]:
+        - img [ref=e7]
+      - button "Show portal menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+      - heading "Microsoft Azure" [level=1] [ref=e12]:
+        - link "Microsoft Azure" [ref=e13] [cursor=pointer]:
+          - /url: "#home"
+          - generic [ref=e14]: Microsoft Azure (Preview)
+      - button "Report a bug" [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+      - search [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e22]
+          - textbox "Search resources, services, and docs (G+/)" [ref=e25]
+      - button "Copilot" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Copilot
+      - generic [ref=e31]:
+        - button "Cloud Shell" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "Notifications" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - button "Settings" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - button "Support + Troubleshooting" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+        - button "Feedback" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+      - alert "Pop-up notification survey. Give feedback to Microsoft. From top of page, continue to tab until you hear How satisfied or dissatisfied are you with ms.portal.azure.com?." [ref=e49]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: Give feedback to Microsoft
+          - group [ref=e53]: How satisfied or dissatisfied are you with ms.portal.azure.com? *
+        - button "Dismiss toast notification" [ref=e54] [cursor=pointer]:
+          - img [ref=e55]
+      - button "Account menu Currently signed in as tamirdresher@microsoft.com, under Microsoft (microsoft.onmicrosoft.com) tenant" [ref=e58] [cursor=pointer]:
+        - 'generic "Name: Tamir Dresher Email: tamirdresher@microsoft.com Directory: Microsoft (72f988bf-86f1-41af-91ab-2d7cd011db47) Domain: microsoft.onmicrosoft.com Your sign in used multifactor authentication." [ref=e59]':
+          - generic [ref=e60]:
+            - generic [ref=e61]: tamirdresher@microsoft.com
+            - generic [ref=e62]: Microsoft (microsoft.onmicrosoft.com)
+          - img [ref=e65]
+    - main [ref=e70]:
+      - generic [ref=e71]:
+        - navigation "Breadcrumb" [ref=e75]:
+          - navigation "Breadcrumb" [ref=e78]:
+            - list [ref=e79]:
+              - listitem [ref=e80] [cursor=pointer]:
+                - link "Home" [ref=e81]:
+                  - /url: "#home"
+        - region "Resource not found" [ref=e84]:
+          - generic "Resource not found" [ref=e87]:
+            - generic [ref=e90]:
+              - heading "Resource not found" [level=2] [ref=e91]: Resource not found
+              - generic [ref=e92]:
+                - button "More content actions" [ref=e94] [cursor=pointer]:
+                  - img [ref=e97]
+                - button "Close content 'Resource not found'" [ref=e100] [cursor=pointer]:
+                  - img [ref=e103]
+          - generic [ref=e112]:
+            - img [ref=e115]
+            - generic [ref=e117]: Resource not found
+            - toolbar [ref=e119]:
+              - button "Leave preview" [active] [ref=e120] [cursor=pointer]:
+                - img [ref=e122]
+                - generic [ref=e124]: Leave preview
+              - button "Get support" [ref=e125] [cursor=pointer]:
+                - img [ref=e127]
+                - generic [ref=e129]: Get support
+              - button "Perform self-diagnostics" [ref=e130] [cursor=pointer]:
+                - img [ref=e132]
+                - generic [ref=e134]: Perform self-diagnostics
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - heading "Summary" [level=4] [ref=e137]
+                - button "Copy to clipboard the value for Copy error summary to clipboard" [ref=e142] [cursor=pointer]:
+                  - img [ref=e144]
+              - list [ref=e146]:
+                - listitem [ref=e147]:
+                  - text: Session ID
+                  - generic [ref=e148]: 7e64923cd0c546c4b7d3a2a0854def8e
+                - listitem [ref=e149]:
+                  - text: Resource ID
+                  - generic [ref=e150]: Not available
+                - listitem [ref=e151]:
+                  - text: Extension
+                  - generic [ref=e152]: HubsExtension
+                - listitem [ref=e153]:
+                  - text: Content
+                  - generic [ref=e154]: NotFoundAssetBlade
+                - listitem [ref=e155]:
+                  - text: Error code
+                  - generic [ref=e156]: "404"
+              - generic [ref=e157]:
+                - text: Details
+                - generic [ref=e158]:
+                  - text: The resource was not found, it may have been deleted. If this was launched from a pinned tile on the dashboard, it should be removed.
+                  - text: "Resource ID: /subscriptions/dde02a76-d4a5-4468-8826-d9ff2f8e7c9e/resourceGroups/tamirdev/providers/Microsoft.Web/sites/tam-research-website"
+                  - text: "Status Code: 404"
+                  - text: "Status Message: unavailable"
+  - generic:
+    - generic:
+      - generic: Microsoft Azure portal is loading.
+      - generic: Microsoft Azure portal is ready.
+    - generic:
+      - generic: Content is loading.
+      - generic: Content is ready.
+  - img [ref=e159]
+  - img [ref=e160]
+  - img [ref=e161]
+  - img [ref=e162]
+  - img [ref=e163]
+  - img [ref=e164]
+  - img [ref=e165]
+  - img [ref=e166]
+  - img [ref=e167]
+  - img [ref=e168]
+  - img [ref=e169]
+  - img [ref=e170]
+  - img [ref=e171]
+  - img [ref=e172]
+  - img [ref=e173]
+  - img [ref=e174]
+  - img [ref=e175]
+  - img [ref=e176]
+  - img [ref=e177]
+  - img [ref=e178]
+  - img [ref=e179]
+  - img [ref=e180]
+  - img [ref=e181]
+  - img [ref=e182]
+  - img [ref=e183]
+  - img [ref=e184]
+  - img [ref=e185]

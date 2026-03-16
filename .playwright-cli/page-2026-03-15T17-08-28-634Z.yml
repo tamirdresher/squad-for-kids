@@ -1,0 +1,27 @@
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - img "CJ Affiliate" [ref=e7]
+        - heading "Welcome" [level=1] [ref=e8]
+        - paragraph [ref=e10]: Log in to continue to the CJ Platform.
+      - generic [ref=e11]:
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - generic [ref=e18]:
+              - generic [ref=e19]: Email address *
+              - textbox "Email address" [active] [ref=e20]
+            - button "Continue" [ref=e22] [cursor=pointer]
+          - generic [ref=e25]:
+            - text: Don't have an account?
+            - link "Sign up here." [ref=e26] [cursor=pointer]:
+              - /url: https://www.cj.com/join
+        - paragraph [ref=e28]:
+          - link [ref=e29] [cursor=pointer]:
+            - /url: /u/signup/identifier?state=hKFo2SBlZHF6WC1mcFZ0S3RESTBrUDJwSzA4Yy1LSDQ1d1FGRKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEl2ZDRORWx3cTRGSUFxOE9pcXVuSk5HeXI4RjJqQlNao2NpZNkgcXBYNjlzbng3WFNjSUJMcDg1ZTVieEI5QWpEcU5qcGM
+    - generic [ref=e30]:
+      - link "Privacy Policy" [ref=e32] [cursor=pointer]:
+        - /url: "https://www.cj.com/legal/privacy "
+      - link "Support Center" [ref=e34] [cursor=pointer]:
+        - /url: http://www.cj.com/support-center
+      - generic [ref=e36]: © 2026 Commission Junction LLC

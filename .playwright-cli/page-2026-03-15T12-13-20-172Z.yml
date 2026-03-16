@@ -1,0 +1,69 @@
+- generic [ref=e1]:
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e11] [cursor=pointer]':
+    - img [ref=e13]
+    - img [ref=e19]
+  - main [ref=e21]:
+    - generic:
+      - button "Main menu" [ref=e34] [cursor=pointer]:
+        - img [ref=e35]: menu
+      - button "New chat" [disabled] [ref=e39]:
+        - generic [ref=e41]: Gemini
+    - generic [ref=e43]:
+      - button "Temporary chat" [ref=e46] [cursor=pointer]:
+        - img [ref=e48]
+      - generic [ref=e52]:
+        - button "PLUS" [disabled]:
+          - generic: PLUS
+    - generic [ref=e26]:
+      - navigation [ref=e53]:
+        - generic [ref=e57]:
+          - group [ref=e58]:
+            - link "New chat" [ref=e60] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e63]: edit_square
+          - group [ref=e66]:
+            - button "Settings & help" [ref=e68] [cursor=pointer]:
+              - img [ref=e71]: settings_2
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - heading "Conversation with Gemini" [level=1] [ref=e77]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - generic "user greeting" [ref=e88]:
+                - generic [ref=e89]: Hi tamir
+              - heading "Where should we start?" [level=1] [ref=e96]
+            - generic [ref=e104]:
+              - button "🖼️ Create image, button, tap to use tool" [ref=e106] [cursor=pointer]:
+                - generic [ref=e107]: 🖼️ Create image
+              - button "🎸 Create music, button, tap to use tool" [ref=e109] [cursor=pointer]:
+                - generic [ref=e110]: 🎸 Create music
+              - button "Create video, button, tap to use tool" [ref=e112] [cursor=pointer]:
+                - generic [ref=e113]: Create video
+              - button "Boost my day, button, tap to use tool" [ref=e115] [cursor=pointer]:
+                - generic [ref=e116]: Boost my day
+              - button "Help me learn, button, tap to use tool" [ref=e118] [cursor=pointer]:
+                - generic [ref=e119]: Help me learn
+              - button "Write anything, button, tap to use tool" [ref=e121] [cursor=pointer]:
+                - generic [ref=e122]: Write anything
+        - generic [ref=e123]:
+          - group [ref=e124]:
+            - generic [ref=e127]:
+              - textbox "Enter a prompt for Gemini" [active] [ref=e132]:
+                - text: Ask Gemini 3
+                - paragraph [ref=e133]
+              - generic [ref=e134]:
+                - button "Open upload file menu" [ref=e139] [cursor=pointer]:
+                  - img [ref=e140]: add_2
+                - button "Tools" [ref=e146]:
+                  - img [ref=e147]: page_info
+                  - generic [ref=e150]: Tools
+              - generic [ref=e153]:
+                - button "Open mode picker" [ref=e156]:
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: Fast
+                    - img [ref=e160]: keyboard_arrow_down
+                - generic [ref=e163]:
+                  - button "Microphone" [ref=e166] [cursor=pointer]:
+                    - img [ref=e168]: mic
+                  - text: send
+          - paragraph [ref=e173]

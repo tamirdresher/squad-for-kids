@@ -1,0 +1,31 @@
+graph TD
+    subgraph week1["WEEK 1: Observation Mode"]
+        W1A["AI Squad Reads<br/>Code patterns<br/>Docs<br/>History"]
+        W1B["AI Squad Analyzes<br/>Test coverage gaps<br/>Security issues<br/>Documentation drift"]
+        W1C["AI Squad Reports<br/>Edge cases found<br/>Vulnerable deps<br/>Out-of-sync docs"]
+        W1D["Human Review<br/>✓ Impressed"]
+        W1A --> W1B --> W1C --> W1D
+    end
+    
+    subgraph week2["WEEK 2: Drafts and Suggestions"]
+        W2A["AI Opens PRs<br/>Marked WIP/Draft"]
+        W2B["AI Explains Work<br/>References decisions.md<br/>Follows conventions"]
+        W2C["Human Reviews<br/>3-5 rounds typical"]
+        W2D["AI Learns<br/>Updates decisions.md<br/>Refines patterns"]
+        W2E["Trust Growing<br/>✓ Ready for autonomy"]
+        W2A --> W2B --> W2C --> W2D --> W2E
+    end
+    
+    subgraph week3["WEEK 3: Autonomy"]
+        W3A["AI Knows Patterns<br/>Follows conventions<br/>Predicts human feedback"]
+        W3B["PRs Need Minimal Review<br/>0-1 rounds typical"]
+        W3C["Auto-Merge Ready<br/>meets criteria<br/>decision documented"]
+        W3D["Full Trust Achieved<br/>✓ Squad integrated"]
+        W3A --> W3B --> W3C --> W3D
+    end
+    
+    week1 --> week2 --> week3
+    
+    style W1D fill:#fff9c4,color:#333
+    style W2E fill:#fff9c4,color:#333
+    style W3D fill:#c8e6c9,color:#333

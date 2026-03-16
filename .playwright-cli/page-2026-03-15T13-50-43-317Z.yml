@@ -1,0 +1,305 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner "Global Navigation Menu" [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - button "Open menu" [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+          - link "Homepage (g then d)" [ref=e15] [cursor=pointer]:
+            - /url: /
+            - img [ref=e16]
+        - generic [ref=e18]:
+          - navigation "Breadcrumbs" [ref=e19]:
+            - list [ref=e20]:
+              - listitem [ref=e21]:
+                - link "Dashboard" [ref=e22] [cursor=pointer]:
+                  - /url: https://github.com/
+                  - generic [ref=e23]: Dashboard
+          - button "Search or jump to…" [ref=e26] [cursor=pointer]:
+            - generic [ref=e27]:
+              - generic:
+                - img
+              - generic [ref=e28]:
+                - generic:
+                  - text: Type
+                  - generic: /
+                  - text: to search
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e32]:
+              - link "Chat with Copilot" [ref=e34] [cursor=pointer]:
+                - /url: /copilot
+                - img [ref=e35]
+              - button "Open Copilot…" [ref=e39] [cursor=pointer]:
+                - generic:
+                  - img
+            - button "Create new..." [ref=e41] [cursor=pointer]:
+              - generic [ref=e42]:
+                - generic:
+                  - img
+              - generic:
+                - img
+            - link "Issues (g then i)" [ref=e43] [cursor=pointer]:
+              - /url: /issues
+              - img [ref=e44]
+            - link "Pull requests (g then p)" [ref=e47] [cursor=pointer]:
+              - /url: /pulls
+              - img [ref=e48]
+            - link "Repositories" [ref=e50] [cursor=pointer]:
+              - /url: /repos
+              - img [ref=e51]
+          - link "You have no unread notifications (g then n)" [ref=e53] [cursor=pointer]:
+            - /url: /notifications
+            - img [ref=e54]
+          - button "Open user navigation menu" [ref=e57] [cursor=pointer]:
+            - img "User avatar" [ref=e58]
+  - generic [ref=e62]:
+    - complementary "Account" [ref=e63]:
+      - navigation "Repositories" [ref=e70]:
+        - generic [ref=e71]:
+          - heading "Create your first project" [level=2] [ref=e72]
+          - paragraph [ref=e73]: Ready to start building? Create a repository for a new idea or bring over an existing repository to keep contributing to it.
+          - generic [ref=e74]:
+            - link "Create repository" [ref=e75] [cursor=pointer]:
+              - /url: /new
+            - link "Import repository" [ref=e76] [cursor=pointer]:
+              - /url: /new/import
+    - generic [ref=e80]:
+      - main [ref=e81]:
+        - generic [ref=e83]:
+          - heading "Dashboard" [level=1] [ref=e84]
+          - heading "Home" [level=2] [ref=e86]
+          - generic [ref=e87]:
+            - generic [ref=e91]:
+              - generic [ref=e95]:
+                - textbox "Ask anything" [ref=e98]
+                - generic [ref=e99]:
+                  - button "Ask" [ref=e102] [cursor=pointer]:
+                    - generic [ref=e103]:
+                      - generic:
+                        - img
+                      - generic [ref=e104]: Ask
+                    - generic:
+                      - img
+                  - generic [ref=e105]:
+                    - button "Select repositories to attach to conversation" [ref=e106] [cursor=pointer]:
+                      - generic [ref=e107]:
+                        - generic:
+                          - img
+                        - generic "All repositories" [ref=e109]
+                      - generic:
+                        - img
+                    - button "Add files, and spaces" [ref=e110] [cursor=pointer]:
+                      - img [ref=e111]
+                  - button "Send now (enter)" [ref=e115] [cursor=pointer]:
+                    - img [ref=e116]
+              - heading "Chat Commands" [level=2] [ref=e118]
+              - list [ref=e120]:
+                - listitem [ref=e121]:
+                  - button "Agent" [ref=e122] [cursor=pointer]:
+                    - img [ref=e123]
+                    - generic [ref=e126]: Agent
+                - listitem [ref=e127]:
+                  - button "Create issue" [ref=e128] [cursor=pointer]:
+                    - img [ref=e129]
+                    - generic [ref=e131]: Create issue
+                - listitem [ref=e132]:
+                  - button "Write code" [ref=e133] [cursor=pointer]:
+                    - img [ref=e136]
+                    - generic [ref=e138]:
+                      - text: Write code
+                      - img [ref=e140]
+                - listitem [ref=e142]:
+                  - button "Git" [ref=e143] [cursor=pointer]:
+                    - img [ref=e146]
+                    - generic [ref=e148]:
+                      - text: Git
+                      - img [ref=e150]
+                - listitem [ref=e152]:
+                  - button "Pull requests" [ref=e153] [cursor=pointer]:
+                    - img [ref=e156]
+                    - generic [ref=e158]:
+                      - text: Pull requests
+                      - img [ref=e160]
+            - generic [ref=e164]:
+              - region "GitHub for beginners on YouTube" [ref=e165]:
+                - generic [ref=e166]:
+                  - generic [ref=e167]:
+                    - generic [ref=e168]:
+                      - generic [ref=e169]: Playlist
+                      - heading "GitHub for beginners on YouTube" [level=3] [ref=e170]
+                      - paragraph [ref=e171]: Designed to help you master the basics of GitHub, whether you're new to coding or looking to enhance your version control skills.
+                      - link "GitHub for beginners on YouTube - Start playlist" [ref=e172] [cursor=pointer]:
+                        - /url: https://www.youtube.com/watch?v=r8jQ9hVA2qs&list=PL0lo9MOBetEFcp4SCWinBdpml9B2U25-f
+                        - generic [ref=e173]:
+                          - generic:
+                            - img
+                          - generic [ref=e174]: Start playlist
+                    - link "Watch video" [ref=e175] [cursor=pointer]:
+                      - /url: https://www.youtube.com/watch?v=r8jQ9hVA2qs&list=PL0lo9MOBetEFcp4SCWinBdpml9B2U25-f
+                      - img "Video thumbnail" [ref=e176]
+                      - img [ref=e178]
+                  - img "Pattern" [ref=e181]
+                  - button "Dismiss" [ref=e303] [cursor=pointer]:
+                    - img [ref=e304]
+              - region "Getting started" [ref=e306]:
+                - generic [ref=e307]:
+                  - generic [ref=e308]:
+                    - heading "Getting started" [level=2] [ref=e309]
+                    - generic [ref=e310]:
+                      - generic [ref=e312]: 0/3 complete
+                      - button "Remove section" [ref=e313] [cursor=pointer]:
+                        - img [ref=e314]
+                  - list [ref=e316]:
+                    - listitem [ref=e317]:
+                      - button "Create your first code project" [expanded] [ref=e318] [cursor=pointer]:
+                        - img [ref=e320]
+                        - heading "Create your first code project" [level=3] [ref=e322]
+                      - region "Create your first code project" [ref=e323]:
+                        - generic [ref=e324]: Create a project on GitHub. It’s your own space to experiment, learn, and share code with the world.
+                        - link "Create project" [ref=e325] [cursor=pointer]:
+                          - /url: /new
+                          - generic [ref=e327]: Create project
+                    - listitem [ref=e328]:
+                      - button "Start a Copilot chat" [ref=e329] [cursor=pointer]:
+                        - img [ref=e331]
+                        - heading "Start a Copilot chat" [level=3] [ref=e333]
+                      - generic [ref=e334]: Ask Copilot questions about coding or GitHub and get instant help with your first project.
+                      - button [ref=e335] [cursor=pointer]:
+                        - generic [ref=e337]: Start chat
+                    - listitem [ref=e338]:
+                      - button "Complete your profile" [ref=e339] [cursor=pointer]:
+                        - img [ref=e341]
+                        - heading "Complete your profile" [level=3] [ref=e343]
+                      - generic [ref=e344]: Add a bio, upload an avatar, and personalize your details — building your social coding presence and connecting with others.
+                      - link [ref=e345] [cursor=pointer]:
+                        - /url: /settings/profile
+                        - generic [ref=e347]: Complete profile
+              - region "Start with GitHub Docs" [ref=e348]:
+                - generic [ref=e349]:
+                  - generic [ref=e350]:
+                    - heading "Start with GitHub Docs" [level=2] [ref=e351]
+                    - button "Remove section" [ref=e352] [cursor=pointer]:
+                      - img [ref=e353]
+                  - list [ref=e355]:
+                    - listitem [ref=e356]:
+                      - link "GitHub Documentation Help for wherever you are on your journey" [ref=e357] [cursor=pointer]:
+                        - /url: https://docs.github.com/
+                        - img [ref=e358]
+                        - generic [ref=e360]:
+                          - generic [ref=e361]: GitHub Documentation
+                          - generic [ref=e362]: Help for wherever you are on your journey
+                    - listitem [ref=e363]:
+                      - link "About GitHub and Git Read · Est. 2m" [ref=e364] [cursor=pointer]:
+                        - /url: https://docs.github.com/en/get-started/start-your-journey/about-github-and-git
+                        - img [ref=e365]
+                        - generic [ref=e367]:
+                          - generic [ref=e368]: About GitHub and Git
+                          - generic [ref=e369]: Read · Est. 2m
+                    - listitem [ref=e370]:
+                      - link "How to create your first repository Read · Est. 5m" [ref=e371] [cursor=pointer]:
+                        - /url: https://docs.github.com/repositories/creating-and-managing-repositories/quickstart-for-repositories
+                        - img [ref=e372]
+                        - generic [ref=e374]:
+                          - generic [ref=e375]: How to create your first repository
+                          - generic [ref=e376]: Read · Est. 5m
+                    - listitem [ref=e377]:
+                      - link "Creating a pull request Read · Est. 6m" [ref=e378] [cursor=pointer]:
+                        - /url: https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
+                        - img [ref=e379]
+                        - generic [ref=e381]:
+                          - generic [ref=e382]: Creating a pull request
+                          - generic [ref=e383]: Read · Est. 6m
+                    - listitem [ref=e384]:
+                      - link "What is GitHub Copilot? Read · Est. 6m" [ref=e385] [cursor=pointer]:
+                        - /url: https://docs.github.com/copilot/about-github-copilot/what-is-github-copilot
+                        - img [ref=e386]
+                        - generic [ref=e388]:
+                          - generic [ref=e389]: What is GitHub Copilot?
+                          - generic [ref=e390]: Read · Est. 6m
+                    - listitem [ref=e391]:
+                      - link "GitHub flow Read · Est. 4m" [ref=e392] [cursor=pointer]:
+                        - /url: https://docs.github.com/get-started/using-github/github-flow
+                        - img [ref=e393]
+                        - generic [ref=e395]:
+                          - generic [ref=e396]: GitHub flow
+                          - generic [ref=e397]: Read · Est. 4m
+                    - listitem [ref=e398]:
+                      - link "Hello World exercise Read · Est. 6m" [ref=e399] [cursor=pointer]:
+                        - /url: https://docs.github.com/get-started/start-your-journey/hello-world
+                        - img [ref=e400]
+                        - generic [ref=e402]:
+                          - generic [ref=e403]: Hello World exercise
+                          - generic [ref=e404]: Read · Est. 6m
+                    - listitem [ref=e405]:
+                      - link "Copilot Chat Cookbook Read · Est. 2m" [ref=e406] [cursor=pointer]:
+                        - /url: https://docs.github.com/copilot/copilot-chat-cookbook
+                        - img [ref=e407]
+                        - generic [ref=e409]:
+                          - generic [ref=e410]: Copilot Chat Cookbook
+                          - generic [ref=e411]: Read · Est. 2m
+              - region "Recommendations" [ref=e412]:
+                - generic [ref=e413]:
+                  - generic [ref=e414]:
+                    - heading "Recommendations" [level=2] [ref=e415]
+                    - button "Remove section" [ref=e416] [cursor=pointer]:
+                      - img [ref=e417]
+                  - generic [ref=e419]:
+                    - img "Download Visual Studio with Copilot" [ref=e420]
+                    - generic [ref=e421]:
+                      - heading "Download Visual Studio with Copilot" [level=3] [ref=e422]
+                      - paragraph [ref=e423]: Chat with Copilot to build your first website, troubleshoot your code, or guide you through your GitHub journey.
+                      - link "Download Visual Studio with Copilot" [ref=e424] [cursor=pointer]:
+                        - /url: https://code.visualstudio.com/download
+                        - generic [ref=e426]: Download
+                    - button "Dismiss" [ref=e427] [cursor=pointer]:
+                      - img [ref=e428]
+                  - generic [ref=e430]:
+                    - img "Download GitHub for Desktop" [ref=e431]
+                    - generic [ref=e432]:
+                      - heading "Download GitHub for Desktop" [level=3] [ref=e433]
+                      - paragraph [ref=e434]: GitHub Desktop simplifies Git workflows and brings core GitHub features to your desktop, helping developers of all levels focus on building and collaborating effectively.
+                      - link "Download GitHub for Desktop" [ref=e435] [cursor=pointer]:
+                        - /url: https://desktop.github.com/
+                        - generic [ref=e437]: Download
+                    - button "Dismiss" [ref=e438] [cursor=pointer]:
+                      - img [ref=e439]
+      - contentinfo [ref=e441]:
+        - heading "Footer" [level=2] [ref=e442]
+        - generic [ref=e443]:
+          - generic [ref=e444]:
+            - link "GitHub Homepage" [ref=e445] [cursor=pointer]:
+              - /url: https://github.com
+              - img [ref=e446]
+            - generic [ref=e448]: © 2026 GitHub, Inc.
+          - navigation "Footer" [ref=e449]:
+            - heading "Footer navigation" [level=3] [ref=e450]
+            - list "Footer navigation" [ref=e451]:
+              - listitem [ref=e452]:
+                - link "Terms" [ref=e453] [cursor=pointer]:
+                  - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+              - listitem [ref=e454]:
+                - link "Privacy" [ref=e455] [cursor=pointer]:
+                  - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+              - listitem [ref=e456]:
+                - link "Security" [ref=e457] [cursor=pointer]:
+                  - /url: https://github.com/security
+              - listitem [ref=e458]:
+                - link "Status" [ref=e459] [cursor=pointer]:
+                  - /url: https://www.githubstatus.com/
+              - listitem [ref=e460]:
+                - link "Community" [ref=e461] [cursor=pointer]:
+                  - /url: https://github.community/
+              - listitem [ref=e462]:
+                - link "Docs" [ref=e463] [cursor=pointer]:
+                  - /url: https://docs.github.com/
+              - listitem [ref=e464]:
+                - link "Contact" [ref=e465] [cursor=pointer]:
+                  - /url: https://support.github.com?tags=dotcom-footer
+              - listitem [ref=e466]:
+                - button "Manage cookies" [ref=e468] [cursor=pointer]
+              - listitem [ref=e469]:
+                - button "Do not share my personal information" [ref=e471] [cursor=pointer]

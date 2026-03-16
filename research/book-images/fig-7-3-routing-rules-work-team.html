@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+table { width: 100%; border-collapse: collapse; border: 2px solid #333; }
+th { background: #e3f2fd; padding: 12px 16px; text-align: left; font-size: 14px; border-bottom: 2px solid #333; color: #1a237e; }
+td { padding: 10px 16px; border-bottom: 1px solid #e0e0e0; font-size: 14px; vertical-align: top; }
+tr:nth-child(even) { background: #fafafa; }
+.pause { color: #f57f17; font-weight: 700; }
+.continue { color: #2e7d32; font-weight: 700; }
+</style></head><body>
+<div class="container">
+<h2>Figure 7.3: Routing Rules for Work Team</h2>
+<p class="subtitle">Pause points define where AI stops and waits for human input</p>
+<table>
+<tr><th>Task Type</th><th>Route To</th><th>Action</th><th>Next Step</th></tr>
+<tr>
+<td>Architecture change</td>
+<td>Brady (Human)</td>
+<td><span class="pause">⏸️ Pause</span><br>Analysis + Recommendations</td>
+<td>Human approves or rejects</td>
+</tr>
+<tr>
+<td>Security sensitive<br><small>auth/secrets/policy</small></td>
+<td>Worf (Human)</td>
+<td><span class="pause">⏸️ Pause</span><br>Automated scan + Findings</td>
+<td>Human reviews threat model</td>
+</tr>
+<tr>
+<td>Production deploy<br><small>multi-cluster change</small></td>
+<td>B'Elanna (Human)</td>
+<td><span class="pause">⏸️ Pause</span><br>Deployment plan + Validation</td>
+<td>Human approves rollback plan</td>
+</tr>
+<tr>
+<td>Code changes<br><small>bug fixes/tests</small></td>
+<td>Data (AI)</td>
+<td><span class="continue">▶️ Continue</span><br>Implements + Tests</td>
+<td>Human reviews PR</td>
+</tr>
+<tr>
+<td>Documentation<br><small>feature docs</small></td>
+<td>Seven (AI)</td>
+<td><span class="continue">▶️ Continue</span><br>References code + Explains why</td>
+<td>Human reviews</td>
+</tr>
+</table>
+</div>
+</body></html>

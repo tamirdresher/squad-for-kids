@@ -1,0 +1,26 @@
+graph TD
+    A["🔴 Ralph: 5-Min Check"] --> B["📡 Poll GitHub API<br/>for new issues/PRs"]
+    B --> C{{"Issue Type?"}}
+    
+    C -->|New Issue| D["🏷️ Check Labels<br/>squad:*?"]
+    C -->|Open PR| E["✅ Check Merge Criteria<br/>Tests passing?<br/>Approved?"]
+    C -->|Stale Task| F["⏰ Mark for Escalation"]
+    
+    D -->|Label Found| G["📋 Read .squad/routing.md"]
+    G --> H["🔀 Route to Agent<br/>Create issue, assign"]
+    
+    E -->|Ready| I["✨ Auto-Merge<br/>Write decision log"]
+    E -->|Blocked| J["⚠️ Flag Blocker<br/>Notify team"]
+    
+    H --> K["⏚ Add to Assignment Tracker<br/>.squad/ralph/assignments.json"]
+    I --> L["🔗 Link PR → Issue → Decision"]
+    
+    K --> M["⏰ Check Again<br/>in 5 minutes"]
+    L --> M
+    J --> M
+    F --> M
+    
+    style A fill:#ffe082,color:#333
+    style M fill:#ffe082,color:#333
+    style G fill:#b2dfdb,color:#333
+    style H fill:#fff9c4,color:#333

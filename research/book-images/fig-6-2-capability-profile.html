@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 30px; font-size: 24px; }
+.section { margin-bottom: 24px; }
+.section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; padding: 10px 16px; border-radius: 8px; }
+.green .section-title { background: #c8e6c9; color: #1b5e20; }
+.yellow .section-title { background: #fff9c4; color: #f57f17; }
+.red .section-title { background: #ffcdd2; color: #b71c1c; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+td { padding: 8px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+td:first-child { width: 45%; }
+td:last-child { color: #666; font-size: 13px; }
+.indicator { font-size: 18px; margin-right: 6px; }
+</style></head><body>
+<div class="container">
+<h2>Figure 6.2: Capability Profile — Green/Yellow/Red Matrix</h2>
+<div class="section green">
+<div class="section-title">🟢 GOOD FIT — Autonomous (AI completes, auto-merge)</div>
+<table>
+<tr><td><span class="indicator">✓</span>Bug fixes (small scope)</td><td>Clear root cause, bounded fix</td></tr>
+<tr><td><span class="indicator">✓</span>Test additions</td><td>Follow existing test patterns</td></tr>
+<tr><td><span class="indicator">✓</span>Dependency updates</td><td>Follow security policy</td></tr>
+<tr><td><span class="indicator">✓</span>Boilerplate code generation</td><td>Well-established patterns</td></tr>
+<tr><td><span class="indicator">✓</span>Documentation sync</td><td>Auto-generated from code</td></tr>
+<tr><td><span class="indicator">✓</span>Code formatting / lint fixes</td><td>Deterministic rules</td></tr>
+</table>
+</div>
+<div class="section yellow">
+<div class="section-title">🟡 NEEDS REVIEW — AI does work, human approves before merge</div>
+<table>
+<tr><td><span class="indicator">~</span>Small features (with spec)</td><td>Needs design review</td></tr>
+<tr><td><span class="indicator">~</span>Refactoring (existing patterns)</td><td>Needs code review for approach</td></tr>
+<tr><td><span class="indicator">~</span>Performance optimizations</td><td>Needs validation of improvements</td></tr>
+<tr><td><span class="indicator">~</span>Test infrastructure changes</td><td>Needs process review</td></tr>
+</table>
+</div>
+<div class="section red">
+<div class="section-title">🔴 NOT SUITABLE — Keep with human squad members</div>
+<table>
+<tr><td><span class="indicator">✗</span>Architecture decisions</td><td>Strategic, long-term impact</td></tr>
+<tr><td><span class="indicator">✗</span>Security review</td><td>Requires threat modeling context</td></tr>
+<tr><td><span class="indicator">✗</span>Production operations</td><td>Requires operational knowledge</td></tr>
+<tr><td><span class="indicator">✗</span>API design changes</td><td>Requires user perspective</td></tr>
+<tr><td><span class="indicator">✗</span>Compliance decisions</td><td>Requires legal/org knowledge</td></tr>
+</table>
+</div>
+</div>
+</body></html>

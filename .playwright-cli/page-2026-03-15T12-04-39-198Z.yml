@@ -1,0 +1,104 @@
+- generic [ref=e1]:
+  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e11] [cursor=pointer]':
+    - img [ref=e13]
+    - img [ref=e19]
+  - main [ref=e21]:
+    - generic:
+      - button "Main menu" [ref=e34] [cursor=pointer]:
+        - img [ref=e35]: menu
+      - button "New chat" [ref=e39] [cursor=pointer]:
+        - generic [ref=e41]: Gemini
+    - generic [ref=e23]:
+      - generic [ref=e45]: "Generate an image: A cinematic sci-fi scene showing a lone developer standing on the bridge of a starship at night, silhouetted against a massive panoramic viewport showing stars and nebulae. Before him, a holographic tactical display shows 7 distinct AI agent avatars each a different glowing color (gold commander, blue analyst, red warrior, purple scientist, orange engineer, green monitor, silver scribe) all connected by flowing data streams. The agents are actively working: code scrolls on one display, security alerts on another, infrastructure diagrams on a third. The mood is confident and peaceful, the human trusts the team. Cinematic lighting, deep blues and warm golds. Highly detailed digital art, 4K quality. Book cover art style with dramatic composition."
+      - generic [ref=e24]:
+        - link "Upgrade to Google AI Pro" [ref=e48]:
+          - img [ref=e49]: spark
+          - generic [ref=e51]: Upgrade to Google AI Pro
+        - generic [ref=e54]:
+          - button "Share conversation" [ref=e56] [cursor=pointer]:
+            - img [ref=e57]: share
+          - button "Open menu for conversation actions." [ref=e61] [cursor=pointer]:
+            - img [ref=e62]: more_vert
+    - generic [ref=e26]:
+      - navigation [ref=e65]:
+        - generic [ref=e69]:
+          - group [ref=e70]:
+            - link "New chat" [ref=e72] [cursor=pointer]:
+              - /url: /app
+              - img [ref=e75]: edit_square
+          - group [ref=e78]:
+            - button "Settings & help" [ref=e80] [cursor=pointer]:
+              - img [ref=e83]: settings_2
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - heading "Conversation with Gemini" [level=1] [ref=e89]
+          - generic [ref=e92]:
+            - generic [ref=e97]:
+              - button "Copy prompt" [ref=e99] [cursor=pointer]:
+                - img [ref=e100]: content_copy
+              - button "Edit" [ref=e104] [cursor=pointer]:
+                - img [ref=e105]: edit
+              - generic [ref=e109]:
+                - 'heading "You said Generate an image: A cinematic sci-fi scene showing a lone developer standing on the bridge of a starship at night, silhouetted against a massive panoramic viewport showing stars and nebulae. Before him, a holographic tactical display shows 7 distinct AI agent avatars each a different glowing color (gold commander, blue analyst, red warrior, purple scientist, orange engineer, green monitor, silver scribe) all connected by flowing data streams. The agents are actively working: code scrolls on one display, security alerts on another, infrastructure diagrams on a third. The mood is confident and peaceful, the human trusts the team. Cinematic lighting, deep blues and warm golds. Highly detailed digital art, 4K quality. Book cover art style with dramatic composition." [level=2] [ref=e110]':
+                  - generic [ref=e111]: You said
+                  - paragraph [ref=e112]: "Generate an image: A cinematic sci-fi scene showing a lone developer standing on the bridge of a starship at night, silhouetted against a massive panoramic viewport showing stars and nebulae. Before him, a holographic tactical display shows 7 distinct AI agent avatars each a different glowing color (gold commander, blue analyst, red warrior, purple scientist, orange engineer, green monitor, silver scribe) all connected by flowing data streams. The agents are actively working: code scrolls on one display, security alerts on another, infrastructure diagrams on a third. The mood is confident and peaceful, the human trusts the team. Cinematic lighting, deep blues and warm golds. Highly detailed digital art, 4K quality. Book cover art style with dramatic composition."
+                - button "Expand" [ref=e113] [cursor=pointer]:
+                  - img [ref=e114]: expand_more
+            - generic [ref=e120]:
+              - generic:
+                - generic:
+                  - generic:
+                    - menu
+              - generic [ref=e121]:
+                - generic [ref=e126]:
+                  - generic:
+                    - generic:
+                      - img
+                - generic [ref=e128]:
+                  - heading "Gemini said" [level=2] [ref=e129]
+                  - paragraph [ref=e134]:
+                    - generic [ref=e141]:
+                      - button ", AI generated" [ref=e142] [cursor=pointer]:
+                        - img ", AI generated" [ref=e143]
+                      - generic [ref=e144]:
+                        - generic [ref=e145]:
+                          - button "Share image" [disabled]:
+                            - img: share
+                        - generic [ref=e146]:
+                          - button "Copy image" [disabled]:
+                            - img: content_copy
+                        - button "Download full size image" [ref=e148]:
+                          - img [ref=e151]: download
+              - generic [ref=e157]:
+                - button "Good response" [ref=e159] [cursor=pointer]:
+                  - img [ref=e160]: thumb_up
+                - button "Bad response" [ref=e164] [cursor=pointer]:
+                  - img [ref=e165]: thumb_down
+                - button "Redo" [ref=e170] [cursor=pointer]:
+                  - img [ref=e171]: refresh
+                - button "Share image" [ref=e175] [cursor=pointer]:
+                  - img [ref=e176]: share
+                - button "Show more options" [ref=e182]:
+                  - img [ref=e183]: more_vert
+        - generic [ref=e186]:
+          - group [ref=e187]:
+            - generic [ref=e190]:
+              - textbox "Enter a prompt for Gemini" [active] [ref=e195]:
+                - text: Ask Gemini 3
+                - paragraph [ref=e196]
+              - generic [ref=e197]:
+                - button "Open upload file menu" [ref=e202] [cursor=pointer]:
+                  - img [ref=e203]: add_2
+                - button "Tools" [ref=e209]:
+                  - img [ref=e210]: page_info
+                  - generic [ref=e213]: Tools
+              - generic [ref=e216]:
+                - button "Open mode picker" [ref=e219]:
+                  - generic [ref=e221]:
+                    - generic [ref=e222]: Fast
+                    - img [ref=e223]: keyboard_arrow_down
+                - generic [ref=e226]:
+                  - button "Microphone" [ref=e229] [cursor=pointer]:
+                    - img [ref=e231]: mic
+                  - text: send
+          - paragraph [ref=e236]: Gemini is AI and can make mistakes.

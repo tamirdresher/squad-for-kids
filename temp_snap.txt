@@ -1,0 +1,8 @@
+### Page
+- Page URL: https://gemini.google.com/app
+- Page Title: Google Gemini
+- Console: 3 errors, 4 warnings
+### Snapshot
+- [Snapshot](.playwright-cli\page-2026-03-15T12-13-20-172Z.yml)
+### Events
+- New console entries: .playwright-cli\console-2026-03-15T12-11-26-773Z.log#L1-L7

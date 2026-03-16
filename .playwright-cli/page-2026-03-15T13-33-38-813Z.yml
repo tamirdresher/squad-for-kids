@@ -1,0 +1,35 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - heading "Select account to sign out" [level=1] [ref=e12]
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - img "@yonatandresher" [ref=e17]
+          - paragraph [ref=e19]:
+            - text: Signed in as
+            - strong [ref=e21]: yonatandresher
+        - button "Sign out of yonatandresher" [ref=e24] [cursor=pointer]: Sign out
+      - button "Sign out from all accounts" [ref=e26] [cursor=pointer]
+  - contentinfo [ref=e27]:
+    - list [ref=e28]:
+      - listitem [ref=e29]:
+        - link "Terms" [ref=e30] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+      - listitem [ref=e31]:
+        - link "Privacy" [ref=e32] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+      - listitem [ref=e33]:
+        - link "Docs" [ref=e34] [cursor=pointer]:
+          - /url: https://docs.github.com
+      - listitem [ref=e35]:
+        - link "Contact GitHub Support" [ref=e36] [cursor=pointer]:
+          - /url: https://support.github.com
+      - listitem [ref=e37]:
+        - button "Manage cookies" [ref=e39] [cursor=pointer]
+      - listitem [ref=e40]:
+        - button "Do not share my personal information" [ref=e42] [cursor=pointer]

@@ -1,0 +1,15 @@
+graph LR
+    A["🛡️ Worf<br/>AI Analysis<br/><br/>Threat modeling<br/>Trade-offs<br/>Recommendations<br/>Questions for human"]
+    
+    B["👤 Human Decision<br/>Architecture Review<br/><br/>Decision Point:<br/>Use Redis?<br/>Use existing cache?<br/>Dev config?<br/><br/>✓ APPROVED"]
+    
+    C["💻 Data<br/>AI Execution<br/><br/>Implementation<br/>Tests<br/>Documentation<br/>Follows decisions.md"]
+    
+    A -->|Analysis Report<br/>PRs with findings| B
+    B -->|Context<br/>Human approval| C
+    C -->|Ship code| D["✅ Merged"]
+    
+    style A fill:#fce4ec,color:#333
+    style B fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px,color:#333
+    style C fill:#e3f2fd,color:#333
+    style D fill:#a5d6a7,color:#333

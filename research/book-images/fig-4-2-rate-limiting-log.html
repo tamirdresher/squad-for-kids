@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Consolas', 'Courier New', monospace; background: #1e1e1e; color: #d4d4d4; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin-bottom: 30px; font-size: 22px; }
+.log { font-size: 14px; line-height: 1.8; }
+.time { color: #569cd6; }
+.ralph { color: #dcdcaa; }
+.picard { color: #c586c0; }
+.data { color: #9cdcfe; }
+.worf { color: #ce9178; }
+.belanna { color: #d7ba7d; }
+.seven { color: #b5cea8; }
+.success { color: #4ec9b0; }
+.arrow { color: #808080; }
+.parallel-bar { border-left: 3px solid #569cd6; padding-left: 20px; margin: 8px 0 8px 180px; }
+.parallel-label { color: #569cd6; font-weight: bold; writing-mode: vertical-rl; position: absolute; left: 160px; }
+.section { margin-bottom: 16px; }
+</style></head><body>
+<div class="container">
+<h2>Figure 4.2: Rate Limiting Task Breakdown — Real Log</h2>
+<div class="log">
+<div class="section">
+<span class="time">[14:23:15]</span> <span class="ralph">Ralph:</span> Issue #231 detected: "Team, implement rate limiting"<br>
+<span class="time">[14:23:16]</span> <span class="ralph">Ralph:</span> Routing to Picard (orchestration keyword detected)<br>
+</div>
+<div class="section">
+<span class="time">[14:23:18]</span> <span class="picard">🎖️ Picard:</span> Analyzing requirements...<br>
+<span class="time">[14:23:42]</span> <span class="arrow">&nbsp;&nbsp;&nbsp;→</span> Task decomposition complete<br>
+</div>
+<div class="section">
+<span class="time">[14:23:43]</span> <span class="picard">🎖️ Picard:</span> Creating subtasks...<br>
+<span class="arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳</span> Issue #232 → <span class="data">@data-agent</span>: Implement middleware<br>
+<span class="arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳</span> Issue #233 → <span class="worf">@worf-agent</span>: Security audit<br>
+<span class="arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳</span> Issue #234 → <span class="seven">@seven-agent</span>: Documentation<br>
+<span class="arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳</span> Issue #235 → <span class="belanna">@belanna-agent</span>: Deployment config<br>
+</div>
+<div class="parallel-bar">
+<span class="time">[14:24:12]</span> <span class="data">💻 Data:</span> Starting work on #232...<br>
+<span class="time">[14:25:33]</span> <span class="data">💻 Data:</span> Opened PR #236 (middleware)<br>
+<span class="time">[14:27:14]</span> <span class="data">💻 Data:</span> Updated PR (header validation)<br>
+<br>
+<span class="time">[14:24:15]</span> <span class="worf">🛡️ Worf:</span> Starting work on #233...<br>
+<span class="time">[14:26:08]</span> <span class="worf">🛡️ Worf:</span> Security findings on PR #236<br>
+<span class="time">[14:28:45]</span> <span class="worf">🛡️ Worf:</span> Audit complete ✓<br>
+<br>
+<span class="time">[14:29:47]</span> <span class="belanna">⚙️ B'Elanna:</span> Starting work on #235...<br>
+<span class="time">[14:30:30]</span> <span class="belanna">⚙️ B'Elanna:</span> Config updated<br>
+<br>
+<span class="time">[14:30:12]</span> <span class="seven">📚 Seven:</span> Starting work on #234...<br>
+<span class="time">[14:31:15]</span> <span class="seven">📚 Seven:</span> Docs drafted<br>
+</div>
+<div class="section" style="margin-top: 16px;">
+<span class="time">[14:32:01]</span> <span class="ralph">Ralph:</span> Coordinating merge sequence...<br>
+<span class="time">[14:32:05]</span> <span class="success">✨ Ralph: All PRs merged, issue #231 closed</span><br>
+</div>
+</div>
+</div>
+</body></html>

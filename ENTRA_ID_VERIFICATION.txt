@@ -1,0 +1,54 @@
+═══════════════════════════════════════════════════════════════════════════════
+ ENTRA ID AUTHENTICATION VERIFICATION - tam-research-website.azurewebsites.net
+═══════════════════════════════════════════════════════════════════════════════
+
+STATUS: ✅ ENABLED AND ACTIVE
+
+INVESTIGATION FINDINGS:
+━━━━━━━━━━━━━━━━━━━━━━
+1. Web app already has Microsoft Entra ID (Azure AD) authentication configured
+2. Verified via:
+   - Browser testing: Website correctly redirects to Microsoft login
+   - Azure CLI: Confirmed auth settings show enabled=true with AAD provider
+   - Authentication flow: OAuth2 with code+id_token response type
+
+CONFIGURATION DETAILS:
+━━━━━━━━━━━━━━━━━━━
+Resource:                tam-research-website
+Location:               East US
+Resource Group:         tamirdev
+Subscription ID:        c5d1c552-a815-4fc8-b12d-ab444e3225b1
+
+Authentication Provider: Microsoft Entra ID (AAD)
+Client ID:              fbc7a7e6-085f-4604-a543-d43110b8de93
+Tenant ID:              72f988bf-86f1-41af-91ab-2d7cd011db47
+Issuer URL:             https://login.microsoftonline.com/.../v2.0
+
+Auth Configuration:
+  - Enabled:                    true
+  - Unauthenticated Action:     Redirect to Login Page
+  - OAuth Scopes:               openid, profile, email
+  - Response Type:              code id_token
+  - Config Version:             V2 (Modern Azure AD)
+  - Token Store:                Configured
+
+BROWSER VERIFICATION:
+━━━━━━━━━━━━━━━━━━
+✅ https://tam-research-website.azurewebsites.net redirects to:
+   → https://login.microsoftonline.com/.../oauth2/v2.0/authorize
+   → Properly configured with client_id, scopes, and redirect_uri
+
+NEXT STEPS:
+━━━━━━━━━
+• Authentication is production-ready
+• All users accessing the site will be required to authenticate with Microsoft account
+• Session management and token validation are active
+• No additional portal UI configuration is needed
+
+NOTES:
+━━━━━━
+The Azure Portal UI approach was not necessary because the web app already has
+Entra ID fully configured. The application was discovered using Azure CLI after
+determining the correct subscription ID and resource group.
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,12 @@
+graph LR
+    A["🔍 Detect<br/>New Issues"] -->|Every 5 min| B["🔀 Route<br/>to Agents"]
+    B --> C["⏱️ Monitor<br/>Progress"]
+    C --> D["✅ Auto-Merge<br/>When Ready"]
+    D --> E["📝 Close &<br/>Document"]
+    E -->|Loop| A
+    
+    style A fill:#e1f5ff,color:#333
+    style B fill:#fff3e0,color:#333
+    style C fill:#f3e5f5,color:#333
+    style D fill:#e8f5e9,color:#333
+    style E fill:#fce4ec,color:#333

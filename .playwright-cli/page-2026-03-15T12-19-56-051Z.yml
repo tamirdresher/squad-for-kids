@@ -1,0 +1,32 @@
+- generic [ref=e5]:
+  - img "Organization background image" [ref=e6]
+  - generic [ref=e8]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - img "Organization banner logo" [ref=e34]
+        - main [ref=e17]:
+          - generic [ref=e35]:
+            - generic [ref=e38]:
+              - heading "Sign in" [level=1] [ref=e39]
+              - generic [ref=e40]: to continue to Microsoft Azure
+            - generic [ref=e41]:
+              - alert
+              - generic [ref=e43]:
+                - textbox "Enter your email, phone, or Skype." [active] [ref=e44]:
+                  - /placeholder: Email, phone, or Skype
+                - textbox [ref=e45]
+            - link "Can’t access your account?" [ref=e51] [cursor=pointer]:
+              - /url: "#"
+            - button "Next" [ref=e54] [cursor=pointer]
+      - generic [ref=e57]:
+        - button "Sign-in options undefined" [ref=e60] [cursor=pointer]:
+          - generic [ref=e64]: Sign-in options
+        - button "Sign in with GitHub undefined" [ref=e67] [cursor=pointer]:
+          - generic [ref=e71]: Sign in with GitHub
+    - contentinfo [ref=e29]:
+      - generic [ref=e30]:
+        - link "Usage Guidelines URL:" [ref=e31] [cursor=pointer]:
+          - /url: https://spo.ms/usage
+        - link "Privacy Policy URL:" [ref=e32] [cursor=pointer]:
+          - /url: https://aka.ms/privacy
+        - button "Click here for troubleshooting information" [ref=e33] [cursor=pointer]: ...

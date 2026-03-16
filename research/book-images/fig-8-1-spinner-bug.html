@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: white; margin: 40px; }
+.container { max-width: 1100px; margin: 0 auto; }
+h2 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+.issue-header { background: #fff3e0; border: 2px solid #ff9800; border-radius: 8px; padding: 16px; margin-bottom: 20px; font-size: 15px; }
+.comparison { display: flex; gap: 30px; }
+.side { flex: 1; border: 2px solid #ddd; border-radius: 12px; overflow: hidden; }
+.side-header { padding: 12px 16px; font-weight: 700; font-size: 16px; text-align: center; }
+.ai-side .side-header { background: #ffcdd2; color: #b71c1c; }
+.fix-side .side-header { background: #c8e6c9; color: #1b5e20; }
+.side-body { padding: 16px; }
+.side-body ul { margin: 0; padding-left: 18px; }
+.side-body li { margin-bottom: 6px; font-size: 14px; color: #444; }
+.code-block { background: #263238; color: #eeffff; padding: 16px; border-radius: 8px; margin: 12px 0; font-family: 'Consolas', monospace; font-size: 14px; }
+.code-block .before { color: #ef5350; }
+.code-block .after { color: #66bb6a; }
+.analysis { background: #f5f5f5; border-radius: 8px; padding: 16px; margin-top: 20px; }
+.analysis h3 { margin: 0 0 12px; font-size: 16px; color: #333; }
+.analysis-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+.lesson { background: #e8eaf6; border-left: 4px solid #3f51b5; padding: 16px; margin-top: 20px; border-radius: 0 8px 8px 0; font-style: italic; font-size: 16px; color: #283593; }
+</style></head><body>
+<div class="container">
+<h2>Figure 8.1: The Spinner Bug — Over-Engineering Example</h2>
+<p class="subtitle">When AI solves the wrong problem brilliantly</p>
+<div class="issue-header">
+<strong>Issue:</strong> "Dashboard loading spinner doesn't work on mobile Safari"<br>
+<strong>Priority:</strong> HIGH (VP filed it) · <strong>Expected:</strong> Quick CSS fix
+</div>
+<div class="comparison">
+<div class="side ai-side">
+<div class="side-header">❌ AI Response (Data): 347 Changed Files</div>
+<div class="side-body">
+<ul>
+<li>Redux → Zustand refactor</li>
+<li>3 custom hooks extracted</li>
+<li>New useLoadingState abstraction</li>
+<li>Unit tests + integration tests</li>
+<li>Storybook stories for design team</li>
+</ul>
+<p style="color: #888; font-style: italic; margin-top: 12px;">Beautiful, elegant, UNNECESSARY</p>
+</div>
+</div>
+<div class="side fix-side">
+<div class="side-header">✅ Actual Fix: 2 Lines of CSS</div>
+<div class="side-body">
+<div class="code-block">
+<span class="before">- @media (max-width: 768px)</span><br>
+<span class="after">+ @media (max-width: 767px)</span>
+</div>
+<p style="color: #2e7d32; font-weight: 600;">One pixel. That's it.</p>
+</div>
+</div>
+</div>
+<div class="analysis">
+<h3>Analysis</h3>
+<div class="analysis-row"><span>Data's code quality</span><span><strong>10/10</strong> engineering</span></div>
+<div class="analysis-row"><span>Problem–solution fit</span><span><strong>0/10</strong> (solved wrong problem)</span></div>
+<div class="analysis-row"><span>Time to review Data's PR</span><span><strong>3 weeks</strong></span></div>
+<div class="analysis-row"><span>Time to merge 2-line fix</span><span><strong>2 minutes</strong></span></div>
+<div class="analysis-row"><span>VP's wait</span><span>3 weeks vs 2 minutes</span></div>
+</div>
+<div class="lesson">
+"AI can solve problems brilliantly. Humans decide <em>which</em> problem to solve."
+</div>
+</div>
+</body></html>

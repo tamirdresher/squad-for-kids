@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 700px;
+    background: linear-gradient(180deg, #0a0a1a 0%, #0d1225 40%, #111830 100%);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  /* Bridge viewport (main screen) */
+  .viewport {
+    position: absolute;
+    top: 30px;
+    left: 200px;
+    right: 200px;
+    height: 280px;
+    background: radial-gradient(ellipse at center, #0a1530 0%, #060d20 100%);
+    border: 2px solid #1a2a4a;
+    border-radius: 200px 200px 0 0;
+    overflow: hidden;
+  }
+  .viewport-stars {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+  
+  /* Console stations */
+  .console-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 380px;
+    background: linear-gradient(180deg, #15192a 0%, #1a1f35 100%);
+    border-top: 3px solid #2a3550;
+  }
+  
+  /* Individual stations */
+  .station {
+    position: absolute;
+    width: 150px;
+    height: 200px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 15px;
+  }
+  .station-screen {
+    width: 110px;
+    height: 80px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .station-label {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .station-role {
+    font-size: 9px;
+    opacity: 0.7;
+    text-align: center;
+    padding: 0 10px;
+  }
+  .station-glow {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(20px);
+  }
+  
+  /* Station colors */
+  .station-security {
+    bottom: 60px; left: 40px;
+    background: linear-gradient(180deg, rgba(229,57,53,0.15) 0%, rgba(229,57,53,0.05) 100%);
+    border: 1px solid rgba(229,57,53,0.3);
+  }
+  .station-security .station-screen { background: rgba(229,57,53,0.1); border: 1px solid rgba(229,57,53,0.4); }
+  .station-security .station-label { color: #ef5350; }
+  .station-security .station-role { color: #ef9a9a; }
+  .station-security .station-glow { background: #e53935; }
+  
+  .station-engineering {
+    bottom: 60px; left: 220px;
+    background: linear-gradient(180deg, rgba(255,167,38,0.15) 0%, rgba(255,167,38,0.05) 100%);
+    border: 1px solid rgba(255,167,38,0.3);
+  }
+  .station-engineering .station-screen { background: rgba(255,167,38,0.1); border: 1px solid rgba(255,167,38,0.4); }
+  .station-engineering .station-label { color: #ffa726; }
+  .station-engineering .station-role { color: #ffcc80; }
+  .station-engineering .station-glow { background: #ff9800; }
+  
+  .station-code {
+    bottom: 60px; left: 400px;
+    background: linear-gradient(180deg, rgba(100,181,246,0.15) 0%, rgba(100,181,246,0.05) 100%);
+    border: 1px solid rgba(100,181,246,0.3);
+  }
+  .station-code .station-screen { background: rgba(100,181,246,0.1); border: 1px solid rgba(100,181,246,0.4); }
+  .station-code .station-label { color: #64b5f6; }
+  .station-code .station-role { color: #90caf9; }
+  .station-code .station-glow { background: #42a5f5; }
+  
+  /* Center command chair */
+  .station-command {
+    bottom: 80px; left: 525px;
+    width: 170px;
+    height: 210px;
+    background: linear-gradient(180deg, rgba(224,224,255,0.12) 0%, rgba(224,224,255,0.03) 100%);
+    border: 2px solid rgba(224,224,255,0.4);
+    z-index: 5;
+  }
+  .station-command .station-screen { 
+    width: 120px; height: 90px;
+    background: rgba(224,224,255,0.08); border: 1px solid rgba(224,224,255,0.5); 
+  }
+  .station-command .station-label { color: #e0e0ff; font-size: 13px; }
+  .station-command .station-role { color: #c5cae9; }
+  .station-command .station-glow { background: #e0e0ff; width: 130px; height: 130px; }
+  
+  .station-docs {
+    bottom: 60px; right: 220px;
+    background: linear-gradient(180deg, rgba(206,147,216,0.15) 0%, rgba(206,147,216,0.05) 100%);
+    border: 1px solid rgba(206,147,216,0.3);
+  }
+  .station-docs .station-screen { background: rgba(206,147,216,0.1); border: 1px solid rgba(206,147,216,0.4); }
+  .station-docs .station-label { color: #ce93d8; }
+  .station-docs .station-role { color: #e1bee7; }
+  .station-docs .station-glow { background: #ab47bc; }
+  
+  .station-monitor {
+    bottom: 60px; right: 40px;
+    background: linear-gradient(180deg, rgba(77,182,172,0.15) 0%, rgba(77,182,172,0.05) 100%);
+    border: 1px solid rgba(77,182,172,0.3);
+  }
+  .station-monitor .station-screen { background: rgba(77,182,172,0.1); border: 1px solid rgba(77,182,172,0.4); }
+  .station-monitor .station-label { color: #4db6ac; }
+  .station-monitor .station-role { color: #80cbc4; }
+  .station-monitor .station-glow { background: #009688; }
+  
+  /* Floor lights */
+  .floor-light {
+    position: absolute;
+    bottom: 30px;
+    width: 60px;
+    height: 4px;
+    border-radius: 2px;
+    opacity: 0.4;
+  }
+  
+  /* Caption */
+  .caption {
+    position: absolute;
+    bottom: 8px;
+    left: 0; right: 0;
+    text-align: center;
+    color: rgba(200,200,220,0.4);
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 2px;
+  }
+  
+  /* LCARS-style decorative elements */
+  .lcars-bar {
+    position: absolute;
+    height: 6px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+  <!-- Main viewport -->
+  <div class="viewport">
+    <div class="viewport-stars">
+      <!-- Stars -->
+      <div class="star" style="top:20px;left:80px;width:2px;height:2px;opacity:0.8"></div>
+      <div class="star" style="top:60px;left:200px;width:1px;height:1px;opacity:0.5"></div>
+      <div class="star" style="top:40px;left:350px;width:3px;height:3px;opacity:0.9"></div>
+      <div class="star" style="top:100px;left:150px;width:1px;height:1px;opacity:0.4"></div>
+      <div class="star" style="top:80px;left:500px;width:2px;height:2px;opacity:0.7"></div>
+      <div class="star" style="top:30px;left:600px;width:1px;height:1px;opacity:0.6"></div>
+      <div class="star" style="top:120px;left:400px;width:2px;height:2px;opacity:0.5"></div>
+      <div class="star" style="top:50px;left:700px;width:1px;height:1px;opacity:0.7"></div>
+      <div class="star" style="top:90px;left:300px;width:1px;height:1px;opacity:0.3"></div>
+      <div class="star" style="top:140px;left:550px;width:2px;height:2px;opacity:0.4"></div>
+      <div class="star" style="top:70px;left:450px;width:1px;height:1px;opacity:0.6"></div>
+      <div class="star" style="top:160px;left:650px;width:1px;height:1px;opacity:0.5"></div>
+      <div class="star" style="top:45px;left:120px;width:1px;height:1px;opacity:0.4"></div>
+      <div class="star" style="top:180px;left:250px;width:2px;height:2px;opacity:0.3"></div>
+    </div>
+  </div>
+  
+  <!-- LCARS decorative bars -->
+  <div class="lcars-bar" style="top:26px;left:30px;width:150px;background:#64b5f6;opacity:0.3"></div>
+  <div class="lcars-bar" style="top:26px;right:30px;width:150px;background:#ce93d8;opacity:0.3"></div>
+  <div class="lcars-bar" style="top:315px;left:30px;width:120px;background:#ffa726;opacity:0.2"></div>
+  <div class="lcars-bar" style="top:315px;right:30px;width:120px;background:#4db6ac;opacity:0.2"></div>
+  
+  <!-- Console area -->
+  <div class="console-area">
+    <!-- Security Station (Worf) -->
+    <div class="station station-security">
+      <div class="station-glow"></div>
+      <div class="station-screen">🛡️</div>
+      <div class="station-label">WORF</div>
+      <div class="station-role">Security & Threat Assessment</div>
+    </div>
+    
+    <!-- Engineering Station (B'Elanna) -->
+    <div class="station station-engineering">
+      <div class="station-glow"></div>
+      <div class="station-screen">⚙️</div>
+      <div class="station-label">B'ELANNA</div>
+      <div class="station-role">Infrastructure & Systems</div>
+    </div>
+    
+    <!-- Code Station (Data) -->
+    <div class="station station-code">
+      <div class="station-glow"></div>
+      <div class="station-screen">💻</div>
+      <div class="station-label">DATA</div>
+      <div class="station-role">Code Expert & Analysis</div>
+    </div>
+    
+    <!-- Command Center (Picard) -->
+    <div class="station station-command">
+      <div class="station-glow"></div>
+      <div class="station-screen">⭐</div>
+      <div class="station-label">PICARD</div>
+      <div class="station-role">Lead Orchestrator & Decision Maker</div>
+    </div>
+    
+    <!-- Documentation Station (Seven) -->
+    <div class="station station-docs">
+      <div class="station-glow"></div>
+      <div class="station-screen">📚</div>
+      <div class="station-label">SEVEN</div>
+      <div class="station-role">Research & Documentation</div>
+    </div>
+    
+    <!-- Monitor Station (Ralph) -->
+    <div class="station station-monitor">
+      <div class="station-glow"></div>
+      <div class="station-screen">👁️</div>
+      <div class="station-label">RALPH</div>
+      <div class="station-role">Autonomous Monitoring</div>
+    </div>
+    
+    <!-- Floor lights -->
+    <div class="floor-light" style="left:100px;background:#ef5350;"></div>
+    <div class="floor-light" style="left:280px;background:#ffa726;"></div>
+    <div class="floor-light" style="left:460px;background:#64b5f6;"></div>
+    <div class="floor-light" style="left:570px;background:#e0e0ff;"></div>
+    <div class="floor-light" style="right:280px;background:#ce93d8;"></div>
+    <div class="floor-light" style="right:100px;background:#4db6ac;"></div>
+  </div>
+  
+  <div class="caption">Figure 3.1 — The Squad Command Center: Each Agent at Their Station</div>
+</body>
+</html>

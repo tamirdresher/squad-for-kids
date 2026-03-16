@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 800px;
+    background: linear-gradient(135deg, #0a0e27 0%, #0d1340 30%, #151a4a 50%, #0d1340 70%, #0a0e27 100%);
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    position: relative;
+  }
+  /* Circuit board pattern overlay */
+  .circuit-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      linear-gradient(rgba(100,150,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100,150,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 1;
+  }
+  .circuit-lines {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 2;
+  }
+  .circuit-lines::before {
+    content: '';
+    position: absolute;
+    top: 100px; left: 200px;
+    width: 800px; height: 600px;
+    border: 1px solid rgba(100,150,255,0.05);
+    border-radius: 20px;
+  }
+  svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; }
+  .glow-effect {
+    filter: drop-shadow(0 0 20px rgba(100,150,255,0.5)) drop-shadow(0 0 40px rgba(100,150,255,0.3));
+  }
+</style>
+</head>
+<body>
+<div class="circuit-overlay"></div>
+<div class="circuit-lines"></div>
+<svg viewBox="0 0 1200 800">
+  <defs>
+    <radialGradient id="nodeGlow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#64b5f6;stop-opacity:1"/>
+      <stop offset="60%" style="stop-color:#42a5f5;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#1e88e5;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="nodeGlow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ce93d8;stop-opacity:1"/>
+      <stop offset="60%" style="stop-color:#ab47bc;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#7b1fa2;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="nodeGlow3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#80cbc4;stop-opacity:1"/>
+      <stop offset="60%" style="stop-color:#4db6ac;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#00897b;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#e0e0ff;stop-opacity:1"/>
+      <stop offset="30%" style="stop-color:#90caf9;stop-opacity:0.8"/>
+      <stop offset="70%" style="stop-color:#42a5f5;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#1565c0;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="blur1">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="blur2">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <linearGradient id="lineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#42a5f5;stop-opacity:0.1"/>
+      <stop offset="50%" style="stop-color:#64b5f6;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#ab47bc;stop-opacity:0.1"/>
+    </linearGradient>
+    <linearGradient id="lineGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#80cbc4;stop-opacity:0.1"/>
+      <stop offset="50%" style="stop-color:#4db6ac;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#42a5f5;stop-opacity:0.1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background ambient glow -->
+  <circle cx="600" cy="400" r="300" fill="url(#centerGlow)" opacity="0.15" filter="url(#blur2)"/>
+  
+  <!-- Connection lines (drawn first, behind nodes) -->
+  <!-- Center (600,380) to each node -->
+  <line x1="600" y1="380" x2="380" y2="220" stroke="url(#lineGrad1)" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="380" x2="820" y2="220" stroke="url(#lineGrad1)" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="380" x2="300" y2="420" stroke="url(#lineGrad2)" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="380" x2="900" y2="420" stroke="url(#lineGrad2)" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="380" x2="420" y2="600" stroke="url(#lineGrad1)" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="380" x2="780" y2="600" stroke="url(#lineGrad1)" stroke-width="2" opacity="0.7"/>
+  
+  <!-- Inter-node connections -->
+  <line x1="380" y1="220" x2="820" y2="220" stroke="#42a5f5" stroke-width="1" opacity="0.2"/>
+  <line x1="300" y1="420" x2="420" y2="600" stroke="#80cbc4" stroke-width="1" opacity="0.2"/>
+  <line x1="900" y1="420" x2="780" y2="600" stroke="#ce93d8" stroke-width="1" opacity="0.2"/>
+  <line x1="380" y1="220" x2="300" y2="420" stroke="#64b5f6" stroke-width="1" opacity="0.15"/>
+  <line x1="820" y1="220" x2="900" y2="420" stroke="#ab47bc" stroke-width="1" opacity="0.15"/>
+  <line x1="420" y1="600" x2="780" y2="600" stroke="#4db6ac" stroke-width="1" opacity="0.2"/>
+  
+  <!-- Glowing connection dots along lines -->
+  <circle cx="490" cy="300" r="3" fill="#64b5f6" opacity="0.8"/>
+  <circle cx="710" cy="300" r="3" fill="#ab47bc" opacity="0.8"/>
+  <circle cx="450" cy="400" r="2" fill="#4db6ac" opacity="0.6"/>
+  <circle cx="750" cy="400" r="2" fill="#4db6ac" opacity="0.6"/>
+  
+  <!-- Outer nodes (6 satellites) -->
+  <!-- Node 1: Top-left (Blue) - Data/Code -->
+  <circle cx="380" cy="220" r="35" fill="url(#nodeGlow1)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="380" cy="220" r="18" fill="#0d1340" stroke="#64b5f6" stroke-width="2"/>
+  <circle cx="380" cy="220" r="8" fill="#64b5f6" opacity="0.9"/>
+  <text x="380" y="270" text-anchor="middle" fill="#64b5f6" font-size="11" opacity="0.7">DATA</text>
+
+  <!-- Node 2: Top-right (Purple) - Seven/Docs -->
+  <circle cx="820" cy="220" r="35" fill="url(#nodeGlow2)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="820" cy="220" r="18" fill="#0d1340" stroke="#ce93d8" stroke-width="2"/>
+  <circle cx="820" cy="220" r="8" fill="#ce93d8" opacity="0.9"/>
+  <text x="820" y="270" text-anchor="middle" fill="#ce93d8" font-size="11" opacity="0.7">SEVEN</text>
+
+  <!-- Node 3: Mid-left (Teal) - B'Elanna/Infra -->
+  <circle cx="300" cy="420" r="35" fill="url(#nodeGlow3)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="300" cy="420" r="18" fill="#0d1340" stroke="#80cbc4" stroke-width="2"/>
+  <circle cx="300" cy="420" r="8" fill="#80cbc4" opacity="0.9"/>
+  <text x="300" y="470" text-anchor="middle" fill="#80cbc4" font-size="11" opacity="0.7">B'ELANNA</text>
+
+  <!-- Node 4: Mid-right (Blue) - Worf/Security -->
+  <circle cx="900" cy="420" r="35" fill="url(#nodeGlow1)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="900" cy="420" r="18" fill="#0d1340" stroke="#ef5350" stroke-width="2"/>
+  <circle cx="900" cy="420" r="8" fill="#ef5350" opacity="0.9"/>
+  <text x="900" y="470" text-anchor="middle" fill="#ef5350" font-size="11" opacity="0.7">WORF</text>
+
+  <!-- Node 5: Bottom-left (Teal) - Troi -->
+  <circle cx="420" cy="600" r="35" fill="url(#nodeGlow3)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="420" cy="600" r="18" fill="#0d1340" stroke="#4db6ac" stroke-width="2"/>
+  <circle cx="420" cy="600" r="8" fill="#4db6ac" opacity="0.9"/>
+  <text x="420" y="650" text-anchor="middle" fill="#4db6ac" font-size="11" opacity="0.7">TROI</text>
+
+  <!-- Node 6: Bottom-right (Purple) - Ralph -->
+  <circle cx="780" cy="600" r="35" fill="url(#nodeGlow2)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="780" cy="600" r="18" fill="#0d1340" stroke="#ffa726" stroke-width="2"/>
+  <circle cx="780" cy="600" r="8" fill="#ffa726" opacity="0.9"/>
+  <text x="780" y="650" text-anchor="middle" fill="#ffa726" font-size="11" opacity="0.7">RALPH</text>
+
+  <!-- Center node (Picard/Orchestrator - larger) -->
+  <circle cx="600" cy="380" r="60" fill="url(#centerGlow)" opacity="0.2" filter="url(#blur2)"/>
+  <circle cx="600" cy="380" r="40" fill="url(#centerGlow)" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="600" cy="380" r="28" fill="#0d1340" stroke="#e0e0ff" stroke-width="3"/>
+  <circle cx="600" cy="380" r="14" fill="#e0e0ff" opacity="0.9"/>
+  <text x="600" y="435" text-anchor="middle" fill="#e0e0ff" font-size="13" font-weight="bold" opacity="0.8">PICARD</text>
+
+  <!-- Pulsing ring around center -->
+  <circle cx="600" cy="380" r="50" fill="none" stroke="#64b5f6" stroke-width="1" opacity="0.2"/>
+  <circle cx="600" cy="380" r="70" fill="none" stroke="#42a5f5" stroke-width="0.5" opacity="0.1"/>
+
+  <!-- Decorative particles -->
+  <circle cx="200" cy="150" r="1.5" fill="#64b5f6" opacity="0.4"/>
+  <circle cx="1000" cy="180" r="1" fill="#ce93d8" opacity="0.3"/>
+  <circle cx="150" cy="650" r="1.5" fill="#80cbc4" opacity="0.3"/>
+  <circle cx="1050" cy="600" r="1" fill="#64b5f6" opacity="0.4"/>
+  <circle cx="550" cy="100" r="1" fill="#e0e0ff" opacity="0.3"/>
+  <circle cx="700" cy="720" r="1.5" fill="#ab47bc" opacity="0.3"/>
+  <circle cx="100" cy="400" r="1" fill="#4db6ac" opacity="0.3"/>
+  <circle cx="1100" cy="350" r="1" fill="#ffa726" opacity="0.3"/>
+</svg>
+</body>
+</html>

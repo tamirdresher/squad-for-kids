@@ -1,0 +1,96 @@
+================================================================================
+INFRASTRUCTURE VERIFICATION COMPLETE - TAM Research Website
+================================================================================
+
+REQUESTED VERIFICATIONS:
+✓ 1. Website Content Service
+✓ 2. AAD/Entra ID Authentication  
+✓ 3. Unauthenticated User Behavior
+
+================================================================================
+VERIFICATION RESULTS
+================================================================================
+
+1. WEBSITE CONTENT DELIVERY
+   Status: ✓ DEPLOYED
+   - Website: Running on Azure App Service
+   - URL: https://tam-research-website.azurewebsites.net
+   - Response: HTTP 401 Unauthorized (auth intercepted, not 404/500)
+   - Content: Not directly accessible (behind auth middleware)
+   
+2. AUTHENTICATION CONFIGURATION  
+   Status: ⚠ PARTIAL IMPLEMENTATION
+   ✓ Authentication Enabled: YES
+   ✓ Default Provider: GitHub OAuth
+   ✓ Unauthenticated Action: RedirectToLoginPage
+   ✗ Microsoft Entra ID: NOT ENABLED
+   
+   Current Auth Details:
+   - GitHub OAuth ID: Ov23liKa785b7aIqLlVM (configured)
+   - AAD App Registration: fbc7a7e6-085f-4604-a543-d43110b8de93 (created)
+   - AAD Status: Blocked - requires client secret (organizational policy blocks credential creation)
+
+3. UNAUTHENTICATED USER BEHAVIOR
+   Status: ⚠ NOT OPTIMAL
+   - Response Code: 401 Unauthorized
+   - Body: Empty
+   - Auth Challenge: Bearer token realm
+   - Expected: Redirect to Microsoft login
+   - Issue: GitHub OAuth is default provider, but users see 401 instead of redirect
+
+================================================================================
+TECHNICAL FINDINGS
+================================================================================
+
+BLOCKING ISSUE:
+The organizational policy prevents creation of client secrets for app
+registrations. This blocks completion of AAD configuration.
+
+Error: "Credential type not allowed as per assigned policy '538f1913-366a-440a-95a0-e195cb55b282'"
+
+SOLUTION PATH:
+1. Request policy exception OR create secret via Azure Portal
+2. Update webapp with secret using:
+   
+   az webapp auth update --name tam-research-website --resource-group tamirdev \
+     --enabled true --action LoginWithAzureActiveDirectory \
+     --aad-client-id fbc7a7e6-085f-4604-a543-d43110b8de93 \
+     --aad-client-secret <CLIENT_SECRET> \
+     --aad-token-issuer-url https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0 \
+     --aad-allowed-token-audiences https://tam-research-website.azurewebsites.net
+
+3. Test unauthenticated access (should redirect to MS login)
+
+================================================================================
+CURRENT SECURITY POSTURE
+================================================================================
+
+✓ Authentication Middleware: ACTIVE
+✓ Public Access: BLOCKED (401 enforced)
+✓ Token Store: ENABLED
+⚠ Provider Restriction: Incomplete (GitHub allowed, should be AAD only)
+⚠ MS FTE Enforcement: PENDING (awaiting AAD config completion)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+IMMEDIATE (Blocking):
+1. Obtain client secret for app registration (policy exception needed)
+   - Contact: Azure AD policy administrator
+   - App ID: fbc7a7e6-085f-4604-a543-d43110b8de93
+
+AFTER SECRET ACQUIRED:
+2. Execute auth update command (see SOLUTION PATH above)
+3. Test unauthenticated access - should see MS login redirect
+4. Verify MS FTE can authenticate
+5. Verify non-FTE cannot access
+
+MONITORING:
+- Website logs: /subscriptions/c5d1c552-a815-4fc8-b12d-ab444e3225b1/resourceGroups/tamirdev/providers/Microsoft.Web/sites/tam-research-website
+- Auth errors: Check App Service authentication logs in Azure Portal
+
+================================================================================
+DEPLOYMENT: 2026-03-15 14:01:51
+VERIFIED BY: B'Elanna (Infrastructure)
+================================================================================

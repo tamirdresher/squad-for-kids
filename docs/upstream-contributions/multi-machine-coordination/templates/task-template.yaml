@@ -1,0 +1,27 @@
+# Cross-Machine Task Template
+# Location: .squad/cross-machine/tasks/{timestamp}-{source}-{task-id}.yaml
+#
+# Copy this file, fill in the values, commit, and push.
+# The target machine's watcher will pick it up on the next cycle.
+
+id: "{task-id}"                          # Unique identifier (alphanumeric + dash)
+source_machine: "{your-machine}"         # Hostname of the machine creating this task
+target_machine: "{target-machine}"       # Hostname of the machine to execute (or ANY)
+priority: normal                         # low | normal | high
+created_at: "2026-01-01T12:00:00Z"       # ISO 8601 timestamp
+task_type: command                       # command | test | build | gpu_workload | script
+description: "Describe what this task does"
+status: pending                          # Must be 'pending' for new tasks
+
+payload:
+  command: "echo Hello from cross-machine coordination!"
+  expected_duration_min: 5               # Timeout in minutes
+  resources:                             # Optional resource hints
+    gpu: false
+    memory_gb: 4
+    cpu_cores: 2
+
+# Optional fields:
+# timeout_override_min: 120              # Override the default timeout
+# retry_count: 3                         # Max retry attempts on failure
+# depends_on: "other-task-id"            # Wait for another task to complete first

@@ -1,0 +1,21 @@
+# Cross-Machine Result Template
+# Location: .squad/cross-machine/results/{task-id}.yaml
+#
+# Written automatically by the watcher after task execution.
+# This file is committed and pushed back to git for the source machine to read.
+
+task_id: "{task-id}"                         # Links back to original task
+executing_machine: "{hostname}"              # Machine that ran the task
+started_at: "2026-01-01T12:01:00Z"           # Execution start (ISO 8601)
+completed_at: "2026-01-01T12:05:00Z"         # Execution end (ISO 8601)
+status: completed                            # completed | failed | timeout
+exit_code: 0                                 # Shell exit code (0 = success)
+stdout: ""                                   # Captured standard output (trimmed)
+stderr: ""                                   # Captured standard error (trimmed)
+duration_seconds: 240                        # Wall-clock duration
+
+# Optional — list output files produced by the task
+artifacts: []
+# - path: "artifacts/output.csv"
+#   type: data                               # data | audio | model | text | binary
+#   size_mb: 1.2

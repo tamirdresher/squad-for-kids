@@ -1,0 +1,83 @@
+{
+  "team": "DK8S Platform",
+  "description": "Birthday registry for the DK8S Platform team. Only month/day stored for privacy (no birth year). Replace MM-DD placeholders with actual dates (e.g., 03-15 for March 15).",
+  "members": [
+    {
+      "name": "Saurabh Agrawal",
+      "birthday": "MM-DD",
+      "alias": "saurabhagrawal",
+      "role": "Engineering Manager",
+      "email": "saurabhagrawal@microsoft.com"
+    },
+    {
+      "name": "Anand Kumar",
+      "birthday": "MM-DD",
+      "alias": "anandkuma",
+      "role": "Senior SDE",
+      "email": "anandkuma@microsoft.com"
+    },
+    {
+      "name": "Nada Jasikova",
+      "birthday": "MM-DD",
+      "alias": "nadajasikova",
+      "role": "SDE",
+      "email": "nadajasikova@microsoft.com"
+    },
+    {
+      "name": "Saurabh Bali",
+      "birthday": "MM-DD",
+      "alias": "saurabhbali",
+      "role": "SDE",
+      "email": "saurabhbali@microsoft.com"
+    },
+    {
+      "name": "Ramaprakash Ganesan",
+      "birthday": "MM-DD",
+      "alias": "ramaprakashg",
+      "role": "SDE",
+      "email": "ramaprakashg@microsoft.com"
+    },
+    {
+      "name": "Yadin Ben Kessous",
+      "birthday": "MM-DD",
+      "alias": "yadinbk",
+      "role": "SDE",
+      "email": "yadinbk@microsoft.com"
+    },
+    {
+      "name": "Sakshi Sharma",
+      "birthday": "MM-DD",
+      "alias": "sakshisharma",
+      "role": "SDE",
+      "email": "sakshisharma@microsoft.com"
+    },
+    {
+      "name": "Tamir Dresher",
+      "birthday": "MM-DD",
+      "alias": "tamird",
+      "role": "Senior SDE",
+      "email": "tamird@microsoft.com"
+    },
+    {
+      "name": "Moshe Peretz",
+      "birthday": "MM-DD",
+      "alias": "moshep",
+      "role": "SDE",
+      "email": "moshep@microsoft.com"
+    },
+    {
+      "name": "Adir Atias",
+      "birthday": "MM-DD",
+      "alias": "adiratias",
+      "role": "SDE",
+      "email": "adiratias@microsoft.com"
+    },
+    {
+      "name": "Roy Mishael",
+      "birthday": "MM-DD",
+      "alias": "roymishael",
+      "role": "SDE",
+      "email": "roymishael@microsoft.com"
+    }
+  ]
+}

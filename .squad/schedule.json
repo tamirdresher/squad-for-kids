@@ -257,6 +257,44 @@
       "enabled": true
     },
     {
+      "id": "birthday-check",
+      "name": "DK8S Team Birthday Check",
+      "description": "Check if any DK8S Platform team member has a birthday today. If yes, generate and send a personalized birthday email with AI-researched contributions via Outlook COM.",
+      "enabled": true,
+      "trigger": {
+        "type": "cron",
+        "expression": "0 8 * * 1-5",
+        "timezone": "Asia/Jerusalem"
+      },
+      "task": {
+        "type": "script",
+        "command": "pwsh scripts/birthday-checker.ps1",
+        "shell": "powershell"
+      },
+      "providers": [
+        "local-polling"
+      ],
+      "retry": {
+        "maxAttempts": 1,
+        "backoffSeconds": 0
+      },
+      "timeout": 300,
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "celebration",
+        "birthday",
+        "kes"
+      ],
+      "metadata": {
+        "owner": "kes",
+        "birthdayFile": ".squad/team-birthdays.json",
+        "sendsEmail": true,
+        "viaOutlookCOM": true
+      }
+    },
+    {
       "id": "whatsapp-check",
       "description": "Open WhatsApp Web via Playwright, check for messages from wife, report via Teams if she needs something. READ ONLY - never send messages.",
       "trigger": {

@@ -1,6 +1,0 @@
-[   13913ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://2k23pcdp-49416.euw.devtunnels.ms/:0
-[   14108ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://2k23pcdp-49416.euw.devtunnels.ms/favicon.ico:0
-[  125973ms] ReferenceError: lastCols is not defined
-    at ws.onopen (https://2k23pcdp-49416.euw.devtunnels.ms/app.js:1011:29)
-[  245513ms] ReferenceError: lastCols is not defined
-    at ws.onopen (https://2k23pcdp-49416.euw.devtunnels.ms/app.js:1011:29)

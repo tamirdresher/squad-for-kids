@@ -1,7 +1,0 @@
-- generic [ref=e2]:
-  - img [ref=e4]
-  - generic:
-    - main:
-      - generic:
-        - heading [level=2]
-        - paragraph

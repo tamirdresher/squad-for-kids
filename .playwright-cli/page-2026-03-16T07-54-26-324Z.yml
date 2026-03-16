@@ -1,9 +1,0 @@
-- generic [ref=e2]:
-  - generic [ref=e4]:
-    - img
-  - generic [ref=e5]: WhatsApp
-  - progressbar [ref=e7]
-  - generic [ref=e8]:
-    - generic [ref=e9]:
-      - img
-    - text: End-to-end encrypted

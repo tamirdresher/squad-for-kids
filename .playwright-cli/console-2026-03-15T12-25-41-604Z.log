@@ -1,9 +1,0 @@
-[      46ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[      46ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    3568ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    3568ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    3684ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    3685ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    5979ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    5980ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    7660ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource/subscriptions/dde02a76-d4a5-4468-8826-d9ff2f8e7c9e/resourceGroups/tamirdev/providers/Microsoft.Web/sites/tam-research-website:0

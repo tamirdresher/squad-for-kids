@@ -240,6 +240,25 @@ function Invoke-SquadScheduler {
                                 Write-Host "  Copilot task queued: $($task.task.instruction.Substring(0, [Math]::Min(80, $task.task.instruction.Length)))..." -ForegroundColor Cyan
                             }
                         }
+                        "agent" {
+                            # Invoke a squad agent for a specific action (e.g., retrospective)
+                            $agentName = $task.task.agent
+                            $agentAction = $task.task.action
+                            Write-Host "  Agent task: $agentName -> $agentAction" -ForegroundColor Cyan
+                            
+                            # Create a task file that Ralph will pick up in its next round
+                            $taskDir = Join-Path $PSScriptRoot ".." "agent-tasks"
+                            if (-not (Test-Path $taskDir)) { New-Item -Path $taskDir -ItemType Directory -Force | Out-Null }
+                            $taskFile = Join-Path $taskDir "$($task.id)-$(Get-Date -Format 'yyyy-MM-dd').json"
+                            @{
+                                id = $task.id
+                                agent = $agentName
+                                action = $agentAction
+                                scheduledAt = $currentTime.ToUniversalTime().ToString("o")
+                                status = "pending"
+                            } | ConvertTo-Json | Set-Content -Path $taskFile -Encoding UTF8
+                            Write-Host "  Agent task queued: $taskFile" -ForegroundColor Green
+                        }
                         default {
                             Write-Host "  Unknown task type: $($task.task.type)" -ForegroundColor Yellow
                             $taskResult = "skipped"

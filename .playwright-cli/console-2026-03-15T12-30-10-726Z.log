@@ -1,5 +1,0 @@
-[      26ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[      26ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[     515ms] [ERROR] Framing 'https://portal.azure.com/' violates the following Content Security Policy directive: "frame-ancestors 'self'". The request has been blocked.
- @ :0
-[     697ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://autologon.microsoftazuread-sso.com/microsoft.onmicrosoft.com/winauth/ssoprobe?client-request-id=019cf179-b3cb-79a8-90a6-ff6e1bf30f1c&_=1773577811296:0

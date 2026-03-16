@@ -45,3 +45,7 @@ obj/
 # Docs build output
 _site/
 
+
+.nano-banana-config.json
+
+.playwright-cli/

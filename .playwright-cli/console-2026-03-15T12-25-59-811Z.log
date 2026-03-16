@@ -1,9 +1,0 @@
-[    1937ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    1937ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    1985ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    1985ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    2024ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    2024ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    3455ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'. @ :0
-[    3455ms] [WARNING] Error with Permissions-Policy header: Unrecognized feature: 'battery'. @ :0
-[    4174ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://ms.portal.azure.com/#home:0

@@ -1,9 +1,0 @@
-[    5378ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0
-[   31494ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0
-[   32441ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0
-[   38863ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0
-[   38867ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0
-[   58866ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0
-[   63454ms] [ERROR] Failed to load resource: net::ERR_HTTP2_SERVER_REFUSED_STREAM @ https://collector.github.com/github/collect:0
-[   81741ms] [ERROR] Failed to load resource: net::ERR_HTTP2_SERVER_REFUSED_STREAM @ https://collector.github.com/github/collect:0
-[   88105ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://collector.github.com/github/collect:0

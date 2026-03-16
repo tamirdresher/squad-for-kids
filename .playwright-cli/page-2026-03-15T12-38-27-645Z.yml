@@ -1,6 +1,0 @@
-- generic [ref=e1]:
-  - textbox "Ask Gemini 3" [active] [ref=e4]
-  - 'button "Google Account: tamir dresher (tamir.dresher@gmail.com)" [ref=e11] [cursor=pointer]':
-    - img [ref=e13]
-    - img [ref=e19]
-  - main [ref=e21]

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   check-marketplace:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     defaults:
       run:
         shell: pwsh

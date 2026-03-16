@@ -6,6 +6,15 @@ $researchRoot = "C:\Users\tamirdresher\source\repos\tamresearch1-research"
 
 Write-Host "Squad DevBox Startup - $(Get-Date)" -ForegroundColor Cyan
 
+# 0. Load secrets into session before anything else
+$secretsScript = Join-Path $repoRoot "scripts\setup-secrets.ps1"
+if (Test-Path $secretsScript) {
+    Write-Host "  Loading secrets..." -ForegroundColor DarkGray
+    & $secretsScript
+} else {
+    Write-Host "  [WARN] setup-secrets.ps1 not found — secrets not loaded" -ForegroundColor Yellow
+}
+
 # 1. Keep-alive (prevents Dev Box auto-stop)
 $keepAlive = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'keep-devbox-alive' }
 if (-not $keepAlive) {

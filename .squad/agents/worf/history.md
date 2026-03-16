@@ -28,6 +28,33 @@ Q2 work incoming: Issue #26 (Defender-Fleet Teams chat review)
 
 **Status:** ✅ Complete. Message posted, decision ready for merge to decisions.md
 
+### 2026-07-11: Issue #666 — Centralize Secrets Management
+
+**Assignment:** Build proper secrets management infrastructure. Eliminate secrets from git, establish patterns for secure storage and retrieval.
+
+**Work Completed:**
+- ✅ Created `.env.example` documenting all required env vars (no values)
+- ✅ Created `scripts/setup-secrets.ps1` — loads secrets from Credential Manager → `~/.squad/.env` → env vars, validates required secrets, reports missing
+- ✅ Hardened `.gitignore` — blocks `*.env`, secret screenshots, `*.key`, `*.pem`, config JSON
+- ✅ Removed `github-oauth-secret-generated.png` (potential OAuth secret exposure)
+- ✅ Created `.squad/skills/secrets-management/SKILL.md` — full pattern documentation
+- ✅ Updated `devbox-startup.ps1` to call `setup-secrets.ps1` before Ralph starts
+- ✅ Branch `squad/666-secrets-management` pushed, PR #668 opened
+
+**Known Secrets Audited:**
+| Secret | Storage | Status |
+|--------|---------|--------|
+| Google API Key (Gemini) | Needs Credential Manager | ⚠️ Needs rotation (was in git per #645) |
+| Teams Webhook URL | `~/.squad/teams-webhook.url` | ✅ Secure |
+| Squad email password | Credential Manager `squad-email-outlook` | ✅ Secure |
+| GitHub PAT | Credential Manager via `gh auth` | ✅ Secure |
+| Telegram bot token | `.nano-banana-config.json` (gitignored) | ✅ Acceptable |
+| OAuth screenshot | Removed from repo | ✅ Fixed |
+
+**Remaining Action:** Google API key must be rotated at https://aistudio.google.com/apikey since it was previously committed to git history.
+
+**Status:** ✅ Complete. PR #668 open for review.
+
 ## Learnings
 
 ### Issue #336 — Dependabot Security PR Investigation (2026-03-10)

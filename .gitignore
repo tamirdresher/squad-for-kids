@@ -49,3 +49,24 @@ _site/
 .nano-banana-config.json
 
 .playwright-cli/
+
+# --- Secrets hardening (issue #666) ---
+# Environment files (never commit actual .env, only .env.example)
+*.env
+.env.*
+!.env.example
+
+# Leaked secret screenshots or dumps
+*secret*.png
+*secret*.jpg
+*secret*.txt
+*credential*.png
+*credential*.jpg
+*credential*.txt
+
+# Config files that may contain tokens
+*-config.json
+
+# Cryptographic material
+*.key
+*.pem

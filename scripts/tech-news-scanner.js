@@ -2,8 +2,14 @@
 
 /**
  * Tech News Scanner
- * Scans HackerNews, Reddit, Morning Dew (alvinashcraft.com), Architecture Notes (architecturenotes.co), and ThoughtWorks Radar for relevant tech stories
- * Filters by topics: AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools
+ * Scans HackerNews, Reddit, Morning Dew (alvinashcraft.com), Architecture Notes (architecturenotes.co),
+ * ThoughtWorks Radar, and bradygaster/squad GitHub repo for relevant tech stories and product updates.
+ * Also checks Brady Gaster's blog for Squad-related posts.
+ * Filters by topics: AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools, Squad
+ * 
+ * Posts digest to both Teams channels:
+ * - squads > Tech News (Tamir's squad notifications)
+ * - Squad > Squad Tech News (Brady's product team)
  * 
  * Deduplication:
  * - Checks if a Tech News Digest issue already exists for today before creating
@@ -24,7 +30,18 @@ const KEYWORDS = [
   'kubernetes', 'k8s', 'cloud native', 'cncf',
   'developer tools', 'devtools', 'ide', 'vscode', 'github',
   'architecture',
-  'tech radar', 'thoughtworks'
+  'tech radar', 'thoughtworks',
+  'squad'
+];
+
+// Brady's Squad repo monitoring config
+const SQUAD_REPO = { owner: 'bradygaster', repo: 'squad' };
+const BRADY_BLOG_URL = 'https://bradygaster.com';
+
+// Teams channel targets for posting digests
+const TEAMS_CHANNELS = [
+  { teamId: '5f93abfe-b968-44ea-bd0a-6f155046ccc7', channelId: '19:bfe3224e8e764c2785e81e7cb3cc944d@thread.tacv2', label: 'squads > Tech News' },
+  { teamId: '1de78cdf-3f73-4447-9601-a940bd98b80d', channelId: '19:c940af255e22486882c069d7b38a6204@thread.tacv2', label: 'Squad > Squad Tech News' }
 ];
 
 // Setup state file path
@@ -309,44 +326,208 @@ async function fetchThoughtWorksRadar() {
   return [];
 }
 
+// Fetch releases from bradygaster/squad via GitHub API
+async function fetchSquadReleases() {
+  console.error('Fetching bradygaster/squad releases...');
+  try {
+    const output = execSync(
+      `gh api repos/${SQUAD_REPO.owner}/${SQUAD_REPO.repo}/releases --jq ".[0:10]" 2>/dev/null || echo "[]"`,
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
+    ).trim();
+    const releases = JSON.parse(output || '[]');
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const recent = releases
+      .filter(r => new Date(r.published_at || r.created_at) > oneDayAgo)
+      .map(r => ({
+        title: `[Squad Release] ${r.name || r.tag_name}`,
+        url: r.html_url,
+        score: 100,
+        source: 'bradygaster/squad',
+        body: (r.body || '').slice(0, 300)
+      }));
+    console.error(`Found ${recent.length} recent Squad releases`);
+    return recent;
+  } catch (e) {
+    console.error(`Error fetching Squad releases: ${e.message}`);
+    return [];
+  }
+}
+
+// Fetch recent discussions from bradygaster/squad
+async function fetchSquadDiscussions() {
+  console.error('Fetching bradygaster/squad discussions...');
+  try {
+    const query = `query { repository(owner:"${SQUAD_REPO.owner}", name:"${SQUAD_REPO.repo}") { discussions(first:10, orderBy:{field:CREATED_AT, direction:DESC}) { nodes { title url createdAt category { name } } } } }`;
+    const output = execSync(
+      `gh api graphql -f query='${query.replace(/'/g, "'\\''")}'`,
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
+    ).trim();
+    const data = JSON.parse(output || '{}');
+    const discussions = data?.data?.repository?.discussions?.nodes || [];
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const recent = discussions
+      .filter(d => new Date(d.createdAt) > oneDayAgo)
+      .map(d => ({
+        title: `[Squad Discussion] ${d.title}`,
+        url: d.url,
+        score: 80,
+        source: 'bradygaster/squad',
+        category: d.category?.name || 'General'
+      }));
+    console.error(`Found ${recent.length} recent Squad discussions`);
+    return recent;
+  } catch (e) {
+    console.error(`Error fetching Squad discussions: ${e.message}`);
+    return [];
+  }
+}
+
+// Fetch recent commits from bradygaster/squad
+async function fetchSquadCommits() {
+  console.error('Fetching bradygaster/squad commits...');
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const output = execSync(
+      `gh api "repos/${SQUAD_REPO.owner}/${SQUAD_REPO.repo}/commits?since=${since}&per_page=10" 2>/dev/null || echo "[]"`,
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
+    ).trim();
+    const commits = JSON.parse(output || '[]');
+    const items = commits.map(c => ({
+      title: `[Squad Commit] ${(c.commit?.message || '').split('\n')[0]}`,
+      url: c.html_url,
+      score: 60,
+      source: 'bradygaster/squad',
+      author: c.commit?.author?.name || 'unknown'
+    }));
+    console.error(`Found ${items.length} recent Squad commits`);
+    return items;
+  } catch (e) {
+    console.error(`Error fetching Squad commits: ${e.message}`);
+    return [];
+  }
+}
+
+// Fetch Brady Gaster's blog RSS for Squad-related posts
+async function fetchBradyBlog() {
+  console.error('Fetching Brady Gaster blog for Squad posts...');
+  try {
+    const xml = await httpsGet(`${BRADY_BLOG_URL}/feed/`);
+    if (typeof xml !== 'string') {
+      // Try alternate feed path
+      const xml2 = await httpsGet(`${BRADY_BLOG_URL}/index.xml`);
+      if (typeof xml2 !== 'string') {
+        console.error('Unexpected response from Brady blog feed');
+        return [];
+      }
+      return parseBlogFeed(xml2);
+    }
+    return parseBlogFeed(xml);
+  } catch (e) {
+    console.error(`Error fetching Brady blog: ${e.message}`);
+    return [];
+  }
+}
+
+function parseBlogFeed(xml) {
+  const items = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[1];
+    const title = (block.match(/<title><!\[CDATA\[(.*?)\]\]>/) || [])[1]
+      || (block.match(/<title>(.*?)<\/title>/) || [])[1]
+      || '';
+    const link = (block.match(/<link>(.*?)<\/link>/) || [])[1] || '';
+    const pubDate = (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || '';
+    const description = (block.match(/<description><!\[CDATA\[(.*?)\]\]>/) || [])[1]
+      || (block.match(/<description>(.*?)<\/description>/) || [])[1]
+      || '';
+
+    if (title && link) {
+      items.push({ title: title.trim(), url: link.trim(), pubDate, description: description.trim() });
+    }
+  }
+
+  // Filter for Squad-related posts
+  const squadKeywords = ['squad', 'ai team', 'ai agents', 'copilot workspace'];
+  const filtered = items.filter(item => {
+    const text = `${item.title} ${item.description}`.toLowerCase();
+    return squadKeywords.some(kw => text.includes(kw));
+  }).map(item => ({
+    title: `[Brady Blog] ${item.title}`,
+    url: item.url,
+    score: 90,
+    source: 'bradygaster.com'
+  }));
+
+  console.error(`Found ${filtered.length} Squad-related Brady blog posts`);
+  return filtered;
+}
+
 async function scanAllSources() {
   const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_'];
   
-  const [hnStories, morningDew, archNotes, twRadar, ...redditResults] = await Promise.all([
+  const [hnStories, morningDew, archNotes, twRadar, squadReleases, squadDiscussions, squadCommits, bradyBlog, ...redditResults] = await Promise.all([
     fetchHackerNews(),
     fetchMorningDew(),
     fetchArchitectureNotes(),
     fetchThoughtWorksRadar(),
+    fetchSquadReleases(),
+    fetchSquadDiscussions(),
+    fetchSquadCommits(),
+    fetchBradyBlog(),
     ...subreddits.map(sub => fetchReddit(sub))
   ]);
   
   const allStories = [...hnStories, ...morningDew, ...archNotes, ...twRadar, ...redditResults.flat()];
+  const squadUpdates = [...squadReleases, ...squadDiscussions, ...squadCommits, ...bradyBlog];
   
   // Sort by score descending
   allStories.sort((a, b) => b.score - a.score);
+  squadUpdates.sort((a, b) => b.score - a.score);
   
-  return allStories;
+  return { stories: allStories, squadUpdates };
 }
 
-function formatDigest(stories) {
+function formatDigest(stories, squadUpdates = []) {
   const date = new Date().toISOString().split('T')[0];
   
   let digest = `# Tech News Digest - ${date}\n\n`;
   digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, Morning Dew, Architecture Notes, and ThoughtWorks Radar.\n\n`;
   digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools\n\n`;
+
+  // Squad product updates section
+  if (squadUpdates.length > 0) {
+    digest += `---\n\n`;
+    digest += `## 🚀 Squad Product Updates (bradygaster/squad)\n\n`;
+    digest += `Found ${squadUpdates.length} updates from Brady's Squad repo and blog.\n\n`;
+    squadUpdates.forEach((item, idx) => {
+      digest += `### ${idx + 1}. ${item.title}\n\n`;
+      digest += `- **Source:** ${item.source}\n`;
+      digest += `- **Link:** ${item.url}\n`;
+      if (item.body) digest += `- **Details:** ${item.body}\n`;
+      if (item.category) digest += `- **Category:** ${item.category}\n`;
+      if (item.author) digest += `- **Author:** ${item.author}\n`;
+      digest += `\n`;
+    });
+  }
+
   digest += `---\n\n`;
   
-  if (stories.length === 0) {
+  if (stories.length === 0 && squadUpdates.length === 0) {
     digest += `No relevant stories found today.\n`;
     return digest;
   }
-  
-  stories.forEach((story, idx) => {
-    digest += `## ${idx + 1}. ${story.title}\n\n`;
-    digest += `- **Source:** ${story.source}\n`;
-    digest += `- **Score:** ${story.score}\n`;
-    digest += `- **Link:** ${story.url}\n\n`;
-  });
+
+  if (stories.length > 0) {
+    digest += `## 📰 Tech News\n\n`;
+    stories.forEach((story, idx) => {
+      digest += `### ${idx + 1}. ${story.title}\n\n`;
+      digest += `- **Source:** ${story.source}\n`;
+      digest += `- **Score:** ${story.score}\n`;
+      digest += `- **Link:** ${story.url}\n\n`;
+    });
+  }
   
   return digest;
 }
@@ -366,26 +547,33 @@ async function main() {
       process.exit(0);
     }
     
-    const stories = await scanAllSources();
+    const { stories, squadUpdates } = await scanAllSources();
     
     // Filter out URLs that have already been reported
     const reportedUrlsForDate = state.reportedUrls[todayDate] || {};
     const newStories = stories.filter(story => !reportedUrlsForDate[story.url]);
+    const newSquadUpdates = squadUpdates.filter(item => !reportedUrlsForDate[item.url]);
     
-    if (newStories.length === 0 && stories.length > 0) {
+    if (newStories.length === 0 && newSquadUpdates.length === 0 && (stories.length > 0 || squadUpdates.length > 0)) {
       console.error('All stories have already been reported. Skipping digest creation.');
       process.exit(0);
     }
     
-    const digest = formatDigest(newStories);
+    const digest = formatDigest(newStories, newSquadUpdates);
     console.log(digest);
+    
+    // Log Teams channel targets for posting
+    console.error('Digest should be posted to the following Teams channels:');
+    for (const ch of TEAMS_CHANNELS) {
+      console.error(`  - ${ch.label} (team: ${ch.teamId}, channel: ${ch.channelId})`);
+    }
     
     // Update state with new URLs
     if (!state.reportedUrls[todayDate]) {
       state.reportedUrls[todayDate] = {};
     }
-    newStories.forEach(story => {
-      state.reportedUrls[todayDate][story.url] = true;
+    [...newStories, ...newSquadUpdates].forEach(item => {
+      state.reportedUrls[todayDate][item.url] = true;
     });
     state.lastScanDate = todayDate;
     saveState(state);

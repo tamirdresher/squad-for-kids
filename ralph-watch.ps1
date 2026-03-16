@@ -573,19 +573,19 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
-    # Step -1: Self-healing — check gh auth and ensure correct account for this repo
-    # Detect required account from git remote (EMU repos need tamirdresher_microsoft)
+    # Step -1: Self-healing — set GH_TOKEN for this process based on repo remote
+    # This avoids fighting over global gh auth state with other repo Ralphs
     try {
         $remoteUrl = & git remote get-url origin 2>&1 | Out-String
         $requiredAccount = if ($remoteUrl -match "tamirdresher_microsoft") { "tamirdresher_microsoft" } else { "tamirdresher" }
-        $currentAccount = & gh api user --jq '.login' 2>&1 | Out-String
-        $currentAccount = $currentAccount.Trim()
-        if ($currentAccount -ne $requiredAccount) {
-            Write-Host "[$timestamp] ⚠️ gh auth on '$currentAccount' but repo needs '$requiredAccount' — switching..." -ForegroundColor Yellow
-            & gh auth switch --user $requiredAccount 2>&1 | Out-Null
-            Write-Host "[$timestamp] ✅ Switched to $requiredAccount" -ForegroundColor Green
+        $token = & gh auth token --user $requiredAccount 2>&1 | Out-String
+        $token = $token.Trim()
+        if ($token -and $token.StartsWith("gho_")) {
+            $env:GH_TOKEN = $token
+            Write-Host "[$timestamp] gh auth: GH_TOKEN set for $requiredAccount (process-local, no global switch)" -ForegroundColor Green
         } else {
-            Write-Host "[$timestamp] gh auth OK ($currentAccount)" -ForegroundColor Green
+            Write-Host "[$timestamp] ⚠️ Could not get token for $requiredAccount, falling back to gh auth switch" -ForegroundColor Yellow
+            & gh auth switch --user $requiredAccount 2>&1 | Out-Null
         }
     } catch {
         Write-Host "[$timestamp] Warning: gh auth check failed: $($_.Exception.Message)" -ForegroundColor Yellow

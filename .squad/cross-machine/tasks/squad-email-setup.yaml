@@ -1,0 +1,17 @@
+id: squad-email-setup-all-machines
+source_machine: TAMIRDRESHER
+target_machine: ANY
+priority: medium
+created_at: 2026-03-16T18:14:52Z
+task_type: setup
+description: |
+  Set up Squad email (td-squad-ai-team@outlook.com) on this machine.
+  Run: pwsh scripts/squad-email/Setup-SquadEmailAuth.ps1
+  This requires a one-time device code auth — open https://microsoft.com/link
+  and enter the code shown, then sign in as td-squad-ai-team@outlook.com.
+  After setup, emails can be sent via: scripts/squad-email/Send-SquadEmail.ps1
+  IMPORTANT: Never use Outlook COM to send emails — always use Send-SquadEmail.ps1
+payload:
+  command: "pwsh scripts/squad-email/Setup-SquadEmailAuth.ps1"
+  expected_duration_min: 5
+status: pending

@@ -308,6 +308,78 @@ This skill is designed to be invoked by the Squad coordinator when users request
 
 The skill bridges natural language understanding and the technical DevBox provisioning infrastructure, abstracting Azure CLI complexity from the end user.
 
+## DevBox Setup Checklist (New Machine)
+
+When setting up a new devbox for Squad operations, run these steps:
+
+### 1. Clone repos
+```powershell
+cd C:\Users\$env:USERNAME\source\repos
+git clone https://github.com/tamirdresher_microsoft/tamresearch1.git
+git clone https://github.com/tamirdresher_microsoft/tamresearch1-research.git
+```
+
+### 2. Install npm dependencies
+```powershell
+cd tamresearch1; npm install
+```
+
+### 3. Verify prerequisites
+- `node --version` (22+), `gh --version`, `pwsh --version` (7+)
+- `gh auth status` — must be authenticated with scopes: `gist, project, read:org, repo, workflow`
+- If missing `project` scope: `gh auth refresh -s read:project,project`
+
+### 4. Update cross-machine config
+Add this machine's `$env:COMPUTERNAME` to `.squad/cross-machine/config.json` → `this_machine_aliases`
+
+### 5. Prevent sleep (Dev Box auto-stop protection)
+```powershell
+powercfg /change standby-timeout-ac 0
+powercfg /change standby-timeout-dc 0
+powercfg /change hibernate-timeout-ac 0
+powercfg /change hibernate-timeout-dc 0
+powercfg /hibernate off
+```
+
+### 6. Launch processes
+```powershell
+# Keep-alive (prevents Dev Box idle detection)
+Start-Process pwsh -ArgumentList "-NoProfile -File scripts\keep-devbox-alive.ps1" -WindowStyle Hidden
+
+# Both Ralphs
+pwsh start-all-ralphs.ps1
+```
+
+### 7. Auto-start on login
+The `scripts/devbox-startup.ps1` handles all of the above. Add shortcut to `shell:startup`:
+```powershell
+$shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut("$([Environment]::GetFolderPath('Startup'))\Squad-DevBox-Startup.lnk")
+$shortcut.TargetPath = "pwsh.exe"
+$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PWD\scripts\devbox-startup.ps1`""
+$shortcut.WindowStyle = 7
+$shortcut.Save()
+```
+
+## Known Issues
+
+### Research Ralph gets stuck on Round 1
+- **Symptom:** Process alive (heartbeat updating), no rounds completing, no log entries
+- **Root cause:** Agency copilot session hangs indefinitely — no per-round timeout
+- **Workaround:** Kill process, remove lockfile, restart
+- **Fix:** Issue #628 — add timeout guard to ralph-watch.ps1
+- **Detection:** Heartbeat shows `round: 1, status: running` for >15 minutes
+
+### Merge conflicts block git pull
+- **Symptom:** Ralph can't pull latest code, cross-machine tasks don't arrive
+- **Root cause:** `.squad/monitoring/schedule-state.json` conflicts between machines
+- **Fix needed:** Auto-resolve with `--theirs` strategy in ralph-watch.ps1 pre-pull step
+
+### gh rate limit exhaustion
+- **Symptom:** `gh` commands return 403, Ralph rounds fail
+- **Root cause:** Ralph uses ~50 API calls per round × 5min interval = burns through 5000/hour limit
+- **Mitigation:** Rate limit resets hourly. Ralph continues on next round.
+
 ## Future Enhancements
 
 ### Phase 3 Considerations
@@ -322,4 +394,5 @@ The skill bridges natural language understanding and the technical DevBox provis
 **Maintained by:** B'Elanna (Infrastructure Expert)  
 **Issue:** #63  
 **Phase:** 2  
-**Status:** Active
+**Status:** Active  
+**Last updated:** 2026-03-16 (added setup checklist, known issues from multi-devbox operations)

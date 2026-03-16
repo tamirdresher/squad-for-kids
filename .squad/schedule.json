@@ -237,24 +237,44 @@
       }
     },
     {
-      "id": "weekly-retro",
-      "description": "Review all work done this week, read issue comments and discussions, identify what Tamir liked/disliked, retrospect on squad behavior, improve rules/directives/tooling proactively",
+      "id": "weekly-squad-retro",
+      "name": "Weekly Squad Retrospective",
+      "description": "Review all work done that week, read discussions and issue comments, identify what Tamir liked/didn't like, retrospect on squad behavior, and improve rules/directives/tooling proactively. Store findings in .squad/log/.",
+      "enabled": true,
       "trigger": {
-        "description": "Every Friday at 14:00 UTC (4 PM Israel)",
+        "type": "cron",
         "expression": "0 14 * * 5",
         "timezone": "UTC",
-        "type": "cron"
+        "description": "Every Friday at 14:00 UTC (4 PM Israel time)"
+      },
+      "task": {
+        "type": "agent",
+        "agent": "picard",
+        "action": "retrospective",
+        "templateRef": ".squad/templates/weekly-retro.md"
       },
       "providers": [
         "local-polling"
       ],
-      "task": {
-        "action": "retrospective",
-        "agent": "picard",
-        "type": "agent"
+      "retry": {
+        "maxAttempts": 2,
+        "backoffSeconds": 120
       },
-      "name": "Weekly Squad Retrospective",
-      "enabled": true
+      "timeout": 1800,
+      "notifyOnFailure": [
+        "teams"
+      ],
+      "tags": [
+        "retro",
+        "reflection",
+        "improvement"
+      ],
+      "metadata": {
+        "issue": "#633",
+        "owner": "picard",
+        "outputDir": ".squad/log/",
+        "filePattern": "YYYY-MM-DD-weekly-retro.md"
+      }
     },
     {
       "id": "birthday-check",

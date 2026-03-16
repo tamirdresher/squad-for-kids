@@ -1,0 +1,9 @@
+# GitHub Sponsors funding configuration for tamirdresher
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+
+github: tamirdresher
+patreon: tamirdresher
+buy_me_a_coffee: tamirdresher
+custom:
+  - https://tdsquad.gumroad.com
+  - https://tamir-dresher.kit.com

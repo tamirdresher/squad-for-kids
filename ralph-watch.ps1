@@ -853,6 +853,16 @@ while ($true) {
     # Write heartbeat AFTER round (status: idle or error) with metrics
     Update-Heartbeat -Round $round -Status $roundStatus -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Metrics $metrics
     
+    # Write cross-machine heartbeat for Telegram bot visibility (Issue #606)
+    $ralphHeartbeatScript = Join-Path $PSScriptRoot "scripts\ralph-heartbeat.ps1"
+    if (Test-Path $ralphHeartbeatScript) {
+        try {
+            & $ralphHeartbeatScript -Round $round -Status $roundStatus -Failures $consecutiveFailures -Repo (Get-Location).Path | Out-Null
+        } catch {
+            Write-Host "[$timestamp] Warning: Failed to update Telegram heartbeat: $($_.Exception.Message)" -ForegroundColor DarkGray
+        }
+    }
+    
     # Rotate log if needed
     Invoke-LogRotation
     

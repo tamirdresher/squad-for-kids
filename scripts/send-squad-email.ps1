@@ -8,6 +8,8 @@
     Outlook COM automation or browser interaction. Credentials are retrieved securely
     from Windows Credential Manager.
 
+    Includes exponential-backoff retry logic for transient SMTP failures.
+
 .PARAMETER To
     Recipient email address(es). Can be a single string or array of strings.
 
@@ -28,6 +30,13 @@
 
 .PARAMETER BodyAsHtml
     If set, body will be sent as HTML instead of plain text.
+
+.PARAMETER MaxRetries
+    Maximum number of send attempts (default 3). Set to 1 to disable retry.
+
+.PARAMETER RetryDelaySeconds
+    Base delay in seconds for exponential backoff (default 2).
+    Actual delays: attempt 1 = 2s, attempt 2 = 8s, attempt 3 = 32s (base^(2*attempt-1)).
 
 .EXAMPLE
     .\send-squad-email.ps1 -To "user@example.com" -Subject "Test" -Body "Hello from Squad"
@@ -50,6 +59,7 @@
     - Credentials must be stored in Windows Credential Manager: squad-email-outlook
     - Requires PowerShell 5.1+
     - SMTP server: smtp-mail.outlook.com:587 (STARTTLS)
+    - Exit codes: 0 = success, 1 = permanent failure, 2 = temp failure after retries
 
 .LINK
     C:\temp\tamresearch1\.squad\skills\squad-email\SKILL.md
@@ -82,7 +92,15 @@ param(
     [switch]$BodyAsHtml,
 
     [Parameter(HelpMessage = "SMTP server timeout in milliseconds")]
-    [int]$TimeoutMs = 30000
+    [int]$TimeoutMs = 30000,
+
+    [Parameter(HelpMessage = "Maximum number of send attempts (default 3)")]
+    [ValidateRange(1, 10)]
+    [int]$MaxRetries = 3,
+
+    [Parameter(HelpMessage = "Base delay in seconds for exponential backoff (default 2)")]
+    [ValidateRange(1, 60)]
+    [int]$RetryDelaySeconds = 2
 )
 
 # Configuration
@@ -204,6 +222,46 @@ function Test-FileExists {
 }
 
 # ============================================================================
+# FUNCTION: Test-SmtpTransientError
+# ============================================================================
+# Returns $true if the error message indicates a transient SMTP failure that
+# is worth retrying (4xx codes), $false for permanent failures (5xx) or
+# unknown errors (which we still retry as a safety net).
+function Test-SmtpTransientError {
+    param([string]$ErrorMessage)
+
+    # SMTP 4xx codes are transient — server is temporarily unable to process
+    # 421 = service not available, 450 = mailbox busy, 451 = local error, 452 = insufficient storage
+    if ($ErrorMessage -match '\b(421|450|451|452)\b') { return $true }
+
+    # SMTP 5xx codes are permanent — do not retry
+    # 550 = mailbox not found, 553 = invalid address, 554 = transaction failed
+    if ($ErrorMessage -match '\b(5[0-5]\d)\b') { return $false }
+
+    # Connection/timeout errors are transient
+    if ($ErrorMessage -match '(timed?\s*out|connection\s*(refused|reset|closed)|network|socket)') {
+        return $true
+    }
+
+    # Unknown errors: retry by default (conservative approach)
+    return $true
+}
+
+# ============================================================================
+# FUNCTION: Test-SmtpPermanentError
+# ============================================================================
+# Returns $true only when the error clearly indicates a permanent failure.
+function Test-SmtpPermanentError {
+    param([string]$ErrorMessage)
+
+    if ($ErrorMessage -match '\b(550|553|554|521|523)\b') { return $true }
+    if ($ErrorMessage -match '(authentication\s+failed|auth.*required|invalid.*credential)') {
+        return $true
+    }
+    return $false
+}
+
+# ============================================================================
 # MAIN LOGIC
 # ============================================================================
 
@@ -254,7 +312,7 @@ For more info, see: C:\temp\tamresearch1\.squad\skills\squad-email\SKILL.md
     $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
     $credential = New-Object PSCredential($fromAddress, $securePassword)
 
-    # Send email
+    # Build Send-MailMessage parameters
     $mailParams = @{
         From       = $fromAddress
         To         = $To
@@ -282,12 +340,50 @@ For more info, see: C:\temp\tamresearch1\.squad\skills\squad-email\SKILL.md
         $mailParams['BodyAsHtml'] = $true
     }
 
-    Write-Verbose "Sending email to: $($To -join ', ')"
-    Send-MailMessage @mailParams -ErrorAction Stop
+    # --- Retry loop with exponential backoff ---
+    # Delays grow as base^(2*attempt-1): e.g. base=2 → 2s, 8s, 32s
+    $lastError = $null
+    $sent = $false
 
-    Write-Host "✓ Email sent successfully from $fromAddress" -ForegroundColor Green
-    Write-Host "  To: $($To -join ', ')"
-    Write-Host "  Subject: $Subject"
+    for ($attempt = 1; $attempt -le $MaxRetries; $attempt++) {
+        try {
+            Write-Verbose "Sending email to: $($To -join ', ') (attempt $attempt/$MaxRetries)"
+            Send-MailMessage @mailParams -ErrorAction Stop
+            $sent = $true
+            break
+        }
+        catch {
+            $lastError = $_
+            $errMsg = $_.Exception.Message
+
+            # Permanent SMTP error — stop immediately, retrying won't help
+            if (Test-SmtpPermanentError -ErrorMessage $errMsg) {
+                Write-Host "✗ Permanent SMTP error (attempt $attempt): $errMsg" -ForegroundColor Red
+                exit 1
+            }
+
+            # Transient or unknown error — retry if attempts remain
+            if ($attempt -lt $MaxRetries) {
+                $delay = [math]::Pow($RetryDelaySeconds, (2 * $attempt - 1))
+                $delay = [math]::Min($delay, 120) # cap at 2 minutes
+                Write-Host "⚠ Transient error (attempt $attempt/$MaxRetries): $errMsg" -ForegroundColor Yellow
+                Write-Host "  Retrying in $delay seconds..." -ForegroundColor Yellow
+                Start-Sleep -Seconds $delay
+            }
+        }
+    }
+
+    if ($sent) {
+        Write-Host "✓ Email sent successfully from $fromAddress" -ForegroundColor Green
+        Write-Host "  To: $($To -join ', ')"
+        Write-Host "  Subject: $Subject"
+        exit 0
+    }
+    else {
+        Write-Host "✗ Failed to send email after $MaxRetries attempt(s): $($lastError.Exception.Message)" -ForegroundColor Red
+        # Exit 2 = temporary failure exhausted retries (distinct from permanent=1)
+        exit 2
+    }
 
 }
 catch {

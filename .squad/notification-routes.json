@@ -1,0 +1,37 @@
+{
+  "defaultChannel": "general",
+  "provider": "webhook",
+  "channels": {
+    "general": {
+      "name": "General",
+      "webhookUrl": "${SQUAD_WEBHOOK_GENERAL}",
+      "description": "Catch-all for unrouted notifications"
+    },
+    "wins": {
+      "name": "Wins & Celebrations",
+      "webhookUrl": "${SQUAD_WEBHOOK_WINS}",
+      "description": "Milestones, merged PRs, closed issues, birthdays"
+    },
+    "alerts": {
+      "name": "Alerts",
+      "webhookUrl": "${SQUAD_WEBHOOK_ALERTS}",
+      "description": "Errors, failures, health issues, urgent items"
+    },
+    "pr-code": {
+      "name": "PR & Code",
+      "webhookUrl": "${SQUAD_WEBHOOK_PR}",
+      "description": "PR opened, reviews needed, CI status, builds"
+    },
+    "research": {
+      "name": "Research",
+      "webhookUrl": "${SQUAD_WEBHOOK_RESEARCH}",
+      "description": "Research outputs, paper summaries, analysis"
+    }
+  },
+  "routing": {
+    "wins": ["merged", "closed", "milestone", "celebration", "birthday", "shipped"],
+    "alerts": ["error", "failure", "blocked", "urgent", "stall", "health", "restart"],
+    "pr-code": ["PR", "review", "CI", "build", "deploy", "pipeline"],
+    "research": ["research", "analysis", "report", "findings"]
+  }
+}

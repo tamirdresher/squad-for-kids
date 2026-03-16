@@ -1,0 +1,11 @@
+id: blog-part4-planning
+source_machine: TAMIRDRESHER
+target_machine: ANY
+priority: high
+created_at: 2026-03-16T17:49:08Z
+task_type: research
+description: "Contribute ideas and an outline section for blog Part 4. The series is 'Scaling AI-Native Software Engineering'. Part 4 should be about distributed systems patterns applied to AI teams — OR about Squad Mesh (cross-repo squad coordination). Read .squad/research/distributed-systems-patterns-for-ai-teams.md and .squad/research/distributed-systems-deep-dive.md for context. Write 200-300 words with your machine's unique perspective. Save to .squad/cross-machine/responses/blog-part4-{MACHINE_NAME}.md"
+payload:
+  command: "echo 'Read the distributed systems research docs, propose Part 4 structure and write 200-300 words from this machine perspective. Save to .squad/cross-machine/responses/blog-part4-{machine}.md'"
+  expected_duration_min: 30
+status: pending

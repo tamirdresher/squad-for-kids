@@ -1,129 +1,63 @@
 ---
 name: gh-auth-isolation
-description: Prevent gh auth race conditions when multiple Ralphs run across repos by using per-process GH_TOKEN instead of global `gh auth switch`.
-confidence: high
+description: Prevent multiple Squad/Ralph instances from fighting over global gh auth state when running across repos with different GitHub accounts (personal vs EMU/enterprise).
 ---
 
-# GH Auth Isolation — Per-Process Token Pattern
+# GitHub Auth Isolation for Multi-Repo Squad
 
-## The Problem
+## Problem
+When multiple Ralphs run across repos (e.g., personal repos on `tamirdresher` + work repos on `tamirdresher_microsoft`), they fight over the global `gh auth switch` state. Each Ralph switches to its required account, causing the others to fail on the next round.
 
-When multiple Ralph instances run simultaneously across different repos (tamresearch1, jellybolt, devtools-pro, etc.), they share a single global `gh` CLI auth state. Each Ralph calls `gh auth switch --user <account>` to authenticate, which mutates global state in `~/.config/gh/hosts.yml`. This creates a race condition:
-
-1. Ralph-A switches to `tamirdresher_microsoft`
-2. Ralph-B switches to `tamirdresher` (overwriting Ralph-A's context)
-3. Ralph-A runs `gh pr create` — **fails** because global auth is now `tamirdresher`
-
-The more Ralphs running, the worse the problem. With 3+ concurrent instances, auth failures become near-constant.
+Symptoms:
+- Consecutive Ralph failures (exit code 1) across repos
+- `gh api user` returns wrong account intermittently
+- Failures are timing-dependent — works when only one Ralph runs
 
 ## Root Cause
+`gh auth switch --user X` mutates GLOBAL state in the gh CLI keyring. All processes on the machine share this state. When process A switches to account X and process B switches to account Y, process A's next API call uses account Y.
 
-`gh auth switch` is a **global mutation** — it writes to a shared config file on disk. The `gh` CLI reads the "active account" from this file on every invocation. There is no built-in per-process or per-session auth isolation.
+## Solution: Per-Process GH_TOKEN
 
-```
-~/.config/gh/hosts.yml   ← shared by ALL gh processes
-├── github.com:
-│   ├── user: tamirdresher_microsoft   ← last `gh auth switch` wins
-│   ├── oauth_token: gho_...
-│   └── ...
-```
-
-When two processes race on `gh auth switch`, the loser's subsequent `gh` commands run under the wrong account.
-
-## The Fix: Per-Process `GH_TOKEN`
-
-The `gh` CLI respects the `GH_TOKEN` environment variable. When set, it **overrides** the global auth state entirely — no disk read, no race.
-
-The key insight: `gh auth token --user <account>` returns the stored OAuth token for a specific account **without switching global state**. Combine these:
+Instead of switching global auth, extract the token for the required account and set it as a process-local environment variable:
 
 ```powershell
-# Set per-process token — does NOT mutate global state
-$env:GH_TOKEN = $(gh auth token --user tamirdresher_microsoft)
+# Detect required account from git remote
+$remoteUrl = git remote get-url origin
+$requiredAccount = if ($remoteUrl -match "orgname") { "user_orgname" } else { "user_personal" }
 
-# All subsequent gh commands in THIS process use this token
-gh pr list          # ✅ runs as tamirdresher_microsoft
-gh issue create ... # ✅ runs as tamirdresher_microsoft
+# Get token without switching global state
+$token = gh auth token --user $requiredAccount
+$env:GH_TOKEN = $token.Trim()
+
+# All subsequent gh commands in THIS process use the correct account
+# Other processes are unaffected
 ```
 
-Other processes are completely unaffected. No file lock, no race.
+## Integration with ralph-watch.ps1
 
-## Example Usage in Ralph Scripts
-
-### Basic: Single-Account Ralph
+Add this at the start of each Ralph round (before any gh commands):
 
 ```powershell
-# At the top of any Ralph script targeting an EMU repo
-$env:GH_TOKEN = $(gh auth token --user tamirdresher_microsoft)
-
-# All gh commands now safely use the EMU account
-gh pr list --repo tamirdresher_microsoft/tamresearch1
-gh issue list --repo tamirdresher_microsoft/tamresearch1
-```
-
-### Multi-Account: Cross-Repo Operations
-
-```powershell
-# Save tokens once at script start
-$emuToken = gh auth token --user tamirdresher_microsoft
-$personalToken = gh auth token --user tamirdresher
-
-# EMU operations
-$env:GH_TOKEN = $emuToken
-gh pr list --repo tamirdresher_microsoft/tamresearch1
-
-# Personal operations — just swap the env var
-$env:GH_TOKEN = $personalToken
-gh issue list --repo tamirdresher/squad-skills
-
-# Back to EMU — no global state touched at any point
-$env:GH_TOKEN = $emuToken
-gh pr create --title "fix" --body "..."
-```
-
-### Ralph Watch Loop Integration
-
-```powershell
-# ralph-watch.ps1 — each cycle is auth-safe
-function Start-RalphCycle {
-    param([string]$Account, [string]$Repo)
-
-    # Lock auth for this process at cycle start
-    $env:GH_TOKEN = $(gh auth token --user $Account)
-
-    # All operations in this cycle are safe
-    $issues = gh issue list --repo $Repo --json number,title | ConvertFrom-Json
-    foreach ($issue in $issues) {
-        # Process issue... gh commands all use $Account
+try {
+    $remoteUrl = & git remote get-url origin 2>&1 | Out-String
+    $requiredAccount = if ($remoteUrl -match "your_org") { "your_emu_account" } else { "your_personal_account" }
+    $token = & gh auth token --user $requiredAccount 2>&1 | Out-String
+    $token = $token.Trim()
+    if ($token -and $token.StartsWith("gho_")) {
+        $env:GH_TOKEN = $token
+    } else {
+        # Fallback to global switch (single-Ralph scenarios)
+        & gh auth switch --user $requiredAccount 2>&1 | Out-Null
     }
+} catch {
+    Write-Warning "gh auth isolation failed: $_"
 }
-
-# Multiple Ralphs can run these simultaneously — zero conflicts
-Start-RalphCycle -Account "tamirdresher_microsoft" -Repo "tamirdresher_microsoft/tamresearch1"
 ```
 
-## When to Use This Pattern
+## When to Use
+- Multiple Ralph instances across repos with different GitHub accounts
+- CI/CD environments where multiple gh-authenticated processes run concurrently
+- DevBox/Cloud PC setups where personal and work repos coexist
 
-| Scenario | Use This Pattern? |
-|----------|:-----------------:|
-| Multiple Ralphs across repos running simultaneously | ✅ **Yes** |
-| Any script that runs `gh` commands in background/scheduled tasks | ✅ **Yes** |
-| Single interactive `gh` command in a terminal | ❌ No — `ghp`/`ghe` aliases are fine |
-| CI/CD pipelines (GitHub Actions) | ❌ No — use `GITHUB_TOKEN` secret instead |
-| One-off manual scripts | ⚠️ Optional but recommended |
-
-**Rule of thumb:** If the script might run concurrently with other `gh`-using processes, use `GH_TOKEN` isolation.
-
-## Relationship to `ghp`/`ghe` Aliases
-
-The `ghp` and `ghe` aliases (see `github-account-switching` skill) wrap `gh auth switch` before each command. They are convenient for interactive use but still mutate global state, making them unsafe for concurrent processes.
-
-- **Interactive terminal work** → use `ghp`/`ghe` aliases
-- **Automated/concurrent scripts** → use `$env:GH_TOKEN` pattern from this skill
-
-## Validation
-
-This pattern has been validated in production:
-- ✅ Multiple Ralphs running across 3+ repos simultaneously
-- ✅ Zero auth race failures after adopting `GH_TOKEN` isolation
-- ✅ No interference with `ghp`/`ghe` aliases for interactive use
-- ✅ Token retrieval via `gh auth token` does not require re-authentication
+## Key Insight
+This is a classic distributed systems problem — shared mutable state (global auth) accessed by concurrent processes. The fix is the same as any concurrent programming fix: eliminate shared mutable state by making it process-local.

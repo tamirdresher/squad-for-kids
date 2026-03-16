@@ -5,30 +5,15 @@
     "description": "Check open PRs for review feedback, CI failures, stale PRs, auto-merge approved"
   },
   {
-    "name": "tech-news-scanner",
-    "interval": "24h",
-    "description": "Scan tech news sources and bradygaster/squad repo for updates, post digest to Teams",
-    "config": {
-      "squadRepo": {
-        "owner": "bradygaster",
-        "repo": "squad",
-        "checkReleases": true,
-        "checkDiscussions": true,
-        "checkCommits": true,
-        "blogUrl": "https://bradygaster.com"
-      },
-      "teamsChannels": [
-        {
-          "teamId": "5f93abfe-b968-44ea-bd0a-6f155046ccc7",
-          "channelId": "19:bfe3224e8e764c2785e81e7cb3cc944d@thread.tacv2",
-          "label": "squads > Tech News"
-        },
-        {
-          "teamId": "1de78cdf-3f73-4447-9601-a940bd98b80d",
-          "channelId": "19:c940af255e22486882c069d7b38a6204@thread.tacv2",
-          "label": "Squad > Squad Tech News"
-        }
-      ]
-    }
+    "name": "brady-squad-monitor",
+    "interval": "daily",
+    "time": "09:00",
+    "description": "Monitor Brady's Squad repo for new releases, commits, blog posts, and discussions",
+    "script": "scripts/brady-squad-monitor.ps1",
+    "postChannels": [
+      "squads > Tech News",
+      "Squad > Squad Tech News"
+    ],
+    "tracking": ".squad/monitoring/brady-squad-state.json"
   }
 ]

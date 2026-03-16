@@ -1,0 +1,73 @@
+# Sync tamirdresher/squad fork with upstream bradygaster/squad
+# Keeps the dev branch current to avoid merge conflicts.
+#
+# Auth note: GITHUB_TOKEN from this repo (tamresearch1) cannot write to
+# tamirdresher/squad (personal account). A PAT with repo scope stored
+# as SQUAD_SYNC_PAT is required. The PAT must belong to an account
+# with push access to tamirdresher/squad.
+
+name: Sync Squad Fork
+
+on:
+  schedule:
+    # Daily at 06:00 UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync dev branch
+        id: sync
+        env:
+          GH_TOKEN: ${{ secrets.SQUAD_SYNC_PAT }}
+        run: |
+          gh repo sync tamirdresher/squad --source bradygaster/squad --branch dev 2>&1 | tee sync-output.txt
+          echo "sync_status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Sync main branch
+        id: sync-main
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.SQUAD_SYNC_PAT }}
+        run: |
+          gh repo sync tamirdresher/squad --source bradygaster/squad --branch main 2>&1 | tee sync-main-output.txt || true
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SYNC_OUTPUT=$(cat sync-output.txt 2>/dev/null || echo "No output captured")
+          gh issue create \
+            --repo ${{ github.repository }} \
+            --title "Squad fork sync failed ($(date -u +%Y-%m-%d))" \
+            --body "## Fork sync failed
+
+          The daily sync of \`tamirdresher/squad\` from \`bradygaster/squad\` failed.
+
+          **Branch:** dev
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ### Output
+          \`\`\`
+          ${SYNC_OUTPUT}
+          \`\`\`
+
+          ### Resolution
+          1. Run \`scripts/sync-squad-fork.ps1\` locally to inspect the conflict
+          2. Or manually resolve with:
+             \`\`\`bash
+             cd /tmp && git clone https://github.com/tamirdresher/squad.git && cd squad
+             git remote add upstream https://github.com/bradygaster/squad.git
+             git fetch upstream
+             git checkout dev
+             git merge upstream/dev
+             # resolve conflicts, commit, push
+             \`\`\`
+          " \
+            --label "automation,squad-sync"

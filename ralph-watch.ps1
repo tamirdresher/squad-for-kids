@@ -844,9 +844,23 @@ while ($true) {
         # Fresh session per round to prevent history accumulation (causes 400 Bad Request)
         $roundSessionId = [guid]::NewGuid().ToString()
         
-        # Launch agency with timeout guard to prevent indefinite hangs
-        $agencyProc = Start-Process -FilePath "agency" `
-            -ArgumentList "copilot --yolo --autopilot --agent squad -p `"$prompt`" --resume=$roundSessionId" `
+        # Write prompt to temp file to avoid Start-Process argument splitting
+        # (embedded flags like -R in prompt text get misinterpreted as CLI args)
+        $promptFile = Join-Path $env:TEMP "ralph-prompt-$round.txt"
+        [System.IO.File]::WriteAllText($promptFile, $prompt, [System.Text.Encoding]::UTF8)
+        
+        # Create a thin wrapper script that reads the prompt from file and calls agency
+        # This avoids ALL Start-Process argument quoting issues
+        $wrapperScript = Join-Path $env:TEMP "ralph-round-$round.ps1"
+        @"
+`$p = [System.IO.File]::ReadAllText('$($promptFile.Replace("'","''"))')
+agency copilot --yolo --autopilot --agent squad -p `$p --resume=$roundSessionId
+exit `$LASTEXITCODE
+"@ | Out-File -FilePath $wrapperScript -Encoding utf8 -Force
+        
+        # Launch the wrapper script with timeout guard
+        $agencyProc = Start-Process -FilePath "pwsh" `
+            -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $wrapperScript) `
             -PassThru -NoNewWindow
         $timedOut = $false
         $timeoutMs = $roundTimeoutMinutes * 60 * 1000

@@ -40,3 +40,10 @@
 - Remove speaker name slides entirely
 - No one should be able to tell the video came from an existing presentation
 - This applies to ALL PPTX conversions — rebrand first, then produce video
+
+## Rule 7: 2FA Handling via Teams
+- When any service requires 2FA (Google, YouTube, etc.), send the number/code to Tamir via Teams DM
+- Message format: "2FA needed: tap [NUMBER] on your phone for [SERVICE]"
+- Do NOT ask Tamir to go to a URL — just send the number he needs to tap
+- Wait 60 seconds after sending, then retry the action
+- This applies to ALL squads and all cross-machine Ralphs

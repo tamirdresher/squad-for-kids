@@ -532,6 +532,78 @@ function formatDigest(stories, squadUpdates = []) {
   return digest;
 }
 
+async function postToTeamsWebhook(digest) {
+  const webhookFile = path.join(process.env.USERPROFILE || process.env.HOME || '', '.squad', 'teams-webhook.url');
+
+  if (!fs.existsSync(webhookFile)) {
+    console.error('Teams webhook URL file not found, skipping Teams post');
+    return;
+  }
+
+  const webhookUrl = fs.readFileSync(webhookFile, 'utf8').trim();
+  if (!webhookUrl) {
+    console.error('Teams webhook URL is empty, skipping Teams post');
+    return;
+  }
+
+  // Truncate for Teams card limit
+  const summary = digest.length > 2000
+    ? digest.slice(0, 2000) + '\n\n_...truncated. See GitHub issue for full digest._'
+    : digest;
+
+  const payload = JSON.stringify({
+    type: 'message',
+    attachments: [{
+      contentType: 'application/vnd.microsoft.card.adaptive',
+      content: {
+        '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
+        type: 'AdaptiveCard',
+        version: '1.4',
+        body: [{
+          type: 'TextBlock',
+          text: summary,
+          wrap: true,
+        }],
+      },
+    }],
+  });
+
+  return new Promise((resolve) => {
+    try {
+      const parsedUrl = new URL(webhookUrl);
+      const req = https.request(parsedUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      }, (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk; });
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            console.error(`Posted digest to Teams webhook (status: ${res.statusCode})`);
+          } else {
+            console.error(`Teams webhook returned ${res.statusCode}: ${data}`);
+          }
+          resolve();
+        });
+      });
+
+      req.on('error', (err) => {
+        console.error(`Failed to post to Teams webhook: ${err.message}`);
+        resolve();
+      });
+
+      req.write(payload);
+      req.end();
+    } catch (err) {
+      console.error(`Failed to post to Teams webhook: ${err.message}`);
+      resolve();
+    }
+  });
+}
+
 async function main() {
   try {
     ensureStateDir();
@@ -562,11 +634,8 @@ async function main() {
     const digest = formatDigest(newStories, newSquadUpdates);
     console.log(digest);
     
-    // Log Teams channel targets for posting
-    console.error('Digest should be posted to the following Teams channels:');
-    for (const ch of TEAMS_CHANNELS) {
-      console.error(`  - ${ch.label} (team: ${ch.teamId}, channel: ${ch.channelId})`);
-    }
+    // Post digest to Teams channels via webhook
+    await postToTeamsWebhook(digest);
     
     // Update state with new URLs
     if (!state.reportedUrls[todayDate]) {

@@ -1,9 +1,11 @@
 name: "CodeQL Analysis"
 
-# Manual trigger only — this repo is primarily markdown, PowerShell, and config files.
+# This repo is primarily markdown, PowerShell, and config files.
 # The JS/TS code (dashboard-ui, scripts/) doesn't have a root build step,
-# causing Autobuild failures on every push/PR. Run manually when needed.
+# causing Autobuild failures on every push/PR. Scheduled monthly + manual.
 on:
+  schedule:
+    - cron: '0 6 1 * *'  # First of every month at 6 AM UTC
   workflow_dispatch:
 
 jobs:

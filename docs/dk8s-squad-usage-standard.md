@@ -1,729 +1,712 @@
-# DK8S Squad Usage Standard & Guidelines
+# DK8S Squad Usage Standard
 
-> Baseline standard for Squad adoption across the DK8S Platform engineering group.
-> Authored by Picard (Lead) with input from Adir, Tamir Dresher.
-> Status: **Draft — v0.1**
+> **Version:** 1.0 · **Status:** Proposed · **Date:** 2026-03-17
+> **Author:** Tamir Dresher · **Issue:** [#771](https://github.com/tamirdresher_microsoft/tamresearch1/issues/771)
 
----
+## 1. Purpose
 
-## Why This Document Exists
+This document defines how DK8S teams adopt and operate Squad — the multi-agent AI framework that runs inside GitHub Copilot CLI and VS Code. It exists so every engineer, across every swimlane, sets up Squad the same way and gets the same benefits:
 
-Adir said it plainly:
+- **Consistent tooling** — one way to configure agents, route work, and track decisions
+- **Shared ownership** — cross-team activities (vuln management, CI/CD, cleanups) have dedicated agent ownership
+- **Personal customization** — every engineer gets a personal squad tuned to their workflow
+- **Upstream inheritance** — org-level defaults flow down; personal overrides stay local
 
-> "We need a clear baseline — how tasks are tracked, how flows/prompts are structured, and what validation, testing, and review standards look like. Otherwise, we risk fragmentation instead of leverage."
-
-This document is that baseline. It covers:
-1. How DK8S organizes its Squad topology (org → swimlane → personal)
-2. What every Squad in the group must do (non-negotiable gates)
-3. What each engineer can customize (universe, ceremonies, local preferences)
-4. How cross-team activities (vuln management, CI/CD, cleanups) are coordinated
-5. How to get started from zero
-
-If you're reading this and you don't have a Squad yet, skip to [Section 5: Getting Started](#5-getting-started).
+This is **not** a theoretical document. It tells you exactly what files to create, what to put in them, and how the pieces connect.
 
 ---
 
-## 1. Squad Topology for DK8S
+## 2. Squad Hierarchy
 
-### The Three-Level Model
-
-Squad operates across three organizational levels. Knowledge flows **down** (org → team → repo). Skills are **promoted up** manually when they've proven themselves.
+Squad operates at three levels. Each level inherits from the one above.
 
 ```
-DK8S Org-Level Squad (microsoft-mtp/dk8s-squad repo)
-│
-├── .squad/
-│   ├── decisions.md            ← org-wide policies (security gates, review requirements)
-│   ├── skills/                 ← shared patterns (vuln scanning, PR review, incident response)
-│   ├── routing.md              ← default routing rules for DK8S work
-│   ├── team.md                 ← org-level agent roster (shared casting)
-│   └── upstream.json           ← (empty — this IS the top-level upstream)
-│
-├── Swimlane Squads (per team area)
-│   ├── platform-core/          ← core platform, ARM templates, K8s operators
-│   ├── security-compliance/    ← SDL, vulnerability management, CVEs
-│   ├── infrastructure/         ← AKS clusters, networking, CI/CD pipelines
-│   └── tooling-dx/             ← developer experience, ConfigGen SDK
-│
-└── Personal Squads (per engineer, separate repos)
-    ├── tamir-squad             ← Star Trek: TNG + Voyager universe ✅
-    ├── adir-squad              ← [Adir picks universe]
-    ├── moshe-squad             ← [Moshe picks universe]
-    └── ...                     ← Every engineer gets one
+┌─────────────────────────────────────────────┐
+│           DK8S Org Squad                    │
+│  repo: microsoft-mtp/dk8s-squad             │
+│  owns: org-wide standards, shared agents,   │
+│        cross-team workflows                 │
+├─────────────────────────────────────────────┤
+│     Swimlane / SubSquad                     │
+│  repo: each swimlane's own repo             │
+│  owns: swimlane-specific agents, routing,   │
+│        domain expertise                     │
+├─────────────────────────────────────────────┤
+│     Personal Squad                          │
+│  location: engineer's dev environment       │
+│  owns: personal preferences, custom agents, │
+│        universe theme, shortcuts            │
+└─────────────────────────────────────────────┘
 ```
 
-### How the Levels Connect
+### 2.1 Org Squad (`microsoft-mtp/dk8s-squad`)
 
-Each personal squad inherits from the org-level squad via upstream:
+The org-level squad repo is the **single source of truth** for DK8S-wide standards. It contains:
 
-```bash
-# In your personal squad repo:
-squad upstream add https://github.com/microsoft-mtp/dk8s-squad.git --name dk8s-org
-squad upstream sync
+| Path | Purpose |
+|------|---------|
+| `.squad/team.md` | Org-wide shared agents (e.g., security scanner, compliance checker) |
+| `.squad/routing.md` | Default routing rules all swimlanes inherit |
+| `.squad/decisions.md` | Org-level architecture decisions |
+| `.squad/ceremonies.md` | Standard ceremonies (design review, retro, model review) |
+| `.squad/casting-policy.json` | Allowed character universes for the org |
+| `squad.config.ts` | Org-wide model defaults, fallback chains, governance |
+| `docs/` | Standards (this document), runbooks, guides |
+| `.github/workflows/squad-*.yml` | Shared GitHub Actions for squad automation |
+
+**Who maintains it:** DK8S Platform leads + designated squad maintainers from each swimlane.
+
+### 2.2 Swimlane Squad (per-repo)
+
+Each swimlane repo has its own `.squad/` directory that **extends** the org squad. Swimlane squads:
+
+- Add domain-specific agents (e.g., a Helm expert for infra, a compliance agent for FedRAMP)
+- Override routing rules for their domain
+- Track swimlane-specific decisions
+- Define swimlane-specific ceremonies and skills
+
+**Example:** A FedRAMP swimlane might add:
+
+```
+.squad/
+├── team.md                    # Swimlane roster (inherits + extends org)
+├── routing.md                 # Swimlane routing (overrides org defaults)
+├── decisions.md               # Swimlane decisions
+├── agents/
+│   ├── compliance-officer/
+│   │   └── charter.md         # FedRAMP-specific agent
+│   └── drift-detector/
+│       └── charter.md         # Config drift agent
+└── skills/
+    └── fedramp-audit/
+        └── SKILL.md           # Domain skill
 ```
 
-This means:
-- Org-level **decisions** (security gates, review standards) flow down to every personal squad
-- Org-level **skills** (incident response, DK8S support patterns) are available everywhere
-- Org-level **routing rules** provide defaults that repos can override
+### 2.3 Personal Squad (per-engineer)
 
-The resolution model is **closest-wins**: your repo's `.squad/decisions.md` takes priority over the org-level one. But org-level security policies are marked as non-overridable (see [Governance](#7-governance)).
+Every engineer configures a personal squad in their dev environment. This is where you:
 
-### Swimlane Squads: Two Models
+- Choose your character universe (Star Trek, Breaking Bad, Marvel, etc.)
+- Add personal productivity agents (e.g., a meeting summarizer, a code reviewer tuned to your style)
+- Override model preferences
+- Configure MCP server connections for your tools
 
-Swimlane-level coordination can use either approach:
+Personal squads live in `~/.squad/` or in the engineer's personal fork/branch.
 
-| Model | When to Use | Example |
-|-------|-------------|---------|
-| **SubSquads** (`.squad/streams.json`) | Multiple teams in one mono-repo | `dk8s-operators` repo with platform + infra teams |
-| **Separate repos** with shared upstream | Independent repos per team area | `dk8s-security-tools` repo with its own squad |
+---
 
-**SubSquads example** (`.squad/streams.json`):
-```json
-{
-  "workstreams": [
-    {
-      "name": "platform-core",
-      "labelFilter": "team:platform",
-      "folderScope": ["operators/", "controllers/", "api/"],
-      "workflow": "default"
+## 3. Required Files & Configuration
+
+### 3.1 `squad.config.ts` — The Main Config
+
+Every squad repo **must** have a `squad.config.ts` at the root. This is the machine-readable configuration.
+
+```typescript
+import type { SquadConfig } from '@bradygaster/squad';
+
+const config: SquadConfig = {
+  version: '1.0.0',
+
+  models: {
+    // Default model for all agents unless overridden in charter
+    defaultModel: 'claude-sonnet-4.5',
+    defaultTier: 'standard',
+    fallbackChains: {
+      premium:  ['claude-opus-4.6', 'claude-opus-4.5', 'claude-sonnet-4.5'],
+      standard: ['claude-sonnet-4.5', 'gpt-5.2-codex', 'claude-sonnet-4', 'gpt-5.2'],
+      fast:     ['claude-haiku-4.5', 'gpt-5.1-codex-mini', 'gpt-4.1', 'gpt-5-mini']
     },
-    {
-      "name": "infrastructure",
-      "labelFilter": "team:infra",
-      "folderScope": ["infra/", "deploy/", ".github/workflows/"],
-      "workflow": "default"
+    preferSameProvider: true,
+    respectTierCeiling: true,
+    nuclearFallback: {
+      enabled: false,      // Don't fall back to cheapest model after failures
+      model: 'claude-haiku-4.5',
+      maxRetriesBeforeNuclear: 3
     }
-  ]
-}
+  },
+
+  routing: {
+    rules: [
+      // Scribe auto-attaches to all work types for logging
+      { workType: 'feature-dev',   agents: ['@scribe'], confidence: 'high' },
+      { workType: 'bug-fix',       agents: ['@scribe'], confidence: 'high' },
+      { workType: 'testing',       agents: ['@scribe'], confidence: 'high' },
+      { workType: 'documentation', agents: ['@scribe'], confidence: 'high' }
+    ],
+    governance: {
+      eagerByDefault: true,         // Spawn agents proactively
+      scribeAutoRuns: false,        // Scribe triggered by routing rules, not auto
+      allowRecursiveSpawn: false    // Agents cannot spawn other agents
+    }
+  },
+
+  casting: {
+    allowlistUniverses: [
+      'Star Trek: TNG',
+      'Star Trek: Voyager',
+      'Breaking Bad',
+      'Firefly'
+      // Add your swimlane's preferred universes
+    ],
+    overflowStrategy: 'generic',   // Use generic names if universe exhausted
+    universeCapacity: {}            // Per-universe limits (optional)
+  },
+
+  platforms: {
+    vscode: {
+      disableModelSelection: false,
+      scribeMode: 'sync'
+    }
+  }
+};
+
+export default config;
 ```
 
-**Activate a SubSquad:**
-```bash
-squad subsquads activate platform-core
-# or via environment variable:
-export SQUAD_TEAM=platform-core
+### 3.2 `.squad/team.md` — Team Roster
+
+Lists every agent and human on the squad. Format:
+
+```markdown
+# Squad Team
+
+## Human Members
+| Name | Role | Contact | Notes |
+|------|------|---------|-------|
+| Jane Doe | Tech Lead | Teams: @janedoe | Decision maker |
+
+## Agent Members
+| Agent | Role | Status | Charter |
+|-------|------|--------|---------|
+| Picard | Lead — Architecture & Decisions | ✅ Active | `.squad/agents/picard/charter.md` |
+| Data | Code Expert — C#, Go, .NET | ✅ Active | `.squad/agents/data/charter.md` |
+| Worf | Security & Cloud — Azure, Networking | ✅ Active | `.squad/agents/worf/charter.md` |
+| @copilot | Coding Agent — Autonomous small tasks | 🤖 Active | — |
 ```
 
-### Branch Naming with SubSquads
+**Rules:**
+- Every squad **must** have at least one Lead agent and one human decision maker
+- The `@copilot` entry enables GitHub's built-in Copilot coding agent
+- Status values: `✅ Active`, `🔄 Monitor` (background), `📋 Silent` (logging only), `🤖 Active` (autonomous)
+
+### 3.3 `.squad/routing.md` — Work Routing
+
+Defines how work gets assigned. This file is read by both humans and the coordinator agent.
+
+```markdown
+# Work Routing
+
+## Routing Table
+| Work Type | Route To | Notes |
+|-----------|----------|-------|
+| Architecture, distributed systems | Picard | Primary owner |
+| Security, Azure, networking | Worf | Security-first |
+| C#, Go, .NET, clean code | Data | Code quality |
+| K8s, Helm, ArgoCD | B'Elanna | Infrastructure |
+| Code review, small bugs, tests | @copilot 🤖 | Well-defined only |
+
+## Issue Triage Process
+1. New issues get `squad` label → Lead triages
+2. Lead assigns `squad:{member}` label → agent picks up work
+3. `squad:copilot` → @copilot works autonomously (🟢 tasks only)
+4. Agents can reassign by changing labels
+
+## @copilot Capability Profile
+- 🟢 Good fit: Bug fixes, test additions, dependency updates, well-defined tasks
+- 🟡 Needs review: Medium features with clear specs (PR review before merge)
+- 🔴 Not suitable: Architecture, security, design decisions → escalate
+
+## Governance Rules
+1. Eager by default — spawn all agents who could usefully start work
+2. Quick facts → coordinator answers directly (don't spawn for trivial questions)
+3. When two agents could handle it, pick the one whose domain is primary
+4. "Team, ..." → fan-out: spawn all relevant agents in parallel
 ```
-{subsquad-name}/issue-{number}-{description}
-# Examples:
-platform-core/issue-42-fix-reconciler-crash
-infrastructure/issue-78-aks-node-pool-scaling
-```
 
----
+### 3.4 `.squad/agents/{name}/charter.md` — Agent Charters
 
-## 2. Baseline Standards
-
-These are the non-negotiable practices for every Squad in the DK8S group. They apply whether you're in a personal squad, a swimlane squad, or the org-level squad.
-
-### 2.1 Task Tracking
-
-**System:** GitHub Issues in each repo.
-
-**Required labels:**
-
-| Label | Purpose | Example |
-|-------|---------|---------|
-| `squad` | Untriaged — sitting in the Lead's inbox | New issue, needs triage |
-| `squad:{member}` | Assigned to a specific agent or person | `squad:belanna`, `squad:data`, `squad:copilot` |
-| `priority:critical` | Drop everything | Production incident, security vuln |
-| `priority:high` | Next sprint | Feature blocking another team |
-| `priority:medium` | Backlog — planned | Improvement, tech debt |
-| `priority:low` | Nice to have | Cleanup, optimization |
-| `type:bug` | Defect | Broken functionality |
-| `type:feature` | New capability | New API, new tool |
-| `type:security` | Security-related | CVE, SDL finding, hardening |
-| `type:cleanup` | Tech debt, refactoring | Dead code, dependency update |
-| `type:docs` | Documentation | README, ADR, runbook |
-
-**Triage workflow:**
-1. Issue created → auto-labeled `squad`
-2. Lead triages: evaluates scope, assigns `squad:{member}` label, adds priority
-3. Lead evaluates @copilot fit using capability profile:
-   - 🟢 **Good fit** (bugs, test additions, well-defined tasks) → `squad:copilot`
-   - 🟡 **Needs review** (small features with specs) → `squad:{member}` + PR review required
-   - 🔴 **Not suitable** (architecture, security, design judgment) → human or specialized agent only
-4. Named member picks up issue in next session
-
-### 2.2 Flow & Prompt Structure
-
-**Issue templates** — every repo should have these in `.github/ISSUE_TEMPLATE/`:
+Each agent has a charter defining its personality, expertise, and constraints.
 
 ```yaml
-# .github/ISSUE_TEMPLATE/squad-task.yml
-name: Squad Task
-description: Standard task for Squad processing
-labels: ["squad"]
-body:
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      options:
-        - critical
-        - high
-        - medium
-        - low
-  - type: dropdown
-    id: type
-    attributes:
-      label: Type
-      options:
-        - bug
-        - feature
-        - security
-        - cleanup
-        - docs
-  - type: textarea
-    id: description
-    attributes:
-      label: Description
-      description: What needs to happen? Include acceptance criteria.
-  - type: textarea
-    id: context
-    attributes:
-      label: Context
-      description: Links, logs, related issues.
-```
-
-**Routing rules** — every repo's `.squad/routing.md` should include at minimum:
-
-```markdown
-## Routing Table
-| Work Type | Route To | Examples |
-|-----------|----------|----------|
-| K8s, Helm, ArgoCD | B'Elanna | Operator bugs, Helm chart fixes |
-| Security, compliance | Worf | CVE response, SDL findings |
-| C#, Go, .NET code | Data | Code review, refactoring |
-| Architecture decisions | Picard | Design review, trade-off analysis |
-| Async bounded tasks | @copilot | Test additions, bug fixes with repro |
-```
-
-### 2.3 Validation & Security Gates
-
-**Every PR must pass these gates before merge:**
-
-| Gate | Tool | Blocks Merge? | Notes |
-|------|------|---------------|-------|
-| CodeQL / SAST | GitHub Advanced Security | ✅ Yes | No new high/critical findings |
-| Dependency scan | Dependabot / GH Advisory | ✅ Yes | No known vulnerable deps |
-| Unit tests | Repo CI pipeline | ✅ Yes | All tests pass, no regressions |
-| AI code review | Squad code-review agent | ⚠️ Advisory | Surfaces bugs, logic errors — human decides |
-| Human review | PR approver | ✅ Yes for 🔴 items | Required for architecture, security, API changes |
-
-**Three-tier review model:**
-1. **Automated SAST** — CodeQL, dependency scanning, secret scanning run on every PR
-2. **AI code review** — Squad's code-review agent analyzes diff for bugs, security issues, logic errors
-3. **Human approval** — Required for:
-   - Any change touching authentication, authorization, or encryption
-   - API surface changes (new endpoints, changed contracts)
-   - Infrastructure changes (Helm values, Terraform, ARM templates)
-   - Architecture decisions (new patterns, dependency additions)
-
-### 2.4 Testing Standards
-
-**Agent-written tests required for all code PRs.** If an agent writes code, the same PR must include tests.
-
-| Change Type | Required Tests | Coverage |
-|-------------|---------------|----------|
-| Bug fix | Regression test proving the fix | Must fail without fix, pass with it |
-| New feature | Unit + integration tests | Happy path + key error paths |
-| Refactor | Existing tests must pass | No coverage regression |
-| Config change | Validation test | Config parses and applies correctly |
-
-**Test naming convention:**
-```
-Test_{MethodUnderTest}_{Scenario}_{ExpectedResult}
-// Example:
-Test_ReconcileCluster_NodePoolMissing_CreatesNodePool
-```
-
-### 2.5 Decision Recording
-
-**All significant decisions go in `.squad/decisions.md`** or `.squad/decisions/inbox/`.
-
-A decision is "significant" if:
-- It affects more than one person or repo
-- It establishes a pattern others should follow
-- It has security or compliance implications
-- It would be confusing if someone didn't know about it
-
-**Decision format:**
-```markdown
-### Decision {N}: {Title}
-- **Date:** YYYY-MM-DD
-- **Author:** {agent or person}
-- **Status:** Active | Superseded by #{M}
-- **Context:** Why was this decision needed?
-- **Decision:** What was decided?
-- **Consequences:** What changes because of this?
-```
-
-**Inbox workflow:**
-1. Agent writes decision to `.squad/decisions/inbox/{author}-{slug}.md`
-2. Lead reviews and either promotes to `decisions.md` or sends back with feedback
-3. Promoted decisions are append-only — supersede, don't edit
-
+---
+name: "worf"
+role: "Security & Cloud"
+expertise: "Security, Azure, networking, compliance"
+style: "Paranoid by design. Assumes every input is hostile."
+model: "auto"
 ---
 
-## 3. Cross-Team Activities
+# Worf — Security & Cloud
 
-These activities span multiple repos and swimlanes. Each has a named owner.
+## Responsibilities
+- Review all security-sensitive changes
+- Maintain Azure networking configurations
+- Run threat modeling on new features
+- Enforce FedRAMP compliance requirements
 
-### 3.1 Vulnerability Management
+## Constraints
+- Never approve security exceptions without Lead sign-off
+- Always run CodeQL analysis before approving PRs
+- Escalate any credential exposure immediately
+```
 
-| Aspect | Standard |
-|--------|----------|
-| **Owner** | Worf (Security & Cloud agent) + human security lead |
-| **Scope** | All DK8S repos (~50 repos) |
-| **Tooling** | GitHub Advanced Security alerts, Dependabot, CodeQL |
-| **Cadence** | Daily scan by Ralph; critical vulns escalate immediately |
-| **Workflow** | Ralph scans → Worf triages → creates `type:security` issues → human approves fix PRs |
-| **Escalation** | Critical/High CVEs → Teams notification to `defenderk8splatform@microsoft.com` within 4 hours |
+### 3.5 `.squad/decisions.md` — Decision Log
 
-**Shared skill:** `dk8s-support-patterns` — common cluster issues, capacity exhaustion, node bootstrap failures, Azure platform misattribution.
-
-### 3.2 CI/CD Alignment
-
-| Aspect | Standard |
-|--------|----------|
-| **Owner** | B'Elanna (Infrastructure Expert) |
-| **Scope** | Shared pipeline templates across all DK8S repos |
-| **Location** | Org-level squad's `.squad/skills/` |
-| **Standard** | All repos use shared OneBranch/ADO pipeline templates |
-| **Validation** | `helm-validate` skill for chart linting; `binlog-generation` for .NET build diagnosis |
-
-### 3.3 Automated Cleanups
-
-| Aspect | Standard |
-|--------|----------|
-| **Owner** | Ralph (Work Monitor) with Data (Code Expert) |
-| **Scope** | Cross-repo tech debt scanning |
-| **Cadence** | Weekly sweep by Ralph |
-| **Types** | Stale branches (>30 days), abandoned PRs, TODO/FIXME audit, dependency freshness |
-| **Action** | Ralph creates `type:cleanup` issues; Data or @copilot picks them up |
-
-### 3.4 Incident Response
-
-| Aspect | Standard |
-|--------|----------|
-| **Owner** | On-call engineer + Worf + B'Elanna |
-| **Shared skill** | `incident-response` — always check Azure Status page first |
-| **Workflow** | ICM fires → on-call picks up → Squad agents assist with log analysis, blast radius assessment |
-| **Post-incident** | Decision recorded in `decisions.md`; runbook updated if gap found |
-
-### 3.5 ConfigGen Support
-
-| Aspect | Standard |
-|--------|----------|
-| **Owner** | Data (Code Expert) |
-| **Shared skill** | `configgen-support-patterns` — enforcement breaking builds, auto-gen conflicts, modeling gaps |
-| **Scope** | All repos consuming ConfigurationGeneration.* NuGet packages |
-| **Workflow** | Support ticket → DK8S queue → Data triages with skill patterns → fix or escalate |
-
-### 3.6 Ownership Matrix
-
-| Cross-Team Activity | Primary Owner | Secondary | Escalation |
-|---------------------|--------------|-----------|------------|
-| Vulnerability management | Worf | Human security lead | `defenderk8splatform@microsoft.com` |
-| CI/CD templates | B'Elanna | Pipeline engineer | Swimlane lead |
-| Cleanups & tech debt | Ralph + Data | @copilot | Picard |
-| Incident response | On-call + Worf | B'Elanna | ICM |
-| ConfigGen support | Data | `configgen-support-patterns` skill | Tamir |
-| Knowledge consolidation | Seven | Picard | — |
-
----
-
-## 4. Personal Squad Customization
-
-### What's Yours to Customize
-
-Each engineer gets a personal squad. It's your workspace. You pick:
-
-| Customizable | Example |
-|-------------|---------|
-| **Universe / casting** | Star Trek, Star Wars, Marvel, Dune, Lord of the Rings, anime — your call |
-| **Agent names & personalities** | Picard → Gandalf, Worf → Wolverine, etc. |
-| **Ceremonies** | Daily standup format, retrospective style |
-| **Local preferences** | Editor settings, shell aliases, notification preferences |
-| **Additional agents** | Add role-specific agents for your workflow |
-| **Model assignments** | Pick faster/cheaper models for routine tasks |
-
-### What's NOT Yours to Override
-
-These flow down from the org-level upstream and are enforced:
-
-| Non-Overridable | Why |
-|----------------|-----|
-| Security review gates | Compliance — SDL requirements |
-| PR must have tests | Quality baseline |
-| Decision recording format | Cross-team readability |
-| Vulnerability scan requirements | Security posture |
-| Label taxonomy (`squad`, `priority:*`, `type:*`) | Cross-team reporting |
-| Escalation paths for `priority:critical` | Incident response SLA |
-
-### How Upstream Enforcement Works
-
-The org-level squad marks non-overridable decisions with `[ENFORCED]`:
+Tracks all architectural and process decisions. Uses a numbered format:
 
 ```markdown
-### Decision 1: Security Review Gate [ENFORCED]
-All PRs touching auth, encryption, or API surfaces require human approval.
-This decision cannot be overridden by downstream squads.
+## Decision 1: Adopt Squad Framework for DK8S
+
+**Date:** 2026-03-17
+**Evaluator:** Picard (Lead)
+**Status:** ✅ APPROVED
+
+### Summary
+Adopt Squad as the standard multi-agent framework for all DK8S swimlanes.
+
+### Context
+Engineers were using ad-hoc Copilot configurations. Squad provides structure.
+
+### Implementation
+1. Create org-level squad repo
+2. Each swimlane extends with domain agents
+3. Engineers set up personal squads
 ```
 
-Closest-wins still applies for everything else. If the org says "use TypeScript" but your repo is a Go operator, your repo-level decision wins locally.
+### 3.6 `.squad/ceremonies.md` — Team Ceremonies
 
-### Personal Squad Setup Example (Star Trek)
+```markdown
+# Squad Ceremonies
 
-Tamir's squad (the reference implementation):
+## Design Review
+- **Trigger:** Before multi-agent tasks or architecture changes
+- **Facilitator:** Lead
+- **Agenda:** Review requirements → agree on interfaces → identify risks
+- **Output:** Updated decisions.md entry
 
-```
-tamresearch1/.squad/
-├── team.md                 ← Picard (Lead), B'Elanna, Worf, Data, Seven, ...
-├── decisions.md            ← 45+ decisions (local + inherited)
-├── routing.md              ← Work routing table
-├── skills/                 ← 35 skills (mix of personal + inherited)
-│   ├── dk8s-support-patterns/     ← inherited from org
-│   ├── incident-response/         ← inherited from org
-│   ├── blog-writing/              ← personal (Tamir's voice)
-│   └── voice-writing/             ← personal (Tamir's tone)
-├── agents/
-│   ├── picard/charter.md
-│   ├── belanna/charter.md
-│   ├── worf/charter.md
-│   └── ...
-└── upstream.json           ← points to dk8s-org squad
+## Retrospective
+- **Trigger:** After build/test failure or PR rejection
+- **Facilitator:** Lead
+- **Agenda:** What happened → root cause → action items
+- **Output:** Process improvement logged
+
+## Model Review
+- **Trigger:** Quarterly or on major model releases
+- **Facilitator:** Lead
+- **Participants:** All agents affected by model changes
+- **Process:** Benchmark → evaluate cost/quality → update squad.config.ts
 ```
 
 ---
 
-## 5. Getting Started
+## 4. Agent Roles & Responsibilities
 
-### Day 1 Checklist
+### 4.1 Standard Agent Roster
+
+Every DK8S squad should include these **core agents** (customize names per your universe):
+
+| Role | Responsibilities | Model Tier | Example Agent |
+|------|-----------------|------------|---------------|
+| **Lead** | Architecture, decisions, triage, coordination | Standard | Picard |
+| **Code Expert** | Code generation, review, refactoring, clean code | Standard | Data |
+| **Security** | Security review, Azure, compliance, threat modeling | Standard | Worf |
+| **Infrastructure** | K8s, Helm, ArgoCD, CI/CD, cloud native | Standard | B'Elanna |
+| **Research & Docs** | Documentation, analysis, presentations | Standard | Seven |
+| **Scribe** | Session logging, decision tracking, context sharing | Fast | Scribe |
+| **@copilot** | Autonomous small tasks, bug fixes, tests | Built-in | @copilot |
+
+### 4.2 Optional Agents
+
+These are useful but not required for every squad:
+
+| Role | Responsibilities | Model Tier |
+|------|-----------------|------------|
+| Devil's Advocate | Fact-checking, counter-hypothesis, assumption testing | Standard |
+| Communications | Calendar, email, Teams, scheduling | Fast |
+| Work Monitor | Queue tracking, backlog health, stale issue detection | Fast |
+| News Reporter | Daily briefings, status reports, styled updates | Fast |
+| Blogger | Voice writing, content series, external comms | Standard |
+| Audio Producer | TTS, podcast generation, audio summaries | Fast |
+
+### 4.3 Model Tier Guidelines
+
+| Tier | Model | Use When |
+|------|-------|----------|
+| **Standard** | `claude-sonnet-4.5` | Complex reasoning, code generation, security review, architecture |
+| **Fast** | `claude-haiku-4.5` | Routine tasks, formatting, logging, daily briefings, monitoring |
+| **Premium** | `claude-opus-4.6` | Mission-critical decisions with high error cost (use sparingly) |
+
+---
+
+## 5. Issue Triage Workflow
 
 ```
-□ Step 1: Create your personal squad repo
-□ Step 2: Initialize Squad and pick your universe
-□ Step 3: Connect to DK8S org-level upstream
-□ Step 4: Configure MCP servers (ADO, GitHub, EngHub)
-□ Step 5: Create your first issue and let Squad process it
-□ Step 6: Verify Ralph loop is running
+┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
+│  New Issue    │────▶│  Add `squad` │────▶│  Lead triages     │
+│  created      │     │  label       │     │  (assigns agent)  │
+└──────────────┘     └──────────────┘     └────────┬─────────┘
+                                                    │
+                          ┌─────────────────────────┼────────────────────┐
+                          │                         │                    │
+                          ▼                         ▼                    ▼
+                  ┌───────────────┐    ┌────────────────┐    ┌──────────────────┐
+                  │ squad:{agent} │    │ squad:copilot   │    │ squad:review      │
+                  │ label added   │    │ label added     │    │ needs human eyes  │
+                  │               │    │                 │    │                   │
+                  │ Agent picks   │    │ @copilot works  │    │ Assign to human   │
+                  │ up in next    │    │ autonomously    │    │ for review        │
+                  │ session       │    │ (🟢 tasks only) │    │                   │
+                  └───────┬───────┘    └────────┬───────┘    └──────────────────┘
+                          │                     │
+                          ▼                     ▼
+                  ┌───────────────┐    ┌────────────────┐
+                  │ Create branch │    │ Create branch   │
+                  │ squad/{issue} │    │ squad/{issue}   │
+                  │ -{description}│    │ -{description}  │
+                  └───────┬───────┘    └────────┬───────┘
+                          │                     │
+                          ▼                     ▼
+                  ┌───────────────────────────────────┐
+                  │          Open PR                   │
+                  │  Title: description (#issue)       │
+                  │  Body: Closes #issue               │
+                  │  Labels: squad:review if 🟡        │
+                  └───────────────────────────────────┘
 ```
 
-### Step 1: Create Your Personal Squad Repo
+### 5.1 Label Reference
 
-```bash
-# Create repo in microsoft-mtp org (or your personal GitHub)
-gh repo create microsoft-mtp/{your-alias}-squad --private --clone
-cd {your-alias}-squad
+| Label | Meaning | Who Acts |
+|-------|---------|----------|
+| `squad` | Untriaged — waiting for Lead | Lead agent |
+| `squad:{agent}` | Assigned to specific agent | Named agent |
+| `squad:copilot` | Assigned to @copilot | GitHub Copilot coding agent |
+| `squad:review` | Needs human review before merge | Human team member |
+| `go:needs-research` | Requires research before implementation | Seven (Research) |
+
+---
+
+## 6. Branch & PR Conventions
+
+### 6.1 Branch Naming
+
+```
+squad/{issue-number}-{brief-description}
 ```
 
-### Step 2: Initialize Squad
-
-```bash
-squad init
-# Interactive prompt:
-#   Pick your universe: Star Trek / Star Wars / Marvel / Custom
-#   Name your Lead agent
-#   Configure team size (start small — 4-5 agents)
+**Examples:**
+```
+squad/771-dk8s-squad-standard
+squad/42-fix-helm-chart-values
+squad/100-add-fedramp-controls
 ```
 
-Minimum viable team:
+### 6.2 Commit Messages
 
-| Role | What They Do |
-|------|-------------|
-| Lead | Triage, architecture decisions, routing |
-| Code Expert | C#/Go code changes, reviews |
-| Infrastructure Expert | K8s, Helm, cloud infra |
-| Security Expert | Security review, compliance |
-| Work Monitor (Ralph) | Background issue scanning, cleanup |
+```
+{type}({scope}): {brief summary} (#{issue})
 
-### Step 3: Connect to DK8S Org-Level Upstream
+{optional body with details}
 
-```bash
-squad upstream add https://github.com/microsoft-mtp/dk8s-squad.git --name dk8s-org
-squad upstream sync
-
-# Verify inherited content:
-ls .squad/_upstream_repos/dk8s-org/
-# Should see: decisions.md, skills/, routing.md
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 ```
 
-### Step 4: Configure MCP Servers
+**Types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`
+**Scopes:** `squad`, `infra`, `security`, `api`, `ui`, `ci`, `docs`
 
-Your `.copilot/mcp-config.json` (or `.vscode/mcp.json`) should include:
+**Examples:**
+```
+docs(squad): add DK8S squad usage standard (#771)
+fix(infra): correct Helm chart memory limits (#42)
+feat(security): add FedRAMP SC-7 network policy (#100)
+```
 
-```jsonc
+### 6.3 Pull Request Template
+
+Every PR should use the repo's template (`.github/PULL_REQUEST_TEMPLATE.md`):
+
+```markdown
+## Description
+[What changed and why]
+
+## Related Issue
+Closes #[issue number]
+
+## Quality Gates Checklist
+- [ ] Tests added/updated
+- [ ] No new CodeQL/security warnings
+- [ ] Code reviewed by squad member
+- [ ] Documentation updated if needed
+- [ ] Churn rate checked (run `scripts/code-churn-rate.ps1`)
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+- [ ] Refactoring
+```
+
+---
+
+## 7. Communication & Teams Integration
+
+### 7.1 Teams Webhook
+
+Squad agents communicate via Microsoft Teams webhooks. Configuration:
+
+```
+# Webhook URL stored at:
+$env:USERPROFILE\.squad\teams-webhook.url
+
+# Or set as environment variable:
+$env:TEAMS_WEBHOOK_URL
+```
+
+Agents like Neelix (News Reporter) and Kes (Communications) use this to:
+- Send daily briefings to team channels
+- Notify on issue assignments
+- Share status reports
+- Alert on build failures
+
+### 7.2 Communication Rules
+
+1. **Plain text messages only** — no adaptive cards (hard to copy on mobile)
+2. **Thread replies** — agents reply in message threads, not top-level
+3. **Human escalation** — tag the human owner when blocked or uncertain
+4. **No spam** — aggregate updates; don't send per-commit notifications
+
+---
+
+## 8. Cross-Team Activities
+
+These activities span multiple swimlanes and need dedicated agent ownership at the org level:
+
+| Activity | Owner Agent | Cadence | Scope |
+|----------|-------------|---------|-------|
+| **Vulnerability Management** | Security agent | Continuous + weekly report | All repos |
+| **CI/CD Pipeline Health** | Infrastructure agent | Daily checks | All pipelines |
+| **Dependency Updates** | @copilot | Weekly PR batches | All repos |
+| **Code Quality Cleanup** | Code Expert agent | Monthly sweeps | High-churn files |
+| **Documentation Freshness** | Research agent | Bi-weekly audit | All docs/ dirs |
+| **Config Drift Detection** | Infrastructure agent | Daily | All environments |
+| **FedRAMP Compliance** | Security agent | Continuous | Sovereign deployments |
+
+### 8.1 How Cross-Team Works
+
+1. Org squad repo defines the cross-team agents and their schedules
+2. GitHub Actions workflows in the org repo trigger cross-team scans
+3. Results are posted to the DK8S Platform leads Teams channel
+4. Swimlane squads receive issues auto-created by the org squad for remediation
+
+---
+
+## 9. Upstream Inheritance
+
+Upstream inheritance connects the three squad levels. When the org squad updates a standard:
+
+```
+Org Squad (microsoft-mtp/dk8s-squad)
+  │
+  ├── Updates squad.config.ts defaults
+  ├── Updates shared agent charters
+  ├── Updates routing rules
+  │
+  ▼
+Swimlane Squads (per-repo .squad/)
+  │
+  ├── Inherit new defaults on next sync
+  ├── Swimlane overrides preserved
+  ├── New agents available immediately
+  │
+  ▼
+Personal Squads (~/.squad/)
+  │
+  └── Personal overrides preserved
+      New org/swimlane agents available
+```
+
+### 9.1 Sync Mechanism
+
+1. **Org → Swimlane:** PR from org squad to swimlane repos (manual review required)
+2. **Swimlane → Personal:** Engineer pulls latest from their repo
+3. **Personal → Swimlane (contributions):** PR upstream with new skills/agents
+
+### 9.2 Override Priority
+
+```
+Personal config > Swimlane config > Org config
+```
+
+A personal `squad.config.ts` can override model preferences, add agents, or disable org-level defaults. Swimlane configs can do the same relative to the org.
+
+---
+
+## 10. Escalation Paths
+
+| Situation | Escalate To | How |
+|-----------|-------------|-----|
+| Unclear requirements | Lead agent (Picard) | Comment on issue, tag @picard |
+| Security concern | Security agent (Worf) | Tag @worf, add `security` label |
+| Architecture question | Lead agent | Tag @picard, request design review |
+| Infrastructure/deployment | Infrastructure agent (B'Elanna) | Tag @belanna |
+| Build/test failure | Lead triggers retrospective ceremony | Automatic |
+| Cross-team conflict | DK8S Platform leads (human) | Teams message to leads channel |
+| Agent not performing | Lead reviews, triggers model review | Update charter or swap model |
+
+---
+
+## 11. Getting Started — Engineer Quickstart
+
+### Step 1: Clone Your Swimlane Repo
+
+```powershell
+git clone https://github.com/microsoft-mtp/{your-swimlane-repo}.git
+cd {your-swimlane-repo}
+```
+
+### Step 2: Verify Squad Config Exists
+
+```powershell
+# These files should exist:
+Test-Path squad.config.ts          # Main config
+Test-Path .squad/team.md           # Team roster
+Test-Path .squad/routing.md        # Work routing
+Test-Path .squad/decisions.md      # Decision log
+```
+
+### Step 3: Set Up Personal Squad
+
+```powershell
+# Create personal squad directory
+New-Item -ItemType Directory -Path "$env:USERPROFILE\.squad" -Force
+
+# Copy template config and customize
+Copy-Item squad.config.ts "$env:USERPROFILE\.squad\squad.config.ts"
+# Edit to set your preferred universe, model overrides, etc.
+```
+
+### Step 4: Configure Teams Webhook
+
+```powershell
+# Get webhook URL from your team lead
+# Save it for agent communication
+Set-Content "$env:USERPROFILE\.squad\teams-webhook.url" "https://your-webhook-url"
+```
+
+### Step 5: Configure MCP Servers
+
+Create `.copilot/mcp-config.json` in your repo (or `~/.copilot/mcp-config.json` for global):
+
+```json
 {
-  "servers": {
-    // Azure DevOps — work items, pipelines, repos
-    "azure-devops": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/azure-devops-mcp"],
-      "env": {
-        "AZURE_DEVOPS_ORG": "your-org",
-        "AZURE_DEVOPS_PAT": "${env:AZURE_DEVOPS_PAT}"
-      }
-    },
-    // GitHub — issues, PRs, code search
+  "mcpServers": {
     "github": {
       "command": "npx",
-      "args": ["-y", "@anthropic/github-mcp"],
-      "env": {
-        "GITHUB_TOKEN": "${env:GH_TOKEN}"
-      }
-    },
-    // EngHub — internal documentation search
-    "enghub": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/enghub-mcp"]
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
     }
   }
 }
 ```
 
-### Step 5: Create Your First Issue
-
-```bash
-# Create a test issue
-gh issue create \
-  --title "Test: Squad processes first issue" \
-  --body "Verify squad triage, assignment, and completion workflow." \
-  --label "squad,priority:low,type:docs"
-
-# Watch the Lead triage it:
-# Lead reads issue → assigns squad:{member} label → member picks it up
-```
-
-### Step 6: Verify Ralph Loop
-
-Ralph should be scanning for work. Check:
-
-```bash
-# In your Copilot CLI session:
-# "Ralph, status" → should show work queue, open issues, pending PRs
-```
-
-Ralph's keep-alive loop:
-1. Scan open issues labeled `squad` (untriaged)
-2. Scan open PRs (review needed)
-3. Scan for stale branches, abandoned work
-4. Report findings → Lead triages
-
----
-
-## 6. Shared Skills Catalog
-
-These skills live in the org-level squad (`microsoft-mtp/dk8s-squad`) and are inherited by every downstream squad via upstream sync.
-
-### Org-Level Skills (Shared Across All DK8S Squads)
-
-| Skill | Description | Owner |
-|-------|------------|-------|
-| `dk8s-support-patterns` | K8s cluster issue patterns: capacity exhaustion, node bootstrap failures, Azure platform misattribution | B'Elanna |
-| `configgen-support-patterns` | ConfigGen SDK recurring issues: enforcement breaking builds, auto-gen conflicts, modeling gaps | Data |
-| `incident-response` | ICM response: always check Azure Status page first, blast radius assessment, escalation protocol | Worf |
-| `secrets-management` | Credential handling: Windows Credential Manager (priority 1), machine-local .env (priority 2), never in git | Worf |
-| `dotnet-build-diagnosis` | .NET build error categorization: missing packages, framework refs, duplicate definitions | Data |
-| `squad-conventions` | Squad CLI patterns: zero-dependency policy, Node.js test runner, error handling via `fatal()` | Picard |
-
-### Skills Eligible for Promotion (Currently Personal, May Graduate)
-
-| Skill | Current Location | Promotion Criteria |
-|-------|-----------------|-------------------|
-| `github-distributed-coordination` | Tamir's squad | Validate with 2+ engineers using multi-machine workflow |
-| `cross-machine-coordination` | Tamir's squad | Validate task queue works across team machines |
-| `fact-checking` | Tamir's squad | If other squads want Q-style verification |
-
-### Personal-Only Skills (Stay in Individual Squads)
-
-| Skill | Why Personal |
-|-------|-------------|
-| `blog-writing` | Tamir's personal voice and blog series |
-| `voice-writing` | Individual writing tone matching |
-| `news-broadcasting` | Neelix formatting preferences |
-| `outlook-automation` | Machine-specific COM automation |
-| `session-recovery` | Copilot CLI session tooling |
-
-### Skill Promotion Path
-
-Skills mature through confidence levels before promotion to org-level:
-
-```
-Low (single observation, one repo)
-  → Medium (validated in multiple contexts)
-    → High (battle-tested, reviewed by humans)
-      → Promoted to org-level upstream
-```
-
-**To promote a skill:**
-```bash
-# Export from your personal squad
-squad export --skill dk8s-support-patterns -o dk8s-support.json
-
-# Submit as PR to org-level squad repo
-cd /path/to/dk8s-squad
-# Copy skill, create PR, get Lead approval
-```
-
----
-
-## 7. Governance
-
-### Decision Authority Matrix
-
-| Scope | Who Decides | Examples |
-|-------|------------|---------|
-| **Org-level** | Lead (Picard) + Tamir approval | Security gates, label taxonomy, review standards |
-| **Swimlane-level** | Swimlane lead | Team-specific conventions, local CI customizations |
-| **Personal squad** | Individual engineer (autonomous) | Universe, casting, ceremonies, model assignments |
-| **Security decisions** | Always escalate to human | Auth changes, encryption, access control, CVE response |
-
-### The Closest-Wins Rule
-
-```
-Org-level decision: "Use structured logging with correlation IDs"
-  ↓ flows down to all squads
-
-Swimlane override: "Use Serilog specifically" (narrows the org policy)
-  ↓ flows down to swimlane repos
-
-Repo override: "Add custom enrichers for K8s metadata" (extends further)
-  ↓ applies locally
-```
-
-Each level can **narrow or extend** the upstream decision. No level can **contradict** an `[ENFORCED]` decision.
-
-### Enforced Policies (Non-Overridable)
-
-These decisions are marked `[ENFORCED]` in the org-level `decisions.md` and cannot be overridden at any level:
-
-1. **Security review gate** — PRs touching auth/encryption/API surfaces require human approval
-2. **Vulnerability scanning** — All repos must have CodeQL and Dependabot enabled
-3. **Secret hygiene** — No secrets in source code, ever. Use Credential Manager or Azure Key Vault
-4. **Decision recording** — Significant decisions must be written down
-5. **Test requirement** — Code PRs must include tests
-6. **Escalation for critical** — `priority:critical` issues notify `defenderk8splatform@microsoft.com`
-
-### Dispute Resolution
-
-1. Agent disagrees with another agent → Lead decides
-2. Engineer disagrees with Lead agent → Human (Tamir) decides
-3. Cross-swimlane conflict → Org-level Lead + swimlane leads discuss
-4. Security disagreement → Always defaults to the more restrictive option
-
----
-
-## 8. MCP Server Configuration Reference
-
-Every DK8S squad should have these MCP servers available:
-
-| Server | Purpose | Required? |
-|--------|---------|-----------|
-| `azure-devops` | ADO work items, pipelines, repos, wiki | ✅ Yes |
-| `github` | GitHub issues, PRs, code search, Actions | ✅ Yes |
-| `enghub` | EngHub documentation, TSGs, knowledge articles | ✅ Yes |
-| `playwright` | Browser automation for web testing | Optional |
-| `mail` | Email integration (Outlook) | Optional |
-| `teams` | Teams messaging | Optional |
-
-### Authentication
+### Step 6: Start Working
 
 ```powershell
-# GitHub token (use gh CLI)
-$env:GH_TOKEN = (gh auth token --user your_alias_microsoft 2>&1).Trim()
+# Open in VS Code or use Copilot CLI
+code .
 
-# Azure DevOps PAT
-$env:AZURE_DEVOPS_PAT = "your-pat-from-credential-manager"
-
-# Never hard-code tokens. Use environment variables or Credential Manager.
+# Create an issue for your work
+# Add the `squad` label
+# Lead will triage and assign
+# Or self-assign with `squad:{your-agent}` label
 ```
 
 ---
 
-## 9. Appendix: File Structure Reference
+## 12. File Structure Reference
 
-### Org-Level Squad Repo (`dk8s-squad`)
+Complete directory structure for a properly configured squad repo:
 
 ```
-dk8s-squad/
+repo-root/
+├── squad.config.ts                    # Main squad configuration
 ├── .squad/
-│   ├── team.md                     ← org-level agent roster
-│   ├── decisions.md                ← org-wide policies [ENFORCED] items
-│   ├── routing.md                  ← default routing rules
-│   ├── ceremonies.md               ← shared ceremony definitions
+│   ├── team.md                        # Team roster (humans + agents)
+│   ├── routing.md                     # Work routing rules
+│   ├── decisions.md                   # Decision log (maintained by Scribe)
+│   ├── ceremonies.md                  # Team ceremonies
+│   ├── casting-policy.json            # Allowed character universes
+│   ├── config.json                    # Machine-specific config
+│   ├── mcp-config.md                  # MCP server setup guide
+│   ├── charter.md                     # Charter template
+│   ├── agents/
+│   │   ├── {lead}/charter.md          # Lead agent charter
+│   │   ├── {code-expert}/charter.md   # Code expert charter
+│   │   ├── {security}/charter.md      # Security agent charter
+│   │   ├── {infra}/charter.md         # Infrastructure agent charter
+│   │   ├── {research}/charter.md      # Research agent charter
+│   │   └── scribe/charter.md          # Scribe charter (always present)
 │   ├── skills/
-│   │   ├── dk8s-support-patterns/
-│   │   ├── configgen-support-patterns/
-│   │   ├── incident-response/
-│   │   ├── secrets-management/
-│   │   ├── dotnet-build-diagnosis/
-│   │   └── squad-conventions/
-│   └── templates/
-│       ├── issue-template.yml      ← standard issue template
-│       ├── pr-template.md          ← standard PR template
-│       └── decision-template.md    ← decision recording template
-├── docs/
-│   ├── dk8s-squad-usage-standard.md  ← this document
-│   └── onboarding/
-│       └── day-1-checklist.md
-└── README.md
-```
-
-### Personal Squad Repo (`{alias}-squad`)
-
-```
-{alias}-squad/
-├── .squad/
-│   ├── team.md                     ← your cast (your universe!)
-│   ├── decisions.md                ← personal + inherited decisions
-│   ├── routing.md                  ← your routing overrides
-│   ├── upstream.json               ← points to dk8s-squad
-│   ├── _upstream_repos/            ← (gitignored) cloned upstream
-│   │   └── dk8s-org/
-│   ├── skills/
-│   │   ├── [inherited skills appear here after sync]
-│   │   └── [your personal skills]
-│   └── agents/
-│       ├── {lead}/charter.md
-│       ├── {code-expert}/charter.md
-│       └── ...
-├── .copilot/
-│   └── mcp-config.json            ← MCP server configuration
-└── squad.config.ts                 ← Squad runtime config
+│   │   └── {skill-name}/SKILL.md      # Skill definitions
+│   ├── decisions/
+│   │   └── inbox/                     # Decision drop-box for parallel work
+│   ├── log/                           # Session logs (written by Scribe)
+│   └── monitoring/                    # Monitoring state files
+├── .github/
+│   ├── copilot-instructions.md        # @copilot behavior rules
+│   ├── PULL_REQUEST_TEMPLATE.md       # PR quality gates
+│   ├── agents/
+│   │   └── {name}.agent.md            # GitHub agent definitions
+│   ├── workflows/
+│   │   ├── squad-ci.yml               # CI pipeline
+│   │   ├── squad-triage.yml           # Auto-triage
+│   │   ├── squad-issue-assign.yml     # Auto-assignment
+│   │   └── squad-*.yml                # Other squad workflows
+│   └── ISSUE_TEMPLATE/
+│       └── squad-task.yml             # Issue template for squad tasks
+└── docs/
+    ├── dk8s-squad-usage-standard.md   # This document
+    └── adr/
+        └── 0001-dk8s-squad-usage-standard.md  # ADR version
 ```
 
 ---
 
-## 10. FAQ
+## 13. FAQ
 
-**Q: Do I have to use Star Trek?**
-No. Pick any universe. Star Trek is Tamir's choice. Your personal squad, your casting. The org-level squad uses neutral role names (Lead, Code Expert, etc.) so universes don't clash.
+**Q: Do I need all the agents listed above?**
+A: No. Start with Lead + Code Expert + Scribe + @copilot. Add more as your squad matures.
 
-**Q: What if my repo doesn't need all the agents?**
-Start with 4-5. Minimum viable: Lead, Code Expert, Security Expert, Work Monitor. Add more as you find gaps.
+**Q: Can I use a different character universe?**
+A: Yes. Check the `casting-policy.json` for approved universes. Add your own via PR to the org squad.
 
-**Q: Can I override an org-level security gate?**
-No. `[ENFORCED]` decisions cannot be overridden. If you believe one should change, raise it with Picard/Tamir. The decision will be discussed and the org-level `decisions.md` updated if approved.
+**Q: What if two agents disagree?**
+A: Lead agent has final say. If it's a security matter, Security agent can veto. Human decision maker is the ultimate escalation.
 
-**Q: How often does upstream sync happen?**
-On demand: `squad upstream sync`. Not automatic. Run it when you want the latest org-level decisions and skills.
+**Q: How do I add a new agent?**
+A: Create `.squad/agents/{name}/charter.md`, add to `.squad/team.md`, add routing rules in `.squad/routing.md`, add `.github/agents/{name}.agent.md`.
 
-**Q: What if two agents claim the same issue?**
-Git-based claiming: the first agent to push a branch with `squad/issue-{N}-*` owns it. If two race, git merge conflict is the tiebreaker. In practice, the Lead assigns explicitly via labels.
+**Q: How do I contribute a skill upstream?**
+A: Create the skill in `.squad/skills/{name}/SKILL.md`, test it locally, then PR to the org squad repo.
 
-**Q: Where do I report a bug in the Squad framework itself?**
-`bradygaster/squad` repo (the upstream framework). Not in the DK8S org-level squad. Brady Gaster owns the framework; Tamir Dresher owns our usage of it.
-
-**Q: What's the distribution list for DK8S escalations?**
-`defenderk8splatform@microsoft.com` — the official DK8S Platform group distribution list.
+**Q: What models should I use?**
+A: Start with `claude-sonnet-4.5` (standard tier). Use `claude-haiku-4.5` for background/routine agents. Only use Opus for mission-critical decisions.
 
 ---
 
-*This is a living document. Updates go through the org-level squad's PR process. Propose changes via `.squad/decisions/inbox/` and tag Picard for review.*
+## Appendix A: Glossary
 
-*Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>*
+| Term | Definition |
+|------|-----------|
+| **Squad** | Multi-agent AI framework by Brady Gaster, runs in Copilot CLI/VS Code |
+| **Agent** | AI persona with defined role, expertise, and constraints |
+| **Charter** | Agent's configuration file defining personality and responsibilities |
+| **Scribe** | Background agent that logs sessions and tracks decisions |
+| **Coordinator** | The orchestration layer that routes work to agents |
+| **Universe** | Character theme for agent personas (Star Trek, Marvel, etc.) |
+| **Upstream** | The org-level squad configuration that flows down to swimlanes |
+| **Swimlane** | A team or workstream within DK8S |
+| **MCP** | Model Context Protocol — standard for connecting AI to external tools |
+| **Casting Policy** | Rules for which character universes are allowed |
+| **Ceremony** | Structured team activity (design review, retro, model review) |

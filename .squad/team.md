@@ -43,6 +43,8 @@
 |------|------|---------------------|-------|
 | Tamir Dresher | Project Owner, Decision Maker | Microsoft Teams (preferred), GitHub Issues | Delegate tasks via Teams. Not spawnable — present work and wait for input. |
 
+> ⚠️ **Important:** Brady Gaster is the creator of the upstream Squad framework (`bradygaster/squad`). He is NOT the owner of this project. All squad communications, notifications, and messages are for **Tamir Dresher** unless Tamir explicitly requests contacting Brady.
+
 ## Issue Source
 
 | Field | Value |

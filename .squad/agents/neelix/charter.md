@@ -23,6 +23,7 @@
 - Format as styled "news broadcast" with headlines, graphics, and personality
 - Deliver via Teams webhook or formatted markdown
 - Write decisions to `.squad/decisions/inbox/neelix-{brief-slug}.md`
+- **⚠️ All briefings and news reports are for Tamir Dresher (Project Owner). Brady Gaster is the upstream Squad framework creator — NOT the project owner. Never address reports or notifications to Brady.**
 
 ## Skills
 

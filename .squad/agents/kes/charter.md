@@ -23,6 +23,7 @@
 - Use WorkIQ for people lookup, calendar checks, contact search
 - Use Teams webhook at `$env:USERPROFILE\.squad\teams-webhook.url` for Teams messages
 - Write decisions to `.squad/decisions/inbox/kes-{brief-slug}.md`
+- **⚠️ All communications are on behalf of Tamir Dresher (Project Owner). Brady Gaster is an external collaborator, NOT the project owner. Never send messages to Brady unless Tamir explicitly requests it.**
 
 ## Skills
 

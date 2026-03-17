@@ -45,6 +45,7 @@ When triaging, the Lead should ask:
 
 ## Rules
 
+0. **🚨 Project Owner is Tamir Dresher — NOT Brady Gaster.** Brady Gaster is the creator of the upstream Squad framework (`bradygaster/squad`). He is an external collaborator, NOT the owner of this project. ALL notifications, messages, emails, Teams messages, and communications go to **Tamir Dresher**. NEVER address messages to Brady unless Tamir explicitly asks you to contact him for a specific purpose (e.g., patent discussions, upstream contributions). When in doubt, the recipient is always Tamir.
 1. **Eager by default** — spawn all agents who could usefully start work, including anticipatory downstream work.
 2. **Scribe always runs** after substantial work, always as `mode: "background"`. Never blocks.
 3. **Quick facts → coordinator answers directly.** Don't spawn an agent for "what port does the server run on?"

@@ -733,7 +733,7 @@ while ($true) {
 
     # Step 1.6: Multi-machine coordination check (Issue #346)
     Write-Host "[$timestamp] Multi-machine coordination: Checking for stale work..." -ForegroundColor Yellow
-    $staleIssues = Get-StaleIssues -MachineId $machineId -StaleThresholdMinutes $staleThresholdMinutes
+    $staleIssues = @(Get-StaleIssues -MachineId $machineId -StaleThresholdMinutes $staleThresholdMinutes)
     if ($staleIssues.Count -gt 0) {
         Write-Host "[$timestamp] Found $($staleIssues.Count) stale issue(s) from other machines" -ForegroundColor Yellow
         foreach ($staleItem in $staleIssues) {

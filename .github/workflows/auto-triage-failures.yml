@@ -1,0 +1,193 @@
+name: Auto-Triage CI Failures
+
+# Event-driven trigger: reacts to workflow failures automatically.
+# Creates a GitHub issue routed to the appropriate squad agent.
+# See docs/event-trigger-gap-analysis.md for the gap analysis behind this.
+
+on:
+  workflow_run:
+    workflows:
+      - "Squad CI"
+      - "Squad Docs"
+      - "Squad Preview"
+      - "Squad Promote"
+      - "Squad Release"
+      - "Squad Insider Release"
+      - "CodeQL Analysis"
+      - "FedRAMP Validation"
+      - "Drift Detection"
+    types:
+      - completed
+
+  workflow_dispatch:
+    inputs:
+      test_workflow_name:
+        description: "Simulate failure for this workflow name (testing only)"
+        required: false
+        type: string
+
+jobs:
+  triage-failure:
+    # Only run when the triggering workflow actually failed
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'failure'
+    runs-on: self-hosted
+    permissions:
+      issues: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create triage issue for failed workflow
+        uses: actions/github-script@v7
+        with:
+          retries: 3
+          retry-exempt-status-codes: 400,401,403,404,422
+          script: |
+            // ── Gather failure context ──────────────────────────────
+            const isTest = context.eventName === 'workflow_dispatch';
+            const run = isTest ? null : context.payload.workflow_run;
+
+            const workflowName = isTest
+              ? (context.payload.inputs?.test_workflow_name || 'Test Workflow')
+              : run.name;
+            const branch = isTest ? 'main' : run.head_branch;
+            const runUrl = isTest
+              ? `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions`
+              : run.html_url;
+            const runId = isTest ? 0 : run.id;
+            const headSha = isTest ? 'abc1234' : run.head_sha.substring(0, 7);
+            const actor = isTest ? 'test-user' : (run.actor?.login || 'unknown');
+
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toISOString().split('T')[1].split('.')[0] + ' UTC';
+
+            // ── Smart routing: classify failure type ────────────────
+            // Infrastructure workflows → B'Elanna
+            // Code / test workflows → Data
+            // Security workflows → Worf
+            // Docs workflows → Seven
+            const infraWorkflows = [
+              'Squad Promote', 'Squad Release', 'Squad Insider Release',
+              'Squad Preview', 'Drift Detection'
+            ];
+            const securityWorkflows = [
+              'CodeQL Analysis', 'FedRAMP Validation'
+            ];
+            const docsWorkflows = [
+              'Squad Docs'
+            ];
+
+            const nameLower = workflowName.toLowerCase();
+
+            let routeLabel, routeAgent, routeReason;
+            if (infraWorkflows.some(w => w.toLowerCase() === nameLower)) {
+              routeLabel = 'squad:belanna';
+              routeAgent = "B'Elanna (Infrastructure)";
+              routeReason = 'Infrastructure/deployment workflow failure';
+            } else if (securityWorkflows.some(w => w.toLowerCase() === nameLower)) {
+              routeLabel = 'squad:worf';
+              routeAgent = 'Worf (Security)';
+              routeReason = 'Security/compliance workflow failure';
+            } else if (docsWorkflows.some(w => w.toLowerCase() === nameLower)) {
+              routeLabel = 'squad:seven';
+              routeAgent = 'Seven (Docs)';
+              routeReason = 'Documentation build failure';
+            } else {
+              routeLabel = 'squad:data';
+              routeAgent = 'Data (Code)';
+              routeReason = 'Code/test workflow failure (default route)';
+            }
+
+            // ── Dedup: check for existing open issue ────────────────
+            const searchTitle = `[CI-Failure] ${workflowName} failed`;
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ci-failure',
+              per_page: 30
+            });
+
+            const duplicate = existingIssues.find(issue =>
+              issue.title.startsWith(searchTitle)
+            );
+
+            if (duplicate) {
+              // Append a comment to the existing issue instead of creating a new one
+              const updateBody = [
+                `### 🔄 Repeated failure detected`,
+                '',
+                `| Field | Value |`,
+                `|-------|-------|`,
+                `| **Workflow** | ${workflowName} |`,
+                `| **Branch** | \`${branch}\` |`,
+                `| **Run** | [#${runId}](${runUrl}) |`,
+                `| **Commit** | \`${headSha}\` |`,
+                `| **Triggered by** | @${actor} |`,
+                `| **Time** | ${dateStr} ${timeStr} |`,
+                '',
+                `> This workflow has failed again. The issue remains open for triage.`,
+              ].join('\n');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: duplicate.number,
+                body: updateBody
+              });
+
+              core.info(`Updated existing issue #${duplicate.number} with repeated failure`);
+              return;
+            }
+
+            // ── Create the triage issue ─────────────────────────────
+            const title = `${searchTitle} on ${branch}`;
+            const body = [
+              `## 🚨 CI Failure — Automated Triage`,
+              '',
+              `A GitHub Actions workflow failed and needs investigation.`,
+              '',
+              `| Field | Value |`,
+              `|-------|-------|`,
+              `| **Workflow** | ${workflowName} |`,
+              `| **Branch** | \`${branch}\` |`,
+              `| **Run** | [#${runId}](${runUrl}) |`,
+              `| **Commit** | \`${headSha}\` |`,
+              `| **Triggered by** | @${actor} |`,
+              `| **Failed at** | ${dateStr} ${timeStr} |`,
+              `| **Routed to** | ${routeAgent} |`,
+              `| **Route reason** | ${routeReason} |`,
+              '',
+              `### What to do`,
+              '',
+              `1. Open the [workflow run](${runUrl}) and check the logs`,
+              `2. Identify root cause (flaky test, dependency issue, infra problem, code bug)`,
+              `3. Fix or escalate — reassign with a different \`squad:{member}\` label if needed`,
+              `4. Close this issue when resolved`,
+              '',
+              `### Context`,
+              '',
+              `This issue was created automatically by the **auto-triage-failures** workflow.`,
+              `See [event trigger gap analysis](../docs/event-trigger-gap-analysis.md) for background.`,
+              '',
+              `---`,
+              `*🤖 Automated by [auto-triage-failures.yml](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/main/.github/workflows/auto-triage-failures.yml)*`,
+            ].join('\n');
+
+            const labels = ['squad', 'github-alert', 'ci-failure', routeLabel];
+
+            const { data: issue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels
+            });
+
+            core.info(`Created triage issue #${issue.number}: ${title}`);
+            core.info(`Routed to ${routeAgent} via label ${routeLabel}`);
+            core.info(`Reason: ${routeReason}`);

@@ -77,6 +77,52 @@ When triaging, the Lead should ask:
 
 ---
 
+## Event-Driven Triggers
+
+Beyond labels and schedules, agents can be triggered automatically by system events.
+
+### How Event Triggers Work
+
+Event-driven triggers use GitHub Actions `workflow_run` events (and similar) to detect system conditions and create issues with squad labels — feeding directly into the existing label-based routing pipeline.
+
+**Flow:** System event → GitHub Actions workflow → Create issue with `squad:{member}` label → Existing triage pipeline picks it up.
+
+### Active Event Triggers
+
+| Event | Workflow | Creates Issue With | Routed To | Since |
+|-------|----------|-------------------|-----------|-------|
+| CI workflow failure | `auto-triage-failures.yml` | `squad`, `github-alert`, `ci-failure` | B'Elanna (infra), Data (code), Worf (security), Seven (docs) | #805 |
+
+### Routing Rules for Event-Created Issues
+
+Event-triggered issues follow the same routing as manually-created issues, with these additions:
+
+1. **`github-alert` label** — indicates the issue was created by an automated event trigger, not a human.
+2. **`ci-failure` label** — specific to CI/CD failures. Other event types will get their own labels (e.g., `security-alert`, `deploy-failure`).
+3. **Smart routing** — the trigger workflow classifies the failure and applies the appropriate `squad:{member}` label directly, bypassing Lead triage for known failure types.
+4. **Deduplication** — if an open issue already exists for the same event (e.g., same workflow failing repeatedly), the trigger appends a comment instead of creating a new issue.
+
+### Adding New Event Triggers
+
+To add a new event-driven trigger:
+
+1. Create a workflow in `.github/workflows/` that listens to the appropriate event
+2. Use `github-script` to create an issue with `squad` + event-specific labels
+3. Apply `squad:{member}` label for smart routing (or just `squad` to go through Lead triage)
+4. Include deduplication logic (check for existing open issues before creating)
+5. Add the trigger to the table above
+6. Document in `docs/event-trigger-gap-analysis.md`
+
+### Planned Event Triggers (Not Yet Implemented)
+
+See `docs/event-trigger-gap-analysis.md` for the full gap analysis. Priority candidates:
+
+- **Deployment failures** → `squad:belanna` (same pattern as CI failures)
+- **Security alerts** (Dependabot, CodeQL findings) → `squad:worf`
+- **PR review stale >24h** → reminder comment, >48h → escalate to Lead
+
+---
+
 ## Per-Agent Model Selection
 
 Agents can override the platform default model based on their role requirements. Current assignments tracked in `.squad/model-assignments-snapshot.md`.

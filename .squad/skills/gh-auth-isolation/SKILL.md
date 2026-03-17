@@ -106,9 +106,26 @@ $env:GH_CONFIG_DIR = "$HOME\.config\gh-public"; gh auth status
 
 ---
 
+### Integration with ralph-watch.ps1
+
+As of issue #783, `ralph-watch.ps1` uses `GH_CONFIG_DIR` for auth isolation:
+
+```powershell
+$remoteUrl = & git remote get-url origin 2>&1 | Out-String
+$env:GH_CONFIG_DIR = if ($remoteUrl -match "tamirdresher_microsoft") {
+    "$HOME\.config\gh-emu"
+} else {
+    "$HOME\.config\gh-public"
+}
+```
+
+No token extraction, format validation, or `gh auth switch` fallback is needed.
+
+---
+
 ## Legacy Approach: Per-Process GH_TOKEN
 
-> **Superseded by GH_CONFIG_DIR above.** Kept for reference and as a fallback for environments where config-dir isolation isn't practical.
+> **Superseded by GH_CONFIG_DIR above.** Kept for reference only. Do not use in new code.
 
 Extract the token for the required account and set it as a process-local environment variable:
 
@@ -125,24 +142,10 @@ $env:GH_TOKEN = $token.Trim()
 # Other processes are unaffected
 ```
 
-### Integration with ralph-watch.ps1 (Legacy)
-
-```powershell
-try {
-    $remoteUrl = & git remote get-url origin 2>&1 | Out-String
-    $requiredAccount = if ($remoteUrl -match "your_org") { "your_emu_account" } else { "your_personal_account" }
-    $token = & gh auth token --user $requiredAccount 2>&1 | Out-String
-    $token = $token.Trim()
-    if ($token -and $token.StartsWith("gho_")) {
-        $env:GH_TOKEN = $token
-    } else {
-        # Fallback to global switch (single-Ralph scenarios)
-        & gh auth switch --user $requiredAccount 2>&1 | Out-Null
-    }
-} catch {
-    Write-Warning "gh auth isolation failed: $_"
-}
-```
+### Drawbacks of GH_TOKEN approach
+- Requires token extraction and format validation (`gho_` prefix check)
+- Only isolates the token — host settings, preferences, and API cache remain shared
+- Needs fallback logic (e.g., `gh auth switch`) when extraction fails
 
 ---
 

@@ -573,20 +573,16 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
-    # Step -1: Self-healing — set GH_TOKEN for this process based on repo remote
-    # This avoids fighting over global gh auth state with other repo Ralphs
+    # Step -1: Self-healing — set GH_CONFIG_DIR for this process based on repo remote
+    # Isolates entire gh config (auth, cache, prefs) per-account without global state mutation
     try {
         $remoteUrl = & git remote get-url origin 2>&1 | Out-String
-        $requiredAccount = if ($remoteUrl -match "tamirdresher_microsoft") { "tamirdresher_microsoft" } else { "tamirdresher" }
-        $token = & gh auth token --user $requiredAccount 2>&1 | Out-String
-        $token = $token.Trim()
-        if ($token -and $token.StartsWith("gho_")) {
-            $env:GH_TOKEN = $token
-            Write-Host "[$timestamp] gh auth: GH_TOKEN set for $requiredAccount (process-local, no global switch)" -ForegroundColor Green
+        $env:GH_CONFIG_DIR = if ($remoteUrl -match "tamirdresher_microsoft") {
+            "$HOME\.config\gh-emu"
         } else {
-            Write-Host "[$timestamp] ⚠️ Could not get token for $requiredAccount, falling back to gh auth switch" -ForegroundColor Yellow
-            & gh auth switch --user $requiredAccount 2>&1 | Out-Null
+            "$HOME\.config\gh-public"
         }
+        Write-Host "[$timestamp] gh auth: GH_CONFIG_DIR set to $($env:GH_CONFIG_DIR) (full config isolation)" -ForegroundColor Green
     } catch {
         Write-Host "[$timestamp] Warning: gh auth check failed: $($_.Exception.Message)" -ForegroundColor Yellow
     }

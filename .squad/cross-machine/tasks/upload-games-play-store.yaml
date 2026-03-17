@@ -1,0 +1,23 @@
+id: upload-games-play-store
+priority: high
+created: 2026-03-17T05:50:00Z
+status: pending
+assignee: any-ralph
+title: "Upload BrainRot Quiz + Code Conquest APKs to Google Play Store"
+description: |
+  APK builds ready at:
+  - BrainRot: https://expo.dev/accounts/jellyboltgames/projects/brainrot-quiz-battle/builds/eb13d78b-cf95-49bc-8c63-d9e556141539
+  - Code Conquest: https://expo.dev/accounts/jellyboltgames/projects/code-conquest/builds/be284876-fca2-4a0e-a2f4-8daeeb9aee35
+  
+  Play Console: play.google.com/console (tdsquadai@gmail.com)
+  Developer: JellyBolt Games
+  
+  Store listings ready at: C:\temp\jellybolt-games\store-listings\
+  Privacy policy: https://tamirdresher.github.io/jellybolt-games/privacy/
+  
+  1. Download APKs from Expo URLs
+  2. Create apps in Play Console
+  3. Fill store listings from the prepared files
+  4. Upload icons and feature graphics
+  5. Set content rating
+  6. Submit to internal testing track

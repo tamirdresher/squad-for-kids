@@ -1,0 +1,25 @@
+id: rebrand-pptx-videos
+priority: high
+created: 2026-03-17T05:50:00Z
+status: pending
+assignee: any-ralph
+title: "Rebrand and re-produce all PPTX-based YouTube videos"
+description: |
+  The 3 PPTX videos were produced with original slide styling. They MUST be rebranded.
+  
+  MANDATORY RULES (from .squad/decisions/inbox/content-production-rules.md):
+  - Change all backgrounds to Deep Navy (#0a0a2e)
+  - Change headings to Electric Cyan (#00d4ff)
+  - Change body text to White (#ffffff)
+  - Remove ALL original branding, logos, conference names, speaker names
+  - Add TechAI Explained branded intro (3s) and outro (5s)
+  - No one should be able to tell these came from existing presentations
+  
+  Source PPTX files:
+  - C:\Users\tamirdresher\OneDrive\lectures\netconf2025\*.pptx
+  - C:\Users\tamirdresher\OneDrive\lectures\Scaling and Coordinating AI Agents for Dev&Prod\*.pptx
+  - C:\Users\tamirdresher\OneDrive\lectures\The Asynchronous Processing World of .NET\*.pptx
+  
+  Output: C:\temp\techai-explained\pipeline\output\videos\rebranded\
+  
+  After rebranding, re-upload to YouTube replacing the current versions.

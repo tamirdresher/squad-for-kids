@@ -1,0 +1,18 @@
+id: fix-youtube-titles
+priority: critical
+created: 2026-03-17T05:50:00Z
+status: pending
+assignee: any-ralph
+title: "Fix ALL YouTube video titles and descriptions — remove personal names"
+description: |
+  Channel: TechAI Explained (@TDSquadAITeam)
+  Channel ID: UC0roFVTTy1nSW9Zc7DgcsmQ
+  Login: tdsquadai@gmail.com
+  
+  Go through ALL videos on the channel and:
+  1. Remove any personal name from titles and descriptions
+  2. Brand is "TechAI Explained" — never a personal name
+  3. Remove "(25 min)" / "(45 min)" from titles
+  4. Ensure every description has: Subscribe CTA, @TDSquadAITeam handle, relevant Gumroad link
+  
+  Use YouTube Studio → Videos → Edit each one

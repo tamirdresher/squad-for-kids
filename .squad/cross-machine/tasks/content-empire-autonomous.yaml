@@ -1,0 +1,24 @@
+id: content-empire-autonomous
+priority: medium
+created: 2026-03-17T05:50:00Z
+status: pending
+assignee: content-empire-ralph
+title: "Content Empire — Start autonomous content production"
+description: |
+  The Content Empire squad (Breaking Bad theme) needs to start producing autonomously.
+  
+  Weekly cadence:
+  - 2 YouTube videos (rebranded from PPTX lectures)
+  - 3 SEO articles on SaaS Finder Hub
+  - 1 newsletter via Kit
+  - 1 social media post per video
+  
+  MANDATORY: Follow ALL rules in .squad/content-rules.md
+  - No personal names
+  - No static title cards
+  - Rebrand all slides
+  - Self-publish everything
+  - Revenue hook in every piece
+  
+  Source material: 50+ lectures in C:\Users\tamirdresher\OneDrive\lectures\
+  Brand guide: .squad/brand-guide.md

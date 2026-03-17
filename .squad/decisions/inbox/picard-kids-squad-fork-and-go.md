@@ -22,7 +22,7 @@ Design a `tamirdresher/kids-squad-setup` repo where:
 
 1. **Hebrew-first UX** — copilot-instructions.md triggers Hebrew on greeting
 2. **Age-adaptive** — 3 tiers: young (8-10), builder (11-13), advanced (14+)
-3. **Hebrew agent names** — מורה, מתכנת, בודק, חוקר, מעצב, מזכיר
+3. **Hebrew agent names** — מורה, מתכנת, בודק, חוקר, מעצב, מזכיר, מומחה מחשבים
 4. **Discord for notifications** (simplest webhook API for kids)
 5. **Copilot free tier mitigation** — 4-layer strategy: tracking → coaching → fallback AI links → offline scripts
 6. **Zero-install via Codespace** — devcontainer with Node.js, Python, Hebrew extensions

@@ -37,6 +37,7 @@ Instead of one AI assistant, Kids Squad gives you an entire crew:
 | 🎨 **Designer** | Helps with visuals and layout | `"Designer: help me design a personal page"` |
 | 🧪 **Tester** | Checks that everything works | `"Tester: check my code"` |
 | 📚 **Researcher** | Helps with studying and research | `"Researcher: I have a history test tomorrow"` |
+| 🔧 **IT Expert** | Helps with computer setup, troubleshooting, and internet safety | `"IT Expert: my computer is running slow"` |
 
 **Why Squad instead of plain ChatGPT?**
 - Your team is **adapted to your age** — a 10-year-old gets different explanations than a 15-year-old
@@ -261,6 +262,9 @@ Squad isn't just for coding! Your team helps with studying too:
 💬 "Teacher: explain what the American Revolution was about. I'm in 6th grade."
 💬 "Researcher: I have a math test tomorrow on equations. Make me practice problems."
 💬 "Teacher: explain what photosynthesis is in a simple way with examples."
+💬 "IT Expert: how do I install Python on my computer?"
+💬 "IT Expert: the internet is not working, what should I check?"
+💬 "IT Expert: how do I stay safe online?"
 ```
 
 > **⚠️ Important:** The team helps you **understand** material and creates practice problems. It **won't give you answers to copy** — because that's not how you learn! 📚
@@ -298,22 +302,25 @@ pwsh ralph-kids.ps1 -Command "status"
 Squad adapts to your age. No settings to change — just tell the team how old you are:
 
 #### 🌈 Ages 8–10 — "The Fun Crew"
-- **3 agents** (Teacher, Coder, Designer)
+- **4 agents** (Teacher, Coder, Designer, IT Expert)
 - Simple language with lots of emojis 🎨🌟🚀
 - Short, fun projects — superhero pages, drawings, animations
 - Explanations with real-world examples
+- IT Expert helps with basic computer questions and staying safe online
 
 #### 💻 Ages 11–13 — "The Game Squad"
-- **4 agents** (+ Tester)
+- **5 agents** (+ Tester, IT Expert)
 - Clear language with technical terms when needed
 - Games, websites, bots, and apps
 - Start learning real programming concepts
+- IT Expert helps set up coding tools and troubleshoot issues
 
 #### 🎓 Ages 14+ — "The Pro Team"
-- **5+ agents** (full team + Researcher)
+- **6+ agents** (full team + Researcher + IT Expert)
 - Professional language
 - Full-stack, data analysis, exam prep
 - More complex projects — databases, APIs, and more
+- IT Expert helps with dev environment setup, networking, and hardware
 
 ### 🌍 Worlds You Can Choose
 
@@ -377,6 +384,9 @@ A: Codespace works in any browser — including your phone! But a bigger screen 
 
 **Q: Can it help me study for tests?**
 A: Yes — the team helps you understand material and creates practice problems. It won't give you answers to copy.
+
+**Q: Can the IT Expert fix my computer?**
+A: The IT Expert can guide you step-by-step through common computer problems — like when things are slow, apps won't open, or you need to install something. Think of it as a patient friend who knows a lot about computers and explains everything in a way you can understand. For serious hardware problems, always ask a grown-up for help!
 
 **Q: Is this safe for kids?**
 A: Squad runs inside GitHub's infrastructure with their safety guardrails. The age-adapted mode keeps interactions appropriate. That said, parents — you're always welcome to sit alongside and see what your kids are building. It's actually pretty fun to watch. 🙂

@@ -108,12 +108,14 @@ function Invoke-GhLogin {
         [string]$AccountName
     )
 
+    # Capture before ANY operations that might touch GH_CONFIG_DIR (e.g. Test-GhAuth)
+    $originalConfigDir = $env:GH_CONFIG_DIR
+
     Write-Host ''
     Write-Host "  Logging in as $AccountName to $HostName" -ForegroundColor White
     Write-Host "  Config dir: $ConfigDir" -ForegroundColor Gray
     Write-Host ''
 
-    $originalConfigDir = $env:GH_CONFIG_DIR
     try {
         $env:GH_CONFIG_DIR = $ConfigDir
         & gh auth login --hostname $HostName --web --git-protocol https
@@ -236,6 +238,7 @@ if ($allOk) {
     Write-OK 'Setup complete. Both accounts are authenticated.'
 } else {
     Write-Warn 'Setup finished with warnings. Check output above.'
+    exit 1
 }
 
 Write-Host ''

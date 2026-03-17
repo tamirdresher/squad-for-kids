@@ -25122,3 +25122,132 @@ This squad should prototype a gh-aw workflow to validate:
 
 ## Violation
 Any message containing a private repo URL sent to someone other than Tamir is a **security incident**. No exceptions.
+
+---
+
+
+### 2026-03-17T14:09Z: Documentation directive
+**By:** Tamir (via Copilot)
+**What:** All work done by the squad must be documented with GitHub issues so we can do analysis and reporting afterwards. No undocumented work.
+**Why:** User request — traceability and reporting capability for all squad activity.
+
+
+---
+
+
+### 2026-03-17T11:59Z: DK8S squad independence directive
+**By:** Tamir (via Copilot)
+**What:** The DK8S squad (microsoft-mtp org) must be completely disconnected from any specific person (including Tamir). It is a shared team tool used by ALL DK8S team members. No personal repos, no personal issues, no personal config. It should work for anyone on the DK8S team who runs it.
+**Why:** User request — DK8S squad is a team resource, not a personal one. Extending it to handle infra issues must not introduce person-specific coupling.
+
+
+---
+
+
+# Directive: NEVER Share Private Repo Links
+
+**Date:** 2026-03-17
+**Author:** Tamir Dresher (explicit order)
+**Status:** 🔴 ENFORCED — Non-negotiable
+**Scope:** ALL agents, ALL machines, ALL sessions
+
+## Rule
+
+**NEVER share links to any of these repos with anyone other than Tamir Dresher:**
+- `tamirdresher_microsoft/tamresearch1`
+- `tamirdresher_microsoft/tamresearch1-research`
+- Any repo under `tamirdresher_microsoft/*`
+- Any private repo under `tamirdresher/*`
+
+**This applies to:**
+- Teams messages
+- Emails (Gmail or Outlook)
+- Issue comments on PUBLIC repos
+- Chat messages
+- Any external communication
+
+## What TO share (public repos only)
+- `tamirdresher/squad-tetris` ✅
+- `tamirdresher/squad-skills` ✅
+- `tamirdresher/squad-personal-demo` ✅
+- `tamirdresher/kids-squad-setup` ✅
+- `tamirdresher/tamirdresher.github.io` ✅
+- `mtp-microsoft/dk8s-platform-squad` ✅ (internal but team-accessible)
+- `bradygaster/squad` ✅
+
+## Violation
+Any message containing a private repo URL sent to someone other than Tamir is a **security incident**. No exceptions.
+
+
+---
+
+
+### Decision: DK8S Squad Usage Standard Published
+
+- **Date:** 2025-07-22
+- **Author:** Picard (Lead)
+- **Status:** Active
+- **Issue:** #773
+
+#### Context
+
+Adir requested a clear baseline for Squad adoption across the DK8S Platform team. Without a standard, each engineer's squad would fragment — different labels, different review gates, different decision formats — eliminating the "leverage" benefit of shared tooling.
+
+#### Decision
+
+Published `docs/dk8s-squad-usage-standard.md` as the canonical reference for DK8S Squad usage. Key elements:
+
+1. **Three-level topology:** Org-level (`mtp-microsoft/dk8s-platform-squad`) → Swimlane → Personal squads
+2. **Upstream inheritance:** All personal squads `squad upstream add` from org-level squad
+3. **Non-overridable policies:** Security review gates, vulnerability scanning, test requirements, decision recording — marked `[ENFORCED]`
+4. **Closest-wins for everything else:** Personal preferences (universe, casting, ceremonies) are autonomous
+5. **Shared skills catalog:** 6 org-level skills identified for promotion to `dk8s-platform-squad`
+6. **Cross-team ownership matrix:** Named owners for vuln management, CI/CD, cleanups, incident response, ConfigGen
+
+#### Consequences
+
+- Every DK8S engineer should create a personal squad and connect upstream
+- The org-level squad repo (`mtp-microsoft/dk8s-platform-squad`) needs the shared skills populated
+- Swimlane leads need to be identified for platform-core, security-compliance, infrastructure, tooling-dx
+- This document should be copied/adapted into the org-level squad repo once reviewed
+
+
+---
+
+
+# Decision: Adopt GH_CONFIG_DIR as primary auth isolation primitive
+
+**Author:** Seven (Research & Docs)
+**Date:** 2026-03-17
+**Context:** Issue #778 — Research from jongio/gh-public-gh-emu-setup
+
+## Decision
+
+Replace `GH_TOKEN` extraction and `gh auth switch` with `GH_CONFIG_DIR` as the primary mechanism for GitHub CLI auth isolation across multiple accounts.
+
+## Rationale
+
+- `GH_CONFIG_DIR` isolates **all config** (tokens, preferences, host settings, cache), not just the token
+- Eliminates the race condition in `ghp`/`ghe` aliases that use `gh auth switch` (global state mutation)
+- Removes the `gh auth token --user X` extraction step and `gho_` format check (2 failure modes)
+- Simpler code, fewer moving parts, zero cross-talk between concurrent processes
+
+## Impact
+
+- **Ralph (ralph-watch.ps1):** Simplify auth flow from 15 lines to 3
+- **Aliases (ghp/ghe):** Fix race condition, change from `gh auth switch` to `$env:GH_CONFIG_DIR`
+- **Skills docs:** Update `gh-auth-isolation/SKILL.md` and `github-account-switching/SKILL.md`
+- **Spawn scripts:** Set `GH_CONFIG_DIR` at process launch time
+
+## Sub-issues
+
+- #781 (P0): Setup directories
+- #782 (P0): Fix aliases
+- #783 (P1): Ralph migration
+- #784 (P2): Terminal profiles
+- #785 (P2): Auto-activation
+
+## Open Question
+
+Should `GH_TOKEN` extraction be kept as a fallback for CI environments where config dirs may not persist? Recommend yes — document as legacy fallback, not primary path.
+

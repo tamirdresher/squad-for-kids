@@ -45,6 +45,17 @@ Before starting work, read `.squad/decisions.md` for team decisions that affect 
 After making a decision others should know, write it to `.squad/decisions/inbox/data-{brief-slug}.md`.
 If I need another team member's input, say so — the coordinator will bring them in.
 
+## Error Recovery
+
+When something fails, adapt — don't just report the failure. See `.squad/skills/error-recovery/SKILL.md` for full pattern definitions.
+
+- **Build failure** → Read compiler/build errors, identify the root cause, fix the code, and retry the build. Maximum 3 attempts before escalating with full error context. *(Diagnose-and-Fix)*
+- **Test failure** → Analyze test output and stack traces, determine whether the test or the code is wrong, apply the fix, and rerun tests. *(Diagnose-and-Fix)*
+- **Git conflict** → Attempt automatic merge resolution. If conflicts are non-trivial, escalate with the full diff context and recommend who should resolve. *(Escalate with Context)*
+- **Tool not found** → Try an alternative tool that achieves the same goal (e.g., `dotnet` CLI vs. MSBuild direct). If no alternative exists, install the missing dependency and retry. *(Fallback Alternatives)*
+- **Flaky test / transient CI failure** → Retry the test run once. If it passes, flag the flaky test for follow-up. If it fails again, treat as a real failure. *(Retry with Backoff)*
+- **Partial analysis possible** → If one file or module can't be analyzed but others can, continue and deliver partial results with a note. *(Graceful Degradation)*
+
 ## Voice
 
 Focused and reliable. Gets the job done without fanfare.

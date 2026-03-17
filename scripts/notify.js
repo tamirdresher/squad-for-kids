@@ -95,6 +95,55 @@ function formatForTeams(body, channelName) {
 }
 
 // ---------------------------------------------------------------------------
+// Per-channel webhook file resolution (Issue #821)
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve webhook URL for a channel. Priority:
+ *   1. Channel-specific file: ~/.squad/teams-webhooks/{channelKey}.url
+ *   2. General webhook file:  ~/.squad/teams-webhooks/general.url
+ *   3. Legacy single file:    ~/.squad/teams-webhook.url
+ *   4. Config env-var URL:    ${SQUAD_WEBHOOK_*} from notification-routes.json
+ */
+function resolveWebhookUrl(channelKey, configWebhookUrl) {
+  const home = process.env.USERPROFILE || process.env.HOME || '';
+  const webhooksDir = path.join(home, '.squad', 'teams-webhooks');
+
+  // 1. Channel-specific webhook file
+  if (channelKey) {
+    const channelFile = path.join(webhooksDir, `${channelKey}.url`);
+    if (fs.existsSync(channelFile)) {
+      const url = fs.readFileSync(channelFile, 'utf8').trim();
+      if (url) return url;
+    }
+  }
+
+  // 2. General webhook file (fallback for any channel)
+  if (channelKey !== 'general') {
+    const generalFile = path.join(webhooksDir, 'general.url');
+    if (fs.existsSync(generalFile)) {
+      const url = fs.readFileSync(generalFile, 'utf8').trim();
+      if (url) return url;
+    }
+  }
+
+  // 3. Legacy single-webhook file
+  const legacyFile = path.join(home, '.squad', 'teams-webhook.url');
+  if (fs.existsSync(legacyFile)) {
+    const url = fs.readFileSync(legacyFile, 'utf8').trim();
+    if (url) return url;
+  }
+
+  // 4. Config env-var URL (original behavior)
+  if (configWebhookUrl) {
+    const url = resolveEnvVars(configWebhookUrl);
+    if (url) return url;
+  }
+
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Providers
 // ---------------------------------------------------------------------------
 
@@ -105,9 +154,9 @@ function sendConsole(formatted, channelName) {
 
 function sendWebhook(formatted, webhookUrl) {
   return new Promise((resolve, reject) => {
-    const url = resolveEnvVars(webhookUrl);
+    const url = typeof webhookUrl === 'string' ? webhookUrl : '';
     if (!url) {
-      return reject(new Error('Webhook URL is empty after env var substitution'));
+      return reject(new Error('Webhook URL is empty'));
     }
 
     const payload = JSON.stringify({
@@ -182,7 +231,10 @@ async function dispatch(message, config, providerOverride) {
   try {
     switch (provider) {
       case 'webhook': {
-        const webhookUrl = channelDef.webhookUrl;
+        const webhookUrl = resolveWebhookUrl(channel, channelDef.webhookUrl);
+        if (!webhookUrl) {
+          throw new Error(`No webhook URL found for channel "${channel}"`);
+        }
         return await sendWebhook(formatted, webhookUrl);
       }
       case 'teams-mcp':
@@ -291,4 +343,4 @@ if (isMain) {
   main();
 }
 
-export { loadConfig, parseChannelTag, detectChannel, resolveChannel, formatForTeams, dispatch };
+export { loadConfig, parseChannelTag, detectChannel, resolveChannel, formatForTeams, resolveWebhookUrl, dispatch };

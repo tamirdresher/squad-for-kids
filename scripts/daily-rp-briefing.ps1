@@ -441,12 +441,14 @@ if ($DryRun) {
 }
 
 # Send to Teams
+# Send to Teams (per-channel webhook — Issue #821)
 if (-not (Test-Path $TeamsWebhookFile)) {
-    Write-Host "Γ¥î Teams webhook URL not found at $TeamsWebhookFile" -ForegroundColor Red
-    exit 1
+    # Try channel-specific webhook resolution
+    . "$PSScriptRoot\Get-ChannelWebhookUrl.ps1"
+    $webhookUrl = Get-ChannelWebhookUrl -ChannelKey "general"
+} else {
+    $webhookUrl = Get-Content -Path $TeamsWebhookFile -Raw -Encoding utf8 | ForEach-Object { $_.Trim() }
 }
-
-$webhookUrl = Get-Content -Path $TeamsWebhookFile -Raw -Encoding utf8 | ForEach-Object { $_.Trim() }
 
 if ([string]::IsNullOrWhiteSpace($webhookUrl)) {
     Write-Host "Γ¥î Teams webhook URL is empty" -ForegroundColor Red

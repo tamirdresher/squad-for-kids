@@ -1,37 +1,63 @@
 {
   "defaultChannel": "general",
   "provider": "webhook",
+  "webhookResolution": {
+    "_comment": "Issue #821: Per-channel incoming webhooks. Priority order for webhook URL resolution:",
+    "1_channelFile": "$USERPROFILE/.squad/teams-webhooks/{channel-key}.url",
+    "2_generalFile": "$USERPROFILE/.squad/teams-webhooks/general.url",
+    "3_legacyFile": "$USERPROFILE/.squad/teams-webhook.url",
+    "4_envVar": "Channel-specific ${SQUAD_WEBHOOK_*} from this config",
+    "setup": "Run scripts/setup-webhooks.ps1 to configure per-channel webhooks"
+  },
   "channels": {
     "general": {
       "name": "General",
       "webhookUrl": "${SQUAD_WEBHOOK_GENERAL}",
+      "webhookFile": "~/.squad/teams-webhooks/general.url",
       "description": "Catch-all for unrouted notifications"
     },
     "wins": {
       "name": "Wins & Celebrations",
       "webhookUrl": "${SQUAD_WEBHOOK_WINS}",
+      "webhookFile": "~/.squad/teams-webhooks/wins.url",
       "description": "Milestones, merged PRs, closed issues, birthdays"
     },
     "alerts": {
       "name": "Alerts",
       "webhookUrl": "${SQUAD_WEBHOOK_ALERTS}",
+      "webhookFile": "~/.squad/teams-webhooks/alerts.url",
       "description": "Errors, failures, health issues, urgent items"
     },
     "pr-code": {
       "name": "PR & Code",
       "webhookUrl": "${SQUAD_WEBHOOK_PR}",
+      "webhookFile": "~/.squad/teams-webhooks/pr-code.url",
       "description": "PR opened, reviews needed, CI status, builds"
     },
     "research": {
       "name": "Research",
       "webhookUrl": "${SQUAD_WEBHOOK_RESEARCH}",
+      "webhookFile": "~/.squad/teams-webhooks/research.url",
       "description": "Research outputs, paper summaries, analysis"
+    },
+    "tech-news": {
+      "name": "Tech News",
+      "webhookUrl": "${SQUAD_WEBHOOK_TECH_NEWS}",
+      "webhookFile": "~/.squad/teams-webhooks/tech-news.url",
+      "description": "Daily tech briefings, industry news"
+    },
+    "ralph-alerts": {
+      "name": "Ralph Alerts",
+      "webhookUrl": "${SQUAD_WEBHOOK_RALPH_ALERTS}",
+      "webhookFile": "~/.squad/teams-webhooks/ralph-alerts.url",
+      "description": "Ralph errors, stalls, restarts, health issues"
     }
   },
   "routing": {
     "wins": ["merged", "closed", "milestone", "celebration", "birthday", "shipped"],
     "alerts": ["error", "failure", "blocked", "urgent", "stall", "health", "restart"],
     "pr-code": ["PR", "review", "CI", "build", "deploy", "pipeline"],
-    "research": ["research", "analysis", "report", "findings"]
+    "research": ["research", "analysis", "report", "findings"],
+    "tech-news": ["tech news", "hacker news", "industry", "trending"]
   }
 }

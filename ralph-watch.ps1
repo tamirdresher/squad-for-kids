@@ -546,7 +546,7 @@ function Invoke-StaleWorkReclaim {
 # webhook (always general channel) as the reliable fallback.
 # -------------------------------------------------------------------
 
-# Function to send Teams alert
+# Function to send Teams alert (uses per-channel webhook — Issue #821)
 function Send-TeamsAlert {
     param(
         [int]$Round,
@@ -555,15 +555,19 @@ function Send-TeamsAlert {
         [hashtable]$Metrics = @{}
     )
     
-    if (-not (Test-Path $teamsWebhookFile)) {
-        Write-Host "[$timestamp] Warning: Teams webhook URL not found at $teamsWebhookFile" -ForegroundColor Yellow
-        return
+    # Resolve webhook URL: alerts channel → general → legacy fallback
+    . "$PSScriptRoot\scripts\Get-ChannelWebhookUrl.ps1"
+    $webhookUrl = Get-ChannelWebhookUrl -ChannelKey "alerts"
+    
+    if (-not $webhookUrl) {
+        # Fallback: try the legacy file directly (in case dot-source fails)
+        if (Test-Path $teamsWebhookFile) {
+            $webhookUrl = (Get-Content -Path $teamsWebhookFile -Raw -Encoding utf8).Trim()
+        }
     }
     
-    $webhookUrl = Get-Content -Path $teamsWebhookFile -Raw -Encoding utf8 | ForEach-Object { $_.Trim() }
-    
     if ([string]::IsNullOrWhiteSpace($webhookUrl)) {
-        Write-Host "[$timestamp] Warning: Teams webhook URL is empty" -ForegroundColor Yellow
+        Write-Host "[$timestamp] Warning: No Teams webhook URL found for alerts channel" -ForegroundColor Yellow
         return
     }
     

@@ -411,11 +411,14 @@ if (-not $SkipEmail) {
 if (-not $SkipTeams) {
     Write-Host "[Phase 3] Teams Notification" -ForegroundColor Cyan
     try {
-        if (-not (Test-Path $TeamsWebhookFile)) {
-            throw "Webhook URL file not found: $TeamsWebhookFile"
+        # Per-channel webhook resolution (Issue #821)
+        . "$PSScriptRoot\Get-ChannelWebhookUrl.ps1"
+        $webhookUrl = Get-ChannelWebhookUrl -ChannelKey "general"
+        
+        if (-not $webhookUrl -and (Test-Path $TeamsWebhookFile)) {
+            $webhookUrl = (Get-Content $TeamsWebhookFile -Raw -Encoding utf8).Trim()
         }
-        $webhookUrl = (Get-Content $TeamsWebhookFile -Raw -Encoding utf8).Trim()
-        if ([string]::IsNullOrWhiteSpace($webhookUrl)) { throw "Webhook URL file is empty" }
+        if ([string]::IsNullOrWhiteSpace($webhookUrl)) { throw "No webhook URL found (checked channel files and $TeamsWebhookFile)" }
 
         # Build O365 Connector MessageCard (reliable for incoming webhooks)
         $actions = @()

@@ -533,16 +533,24 @@ function formatDigest(stories, squadUpdates = []) {
 }
 
 async function postToTeamsWebhook(digest) {
-  const webhookFile = path.join(process.env.USERPROFILE || process.env.HOME || '', '.squad', 'teams-webhook.url');
+  const home = process.env.USERPROFILE || process.env.HOME || '';
+  
+  // Per-channel webhook resolution (Issue #821)
+  // Priority: tech-news channel file → general channel file → legacy file
+  let webhookUrl = null;
+  const channelFile = path.join(home, '.squad', 'teams-webhooks', 'tech-news.url');
+  const generalFile = path.join(home, '.squad', 'teams-webhooks', 'general.url');
+  const legacyFile  = path.join(home, '.squad', 'teams-webhook.url');
 
-  if (!fs.existsSync(webhookFile)) {
-    console.error('Teams webhook URL file not found, skipping Teams post');
-    return;
+  for (const file of [channelFile, generalFile, legacyFile]) {
+    if (fs.existsSync(file)) {
+      const url = fs.readFileSync(file, 'utf8').trim();
+      if (url) { webhookUrl = url; break; }
+    }
   }
 
-  const webhookUrl = fs.readFileSync(webhookFile, 'utf8').trim();
   if (!webhookUrl) {
-    console.error('Teams webhook URL is empty, skipping Teams post');
+    console.error('No Teams webhook URL found (checked tech-news, general, legacy), skipping Teams post');
     return;
   }
 

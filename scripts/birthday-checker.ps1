@@ -190,14 +190,19 @@ foreach ($person in $birthdayPeople) {
 
         # --- Post birthday notification to Teams "Wins and Celebrations" channel ---
         # Channel routing: birthday notifications go to the "wins" channel.
-        # When running with Teams MCP tools, use channelId from .squad/teams-channels.json.
-        # Fallback: post to general channel via webhook.
+        # Per-channel webhook resolution (Issue #821)
         $channelsFile = Join-Path $repoRoot ".squad\teams-channels.json"
-        $webhookFile = Join-Path $env:USERPROFILE ".squad\teams-webhook.url"
-        if (Test-Path $webhookFile) {
-            try {
+        . "$PSScriptRoot\Get-ChannelWebhookUrl.ps1"
+        $webhookUrl = Get-ChannelWebhookUrl -ChannelKey "wins"
+        if (-not $webhookUrl) {
+            # Legacy fallback
+            $webhookFile = Join-Path $env:USERPROFILE ".squad\teams-webhook.url"
+            if (Test-Path $webhookFile) {
                 $webhookUrl = (Get-Content $webhookFile -Raw -Encoding utf8).Trim()
-                if (-not [string]::IsNullOrWhiteSpace($webhookUrl)) {
+            }
+        }
+        if (-not [string]::IsNullOrWhiteSpace($webhookUrl)) {
+            try {
                     $teamsMsg = @{
                         "@type"    = "MessageCard"
                         "@context" = "https://schema.org/extensions"
@@ -209,7 +214,6 @@ foreach ($person in $birthdayPeople) {
                     $body = $teamsMsg | ConvertTo-Json -Depth 5
                     Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json" | Out-Null
                     Write-Host "   Teams notification sent (CHANNEL: wins)" -ForegroundColor Yellow
-                }
             } catch {
                 Write-Host "   Warning: Teams notification failed: $($_.Exception.Message)" -ForegroundColor Yellow
             }

@@ -2,6 +2,274 @@
 
 ## Active Decisions
 
+### 2026-03-17: Guinan — Autonomous Content Pipeline Design (Issue #770)
+
+# Decision: Autonomous Content Pipeline Design
+
+**Date:** 2026-03-18  
+**Author:** Guinan (Content Strategist)  
+**Status:** PROPOSED  
+**Severity:** HIGH  
+**Issue:** #770
+
+---
+
+## Problem Statement
+
+The Content & Marketing squad currently operates reactively:
+- Editorial decisions are manual
+- Production waits for assignments
+- Optimization and publishing happen ad hoc
+- Tamir is in the daily loop despite the squad existing to reduce his workload
+
+This is not autonomy. A truly autonomous squad must self-organize with clear authority boundaries and automated workflows.
+
+---
+
+## Proposed Solution: Content Pipeline Autonomous Loop
+
+### Architecture
+
+**Five sequential stages, each with clear input/output:**
+
+1. **Detection (Ralph)**: Watch for new news reports → trigger daily batch
+2. **Editorial (Guinan)**: Pick stories, create briefs → assign to production
+3. **Production (Paris)**: Create 4 language versions → hand to growth
+4. **Optimization (Geordi)**: Optimize metadata, schedule posts → ready for review
+5. **Safety (Crusher)**: Review all content → approve or reject → auto-publish if approved
+
+### Authority Distribution
+
+| Role | Authority | Autonomy |
+|------|-----------|----------|
+| **Guinan** | Decides what's newsworthy | No approval needed from anyone except Crusher's safety veto |
+| **Paris** | Decides creative presentation | Crusher may reject for quality |
+| **Geordi** | Runs growth experiments (titles, thumbnails, posting times) | No approval needed |
+| **Crusher** | VETO power — can reject anything unsafe/off-brand | Final gate, no override |
+
+**Escalation:** Only to Tamir for safety incidents, budget decisions, or new channel launches.
+
+---
+
+## Key Design Decisions
+
+### 1. Crusher's Review is MANDATORY & BLOCKING
+
+- Nothing publishes without Crusher's approval
+- Crusher can reject for safety, quality, or brand fit reasons
+- If rejected: auto-loop back to Paris (production) or Geordi (metadata)
+- No further gates after Crusher approves
+
+**Rationale:** Safety and brand consistency are non-negotiable. Crusher's role is to protect the company and audience.
+
+### 2. Guinan Decides Newsworthiness (No Vote)
+
+Criteria:
+- Relevant to AI/SaaS audience
+- Can be meaningfully localized (EN/HE/ES/FR)
+- Has visual potential
+- Evergreen enough to survive production delay
+
+**Rationale:** Editorial judgment requires one voice, not consensus. Guinan owns this.
+
+### 3. Geordi Optimizes Autonomously
+
+Geordi runs A/B tests on posting times, titles, thumbnails without approval. Runs growth experiments daily.
+
+**Rationale:** Growth requires experimentation at speed. Crusher still gates publication.
+
+### 4. Four Languages, One Editorial Decision
+
+- English produced first (primary)
+- Hebrew, Spanish, French follow (same day)
+- One decision to make a story → all four versions happen
+
+**Rationale:** Maximizes audience reach, amortizes production cost.
+
+### 5. SLA: 8 Hours Report → Publish
+
+Neelix report lands → Squad has 8 hours to publish 4 versions.
+
+- Ralph detects within 1 hour
+- Guinan briefs within 2 hours
+- Paris produces within 4 hours
+- Geordi optimizes within 1 hour
+- Crusher reviews within 30 min
+
+**Rationale:** Speed-to-market matters for trending content. 8h is aggressive but achievable with async parallel work.
+
+---
+
+## Automation Mechanisms
+
+### Ralph Watch Instance
+
+Dedicated `ralph-watch-content.ps1` that:
+- Polls Neelix reports every 30-60 minutes
+- Scans saas-finder-hub for article opportunities
+- Creates GitHub issue with label `content-batch` when new content available
+- Routes to Guinan automatically
+
+### Auto-Scanning for Safety
+
+Before Crusher review, automated scan detects:
+- Microsoft internal URLs or keywords
+- Personal information (full names, contact details)
+- NDA-protected phrases
+- Flags suspicious content for manual review
+
+### Auto-Publishing
+
+After Crusher approval (`/approve` comment):
+- YouTube API integration uploads to all 4 channel versions
+- Posts go live immediately
+- Analytics tracking starts
+- Squad notified in GitHub issue
+
+---
+
+## Escalation Rules
+
+**Escalate to Tamir ONLY for:**
+- 🔴 Safety incident (internal content leaked, NDA violation)
+- 💰 Budget decision (new tools, paid promotion, channel upgrade)
+- 🆕 New channel launch or major format change
+- ⚖️ Ethical dilemma (competitor strategy, controversial topic)
+
+**Do NOT escalate:**
+- Editorial taste disagreements (Crusher's veto is final)
+- Production delays (Paris handles)
+- Performance questions (Geordi handles)
+- Routine safety rejections (Crusher handles)
+
+---
+
+## Success Metrics
+
+**SLA Compliance:**
+- % of batches published within 8 hours (target: 95%)
+- Average time: report → publication
+
+**Quality:**
+- Safety incidents (target: 0)
+- Crusher rejection rate (baseline: track weekly)
+- Content performance (views, engagement per market)
+
+**Autonomy:**
+- Days without Tamir involvement in daily decisions (target: >95%)
+- Escalation frequency (target: <1 per week)
+
+---
+
+## Open Questions
+
+1. **YouTube Channels:** Use existing "TechAI Explained" channels or create new ones per language?
+2. **Evergreen Fill:** Should Geordi pre-schedule evergreen content on non-news days?
+3. **Rejection Loop:** If Crusher rejects, should issue auto-loop or wait for manual assignment?
+4. **Posting Cadence:** One story per day, or variable based on quality?
+5. **Budget:** Any tool licensing needed (TTS, video hosting, scheduling)?
+
+---
+
+## Implementation Phases
+
+| Phase | Deliverable | Timeline |
+|-------|-------------|----------|
+| 1 | Ralph detection → GitHub issues | Week 1 |
+| 2 | Guinan editorial briefs + triage | Week 2 |
+| 3 | Paris production pipeline | Week 2-3 |
+| 4 | Geordi optimization + experiments | Week 3 |
+| 5 | Crusher safety + auto-publish | Week 4 |
+| 6 | Monitoring, metrics, retro | Ongoing |
+
+---
+
+## Related Decisions
+
+- Decision 32: User Directive — Content Squad Autonomy
+- Decision 33: User Directive — Charity/Donation Separation
+
+---
+
+## Sign-Off
+
+**Status:** PROPOSED — Awaiting squad input and Tamir approval before implementation begins.
+
+**Next Step:** Squad meeting to discuss questions, refine SLAs, confirm tool availability.
+
+---
+
+### 2026-03-17: User Directive — Content Squad Autonomy
+
+# Decision: Content Squad Autonomy Directive
+
+**Date:** 2026-03-17T11:41Z  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ACTIVE DIRECTIVE  
+**Severity:** HIGH
+
+---
+
+## What
+
+The Content & Marketing squad (Guinan, Paris, Geordi, Crusher) must operate **fully independently and autonomously in the background**. No user involvement required for daily operations. They should self-organize:
+
+1. **Guinan** plans content
+2. **Paris** produces it
+3. **Geordi** optimizes distribution
+4. **Crusher** reviews before publish
+5. **Ralph** drives the pipeline
+
+**Escalation:** Only to Tamir for exceptional situations (safety incidents, major strategy pivots).
+
+---
+
+## Why
+
+User request — the content company should run like a business unit, not a supervised team.
+
+---
+
+## Implementation
+
+This decision is operationalized in Decision 31 (Autonomous Content Pipeline Design).
+
+---
+
+### 2026-03-17: User Directive — Charity/Donation Separation
+
+# Decision: Charity/Donation Separation Directive
+
+**Date:** 2026-03-17T11:39Z  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ACTIVE DIRECTIVE  
+**Severity:** HIGH
+
+---
+
+## What
+
+Charity/donation work must be **COMPLETELY SEPARATE** from JellyBolt Games or any other brand. No connection between the companies.
+
+**Principle:** מתן בסתר (Anonymous Giving) — never mention charity in connection with any revenue-generating brand.
+
+---
+
+## Why
+
+User request — ethical principle of anonymous giving. The values and organizations must be kept distinct.
+
+---
+
+## Impact
+
+- No cross-promotion between charitable initiatives and branded products
+- No mention of charity partners in product marketing
+- Separate bank accounts, governance, communications
+- Squad members should maintain clear ethical boundaries
+
+---
+
 ### 2026-03-14: Seven — Model Monitor Script & Sonnet 4.6 Evaluation (Issue #509)
 
 # Decision: Model Monitor Script & Sonnet 4.6 Evaluation

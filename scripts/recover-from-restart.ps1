@@ -41,7 +41,8 @@ function Test-SafePath {
 
 function Test-SafeSessionId {
     param([string]$Id)
-    return ($Id -match '^[0-9a-f\-]{8,64}$')
+    # Strict UUID v4 format, case-sensitive match
+    return ($Id -cmatch '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
 }
 
 # ---------------------------------------------------------------------------

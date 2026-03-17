@@ -31,6 +31,7 @@ jobs:
       
       - name: Detect Helm/Kustomize changes
         id: detect
+        shell: pwsh
         run: |
           if (Test-Path scripts\drift-detection\detect-helm-kustomize-changes.sh) {
             bash scripts/drift-detection/detect-helm-kustomize-changes.sh
@@ -39,8 +40,8 @@ jobs:
           }
           
           # Load results
-          if (Test-Path /tmp/drift-detection/changes.env) {
-            Get-Content /tmp/drift-detection/changes.env | ForEach-Object {
+          if (Test-Path "$env:RUNNER_TEMP/drift-detection/changes.env") {
+            Get-Content "$env:RUNNER_TEMP/drift-detection/changes.env" | ForEach-Object {
               if ($_ -match '^([^=]+)=(.*)$') {
                 $name = $matches[1]
                 $value = $matches[2]
@@ -53,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: drift-detection-results
-          path: /tmp/drift-detection/
+          path: ${{ runner.temp }}/drift-detection/
           retention-days: 7
 
   validate-manifests:
@@ -72,7 +73,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: drift-detection-results
-          path: /tmp/drift-detection/
+          path: ${{ runner.temp }}/drift-detection/
       
       - name: Setup Helm
         uses: azure/setup-helm@v4
@@ -85,6 +86,7 @@ jobs:
           version: 'v1.28.0'
       
       - name: Install conftest (OPA policy testing)
+        shell: pwsh
         run: |
           if (-not (Get-Command conftest -ErrorAction SilentlyContinue)) {
             Write-Output "Installing conftest..."
@@ -96,6 +98,7 @@ jobs:
       
       - name: Render and validate manifests
         id: validate
+        shell: pwsh
         run: |
           if (Test-Path scripts\drift-detection\render-and-validate.sh) {
             bash scripts/drift-detection/render-and-validate.sh
@@ -109,11 +112,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rendered-manifests
-          path: /tmp/drift-detection/rendered/
+          path: ${{ runner.temp }}/drift-detection/rendered/
           retention-days: 7
       
       - name: Check validation result
         if: steps.validate.outcome == 'failure'
+        shell: pwsh
         run: |
           Write-Output "::error::Manifest validation failed - security issues detected"
           exit 1
@@ -138,17 +142,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: drift-detection-results
-          path: /tmp/drift-detection/
+          path: ${{ runner.temp }}/drift-detection/
       
       - name: Download rendered manifests
         uses: actions/download-artifact@v4
         with:
           name: rendered-manifests
-          path: /tmp/drift-detection/rendered/
+          path: ${{ runner.temp }}/drift-detection/rendered/
         continue-on-error: true
       
       - name: Generate compliance delta report
         id: report
+        shell: pwsh
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
@@ -165,7 +170,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compliance-delta-report
-          path: /tmp/drift-detection/compliance-delta-report.md
+          path: ${{ runner.temp }}/drift-detection/compliance-delta-report.md
           retention-days: 30
       
       - name: Comment PR with compliance report
@@ -174,7 +179,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const reportPath = '/tmp/drift-detection/compliance-delta-report.md';
+            const reportPath = process.env.RUNNER_TEMP + '/drift-detection/compliance-delta-report.md';
             
             if (!fs.existsSync(reportPath)) {
               console.log('Report file not found, skipping PR comment');
@@ -216,6 +221,7 @@ jobs:
       
       - name: Fail if validation failed
         if: needs.validate-manifests.result == 'failure'
+        shell: pwsh
         run: |
           Write-Output "::error::Drift validation failed - see compliance report for details"
           exit 1

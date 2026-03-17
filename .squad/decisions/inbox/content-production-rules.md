@@ -47,3 +47,8 @@
 - Do NOT ask Tamir to go to a URL — just send the number he needs to tap
 - Wait 60 seconds after sending, then retry the action
 - This applies to ALL squads and all cross-machine Ralphs
+
+## Rule 8: Notifications Only to Tamir
+- ONLY send Teams messages, emails, or notifications to Tamir Dresher (tamirdresher@microsoft.com)
+- NEVER message Brady, Roy, or anyone else unless Tamir explicitly says to
+- This applies to ALL squads, ALL agents, ALL machines

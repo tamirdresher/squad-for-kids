@@ -158,10 +158,11 @@ function Test-GhAuth {
 
         if ($actualUser -eq $ExpectedUser) {
             Write-OK "$AccountName — authenticated as $actualUser"
+            return $true
         } else {
             Write-Warn "$AccountName — authenticated as '$actualUser' (expected '$ExpectedUser')"
+            return $false
         }
-        return $true
     }
     finally {
         $env:GH_CONFIG_DIR = $originalConfigDir

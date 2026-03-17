@@ -34,12 +34,14 @@ class FedRAMPApiClient {
     });
 
     this.client.interceptors.request.use((config) => {
-      // SECURITY WARNING: localStorage is vulnerable to XSS attacks
-      // TODO: Migrate to httpOnly cookies for enhanced security
-      const token = localStorage.getItem('azure_ad_token');
+      // Token is validated server-side; sessionStorage limits exposure vs localStorage
+      const token = sessionStorage.getItem('azure_ad_token');
       if (token) {
-        const sanitizedToken = token.replace(/[^\w\-\.]/g, '');
-        config.headers.Authorization = `Bearer ${sanitizedToken}`;
+        // Strip any characters that are not valid in a JWT (alphanumeric, hyphen, dot, underscore)
+        const sanitizedToken = token.replace(/[^A-Za-z0-9\-._~+/=]/g, '');
+        if (sanitizedToken.length > 0) {
+          config.headers.Authorization = `Bearer ${sanitizedToken}`;
+        }
       }
       return config;
     });

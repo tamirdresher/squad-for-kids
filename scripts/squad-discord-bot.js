@@ -25,7 +25,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync,
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -120,7 +120,7 @@ function getToken() {
         try {
             const ps = `(New-Object System.Net.NetworkCredential('', ` +
                 `(Get-StoredCredential -Target 'squad-discord-bot').Password)).Password`;
-            const result = execSync(`powershell -NoProfile -Command "${ps}"`,
+            const result = execFileSync('powershell', ['-NoProfile', '-Command', ps],
                 { encoding: 'utf-8', timeout: 5000 }).trim();
             if (result && !result.startsWith('Get-StoredCredential')) {
                 logInfo('Token loaded from Windows Credential Manager');

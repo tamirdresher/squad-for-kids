@@ -55,8 +55,15 @@ export const getRolePermissions = (role: UserRole): UserPermissions => {
 
 export const parseJwtRole = (token: string): UserRole | null => {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const roles = payload.roles || [];
+    // Client-side role extraction for UI rendering only.
+    // Authorization is enforced server-side; never trust client-parsed claims for access control.
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const payload = JSON.parse(atob(parts[1]));
+    if (typeof payload !== 'object' || payload === null) return null;
+
+    const roles: unknown[] = Array.isArray(payload.roles) ? payload.roles : [];
     
     if (roles.includes('FedRAMP.SecurityAdmin')) return 'Security Admin';
     if (roles.includes('FedRAMP.SecurityEngineer')) return 'Security Engineer';
@@ -72,7 +79,7 @@ export const parseJwtRole = (token: string): UserRole | null => {
 
 export const mockGetCurrentUserRole = (): UserRole => {
   if (process.env.NODE_ENV === 'development') {
-    const mockRole = localStorage.getItem('mock_user_role');
+    const mockRole = sessionStorage.getItem('mock_user_role');
     if (mockRole && isValidRole(mockRole)) {
       return mockRole as UserRole;
     }

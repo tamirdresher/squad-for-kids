@@ -13,7 +13,7 @@ export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('azure_ad_token');
+    const token = sessionStorage.getItem('azure_ad_token');
     
     if (token) {
       const role = parseJwtRole(token);

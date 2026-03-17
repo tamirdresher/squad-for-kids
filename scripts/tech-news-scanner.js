@@ -20,7 +20,7 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 const KEYWORDS = [
   'ai', 'artificial intelligence', 'machine learning', 'ml', 'llm', 'gpt', 'copilot',
@@ -88,8 +88,8 @@ function getTodayDate() {
 function issueExistsForToday(date) {
   try {
     const searchTerm = `Tech News Digest: ${date} in:title`;
-    const output = execSync(
-      `gh issue list --state all --search "${searchTerm}" --json number,title`,
+    const output = execFileSync(
+      'gh', ['issue', 'list', '--state', 'all', '--search', searchTerm, '--json', 'number,title'],
       { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
     ).trim();
     const issues = JSON.parse(output || '[]');
@@ -330,8 +330,8 @@ async function fetchThoughtWorksRadar() {
 async function fetchSquadReleases() {
   console.error('Fetching bradygaster/squad releases...');
   try {
-    const output = execSync(
-      `gh api repos/${SQUAD_REPO.owner}/${SQUAD_REPO.repo}/releases --jq ".[0:10]" 2>/dev/null || echo "[]"`,
+    const output = execFileSync(
+      'gh', ['api', `repos/${SQUAD_REPO.owner}/${SQUAD_REPO.repo}/releases`, '--jq', '.[0:10]'],
       { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
     ).trim();
     const releases = JSON.parse(output || '[]');
@@ -358,8 +358,8 @@ async function fetchSquadDiscussions() {
   console.error('Fetching bradygaster/squad discussions...');
   try {
     const query = `query { repository(owner:"${SQUAD_REPO.owner}", name:"${SQUAD_REPO.repo}") { discussions(first:10, orderBy:{field:CREATED_AT, direction:DESC}) { nodes { title url createdAt category { name } } } } }`;
-    const output = execSync(
-      `gh api graphql -f query='${query.replace(/'/g, "'\\''")}'`,
+    const output = execFileSync(
+      'gh', ['api', 'graphql', '-f', `query=${query}`],
       { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
     ).trim();
     const data = JSON.parse(output || '{}');
@@ -387,8 +387,8 @@ async function fetchSquadCommits() {
   console.error('Fetching bradygaster/squad commits...');
   try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const output = execSync(
-      `gh api "repos/${SQUAD_REPO.owner}/${SQUAD_REPO.repo}/commits?since=${since}&per_page=10" 2>/dev/null || echo "[]"`,
+    const output = execFileSync(
+      'gh', ['api', `repos/${SQUAD_REPO.owner}/${SQUAD_REPO.repo}/commits?since=${since}&per_page=10`],
       { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
     ).trim();
     const commits = JSON.parse(output || '[]');

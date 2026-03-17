@@ -83,6 +83,34 @@
       "created_at": "2026-03-11T22:42:00Z",
       "universe": "Star Trek TNG/Voyager",
       "persistent_name": "Q"
+    },
+    "guinan": {
+      "role": "Content Strategist",
+      "created_at": "2026-03-13T00:00:00Z",
+      "persistent_name": "Guinan",
+      "universe": "Star Trek TNG/Voyager",
+      "status": "active"
+    },
+    "paris": {
+      "role": "Video & Audio Producer",
+      "created_at": "2026-03-13T00:00:00Z",
+      "persistent_name": "Paris",
+      "universe": "Star Trek TNG/Voyager",
+      "status": "active"
+    },
+    "geordi": {
+      "role": "Growth & SEO Engineer",
+      "created_at": "2026-03-13T00:00:00Z",
+      "persistent_name": "Geordi",
+      "universe": "Star Trek TNG/Voyager",
+      "status": "active"
+    },
+    "crusher": {
+      "role": "Content Safety Reviewer",
+      "created_at": "2026-03-13T00:00:00Z",
+      "persistent_name": "Crusher",
+      "universe": "Star Trek TNG/Voyager",
+      "status": "active"
     }
   },
   "kes": {

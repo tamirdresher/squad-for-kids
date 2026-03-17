@@ -4,6 +4,220 @@
 
 ---
 
+## Decision 32: Content Production Rules — MANDATORY
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED  
+**Severity:** CRITICAL
+
+### Rule 1: No Personal Names
+- NEVER put Tamir's name in video titles, slides, thumbnails, or descriptions
+- The brand is **"TechAI Explained"** — use that everywhere
+- Exception: If citing a source (e.g., "based on a talk by..." in a description footnote)
+
+### Rule 2: No Static Title Cards
+- NEVER produce a video that is just a static image with audio
+- Every video MUST have visual content: slides, animations, code demos, diagrams
+- Minimum: slide transitions with the branded template
+- Preferred: animated slides, code walkthroughs, diagram builds
+
+### Rule 3: Self-Publish Everything
+- NEVER ask the user to manually upload, publish, or fill forms
+- Use Playwright, APIs, or CLI tools to do it yourself
+- If blocked (CAPTCHA, 2FA), handle it or queue for retry — don't delegate to user
+- The Squad exists so the user doesn't have to do operational work
+
+### Rule 4: Brand Consistency
+- Follow `.squad/brand-guide.md` for ALL content
+- Colors: Deep Navy #0a0a2e, Cyan #00d4ff, Magenta #ff006e, Gold #ffd700
+- Font: Inter (headings), JetBrains Mono (code)
+- Every video has branded intro (3s) and outro (5s)
+- Every thumbnail follows the template
+
+### Rule 5: Revenue Hook in Every Piece
+- Every YouTube video description includes relevant Gumroad product link
+- Every blog post includes at least one affiliate link
+- Every newsletter includes a CTA (product, course, or affiliate)
+- Track which content drives which revenue
+
+### Rule 6: Rebrand All Source Slides
+- NEVER use original lecture slides as-is
+- ALWAYS apply the TechAI Explained brand template (colors, fonts, layout)
+- Change background to Deep Navy (#0a0a2e)
+- Change headings to Electric Cyan (#00d4ff)
+- Change body text to White (#ffffff)
+- Remove any original branding, logos, company names, conference names
+- Remove speaker name slides entirely
+- No one should be able to tell the video came from an existing presentation
+- This applies to ALL PPTX conversions — rebrand first, then produce video
+
+### Rule 7: 2FA Handling via Teams
+- When any service requires 2FA (Google, YouTube, etc.), send the number/code to Tamir via Teams DM
+- Message format: "2FA needed: tap [NUMBER] on your phone for [SERVICE]"
+- Do NOT ask Tamir to go to a URL — just send the number he needs to tap
+- Wait 60 seconds after sending, then retry the action
+- This applies to ALL squads and all cross-machine Ralphs
+
+### Rule 8: Notifications Only to Tamir
+- ONLY send Teams messages, emails, or notifications to Tamir Dresher (tamirdrescher@microsoft.com)
+- NEVER message Brady, Roy, or anyone else unless Tamir explicitly says to
+- This applies to ALL squads, ALL agents, ALL machines
+
+---
+
+## Decision 31: User Directive — Content Squad Approved
+
+**Date:** 2026-03-17  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ APPROVED
+
+Approved creating a Content & Marketing squad. Skipped Kids squad. Infra stays with existing DK8S squad on microsoft-mtp org (enhance, don't duplicate).
+
+**Rationale:** Current squad is saturated across too many domains. Content/marketing work (YouTube #760, blogs, podcasts, SEO, viral strategy) needs dedicated focus.
+
+---
+
+## Decision 30: User Directive — GitHub Aliases MANDATORY
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ MANDATORY  
+**Severity:** CRITICAL
+
+ALL agents MUST use `gh-personal` (alias `ghp`) for tamirdresher repos and `gh-emu` (alias `ghe`) for tamirdresher_microsoft repos. NEVER use bare `gh` followed by `gh auth switch`. The aliases auto-switch.
+
+**Define at top of any script:**
+```powershell
+function gh-personal { gh auth switch --user tamirdresher 2>$null | Out-Null; gh @args }
+function gh-emu { gh auth switch --user tamirdresher_microsoft 2>$null | Out-Null; gh @args }
+```
+
+**Why:** Agents constantly fail account switching causing operations on wrong repos. This is the permanent fix.  
+**Severity:** CRITICAL — violations cause real damage (PRs on wrong repos, failed pushes, auth errors)
+
+---
+
+## Decision 29: User Directive — Contribution Routing Policy
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+Upstream contributions must be classified:
+- **Squad core** (bradygaster/squad fork): Only fundamental capabilities that every squad needs (ceremonies, scheduling, directive capture, multi-machine via RFC)
+- **Skills repo** (tamirdresher/squad-skills): Provider-specific patterns, agent role templates, specialized plugins (notification routing, Neelix, birthday system)
+- **Defer**: Usage templates that are too Copilot CLI-specific or too niche (session recovery, upstream monitor)
+
+**Why:** Don't pollute Squad core with specialized patterns. Skills repo is the adapter layer.
+
+---
+
+## Decision 28: User Directive — Dual Tech News Channel Delivery
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+Tech news must be posted to BOTH Teams channels:
+- "Tech News" channel under "squads" team (teamId: 5f93abfe-b968-44ea-bd0a-6f155046ccc7, channelId: 19:bfe3224e8e764c2785e81e7cb3cc944d@thread.tacv2)
+- "Squad Tech News" channel under "Squad" team (teamId: 1de78cdf-3f73-4447-9601-a940bd98b80d, channelId: 19:c940af255e22486882c069d7b38a6204@thread.tacv2)
+
+Both channels must receive the same styled HTML tech brief. Additionally, tech news should include searches for new posts, blogs, or announcements about Brady's Squad product (bradygaster/squad on GitHub). This should be part of the daily tech scanning ceremony.
+
+**Why:** Brady's team also wants tech news, and Squad product updates should be tracked.
+
+---
+
+## Decision 27: User Directive — Teams Channel Routing Established
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+Squad notifications must be routed to dedicated channels under the "squads" team (5f93abfe-b968-44ea-bd0a-6f155046ccc7):
+- Tech News → tech briefings
+- Ralph Alerts → errors, stalls, health
+- Wins and Celebrations → closed issues, merges, birthdays
+- PR and Code → PRs, reviews, CI
+- Research Updates → research squad outputs
+- tamir-squads-notifications → general/catch-all (webhook fallback)
+
+Channel routing map: `.squad/teams-channels.json`
+
+**Why:** Stop dumping everything into one channel.
+
+---
+
+## Decision 26: User Directive — DK8S Group Distribution List
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+defenderk8splatform@microsoft.com is the DK8S Platform team distribution list. Use it for group-wide emails, calendar invites, birthday email CCs, and team announcements.
+
+**Why:** User request — captured for team memory.
+
+---
+
+## Decision 25: User Directive — Centralized Secrets Management
+
+**Date:** 2026-07-11  
+**Author:** Worf (Security & Cloud)  
+**Status:** Proposed
+
+Adopt a centralized secrets management pattern:
+1. **No secrets in git.** Ever. Not in code, not in config, not in screenshots.
+2. **Windows Credential Manager** is the primary secret store (key per secret).
+3. **`$env:USERPROFILE\.squad\.env`** is the fallback for machines without Credential Manager module.
+4. **`.env.example`** documents all required variables (names and descriptions only).
+5. **`scripts/setup-secrets.ps1`** loads secrets at session start; `devbox-startup.ps1` calls it before Ralph.
+6. **`.gitignore`** hardened to block `*.env`, secret screenshots, `*.key`, `*.pem`, config JSON.
+7. **Each machine sets up independently** — no cross-machine secret sync.
+
+**Rationale:** Google API key was committed to git (#645). Screenshots with visible secrets are leak vectors. Inconsistent storage makes onboarding error-prone.
+
+---
+
+## Decision 24: Squad Skills Marketplace — Batch 2 Publication
+
+**Date:** 2026-03-14  
+**Author:** Seven  
+**Issue:** #685  
+**Status:** ✅ APPROVED
+
+Publish 7 generalized skills to `tamirdresher/squad-skills`:
+1. session-recovery
+2. blog-publishing
+3. tts-conversion
+4. birthday-celebration
+5. upstream-monitor
+6. notification-routing
+7. voice-writing
+
+All skills are AI-platform agnostic (Copilot, Claude, ChatGPT, any LLM). Squad-specific references fully scrubbed.
+
+---
+
+## Decision 23: Squad Expansion — Infrastructure, Content, Kids Proposed
+
+**Date:** 2026-03-17  
+**Author:** Picard (Lead)  
+**Status:** ✅ APPROVED BY TAMIR
+
+**RECOMMENDATION: Yes, create 3 new specialized squads now. The current single squad is saturated.**
+
+Create 4 squads total (up from 1):
+1. **Research & Platform** (keep/expand) — Picard lead
+2. **Infrastructure & DevOps** (NEW) — B'Elanna lead
+3. **Content & Marketing** (NEW) — Troi lead
+4. **Kids Squad** (deferred, awaiting Tamir decision)
+
+**Rationale:** Tamresearch1 has 50+ open issues spanning content, infrastructure, AI research, platform tools, and ventures. Single squad cannot credibly handle this breadth. New squads enable parallel execution.
+
+---
+
 ## Decision 22: nano-banana-mcp Evaluation & Adoption
 
 **Date:** 2026-03-13  
@@ -374,6 +588,209 @@ When reviewing or drafting public content:
 1. Search for "DK8S", "Distributed Kubernetes", "FedRAMP", team member names
 2. Replace with generic terms: "my team", "infrastructure platform", "government compliance"
 3. Keep technical depth but remove Microsoft/team-specific context
+
+---
+
+## Decision 21: Infrastructure NGINX EOL Migration to Gateway API
+
+**Date:** 2026-03-16  
+**Author:** B'Elanna (Infrastructure)  
+**Issue:** #644  
+**Priority:** CRITICAL
+
+### Context
+
+Community-maintained `kubernetes/ingress-nginx` reached End of Life on March 16, 2026. No more security patches, bug fixes, or releases. Known critical CVEs (CVE-2025-1974) will remain unpatched.
+
+### Decision
+
+All DK8S clusters using `kubernetes/ingress-nginx` must migrate to **Kubernetes Gateway API** within 8 weeks (target: May 11, 2026).
+
+### Key Points for Team
+
+- **ConfigGen impact**: Templates that generate `Ingress` resources will need updating to generate `Gateway`, `HTTPRoute`, etc.
+- **Helm charts**: All Helm charts deploying ingress-nginx controller need replacement charts for Gateway API implementation
+- **Recommended implementation**: NGINX Gateway Fabric (closest migration path from current setup)
+- **Compliance**: Running EOL software blocks SOC 2, ISO 27001, PCI-DSS — auditors need documented migration plan
+
+### Action Required From
+
+- **Data (C#/.NET)**: Review ConfigGen templates that generate Ingress resources
+- **Worf (Security)**: File security advisory for compliance tracking
+- **B'Elanna (Infra)**: Lead migration execution across DK8S clusters
+
+---
+
+## Decision 20: Ralph Self-Healing Architecture
+
+**Date:** 2026-07-15  
+**Author:** B'Elanna (Infrastructure Expert)  
+**Issue:** #558  
+**PR:** #559  
+**Status:** PROPOSED
+
+### Context
+
+Ralph runs autonomously on DevBoxes and occasionally encounters gh CLI auth failures (missing scopes, expired tokens). Additionally, GitHub sends error notification emails that go unnoticed until a human checks. Both require manual intervention, breaking Ralph's autonomous loop.
+
+### Decision
+
+**1. gh auth self-heal runs in PowerShell, not inside copilot session**
+- Auth check (`gh api user`) runs as PowerShell pre-round step (Step -1) in ralph-watch.ps1
+- Faster, costs no tokens, fixes auth before copilot session starts
+- Only Playwright device flow delegates to agency copilot (which has Playwright MCP access)
+
+**2. Email monitoring runs inside copilot session via prompt**
+- GitHub error email monitoring embedded in Ralph's agency prompt
+- Needs WorkIQ MCP tool access (only in copilot session)
+- Prompt instructs Ralph to check for specific GitHub notification patterns and create deduplicated issues
+
+**3. Alert deduplication via GitHub labels**
+- Issues created by email monitoring use label format `squad,github-alert,{type}` (e.g., `squad,github-alert,ci-failure`)
+- Before creating new issue, Ralph checks for existing open issues with matching labels to avoid duplicates
+
+**4. Auto-remediation scoping**
+- Only CI workflow failures are auto-remediated (re-run)
+- Security alerts and dependency vulnerabilities require human review — Ralph flags these in Teams notifications
+
+---
+
+## Decision 19: Squad Docs CI — Build-Only on Self-Hosted
+
+**Date:** 2026-07-16  
+**Author:** B'Elanna (Infrastructure)  
+**Issue:** #568  
+**PR:** #570  
+**Status:** Proposed
+
+### Context
+
+Squad Docs workflow needs to run in EMU repo where:
+1. GitHub-hosted runners are disabled
+2. Self-hosted runner is Windows-based
+3. GitHub Pages deployment not available for EMU private repos
+
+### Decision
+
+- **Runner:** Always use `runs-on: self-hosted` for all workflows
+- **Docs CI:** Build-only validation (no deployment). Workflow confirms `docs/build.js` produces valid `_site` output
+- **Shell:** Use `shell: pwsh` for all workflow steps (Windows compatibility)
+- **No Pages deployment:** Removed `upload-pages-artifact` and `deploy-pages` actions entirely
+
+### Rationale
+
+Simplest approach that makes CI green. GitHub Pages unavailable for EMU private repos anyway. Build validation still catches broken docs.
+
+---
+
+## Decision 18: User Directive — Styled Tech News in Teams
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+Tech news posted to Squad Tech News Teams chat must use Neelix's styled format — HTML with links, headers, emoji, styled cards. Not plain text.
+
+**Why:** User request — plain text news is boring and missing clickable links.
+
+---
+
+## Decision 17: User Directive — Squad Email Identity
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ CRITICAL
+
+When Squad sends emails FROM ITSELF (notifications, reports, deliverables), use td-squad-ai-team@outlook.com. Only use Tamir's work/personal email when HE asks to send on his behalf. Create a skill for sending via Squad's own email without Outlook or browser (SMTP, Graph API, etc.)
+
+**Why:** Squad has its own identity and should communicate as itself, not impersonate Tamir.
+
+---
+
+## Decision 16: User Directive — Deliver to All Channels
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+When deliverables are ready (book PDF, podcasts, etc.), send them to ALL three channels: Teams (personal webhook), work email (tamirdresher@microsoft.com), and personal email (intheclouds@hotmail.com).
+
+**Why:** Tamir wants copies everywhere so he can access from any device/context.
+
+---
+
+## Decision 15: User Directive — Zero Legal Liability
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ CRITICAL
+
+In ANY monetization venture (SaaS, kids app, blog, book, marketplace), Tamir wants ZERO legal liability. All projects must be structured to protect him personally — proper LLC/entity, terms of service, privacy policy, COPPA compliance if kids involved, no personal guarantees, proper disclaimers. If a venture creates legal exposure, flag it immediately and find a way to eliminate it or don't do it.
+
+**Why:** User requirement — non-negotiable safety constraint on all commercial work.
+
+---
+
+## Decision 14: User Directive — Kids Squad Onboarding Design
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ DESIGN APPROVED
+
+- Public repo (tamirdresher/kids-squad-setup) — not template
+- Ralph included for kids, responds to Hebrew commands (ראלף תתחיל, ראלף תמשיך)
+- WhatsApp Web via Playwright as primary notification channel, Discord as fallback — kid chooses during setup
+- Blog about it after testing with the actual kids
+
+**Why:** User decisions on kids Squad onboarding UX design.
+
+---
+
+## Decision 13: User Directive — Blog PR Approval Mandatory
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ CRITICAL
+
+ALL blog changes to tamirdrescher.com MUST go through PR approval. No direct pushes. Create a branch, open a PR, let Tamir review and merge.
+
+**Why:** Blog is Tamir's public face — he needs to approve every change before it goes live.
+
+---
+
+## Decision 12: User Directive — Book Opening Concept
+
+**Date:** 2026-03-15  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ APPROVED
+
+The book should riff on Star Trek's "Space is the final frontier" — but reframe it: "Maybe Agentic AI is the final frontier, and I want to take it to where no man has gone before." This should be a key thematic line — possibly the book's opening or epigraph.
+
+**Why:** Perfect thematic bridge between Star Trek TNG agent naming and actual mission of the book. The "final frontier" isn't space — it's the boundary between human and AI collaboration.
+
+---
+
+## Decision 11: User Directive — Birthday Emails Must Be Personal
+
+**Date:** 2026-03-16  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ ADOPTED
+
+Birthday emails must be unique to each person. Research their contributions via WorkIQ, find specific wins, match their personality, role-specific praise, include recent examples. Not generic templates with name swaps. Each email should feel like a thoughtful colleague wrote it.
+
+**Why:** User request — generic birthday emails are worse than no email at all.
+
+---
+
+## Decision 10: User Directive — Notifications Only to Tamir
+
+**Date:** 2026-03-17  
+**Author:** Tamir Dresher (via Copilot)  
+**Status:** ✅ MANDATORY
+
+Only send Teams notifications/messages to Tamir Dresher (tamirdrescher@microsoft.com). NEVER send messages to Brady or anyone else unless explicitly told to.
+
+**Why:** User request — prevent accidental notifications to external people.
 
 ---
 

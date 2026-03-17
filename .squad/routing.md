@@ -68,8 +68,10 @@ When triaging, the Lead should ask:
 | Audio content generation, TTS, markdown to audio | Podcaster | — |
 | Blog writing, voice matching, content series, blog publishing | Troi | Seven |
 | News, briefings, status reports, Teams updates | Neelix | Seven |
-
-
+| Editorial strategy, content calendar, pipeline orchestration, audience targeting | Guinan | — |
+| Video/audio production, script-to-video, multilingual content, voice cloning | Paris | — |
+| Growth & SEO, algorithm optimization, analytics, A/B testing | Geordi | — |
+| Content safety review, compliance, confidentiality gate (MANDATORY before publishing) | Crusher | — |
 | Meetings, calendar, email, scheduling, invites, attendees, communications | Kes | Playwright + Outlook web |
 | Fact-checking, verification, counter-hypothesis testing | Q | Challenge claims, verify sources, test assumptions |
 

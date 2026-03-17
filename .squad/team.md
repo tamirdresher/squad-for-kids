@@ -25,6 +25,10 @@
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 | Troi | Blogger & Voice Writer | `.squad/agents/troi/charter.md` | ✅ Active |
 | Neelix | News Reporter | `.squad/agents/neelix/charter.md` | ✅ Active |
+| Guinan | Content Strategist | `.squad/agents/guinan/charter.md` | ✅ Active |
+| Paris | Video & Audio Producer | `.squad/agents/paris/charter.md` | ✅ Active |
+| Geordi | Growth & SEO Engineer | `.squad/agents/geordi/charter.md` | ✅ Active |
+| Crusher | Content Safety Reviewer | `.squad/agents/crusher/charter.md` | ✅ Active |
 | @copilot | Coding Agent | — | 🤖 Active |
 
 <!-- copilot-auto-assign: true -->

@@ -1,0 +1,7 @@
+{
+  "status": "pending",
+  "scheduledAt": "2026-03-17T11:20:26.2852393Z",
+  "id": "whatsapp-check",
+  "agent": "kes",
+  "action": "whatsapp-monitor"
+}

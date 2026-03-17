@@ -1,6 +1,6 @@
 ---
 name: github-account-switching
-description: Use gh-personal (ghp) and gh-emu (ghe) aliases to avoid account context errors. NEVER use bare `gh` followed by `gh auth switch`.
+description: Use gh-personal (ghp) and gh-emu (ghe) wrappers with GH_CONFIG_DIR for process-safe account isolation. NEVER use bare `gh` for repo operations or `gh auth switch`.
 confidence: high
 ---
 
@@ -11,24 +11,43 @@ We have two GitHub accounts. Agents constantly fail by:
 - Forgetting to switch accounts
 - Switching but then switching back too early
 - Running commands in the wrong account context
+- Concurrent processes fighting over global `gh auth switch` state
 
-## The Solution — Account-Locked Aliases
+## The Solution — GH_CONFIG_DIR Isolation
 
-| Alias | Account | Use For |
-|-------|---------|---------|
-| `ghp` / `gh-personal` | tamirdresher | squad-skills, squad-monitor, personal public repos |
-| `ghe` / `gh-emu` | tamirdresher_microsoft | tamresearch1, tamresearch1-research, all EMU/work repos |
+Each wrapper sets `GH_CONFIG_DIR` to a dedicated config directory before calling `gh`.
+This is **process-local** — concurrent calls from different shells or agents never interfere.
 
-Each alias switches to the correct account BEFORE running the command. No manual `gh auth switch` needed.
+| Wrapper | Config Dir | Account | Use For |
+|---------|-----------|---------|---------|
+| `ghp` / `gh-personal` | `~/.config/gh-public` | tamirdresher | squad-skills, squad-monitor, personal public repos |
+| `ghe` / `gh-emu` | `~/.config/gh-emu` | tamirdresher_microsoft | tamresearch1, tamresearch1-research, all EMU/work repos |
 
 ## Rules
 
 1. **NEVER** use bare `gh` for repo operations — always use `ghp` or `ghe`
-2. **NEVER** manually run `gh auth switch` — the aliases handle it
-3. Determine which alias by the repo:
+2. **NEVER** use `gh auth switch` — it mutates global state and is not process-safe
+3. Determine which wrapper by the repo:
    - `tamirdresher/*` repos → `ghp`
    - `tamirdresher_microsoft/*` repos → `ghe`
-4. For operations that don't target a repo (e.g., `gh auth status`), bare `gh` is OK
+4. For operations that don’t target a repo (e.g., `gh auth status`), bare `gh` is OK
+
+## How It Works
+
+```powershell
+# PowerShell wrappers (in scripts/gh-account-wrappers.ps1)
+function ghe { $env:GH_CONFIG_DIR = "$HOME\.config\gh-emu"; gh @args }
+function ghp { $env:GH_CONFIG_DIR = "$HOME\.config\gh-public"; gh @args }
+```
+
+```batch
+:: CMD wrappers (gh-emu.cmd / gh-personal.cmd)
+@echo off
+set "GH_CONFIG_DIR=%USERPROFILE%\.config\gh-emu"
+gh %*
+```
+
+Each config directory holds its own `hosts.yml`, tokens, and preferences — fully isolated.
 
 ## Examples
 
@@ -38,17 +57,28 @@ ghe issue list                           # lists issues in current EMU repo
 ghe pr create --title "fix" --body "..."  # creates PR in EMU repo
 ghe repo view tamirdresher_microsoft/tamresearch1
 
-# Personal work  
+# Personal work
 ghp repo list                            # lists personal repos
 ghp issue create --repo tamirdresher/squad-skills --title "new plugin"
 ghp pr list --repo tamirdresher/squad-monitor
 
-# Cross-account in one script — safe because each call locks its own context
+# Concurrent usage — safe because GH_CONFIG_DIR is process-local
 ghe issue list --json number,title       # EMU
 ghp repo list --json name               # personal — no conflict!
 ```
 
 ## Setup
-Aliases are defined in:
-- PowerShell profile: `$PROFILE.CurrentUserAllHosts`
-- CMD scripts: `C:\temp\bin\gh-personal.cmd` and `C:\temp\bin\gh-emu.cmd`
+
+1. **One-time init**: Run `scripts/setup-gh-isolated-auth.ps1` to create config dirs and authenticate
+2. **PowerShell**: Dot-source the wrappers in your profile:
+   ```powershell
+   . "C:\temp\tamresearch1\scripts\gh-account-wrappers.ps1"
+   ```
+3. **CMD**: Wrappers at `C:\temp\bin\gh-personal.cmd` and `C:\temp\bin\gh-emu.cmd` (ensure `C:\temp\bin` is in PATH)
+
+## Deprecated
+
+> ⚠️ **`gh auth switch` is deprecated for multi-account use.**
+> It mutates global state (`~/.config/gh/hosts.yml`) and is not safe when
+> multiple processes run concurrently. Use `GH_CONFIG_DIR` wrappers instead.
+> See `.squad/skills/gh-auth-isolation/SKILL.md` for the full rationale.

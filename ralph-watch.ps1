@@ -63,15 +63,20 @@ if (Test-Path $lockFile) {
 # Clean up on exit
 Register-EngineEvent PowerShell.Exiting -Action { 
     Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+    $sentinel = Join-Path $env:USERPROFILE ".squad\ralph-stop"
+    Remove-Item $sentinel -Force -ErrorAction SilentlyContinue
     if ($mutex) { $mutex.ReleaseMutex(); $mutex.Dispose() }
 } | Out-Null
 trap { 
     Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+    $sentinel = Join-Path $env:USERPROFILE ".squad\ralph-stop"
+    Remove-Item $sentinel -Force -ErrorAction SilentlyContinue
     if ($mutex) { try { $mutex.ReleaseMutex() } catch {} ; $mutex.Dispose() }
     break 
 }
 
-$intervalMinutes = 5
+$defaultIntervalMinutes = 5
+$intervalMinutes = $defaultIntervalMinutes
 $roundTimeoutMinutes = 20  # Kill round if it exceeds this (prevents hangs)
 $round = 0
 $consecutiveFailures = 0
@@ -81,6 +86,64 @@ $maxLogBytes = 1048576  # 1MB
 # Log rotation settings
 $maxLogBytes = 1MB
 $maxLogEntries = 500
+
+# Throttle mode config (Issue #847)
+$ralphConfigPath = Join-Path $env:USERPROFILE ".squad\ralph-config.json"
+$ralphStopSentinel = Join-Path $env:USERPROFILE ".squad\ralph-stop"
+$ralphThrottleSentinel = Join-Path $env:USERPROFILE ".squad\ralph-throttle"
+
+# Create default config if it doesn't exist
+if (-not (Test-Path $ralphConfigPath)) {
+    $squadDir = Join-Path $env:USERPROFILE ".squad"
+    if (-not (Test-Path $squadDir)) { New-Item -ItemType Directory -Path $squadDir -Force | Out-Null }
+    @{ intervalSeconds = 300; throttled = $false; throttleIntervalSeconds = 900 } |
+        ConvertTo-Json | Out-File $ralphConfigPath -Encoding utf8
+    Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Created default config: $ralphConfigPath" -ForegroundColor DarkGray
+}
+
+function Read-RalphConfig {
+    <#
+    .SYNOPSIS
+    Reads ralph-config.json and returns the effective sleep interval in minutes.
+    Re-read every round so changes take effect without restart.
+    Also checks for ralph-throttle sentinel file to temporarily override throttle.
+    #>
+    $ts = Get-Date -Format "HH:mm:ss"
+
+    # Sentinel file override: ralph-throttle forces throttled interval for this round
+    $sentinelThrottle = Test-Path $ralphThrottleSentinel
+
+    if (-not (Test-Path $ralphConfigPath)) {
+        if ($sentinelThrottle) {
+            $mins = [math]::Round(900 / 60, 1)
+            Write-Host "[$ts] Throttle sentinel ACTIVE (no config) — interval ${mins}m" -ForegroundColor Yellow
+            return $mins
+        }
+        return $defaultIntervalMinutes
+    }
+    try {
+        $cfg = Get-Content $ralphConfigPath -Raw | ConvertFrom-Json
+        # Support both "throttled" (spec) and "throttleMode" (legacy)
+        $isThrottled = if ($null -ne $cfg.throttled) { $cfg.throttled } elseif ($null -ne $cfg.throttleMode) { $cfg.throttleMode } else { $false }
+        # Sentinel file overrides config — treat as throttled
+        if ($sentinelThrottle) { $isThrottled = $true }
+
+        if ($isThrottled -eq $true) {
+            $throttleSec = if ($cfg.throttleIntervalSeconds) { $cfg.throttleIntervalSeconds } else { 900 }
+            $mins = [math]::Round($throttleSec / 60, 1)
+            $source = if ($sentinelThrottle) { "sentinel+config" } else { "config" }
+            Write-Host "[$ts] Throttle mode ACTIVE — interval ${mins}m (source: $source)" -ForegroundColor Yellow
+            return $mins
+        }
+        $normalSec = if ($cfg.intervalSeconds) { $cfg.intervalSeconds } else { $defaultIntervalMinutes * 60 }
+        $mins = [math]::Round($normalSec / 60, 1)
+        Write-Host "[$ts] Config loaded — interval ${mins}m" -ForegroundColor DarkGray
+        return $mins
+    } catch {
+        Write-Host "[$ts] Warning: Failed to read $ralphConfigPath — using default ${defaultIntervalMinutes}m" -ForegroundColor Yellow
+        return $defaultIntervalMinutes
+    }
+}
 
 # Multi-machine coordination settings (Issue #346)
 $machineId = $env:COMPUTERNAME
@@ -559,6 +622,17 @@ function Send-TeamsAlert {
 }
 
 while ($true) {
+    # Graceful shutdown sentinel (Issue #847)
+    if (Test-Path $ralphStopSentinel) {
+        $ts = Get-Date -Format "HH:mm:ss"
+        Write-Host "[$ts] Graceful shutdown requested (sentinel: $ralphStopSentinel)" -ForegroundColor Yellow
+        Remove-Item $ralphStopSentinel -Force -ErrorAction SilentlyContinue
+        break
+    }
+
+    # Re-read config every round for hot-reload of interval/throttle settings
+    $intervalMinutes = Read-RalphConfig
+
     $round++
     $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
     $displayTime = Get-Date -Format "HH:mm:ss"

@@ -12,7 +12,7 @@ The DK8S Platform team is adopting Squad (AI agent teams) across multiple engine
 ## Decision
 Adopt a three-level Squad topology with enforced org-level policies:
 
-1. **Org-Level Squad** (`mtp-microsoft/dk8s-platform-squad`) — shared decisions, skills, routing rules
+1. **Org-Level Squad** ([`mtp-microsoft/dk8s-platform-squad`](https://github.com/mtp-microsoft/dk8s-platform-squad)) — shared decisions, skills, routing rules
 2. **Swimlane Squads** — per team area (platform-core, security, infra, tooling) via SubSquads or separate repos
 3. **Personal Squads** — per engineer, customized universe, inherits from org via `squad upstream`
 

@@ -39,7 +39,7 @@ Squad operates at three levels. Each level inherits from the one above.
 └─────────────────────────────────────────────┘
 ```
 
-### 2.1 Org Squad (`microsoft-mtp/dk8s-squad`)
+### 2.1 Org Squad ([`microsoft-mtp/dk8s-squad`](https://github.com/microsoft-mtp/dk8s-squad))
 
 The org-level squad repo is the **single source of truth** for DK8S-wide standards. It contains:
 

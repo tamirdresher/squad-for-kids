@@ -67,6 +67,43 @@ ghe issue list --json number,title       # EMU
 ghp repo list --json name               # personal — no conflict!
 ```
 
+## Auto-Context (per-directory activation)
+
+`scripts/gh-auto-context.ps1` automatically sets `GH_CONFIG_DIR` every time the
+prompt renders, so `gh` (and by extension the aliases) pick the right config
+directory without any manual intervention.
+
+### Quick start
+
+```powershell
+. ./scripts/gh-auto-context.ps1   # dot-source the script
+Install-GhAutoContext              # hook into the prompt
+```
+
+### How it works
+
+1. `$GH_CONTEXT_RULES` — an ordered array of `@{ Pattern; ConfigDir }` hashtables.
+   The first regex match against `(Get-Location).Path` wins.
+2. Default rules:
+   - Paths matching `tamirdresher_microsoft` → `~/.config/gh-emu`
+   - Paths under `\work\` → `~/.config/gh-emu`
+   - Everything else → `~/.config/gh-public`
+3. Override before dot-sourcing to add custom rules:
+   ```powershell
+   $GH_CONTEXT_RULES = @(
+       @{ Pattern = 'my-corp'; ConfigDir = "$HOME\.config\gh-corp" }
+   )
+   . ./scripts/gh-auto-context.ps1
+   ```
+
+### Functions
+
+| Function | Purpose |
+|----------|---------|
+| `Set-GhContext` | Evaluate rules and set `GH_CONFIG_DIR` (call manually or via prompt hook) |
+| `Install-GhAutoContext` | Patch `prompt` to call `Set-GhContext` on every prompt |
+| `Uninstall-GhAutoContext` | Remove the hook from `prompt` |
+
 ## Setup
 
 1. **One-time init**: Run `scripts/setup-gh-isolated-auth.ps1` to create config dirs and authenticate

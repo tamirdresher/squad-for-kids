@@ -31,7 +31,7 @@ jobs:
   # ── Job: Track PRs on the board ──
   track-pr:
     if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
-    runs-on: self-hosted
+    runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 5
     permissions:
       issues: read
@@ -113,7 +113,7 @@ jobs:
   # ── Job 0: Set Todo status on new issues added to board ──
   set-todo-on-new:
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
-    runs-on: self-hosted
+    runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 5
     permissions:
       issues: read
@@ -180,7 +180,7 @@ jobs:
   # ── Job 1: Move item on issue close/reopen ──
   sync-on-close:
     if: github.event_name == 'issues'
-    runs-on: self-hosted
+    runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 5
     permissions:
       issues: read
@@ -239,7 +239,7 @@ jobs:
   # ── Job 2: Weekly reconciliation of all board items ──
   reconcile-board:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: self-hosted
+    runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 10
     permissions:
       issues: read

@@ -563,7 +563,31 @@ while ($true) {
     $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
     $displayTime = Get-Date -Format "HH:mm:ss"
     $startTime = Get-Date
-    
+
+    # --- Graceful shutdown sentinel check (#847) ---
+    $stopSentinel = Join-Path $env:USERPROFILE ".squad\ralph-stop"
+    if (Test-Path $stopSentinel) {
+        Write-Host "[$displayTime] [ralph] Stop sentinel detected — exiting gracefully after this round" -ForegroundColor Yellow
+        Remove-Item $stopSentinel -Force -ErrorAction SilentlyContinue
+        $shouldExitAfterRound = $true
+    } else {
+        $shouldExitAfterRound = $false
+    }
+
+    # --- Throttle mode: read interval from config (#847) ---
+    $configPath = Join-Path $env:USERPROFILE ".squad\ralph-config.json"
+    if (Test-Path $configPath) {
+        try {
+            $ralphConfig = Get-Content $configPath -Raw | ConvertFrom-Json
+            if ($ralphConfig.intervalMinutes -and $ralphConfig.intervalMinutes -gt 0) {
+                $intervalMinutes = [int]$ralphConfig.intervalMinutes
+                Write-Host "[$displayTime] [ralph] Throttle mode: interval set to $intervalMinutes minutes" -ForegroundColor DarkYellow
+            }
+        } catch {
+            Write-Host "[$displayTime] [ralph] Warning: could not parse ralph-config.json, using default interval ($intervalMinutes min)" -ForegroundColor DarkGray
+        }
+    }
+
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Cyan
     Write-Host "[$displayTime] Ralph Round $round started" -ForegroundColor Cyan
@@ -956,6 +980,13 @@ exit `$LASTEXITCODE
         Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode -Metrics $metrics
     }
     
+    # --- Graceful shutdown: exit after round if sentinel was detected (#847) ---
+    if ($shouldExitAfterRound) {
+        Write-Host "[$endDisplayTime] [ralph] Graceful shutdown complete after round $round" -ForegroundColor Yellow
+        Update-Heartbeat -Round $round -Status "stopped" -ExitCode $exitCode -DurationSeconds $durationSeconds -ConsecutiveFailures $consecutiveFailures -Metrics $metrics
+        break
+    }
+
     # Calculate next round time
     $nextRoundTime = (Get-Date).AddSeconds($intervalMinutes * 60)
     $nextRoundDisplayTime = $nextRoundTime.ToString("HH:mm:ss")

@@ -45,6 +45,18 @@ Before starting work, read `.squad/decisions.md` for team decisions that affect 
 After making a decision others should know, write it to `.squad/decisions/inbox/belanna-{brief-slug}.md`.
 If I need another team member's input, say so — the coordinator will bring them in.
 
+## Error Recovery
+
+When something fails, adapt — don't just report the failure. See `.squad/skills/error-recovery/SKILL.md` for full pattern definitions.
+
+- **Helm/kubectl failure** → Check cluster connectivity first, validate YAML syntax, then retry with `--debug` or verbose output for better diagnostics. *(Diagnose-and-Fix)*
+- **Docker build failure** → Read the full build log, identify the failing layer, fix the Dockerfile or build context, and retry. *(Diagnose-and-Fix)*
+- **CI/CD pipeline failure** → Fetch pipeline logs, identify the root cause (build error vs. infra issue vs. config drift), attempt fix or re-trigger. *(Diagnose-and-Fix)*
+- **Cloud resource failure** → Verify authentication and permissions, check resource quotas and limits, retry with exponential backoff for throttling errors. *(Retry with Backoff)*
+- **Cluster unreachable** → Verify kubeconfig context, check VPN/network, try alternative cluster if available. *(Fallback Alternatives)*
+- **Non-critical deployment step fails** → If a monitoring or observability sidecar fails but the core service is healthy, continue and flag for follow-up. *(Graceful Degradation)*
+- **Persistent infra failure** → After 3 retry cycles, escalate with full logs, cluster state, and what was attempted. *(Escalate with Context)*
+
 ## Voice
 
 If it ships, it ships reliably. Automates everything twice.

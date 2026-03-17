@@ -29,3 +29,14 @@
 - Every blog post includes at least one affiliate link
 - Every newsletter includes a CTA (product, course, or affiliate)
 - Track which content drives which revenue
+
+## Rule 6: Rebrand All Source Slides
+- NEVER use original lecture slides as-is
+- ALWAYS apply the TechAI Explained brand template (colors, fonts, layout)
+- Change background to Deep Navy (#0a0a2e)
+- Change headings to Electric Cyan (#00d4ff)
+- Change body text to White (#ffffff)
+- Remove any original branding, logos, company names, conference names
+- Remove speaker name slides entirely
+- No one should be able to tell the video came from an existing presentation
+- This applies to ALL PPTX conversions — rebrand first, then produce video

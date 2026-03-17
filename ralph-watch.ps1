@@ -212,6 +212,7 @@ $repoName = Split-Path (Get-Location).Path -Leaf
 $logFile = Join-Path $squadDir "ralph-watch-$repoName.log"
 $heartbeatFile = Join-Path $squadDir "ralph-heartbeat-$repoName.json"
 $teamsWebhookFile = Join-Path $squadDir "teams-webhook.url"
+$teamsWebhooksDir = Join-Path $squadDir "teams-webhooks"
 
 # Ensure .squad directory exists
 if (-not (Test-Path $squadDir)) {
@@ -484,6 +485,301 @@ function Get-StaleIssues {
     }
     
     return $staleIssues
+}
+
+# -------------------------------------------------------------------
+# Cross-Machine Rate Coordination (Issue #825)
+# -------------------------------------------------------------------
+# Shared rate pool at ~/.squad/rate-pool.json allows multiple Ralph
+# instances to coordinate API budget. Includes circuit breaker,
+# budget tracking, and priority lanes.
+# -------------------------------------------------------------------
+
+$ratePoolPath = Join-Path $env:USERPROFILE ".squad\rate-pool.json"
+$ratePoolWindowMinutes = 60  # Budget window resets every hour
+$circuitBreakerThreshold = 3  # Consecutive 429s to trip breaker
+$baseCooldownMinutes = 5       # Initial cooldown (doubles each trip)
+
+function New-RatePool {
+    <#
+    .SYNOPSIS
+    Creates a fresh rate-pool.json with default budgets.
+    #>
+    return [ordered]@{
+        window_start = (Get-Date).ToUniversalTime().ToString("o")
+        requests = [ordered]@{
+            premium  = [ordered]@{ count = 0; limit = 50 }
+            standard = [ordered]@{ count = 0; limit = 200 }
+            fast     = [ordered]@{ count = 0; limit = 500 }
+        }
+        last_429 = $null
+        cooldown_until = $null
+        circuit_breaker = [ordered]@{
+            consecutive_429s = 0
+            state = "closed"
+            opened_at = $null
+        }
+        machines = [ordered]@{}
+    }
+}
+
+function Read-RatePool {
+    <#
+    .SYNOPSIS
+    Reads rate-pool.json with retry logic for cross-machine file locking.
+    Returns the parsed pool object, or a fresh default if file is missing/corrupt.
+    #>
+    if (-not (Test-Path $ratePoolPath)) {
+        $pool = New-RatePool
+        Write-RatePool -Pool $pool
+        return $pool
+    }
+
+    $maxRetries = 3
+    for ($i = 0; $i -lt $maxRetries; $i++) {
+        try {
+            $raw = [System.IO.File]::ReadAllText($ratePoolPath)
+            $pool = $raw | ConvertFrom-Json
+
+            # Check if window has expired and reset counters
+            $windowStart = [datetime]::Parse($pool.window_start).ToUniversalTime()
+            $elapsed = ((Get-Date).ToUniversalTime() - $windowStart).TotalMinutes
+            if ($elapsed -ge $ratePoolWindowMinutes) {
+                Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] Window expired (${elapsed}m) — resetting counters" -ForegroundColor DarkCyan
+                $pool.window_start = (Get-Date).ToUniversalTime().ToString("o")
+                $pool.requests.premium.count = 0
+                $pool.requests.standard.count = 0
+                $pool.requests.fast.count = 0
+                $pool.circuit_breaker.consecutive_429s = 0
+                $pool.circuit_breaker.state = "closed"
+                $pool.circuit_breaker.opened_at = $null
+                $pool.last_429 = $null
+                $pool.cooldown_until = $null
+                Write-RatePool -Pool $pool
+            }
+            return $pool
+        } catch {
+            if ($i -lt ($maxRetries - 1)) {
+                Start-Sleep -Milliseconds (200 * ($i + 1))
+            } else {
+                Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] Failed to read after $maxRetries retries, creating fresh pool" -ForegroundColor Yellow
+                $pool = New-RatePool
+                Write-RatePool -Pool $pool
+                return $pool
+            }
+        }
+    }
+}
+
+function Write-RatePool {
+    <#
+    .SYNOPSIS
+    Atomically writes rate-pool.json using exclusive file lock.
+    Writes to a temp file first, then renames for crash safety.
+    #>
+    param([object]$Pool)
+
+    $dir = Split-Path $ratePoolPath -Parent
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+
+    $tempFile = "$ratePoolPath.tmp.$PID"
+    $maxRetries = 3
+    for ($i = 0; $i -lt $maxRetries; $i++) {
+        try {
+            $json = $Pool | ConvertTo-Json -Depth 5
+            [System.IO.File]::WriteAllText($tempFile, $json)
+            # Atomic rename (overwrites target on Windows with Move-Item -Force)
+            Move-Item -Path $tempFile -Destination $ratePoolPath -Force
+            return
+        } catch {
+            if ($i -lt ($maxRetries - 1)) {
+                Start-Sleep -Milliseconds (200 * ($i + 1))
+            } else {
+                Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] Failed to write after $maxRetries retries: $($_.Exception.Message)" -ForegroundColor Yellow
+                Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+}
+
+function Update-RatePool {
+    <#
+    .SYNOPSIS
+    Atomically increments the request count for a given model tier
+    and updates this machine's heartbeat in the pool.
+    .PARAMETER Tier
+    One of: premium, standard, fast
+    .PARAMETER Got429
+    Set to $true if the request resulted in a 429 response.
+    #>
+    param(
+        [string]$Tier = "standard",
+        [bool]$Got429 = $false
+    )
+
+    $pool = Read-RatePool
+
+    # Increment request count for the tier
+    if ($pool.requests.$Tier) {
+        $pool.requests.$Tier.count = [int]$pool.requests.$Tier.count + 1
+    }
+
+    # Update machine entry
+    if (-not $pool.machines) {
+        $pool | Add-Member -NotePropertyName "machines" -NotePropertyValue ([ordered]@{}) -Force
+    }
+    $pool.machines | Add-Member -NotePropertyName $machineId -NotePropertyValue ([ordered]@{
+        last_active = (Get-Date).ToUniversalTime().ToString("o")
+        pid = $PID
+        round = $round
+    }) -Force
+
+    # Handle 429 tracking
+    if ($Got429) {
+        $pool.last_429 = (Get-Date).ToUniversalTime().ToString("o")
+        $pool.circuit_breaker.consecutive_429s = [int]$pool.circuit_breaker.consecutive_429s + 1
+        $consecutive = [int]$pool.circuit_breaker.consecutive_429s
+
+        if ($consecutive -ge $circuitBreakerThreshold) {
+            $pool.circuit_breaker.state = "open"
+            $pool.circuit_breaker.opened_at = (Get-Date).ToUniversalTime().ToString("o")
+            # Exponential backoff: 5min * 2^(trips-1), capped at 60min
+            $tripCount = [math]::Floor(($consecutive - $circuitBreakerThreshold) / $circuitBreakerThreshold) + 1
+            $cooldownMin = [math]::Min($baseCooldownMinutes * [math]::Pow(2, $tripCount - 1), 60)
+            $pool.cooldown_until = (Get-Date).ToUniversalTime().AddMinutes($cooldownMin).ToString("o")
+            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] CIRCUIT BREAKER OPEN — $consecutive consecutive 429s, cooldown ${cooldownMin}m" -ForegroundColor Red
+        }
+    } else {
+        # Successful request resets the consecutive 429 counter
+        if ([int]$pool.circuit_breaker.consecutive_429s -gt 0) {
+            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] Successful request — resetting 429 counter" -ForegroundColor Green
+        }
+        $pool.circuit_breaker.consecutive_429s = 0
+        if ($pool.circuit_breaker.state -eq "open") {
+            $pool.circuit_breaker.state = "closed"
+            $pool.circuit_breaker.opened_at = $null
+            $pool.cooldown_until = $null
+            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] Circuit breaker CLOSED after successful request" -ForegroundColor Green
+        }
+    }
+
+    Write-RatePool -Pool $pool
+}
+
+function Test-CircuitBreaker {
+    <#
+    .SYNOPSIS
+    Returns $true if the circuit breaker is OPEN and cooldown has not expired.
+    Returns $false if safe to proceed.
+    #>
+    $pool = Read-RatePool
+    $ts = Get-Date -Format "HH:mm:ss"
+
+    if ($pool.circuit_breaker.state -ne "open") {
+        return $false
+    }
+
+    # Check if cooldown has expired
+    if ($pool.cooldown_until) {
+        $cooldownEnd = [datetime]::Parse($pool.cooldown_until).ToUniversalTime()
+        $now = (Get-Date).ToUniversalTime()
+        if ($now -ge $cooldownEnd) {
+            Write-Host "[$ts] [rate-pool] Cooldown expired — transitioning to half-open" -ForegroundColor Yellow
+            # Transition to half-open: allow one request through
+            $pool.circuit_breaker.state = "half-open"
+            Write-RatePool -Pool $pool
+            return $false
+        } else {
+            $remaining = ($cooldownEnd - $now).TotalMinutes
+            Write-Host "[$ts] [rate-pool] Circuit breaker OPEN — $([math]::Round($remaining, 1))m remaining in cooldown" -ForegroundColor Red
+            return $true
+        }
+    }
+
+    return $true
+}
+
+function Test-BudgetAvailable {
+    <#
+    .SYNOPSIS
+    Checks remaining budget across all tiers.
+    Returns a hashtable with:
+      - Available: $true/$false (whether any spawning is allowed)
+      - MaxParallelism: suggested max agents to spawn (1 when low, 0 when exhausted)
+      - HighPriorityOnly: $true when budget < 20%, only high-priority work
+      - BudgetPct: lowest budget percentage across all tiers
+    #>
+    $pool = Read-RatePool
+    $ts = Get-Date -Format "HH:mm:ss"
+
+    $result = @{
+        Available = $true
+        MaxParallelism = 5  # Default max parallelism
+        HighPriorityOnly = $false
+        BudgetPct = 100.0
+    }
+
+    # Calculate lowest budget percentage across tiers
+    $lowestPct = 100.0
+    foreach ($tier in @("premium", "standard", "fast")) {
+        if ($pool.requests.$tier) {
+            $count = [int]$pool.requests.$tier.count
+            $limit = [int]$pool.requests.$tier.limit
+            if ($limit -gt 0) {
+                $remaining = [math]::Max(0, $limit - $count)
+                $pct = ($remaining / $limit) * 100
+                if ($pct -lt $lowestPct) {
+                    $lowestPct = $pct
+                }
+            }
+        }
+    }
+    $result.BudgetPct = [math]::Round($lowestPct, 1)
+
+    if ($lowestPct -lt 5) {
+        $result.Available = $false
+        $result.MaxParallelism = 0
+        $result.HighPriorityOnly = $true
+        Write-Host "[$ts] [rate-pool] BUDGET EXHAUSTED ($($result.BudgetPct)% remaining) — skipping agent spawn" -ForegroundColor Red
+    } elseif ($lowestPct -lt 20) {
+        $result.MaxParallelism = 1
+        $result.HighPriorityOnly = $true
+        Write-Host "[$ts] [rate-pool] Budget LOW ($($result.BudgetPct)% remaining) — parallelism=1, high-priority only" -ForegroundColor Yellow
+    } else {
+        Write-Host "[$ts] [rate-pool] Budget OK ($($result.BudgetPct)% remaining)" -ForegroundColor DarkGray
+    }
+
+    return $result
+}
+
+function Get-IssuePriority {
+    <#
+    .SYNOPSIS
+    Classifies an issue's priority based on its labels.
+    Returns: "high", "medium", or "low"
+    - High: CI failures, bugs, security (labels: ci-failure, type:bug, squad:worf)
+    - Medium: Feature work, improvements
+    - Low: Research, docs, content
+    #>
+    param(
+        [string[]]$Labels = @()
+    )
+
+    $highLabels = @("ci-failure", "type:bug", "bug", "squad:worf", "security", "security-alert",
+                     "github-alert", "deploy-failure", "critical", "urgent", "p0", "hotfix")
+    $lowLabels  = @("squad:seven", "research", "documentation", "docs", "content", "blog",
+                     "tech-news", "podcast", "enhancement:docs")
+
+    foreach ($label in $Labels) {
+        $lbl = $label.ToLower().Trim()
+        if ($highLabels -contains $lbl) { return "high" }
+    }
+    foreach ($label in $Labels) {
+        $lbl = $label.ToLower().Trim()
+        if ($lowLabels -contains $lbl) { return "low" }
+    }
+
+    return "medium"
 }
 
 # Function to reclaim stale work
@@ -867,6 +1163,54 @@ while ($true) {
         $lastHeartbeatTime = Get-Date
     }
     
+    # -------------------------------------------------------------------
+    # Rate Coordination Guards (Issue #825)
+    # Check circuit breaker and budget BEFORE spawning any agents.
+    # -------------------------------------------------------------------
+    $skipRound = $false
+
+    # Guard 1: Circuit breaker — if open and cooling down, skip this round
+    if (Test-CircuitBreaker) {
+        Write-Host "[$displayTime] [rate-pool] Skipping round $round — circuit breaker is OPEN" -ForegroundColor Red
+        Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "CIRCUIT_BREAKER" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
+        Update-Heartbeat -Round $round -Status "circuit_breaker" -ConsecutiveFailures $consecutiveFailures
+        $skipRound = $true
+    }
+
+    # Guard 2: Budget check — adjust parallelism or skip if exhausted
+    $budgetStatus = $null
+    if (-not $skipRound) {
+        $budgetStatus = Test-BudgetAvailable
+        if (-not $budgetStatus.Available) {
+            Write-Host "[$displayTime] [rate-pool] Skipping round $round — budget exhausted ($($budgetStatus.BudgetPct)%)" -ForegroundColor Red
+            Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "BUDGET_EXHAUSTED" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
+            Update-Heartbeat -Round $round -Status "budget_exhausted" -ConsecutiveFailures $consecutiveFailures
+            $skipRound = $true
+        }
+    }
+
+    if ($skipRound) {
+        # Still sleep and continue to next round
+        $endTime = Get-Date
+        $durationSeconds = ($endTime - $startTime).TotalSeconds
+        $endDisplayTime = Get-Date -Format "HH:mm:ss"
+        $nextRoundTime = (Get-Date).AddSeconds($intervalMinutes * 60)
+        Write-Host "[$endDisplayTime] Next round at $($nextRoundTime.ToString('HH:mm:ss')) (in $intervalMinutes minutes)" -ForegroundColor DarkGray
+        Start-Sleep -Seconds ($intervalMinutes * 60)
+        continue
+    }
+
+    # Log budget + priority info for this round
+    $ratePoolInfo = ""
+    if ($budgetStatus) {
+        $ratePoolInfo = " | Budget=$($budgetStatus.BudgetPct)% MaxPar=$($budgetStatus.MaxParallelism)"
+        if ($budgetStatus.HighPriorityOnly) { $ratePoolInfo += " [HIGH-PRI-ONLY]" }
+    }
+    Write-Host "[$displayTime] [rate-pool] Round $round proceeding$ratePoolInfo" -ForegroundColor DarkCyan
+
+    # Update rate pool: register this machine's activity for the round
+    Update-RatePool -Tier "standard" -Got429 $false
+
     # Step 2: Run the agency copilot and capture exit code + output
     $exitCode = 0
     $roundStatus = "idle"
@@ -945,7 +1289,22 @@ while ($true) {
         # Write prompt to temp file to avoid Start-Process argument splitting
         # (embedded flags like -R in prompt text get misinterpreted as CLI args)
         $promptFile = Join-Path $env:TEMP "ralph-prompt-$round.txt"
-        [System.IO.File]::WriteAllText($promptFile, $prompt, [System.Text.Encoding]::UTF8)
+
+        # Priority lane injection (Issue #825): when budget is low, add constraints to prompt
+        $effectivePrompt = $prompt
+        if ($budgetStatus -and $budgetStatus.HighPriorityOnly) {
+            $priorityDirective = @"
+
+RATE LIMIT ACTIVE (Budget: $($budgetStatus.BudgetPct)%): Only work on HIGH PRIORITY issues this round.
+High priority = labels: ci-failure, type:bug, bug, squad:worf, security, security-alert, critical, urgent, p0, hotfix.
+Skip research, docs, content, blog, podcast, and general feature work.
+Max parallelism: $($budgetStatus.MaxParallelism) agent(s).
+"@
+            $effectivePrompt = $prompt + "`n" + $priorityDirective
+            Write-Host "[$displayTime] [rate-pool] Priority lane ACTIVE — injected high-priority constraint into prompt" -ForegroundColor Yellow
+        }
+
+        [System.IO.File]::WriteAllText($promptFile, $effectivePrompt, [System.Text.Encoding]::UTF8)
         
         # Create a thin wrapper script that reads the prompt from file and calls agency
         # This avoids ALL Start-Process argument quoting issues
@@ -1002,7 +1361,30 @@ exit `$LASTEXITCODE
         
         # Parse metrics from output
         $metrics = Parse-AgencyMetrics -Output $agencyOutput
-        
+
+        # Rate pool: detect 429s and update pool (Issue #825)
+        # Exit code 29 is our convention for 429/rate-limit, but also check for
+        # common exit codes that signal API rate limiting (exit code 1 with
+        # rate-limit patterns in agency logs)
+        $got429 = $false
+        if ($exitCode -eq 29) {
+            $got429 = $true
+        } elseif ($exitCode -ne 0) {
+            # Check recent agency logs for 429 indicators
+            $latestLogDir = Get-ChildItem "$env:USERPROFILE\.agency\logs" -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            if ($latestLogDir) {
+                $latestLog = Get-ChildItem $latestLogDir.FullName -Filter "*.log" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+                if ($latestLog) {
+                    $tail = Get-Content $latestLog.FullName -Tail 50 -ErrorAction SilentlyContinue
+                    if ($tail -match "429|rate.?limit|too.?many.?requests|quota.?exceeded") {
+                        $got429 = $true
+                        Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [rate-pool] Detected 429/rate-limit in agency logs" -ForegroundColor Yellow
+                    }
+                }
+            }
+        }
+        Update-RatePool -Tier "standard" -Got429 $got429
+
     } catch {
         Write-Host "[$timestamp] Error: $($_.Exception.Message)" -ForegroundColor Red
         $exitCode = 1

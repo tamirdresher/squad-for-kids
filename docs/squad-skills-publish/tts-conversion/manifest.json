@@ -1,0 +1,17 @@
+{
+  "name": "tts-conversion",
+  "version": "1.0.0",
+  "description": "Convert markdown documents to audio using Text-to-Speech for accessibility and briefings",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["convert to audio", "text to speech", "generate podcast", "audio summary", "read aloud", "tts", "podcast generation"],
+  "tags": ["audio", "accessibility", "tts", "podcast", "content-conversion"],
+  "capabilities": [
+    "Convert markdown to clean plaintext for TTS processing",
+    "Generate MP3 audio from document content",
+    "Support multiple TTS engines (edge-tts, Azure AI Speech)",
+    "Batch conversion for multiple documents",
+    "Configurable voice, rate, pitch, and volume"
+  ]
+}

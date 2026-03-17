@@ -1,0 +1,17 @@
+{
+  "name": "upstream-monitor",
+  "version": "1.0.0",
+  "description": "Track changes in upstream/dependency repositories and surface relevant updates",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["check upstream", "upstream changes", "dependency updates", "sync upstream", "monitor repos", "what changed upstream"],
+  "tags": ["monitoring", "dependencies", "upstream", "sync", "automation"],
+  "capabilities": [
+    "Register and track upstream Git repositories",
+    "Detect new commits, PRs, and releases since last sync",
+    "Surface breaking changes and important updates",
+    "Generate digest of upstream activity",
+    "Support configurable sync frequency and filters"
+  ]
+}

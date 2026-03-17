@@ -1,0 +1,11 @@
+IMAGE PROMPT FOR BLOG PART 4 HERO:
+
+Generate in the EXACT same style as the attached reference images (borg-cube.png, borg-collective.png, unimatrix-zero.png from the Scaling AI blog series).
+
+Style: Dark cinematic sci-fi digital art. Borg/Star Trek inspired. High quality, photorealistic lighting.
+
+Scene: Eight glowing autonomous drones/nodes (representing AI agents called "Ralph") in a dark space environment, all simultaneously reaching for / fighting over a single glowing authentication key/lock symbol in the center. Some connections between nodes are sparking and breaking. Energy arcs and particle effects. The central lock glows amber/gold while the nodes glow blue-green. Some nodes show red warning indicators. The overall feeling is controlled chaos - a distributed system under contention.
+
+Color palette: Deep black/dark blue background, electric blue and neon green nodes, amber/gold central lock, red/orange sparks for broken connections, subtle purple nebula in background.
+
+No text, no labels, no UI elements. Pure cinematic art.

@@ -1,0 +1,17 @@
+{
+  "name": "notification-routing",
+  "version": "1.0.0",
+  "description": "Route work items to the right agent or team member based on domain expertise and availability",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["route work", "assign task", "triage issue", "who handles", "route notification", "work routing"],
+  "tags": ["routing", "triage", "task-assignment", "coordination", "workflow"],
+  "capabilities": [
+    "Match work items to domain experts using configurable routing tables",
+    "Triage issues by label, content, and complexity",
+    "Support primary/secondary routing with fallback chains",
+    "Evaluate task fit for autonomous agents vs human assignment",
+    "Route notifications to appropriate channels based on urgency"
+  ]
+}

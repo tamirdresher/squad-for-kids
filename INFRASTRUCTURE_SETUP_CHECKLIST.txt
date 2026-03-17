@@ -1,0 +1,114 @@
+INFRASTRUCTURE SETUP CHECKLIST
+==============================
+Created: 2026-03-16
+Infrastructure Engineer: B'Elanna
+
+□ GUMROAD VERIFICATION
+  □ Navigate to https://outlook.office.com
+  □ Log in with saved credentials
+  □ Search inbox for "Gumroad"
+  □ Click verification email link
+  □ Navigate to https://app.gumroad.com
+  □ Publish "AI Agent Architecture Cheatsheet" product
+  
+  📝 Documentation: INFRASTRUCTURE_SETUP_GUIDE.md - Task 1
+
+□ YOUTUBE GMAIL CREATION
+  □ Navigate to https://accounts.google.com/signup
+  □ Enter First Name: Tech
+  □ Enter Last Name: AI
+  □ Select Birthday: 05/15/1990
+  □ Select Gender: [Your preference]
+  □ Create email: tdsquadai@gmail.com (or similar available)
+  □ Set strong password (save securely!)
+  □ Complete phone verification
+  □ Verify account creation successful
+  
+  📝 Documentation: INFRASTRUCTURE_SETUP_GUIDE.md - Task 2
+
+□ SQUAD EMAIL SMTP CONFIGURATION
+  □ Go to https://account.microsoft.com/security
+  □ Verify 2-factor authentication is enabled
+  □ Click "App passwords"
+  □ Select: Mail / Windows
+  □ Copy 16-character app password
+  
+  □ Open PowerShell as Administrator
+  □ Navigate to: cd C:\temp\tamresearch1\scripts
+  □ Run: .\setup-squad-credentials.ps1
+  □ Paste app password when prompted
+  □ Verify: "✓ Credential stored successfully!"
+  
+  □ Test setup with: .\test-squad-email.ps1
+  □ Verify: "✓ Test email sent successfully!"
+  
+  📝 Documentation: INFRASTRUCTURE_SETUP_GUIDE.md - Task 3
+
+VERIFICATION
+============
+All tasks complete when:
+  ✓ Gumroad product shows as "Published"
+  ✓ Gmail account tdsquadai@gmail.com receives account confirmation email
+  ✓ Test email successfully sent and received
+
+HELPER SCRIPTS AVAILABLE
+========================
+Location: C:\temp\tamresearch1\scripts\
+
+1. setup-squad-credentials.ps1
+   Interactive setup for SMTP credential storage
+   Usage: .\setup-squad-credentials.ps1
+
+2. test-squad-email.ps1
+   Verify email sending works
+   Usage: .\test-squad-email.ps1
+
+3. send-squad-email.ps1 (existing)
+   Send emails from Squad account
+   Usage: .\send-squad-email.ps1 -To "user@example.com" -Subject "..." -Body "..."
+
+TROUBLESHOOTING RESOURCES
+=========================
+See: INFRASTRUCTURE_SETUP_GUIDE.md
+     BELANNA_INFRASTRUCTURE_REPORT.md
+
+Common Issues:
+  • Can't access Outlook → Use Windows saved credentials
+  • Gmail form won't progress → Try different browser or clear cache
+  • SMTP credential error → Regenerate app password at account.microsoft.com/security
+  • Email send failed → Run test-squad-email.ps1 to diagnose
+
+DOCUMENTATION FILES
+===================
+Main Files (Root Directory):
+  • INFRASTRUCTURE_SETUP_GUIDE.md - Complete setup guide for all tasks
+  • BELANNA_INFRASTRUCTURE_REPORT.md - Status report with findings
+  • INFRASTRUCTURE_SETUP_SUMMARY.txt - Quick reference
+  • INFRASTRUCTURE_SETUP_CHECKLIST.txt - This file
+
+Helper Scripts (scripts/ Directory):
+  • setup-squad-credentials.ps1
+  • test-squad-email.ps1
+
+ESTIMATED TIME
+==============
+Gumroad verification: 5-10 minutes
+YouTube Gmail creation: 10-15 minutes
+SMTP configuration: 5-10 minutes
+───────────────────────────────
+TOTAL: 20-35 minutes
+
+COMPLETION TRACKING
+===================
+Started: _______________
+Gumroad Complete: _______________
+Gmail Complete: _______________
+SMTP Complete: _______________
+All Tasks Done: _______________
+
+Completed by: _______________
+Date: _______________
+
+═══════════════════════════════════════════════════════════════
+For questions or issues: Check INFRASTRUCTURE_SETUP_GUIDE.md
+═══════════════════════════════════════════════════════════════

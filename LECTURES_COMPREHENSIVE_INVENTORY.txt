@@ -1,0 +1,545 @@
+╔======================================================================================================================╗
+║                                      LECTURES COMPREHENSIVE INVENTORY                                                ║
+║                              C:\Users\tamirdresher\OneDrive\lectures                                                  ║
+╚======================================================================================================================╝
+
+Generated: 2026-03-16 20:40:48
+
+1. DIRECTORY SUMMARY (Sorted by Size)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📁 NDC Oslo 2016
+   Files: 965 | Size: 528.55 MB (0.5162 GB)
+   File Types: .asax, .ascx, .aspx, .cache, .ccproj, .config, .cs, .cscfg, .csdef, .cshtml, .csproj, .css, .dll, .eot, .exe, .html, .ico, .jpg, .js, .man, .manifest, .map, .Master, .nupkg, .nuspec, .pdb, .pdf, .pp, .ppt, .pptx, .ps1, .psd1, .psm1, .sln, .suo, .svg, .transform, .ttf, .txt, .wadcfg, .woff, .xdt, .xml, .zip
+
+📁 Event driven for bootcamp
+   Files: 2 | Size: 458.5 MB (0.4478 GB)
+   File Types: .mp4, .pptx
+
+📁 Debugging Tricks you wish you knew
+   Files: 41 | Size: 172.9 MB (0.1689 GB)
+   File Types: .docx, .mp4, .pdf, .png, .pptx, .txt
+
+📁 ReactiveExtensions
+   Files: 1340 | Size: 137.17 MB (0.134 GB)
+   File Types: ._, .appxmanifest, .appxrecipe, .backup, .baml, .Cache, .ClientConfig, .config, .cs, .csproj, .datasource, .disco, .dll, .docx, .exe, .gif, .html, .intermediate, .manifest, .nupkg, .nuspec, .pckgdep, .pdb, .pfx, .png, .pptx, .pri, .ps1, .psm1, .resfiles, .resources, .resw, .resx, .settings, .sln, .suo, .svc, .svcinfo, .svcmap, .txt, .user, .wsdl, .xaml, .xml, .xsd
+
+📁 Anatomy of Data-Driven Architecture
+   Files: 5 | Size: 120.56 MB (0.1177 GB)
+   File Types: .mp4, .pdf, .pptx
+
+📁 Semantic Kernel Agents Bootcamp
+   Files: 15 | Size: 108.12 MB (0.1056 GB)
+   File Types: .docx, .mp4, .pdf, .pptx
+
+📁 .NET Aspire
+   Files: 279 | Size: 99.84 MB (0.0975 GB)
+   File Types: .docx, .drawio, .gif, .htm, .jpg, .md, .pdf, .png, .pptx, .rtf, .thmx, .txt, .xml
+
+📁 Concurrent programming in dotnet
+   Files: 27 | Size: 59.21 MB (0.0578 GB)
+   File Types: .docx, .pdf, .pptx, .zip
+
+📁 The Asynchronous Processing World of .NET
+   Files: 5 | Size: 56.85 MB (0.0555 GB)
+   File Types: .csv, .pdf, .pptx, .txt
+
+📁 Smarter Decisions
+   Files: 3 | Size: 45.26 MB (0.0442 GB)
+   File Types: .pptx, .xlsx
+
+📁 Scaling and Coordinating AI Agents for Dev&Prod
+   Files: 2 | Size: 40.99 MB (0.04 GB)
+   File Types: .pdf, .pptx
+
+📁 DotNetAsyncStreams
+   Files: 4 | Size: 39.88 MB (0.0389 GB)
+   File Types: .pptx, .txt
+
+📁 DotNet 7 what's new
+   Files: 4 | Size: 35.74 MB (0.0349 GB)
+   File Types: .pdf, .pptx, .txt
+
+📁 ArchitectureNext2018
+   Files: 7 | Size: 33.93 MB (0.0331 GB)
+   File Types: .md, .pptx, .txt, .xlsx
+
+📁 Building Responsive Applications with Rx
+   Files: 8 | Size: 26.03 MB (0.0254 GB)
+   File Types: .docx, .gif, .pptx, .xlsx
+
+📁 The Core of .NET Core
+   Files: 12 | Size: 21.17 MB (0.0207 GB)
+   File Types: .jpg, .pdf, .png, .pptx, .txt
+
+📁 Courses
+   Files: 2366 | Size: 19 MB (0.0186 GB)
+   File Types: .baml, .cache, .config, .cs, .csproj, .CSV, .dbml, .dll, .docx, .exe, .gif, .gpState, .htm, .ico, .layout, .lref, .manifest, .pdb, .png, .pptx, .resources, .restext, .resx, .settings, .sln, .suo, .tlog, .txt, .user, .vbproj, .xaml, .zip
+
+📁 Messaging Patterns from the trenches
+   Files: 6 | Size: 15.82 MB (0.0155 GB)
+   File Types: .docx, .pptx
+
+📁 Testing Time and Concurrency Rx
+   Files: 4 | Size: 12.76 MB (0.0125 GB)
+   File Types: .pdf, .png, .pptx
+
+📁 PastSessions
+   Files: 4 | Size: 12.56 MB (0.0123 GB)
+   File Types: .pptx, .rar
+
+📁 Containers for .NET Developers
+   Files: 3 | Size: 10.04 MB (0.0098 GB)
+   File Types: .pdf, .pptx
+
+📁 Cloud Patterns
+   Files: 2 | Size: 9.68 MB (0.0095 GB)
+   File Types: .pdf, .pptx
+
+📁 Rx101
+   Files: 6 | Size: 8.18 MB (0.008 GB)
+   File Types: .gif, .pdf, .pptx, .rtf, .xlsx
+
+📁 netconf2025
+   Files: 6 | Size: 7.3 MB (0.0071 GB)
+   File Types: , .pdf, .pptx, .txt
+
+📁 Kubernetes
+   Files: 1 | Size: 7.17 MB (0.007 GB)
+   File Types: .pptx
+
+📁 Semantic Kernel
+   Files: 2 | Size: 4.11 MB (0.004 GB)
+   File Types: .pptx, .txt
+
+📁 .NET Core for MS
+   Files: 1 | Size: 3.26 MB (0.0032 GB)
+   File Types: .pptx
+
+📁 ASP.NET Core Internals
+   Files: 1 | Size: 2.91 MB (0.0028 GB)
+   File Types: .pptx
+
+📁 ASP.NET Core Internals (Deep Dive)
+   Files: 8 | Size: 2.5 MB (0.0024 GB)
+   File Types: .png, .pptx, .svg
+
+📁 CSharp 8
+   Files: 1 | Size: 1.23 MB (0.0012 GB)
+   File Types: .pptx
+
+📁 Semantic Kernel Course
+   Files: 1 | Size: 0.15 MB (0.0001 GB)
+   File Types: .docx
+
+📁 Suggestions
+   Files: 2 | Size: 0.06 MB (0.0001 GB)
+   File Types: .docx, .xlsx
+
+📁 Workflow orchestration
+   Files: 1 | Size: 0.01 MB (0 GB)
+   File Types: .docx
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+TOTAL: 33 directories | 5134 files | 2.05 GB total size
+
+
+2. DETAILED FILE LISTINGS FOR KEY DIRECTORIES
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+▶ .NET Aspire
+  Total: 279 files, 99.84 MB
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Aspire Course Prerequisites.docx
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\AspireAWS - IDVerify.drawio
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\colorschememapping.xml
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\filelist.xml
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\header.htm
+    [0.52 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image001.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image002.png
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image003.jpg
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image004.gif
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image005.png
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image006.png
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image007.gif
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image008.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image009.gif
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image010.png
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image011.jpg
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image012.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image013.gif
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image014.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image015.png
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image016.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image017.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image018.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image019.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image020.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image021.png
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image022.gif
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image023.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image024.jpg
+    [0.3 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image025.gif
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image026.jpg
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image027.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image028.gif
+    [0.19 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image029.jpg
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image030.gif
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image031.gif
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image032.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image033.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image034.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image035.gif
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image036.png
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image037.gif
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image038.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image039.gif
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image040.jpg
+    [0.09 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image041.jpg
+    [0.24 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image042.jpg
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image043.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image044.jpg
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image045.jpg
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image046.gif
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image047.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image048.gif
+    [0.12 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image049.jpg
+    [0.09 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image050.gif
+    [0.14 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image051.jpg
+    [0.23 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image052.gif
+    [0.23 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image053.jpg
+    [0.27 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image054.gif
+    [0.23 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image055.gif
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image056.jpg
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image057.jpg
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image058.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image059.jpg
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image060.gif
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image061.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image062.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image063.gif
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image064.jpg
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image065.gif
+    [0.12 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image066.jpg
+    [0.14 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image067.gif
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image068.jpg
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image069.gif
+    [0.12 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image070.jpg
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image071.gif
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image072.jpg
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image073.jpg
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image074.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image075.gif
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image076.jpg
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image077.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image078.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image079.png
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image080.gif
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image081.jpg
+    [0.14 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image082.jpg
+    [0.13 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image083.png
+    [0.09 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image084.gif
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image085.jpg
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image086.jpg
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image087.jpg
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image088.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image089.jpg
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image090.jpg
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image091.jpg
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image092.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image093.jpg
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image094.gif
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image095.gif
+    [0.23 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image096.jpg
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image097.gif
+    [0.21 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image098.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image099.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image100.gif
+    [0.13 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image101.jpg
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image102.jpg
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image103.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image104.gif
+    [0.28 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image105.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image106.gif
+    [0.17 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image107.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image108.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image109.gif
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image110.jpg
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image111.jpg
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image112.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image113.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image114.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image115.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image116.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image117.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image118.gif
+    [0.3 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image119.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image120.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image121.gif
+    [0.53 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image122.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image123.jpg
+    [0.58 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image124.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image125.jpg
+    [0.58 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image126.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image127.jpg
+    [0.17 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image128.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image129.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image130.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image131.gif
+    [0.12 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image132.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image133.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image134.gif
+    [0.73 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image135.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image136.jpg
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image137.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image138.gif
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image139.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image140.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image141.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image142.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image143.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image144.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image145.gif
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image146.jpg
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image147.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image148.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image149.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image150.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image151.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image152.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image153.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image154.gif
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image155.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image156.gif
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image157.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image158.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image159.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image160.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image161.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image162.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image163.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image164.gif
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image165.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image166.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image167.gif
+    [0.27 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image168.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image169.jpg
+    [0.48 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image170.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image171.jpg
+    [0.69 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image172.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image173.jpg
+    [0.69 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image174.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image175.jpg
+    [0.6 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image176.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image177.jpg
+    [0.48 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image178.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image179.jpg
+    [0.15 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image180.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image181.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image182.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image183.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image184.gif
+    [0.26 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image185.jpg
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image186.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image187.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image188.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image189.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image190.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image191.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image192.png
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image193.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image194.gif
+    [0.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image195.png
+    [0.23 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image196.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image197.gif
+    [0.26 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image198.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image199.gif
+    [0.54 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image200.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image201.gif
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image202.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image203.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image204.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image205.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image206.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image207.gif
+    [0.05 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image208.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image209.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image210.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image211.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image212.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image213.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image214.gif
+    [0.06 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image215.jpg
+    [0.18 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image216.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image217.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image218.gif
+    [0.68 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image219.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image220.jpg
+    [0.12 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image221.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image222.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image223.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image224.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image225.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image226.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image227.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image228.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image229.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image230.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image231.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image232.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image233.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image234.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image235.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image236.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image237.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image238.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image239.gif
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image240.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image241.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image242.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image243.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image244.png
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image245.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image246.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image247.png
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image248.gif
+    [0.53 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image249.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image250.jpg
+    [0.56 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image251.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image252.jpg
+    [0.68 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image253.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image254.jpg
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image255.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image256.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image257.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image258.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image259.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\image260.gif
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher_files\themedata.thmx
+    [25.46 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher.htm
+    [0.09 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher.md
+    [5.89 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher.pdf
+    [17.84 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher.pptx
+    [0.08 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\Building Distributed Systems with Aspire  - Tamir Dresher.rtf
+    [7.47 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\NET Aspire - AWS meetup 2024 - Tamir Dresher.pdf
+    [8.98 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\NET Aspire - AWS meetup 2024 - Tamir Dresher.pptx
+    [3.74 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\NET Aspire - NET Conf IL 2024 - Tamir Dresher.pdf
+    [9.72 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\NET Aspire - NET Conf IL 2024 - Tamir Dresher.pptx
+    [0.15 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\NET Aspire Syllabus.docx
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\NET-Aspire-Course-Syllabus.docx
+    [0.64 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\plan.docx
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\.NET Aspire\responses.txt
+
+▶ Semantic Kernel Agents Bootcamp
+  Total: 15 files, 108.12 MB
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [16.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\AI Assisstant Demo.mp4
+    [1.7 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\AI Summer Days Feedback - Creating AI Apps and Agents with C# - Tamir.pptx
+    [7.17 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\assisstant demo.mp4
+    [8.23 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\assisstant demo2.mp4
+    [0.15 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Building AI Agents with Semantic Kernel in C#  Syllabus Tech train.docx
+    [0.15 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Building AI Agents with Semantic Kernel in C#  Syllabus.docx
+    [0.2 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Feedback - Building AI Agents with Semantic Kernel in C - Tamir Dresher.docx
+    [2.19 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Microsoft Academy template  2.pptx
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Prerequisites.docx
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\SemanticKernel_Course_Agenda.docx
+    [22.75 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Tamir Dresher - Creating AI Applications and Agents with C#.pptx
+    [20.28 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Tamir Dresher - Creating AI Applications and Agents with CSharp - Day1.pptx
+    [3 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Tamir Dresher - Creating AI Applications and Agents with CSharp - Full.pdf
+    [25.11 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Tamir Dresher - Creating AI Applications and Agents with CSharp - Full.pptx
+    [1.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\Semantic Kernel Agents Bootcamp\Training Content Guildelines and Template.pptx
+
+▶ The Asynchronous Processing World of .NET
+  Total: 5 files, 56.85 MB
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\The Asynchronous Processing World of .NET\Benchmarks\new 21.txt
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\The Asynchronous Processing World of .NET\Benchmarks\NoTranslate.csv
+    [0.01 MB] C:\Users\tamirdresher\OneDrive\Lectures\The Asynchronous Processing World of .NET\Benchmarks\WebScraper.Benchmark.WebScraperBenchmark-net8 vs net9 report.csv
+    [1.58 MB] C:\Users\tamirdresher\OneDrive\Lectures\The Asynchronous Processing World of .NET\The Asynchronous Processing World of NET - Tamir Dresher.pdf
+    [55.25 MB] C:\Users\tamirdresher\OneDrive\Lectures\The Asynchronous Processing World of .NET\The Asynchronous Processing World of NET.pptx
+
+▶ Anatomy of Data-Driven Architecture
+  Total: 5 files, 120.56 MB
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [40.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\Anatomy of Data-Driven Architecture\Tamir Dresher - Anatomy of a Data Driven Architecture - 25min.mp4
+    [61 MB] C:\Users\tamirdresher\OneDrive\Lectures\Anatomy of Data-Driven Architecture\Tamir Dresher - Anatomy of a Data Driven Architecture - 45min.mp4
+    [1 MB] C:\Users\tamirdresher\OneDrive\Lectures\Anatomy of Data-Driven Architecture\Tamir Dresher - Anatomy of a Data Driven Architecture 25min.pdf
+    [9.25 MB] C:\Users\tamirdresher\OneDrive\Lectures\Anatomy of Data-Driven Architecture\Tamir Dresher - Anatomy of a Data Driven Architecture 25min.pptx
+    [9.26 MB] C:\Users\tamirdresher\OneDrive\Lectures\Anatomy of Data-Driven Architecture\Tamir Dresher - Anatomy of a Data Driven Architecture.pptx
+
+▶ Event driven for bootcamp
+  Total: 2 files, 458.5 MB
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [15.33 MB] C:\Users\tamirdresher\OneDrive\Lectures\Event driven for bootcamp\Event Driven Architecture - Junior Bootcamp.pptx
+    [443.17 MB] C:\Users\tamirdresher\OneDrive\Lectures\Event driven for bootcamp\Payoneer Boot-Camp - Event driven by @Tamir Dressher-20210830_103131-Meeting Recording.mp4
+
+▶ Debugging Tricks you wish you knew
+  Total: 41 files, 172.9 MB
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [3.92 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\Debugging past present and future.pptx
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\debugging steps.txt
+    [8.24 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\Debugging tricks - Tamir Dresher.pdf
+    [32.9 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\Debugging Tricks you wish you knew - Tamir Dresher - Odessa 2019.pptx
+    [32.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\Debugging Tricks you wish you knew - Tamir Dresher - Update prague [Autosaved].pptx
+    [32.68 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\Debugging Tricks you wish you knew - Tamir Dresher - Update prague.pptx
+    [31.95 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\Debugging Tricks you wish you knew - Tamir Dresher.pptx
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\plan.txt
+    [0.29 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\Add dotpeek to symbols.png
+    [0.26 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\breaking in the external code.png
+    [0.35 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\breakpoint in the migration.png
+    [0.14 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\Creating a dump - save completed.png
+    [0.14 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\Creating a dump - saving.png
+    [0.14 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\Creating a dump.png
+    [0.36 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\DataBaseCreator CreateDatabase.png
+    [0.07 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\dotpeek copyaddress.png
+    [0.09 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\dotPeek.StartSymbolServer.png
+    [0.37 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\EF MarkDatabaseInitialized on Create.png
+    [0.31 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\ef6 github.png
+    [0.41 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\InitalizeDatabase static field.png
+    [0.37 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\InitalizeDatabase to static.png
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\modules window.png
+    [0.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\modules windows symbols loaded.png
+    [0.22 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\open the modules window.png
+    [0.3 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\setting a breakpoint on external code from new breakpoint window.png
+    [0.09 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\setting a breakpoint on external code from window.png
+    [0.1 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\symbol loaded in dotpeek.png
+    [0.27 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\screenshots\VS crashed with the reason in the error message.png
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\script.docx
+    [0 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\uml\sequence.txt
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\uml\sequence\sequence@13-25.png
+    [0.02 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\uml\sequence\sequence@14-26.png
+    [2.68 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\backgamon fails.mp4
+    [1.49 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\crashing VS.mp4
+    [2.22 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\creating a notebook. and todo.mp4
+    [7.26 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\Debugging a dump.mp4
+    [1.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\Debugging an exe.mp4
+    [4.39 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\export and import.mp4
+    [2.32 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\importing an old notebook.mp4
+    [3.25 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\taking an debugging the backgamon dump.mp4
+    [2.04 MB] C:\Users\tamirdresher\OneDrive\Lectures\Debugging Tricks you wish you knew\vids\VS crashed with another VS attached.mp4
+
+
+3. SPECIAL DIRECTORIES (PastSessions & Suggestions)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+▶ PastSessions
+  Total: 4 files, 12.56 MB
+  File Types: .pptx, .rar
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [0.3 MB] C:\Users\tamirdresher\OneDrive\Lectures\PastSessions\.NET UserGroup 19_06_13\Caliburn.Micro For WinRT.pptx
+    [2.56 MB] C:\Users\tamirdresher\OneDrive\Lectures\PastSessions\.NET UserGroup 19_06_13\HelloCaliburnMicro.rar
+    [1.22 MB] C:\Users\tamirdresher\OneDrive\Lectures\PastSessions\.NET UserGroup 19_06_13\Reactive Extensions(RX).pptx
+    [8.47 MB] C:\Users\tamirdresher\OneDrive\Lectures\PastSessions\.NET UserGroup 19_06_13\ReactiveExtensions.Demos.rar
+
+▶ Suggestions
+  Total: 2 files, 0.06 MB
+  File Types: .docx, .xlsx
+  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─  ─
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\Suggestions\SA2015 - Submission Document.docx
+    [0.03 MB] C:\Users\tamirdresher\OneDrive\Lectures\Suggestions\SDD 2016 Tamir Dresher.xlsx
+
+════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+END OF REPORT
+════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

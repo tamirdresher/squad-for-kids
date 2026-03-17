@@ -1,0 +1,17 @@
+{
+  "name": "voice-writing",
+  "version": "1.0.0",
+  "description": "Maintain consistent writing voice and style across AI-generated content",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["write in voice", "match voice", "writing style", "content voice", "author voice", "tone matching"],
+  "tags": ["content", "writing", "voice-matching", "consistency", "branding"],
+  "capabilities": [
+    "Define and enforce author-specific writing voice rules",
+    "Maintain tone consistency across multiple content pieces",
+    "Support voice profiles with reference material links",
+    "Check content against voice guidelines before publishing",
+    "Adapt style for different content types (blog, docs, social)"
+  ]
+}

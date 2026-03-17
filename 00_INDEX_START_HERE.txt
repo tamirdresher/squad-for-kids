@@ -1,0 +1,263 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                           LECTURES INVENTORY - COMPLETE INDEX                                     ║
+║                                                                                                    ║
+║                   Location: C:\Users\tamirdresher\OneDrive\lectures\                              ║
+║                   Generated: 2026-03-16 20:43:11                                             ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ QUICK FACTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Total Directories Analyzed:        33
+  Total Files Inventoried:          5,134
+  Total Storage Size:                2.05 GB
+  
+  Largest Directory:                 NDC Oslo 2016 (965 files, 528.55 MB)
+  Smallest Directory:                Workflow orchestration (1 file, 0.01 MB)
+  Largest Single File:               Event-driven bootcamp recording (443.17 MB)
+  Most Populated Directory:           Courses (2,366 files)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ALL 33 DIRECTORIES INVENTORIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ .NET Aspire (279 files, 99.84 MB)
+✓ Scaling and Coordinating AI Agents for Dev&Prod (2 files, 40.99 MB)
+✓ Semantic Kernel (2 files, 4.11 MB)
+✓ Semantic Kernel Agents Bootcamp (15 files, 108.12 MB) **
+✓ Semantic Kernel Course (1 file, 0.15 MB)
+✓ The Asynchronous Processing World of .NET (5 files, 56.85 MB)
+✓ Rx101 (6 files, 8.18 MB)
+✓ ReactiveExtensions (1,340 files, 137.17 MB) *** MOST FILES
+✓ Building Responsive Applications with Rx (8 files, 26.03 MB)
+✓ Testing Time and Concurrency Rx (4 files, 12.76 MB)
+✓ Cloud Patterns (2 files, 9.68 MB)
+✓ NDC Oslo 2016 (965 files, 528.55 MB) *** LARGEST
+✓ Event driven for bootcamp (2 files, 458.50 MB) **
+✓ Messaging Patterns from the trenches (6 files, 15.82 MB)
+✓ Containers for .NET Developers (3 files, 10.04 MB)
+✓ Kubernetes (1 file, 7.17 MB)
+✓ .NET Core for MS (1 file, 3.26 MB)
+✓ ASP.NET Core Internals (1 file, 2.91 MB)
+✓ ASP.NET Core Internals (Deep Dive) (8 files, 2.50 MB)
+✓ Concurrent programming in dotnet (27 files, 59.21 MB)
+✓ DotNetAsyncStreams (4 files, 39.88 MB)
+✓ Debugging Tricks you wish you knew (41 files, 172.90 MB)
+✓ netconf2025 (6 files, 7.30 MB)
+✓ DotNet 7 what's new (4 files, 35.74 MB)
+✓ CSharp 8 (1 file, 1.23 MB)
+✓ The Core of .NET Core (12 files, 21.17 MB)
+✓ Anatomy of Data-Driven Architecture (5 files, 120.56 MB) **
+✓ Workflow orchestration (1 file, 0.01 MB)
+✓ Smarter Decisions (3 files, 45.26 MB)
+✓ ArchitectureNext2018 (7 files, 33.93 MB)
+✓ Courses (2,366 files, 19.00 MB) *** MOST POPULATED
+✓ PastSessions (4 files, 12.56 MB)
+✓ Suggestions (2 files, 0.06 MB)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ INVENTORY REPORT FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 LECTURES_SUMMARY.txt (10 KB)
+   ├─ Purpose: Executive summary with key statistics and highlights
+   ├─ Content: Top directories, file types, category breakdown, key findings
+   ├─ Best for: Quick overview and decision-making
+   └─ Format: Text, human-readable
+
+📄 LECTURES_COMPREHENSIVE_INVENTORY.txt (58 KB)
+   ├─ Purpose: Detailed inventory with file listings for key directories
+   ├─ Content: Summary of all 33 directories, detailed file paths for major ones
+   ├─ Best for: In-depth exploration and research
+   └─ Format: Text with formatted layout
+
+📊 lectures_inventory_summary.tsv (3 KB)
+   ├─ Purpose: Summary statistics in Tab-Separated Values format
+   ├─ Content: Directory name, file count, total size, file types
+   ├─ Best for: Importing into Excel/Sheets for analysis and pivot tables
+   ├─ Columns: Directory | Files | SizeMB | SizeGB | FileTypes | ReadmeFiles
+   └─ Format: TSV (Excel-compatible)
+
+📊 lectures_inventory.csv (1,012 KB)
+   ├─ Purpose: Complete file-by-file inventory (CSV format)
+   ├─ Content: All 5,134 files with full details
+   ├─ Best for: Searching, sorting, and filtering in Excel/database tools
+   ├─ Columns: Directory | FileName | FullPath | Extension | SizeMB | SizeBytes
+   └─ Format: CSV (Excel-compatible)
+
+📊 lectures_all_files_detailed.csv (1,728 KB)
+   ├─ Purpose: Detailed file listing with relative paths (CSV format)
+   ├─ Content: All 5,134 files with relative path structure
+   ├─ Best for: Understanding directory organization and file hierarchy
+   ├─ Columns: Same as lectures_inventory.csv + RelativePath
+   └─ Format: CSV (Excel-compatible)
+
+📋 lectures_all_files_list.txt (810 KB)
+   ├─ Purpose: Simple text listing of all files
+   ├─ Content: Pipe-separated entries (Directory | RelativePath | Size MB)
+   ├─ Best for: Quick reference and grep/search operations
+   ├─ Format: Text, easy to parse
+   └─ Usage: Can be imported into text editors or command-line tools
+
+📄 Individual Directory Files:
+   ├─ .NET Aspire_files.txt - 279 files with paths
+   ├─ Semantic Kernel Agents Bootcamp_files.txt - 15 files with paths
+   ├─ Debugging Tricks you wish you knew_files.txt - 41 files with paths
+   ├─ Anatomy of Data-Driven Architecture_files.txt - 5 files with paths
+   ├─ Concurrent programming in dotnet_files.txt - 27 files with paths
+   └─ The Asynchronous Processing World of .NET_files.txt - 5 files with paths
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ HOW TO USE THESE FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FOR QUICK OVERVIEW:
+   1. Open LECTURES_SUMMARY.txt
+   2. Read the key findings and statistics
+   3. Check which directories interest you most
+
+FOR DETAILED EXPLORATION:
+   1. Open LECTURES_COMPREHENSIVE_INVENTORY.txt
+   2. Find your directory of interest
+   3. Review the complete file listings
+
+FOR DATA ANALYSIS:
+   1. Open lectures_inventory.csv or lectures_all_files_detailed.csv in Excel
+   2. Use Excel's Sort/Filter features to find:
+      - All files of a specific type (.pptx, .mp4, etc.)
+      - All files in a specific directory
+      - Largest files in the collection
+      - Files modified recently
+
+FOR SEARCHING IN EXCEL:
+   1. Import lectures_inventory.csv
+   2. Use Find & Replace to search for:
+      - Specific filenames
+      - File extensions
+      - Directory names
+      - Size ranges
+
+FOR COMMAND-LINE ANALYSIS:
+   1. Use lectures_all_files_list.txt with grep/awk commands
+   2. Examples:
+      - grep "\.mp4" lectures_all_files_list.txt  (find all videos)
+      - grep "NDC Oslo" lectures_all_files_list.txt (find NDC files)
+      - grep "\.pptx" lectures_all_files_list.txt (find all presentations)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ FILE TYPE BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRESENTATIONS & DOCUMENTS:
+  .pptx  (PowerPoint)          - 234 files (~15 MB)  - Main presentation format
+  .pdf   (PDF Documents)       - ~150 files (~50 MB) - Reference materials
+  .docx  (Word Documents)      - ~60 files (~3 MB)   - Notes and documentation
+
+MULTIMEDIA:
+  .mp4   (Video)               - ~25 files (~650 MB) - Meeting recordings & demos
+  .gif   (Animated Graphics)   - 115 files (~3 MB)   - Animated content
+
+IMAGERY:
+  .png   (PNG Images)          - 158 files (~7 MB)   - Diagrams and screenshots
+  .jpg   (JPEG Images)         - 100 files (~16 MB)  - Photos and graphics
+
+SOURCE CODE:
+  .cs    (C# Code)             - 1,135 files (~2 MB) - Source code files
+  .xaml  (XAML Markup)         - 321 files (~3 MB)   - UI markup files
+
+COMPILED BINARIES:
+  .dll   (Assemblies)          - 594 files (~140 MB) - Compiled .NET libraries
+  .exe   (Executables)         - ~20 files           - Executable programs
+
+CONFIGURATION & BUILD:
+  .xml   (XML Config)          - 346 files (~111 MB) - Configuration files
+  .config (App Config)         - 111 files           - Application settings
+  .Cache (Build Cache)         - 329 files (~1 MB)   - Cache files
+
+PROJECT FILES:
+  .csproj (C# Projects)        - 128 files (~1 MB)   - Project definitions
+  .sln   (Solutions)           - ~20 files           - Solution files
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ CONTENT CATEGORIES & RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🤖 AI & MACHINE LEARNING TOPICS:
+   • Semantic Kernel (current hot topic)
+   • Scaling and Coordinating AI Agents
+   • Smarter Decisions
+   Storage: 190 MB across 20 files
+
+⚡ REACTIVE & ASYNCHRONOUS PROGRAMMING:
+   • ReactiveExtensions (largest by file count: 1,340 files)
+   • Rx101, Building Responsive Apps with Rx, Testing Time & Concurrency
+   • The Asynchronous Processing World of .NET
+   • DotNetAsyncStreams
+   Storage: 281 MB across 1,367 files
+
+☁️ CLOUD & CONTAINERIZATION:
+   • Containers for .NET Developers
+   • Kubernetes
+   • Cloud Patterns
+   • NDC Oslo 2016 (includes extensive cloud content)
+   Storage: 555 MB across 971 files
+
+🏗️ ARCHITECTURE & DESIGN:
+   • Anatomy of Data-Driven Architecture
+   • Messaging Patterns from the Trenches
+   • Concurrent Programming in .NET
+   • Event-driven Architecture
+   Storage: 733 MB across 51 files
+
+🔧 .NET PLATFORM DEEP DIVES:
+   • .NET Aspire (modern platform)
+   • ASP.NET Core Internals (both courses)
+   • The Core of .NET Core
+   • .NET Core for MS
+   • CSharp 8
+   • DotNet 7 what's new
+   Storage: 167 MB across 306 files
+
+📚 COMPREHENSIVE CONFERENCE CONTENT:
+   • NDC Oslo 2016 (965 files, 528 MB - one of the most complete)
+   • Debugging Tricks You Wish You Knew (41 files, 173 MB)
+   • ArchitectureNext2018 (7 files, 34 MB)
+
+💾 SOURCE CODE & PROJECTS:
+   • ReactiveExtensions folder contains complete project structure
+   • NDC Oslo 2016 includes multiple sample projects
+   • Courses folder contains many project templates
+   Storage: 673 MB in compiled binaries and source code
+
+📹 VIDEO CONTENT:
+   • Event-driven for bootcamp (443 MB video!)
+   • Anatomy of Data-Driven Architecture (100 MB videos)
+   • Debugging Tricks (includes video recordings)
+   Storage: ~650 MB in .mp4 files (high-value learning resources)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ NOTES & OBSERVATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• The collection represents professional training materials and conference content
+• Strong focus on .NET ecosystem, particularly reactive programming and async patterns
+• Recent additions include AI/Semantic Kernel and modern .NET platforms (Aspire)
+• Many directories contain complete project source code with compiled binaries
+• Video recordings are large files but offer high-value learning resources
+• The "NDC Oslo 2016" directory is essentially a complete conference archive
+• "ReactiveExtensions" appears to be a complete project repository rather than just slides
+• Multiple Microsoft-specific training materials (marked with [MS])
+• Active and growing collection with 2025 conference materials already included
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Generated by: Comprehensive Lectures Inventory Tool
+Location: C:\temp\tamresearch1\
+Inventory Version: 1.0
+Report Date: 2026-03-16 20:43:11

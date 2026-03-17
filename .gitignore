@@ -70,3 +70,29 @@ _site/
 # Cryptographic material
 *.key
 *.pem
+
+# --- Repo hygiene (health-check cleanup) ---
+
+# Nested git repos (separate projects, own history)
+content-empire/
+saas-finder-hub/
+
+# Large media uploads (stored in OneDrive/cloud, not Git)
+uploads/
+
+# Automation screenshots & browser artifacts (root only)
+/*.png
+/*.pdf
+/*.vbs
+*_files.txt
+
+# Playwright automation state/snapshots (root only)
+/*.yaml
+.playwright-headed.json
+
+# Script/VBS output artifacts
+script-result.*
+vbs-result*.txt
+
+# Auth tokens
+scripts/squad-email/device-code-reauth.json

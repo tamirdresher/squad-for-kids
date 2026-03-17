@@ -1,0 +1,153 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                      LECTURES LIBRARY INVENTORY - EXECUTIVE SUMMARY                               ║
+║                    C:\Users\tamirdresher\OneDrive\lectures                                         ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+OVERALL STATISTICS
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+• Total Directories: 33
+• Total Files: 5,134
+• Total Storage: 2.05 GB
+• Generated: 2026-03-16 20:42:04
+
+TOP DIRECTORIES BY SIZE
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+1. NDC Oslo 2016                          965 files    528.55 MB    (25.8%)
+2. Event driven for bootcamp              2 files     458.50 MB    (22.4%)
+3. Debugging Tricks you wish you knew     41 files    172.90 MB    (8.4%)
+4. ReactiveExtensions                   1,340 files   137.17 MB    (6.7%)
+5. Anatomy of Data-Driven Architecture    5 files    120.56 MB    (5.9%)
+6. Semantic Kernel Agents Bootcamp       15 files    108.12 MB    (5.3%)
+7. .NET Aspire                           279 files     99.84 MB    (4.9%)
+8. Concurrent programming in dotnet      27 files     59.21 MB    (2.9%)
+9. The Asynchronous Processing World     5 files     56.85 MB    (2.8%)
+10. Smarter Decisions                     3 files     45.26 MB    (2.2%)
+
+TOP FILES BY SIZE
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+1. Event driven for bootcamp - Meeting Recording.mp4                              443.17 MB
+2. NDC Oslo 2016 - Azure Cloud Patterns.zip                                       130.20 MB
+3. NDC Oslo 2016 - Azure Cloud Patterns (Nested).zip                              72.94 MB
+4. Anatomy - Data Driven Architecture (45min).mp4                                 60.99 MB
+5. Asynchronous Processing World of .NET.pptx                                     55.25 MB
+6. NDC Oslo 2016 - AWSSDK.pdb (net35)                                             42.33 MB
+7. NDC Oslo 2016 - AWSSDK.pdb (net45)                                             41.97 MB
+8. Anatomy - Data Driven Architecture (25min).mp4                                 40.04 MB
+9. Scaling AI Agents for Dev&Prod.pptx                                            35.44 MB
+10. Debugging Tricks - Odessa 2019.pptx                                           32.90 MB
+
+KEY DIRECTORY CATEGORIES
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+
+📊 AI & Semantic Kernel Topics:
+   ├─ Semantic Kernel                     2 files       4.11 MB
+   ├─ Semantic Kernel Agents Bootcamp    15 files     108.12 MB    ⭐ LARGEST
+   ├─ Semantic Kernel Course              1 file        0.15 MB
+   └─ Scaling & Coordinating AI Agents    2 files      40.99 MB
+   Total: 20 files, 153.37 MB
+
+🔄 Reactive & Async Topics:
+   ├─ ReactiveExtensions              1,340 files     137.17 MB    ⭐ MOST FILES
+   ├─ Rx101                                6 files       8.18 MB
+   ├─ Building Responsive Rx Apps          8 files      26.03 MB
+   ├─ Testing Time & Concurrency Rx        4 files      12.76 MB
+   ├─ The Async World of .NET              5 files      56.85 MB
+   └─ DotNetAsyncStreams                   4 files      39.88 MB
+   Total: 1,367 files, 280.87 MB
+
+.NET Core & Infrastructure:
+   ├─ .NET Aspire                        279 files      99.84 MB
+   ├─ ASP.NET Core Internals              1 file        2.91 MB
+   ├─ ASP.NET Core Internals (Deep)       8 files       2.50 MB
+   ├─ .NET Core for MS                    1 file        3.26 MB
+   ├─ The Core of .NET Core              12 files      21.17 MB
+   ├─ CSharp 8                            1 file        1.23 MB
+   └─ DotNet 7 what's new                 4 files      35.74 MB
+   Total: 306 files, 166.65 MB
+
+☁️ Cloud & DevOps:
+   ├─ Containers for .NET Developers      3 files      10.04 MB
+   ├─ Kubernetes                          1 file        7.17 MB
+   ├─ Cloud Patterns                      2 files       9.68 MB
+   └─ NDC Oslo 2016                     965 files     528.55 MB    ⭐ LARGEST
+   Total: 971 files, 555.44 MB
+
+🏗️ Architecture & Patterns:
+   ├─ Anatomy of Data-Driven Arch         5 files     120.56 MB
+   ├─ Messaging Patterns from Trenches    6 files      15.82 MB
+   ├─ Concurrent programming in .NET     27 files      59.21 MB
+   ├─ Event driven for bootcamp           2 files     458.50 MB    ⭐ LARGE
+   ├─ Workflow orchestration              1 file        0.01 MB
+   ├─ ArchitectureNext2018                7 files      33.93 MB
+   └─ Smarter Decisions                   3 files      45.26 MB
+   Total: 51 files, 733.29 MB
+
+📚 Learning & Development:
+   ├─ Courses                          2,366 files      19.00 MB
+   ├─ Debugging Tricks                    41 files     172.90 MB
+   └─ netconf2025                         6 files       7.30 MB
+   Total: 2,413 files, 199.20 MB
+
+📁 Administration:
+   ├─ PastSessions                        4 files      12.56 MB
+   └─ Suggestions                         2 files       0.06 MB
+   Total: 6 files, 12.62 MB
+
+FILE TYPE DISTRIBUTION
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+Primary Content Files:
+  • .pptx (Presentations)      - 234 files      ~15 MB  (Educational slides)
+  • .pdf (Documents)           - ~150 files     ~50 MB  (Reference materials)
+  • .mp4 (Videos)              - ~25 files     ~650 MB  (Recordings & demos)
+  • .docx (Documents)          - ~60 files      ~3 MB   (Notes & docs)
+  
+Source Code & Build Files:
+  • .cs (C# Source)            - 1,135 files     2.36 MB
+  • .dll (Compiled)            - 594 files     140.09 MB
+  • .xml (Config/Manifest)     - 346 files     110.74 MB
+  • .xaml (Markup)             - 321 files       3 MB
+  • .csproj (Project)          - 128 files       0.67 MB
+
+Supporting Files:
+  • .Cache (Build Cache)       - 329 files       1.43 MB
+  • .resources/.resx           - 243 files       0.75 MB
+  • .png (Images)              - 158 files       6.76 MB
+  • .js (JavaScript)           - 123 files       5 MB
+  • .gif (Graphics)            - 115 files       3.14 MB
+
+KEY FINDINGS
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+✓ LARGEST SINGLE FILE: 443.17 MB (Event-driven recording)
+✓ MOST FILES IN DIRECTORY: 2,366 files (Courses folder)
+✓ MOST FILES BY EXTENSION: 1,135 C# source files
+✓ HIGHEST STORAGE CATEGORY: Reactive & Async (280.87 MB)
+✓ ACTIVE TOPICS: Semantic Kernel, AI Agents, .NET Aspire, Event-driven architecture
+✓ VIDEO CONTENT: ~25 videos totaling ~650 MB
+✓ SOURCE CODE: Complete project files with DLLs for multiple demos
+
+INVENTORY FILES GENERATED
+══════════════════════════════════════════════════════════════════════════════════════════════════════
+1. lectures_inventory.csv
+   └─ Raw CSV with all 5,134 files (Directory, FileName, FullPath, Extension, SizeMB, SizeBytes)
+
+2. lectures_all_files_detailed.csv
+   └─ Detailed CSV with relative paths for each file
+
+3. lectures_all_files_list.txt
+   └─ Simplified text listing (Directory | RelativePath | Size)
+
+4. lectures_inventory_summary.tsv
+   └─ Tab-separated summary by directory (for Excel import)
+
+5. LECTURES_COMPREHENSIVE_INVENTORY.txt
+   └─ Comprehensive report with detailed file listings for key directories
+
+6. Detailed directory files:
+   ├─ .NET Aspire_files.txt
+   ├─ Semantic Kernel Agents Bootcamp_files.txt
+   ├─ Debugging Tricks you wish you knew_files.txt
+   ├─ Anatomy of Data-Driven Architecture_files.txt
+   ├─ Concurrent programming in dotnet_files.txt
+   └─ The Asynchronous Processing World of .NET_files.txt
+
+════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

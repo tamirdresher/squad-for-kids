@@ -1,0 +1,17 @@
+{
+  "name": "birthday-celebration",
+  "version": "1.0.0",
+  "description": "Automated team birthday and celebration tracking with scheduled notifications",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["birthday", "celebration", "team birthday", "upcoming birthdays", "who has a birthday", "celebrate"],
+  "tags": ["team-culture", "celebrations", "notifications", "scheduling"],
+  "capabilities": [
+    "Maintain privacy-safe birthday registry (month/day only)",
+    "Check for upcoming birthdays within a configurable window",
+    "Generate celebration messages for team channels",
+    "Deliver notifications via webhooks or messaging APIs",
+    "Support multiple celebration types (birthdays, work anniversaries, milestones)"
+  ]
+}

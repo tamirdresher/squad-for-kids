@@ -1,0 +1,17 @@
+{
+  "name": "blog-publishing",
+  "version": "1.0.0",
+  "description": "Multi-account GitHub workflow for publishing blog posts to GitHub Pages sites",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["publish blog", "blog post", "deploy blog", "push to blog", "blog workflow", "content publishing"],
+  "tags": ["content", "publishing", "blogging", "github-pages", "workflow"],
+  "capabilities": [
+    "Manage multi-account GitHub authentication for publishing",
+    "Coordinate content from working repo to publishing repo",
+    "Ensure account switching safety with rollback",
+    "Link published content to tracking issues for traceability",
+    "Support GitHub Pages and static site generators"
+  ]
+}

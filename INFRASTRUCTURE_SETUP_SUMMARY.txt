@@ -1,0 +1,54 @@
+============================================================
+INFRASTRUCTURE SETUP SUMMARY - B'Elanna Report
+============================================================
+
+**TASK 1: VERIFY GUMROAD**
+STATUS: ⚠️  REQUIRES MANUAL COMPLETION
+
+Issue: Accessing td-squad-ai-team@outlook.com requires password retrieval.
+- Credential exists in Windows Credential Manager: CONFIRMED
+- Password cannot be extracted programmatically due to security restrictions
+- Browser-based Outlook access attempted but failed due to Outlook UI complexity
+
+Required Manual Action:
+1. Log into https://outlook.office.com manually using Windows saved credentials
+2. Search for "Gumroad" in inbox to find verification email
+3. Click the verification link in the email
+4. Then navigate to https://app.gumroad.com
+5. Publish the "AI Agent Architecture Cheatsheet" product
+
+**TASK 2: CREATE YOUTUBE GMAIL**
+STATUS: ⚠️  INCOMPLETE - FORM VALIDATION
+
+Email: tdsquadai@gmail.com (or similar available address)
+First Name: Tech
+Last Name: AI
+Birthday: 05/15/1990
+Gender: (attempted selection, but form validation prevented progression)
+
+Required Manual Action:
+1. Navigate to https://accounts.google.com/signup
+2. Complete the form with the details above
+3. Save the generated password securely
+4. Use this account for the "TechAI Explained" faceless YouTube channel
+
+**TASK 3: SQUAD EMAIL SMTP PASSWORD**
+STATUS: ⚠️  REQUIRES APP PASSWORD GENERATION
+
+Account: td-squad-ai-team@outlook.com
+Requirements for send-squad-email.ps1 script:
+- Must store credential in Windows Credential Manager
+- Command: cmdkey /generic:squad-email-outlook /user:td-squad-ai-team@outlook.com /pass:PASSWORD
+
+Manual Steps Required:
+1. Log into https://account.microsoft.com/security
+2. If 2FA enabled:
+   - Click "App passwords"
+   - Select "Mail" / "Windows"
+   - Generate new 16-character app password
+3. Store in Credential Manager:
+   cmdkey /generic:squad-email-outlook /user:td-squad-ai-team@outlook.com /pass:YOUR_APP_PASSWORD
+4. Test script:
+   .\\scripts\\send-squad-email.ps1 -To "test@example.com" -Subject "Test" -Body "Hello"
+
+============================================================

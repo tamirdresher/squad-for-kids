@@ -1,0 +1,17 @@
+{
+  "name": "session-recovery",
+  "version": "1.0.0",
+  "description": "Find and resume recently closed AI agent sessions using session history databases",
+  "author": "tamirdresher",
+  "license": "MIT",
+  "platforms": ["github-copilot", "claude", "chatgpt", "any-llm"],
+  "triggers": ["recover session", "find session", "resume session", "lost session", "closed session", "recent sessions", "session history"],
+  "tags": ["workflow-recovery", "session-management", "productivity", "continuity"],
+  "capabilities": [
+    "Search session history by topic, time range, or working directory",
+    "Filter out monitoring/background sessions from results",
+    "Retrieve conversation history and checkpoint progress",
+    "Identify session state for seamless resume",
+    "Full-text search across past session content"
+  ]
+}

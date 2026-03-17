@@ -1,0 +1,185 @@
+{
+  "body": "## Source\nFlagged URGENT in **Squad Tech News** Teams channel by Tamir (2026-03-16).\n\n## Summary\nIngress-NGINX has reached **End of Life today (March 16, 2026)**. The guidance is to migrate to **Gateway API**.\n\n## Action Items\n- [ ] Audit all DK8S clusters for ingress-nginx usage\n- [ ] Identify migration path to Gateway API\n- [ ] Create migration timeline and plan\n- [ ] Coordinate with DK8S team on rollout\n\n## Priority\n🔴 **URGENT** — EOL is effective today. Migration audits should start immediately.\n\n---\n*Created by Ralph (CPC-tamir-WCBED) from Teams monitoring at 2026-03-16T10:09:30Z*",
+  "comments": [
+    {
+      "id": "IC_kwDORgGSiM7yV7H0",
+      "author": {
+        "login": "tamirdresher_microsoft"
+      },
+      "authorAssociation": "OWNER",
+      "body": "🔄 Claimed by **CPC-tamir-3H7BI** at 2026-03-16T10:10:33Z — spawning B'Elanna for ingress-nginx migration research",
+      "createdAt": "2026-03-16T08:10:36Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4065833460",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDORgGSiM7yV8uL",
+      "author": {
+        "login": "github-actions"
+      },
+      "authorAssociation": "NONE",
+      "body": "### 🏗️ Squad Triage — Picard (Lead)\n**Issue:** #644 — [URGENT] Ingress-NGINX EOL (March 16) — Migrate to Gateway API\n**Assigned to:** Picard (Lead)\n**Reason:** No specific domain match — assigned to Lead for further analysis\n---\n**Team roster:**\n- **Picard** (Lead) → label: `squad:picard`\n- **B'Elanna** (Infrastructure Expert) → label: `squad:belanna`\n- **Worf** (Security & Cloud) → label: `squad:worf`\n- **Data** (Code Expert) → label: `squad:data`\n- **Seven** (Research & Docs) → label: `squad:seven`\n- **Podcaster** (Audio Content Generator) → label: `squad:podcaster`\n- **Tamir Dresher** (👤 Human — Project Owner) → label: `squad:tamirdresher`\n- **Q** (Devil's Advocate & Fact Checker) → label: `squad:q`\n- **Kes** (Communications & Scheduling) → label: `squad:kes`\n- **Ralph** (Work Monitor) → label: `squad:ralph`\n- **Troi** (Blogger & Voice Writer) → label: `squad:troi`\n- **Neelix** (News Reporter) → label: `squad:neelix`\n- **@copilot** (Coding Agent) → label: `squad:copilot`\n> To reassign, remove the current `squad:*` label and add the correct one.",
+      "createdAt": "2026-03-16T08:11:52Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4065840011",
+      "viewerDidAuthor": false
+    },
+    {
+      "id": "IC_kwDORgGSiM7yV-UK",
+      "author": {
+        "login": "tamirdresher_microsoft"
+      },
+      "authorAssociation": "OWNER",
+      "body": "# 🚨 Ingress-NGINX EOL Research & DK8S Migration Audit\n\n**Researched by:** B'Elanna (Infrastructure Expert)\n**Date:** 2026-03-16 (EOL DAY)\n**Priority:** CRITICAL — EOL is TODAY\n\n---\n\n## 1. Current EOL Status — Facts\n\n| Item | Detail |\n|------|--------|\n| **What's retiring** | `kubernetes/ingress-nginx` — the community-maintained Ingress-NGINX controller |\n| **EOL date** | **March 2026** (effective today, 2026-03-16) |\n| **NOT affected** | F5/NGINX Inc's `nginxinc/kubernetes-ingress` (still actively maintained) |\n| **Post-EOL impact** | No new releases, no bug fixes, no security patches. Repo goes read-only. |\n| **Existing images** | Container images and Helm charts remain available but will NOT be updated |\n| **Known CVEs** | CVE-2025-1974 (critical) — will NOT be patched post-EOL |\n| **Compliance risk** | Running EOL software blocks SOC 2, ISO 27001, PCI-DSS certifications |\n| **Usage scope** | Used in ~40-50% of all Kubernetes clusters globally |\n\n### Why It's Retiring\n- Chronic maintainer shortage (1-2 people maintaining software used in half of K8s clusters)\n- Significant accumulated technical debt\n- Custom NGINX snippets became serious security attack vectors\n- The planned successor (InGate) never matured\n- Kubernetes networking innovation has shifted entirely to Gateway API\n\n### Official Sources\n- [Kubernetes Blog: Ingress NGINX Retirement](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/)\n- [Kubernetes Steering & Security Statement (Jan 2026)](https://kubernetes.io/blog/2026/01/29/ingress-nginx-statement/)\n- [Google Open Source Blog](https://opensource.googleblog.com/2026/02/the-end-of-an-era-transitioning-away-from-ingress-nginx.html)\n\n---\n\n## 2. Gateway API — The Recommended Migration Path\n\n### What Is Gateway API?\nThe **Kubernetes Gateway API** is the official successor to the Ingress API. It provides a standardized, role-oriented API for advanced cloud-native networking.\n\n### Key Resources\n| Gateway API Resource | Purpose |\n|---------------------|---------|\n| `GatewayClass` | Defines the controller implementation (infra provider) |\n| `Gateway` | Configures the listener (ports, protocols, TLS) — managed by cluster admins |\n| `HTTPRoute` | Defines HTTP routing rules — managed by app teams |\n| `TCPRoute` / `TLSRoute` / `GRPCRoute` | Protocol-specific routing |\n| `ReferenceGrant` | Cross-namespace access control |\n\n### Benefits Over Ingress-NGINX\n\n| Capability | Ingress-NGINX | Gateway API |\n|-----------|--------------|-------------|\n| Role separation | ❌ Mixed infra/app config | ✅ Clear GatewayClass → Gateway → Route hierarchy |\n| Advanced routing | ⚠️ Via annotations only | ✅ Native header/method/query-param routing |\n| Traffic splitting | ⚠️ Annotation-based canary | ✅ Native weighted backends |\n| Multi-protocol | ❌ HTTP/HTTPS only | ✅ HTTP, TCP, UDP, gRPC, WebSocket |\n| Multi-tenancy | ⚠️ Limited | ✅ Built-in cross-namespace with ReferenceGrant |\n| Portability | ❌ NGINX-specific annotations | ✅ Vendor-agnostic spec |\n| Policy attachment | ❌ Ad-hoc | ✅ Standardized PolicyAttachment pattern |\n| Security model | ⚠️ Snippet injection risks | ✅ No arbitrary config injection |\n\n### Recommended Gateway Implementations for DK8S\n1. **NGINX Gateway Fabric** — F5/NGINX's Gateway API implementation (closest migration path)\n2. **Envoy Gateway** — Lightweight, CNCF-backed, built on Envoy proxy\n3. **Istio Gateway** — If already using Istio service mesh\n4. **Traefik** — Full Gateway API support with additional features\n\n---\n\n## 3. DK8S Cluster Migration Audit Checklist\n\n### Phase 0: Discovery & Assessment (Week 1)\n- [ ] **Inventory all Ingress resources** across all DK8S clusters:\n  ```bash\n  kubectl get ingress --all-namespaces -o json | jq '.items[] | {namespace: .metadata.namespace, name: .metadata.name, host: .spec.rules[].host}'\n  ```\n- [ ] **Identify which controller** each cluster uses (`kubernetes/ingress-nginx` vs `nginxinc/kubernetes-ingress`)\n- [ ] **Document all custom annotations** — especially NGINX-specific ones:\n  ```bash\n  kubectl get ingress --all-namespaces -o json | jq '[.items[].metadata.annotations // {} | keys[]] | unique'\n  ```\n- [ ] **Catalog custom NGINX snippets** (HIGH RISK — these have no Gateway API equivalent)\n- [ ] **Map TLS certificate management** (cert-manager integration, secret references)\n- [ ] **Identify ExternalDNS dependencies**\n- [ ] **Document rate limiting, auth, and WAF configurations**\n- [ ] **Check ConfigGen templates** for any Ingress resource generation\n\n### Phase 1: Environment Preparation (Week 2)\n- [ ] **Install Gateway API CRDs** on test clusters:\n  ```bash\n  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml\n  ```\n- [ ] **Select and deploy Gateway implementation** (recommend NGINX Gateway Fabric for easiest migration path)\n- [ ] **Verify CRD installation**: `kubectl get crd | grep gateway`\n- [ ] **Create GatewayClass resource** for selected implementation\n- [ ] **Update RBAC** — Gateway API has different permission model:\n  - Infra admins → manage GatewayClass\n  - Cluster admins → manage Gateway\n  - App teams → manage HTTPRoute\n- [ ] **Update Helm charts / ConfigGen templates** to generate Gateway API resources\n\n### Phase 2: Conversion & Testing (Weeks 3-4)\n- [ ] **Run `ingress2gateway` conversion tool** on existing manifests:\n  ```bash\n  # Install the tool\n  go install github.com/kubernetes-sigs/ingress2gateway@latest\n  # Convert\n  ingress2gateway print --providers ingress-nginx --all-namespaces\n  ```\n- [ ] **Manual review** of all converted resources — especially:\n  - TLS termination configuration\n  - Path matching semantics (Ingress uses prefix by default; Gateway API requires explicit type)\n  - Header-based routing rules\n  - Backend weight distributions\n- [ ] **Deploy Gateway resources in parallel** — both old and new get separate external IPs\n- [ ] **Validate each route** against existing Ingress behavior\n- [ ] **Test cert-manager integration** with Gateway API\n- [ ] **Test ExternalDNS** with Gateway resources\n- [ ] **Load test** the new Gateway setup against production-like traffic\n\n### Phase 3: Staged Rollout (Weeks 5-6)\n- [ ] **DNS-based traffic shifting**: Point a % of traffic to new Gateway IP\n- [ ] **Monitor error rates, latency, and throughput** during parallel operation\n- [ ] **Migrate non-critical services first**\n- [ ] **Migrate critical services** with rollback plan ready\n- [ ] **Validate monitoring/alerting** works with new resources\n\n### Phase 4: Cutover & Cleanup (Week 7)\n- [ ] **Full DNS cutover** to Gateway API endpoints\n- [ ] **Remove Ingress-NGINX controller** Helm release\n- [ ] **Delete legacy Ingress resources**\n- [ ] **Remove old CRDs** if no longer needed\n- [ ] **Update runbooks and documentation**\n- [ ] **Update ConfigGen templates** to only generate Gateway API resources\n- [ ] **Notify all service teams** of completed migration\n\n---\n\n## 4. Risk Assessment\n\n| Risk | Severity | Likelihood | Mitigation |\n|------|----------|-----------|------------|\n| **Unpatched CVEs in production** | 🔴 Critical | Certain (post-EOL) | Migrate ASAP; no patches coming |\n| **Compliance audit failure** | 🔴 Critical | High | Document migration plan for auditors NOW |\n| **Custom NGINX snippets have no equivalent** | 🟠 High | Medium | Audit snippets; redesign using Gateway API policies or implementation-specific extensions |\n| **Annotation incompatibility** | 🟡 Medium | High | Use `ingress2gateway` tool + manual review |\n| **IP address change during migration** | 🟡 Medium | Certain | Parallel deployment → DNS cutover approach |\n| **Traffic disruption during cutover** | 🟡 Medium | Low | Weighted DNS shifting; rollback plan |\n| **Team unfamiliarity with Gateway API** | 🟡 Medium | Medium | Training sessions; start with non-critical services |\n| **ConfigGen template updates needed** | 🟡 Medium | High | Coordinate with ConfigGen team for new resource templates |\n\n---\n\n## 5. Recommended Timeline\n\nGiven that **EOL is TODAY**, we are already in the danger zone. Here's the emergency timeline:\n\n```\nNOW → Week 1:  Phase 0 — Discovery & Assessment (STARTED)\nWeek 2:         Phase 1 — Environment Preparation\nWeeks 3-4:      Phase 2 — Conversion & Testing\nWeeks 5-6:      Phase 3 — Staged Rollout\nWeek 7:         Phase 4 — Cutover & Cleanup\nWeek 8:         Buffer / Post-migration validation\n```\n\n**Target completion: May 11, 2026** (8 weeks from today)\n\n### Immediate Actions Required\n1. ⚡ **TODAY**: Run the Ingress inventory commands on all DK8S clusters\n2. ⚡ **THIS WEEK**: Identify which clusters use `kubernetes/ingress-nginx` vs alternatives\n3. ⚡ **THIS WEEK**: File security advisory for compliance tracking\n4. ⚡ **NEXT WEEK**: Begin Gateway API CRD installation on non-prod clusters\n\n---\n\n## References\n\n- [Kubernetes Gateway API Docs](https://gateway-api.sigs.k8s.io/)\n- [Official Migration Guide: Ingress to Gateway API](https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress-nginx/)\n- [ingress2gateway Tool](https://github.com/kubernetes-sigs/ingress2gateway)\n- [NGINX Gateway Fabric](https://github.com/nginx/nginx-gateway-fabric)\n- [Microsoft Azure Architecture Blog: From Ingress to Gateway API](https://techcommunity.microsoft.com/blog/azurearchitectureblog/from-ingress-to-gateway-api-a-pragmatic-path-forward-and-why-it-matters-now/4489779)\n\n---\n\n*If it ships, it ships reliably. This one stops shipping today — time to move.* — B'Elanna",
+      "createdAt": "2026-03-16T08:13:09Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4065846538",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDORgGSiM7yWAvc",
+      "author": {
+        "login": "github-actions"
+      },
+      "authorAssociation": "NONE",
+      "body": "### 📋 Assigned to B'Elanna (Infrastructure Expert)\n\n**Issue:** #644 — [URGENT] Ingress-NGINX EOL (March 16) — Migrate to Gateway API\n\nB'Elanna will pick this up in the next Copilot session.\n\n> **For Copilot coding agent:** If enabled, this issue will be worked automatically.\n> Otherwise, start a Copilot session and say:\n> `B'Elanna, work on issue #644`",
+      "createdAt": "2026-03-16T08:15:05Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4065856476",
+      "viewerDidAuthor": false
+    },
+    {
+      "id": "IC_kwDORgGSiM7yWIO0",
+      "author": {
+        "login": "github-actions"
+      },
+      "authorAssociation": "NONE",
+      "body": "🏷️ Triage verdict updated → `go:yes`",
+      "createdAt": "2026-03-16T08:20:07Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4065887156",
+      "viewerDidAuthor": false
+    },
+    {
+      "id": "IC_kwDORgGSiM7yWIRD",
+      "author": {
+        "login": "github-actions"
+      },
+      "authorAssociation": "NONE",
+      "body": "📋 Marked as `release:backlog` — assign a release target when ready.",
+      "createdAt": "2026-03-16T08:20:08Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4065887299",
+      "viewerDidAuthor": false
+    },
+    {
+      "id": "IC_kwDORgGSiM7yXkpJ",
+      "author": {
+        "login": "tamirdresher_microsoft"
+      },
+      "authorAssociation": "OWNER",
+      "body": "🔄 Claimed by **TAMIRDRESHER** at 2026-03-16T11:26:35Z — Starting ingress-nginx EOL migration research and planning.",
+      "createdAt": "2026-03-16T09:27:12Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4066265673",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDORgGSiM7yXvDJ",
+      "author": {
+        "login": "tamirdresher_microsoft"
+      },
+      "authorAssociation": "OWNER",
+      "body": "## Migration Plan Created\n\nComprehensive migration plan from ingress-nginx to Gateway API has been created at `research/ingress-nginx-eol-migration-plan.md`.\n\n### Key Recommendations:\n- **Use Envoy Gateway** as the primary Gateway API implementation for DK8S — full GA conformance, zero-disruption hot-reload via xDS, 1P alignment (AKS App GW for Containers is Envoy-based), native mTLS/rate-limiting/OTel support\n- **Use ingress2gateway tool** for automated conversion of Ingress resources, with manual adjustments for snippet annotations and implementation-specific policies\n- **Prioritize FedRAMP/government cloud clusters** for early migration — running EOL ingress-nginx is a P0 compliance blocker\n\n### Proposed Timeline:\n- **Week 1-2:** Audit all Ingress resources across DK8S clusters\n- **Week 2-4:** Convert using ingress2gateway + manual policy creation\n- **Week 4-6:** Parallel run (old + new side-by-side)\n- **Week 6-7:** DNS cutover to new Gateway\n- **Week 7-8:** Cleanup and close\n- **Total: 8 weeks to full migration**\n\n### Risk Mitigations:\n- Rollback plan: DNS switch back to ingress-nginx LB (< 5 min)\n- File compliance exception for migration window\n- Keep ingress-nginx running parallel until 1 week stable on new gateway\n\nReady for review. /cc @tamirdresher_microsoft",
+      "createdAt": "2026-03-16T09:33:28Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4066308297",
+      "viewerDidAuthor": true
+    },
+    {
+      "id": "IC_kwDORgGSiM7yYkGX",
+      "author": {
+        "login": "tamirdresher_microsoft"
+      },
+      "authorAssociation": "OWNER",
+      "body": "## B'Elanna Follow-Up: Urgency Reassessment + Repo Audit + Gateway API Config Drafts\n\n**Date:** 2026-03-16 (follow-up to initial research)\n**Scope:** Deep-dive into DK8S-specific impact, repo audit, AKS extended support finding, and concrete config migration\n\n---\n\n### URGENCY DOWNGRADE: Plan the Migration, NOT Stop Everything\n\n**Critical finding from Microsoft/AKS team:**\n\n> Azure's **Application Routing add-on** (which uses ingress-nginx under the hood) will continue to receive **critical security patches through November 2026** — even though the upstream community project is EOL today.\n> — [AKS Blog: Ingress-NGINX Update](https://blog.aks.azure.com/2025/11/13/ingress-nginx-update)\n\n**What this means for DK8S:**\n- If DK8S clusters use the AKS Application Routing add-on (managed NGINX), you have until **November 2026** for security patches\n- If DK8S uses self-managed `kubernetes/ingress-nginx` Helm charts, you are **unpatched starting today**\n- Either way, migration should complete well before November 2026\n\n**Revised urgency: HIGH (plan and execute) — not CRITICAL (stop everything)**\n\nThe 8-week timeline from the earlier comments is still correct and appropriate.\n\n---\n\n### Repo Audit Results\n\nSearched this repo (`tamresearch1`) for all ingress-related configs:\n\n| Finding | Details |\n|---------|---------|\n| **`kind: Ingress` resources** | **None found** — no actual Ingress manifests in this repo |\n| **`kind: Gateway` / `HTTPRoute`** | None yet |\n| **NetworkPolicies for ingress-nginx namespace** | 3 files in `docs/fedramp/` (FedRAMP compensating controls from Issue #54) |\n| **Helm template** | `docs/fedramp/helm-networkpolicy-template.yaml` — references ingress-nginx labels |\n| **Helm values** | `docs/fedramp/helm-values-networkpolicy.yaml` — ingress-nginx namespace config |\n| **FedRAMP Assessment** | `FEDRAMP_P0_NGINX_INGRESS_ASSESSMENT.md` — Worf's CVE assessment (Issue #51) |\n| **DK8S Stability Runbook** | References ingress-nginx in Tier 1 runbook |\n\n**Bottom line:** The actual Ingress resources and ingress-nginx controllers live in the DK8S platform clusters, not this repo. This repo has **supporting configs** (NetworkPolicies, Helm templates, runbooks) that need updating as part of the migration.\n\n---\n\n### Configs That Need Migration\n\n#### 1. FedRAMP NetworkPolicies — Update Namespace References\n\nThe 3 NetworkPolicy files in `docs/fedramp/` target the `ingress-nginx` namespace. When migrating to Gateway API, these need namespace updates:\n\n**Files to update:**\n- `docs/fedramp/networkpolicy-ingress-default-deny.yaml` — change namespace to gateway controller namespace\n- `docs/fedramp/networkpolicy-ingress-controller.yaml` — update pod selectors + namespace\n- `docs/fedramp/networkpolicy-ingress-sovereign.yaml` — update pod selectors + namespace\n\n**Key changes needed:**\n- Namespace: `ingress-nginx` to `nginx-gateway` (or `envoy-gateway-system`)\n- Pod selector labels: `app.kubernetes.io/name: ingress-nginx` to new controller labels\n- Port changes: healthcheck port 10254 may differ; admission webhook port 8443 may change\n- Add port for Gateway API webhook validation\n\n#### 2. Helm Template — Update Labels and Selectors\n\n`docs/fedramp/helm-networkpolicy-template.yaml` uses ingress-nginx label helpers. These need updating to the new gateway controller chart label helpers.\n\n#### 3. DK8S Runbook — Update Procedures\n\nThe Tier 1 stability runbook references ingress-nginx troubleshooting steps. These need updating to Gateway API equivalents (different controller pods, different log locations, different metrics endpoints).\n\n---\n\n### Recommended Implementation: Envoy Gateway (Aligned with AKS)\n\nConcurring with the earlier migration plan — **Envoy Gateway** is the right choice for DK8S:\n\n| Factor | Envoy Gateway | NGINX Gateway Fabric |\n|--------|--------------|---------------------|\n| **AKS alignment** | AKS App GW for Containers is Envoy-based | Separate from AKS managed offering |\n| **Gateway API conformance** | Full GA conformance | Full GA conformance |\n| **Hot reload** | xDS-based (zero-disruption) | NGINX reload (brief connection drop) |\n| **mTLS** | Native | Requires additional config |\n| **Observability** | Native OTel support | Prometheus only |\n| **Rate limiting** | Built-in global rate limiting | Requires separate component |\n\n---\n\n### Updated Action Items\n\n| # | Action | Owner | Status | Deadline |\n|---|--------|-------|--------|----------|\n| 1 | Confirm whether DK8S uses AKS Application Routing add-on or self-managed ingress-nginx | Tamir / DK8S team | Pending | This week |\n| 2 | If self-managed: immediately check if latest patched version (v1.13.7+) is deployed | B'Elanna | Blocked on #1 | This week |\n| 3 | Update FedRAMP NetworkPolicy configs for new gateway namespace | B'Elanna | Pending | Week 2 |\n| 4 | Update Helm NetworkPolicy template for new controller labels | B'Elanna | Pending | Week 2 |\n| 5 | Update DK8S stability runbook gateway sections | B'Elanna | Pending | Week 3 |\n| 6 | File compliance exception for migration window | Worf | Pending | This week |\n| 7 | Review ConfigGen templates for Ingress resource generation | Data | Pending | Week 2 |\n| 8 | Gateway API CRD install on non-prod clusters | B'Elanna / DK8S | Pending | Week 2 |\n\n**Key question for Tamir:** Does DK8S use the **AKS Application Routing add-on** (managed by Azure, patches until Nov 2026) or **self-managed ingress-nginx Helm charts** (unpatched as of today)? This determines whether we have 8 weeks or 8 months of runway.\n\n---\n\n*Configs don't migrate themselves. Let's get the controller type confirmed and I'll start updating the FedRAMP policies.* — B'Elanna\r\n",
+      "createdAt": "2026-03-16T10:06:02Z",
+      "includesCreatedEdit": false,
+      "isMinimized": false,
+      "minimizedReason": "",
+      "reactionGroups": [],
+      "url": "https://github.com/tamirdresher_microsoft/tamresearch1/issues/644#issuecomment-4066525591",
+      "viewerDidAuthor": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "LA_kwDORgGSiM8AAAACaZAzYA",
+      "name": "squad",
+      "description": "Squad triage inbox — Lead will assign to a member",
+      "color": "0E8A16"
+    },
+    {
+      "id": "LA_kwDORgGSiM8AAAACaZAz-w",
+      "name": "squad:picard",
+      "description": "Assigned to Picard (Lead)",
+      "color": "0E8A16"
+    },
+    {
+      "id": "LA_kwDORgGSiM8AAAACaZA0aQ",
+      "name": "squad:belanna",
+      "description": "Assigned to B'Elanna (Infrastructure Expert)",
+      "color": "9B8FCC"
+    },
+    {
+      "id": "LA_kwDORgGSiM8AAAACag82Nw",
+      "name": "status:in-progress",
+      "description": "Squad is actively working on this",
+      "color": "FBCA04"
+    },
+    {
+      "id": "LA_kwDORgGSiM8AAAACahGYJw",
+      "name": "teams-bridge",
+      "description": "Bridged from Teams via WorkIQ",
+      "color": "D876E3"
+    },
+    {
+      "id": "LA_kwDORgGSiM8AAAACantjyQ",
+      "name": "go:yes",
+      "description": "Ready to implement",
+      "color": "0E8A16"
+    },
+    {
+      "id": "LA_kwDORgGSiM8AAAACantl6g",
+      "name": "release:backlog",
+      "description": "Not yet targeted",
+      "color": "D4E5F7"
+    }
+  ],
+  "title": "[URGENT] Ingress-NGINX EOL (March 16) — Migrate to Gateway API"
+}

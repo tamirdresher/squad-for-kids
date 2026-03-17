@@ -1,0 +1,22 @@
+id: fix-email-setup-retry
+source_machine: TAMIRDRESHER
+target_machine: ANY
+priority: medium
+created_at: "2026-03-17T07:59:46Z"
+task_type: setup
+description: |
+  Set up Squad email on this machine. Two accounts:
+  1. Outlook (td-squad-ai-team@outlook.com): Run scripts/squad-email/Setup-SquadEmailAuth.ps1
+     - Requires interactive device code auth at https://microsoft.com/link
+  2. Gmail (tdsquadai@gmail.com): Store app password in Credential Manager
+     - Run: cmdkey /generic:squad-email-gmail /user:tdsquadai@gmail.com /pass:APP_PASSWORD
+     - Get APP_PASSWORD from GitHub Secret: gh secret get SQUAD_GMAIL_APP_PASSWORD -R tamirdresher/squad-personal-demo
+     - Or ask Tamir for the app password
+  3. Test both:
+     - Outlook: pwsh scripts/squad-email/Send-SquadEmail.ps1 -To "tamirdresher@microsoft.com" -Subject "Test" -Body "Health check"
+     - Gmail: python -c "import smtplib; s=smtplib.SMTP('smtp.gmail.com',587); s.starttls(); s.login('tdsquadai@gmail.com',APP_PASSWORD); print('OK')"
+  Save results to .squad/cross-machine/responses/email-setup-{MACHINE_NAME}.md
+payload:
+  command: "pwsh scripts/squad-email/Setup-SquadEmailAuth.ps1"
+  expected_duration_min: 10
+status: pending

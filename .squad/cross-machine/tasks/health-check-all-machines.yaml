@@ -1,0 +1,18 @@
+id: health-check-all-machines
+source_machine: TAMIRDRESHER
+target_machine: ANY
+priority: high
+created_at: "2026-03-17T07:59:46Z"
+task_type: health-check
+description: |
+  Run a full health check on this machine:
+  1. Check Ralph process is running and heartbeat is current
+  2. Check gh auth status — ensure correct account per repo
+  3. Check git status — report uncommitted files
+  4. Check Squad email setup (both Outlook Graph + Gmail SMTP)
+  5. Report findings as a response file
+  Save to .squad/cross-machine/responses/health-check-{MACHINE_NAME}.md
+payload:
+  command: "echo 'Run health check and save to .squad/cross-machine/responses/health-check-{machine}.md'"
+  expected_duration_min: 10
+status: pending

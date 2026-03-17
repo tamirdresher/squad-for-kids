@@ -733,7 +733,7 @@ while ($true) {
 
     # Step 1.6: Multi-machine coordination check (Issue #346)
     Write-Host "[$timestamp] Multi-machine coordination: Checking for stale work..." -ForegroundColor Yellow
-    $staleIssues = @(Get-StaleIssues -MachineId $machineId -StaleThresholdMinutes $staleThresholdMinutes)
+    $staleIssues = Get-StaleIssues -MachineId $machineId -StaleThresholdMinutes $staleThresholdMinutes
     if ($staleIssues.Count -gt 0) {
         Write-Host "[$timestamp] Found $($staleIssues.Count) stale issue(s) from other machines" -ForegroundColor Yellow
         foreach ($staleItem in $staleIssues) {
@@ -880,6 +880,12 @@ exit `$LASTEXITCODE
         
         if ($timedOut) {
             $consecutiveFailures++
+
+    # Self-escalation: if Ralph keeps failing, log it for visibility
+    if ($consecutiveFailures -ge 3 -and ($consecutiveFailures % 3) -eq 0) {
+        Write-Host "[$timestamp] WARNING: $consecutiveFailures consecutive failures! Logging escalation..." -ForegroundColor Red
+        Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode $exitCode -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "ESCALATION" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
+    }
             $roundStatus = "timeout"
             $logStatus = "TIMEOUT"
         } elseif ($exitCode -eq 0) {

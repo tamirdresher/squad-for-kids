@@ -20,6 +20,7 @@ jobs:
       - name: Archive old Done items
         shell: pwsh
         env:
+          GH_TOKEN: ${{ secrets.SQUAD_PROJECT_TOKEN }}
           DAYS_THRESHOLD: '3'
           PROJECT_OWNER: 'tamirdresher_microsoft'
           PROJECT_NUMBER: '1'

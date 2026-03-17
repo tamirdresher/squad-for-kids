@@ -292,7 +292,7 @@ jobs:
 
             # Rule 1: CLOSED issue must be in Done
             if ($issueState -eq 'CLOSED' -and $boardStatus -ne 'Done') {
-              Write-Host "🔧 #$num: CLOSED but in '$boardStatus' → moving to Done"
+              Write-Host "🔧 #${num}: CLOSED but in '$boardStatus' → moving to Done"
               gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:DONE_OPTION_ID 2>&1
               $fixedCount++
               $issues += "#$num (was '$boardStatus')"
@@ -300,7 +300,7 @@ jobs:
 
             # Rule 2: OPEN issue in Done should move to Todo
             if ($issueState -eq 'OPEN' -and $boardStatus -eq 'Done') {
-              Write-Host "🔧 #$num: OPEN but in 'Done' → moving to Todo"
+              Write-Host "🔧 #${num}: OPEN but in 'Done' → moving to Todo"
               gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
               $fixedCount++
               $issues += "#$num (OPEN in Done)"
@@ -308,7 +308,7 @@ jobs:
 
             # Rule 3: OPEN issue with no status should be set to Todo
             if ($issueState -eq 'OPEN' -and -not $boardStatus) {
-              Write-Host "🔧 #$num: OPEN but no status → setting to Todo"
+              Write-Host "🔧 #${num}: OPEN but no status → setting to Todo"
               gh project item-edit --project-id $env:PROJECT_ID --id $item.id --field-id $env:STATUS_FIELD_ID --single-select-option-id $env:TODO_OPTION_ID 2>&1
               $fixedCount++
               $issues += "#$num (no status → Todo)"

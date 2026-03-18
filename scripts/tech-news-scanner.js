@@ -39,9 +39,11 @@ const SQUAD_REPO = { owner: 'bradygaster', repo: 'squad' };
 const BRADY_BLOG_URL = 'https://bradygaster.com';
 
 // Teams channel targets for posting digests
+// public: true  = shared with external collaborators — NO issue numbers, repo names, or internal refs
+// public: false = Tamir's private notifications — full content with issue links and internal refs
 const TEAMS_CHANNELS = [
-  { teamId: '5f93abfe-b968-44ea-bd0a-6f155046ccc7', channelId: '19:bfe3224e8e764c2785e81e7cb3cc944d@thread.tacv2', label: 'squads > Tech News' },
-  { teamId: '1de78cdf-3f73-4447-9601-a940bd98b80d', channelId: '19:c940af255e22486882c069d7b38a6204@thread.tacv2', label: 'Squad > Squad Tech News' }
+  { teamId: '5f93abfe-b968-44ea-bd0a-6f155046ccc7', channelId: '19:bfe3224e8e764c2785e81e7cb3cc944d@thread.tacv2', label: 'squads > Tech News', public: false },
+  { teamId: '1de78cdf-3f73-4447-9601-a940bd98b80d', channelId: '19:c940af255e22486882c069d7b38a6204@thread.tacv2', label: 'Squad > Squad Tech News', public: true }
 ];
 
 // Setup state file path
@@ -489,15 +491,42 @@ async function scanAllSources() {
   return { stories: allStories, squadUpdates };
 }
 
-function formatDigest(stories, squadUpdates = []) {
+/**
+ * Sanitize content for public channels.
+ * Strips GitHub issue numbers (#XXX), repo names (tamresearch1), internal Squad references,
+ * and any private repo URLs so nothing internal leaks to shared channels.
+ */
+function sanitizeForPublic(text) {
+  return text
+    // Remove issue references like #920, Issue #123, issue #45
+    .replace(/\b[Ii]ssue\s*#\d+/g, '')
+    // Remove standalone #NNN references (but not inside URLs)
+    .replace(/(?<![/\w])#\d+\b/g, '')
+    // Remove repo name references
+    .replace(/\btamresearch1\b/gi, '')
+    // Remove GitHub URLs pointing to private repos
+    .replace(/https?:\/\/github\.com\/[^/]+\/tamresearch1[^\s)>]*/g, '')
+    // Remove internal scanner/script references
+    .replace(/\bscanner script\b/gi, '')
+    // Remove Squad internal metadata labels
+    .replace(/\bsquad:(copilot|review|triage)\b/gi, '')
+    // Clean up leftover empty parentheses or brackets from removed refs
+    .replace(/\(\s*\)/g, '')
+    .replace(/\[\s*\]/g, '')
+    // Collapse multiple blank lines
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function formatDigest(stories, squadUpdates = [], { isPublic = false } = {}) {
   const date = new Date().toISOString().split('T')[0];
   
   let digest = `# Tech News Digest - ${date}\n\n`;
   digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, Morning Dew, Architecture Notes, and ThoughtWorks Radar.\n\n`;
   digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools\n\n`;
 
-  // Squad product updates section
-  if (squadUpdates.length > 0) {
+  // Squad product updates section — only include in private digests
+  if (!isPublic && squadUpdates.length > 0) {
     digest += `---\n\n`;
     digest += `## 🚀 Squad Product Updates (bradygaster/squad)\n\n`;
     digest += `Found ${squadUpdates.length} updates from Brady's Squad repo and blog.\n\n`;
@@ -514,7 +543,7 @@ function formatDigest(stories, squadUpdates = []) {
 
   digest += `---\n\n`;
   
-  if (stories.length === 0 && squadUpdates.length === 0) {
+  if (stories.length === 0 && (isPublic || squadUpdates.length === 0)) {
     digest += `No relevant stories found today.\n`;
     return digest;
   }
@@ -529,9 +558,15 @@ function formatDigest(stories, squadUpdates = []) {
     });
   }
   
+  // Final sanitization pass for public channels
+  if (isPublic) {
+    digest = sanitizeForPublic(digest);
+  }
+  
   return digest;
 }
 
+// Post to private webhook channel (full content with issue links and internal refs)
 async function postToTeamsWebhook(digest) {
   const home = process.env.USERPROFILE || process.env.HOME || '';
   
@@ -640,10 +675,16 @@ async function main() {
     }
     
     const digest = formatDigest(newStories, newSquadUpdates);
+    const publicDigest = formatDigest(newStories, newSquadUpdates, { isPublic: true });
     console.log(digest);
     
-    // Post digest to Teams channels via webhook
+    // Post full digest to private webhook channel (includes issue links, repo refs)
     await postToTeamsWebhook(digest);
+    
+    // Log public digest info for public channel posting
+    console.error(`\nPublic digest (sanitized) available for Squad > Tech News channel.`);
+    console.error(`Public channels strip: issue numbers, repo names, internal refs.`);
+    console.error(`Private webhook gets: full content with all references.\n`);
     
     // Update state with new URLs
     if (!state.reportedUrls[todayDate]) {

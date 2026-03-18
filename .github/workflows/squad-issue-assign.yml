@@ -4,6 +4,11 @@ on:
   issues:
     types: [labeled]
   workflow_dispatch:
+
+# Cancel redundant runs for the same issue — prevents cascade pile-up
+concurrency:
+  group: issue-assign-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
 jobs:
   assign-work:
     # Only trigger on squad:{member} labels (not the base "squad" label)

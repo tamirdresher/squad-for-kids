@@ -2,11 +2,28 @@ name: Squad Triage
 
 on:
   issues:
-    types: [labeled]
+    types: [opened, labeled]
   workflow_dispatch:
+
+# Cancel redundant runs for the same issue — prevents cascade pile-up
+concurrency:
+  group: triage-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
 jobs:
+  add-squad-label:
+    if: github.event.action == 'opened'
+    runs-on: self-hosted
+    permissions:
+      issues: write
+    steps:
+      - name: Add squad label to new issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue edit $ISSUE_NUMBER --add-label "squad" --repo ${{ github.repository }}
+
   triage:
-    if: github.event.label.name == 'squad'
+    if: github.event.action == 'labeled' && github.event.label.name == 'squad'
     runs-on: self-hosted
     permissions:
       issues: write

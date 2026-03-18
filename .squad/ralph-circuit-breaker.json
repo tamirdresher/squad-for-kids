@@ -1,0 +1,16 @@
+{
+  "state": "closed",
+  "preferredModel": "claude-sonnet-4.6",
+  "currentModel": "claude-sonnet-4.6",
+  "fallbackChain": [
+    "gpt-5.4-mini",
+    "gpt-5-mini",
+    "gpt-4.1"
+  ],
+  "lastRateLimitHit": null,
+  "cooldownMinutes": 10,
+  "consecutiveSuccesses": 0,
+  "requiredSuccessesToClose": 2,
+  "totalFallbacks": 0,
+  "totalRecoveries": 0
+}

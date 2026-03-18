@@ -126,4 +126,5 @@ jobs:
           Write-Host "   - Archived $archivedCount items older than $daysThreshold days"
 
           # Explicit exit 0 to prevent $LASTEXITCODE bleed-through from gh CLI calls
+          $global:LASTEXITCODE = 0
           exit 0

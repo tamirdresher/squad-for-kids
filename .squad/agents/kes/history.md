@@ -6,12 +6,25 @@
 
 ## Active Context
 
-**Issue #259 Status:** ⏳ PENDING — Email account ready, awaiting Tamir's CAPTCHA completion  
+**Issue #259 Status:** ✅ CLOSED — Full family request pipeline operational (email + WhatsApp)  
 **Issue #471 Status:** ✅ CLOSED — Meeting scheduled and sent  
 **Issue #546 Status:** ⚠️ PARTIAL — Meeting sent to 3/5 attendees; Avery Anderson & Carlo Rivera need manual add  
-**Next:** Once Tamir creates the email account, set up inbox rules and forwarding pipeline
+**Next:** Monitor family-request issues to ensure WhatsApp pipeline is working correctly
 
 ## Learnings
+
+### Issue #259: Family Request Pipeline — WhatsApp + Email (2026-06-23)
+- **Task**: Extend wife's request pipeline with WhatsApp monitoring alongside existing email
+- **What was done**: Added `WHATSAPP FAMILY MONITORING` section to Ralph prompt in `ralph-watch.ps1`
+- **WhatsApp monitoring**: Every 3rd Ralph round, Playwright checks WhatsApp Web for messages from "gabi" containing keywords (print, calendar, reminder, buy, todo)
+- **Actions**: print → HP printer email (Dresherhome@hpeprint.com), calendar/reminder/buy/todo → GitHub issue with `squad,family-request` labels
+- **Graceful degradation**: If WhatsApp Web session expired (needs QR scan), Ralph logs warning and skips — doesn't block the round
+- **Deduplication**: Checks existing open `family-request` issues before creating new ones
+- **Key learning**: WhatsApp Web sessions can expire and require re-scanning QR code from phone. The monitoring must handle this gracefully — never block the Ralph round on a failed WhatsApp connection.
+- **Key learning**: Combining email + WhatsApp gives redundant channels for family requests. Email is more reliable (no session expiry), WhatsApp is more natural/convenient for the sender.
+- **Decision documented**: `.squad/decisions/inbox/kes-family-pipeline.md`
+- **Teams notification sent**: Confirmed to Tamir with full setup summary
+- **Issue #259**: Closed with summary comment
 
 ### Issue #546: Cross-team AI Agent Collaboration Meeting (2026-03-15)
 - **Meeting created**: "AI Agent Teams — Security & Collaboration Sync" — Monday March 16, 2026 at 19:00 IST / 10:00 AM PDT

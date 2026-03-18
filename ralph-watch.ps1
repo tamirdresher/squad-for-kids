@@ -203,6 +203,16 @@ PODCASTER: After any agent completes a significant deliverable (research report,
 
 TECH NEWS SCANNING (once per day, morning round only): On the first round after 7:00 AM local time, run: node scripts/tech-news-scanner.js. It scans HackerNews and Reddit for AI, .NET, Kubernetes, and developer tools news. If it finds relevant stories, create a GitHub issue titled "Tech News Digest: {date}" with label "squad,squad:seven" summarizing the top stories. Include links. Neelix should then send a Teams notification with the highlights (use CHANNEL: tech-news for routing).
 
+WHATSAPP FAMILY MONITORING (every 3rd round):
+1. Use Playwright to check WhatsApp Web (https://web.whatsapp.com) for new messages from contact "gabi"
+2. Look for action keywords in her messages: print, calendar, reminder, buy, todo
+3. For print requests: forward attachment/content to Dresherhome@hpeprint.com using Send-SquadEmail.ps1
+4. For calendar/reminder requests: create a GitHub issue titled "📅 Family: {summary}" with labels "squad,family-request" and include date/time details
+5. For buy/todo/general requests: create a GitHub issue titled "🏠 Family: {summary}" with labels "squad,family-request"
+6. After processing, send Tamir a brief Teams notification (CHANNEL: general) summarizing what was handled
+7. Do NOT create duplicate issues — check existing open issues with label "family-request" first
+8. If WhatsApp Web is not connected or requires QR scan, log a warning and skip — do NOT block the round
+
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
 '@
 

@@ -6,10 +6,25 @@
 
 ## Active Context
 
-**Issue #259 Status:** ✅ CLOSED — Full family request pipeline operational (email + WhatsApp)  
+**Issue #259 Status:** ⏳ PENDING ACTIVATION — Setup script + docs ready, Tamir needs to run `Setup-FamilyEmailRules.ps1` once  
 **Issue #471 Status:** ✅ CLOSED — Meeting scheduled and sent  
 **Issue #546 Status:** ⚠️ PARTIAL — Meeting sent to 3/5 attendees; Avery Anderson & Carlo Rivera need manual add  
-**Next:** Monitor family-request issues to ensure WhatsApp pipeline is working correctly
+**Next:** Once Tamir runs the setup script, verify rules work by sending a test email from gabrielayael@gmail.com
+
+## Issue #259: Family Email Pipeline — @Keyword Routing (2026-03-18)
+- **Problem**: Issue stuck 8 days. Previous attempts to create new email accounts failed (M365 admin block, Gmail CAPTCHA, Outlook CAPTCHA).
+- **Solution**: Reuse existing `td-squad-ai-team@outlook.com` with Microsoft Graph API inbox rules for @keyword-based routing.
+- **Created**: `scripts/squad-email/Setup-FamilyEmailRules.ps1` — creates 4 inbox rules via Graph API:
+  - Rule 1: From Gabi + `@print` → Forward to `Dresherhome@hpeprint.com`
+  - Rule 2: From Gabi + `@calendar` → Forward to `tamirdresher@microsoft.com`
+  - Rule 3: From Gabi + `@reminder` → Forward to `tamirdresher@microsoft.com`
+  - Rule 4: From Gabi (catch-all) → Forward to `tamirdresher@microsoft.com`
+- **Updated**: `.squad/email-pipeline/FAMILY_EMAIL_GUIDE.md` with @keyword routing docs and examples
+- **Blocker**: No Graph API refresh token on this machine. Script requires one-time device code auth (Tamir runs script, enters code at microsoft.com/link, signs in with td-squad-ai-team@outlook.com).
+- **GitHub comment**: Posted activation instructions + Gabi-facing instructions on issue #259
+- **Issue reopened**: Was prematurely closed — rules not yet active
+- **Decision**: `.squad/decisions/inbox/kes-family-email-pipeline.md`
+- **Key learning**: When automation can't create accounts due to CAPTCHAs, reuse existing accounts with API-based rules instead. Graph API `mailFolders/inbox/messageRules` endpoint can create Outlook.com rules programmatically without web UI.
 
 ## Learnings
 

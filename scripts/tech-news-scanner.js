@@ -31,7 +31,13 @@ const KEYWORDS = [
   'developer tools', 'devtools', 'ide', 'vscode', 'github',
   'architecture',
   'tech radar', 'thoughtworks',
-  'squad'
+  'squad',
+  // AWS keywords — added for issue #931
+  'aws', 'amazon web services', 'lambda', 'serverless', 'ec2', 's3', 'dynamodb',
+  'cloudformation', 'cdk', 'eks', 'ecs', 'fargate', 'bedrock', 'sagemaker',
+  'step functions', 'eventbridge', 'api gateway', 'cognito', 'iam',
+  'well-architected', 'multi-region', 'elasticache', 'rds', 'aurora',
+  'graviton', 'outposts', 'wavelength', 'cloudfront', 'route 53'
 ];
 
 // Brady's Squad repo monitoring config
@@ -466,10 +472,74 @@ function parseBlogFeed(xml) {
   return filtered;
 }
 
+// AWS blog sources — added for issue #931
+const AWS_BLOGS = [
+  { name: 'AWS Architecture Blog',    feedUrl: 'https://aws.amazon.com/blogs/architecture/feed/',   category: 'cloud/aws', score: 80 },
+  { name: 'AWS News Blog',            feedUrl: 'https://aws.amazon.com/blogs/aws/feed/',            category: 'cloud/aws', score: 85 },
+  { name: 'AWS Compute Blog',         feedUrl: 'https://aws.amazon.com/blogs/compute/feed/',        category: 'cloud/aws', score: 75 },
+  { name: 'AWS Developer Tools Blog', feedUrl: 'https://aws.amazon.com/blogs/developer/feed/',      category: 'cloud/aws', score: 70 },
+  { name: 'AWS Containers Blog',      feedUrl: 'https://aws.amazon.com/blogs/containers/feed/',     category: 'cloud/aws', score: 75 },
+];
+
+/**
+ * Fetch a single AWS blog RSS feed.
+ * All AWS blogs use the same WordPress RSS structure.
+ */
+async function fetchAwsBlog({ name, feedUrl, category, score }) {
+  console.error(`Fetching ${name}...`);
+  try {
+    const xml = await httpsGet(feedUrl);
+
+    if (typeof xml !== 'string') {
+      console.error(`Unexpected response from ${name}`);
+      return [];
+    }
+
+    const items = [];
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+    let match;
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const block = match[1];
+      // AWS feeds use CDATA-wrapped titles
+      const title = (block.match(/<title><!\[CDATA\[(.*?)\]\]>/) || [])[1]
+        || (block.match(/<title>(.*?)<\/title>/) || [])[1]
+        || '';
+      // AWS feeds use <link> as a direct URL (no CDATA) but sometimes wrapped in CDATA
+      const link = (block.match(/<link><!\[CDATA\[(.*?)\]\]>/) || [])[1]
+        || (block.match(/<link>(.*?)<\/link>/) || [])[1]
+        || '';
+      const pubDate = (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || '';
+
+      if (title && link) {
+        items.push({ title: title.trim(), url: link.trim(), pubDate });
+      }
+    }
+
+    // AWS blogs are always cloud-relevant; still filter by keyword to avoid noise
+    // but fall back to including all items from Architecture/News blogs (high signal)
+    const isHighSignal = name === 'AWS Architecture Blog' || name === 'AWS News Blog';
+    const filtered = items
+      .filter(item => isHighSignal || matchesKeywords(item.title))
+      .map(item => ({
+        title: item.title,
+        url: item.url,
+        score,
+        source: name,
+        category,
+      }));
+
+    console.error(`Found ${filtered.length} relevant items from ${name}`);
+    return filtered;
+  } catch (e) {
+    console.error(`Error fetching ${name}: ${e.message}`);
+    return [];
+  }
+}
+
 async function scanAllSources() {
   const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_'];
   
-  const [hnStories, morningDew, archNotes, twRadar, squadReleases, squadDiscussions, squadCommits, bradyBlog, ...redditResults] = await Promise.all([
+  const [hnStories, morningDew, archNotes, twRadar, squadReleases, squadDiscussions, squadCommits, bradyBlog, ...rest] = await Promise.all([
     fetchHackerNews(),
     fetchMorningDew(),
     fetchArchitectureNotes(),
@@ -478,10 +548,23 @@ async function scanAllSources() {
     fetchSquadDiscussions(),
     fetchSquadCommits(),
     fetchBradyBlog(),
+    // AWS blogs (issue #931) — fetch all in parallel with other sources
+    ...AWS_BLOGS.map(blog => fetchAwsBlog(blog)),
     ...subreddits.map(sub => fetchReddit(sub))
   ]);
   
-  const allStories = [...hnStories, ...morningDew, ...archNotes, ...twRadar, ...redditResults.flat()];
+  // rest = [awsArch, awsNews, awsCompute, awsDev, awsContainers, ...redditResults]
+  const awsResults = rest.slice(0, AWS_BLOGS.length);
+  const redditResults = rest.slice(AWS_BLOGS.length);
+
+  const allStories = [
+    ...hnStories,
+    ...morningDew,
+    ...archNotes,
+    ...twRadar,
+    ...awsResults.flat(),
+    ...redditResults.flat(),
+  ];
   const squadUpdates = [...squadReleases, ...squadDiscussions, ...squadCommits, ...bradyBlog];
   
   // Sort by score descending
@@ -522,8 +605,8 @@ function formatDigest(stories, squadUpdates = [], { isPublic = false } = {}) {
   const date = new Date().toISOString().split('T')[0];
   
   let digest = `# Tech News Digest - ${date}\n\n`;
-  digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, Morning Dew, Architecture Notes, and ThoughtWorks Radar.\n\n`;
-  digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools\n\n`;
+  digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, Morning Dew, Architecture Notes, ThoughtWorks Radar, and AWS Blogs.\n\n`;
+  digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools, AWS architecture & announcements\n\n`;
 
   // Squad product updates section — only include in private digests
   if (!isPublic && squadUpdates.length > 0) {

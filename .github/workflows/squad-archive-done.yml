@@ -124,3 +124,6 @@ jobs:
           Write-Host "✅ Summary:"
           Write-Host "   - Checked $checkedCount Done items"
           Write-Host "   - Archived $archivedCount items older than $daysThreshold days"
+
+          # Explicit exit 0 to prevent $LASTEXITCODE bleed-through from gh CLI calls
+          exit 0

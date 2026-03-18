@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-03-18T00:00:00Z",
+  "parentRepo": "tamirdresher_microsoft/tamresearch1",
+  "directivesPath": ".squad/kids-directives/",
+  "procedures": [
+    {
+      "id": "RP-001",
+      "name": "morning-checkin",
+      "cron": "0 8 * * 0-4",
+      "action": "report-completed-tasks",
+      "enabled": true
+    },
+    {
+      "id": "RP-002",
+      "name": "weekly-parent-report",
+      "cron": "0 18 * * 0",
+      "action": "weekly-summary-to-parent",
+      "enabled": true
+    },
+    {
+      "id": "RP-003",
+      "name": "homework-reminder",
+      "cron": "30 15 * * 0-4",
+      "action": "homework-check-reminder",
+      "enabled": true
+    },
+    {
+      "id": "RP-004",
+      "name": "parent-sync-check",
+      "cron": "0 9 * * *",
+      "action": "sync-parent-directives",
+      "enabled": true
+    }
+  ]
+}

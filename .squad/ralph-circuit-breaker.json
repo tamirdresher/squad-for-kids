@@ -1,16 +1,41 @@
 {
-  "state": "closed",
-  "preferredModel": "claude-sonnet-4.6",
-  "currentModel": "claude-sonnet-4.6",
-  "fallbackChain": [
-    "gpt-5.4-mini",
-    "gpt-5-mini",
-    "gpt-4.1"
-  ],
-  "lastRateLimitHit": null,
-  "cooldownMinutes": 10,
-  "consecutiveSuccesses": 0,
-  "requiredSuccessesToClose": 2,
-  "totalFallbacks": 0,
-  "totalRecoveries": 0
+  "_description": "Circuit breaker configuration for Ralph model rate limiting. Runtime state is tracked in $USERPROFILE/.squad/rate-pool.json",
+  "circuit_breaker": {
+    "enabled": true,
+    "consecutive_429_threshold": 3,
+    "cooldown_strategy": "exponential_backoff",
+    "base_cooldown_minutes": 5,
+    "max_cooldown_minutes": 60,
+    "states": ["closed", "open", "half-open"]
+  },
+  "model_fallback": {
+    "preferred": "claude-sonnet-4.6",
+    "fallback_chain": [
+      "claude-sonnet-4.5",
+      "gpt-5.4-mini",
+      "gpt-5-mini",
+      "gpt-4.1"
+    ],
+    "fast_tier_fallback": [
+      "claude-haiku-4.5",
+      "gpt-5.1-codex-mini",
+      "gpt-4.1"
+    ]
+  },
+  "budget_thresholds": {
+    "critical_percent": 5,
+    "low_percent": 20,
+    "behavior": {
+      "below_critical": { "max_parallelism": 0, "note": "Skip spawning entirely" },
+      "below_low": { "max_parallelism": 1, "note": "High-priority work only" },
+      "normal": { "max_parallelism": 5, "note": "Normal operation" }
+    }
+  },
+  "priority_classification": {
+    "high": ["ci-failure", "type:bug", "squad:worf", "deploy-failure", "critical", "security-alert"],
+    "medium": ["squad:picard", "squad:data", "squad:belanna"],
+    "low": ["squad:seven", "research", "documentation", "blog", "podcast"]
+  },
+  "runtime_state_file": "$USERPROFILE/.squad/rate-pool.json",
+  "implementation": "ralph-watch.ps1 (functions: Update-RatePool, Test-CircuitBreaker, Test-BudgetAvailable)"
 }

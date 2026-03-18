@@ -18,6 +18,11 @@ on:
     - cron: '0 3 * * 0'
   workflow_dispatch: # Allow manual trigger for immediate reconciliation
 
+# Cancel redundant runs for the same issue/PR — prevents cascade pile-up
+concurrency:
+  group: board-sync-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 env:
   PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
   PROJECT_NUMBER: '1'
@@ -112,7 +117,7 @@ jobs:
 
   # ── Job 0: Set Todo status on new issues added to board ──
   set-todo-on-new:
-    if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
+    if: github.actor != 'github-actions[bot]' && github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
     runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 5
     permissions:

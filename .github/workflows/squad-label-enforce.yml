@@ -4,8 +4,14 @@ on:
   issues:
     types: [labeled]
   workflow_dispatch:
+
+# Cancel redundant runs for the same issue — prevents cascade pile-up
+concurrency:
+  group: label-enforce-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
 jobs:
   enforce:
+    if: github.actor != 'github-actions[bot]'
     runs-on: self-hosted
     permissions:
       issues: write

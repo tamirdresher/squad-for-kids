@@ -12,7 +12,7 @@ concurrency:
 jobs:
   assign-work:
     # Only trigger on squad:{member} labels (not the base "squad" label)
-    if: startsWith(github.event.label.name, 'squad:')
+    if: github.actor != 'github-actions[bot]' && startsWith(github.event.label.name, 'squad:')
     runs-on: self-hosted
     permissions:
       issues: write

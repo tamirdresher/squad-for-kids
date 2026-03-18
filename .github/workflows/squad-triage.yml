@@ -23,7 +23,7 @@ jobs:
         run: gh issue edit $ISSUE_NUMBER --add-label "squad" --repo ${{ github.repository }}
 
   triage:
-    if: github.event.action == 'labeled' && github.event.label.name == 'squad'
+    if: github.actor != 'github-actions[bot]' && github.event.action == 'labeled' && github.event.label.name == 'squad'
     runs-on: self-hosted
     permissions:
       issues: write

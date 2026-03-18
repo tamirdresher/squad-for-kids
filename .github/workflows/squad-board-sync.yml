@@ -117,7 +117,7 @@ jobs:
 
   # ── Job 0: Set Todo status on new issues added to board ──
   set-todo-on-new:
-    if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
+    if: github.actor != 'github-actions[bot]' && github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'labeled')
     runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 5
     permissions:

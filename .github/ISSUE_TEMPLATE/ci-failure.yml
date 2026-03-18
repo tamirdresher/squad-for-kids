@@ -1,0 +1,106 @@
+name: CI Failure Triage
+description: Report and triage a CI/CD pipeline failure
+labels: ["ci-failure", "squad"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## CI Failure Report
+        Use this template when a GitHub Actions workflow or CI pipeline fails.
+        Fill in as much detail as possible so the squad can triage quickly.
+
+  - type: dropdown
+    id: pipeline
+    attributes:
+      label: Pipeline / Workflow
+      description: Which pipeline failed?
+      options:
+        - Squad Docs CI
+        - AI Marketplace CI
+        - multiplayer-tetris CI
+        - FedRAMP Dashboard
+        - Content Pipeline
+        - Other (specify in details)
+    validations:
+      required: true
+
+  - type: input
+    id: run-url
+    attributes:
+      label: Failed Run URL
+      description: Link to the failed workflow run on GitHub Actions.
+      placeholder: "https://github.com/tamirdresher_microsoft/tamresearch1/actions/runs/..."
+    validations:
+      required: false
+
+  - type: input
+    id: branch
+    attributes:
+      label: Branch
+      description: Which branch triggered the failure?
+      placeholder: "main, squad/*, feature/*"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: failure-type
+    attributes:
+      label: Failure Category
+      description: What kind of failure is this?
+      options:
+        - Build error (compilation / bundling)
+        - Test failure
+        - Lint / formatting
+        - Deployment failure
+        - Timeout
+        - Infrastructure / runner issue
+        - Dependency / package resolution
+        - Unknown
+    validations:
+      required: true
+
+  - type: dropdown
+    id: is-flaky
+    attributes:
+      label: Flaky?
+      description: Has this same failure occurred intermittently before?
+      options:
+        - "Yes — known flaky"
+        - "No — new failure"
+        - "Unsure"
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-summary
+    attributes:
+      label: Error Summary
+      description: Paste the key error message or a short summary of what went wrong.
+      placeholder: |
+        Example:
+        Error CS1061: 'FooService' does not contain a definition for 'Bar'
+        at src/Services/FooService.cs:42
+    validations:
+      required: false
+
+  - type: textarea
+    id: root-cause
+    attributes:
+      label: Root Cause / Investigation Notes
+      description: If you've already investigated, note findings here. Otherwise leave blank for triage.
+      placeholder: "Leave blank if not yet investigated."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Triage Checklist
+      description: Check items as you investigate.
+      options:
+        - label: Reviewed the build log
+        - label: Checked if failure is on main or a feature branch
+        - label: Searched for existing issues with the same error
+        - label: Attempted a re-run to rule out flakiness
+        - label: Identified the breaking commit (if applicable)
+        - label: Fix PR opened or linked

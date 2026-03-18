@@ -15,11 +15,16 @@ if (Test-Path $secretsScript) {
     Write-Host "  [WARN] setup-secrets.ps1 not found — secrets not loaded" -ForegroundColor Yellow
 }
 
-# 1. Keep-alive (prevents Dev Box auto-stop)
-$keepAlive = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'keep-devbox-alive' }
+# 1. Keep-alive (prevents Dev Box auto-stop + hibernation — Issue #888)
+# Uses devbox-keep-alive.ps1 v2 which delays server-side scheduled actions
+# via az CLI AND jiggles the mouse. Falls back to legacy if new script missing.
+$keepAlive = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'devbox-keep-alive|keep-devbox-alive' }
 if (-not $keepAlive) {
-    Start-Process pwsh.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $repoRoot\scripts\keep-devbox-alive.ps1" -WindowStyle Hidden
-    Write-Host "  [OK] Keep-alive started" -ForegroundColor Green
+    $v2Script = "$repoRoot\scripts\devbox-keep-alive.ps1"
+    $v1Script = "$repoRoot\scripts\keep-devbox-alive.ps1"
+    $script = if (Test-Path $v2Script) { $v2Script } else { $v1Script }
+    Start-Process pwsh.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $script" -WindowStyle Hidden
+    Write-Host "  [OK] Keep-alive started ($(Split-Path $script -Leaf))" -ForegroundColor Green
 } else {
     Write-Host "  [OK] Keep-alive already running (PID $($keepAlive.ProcessId))" -ForegroundColor Green
 }

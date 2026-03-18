@@ -1,11 +1,16 @@
 name: "CodeQL Analysis"
 
 # This repo is primarily markdown, PowerShell, and config files.
-# The JS/TS code (dashboard-ui, scripts/) doesn't have a root build step,
-# causing Autobuild failures on every push/PR. Scheduled monthly + manual.
+# The JS/TS code (dashboard-ui, scripts/) doesn't have a root build step;
+# build step is skipped — source-only analysis works fine on every PR/push.
+# SDL compliance (#647): per-PR scanning enabled.
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   schedule:
-    - cron: '0 6 1 * *'  # First of every month at 6 AM UTC
+    - cron: '0 6 * * 0'  # Weekly on Sunday at 6 AM UTC
   workflow_dispatch:
 
 jobs:

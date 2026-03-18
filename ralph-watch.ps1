@@ -145,6 +145,108 @@ function Read-RalphConfig {
     }
 }
 
+# -------------------------------------------------------------------
+# Model Circuit Breaker (model-level fallback for rate limits)
+# -------------------------------------------------------------------
+# When the preferred model hits rate limits, automatically falls back
+# to free-tier models, then recovers after cooldown.
+# State tracked in .squad/ralph-circuit-breaker.json
+# -------------------------------------------------------------------
+
+function Get-CircuitBreakerState {
+    $cbFile = Join-Path $PSScriptRoot ".squad\ralph-circuit-breaker.json"
+    if (Test-Path $cbFile) {
+        try {
+            return Get-Content $cbFile -Raw | ConvertFrom-Json
+        } catch {
+            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [model-cb] Failed to read circuit breaker state, using defaults" -ForegroundColor Yellow
+        }
+    }
+    return [ordered]@{
+        state = "closed"
+        preferredModel = "claude-sonnet-4.6"
+        currentModel = "claude-sonnet-4.6"
+        fallbackChain = @("gpt-5.4-mini", "gpt-5-mini", "gpt-4.1")
+        lastRateLimitHit = $null
+        cooldownMinutes = 10
+        consecutiveSuccesses = 0
+        requiredSuccessesToClose = 2
+        totalFallbacks = 0
+        totalRecoveries = 0
+    }
+}
+
+function Save-CircuitBreakerState($cb) {
+    $cbFile = Join-Path $PSScriptRoot ".squad\ralph-circuit-breaker.json"
+    $cbDir = Split-Path $cbFile -Parent
+    if (-not (Test-Path $cbDir)) { New-Item -ItemType Directory -Path $cbDir -Force | Out-Null }
+    $cb | ConvertTo-Json -Depth 5 | Set-Content $cbFile -Encoding utf8
+}
+
+function Get-CurrentModel {
+    $cb = Get-CircuitBreakerState
+    $ts = Get-Date -Format "HH:mm:ss"
+
+    switch ($cb.state) {
+        "closed" { return $cb.preferredModel }
+        "open" {
+            if ($cb.lastRateLimitHit) {
+                $elapsed = (Get-Date) - [datetime]$cb.lastRateLimitHit
+                if ($elapsed.TotalMinutes -ge $cb.cooldownMinutes) {
+                    $cb.state = "half-open"
+                    $cb.currentModel = $cb.preferredModel
+                    Save-CircuitBreakerState $cb
+                    Write-Host "[$ts] [model-cb] HALF-OPEN: Testing preferred model $($cb.preferredModel)" -ForegroundColor Yellow
+                    return $cb.preferredModel
+                }
+            }
+            return $cb.currentModel
+        }
+        "half-open" { return $cb.preferredModel }
+    }
+    return $cb.preferredModel
+}
+
+function Update-CircuitBreakerOnSuccess {
+    $cb = Get-CircuitBreakerState
+    $ts = Get-Date -Format "HH:mm:ss"
+
+    if ($cb.state -eq "half-open") {
+        $cb.consecutiveSuccesses = [int]$cb.consecutiveSuccesses + 1
+        if ([int]$cb.consecutiveSuccesses -ge [int]$cb.requiredSuccessesToClose) {
+            $cb.state = "closed"
+            $cb.currentModel = $cb.preferredModel
+            $cb.consecutiveSuccesses = 0
+            $cb.totalRecoveries = [int]$cb.totalRecoveries + 1
+            Write-Host "[$ts] [model-cb] CLOSED: Recovered to preferred model $($cb.preferredModel)" -ForegroundColor Green
+        } else {
+            Write-Host "[$ts] [model-cb] HALF-OPEN: Success $($cb.consecutiveSuccesses)/$($cb.requiredSuccessesToClose) toward recovery" -ForegroundColor Yellow
+        }
+        Save-CircuitBreakerState $cb
+    }
+    # If closed or open-on-fallback, no state change needed
+}
+
+function Update-CircuitBreakerOnRateLimit {
+    $cb = Get-CircuitBreakerState
+    $ts = Get-Date -Format "HH:mm:ss"
+    $cb.state = "open"
+    $cb.lastRateLimitHit = (Get-Date).ToString("o")
+    $cb.consecutiveSuccesses = 0
+    $cb.totalFallbacks = [int]$cb.totalFallbacks + 1
+
+    # Pick first available fallback model
+    $fallbacks = @($cb.fallbackChain)
+    if ($fallbacks.Count -gt 0) {
+        $cb.currentModel = $fallbacks[0]
+    } else {
+        $cb.currentModel = "gpt-4.1"
+    }
+
+    Write-Host "[$ts] [model-cb] OPEN: Rate limited! Falling back to $($cb.currentModel)" -ForegroundColor Red
+    Save-CircuitBreakerState $cb
+}
+
 # Multi-machine coordination settings (Issue #346)
 $machineId = $env:COMPUTERNAME
 $heartbeatIntervalSeconds = 120  # 2 minutes
@@ -1316,12 +1418,16 @@ Max parallelism: $($budgetStatus.MaxParallelism) agent(s).
 
         [System.IO.File]::WriteAllText($promptFile, $effectivePrompt, [System.Text.Encoding]::UTF8)
         
+        # Model circuit breaker: select model based on rate-limit state
+        $modelForRound = Get-CurrentModel
+        Write-Host "[$displayTime] [model-cb] Using model: $modelForRound (state: $((Get-CircuitBreakerState).state))" -ForegroundColor DarkCyan
+        
         # Create a thin wrapper script that reads the prompt from file and calls agency
         # This avoids ALL Start-Process argument quoting issues
         $wrapperScript = Join-Path $env:TEMP "ralph-round-$round.ps1"
         @"
 `$p = [System.IO.File]::ReadAllText('$($promptFile.Replace("'","''"))')
-agency copilot --yolo --autopilot --agent squad --mcp mail --mcp calendar -p `$p --resume=$roundSessionId
+agency copilot --yolo --autopilot --agent squad --mcp mail --mcp calendar --model $modelForRound -p `$p --resume=$roundSessionId
 exit `$LASTEXITCODE
 "@ | Out-File -FilePath $wrapperScript -Encoding utf8 -Force
         
@@ -1394,6 +1500,13 @@ exit `$LASTEXITCODE
             }
         }
         Update-RatePool -Tier "standard" -Got429 $got429
+
+        # Model circuit breaker: update state based on rate limit detection
+        if ($got429) {
+            Update-CircuitBreakerOnRateLimit
+        } elseif ($exitCode -eq 0) {
+            Update-CircuitBreakerOnSuccess
+        }
 
     } catch {
         Write-Host "[$timestamp] Error: $($_.Exception.Message)" -ForegroundColor Red

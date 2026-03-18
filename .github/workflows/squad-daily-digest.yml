@@ -101,7 +101,7 @@ jobs:
         if: env.TEAMS_WEBHOOK_URL != ''
         uses: actions/github-script@v7
         env:
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.SQUAD_WEBHOOK_GENERAL || secrets.TEAMS_WEBHOOK_URL }}
         with:
           script: |
             const payload = {

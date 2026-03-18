@@ -18,6 +18,11 @@ on:
     - cron: '0 3 * * 0'
   workflow_dispatch: # Allow manual trigger for immediate reconciliation
 
+# Cancel redundant runs for the same issue/PR — prevents cascade pile-up
+concurrency:
+  group: board-sync-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 env:
   PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
   PROJECT_NUMBER: '1'

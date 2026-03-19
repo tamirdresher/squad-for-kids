@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>CodeReviewArena</AssemblyName>
+    <RootNamespace>CodeReviewArena</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- GitHub Copilot SDK / Microsoft Extensions AI -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.3.0-preview.1.25161.3" />
+    <PackageReference Include="Microsoft.Extensions.AI.AzureAIInference" Version="9.3.0-preview.1.25161.3" />
+    <PackageReference Include="Azure.AI.Inference" Version="1.0.0-beta.3" />
+
+    <!-- Beautiful terminal UI -->
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+
+    <!-- CLI argument parsing -->
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+</Project>

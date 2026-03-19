@@ -1,0 +1,17 @@
+apiVersion: v2
+name: squad
+description: Squad AI Agent Framework — Helm chart for running Squad agents on Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - squad
+  - ai-agents
+  - ralph
+  - copilot
+  - github
+maintainers:
+  - name: squad-team
+home: https://github.com/tamirdresher/tamresearch1
+sources:
+  - https://github.com/tamirdresher/tamresearch1

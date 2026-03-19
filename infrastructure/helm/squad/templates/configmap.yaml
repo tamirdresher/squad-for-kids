@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "squad.configMapName" . }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+data:
+  squad.config.ts: |
+    // Auto-generated from Helm values — do not edit directly
+    const config = {
+      version: '1.0.0',
+      models: {
+        defaultModel: {{ .Values.squadConfig.defaultModel | quote }},
+        defaultTier: {{ .Values.squadConfig.defaultTier | quote }},
+      },
+      routing: {
+        governance: {
+          eagerByDefault: {{ .Values.squadConfig.eagerByDefault }},
+          allowRecursiveSpawn: {{ .Values.squadConfig.allowRecursiveSpawn }},
+        },
+      },
+    };
+    export default config;
+  team.md: |
+    # Squad Team (K8s Deployment)
+    Managed by Helm chart {{ include "squad.chart" . }}
+    Repository: {{ .Values.global.repository }}
+  routing.md: |
+    # Routing Rules (K8s Deployment)
+    See squad.config.ts ConfigMap for routing configuration.

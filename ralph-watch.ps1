@@ -398,100 +398,162 @@ function Invoke-LogRotation {
     }
 }
 
-# Self-healing watchdog: pre-round health check (Issue #988)
-# Runs BEFORE each round to detect and fix known failure modes proactively
-function Invoke-PreRoundHealthCheck {
-    param([int]$Round)
-    $ts = Get-Date -Format 'HH:mm:ss'
-    $healed = @()
+# ─────────────────────────────────────────────────────────────────────────────
+# Invoke-RalphHealthCheck  (Issue #988)
+# Pre-round watchdog — auto-detects and fixes the 5 most common Ralph failures:
+#   1. CB file schema corruption (nested vs flat)  → convert to flat + reset
+#   2. Empty / null model string                   → reset CB to safe defaults
+#   3. GH_CONFIG_DIR wrong or gh unauthenticated   → probe known paths, fix in-process
+#   4. Orphaned agency.exe / node processes (>5)   → kill extras
+#   5. Branch drift (not on expected branch)       → warn operator
+# Returns: [PSCustomObject]@{ Healed=[string[]]; Warnings=[string[]] }
+# ─────────────────────────────────────────────────────────────────────────────
+function Invoke-RalphHealthCheck {
+    param(
+        [int]$Round,
+        [string]$ExpectedBranch = "main"
+    )
+    $ts       = Get-Date -Format 'HH:mm:ss'
+    $healed   = [System.Collections.Generic.List[string]]::new()
+    $warnings = [System.Collections.Generic.List[string]]::new()
 
-    # Check 1: CB file schema — ensure flat format with expected keys
+    # ── Check 1 & 2: CB file schema + model sanity ────────────────────────────
     $cbFile = Join-Path (Get-Location) ".squad/ralph-circuit-breaker.json"
     if (Test-Path $cbFile) {
-        $cb = Get-Content $cbFile -Raw | ConvertFrom-Json
-        if (-not $cb.preferredModel -and $cb.model_fallback) {
-            # Nested schema detected — convert to flat
-            $flat = @{
-                state = "closed"
-                preferredModel = $cb.model_fallback.preferred
-                currentModel = $cb.model_fallback.preferred
-                fallbackChain = $cb.model_fallback.fallback_chain
-                lastRateLimitHit = $null
-                cooldownMinutes = 10
-                consecutiveSuccesses = 0
-                requiredSuccessesToClose = 2
-                totalFallbacks = 0
-                totalRecoveries = 0
+        try {
+            $cb = Get-Content $cbFile -Raw | ConvertFrom-Json
+            # Nested schema (model_fallback wrapper) → convert to flat
+            if (-not $cb.preferredModel -and $cb.model_fallback) {
+                $flat = [ordered]@{
+                    state                    = "closed"
+                    preferredModel           = $cb.model_fallback.preferred
+                    currentModel             = $cb.model_fallback.preferred
+                    fallbackChain            = $cb.model_fallback.fallback_chain
+                    lastRateLimitHit         = $null
+                    cooldownMinutes          = 10
+                    consecutiveSuccesses     = 0
+                    requiredSuccessesToClose = 2
+                    totalFallbacks           = 0
+                    totalRecoveries          = 0
+                }
+                $flat | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
+                $healed.Add("CB schema: converted nested->flat")
+                Write-Host "[$ts] [health] CB schema fixed: nested->flat (was missing preferredModel)" -ForegroundColor Yellow
             }
-            $flat | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
-            $healed += "CB schema: converted nested->flat"
-            Write-Host "[$ts] [self-heal] Fixed CB schema (nested->flat)" -ForegroundColor Yellow
+        } catch {
+            $warnings.Add("CB parse error: $($_.Exception.Message)")
+            Write-Host "[$ts] [health] WARNING: CB file could not be parsed — $($_.Exception.Message)" -ForegroundColor Yellow
         }
     }
 
-    # Check 2: Model sanity — verify Get-CurrentModel returns non-empty
+    # Empty model string → --model "" causes instant exit code 1; reset to safe defaults
     $model = Get-CurrentModel
     if ([string]::IsNullOrWhiteSpace($model)) {
-        # Reset CB to defaults
-        @{
-            state = "closed"; preferredModel = "claude-sonnet-4.6"; currentModel = "claude-sonnet-4.6"
-            fallbackChain = @("claude-sonnet-4.5","gpt-5.4-mini","gpt-5-mini","gpt-4.1")
-            lastRateLimitHit = $null; cooldownMinutes = 10; consecutiveSuccesses = 0
-            requiredSuccessesToClose = 2; totalFallbacks = 0; totalRecoveries = 0
-        } | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
-        $healed += "Model was null -- reset CB to defaults"
-        Write-Host "[$ts] [self-heal] Model was null/empty -- reset CB file" -ForegroundColor Yellow
+        $safeDefaults = [ordered]@{
+            state                    = "closed"
+            preferredModel           = "claude-sonnet-4.6"
+            currentModel             = "claude-sonnet-4.6"
+            fallbackChain            = @("claude-sonnet-4.5","gpt-5.4-mini","gpt-5-mini","gpt-4.1")
+            lastRateLimitHit         = $null
+            cooldownMinutes          = 10
+            consecutiveSuccesses     = 0
+            requiredSuccessesToClose = 2
+            totalFallbacks           = 0
+            totalRecoveries          = 0
+        }
+        $safeDefaults | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
+        $healed.Add("Model null/empty — CB reset to claude-sonnet-4.6")
+        Write-Host "[$ts] [health] Model was null/empty — CB reset to claude-sonnet-4.6 (fixes --model '' exit-1)" -ForegroundColor Yellow
     }
 
-    # Check 3: GH auth probe — verify gh api user works
-    $ghResult = & gh api user --jq '.login' 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        # Try known config paths
-        $knownPaths = @(
-            "$env:APPDATA\GitHub CLI",
-            "$HOME\.config\gh",
-            "$HOME\.config\gh-emu"
-        )
-        foreach ($path in $knownPaths) {
-            if (Test-Path "$path\hosts.yml") {
-                $env:GH_CONFIG_DIR = $path
-                $retry = & gh api user --jq '.login' 2>&1
-                if ($LASTEXITCODE -eq 0) {
-                    $healed += "GH auth: switched to $path"
-                    Write-Host "[$ts] [self-heal] Fixed GH auth -> $path" -ForegroundColor Yellow
-                    break
+    # ── Check 3: GH_CONFIG_DIR — validate dir exists AND gh is authenticated ──
+    $ghAuthOk = $false
+    if (-not [string]::IsNullOrWhiteSpace($env:GH_CONFIG_DIR) -and (Test-Path $env:GH_CONFIG_DIR)) {
+        $probe = & gh api user --jq '.login' 2>&1
+        $ghAuthOk = ($LASTEXITCODE -eq 0)
+    }
+    if (-not $ghAuthOk) {
+        # Primary fallback: %APPDATA%\GitHub CLI (canonical Windows path for both EMU + personal)
+        $canonicalDir = "$env:APPDATA\GitHub CLI"
+        $env:GH_CONFIG_DIR = $canonicalDir
+        $probe = & gh api user --jq '.login' 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $healed.Add("GH_CONFIG_DIR set to '$canonicalDir' (login: $($probe.Trim()))")
+            Write-Host "[$ts] [health] GH_CONFIG_DIR fixed -> '$canonicalDir' (login: $($probe.Trim()))" -ForegroundColor Yellow
+            $ghAuthOk = $true
+        } else {
+            # Try additional fallback paths
+            foreach ($path in @("$HOME\.config\gh", "$HOME\.config\gh-emu")) {
+                if (Test-Path "$path\hosts.yml") {
+                    $env:GH_CONFIG_DIR = $path
+                    $retry = & gh api user --jq '.login' 2>&1
+                    if ($LASTEXITCODE -eq 0) {
+                        $healed.Add("GH_CONFIG_DIR set to '$path' (login: $($retry.Trim()))")
+                        Write-Host "[$ts] [health] GH_CONFIG_DIR fixed -> '$path' (login: $($retry.Trim()))" -ForegroundColor Yellow
+                        $ghAuthOk = $true
+                        break
+                    }
+                }
+            }
+        }
+        if (-not $ghAuthOk) {
+            $warnings.Add("GH auth: gh is NOT authenticated — all config paths failed")
+            Write-Host "[$ts] [health] WARNING: gh is NOT authenticated — run 'gh auth login'" -ForegroundColor Red
+        }
+    }
+
+    # ── Check 4: Orphaned agency.exe / node processes — kill if >5 extras ────
+    $myPid      = $PID
+    $myChildren = @((Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+                    Where-Object { $_.ParentProcessId -eq $myPid }).ProcessId)
+    $orphanCount = 0
+    foreach ($procName in @('agency', 'node')) {
+        $procs = @(Get-Process -Name $procName -ErrorAction SilentlyContinue)
+        if ($procs.Count -gt 5) {
+            foreach ($proc in $procs) {
+                $ppid = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" -ErrorAction SilentlyContinue).ParentProcessId
+                if ($ppid -ne $myPid -and $ppid -notin $myChildren) {
+                    try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $orphanCount++ } catch {}
                 }
             }
         }
     }
-
-    # Check 4: Orphaned agency processes — kill if >20 orphans
-    $myPid = $PID
-    $allAgency = Get-Process -Name agency -ErrorAction SilentlyContinue
-    if ($allAgency.Count -gt 20) {
-        $myChildren = Get-CimInstance Win32_Process | Where-Object { $_.ParentProcessId -eq $myPid } | Select-Object -ExpandProperty ProcessId
-        $orphanCount = 0
-        foreach ($proc in $allAgency) {
-            # Don't kill our own children or grandchildren
-            $parent = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" -ErrorAction SilentlyContinue).ParentProcessId
-            if ($parent -ne $myPid -and $parent -notin $myChildren) {
-                try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $orphanCount++ } catch {}
-            }
-        }
-        if ($orphanCount -gt 0) {
-            $healed += "Killed $orphanCount orphaned agency processes"
-            Write-Host "[$ts] [self-heal] Killed $orphanCount orphaned agency.exe processes" -ForegroundColor Yellow
-        }
+    if ($orphanCount -gt 0) {
+        $healed.Add("Killed $orphanCount orphaned agency/node processes")
+        Write-Host "[$ts] [health] Killed $orphanCount orphaned agency.exe/node processes (>5 threshold)" -ForegroundColor Yellow
     }
 
-    # Log to self-heal log
-    if ($healed.Count -gt 0) {
-        $logFile = "$env:USERPROFILE\.squad\ralph-self-heal.log"
-        $entry = "$(Get-Date -Format 'o') | HEALED | Round=$Round | Actions: $($healed -join '; ')"
+    # ── Check 5: Branch drift — warn if not on expected branch ───────────────
+    try {
+        $currentBranch = (& git rev-parse --abbrev-ref HEAD 2>&1).Trim()
+        if (-not [string]::IsNullOrWhiteSpace($currentBranch) -and $currentBranch -ne $ExpectedBranch) {
+            $warnings.Add("Branch drift: on '$currentBranch' (expected '$ExpectedBranch')")
+            Write-Host "[$ts] [health] WARNING: Branch drift — running on '$currentBranch', expected '$ExpectedBranch'" -ForegroundColor Magenta
+            Write-Host "[$ts] [health]   Fixes from $ExpectedBranch may be missing. Consider: git checkout $ExpectedBranch" -ForegroundColor DarkMagenta
+        }
+    } catch {
+        $warnings.Add("Branch check failed: $($_.Exception.Message)")
+    }
+
+    # ── Structured self-heal log ──────────────────────────────────────────────
+    if ($healed.Count -gt 0 -or $warnings.Count -gt 0) {
+        $logDir = Join-Path $env:USERPROFILE ".squad"
+        if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
+        $logFile = Join-Path $logDir "ralph-self-heal.log"
+        $entry = "$(Get-Date -Format 'o') | Round=$Round | HEALED=[$($healed -join '; ')] | WARNINGS=[$($warnings -join '; ')]"
         Add-Content -Path $logFile -Value $entry
     }
 
-    return $healed
+    return [PSCustomObject]@{
+        Healed   = $healed.ToArray()
+        Warnings = $warnings.ToArray()
+    }
+}
+
+# Backward-compat shim (callers using old name still work)
+function Invoke-PreRoundHealthCheck {
+    param([int]$Round)
+    return Invoke-RalphHealthCheck -Round $Round
 }
 
 # Self-healing watchdog: post-failure remediation (Issue #988)
@@ -1305,38 +1367,15 @@ while ($true) {
     # Write heartbeat BEFORE round (status: running)
     Update-Heartbeat -Round $round -Status "running" -ConsecutiveFailures $consecutiveFailures
     
-    # Step -1: Self-healing — set GH_CONFIG_DIR for this process based on repo remote
-    # Isolates entire gh config (auth, cache, prefs) per-account without global state mutation
-    try {
-        $remoteUrl = & git remote get-url origin 2>&1 | Out-String
-        # Auth lives in %APPDATA%\GitHub CLI (both EMU and personal accounts via gh auth switch)
-        # The gh-emu/gh-public dirs were planned but never created — use the real config dir
-        $env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
-        Write-Host "[$timestamp] gh auth: GH_CONFIG_DIR set to $($env:GH_CONFIG_DIR) (full config isolation)" -ForegroundColor Green
-    } catch {
-        Write-Host "[$timestamp] Warning: gh auth check failed: $($_.Exception.Message)" -ForegroundColor Yellow
+    # ── Step -1: Pre-round health check (Issue #988) ──────────────────────────
+    # Runs at the TOP of every round — auto-detects and fixes the 5 common failure modes
+    # before any agency work starts. This is the canonical entry point for Ralph self-healing.
+    $healthResult = Invoke-RalphHealthCheck -Round $round
+    if ($healthResult.Healed.Count -gt 0) {
+        Write-Host "[$displayTime] [health] Healed $($healthResult.Healed.Count) issue(s): $($healthResult.Healed -join ' | ')" -ForegroundColor Yellow
     }
-
-    $selfHealScript = Join-Path (Get-Location) "scripts\ralph-self-heal.ps1"
-    if (Test-Path $selfHealScript) {
-        Write-Host "[$timestamp] Running gh auth self-healing check..." -ForegroundColor Yellow
-        try {
-            $ghHealthOutput = & gh api user 2>&1 | Out-String
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "[$timestamp] gh CLI error detected — invoking self-heal..." -ForegroundColor Yellow
-                . $selfHealScript
-                $healResult = Invoke-SelfHeal
-                if ($healResult.Healed) {
-                    Write-Host "[$timestamp] Self-heal: $($healResult.Details)" -ForegroundColor Green
-                } else {
-                    Write-Host "[$timestamp] Self-heal could not fix: $($healResult.Details)" -ForegroundColor Yellow
-                }
-            } else {
-                Write-Host "[$timestamp] gh CLI health check passed" -ForegroundColor Green
-            }
-        } catch {
-            Write-Host "[$timestamp] Warning: Self-heal check failed: $($_.Exception.Message)" -ForegroundColor Yellow
-        }
+    if ($healthResult.Warnings.Count -gt 0) {
+        Write-Host "[$displayTime] [health] $($healthResult.Warnings.Count) warning(s): $($healthResult.Warnings -join ' | ')" -ForegroundColor Magenta
     }
 
     # Step -0.5: Machine capability discovery (Issue #987 — run once per startup, then every 50 rounds)
@@ -1657,10 +1696,11 @@ Max parallelism: $($budgetStatus.MaxParallelism) agent(s).
 
         [System.IO.File]::WriteAllText($promptFile, $effectivePrompt, [System.Text.Encoding]::UTF8)
         
-        # Self-healing pre-round health check (Issue #988)
-        $healActions = Invoke-PreRoundHealthCheck -Round $round
-        if ($healActions.Count -gt 0) {
-            Write-Host "[$displayTime] [self-heal] Pre-round healed $($healActions.Count) issue(s): $($healActions -join ', ')" -ForegroundColor Yellow
+        # Health already ran at top-of-round; this second call is now a no-op kept for safety
+        # (Invoke-PreRoundHealthCheck is a shim that delegates to Invoke-RalphHealthCheck)
+        $healActions2 = Invoke-RalphHealthCheck -Round $round
+        if ($healActions2.Healed.Count -gt 0) {
+            Write-Host "[$displayTime] [health] Pre-prompt check healed: $($healActions2.Healed -join ' | ')" -ForegroundColor Yellow
         }
 
         # Model circuit breaker: select model based on rate-limit state

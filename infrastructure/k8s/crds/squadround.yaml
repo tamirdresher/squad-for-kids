@@ -1,0 +1,121 @@
+# =============================================================================
+# SquadRound CRD — Represents a single Ralph execution round
+# POC for Squad-on-K8s (Issue #996)
+#
+# Each time Ralph polls and processes issues, a SquadRound CR is created.
+# This provides an audit trail and observability for agent activity.
+# This is a prototype CRD definition only — no operator is implemented yet.
+# Apply with: kubectl apply -f squadround.yaml
+# =============================================================================
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: squadrounds.squad.github.com
+  labels:
+    app.kubernetes.io/part-of: squad
+spec:
+  group: squad.github.com
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - agentRef
+                - roundNumber
+              properties:
+                agentRef:
+                  type: string
+                  description: "Name of the SquadAgent CR that ran this round"
+                roundNumber:
+                  type: integer
+                  description: "Sequential round number for this agent"
+                  minimum: 1
+                triggeredBy:
+                  type: string
+                  description: "What triggered this round"
+                  enum: ["scheduled", "manual", "webhook", "retry"]
+                  default: "scheduled"
+                repository:
+                  type: string
+                  description: "GitHub repository processed"
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: ["pending", "running", "completed", "failed", "skipped"]
+                  default: "pending"
+                startTime:
+                  type: string
+                  format: date-time
+                completionTime:
+                  type: string
+                  format: date-time
+                durationSeconds:
+                  type: integer
+                exitCode:
+                  type: integer
+                issuesProcessed:
+                  type: array
+                  description: "GitHub issues that were processed in this round"
+                  items:
+                    type: object
+                    properties:
+                      issueNumber:
+                        type: integer
+                      title:
+                        type: string
+                      action:
+                        type: string
+                        description: "What Ralph did (assigned, commented, labeled, skipped)"
+                      assignedTo:
+                        type: string
+                        description: "Agent the issue was routed to"
+                issueCount:
+                  type: integer
+                  description: "Total issues processed"
+                  default: 0
+                prsCreated:
+                  type: integer
+                  description: "PRs created or triggered during this round"
+                  default: 0
+                errorMessage:
+                  type: string
+                  description: "Error details if phase=failed"
+                logs:
+                  type: string
+                  description: "Truncated log output from the round"
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Agent
+          type: string
+          jsonPath: .spec.agentRef
+        - name: Round
+          type: integer
+          jsonPath: .spec.roundNumber
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Issues
+          type: integer
+          jsonPath: .status.issueCount
+        - name: Duration
+          type: integer
+          jsonPath: .status.durationSeconds
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: squadrounds
+    singular: squadround
+    kind: SquadRound
+    shortNames:
+      - sr

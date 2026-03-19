@@ -1,0 +1,82 @@
+# =============================================================================
+# values.yaml — Default configuration for the Squad Helm chart
+# Override these in your own values file or via --set flags
+# =============================================================================
+
+# -- Global settings
+global:
+  repository: "tamirdresher/tamresearch1"
+  namespace: "squad"
+
+# -- Ralph agent configuration
+ralph:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: squad-ralph
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Pod-per-agent: each agent runs as its own deployment
+  resources:
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "128Mi"
+
+  # Ralph polling interval (seconds)
+  intervalSeconds: 300
+
+  # Log level: debug, info, warn, error
+  logLevel: "info"
+
+  # Node selector (maps needs:* labels to node affinity)
+  nodeSelector: {}
+  #   squad.github.com/workload: monitor
+
+  tolerations: []
+
+  affinity: {}
+
+  # Pod annotations (e.g., for Prometheus scraping)
+  podAnnotations: {}
+
+  # Health check
+  healthCheck:
+    enabled: true
+    intervalSeconds: 60
+    timeoutSeconds: 10
+    failureThreshold: 3
+
+# -- Credentials (referenced as K8s Secret)
+credentials:
+  # Name of an existing Secret. If empty, chart creates one from values below.
+  existingSecret: ""
+  # Only used if existingSecret is empty:
+  ghToken: ""
+  copilotApiKey: ""
+
+# -- Squad configuration (injected as ConfigMap)
+squadConfig:
+  # Model configuration
+  defaultModel: "claude-sonnet-4.5"
+  defaultTier: "standard"
+
+  # Routing
+  eagerByDefault: true
+  allowRecursiveSpawn: false
+
+# -- Image pull secrets (for private registries / ACR)
+imagePullSecrets: []
+#   - name: acr-secret
+
+# -- Service account
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+  # For AKS Workload Identity:
+  #   azure.workload.identity/client-id: "<managed-identity-client-id>"

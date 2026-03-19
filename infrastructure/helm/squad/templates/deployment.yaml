@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squad.fullname" . }}-ralph
+  labels:
+    {{- include "squad.ralph.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.ralph.replicaCount }}
+  # Ralph is a singleton monitor — use Recreate to avoid duplicate rounds
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "squad.ralph.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.ralph.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "squad.ralph.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "squad.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: ralph
+          image: "{{ .Values.ralph.image.repository }}:{{ .Values.ralph.image.tag }}"
+          imagePullPolicy: {{ .Values.ralph.image.pullPolicy }}
+          env:
+            - name: GH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "squad.secretName" . }}
+                  key: gh-token
+            - name: COPILOT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "squad.secretName" . }}
+                  key: copilot-api-key
+                  optional: true
+            - name: GITHUB_REPOSITORY
+              value: {{ .Values.global.repository | quote }}
+            - name: RALPH_INTERVAL_SECONDS
+              value: {{ .Values.ralph.intervalSeconds | quote }}
+            - name: RALPH_LOG_LEVEL
+              value: {{ .Values.ralph.logLevel | quote }}
+            - name: SQUAD_CONFIG_PATH
+              value: "/config/squad.config.ts"
+          volumeMounts:
+            - name: squad-config
+              mountPath: /config
+              readOnly: true
+          resources:
+            {{- toYaml .Values.ralph.resources | nindent 12 }}
+          {{- if .Values.ralph.healthCheck.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - pwsh
+                - -NoProfile
+                - -Command
+                - "if ($PSVersionTable.PSVersion.Major -ge 7) { exit 0 } else { exit 1 }"
+            initialDelaySeconds: 30
+            periodSeconds: {{ .Values.ralph.healthCheck.intervalSeconds }}
+            timeoutSeconds: {{ .Values.ralph.healthCheck.timeoutSeconds }}
+            failureThreshold: {{ .Values.ralph.healthCheck.failureThreshold }}
+          {{- end }}
+      volumes:
+        - name: squad-config
+          configMap:
+            name: {{ include "squad.configMapName" . }}
+      {{- with .Values.ralph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ralph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ralph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,116 @@
+# =============================================================================
+# Dockerfile.ralph — Containerized Ralph (Squad Work Monitor)
+# POC for Squad-on-K8s (Issue #996)
+#
+# Ralph is a PowerShell 7+ agent that polls GitHub issues and dispatches
+# work to Squad agents via the Copilot CLI (agency).
+#
+# Build:  docker build -f infrastructure/k8s/Dockerfile.ralph -t squad-ralph:latest .
+# Run:    docker run --env-file .env squad-ralph:latest
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: Build dependencies (Node.js tooling)
+# ---------------------------------------------------------------------------
+FROM mcr.microsoft.com/powershell:latest AS deps
+
+# Install system prerequisites
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    ca-certificates \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20 LTS (required for Copilot CLI / agency)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install GitHub CLI
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends gh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Copilot CLI extension (agency)
+# NOTE: In production, pin to a specific version
+RUN gh extension install github/gh-copilot 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime image
+# ---------------------------------------------------------------------------
+FROM mcr.microsoft.com/powershell:latest AS runtime
+
+LABEL maintainer="squad-team" \
+      description="Ralph — Squad Work Monitor agent for K8s" \
+      org.opencontainers.image.source="https://github.com/tamirdresher/tamresearch1"
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    ca-certificates \
+    gnupg \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20 LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install GitHub CLI
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends gh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for the agent
+RUN useradd -m -s /bin/bash ralph
+ENV HOME=/home/ralph
+
+# Set working directory
+WORKDIR /app
+
+# Copy Squad configuration
+COPY squad.config.ts ./
+COPY .squad/team.md .squad/routing.md .squad/
+
+# Copy the Ralph watch script
+COPY ralph-watch.ps1 ./
+
+# ---------------------------------------------------------------------------
+# Credential Injection (K8s Secrets → Environment Variables)
+#
+# These are injected at runtime via K8s Secret or docker run --env:
+#   GH_TOKEN          — GitHub PAT (repo, issues, PRs scope)
+#   GITHUB_REPOSITORY — owner/repo (e.g., tamirdresher/tamresearch1)
+#   COPILOT_API_KEY   — Copilot/agency API key (if separate from GH_TOKEN)
+#
+# For AKS production: use Workload Identity + Azure Key Vault CSI driver
+# instead of plain K8s Secrets.
+#
+# The GH CLI reads GH_TOKEN automatically; no gh auth login needed.
+# ---------------------------------------------------------------------------
+ENV GH_TOKEN="" \
+    GITHUB_REPOSITORY="" \
+    RALPH_INTERVAL_SECONDS="300" \
+    RALPH_LOG_LEVEL="info" \
+    SQUAD_CONFIG_PATH="/app/squad.config.ts"
+
+# Switch to non-root
+USER ralph
+
+# Health check: verify PowerShell and gh CLI are functional
+HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
+    CMD ["pwsh", "-NoProfile", "-Command", "if ($PSVersionTable.PSVersion.Major -ge 7) { exit 0 } else { exit 1 }"]
+
+# Entry point: run Ralph watch loop
+ENTRYPOINT ["pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "/app/ralph-watch.ps1"]

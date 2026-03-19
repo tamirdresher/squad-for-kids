@@ -1,0 +1,147 @@
+# =============================================================================
+# SquadTeam CRD — Defines a Squad team with agents and routing rules
+# POC for Squad-on-K8s (Issue #996)
+#
+# This is a prototype CRD definition only — no operator is implemented yet.
+# Apply with: kubectl apply -f squadteam.yaml
+# =============================================================================
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: squadteams.squad.github.com
+  labels:
+    app.kubernetes.io/part-of: squad
+spec:
+  group: squad.github.com
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - name
+                - repository
+                - agents
+              properties:
+                name:
+                  type: string
+                  description: "Human-readable team name"
+                repository:
+                  type: string
+                  description: "GitHub repository (owner/repo)"
+                universe:
+                  type: string
+                  description: "Character universe for agent casting"
+                  default: "Star Trek TNG"
+                agents:
+                  type: array
+                  description: "List of agent references in this team"
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - role
+                    properties:
+                      name:
+                        type: string
+                        description: "Agent name (e.g., ralph, picard)"
+                      role:
+                        type: string
+                        description: "Agent role (e.g., monitor, lead, coder)"
+                      agentRef:
+                        type: string
+                        description: "Reference to a SquadAgent CR name"
+                      status:
+                        type: string
+                        enum: ["active", "silent", "monitor", "disabled"]
+                        default: "active"
+                routing:
+                  type: object
+                  description: "Work routing configuration"
+                  properties:
+                    rules:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          workType:
+                            type: string
+                            description: "Type of work (feature-dev, bug-fix, testing, docs)"
+                          agents:
+                            type: array
+                            items:
+                              type: string
+                            description: "Agent names to route this work type to"
+                          labels:
+                            type: array
+                            items:
+                              type: string
+                            description: "GitHub labels that trigger this route (maps to needs:* labels)"
+                          confidence:
+                            type: string
+                            enum: ["high", "medium", "low"]
+                    governance:
+                      type: object
+                      properties:
+                        eagerByDefault:
+                          type: boolean
+                          default: true
+                        allowRecursiveSpawn:
+                          type: boolean
+                          default: false
+                models:
+                  type: object
+                  description: "Model configuration for the team"
+                  properties:
+                    defaultModel:
+                      type: string
+                    defaultTier:
+                      type: string
+                      enum: ["premium", "standard", "fast"]
+                      default: "standard"
+            status:
+              type: object
+              properties:
+                activeAgents:
+                  type: integer
+                lastSyncTime:
+                  type: string
+                  format: date-time
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      message:
+                        type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Repository
+          type: string
+          jsonPath: .spec.repository
+        - name: Agents
+          type: integer
+          jsonPath: .status.activeAgents
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: squadteams
+    singular: squadteam
+    kind: SquadTeam
+    shortNames:
+      - st

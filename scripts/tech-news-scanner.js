@@ -730,6 +730,160 @@ async function postToTeamsWebhook(digest) {
   });
 }
 
+/**
+ * Convert a markdown-ish digest to HTML suitable for a Teams channel message.
+ * Handles: # headings, **bold**, - list items, URLs → <a> links.
+ */
+function digestToHtml(markdown) {
+  const lines = markdown.split('\n');
+  const htmlLines = [];
+  let inList = false;
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+
+    // H1
+    if (/^# /.test(line)) {
+      if (inList) { htmlLines.push('</ul>'); inList = false; }
+      htmlLines.push(`<h1>${escHtml(line.slice(2))}</h1>`);
+      continue;
+    }
+    // H2
+    if (/^## /.test(line)) {
+      if (inList) { htmlLines.push('</ul>'); inList = false; }
+      htmlLines.push(`<h2>${escHtml(line.slice(3))}</h2>`);
+      continue;
+    }
+    // H3
+    if (/^### /.test(line)) {
+      if (inList) { htmlLines.push('</ul>'); inList = false; }
+      htmlLines.push(`<h3>${escHtml(line.slice(4))}</h3>`);
+      continue;
+    }
+    // HR
+    if (/^---+$/.test(line)) {
+      if (inList) { htmlLines.push('</ul>'); inList = false; }
+      htmlLines.push('<hr/>');
+      continue;
+    }
+    // List item
+    if (/^- /.test(line)) {
+      if (!inList) { htmlLines.push('<ul>'); inList = true; }
+      htmlLines.push(`<li>${inlineFormat(line.slice(2))}</li>`);
+      continue;
+    }
+    // Blank line
+    if (line === '') {
+      if (inList) { htmlLines.push('</ul>'); inList = false; }
+      continue;
+    }
+    // Paragraph
+    if (inList) { htmlLines.push('</ul>'); inList = false; }
+    htmlLines.push(`<p>${inlineFormat(line)}</p>`);
+  }
+  if (inList) htmlLines.push('</ul>');
+  return htmlLines.join('\n');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function inlineFormat(text) {
+  // Bold: **text**
+  text = text.replace(/\*\*([^*]+)\*\*/g, (_, t) => `<strong>${escHtml(t)}</strong>`);
+  // Inline code: `text`
+  text = text.replace(/`([^`]+)`/g, (_, t) => `<code>${escHtml(t)}</code>`);
+  // Bare URLs (not already inside href=) → clickable links
+  text = text.replace(/(?<!href=["'])https?:\/\/[^\s<>"')]+/g, (url) => {
+    const cleanUrl = url.replace(/[.,;:!?)]+$/, ''); // strip trailing punctuation
+    const display = escHtml(cleanUrl.length > 80 ? cleanUrl.slice(0, 77) + '…' : cleanUrl);
+    return `<a href="${cleanUrl}">${display}</a>`;
+  });
+  return text;
+}
+
+/**
+ * Get an Azure AD access token for the Graph API via the Azure CLI.
+ * Returns the token string, or null if az is unavailable / not logged in.
+ */
+function getGraphToken() {
+  try {
+    const raw = execFileSync(
+      'az', ['account', 'get-access-token', '--resource', 'https://graph.microsoft.com', '--query', 'accessToken', '-o', 'tsv'],
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 15000 }
+    ).trim();
+    return raw || null;
+  } catch (e) {
+    console.error(`Warning: Could not obtain Graph API token via az CLI: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * Post an HTML message to a single Teams channel via the Graph API.
+ * teamId / channelId come from TEAMS_CHANNELS config.
+ */
+function postToTeamsChannelViaGraph(teamId, channelId, htmlBody, token) {
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({
+      body: { contentType: 'html', content: htmlBody }
+    });
+
+    const options = {
+      hostname: 'graph.microsoft.com',
+      path: `/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/messages`,
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          console.error(`Posted digest to Teams channel ${channelId} (status: ${res.statusCode})`);
+        } else {
+          console.error(`Teams Graph API returned ${res.statusCode} for channel ${channelId}: ${data.slice(0, 200)}`);
+        }
+        resolve();
+      });
+    });
+
+    req.on('error', (err) => {
+      console.error(`Failed to post to Teams channel ${channelId}: ${err.message}`);
+      resolve();
+    });
+
+    req.write(payload);
+    req.end();
+  });
+}
+
+/**
+ * Post the tech news digest to ALL channels listed in TEAMS_CHANNELS using the
+ * Graph API.  Private channels receive the full digest; public channels receive
+ * the sanitized version.  Falls back gracefully if az CLI is unavailable.
+ */
+async function postToBothTeamsChannels(digest, publicDigest) {
+  const token = getGraphToken();
+  if (!token) {
+    console.error('Skipping Graph API channel posts — no access token available.');
+    return;
+  }
+
+  for (const ch of TEAMS_CHANNELS) {
+    const content = ch.public ? publicDigest : digest;
+    const html = digestToHtml(content);
+    console.error(`Posting to ${ch.label} (teamId: ${ch.teamId})…`);
+    await postToTeamsChannelViaGraph(ch.teamId, ch.channelId, html, token);
+  }
+}
+
 async function main() {
   try {
     ensureStateDir();
@@ -764,10 +918,10 @@ async function main() {
     // Post full digest to private webhook channel (includes issue links, repo refs)
     await postToTeamsWebhook(digest);
     
-    // Log public digest info for public channel posting
-    console.error(`\nPublic digest (sanitized) available for Squad > Tech News channel.`);
-    console.error(`Public channels strip: issue numbers, repo names, internal refs.`);
-    console.error(`Private webhook gets: full content with all references.\n`);
+    // Post to both dedicated Teams channels via Graph API:
+    //   - squads > Tech News          (full content, private)
+    //   - Squad > Squad Tech News     (sanitized, public)
+    await postToBothTeamsChannels(digest, publicDigest);
     
     // Update state with new URLs
     if (!state.reportedUrls[todayDate]) {

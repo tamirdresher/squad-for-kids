@@ -1,0 +1,70 @@
+# =============================================================================
+# docker-compose.yml — Local multi-agent Squad testing
+# POC for Squad-on-K8s (Issue #996)
+#
+# Usage:
+#   cp .env.example .env   # fill in GH_TOKEN, GITHUB_REPOSITORY
+#   docker compose -f infrastructure/k8s/docker-compose.yml up --build
+# =============================================================================
+
+services:
+  ralph:
+    build:
+      context: ../..
+      dockerfile: infrastructure/k8s/Dockerfile.ralph
+    container_name: squad-ralph
+    restart: unless-stopped
+    environment:
+      # Injected from .env file or shell environment
+      - GH_TOKEN=${GH_TOKEN:?GH_TOKEN is required}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-tamirdresher/tamresearch1}
+      - RALPH_INTERVAL_SECONDS=${RALPH_INTERVAL_SECONDS:-300}
+      - RALPH_LOG_LEVEL=${RALPH_LOG_LEVEL:-info}
+      - SQUAD_CONFIG_PATH=/app/squad.config.ts
+      # Copilot CLI configuration
+      - COPILOT_API_KEY=${COPILOT_API_KEY:-}
+    volumes:
+      # Mount squad config for live editing during development
+      - ../../squad.config.ts:/app/squad.config.ts:ro
+      - ../../.squad/team.md:/app/.squad/team.md:ro
+      - ../../.squad/routing.md:/app/.squad/routing.md:ro
+      # Persist Ralph logs across restarts
+      - ralph-logs:/home/ralph/.squad
+    networks:
+      - squad-net
+    healthcheck:
+      test: ["CMD", "pwsh", "-NoProfile", "-Command", "if ($PSVersionTable.PSVersion.Major -ge 7) { exit 0 } else { exit 1 }"]
+      interval: 60s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  # -----------------------------------------------------------------------
+  # Future agents can be added here following the same pattern:
+  #
+  # scribe:
+  #   build:
+  #     context: ../..
+  #     dockerfile: infrastructure/k8s/Dockerfile.scribe
+  #   environment:
+  #     - GH_TOKEN=${GH_TOKEN}
+  #     - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+  #   networks:
+  #     - squad-net
+  # -----------------------------------------------------------------------
+
+volumes:
+  ralph-logs:
+    driver: local
+
+networks:
+  squad-net:
+    driver: bridge

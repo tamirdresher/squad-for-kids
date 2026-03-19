@@ -96,3 +96,5 @@ vbs-result*.txt
 
 # Auth tokens
 scripts/squad-email/device-code-reauth.json
+
+Zonos-Hebrew/

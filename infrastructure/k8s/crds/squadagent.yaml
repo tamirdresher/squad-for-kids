@@ -1,0 +1,180 @@
+# =============================================================================
+# SquadAgent CRD — Defines an individual Squad agent
+# POC for Squad-on-K8s (Issue #996)
+#
+# Each SquadAgent maps to a pod (pod-per-agent model).
+# This is a prototype CRD definition only — no operator is implemented yet.
+# Apply with: kubectl apply -f squadagent.yaml
+# =============================================================================
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: squadagents.squad.github.com
+  labels:
+    app.kubernetes.io/part-of: squad
+spec:
+  group: squad.github.com
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - name
+                - role
+                - image
+              properties:
+                name:
+                  type: string
+                  description: "Agent character name (e.g., ralph, picard, data)"
+                role:
+                  type: string
+                  description: "Agent role/function"
+                  enum:
+                    - monitor
+                    - lead
+                    - coder
+                    - researcher
+                    - security
+                    - infrastructure
+                    - communications
+                    - scribe
+                    - reviewer
+                image:
+                  type: string
+                  description: "Container image for this agent"
+                capabilities:
+                  type: array
+                  description: "What this agent can do (maps to needs:* labels)"
+                  items:
+                    type: string
+                  example:
+                    - "work-monitoring"
+                    - "issue-triage"
+                    - "pr-review"
+                modelTier:
+                  type: string
+                  description: "Model tier this agent uses"
+                  enum: ["premium", "standard", "fast"]
+                  default: "standard"
+                schedule:
+                  type: object
+                  description: "Scheduling configuration for periodic agents"
+                  properties:
+                    type:
+                      type: string
+                      enum: ["continuous", "interval", "cron"]
+                      default: "interval"
+                    intervalSeconds:
+                      type: integer
+                      description: "Poll interval in seconds (for type=interval)"
+                      default: 300
+                      minimum: 60
+                    cronExpression:
+                      type: string
+                      description: "Cron schedule (for type=cron)"
+                    activeHours:
+                      type: object
+                      description: "Restrict agent to specific hours"
+                      properties:
+                        startHour:
+                          type: integer
+                          minimum: 0
+                          maximum: 23
+                        endHour:
+                          type: integer
+                          minimum: 0
+                          maximum: 23
+                        timezone:
+                          type: string
+                          default: "UTC"
+                resources:
+                  type: object
+                  description: "K8s resource requirements"
+                  properties:
+                    limits:
+                      type: object
+                      properties:
+                        cpu:
+                          type: string
+                          default: "1"
+                        memory:
+                          type: string
+                          default: "512Mi"
+                    requests:
+                      type: object
+                      properties:
+                        cpu:
+                          type: string
+                          default: "250m"
+                        memory:
+                          type: string
+                          default: "128Mi"
+                credentialRef:
+                  type: string
+                  description: "Name of K8s Secret containing GH_TOKEN and other creds"
+                nodeSelector:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: "Maps needs:* labels to K8s node selectors for affinity"
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: ["pending", "running", "idle", "error", "disabled"]
+                lastRoundTime:
+                  type: string
+                  format: date-time
+                totalRounds:
+                  type: integer
+                consecutiveFailures:
+                  type: integer
+                  default: 0
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Role
+          type: string
+          jsonPath: .spec.role
+        - name: Tier
+          type: string
+          jsonPath: .spec.modelTier
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Rounds
+          type: integer
+          jsonPath: .status.totalRounds
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: squadagents
+    singular: squadagent
+    kind: SquadAgent
+    shortNames:
+      - sa

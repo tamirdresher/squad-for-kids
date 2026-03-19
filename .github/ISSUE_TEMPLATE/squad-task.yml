@@ -6,11 +6,32 @@ body:
     attributes:
       value: |
         This issue will be triaged by the Squad lead and assigned to the appropriate team member.
+
   - type: textarea
     id: description
     attributes:
       label: Description
       description: Optional - describe the task or leave blank if the title is sufficient.
       placeholder: Add details here if needed...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: machine_capabilities
+    attributes:
+      label: "Machine capability requirements (needs:* labels)"
+      description: |
+        Check any capabilities this task requires. Ralph instances will only pick up this issue
+        if their `~/.squad/machine-capabilities.json` lists all checked capabilities.
+        Leave unchecked if any machine can handle it.
+      options:
+        - label: "`needs:browser` — requires Playwright / browser automation"
+        - label: "`needs:whatsapp` — requires active WhatsApp Web session"
+        - label: "`needs:gpu` — requires GPU for ML / voice workloads"
+        - label: "`needs:personal-gh` — requires `tamirdresher` personal GitHub account"
+        - label: "`needs:emu-gh` — requires `tamirdresher_microsoft` EMU GitHub account"
+        - label: "`needs:teams-mcp` — requires Teams MCP tools running"
+        - label: "`needs:onedrive` — requires OneDrive folder synced"
+        - label: "`needs:azure-speech` — requires Azure Speech SDK and credentials"
     validations:
       required: false

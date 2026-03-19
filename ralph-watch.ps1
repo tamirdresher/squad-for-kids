@@ -721,6 +721,7 @@ function Invoke-PostFailureRemediation {
     return $actions
 }
 
+
 # Function to test if this machine can handle an issue's needs:* labels (Issue #987)
 function Test-MachineCapability {
     param(

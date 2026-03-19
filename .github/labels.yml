@@ -1,0 +1,122 @@
+# GitHub Labels — declarative definition
+# Managed by .github/labels.yml — synced via sync-squad-labels workflow.
+# Add new labels here and they will be created/updated automatically.
+
+# ── Squad routing ──────────────────────────────────────────────────────────
+- name: squad
+  color: "0075ca"
+  description: "Squad AI team issue"
+
+- name: squad:belanna
+  color: "e4e669"
+  description: "Assigned to B'Elanna (Infrastructure)"
+
+- name: squad:picard
+  color: "e4e669"
+  description: "Assigned to Picard (Lead/Architect)"
+
+- name: squad:data
+  color: "e4e669"
+  description: "Assigned to Data (Code Expert)"
+
+- name: squad:seven
+  color: "e4e669"
+  description: "Assigned to Seven (Research & Docs)"
+
+- name: squad:worf
+  color: "e4e669"
+  description: "Assigned to Worf (Security & Cloud)"
+
+- name: squad:neelix
+  color: "e4e669"
+  description: "Assigned to Neelix (News/Comms)"
+
+- name: squad:troi
+  color: "e4e669"
+  description: "Assigned to Troi (Blog/Voice)"
+
+- name: squad:ralph
+  color: "e4e669"
+  description: "Assigned to Ralph (Work Monitor)"
+
+- name: squad:copilot
+  color: "e4e669"
+  description: "Assigned to @copilot (autonomous)"
+
+# ── Status ─────────────────────────────────────────────────────────────────
+- name: status:needs-action
+  color: "D73A4A"
+  description: "Tamir must take a specific action (email, form, etc)"
+
+- name: status:needs-decision
+  color: "9B30CC"
+  description: "Tamir must make a call before work can proceed"
+
+- name: status:needs-review
+  color: "F9A825"
+  description: "Tamir needs to review a PR, doc, or plan"
+
+- name: status:waiting-external
+  color: "0075ca"
+  description: "Waiting on something outside the squad"
+
+- name: status:in-progress
+  color: "FEF2C0"
+  description: "Squad is actively working on this"
+
+- name: status:blocked
+  color: "B60205"
+  description: "Hard-blocked on a dependency"
+
+- name: status:scheduled
+  color: "0E8A16"
+  description: "Planned, not yet started"
+
+- name: status:postponed
+  color: "FEF2C0"
+  description: "Deliberately deferred"
+
+- name: status:done
+  color: "0E8A16"
+  description: "Complete"
+
+- name: status:ready-to-publish
+  color: "0E8A16"
+  description: "Content/artifact ready to publish — just needs Tamir to pull the trigger"
+
+# ── Machine capability requirements (Issue #987) ───────────────────────────
+# These labels declare what machine capabilities an issue needs.
+# Ralph instances read their ~/.squad/machine-capabilities.json and skip
+# any issue whose needs:* labels aren't satisfied by local capabilities.
+
+- name: "needs:browser"
+  color: "D4C5F9"
+  description: "requires Playwright/browser automation"
+
+- name: "needs:whatsapp"
+  color: "D4C5F9"
+  description: "requires WhatsApp Web session (persistent browser)"
+
+- name: "needs:gpu"
+  color: "D4C5F9"
+  description: "requires GPU for ML/voice workloads"
+
+- name: "needs:personal-gh"
+  color: "D4C5F9"
+  description: "requires tamirdresher personal GitHub account"
+
+- name: "needs:emu-gh"
+  color: "D4C5F9"
+  description: "requires tamirdresher_microsoft EMU GitHub account"
+
+- name: "needs:teams-mcp"
+  color: "D4C5F9"
+  description: "requires Teams MCP tools running"
+
+- name: "needs:onedrive"
+  color: "D4C5F9"
+  description: "requires OneDrive folder synced"
+
+- name: "needs:azure-speech"
+  color: "D4C5F9"
+  description: "requires Azure Speech SDK and credentials"

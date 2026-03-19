@@ -5,6 +5,7 @@ on:
     paths:
       - '.squad/team.md'
       - '.ai-team/team.md'
+      - '.github/labels.yml'
       - '.github/workflows/sync-squad-labels.yml'
   workflow_dispatch:
 jobs:

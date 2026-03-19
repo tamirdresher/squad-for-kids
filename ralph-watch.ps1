@@ -21,6 +21,14 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     exit 1
 }
 
+# Fix GH_CONFIG_DIR — MUST be set before any gh commands
+# The system env var often points to a nonexistent path (e.g., ~/.config/gh-emu)
+# Real auth lives in %APPDATA%\GitHub CLI on this DevBox
+$ghConfigCandidate = "$env:APPDATA\GitHub CLI"
+if (Test-Path "$ghConfigCandidate\hosts.yml") {
+    $env:GH_CONFIG_DIR = $ghConfigCandidate
+}
+
 # Fix UTF-8 rendering in Windows PowerShell console
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -510,7 +518,8 @@ function Invoke-RalphHealthCheck {
     foreach ($procName in @('agency', 'node')) {
         $procs = @(Get-Process -Name $procName -ErrorAction SilentlyContinue)
         if ($procs.Count -gt 5) {
-            foreach ($proc in $procs) {
+            $toKill = $procs | Select-Object -Skip 5
+            foreach ($proc in $toKill) {
                 $ppid = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" -ErrorAction SilentlyContinue).ParentProcessId
                 if ($ppid -ne $myPid -and $ppid -notin $myChildren) {
                     try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $orphanCount++ } catch {}
@@ -1696,13 +1705,6 @@ Max parallelism: $($budgetStatus.MaxParallelism) agent(s).
 
         [System.IO.File]::WriteAllText($promptFile, $effectivePrompt, [System.Text.Encoding]::UTF8)
         
-        # Health already ran at top-of-round; this second call is now a no-op kept for safety
-        # (Invoke-PreRoundHealthCheck is a shim that delegates to Invoke-RalphHealthCheck)
-        $healActions2 = Invoke-RalphHealthCheck -Round $round
-        if ($healActions2.Healed.Count -gt 0) {
-            Write-Host "[$displayTime] [health] Pre-prompt check healed: $($healActions2.Healed -join ' | ')" -ForegroundColor Yellow
-        }
-
         # Model circuit breaker: select model based on rate-limit state
         $modelForRound = Get-CurrentModel
         if ([string]::IsNullOrWhiteSpace($modelForRound)) {

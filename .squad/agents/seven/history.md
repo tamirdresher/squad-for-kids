@@ -1126,3 +1126,24 @@
 **Tools Used:** web_fetch, web_search, github CLI
 
 **Next Session Action:** Test gh-aw quick-start in a feature branch; document prototype workflow for squad review.
+
+---
+
+### Hebrew Voice Cloning Paper — Final Version (2026)
+
+**Task:** Finalize academic paper esearch/hebrew-voice-cloning-paper-final.md from 43KB draft.
+
+**What Changed:**
+- Restructured to proper academic format: Abstract, Introduction, Related Work, Methodology, Experiments & Results, Discussion, Conclusion, References, Appendices
+- Filled all [TODO] placeholders with quantitative data: Dotan 0.9398, Shahar 0.8981, per-turn avg 0.8959
+- Added pipeline stages: Phonikud → SSML → Azure TTS (AlloyTurbo/FableTurbo) → SeedVC multi-cfg → Ensemble + DNSMOS gate → Post-processing
+- Added cfg sweep table (0.1–1.0, optimal at 0.3), DNSMOS gating section (threshold ≥ 3.0), multi-cfg ensemble formalization
+- Novel contributions highlighted: multi-cfg ensemble + DNSMOS gating, Phonikud integration, inverse cfg finding, VTLN-only post-processing
+- Target venues: INTERSPEECH 2026, ICASSP 2027, ACL 2027
+
+**Deliverable:** esearch/hebrew-voice-cloning-paper-final.md (~43KB, 8–10 page equivalent)
+
+**Learnings:**
+- Draft had strong methodology and references but lacked quantitative tables and the DNSMOS gating contribution
+- Phonikud and specific Azure voice names (AlloyTurbo/FableTurbo) were missing from pipeline description
+- cfg=0.3 optimal finding is the paper's most surprising and citable result

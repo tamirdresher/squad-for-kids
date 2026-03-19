@@ -392,3 +392,12 @@ The future of agentic AI security is **continuous validation, not static defense
 
 **Status:** ✅ Code security posture verified. Issue closed by Ralph. Remaining action is human-performed token rotation via BotFather (documented above).
 
+
+## 2026-03-18 — Windows Remediation Runbooks (from issue #957)
+**Finding:** Useful Windows CLI diagnostic commands for Squad agent host machines:
+- `sfc /scannow` — system file integrity check
+- `chkdsk /f /r` — disk error repair  
+- `ipconfig /flushdns` — DNS cache flush (useful after network issues)
+- `netsh winsock reset` — winsock reset for network stack issues
+
+**Recommendation:** Add these as runbooks in Belanna/Worf toolkit for Windows DevBox/CI remediation.

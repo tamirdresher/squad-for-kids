@@ -1309,11 +1309,9 @@ while ($true) {
     # Isolates entire gh config (auth, cache, prefs) per-account without global state mutation
     try {
         $remoteUrl = & git remote get-url origin 2>&1 | Out-String
-        $env:GH_CONFIG_DIR = if ($remoteUrl -match "tamirdresher_microsoft") {
-            "$HOME\.config\gh-emu"
-        } else {
-            "$HOME\.config\gh-public"
-        }
+        # Auth lives in %APPDATA%\GitHub CLI (both EMU and personal accounts via gh auth switch)
+        # The gh-emu/gh-public dirs were planned but never created — use the real config dir
+        $env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
         Write-Host "[$timestamp] gh auth: GH_CONFIG_DIR set to $($env:GH_CONFIG_DIR) (full config isolation)" -ForegroundColor Green
     } catch {
         Write-Host "[$timestamp] Warning: gh auth check failed: $($_.Exception.Message)" -ForegroundColor Yellow

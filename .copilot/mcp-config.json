@@ -12,6 +12,23 @@
         "*"
       ]
     },
+    "bitwarden": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "C:/temp/mcp-server/dist/index.js"
+      ],
+      "tools": [
+        "squad_store",
+        "squad_get",
+        "squad_list",
+        "squad_audit",
+        "status",
+        "list",
+        "get",
+        "generate"
+      ]
+    },
     "EXAMPLE-trello": {
       "command": "npx",
       "args": [

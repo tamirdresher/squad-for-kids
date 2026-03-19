@@ -474,6 +474,36 @@ function Invoke-RalphHealthCheck {
         Write-Host "[$ts] [health] Model was null/empty — CB reset to claude-sonnet-4.6 (fixes --model '' exit-1)" -ForegroundColor Yellow
     }
 
+    # ── Check 2b: Copilot config CB validator — verify preferredModel key exists ──
+    # Checks the Copilot config file (not the ralph-circuit-breaker.json) for a
+    # preferredModel key. If missing or null, logs warning and resets to default.
+    $copilotConfigPaths = @(
+        (Join-Path $env:USERPROFILE ".copilot\copilot.json"),
+        (Join-Path $env:APPDATA    "GitHub Copilot\copilot.json")
+    )
+    foreach ($cfPath in $copilotConfigPaths) {
+        if (Test-Path $cfPath) {
+            try {
+                $cfContent = Get-Content $cfPath -Raw -Encoding utf8 | ConvertFrom-Json
+                if ($null -eq $cfContent.preferredModel -or
+                    [string]::IsNullOrWhiteSpace($cfContent.preferredModel)) {
+                    $warnings.Add("Copilot config '$cfPath' missing/null preferredModel — resetting to claude-sonnet-4.6")
+                    Write-Host "[$ts] [health] WARNING: Copilot config '$cfPath' missing preferredModel — resetting to claude-sonnet-4.6" -ForegroundColor Yellow
+                    $cfContent | Add-Member -NotePropertyName "preferredModel" `
+                                            -NotePropertyValue "claude-sonnet-4.6" -Force
+                    $cfContent | ConvertTo-Json -Depth 5 | Set-Content $cfPath -Encoding utf8
+                    $healed.Add("Copilot config preferredModel reset to claude-sonnet-4.6 at '$cfPath'")
+                } else {
+                    Write-Host "[$ts] [health] Copilot config OK: preferredModel=$($cfContent.preferredModel)" -ForegroundColor DarkGray
+                }
+            } catch {
+                $warnings.Add("Copilot config parse error at '$cfPath': $($_.Exception.Message)")
+                Write-Host "[$ts] [health] WARNING: Could not parse Copilot config '$cfPath': $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+            break  # Only inspect the first path that exists
+        }
+    }
+
     # ── Check 3: GH_CONFIG_DIR — validate dir exists AND gh is authenticated ──
     $ghAuthOk = $false
     if (-not [string]::IsNullOrWhiteSpace($env:GH_CONFIG_DIR) -and (Test-Path $env:GH_CONFIG_DIR)) {
@@ -490,8 +520,8 @@ function Invoke-RalphHealthCheck {
             Write-Host "[$ts] [health] GH_CONFIG_DIR fixed -> '$canonicalDir' (login: $($probe.Trim()))" -ForegroundColor Yellow
             $ghAuthOk = $true
         } else {
-            # Try additional fallback paths
-            foreach ($path in @("$HOME\.config\gh", "$HOME\.config\gh-emu")) {
+            # Try additional fallback paths — gh-emu first, then personal gh
+            foreach ($path in @("$HOME\.config\gh-emu", "$HOME\.config\gh")) {
                 if (Test-Path "$path\hosts.yml") {
                     $env:GH_CONFIG_DIR = $path
                     $retry = & gh api user --jq '.login' 2>&1
@@ -510,26 +540,39 @@ function Invoke-RalphHealthCheck {
         }
     }
 
-    # ── Check 4: Orphaned agency.exe / node processes — kill if >5 extras ────
-    $myPid      = $PID
-    $myChildren = @((Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
-                    Where-Object { $_.ParentProcessId -eq $myPid }).ProcessId)
-    $orphanCount = 0
+    # ── Check 4: Orphaned agency.exe / node processes — kill oldest if >10 are >30min old ──
+    # Collect agency/node processes that are NOT our children and are older than 30 minutes.
+    # If the stale-orphan count exceeds 10, kill the oldest ones (keep the 10 newest).
+    $myPid           = $PID
+    $myChildren      = @((Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+                         Where-Object { $_.ParentProcessId -eq $myPid }).ProcessId)
+    $orphanAgeMin    = 30
+    $orphanKillLimit = 10
+    $staleOrphans    = [System.Collections.Generic.List[object]]::new()
     foreach ($procName in @('agency', 'node')) {
-        $procs = @(Get-Process -Name $procName -ErrorAction SilentlyContinue)
-        if ($procs.Count -gt 5) {
-            $toKill = $procs | Select-Object -Skip 5
-            foreach ($proc in $toKill) {
-                $ppid = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" -ErrorAction SilentlyContinue).ParentProcessId
-                if ($ppid -ne $myPid -and $ppid -notin $myChildren) {
-                    try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $orphanCount++ } catch {}
+        foreach ($proc in @(Get-Process -Name $procName -ErrorAction SilentlyContinue)) {
+            try {
+                $ageMin = ((Get-Date) - $proc.StartTime).TotalMinutes
+                $ppid   = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" `
+                           -ErrorAction SilentlyContinue).ParentProcessId
+                if ($ageMin -gt $orphanAgeMin -and
+                    $ppid -ne $myPid -and $ppid -notin $myChildren) {
+                    $staleOrphans.Add($proc)
                 }
-            }
+            } catch {}
         }
     }
-    if ($orphanCount -gt 0) {
-        $healed.Add("Killed $orphanCount orphaned agency/node processes")
-        Write-Host "[$ts] [health] Killed $orphanCount orphaned agency.exe/node processes (>5 threshold)" -ForegroundColor Yellow
+    $orphanCount = 0
+    if ($staleOrphans.Count -gt $orphanKillLimit) {
+        # Kill the oldest, keeping the $orphanKillLimit newest alive
+        $toKill = $staleOrphans | Sort-Object StartTime | Select-Object -First ($staleOrphans.Count - $orphanKillLimit)
+        foreach ($proc in $toKill) {
+            try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $orphanCount++ } catch {}
+        }
+        $healed.Add("Killed $orphanCount orphaned agency/node processes (>$orphanAgeMin min old, threshold >$orphanKillLimit)")
+        Write-Host "[$ts] [health] Killed $orphanCount orphaned agency.exe/node processes ($($staleOrphans.Count) found >$orphanAgeMin min old; kept $orphanKillLimit newest)" -ForegroundColor Yellow
+    } elseif ($staleOrphans.Count -gt 0) {
+        Write-Host "[$ts] [health] $($staleOrphans.Count) stale orphan(s) found (threshold $orphanKillLimit — no kill needed)" -ForegroundColor DarkGray
     }
 
     # ── Check 5: Branch drift — warn if not on expected branch ───────────────
@@ -589,7 +632,7 @@ function Invoke-PostFailureRemediation {
             $pool | ConvertTo-Json -Depth 5 | Set-Content $ratePool -Encoding utf8
         }
         $actions += "Tier1: Reset CB + cleared rate pool cooldown"
-        Write-Host "[$ts] [self-heal] Tier 1 remediation: reset CB and rate pool" -ForegroundColor Yellow
+        Write-Host "[$ts] [self-heal] 🔧 Self-heal: reset cooldown (Tier 1 — $ConsecutiveFailures consecutive failures)" -ForegroundColor Yellow
     }
 
     if ($ConsecutiveFailures -ge 6 -and $ConsecutiveFailures -lt 9) {
@@ -626,10 +669,46 @@ function Invoke-PostFailureRemediation {
     }
 
     if ($ConsecutiveFailures -ge 15) {
-        # Tier 4: Give up — pause 1 hour
-        $actions += "Tier4: Pausing 1 hour after $ConsecutiveFailures failures"
-        Write-Host "[$ts] [self-heal] Tier 4: GIVING UP -- pausing 1 hour" -ForegroundColor Red
-        Start-Sleep -Seconds 3600
+        # Tier 4: Post Teams alert + pause 30 minutes
+        $actions += "Tier4: Posting Teams alert + pausing 30 minutes after $ConsecutiveFailures failures"
+        Write-Host "[$ts] [self-heal] Tier 4: CRITICAL — $ConsecutiveFailures failures, alerting Teams and pausing 30 minutes" -ForegroundColor Red
+
+        # Post Teams alert via the squad webhook file
+        $webhookFile = Join-Path $env:USERPROFILE ".squad\teams-webhook.url"
+        if (Test-Path $webhookFile) {
+            try {
+                $webhookUrl = (Get-Content $webhookFile -Raw -Encoding utf8).Trim()
+                if (-not [string]::IsNullOrWhiteSpace($webhookUrl)) {
+                    $alertBody = @{
+                        "@type"    = "MessageCard"
+                        "@context" = "https://schema.org/extensions"
+                        summary    = "🚨 Ralph Self-Heal: $ConsecutiveFailures consecutive failures on $env:COMPUTERNAME"
+                        themeColor = "FF0000"
+                        title      = "🚨 Ralph Self-Heal Alert — $env:COMPUTERNAME"
+                        sections   = @(@{
+                            activityTitle = "Ralph has hit $ConsecutiveFailures consecutive failures and is pausing 30 minutes"
+                            facts = @(
+                                @{ name = "Machine";              value = $env:COMPUTERNAME },
+                                @{ name = "Round";                value = $Round },
+                                @{ name = "Consecutive Failures"; value = $ConsecutiveFailures },
+                                @{ name = "Timestamp";            value = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') },
+                                @{ name = "Action";               value = "Pausing 30 minutes, then resuming" }
+                            )
+                        })
+                    } | ConvertTo-Json -Depth 10
+                    Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $alertBody `
+                        -ContentType "application/json" -ErrorAction SilentlyContinue | Out-Null
+                    $actions += "Tier4: Teams alert sent via $webhookFile"
+                    Write-Host "[$ts] [self-heal] Teams alert sent to webhook" -ForegroundColor Yellow
+                }
+            } catch {
+                Write-Host "[$ts] [self-heal] Warning: Failed to send Teams alert: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "[$ts] [self-heal] Teams webhook file not found at $webhookFile — skipping alert" -ForegroundColor Yellow
+        }
+
+        Start-Sleep -Seconds 1800  # 30 minutes
     }
 
     # Log

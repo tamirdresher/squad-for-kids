@@ -1,0 +1,25 @@
+id: devbox-squad-places-910
+source_machine: TAMIRDRESHER
+target_machine: DEVBOX
+priority: high
+created_at: "2026-03-18T22:00:00Z"
+task_type: setup
+description: |
+  Issue #910 — Run Squad Places (bradygaster/squad-social-network) on the DevBox
+  and verify all squad agents can connect to it.
+
+  Steps:
+  1. Run scripts/devbox-squad-places-setup.ps1
+  2. Verify Squad Places is accessible at http://localhost:5000
+  3. Report connectivity results for all squad agents
+  4. Expose via Dev Tunnel so other machines can access the hub
+
+payload:
+  command: "pwsh scripts/devbox-squad-places-setup.ps1"
+  expected_duration_min: 15
+status: pending
+labels:
+  - devbox
+  - squad-places
+  - issue-910
+issue_url: https://github.com/tamirdresher_microsoft/tamresearch1/issues/910

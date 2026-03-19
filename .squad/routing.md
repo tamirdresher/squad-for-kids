@@ -24,6 +24,35 @@ How to decide who handles what.
 | `squad:{name}` | Pick up issue and complete the work | Named member |
 | `squad:copilot` | Assign to @copilot for autonomous work (if enabled) | @copilot 🤖 |
 
+## Status Label Taxonomy
+
+Status labels describe where an issue stands. Use the most specific label — avoid `status:pending-user` (deprecated).
+
+| Label | Color | When to use |
+|-------|-------|-------------|
+| `status:needs-action` | 🔴 red | Tamir must physically DO something (approve, reply, fill form, rotate key) |
+| `status:needs-decision` | 🟣 purple | Tamir must make a directional call before squad can proceed |
+| `status:needs-review` | 🟠 amber | Tamir needs to read and give feedback (PR, doc, plan) |
+| `status:waiting-external` | 🔵 blue | Waiting on someone/something outside the squad — no action needed from Tamir |
+| `status:in-progress` | 🟡 yellow | Squad is actively working on this |
+| `status:blocked` | 🔴 dark | Hard-blocked on a dependency or technical issue |
+| `status:scheduled` | 🔷 teal | Planned, not yet started — sitting in queue intentionally |
+| `status:postponed` | 🟡 yellow | Deliberately deferred — waiting for a future event |
+| `status:done` | 🟢 green | Complete |
+
+### Quick Decision Guide for Agents
+
+```
+Is Tamir reviewing something someone produced?   → status:needs-review
+Does Tamir need to choose between options?        → status:needs-decision
+Does Tamir need to DO a specific concrete task?   → status:needs-action
+Is everyone just waiting for an external event?   → status:waiting-external
+```
+
+> ⚠️ `status:pending-user` is **deprecated** as of 2026-06-07. Do not use it for new issues.
+
+---
+
 ### How Issue Assignment Works
 
 1. When a GitHub issue gets the `squad` label, the **Lead** triages it — analyzing content, evaluating @copilot's capability profile, assigning the right `squad:{member}` label, and commenting with triage notes.
@@ -120,6 +149,52 @@ See `docs/event-trigger-gap-analysis.md` for the full gap analysis. Priority can
 - **Deployment failures** → `squad:belanna` (same pattern as CI failures)
 - **Security alerts** (Dependabot, CodeQL findings) → `squad:worf`
 - **PR review stale >24h** → reminder comment, >48h → escalate to Lead
+
+---
+
+## Machine Capability Routing (Issue #987)
+
+Some issues require specific machine capabilities — a GPU, a WhatsApp session, a particular GitHub account, etc.
+The `needs:*` label family declares these requirements on issues so Ralph instances can self-select work they can actually complete.
+
+### Label → Capability Mapping
+
+| Label | Capability key | What it means |
+|-------|---------------|---------------|
+| `needs:whatsapp` | `whatsapp` | Machine must have an active WhatsApp Web session |
+| `needs:browser` | `browser` | Machine must have Playwright / browser automation |
+| `needs:gpu` | `gpu` | Machine must have an NVIDIA GPU (nvidia-smi) |
+| `needs:personal-gh` | `personal-gh` | Machine must have `tamirdresher` personal GitHub auth |
+| `needs:emu-gh` | `emu-gh` | Machine must have `tamirdresher_microsoft` EMU auth |
+| `needs:teams-mcp` | `teams-mcp` | Machine must have Teams MCP tools available |
+| `needs:onedrive` | `onedrive` | Machine must have OneDrive folder synced |
+| `needs:azure-speech` | `azure-speech` | Machine must have Azure Speech SDK / credentials |
+
+### How It Works
+
+1. **Discovery:** `scripts/discover-machine-capabilities.ps1` probes the local machine and writes `~/.squad/machine-capabilities.json`.
+2. **Startup:** Ralph runs the discovery script on its first round (and every 50th round to stay fresh).
+3. **Filtering:** Before picking up an issue, Ralph checks all `needs:*` labels against the manifest's `capabilities` array.
+4. **Skip logic:** If ANY required capability is missing, Ralph skips the issue. Another instance on a capable machine handles it.
+5. **No needs labels:** Issues without `needs:*` labels can be picked up by any machine (the common case).
+
+### Manifest Format (`~/.squad/machine-capabilities.json`)
+
+```json
+{
+  "machine": "DESKTOP-ABC123",
+  "capabilities": ["browser", "emu-gh", "onedrive", "teams-mcp"],
+  "missing": ["gpu", "whatsapp", "personal-gh", "azure-speech"],
+  "details": { ... },
+  "last_updated": "2026-07-23T10:30:00Z"
+}
+```
+
+### When to Add `needs:*` Labels
+
+- **At issue creation** if the requirement is obvious (e.g., "Record Hebrew podcast" → `needs:azure-speech`)
+- **During triage** when the Lead or agent identifies a machine dependency
+- **Retroactively** when Ralph fails an issue due to missing tooling — add the label so it gets routed correctly next time
 
 ---
 

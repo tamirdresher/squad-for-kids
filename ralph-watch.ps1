@@ -315,6 +315,11 @@ WHATSAPP FAMILY MONITORING (every 3rd round):
 7. Do NOT create duplicate issues — check existing open issues with label "family-request" first
 8. If WhatsApp Web is not connected or requires QR scan, log a warning and skip — do NOT block the round
 
+MACHINE CAPABILITY ROUTING (Issue #987): Before picking up ANY issue, check its labels for `needs:*` prefixes.
+The file ~/.squad/machine-capabilities.json lists what this machine supports. The `capabilities` array contains strings like "browser", "gpu", "whatsapp", "personal-gh", "emu-gh", "teams-mcp", "onedrive", "azure-speech".
+For every `needs:X` label on an issue, verify that `X` is in the capabilities array. If ANY required capability is missing, SKIP the issue silently — another Ralph instance on a capable machine will handle it. Log: "[cap-check] Skipping issue #N — missing: X, Y".
+This prevents wasted rounds on issues this machine cannot complete.
+
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
 '@
 
@@ -390,6 +395,223 @@ function Invoke-LogRotation {
         $kept = $allLines | Select-Object -Last ($maxLogEntries - 1)
         $rotatedHeader = "# Ralph Watch Log - Rotated $(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss') (kept last $($maxLogEntries - 1) entries)"
         @($rotatedHeader) + $kept | Out-File -FilePath $logFile -Encoding utf8 -Force
+    }
+}
+
+# Self-healing watchdog: pre-round health check (Issue #988)
+# Runs BEFORE each round to detect and fix known failure modes proactively
+function Invoke-PreRoundHealthCheck {
+    param([int]$Round)
+    $ts = Get-Date -Format 'HH:mm:ss'
+    $healed = @()
+
+    # Check 1: CB file schema — ensure flat format with expected keys
+    $cbFile = Join-Path (Get-Location) ".squad/ralph-circuit-breaker.json"
+    if (Test-Path $cbFile) {
+        $cb = Get-Content $cbFile -Raw | ConvertFrom-Json
+        if (-not $cb.preferredModel -and $cb.model_fallback) {
+            # Nested schema detected — convert to flat
+            $flat = @{
+                state = "closed"
+                preferredModel = $cb.model_fallback.preferred
+                currentModel = $cb.model_fallback.preferred
+                fallbackChain = $cb.model_fallback.fallback_chain
+                lastRateLimitHit = $null
+                cooldownMinutes = 10
+                consecutiveSuccesses = 0
+                requiredSuccessesToClose = 2
+                totalFallbacks = 0
+                totalRecoveries = 0
+            }
+            $flat | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
+            $healed += "CB schema: converted nested->flat"
+            Write-Host "[$ts] [self-heal] Fixed CB schema (nested->flat)" -ForegroundColor Yellow
+        }
+    }
+
+    # Check 2: Model sanity — verify Get-CurrentModel returns non-empty
+    $model = Get-CurrentModel
+    if ([string]::IsNullOrWhiteSpace($model)) {
+        # Reset CB to defaults
+        @{
+            state = "closed"; preferredModel = "claude-sonnet-4.6"; currentModel = "claude-sonnet-4.6"
+            fallbackChain = @("claude-sonnet-4.5","gpt-5.4-mini","gpt-5-mini","gpt-4.1")
+            lastRateLimitHit = $null; cooldownMinutes = 10; consecutiveSuccesses = 0
+            requiredSuccessesToClose = 2; totalFallbacks = 0; totalRecoveries = 0
+        } | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
+        $healed += "Model was null -- reset CB to defaults"
+        Write-Host "[$ts] [self-heal] Model was null/empty -- reset CB file" -ForegroundColor Yellow
+    }
+
+    # Check 3: GH auth probe — verify gh api user works
+    $ghResult = & gh api user --jq '.login' 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        # Try known config paths
+        $knownPaths = @(
+            "$env:APPDATA\GitHub CLI",
+            "$HOME\.config\gh",
+            "$HOME\.config\gh-emu"
+        )
+        foreach ($path in $knownPaths) {
+            if (Test-Path "$path\hosts.yml") {
+                $env:GH_CONFIG_DIR = $path
+                $retry = & gh api user --jq '.login' 2>&1
+                if ($LASTEXITCODE -eq 0) {
+                    $healed += "GH auth: switched to $path"
+                    Write-Host "[$ts] [self-heal] Fixed GH auth -> $path" -ForegroundColor Yellow
+                    break
+                }
+            }
+        }
+    }
+
+    # Check 4: Orphaned agency processes — kill if >20 orphans
+    $myPid = $PID
+    $allAgency = Get-Process -Name agency -ErrorAction SilentlyContinue
+    if ($allAgency.Count -gt 20) {
+        $myChildren = Get-CimInstance Win32_Process | Where-Object { $_.ParentProcessId -eq $myPid } | Select-Object -ExpandProperty ProcessId
+        $orphanCount = 0
+        foreach ($proc in $allAgency) {
+            # Don't kill our own children or grandchildren
+            $parent = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" -ErrorAction SilentlyContinue).ParentProcessId
+            if ($parent -ne $myPid -and $parent -notin $myChildren) {
+                try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $orphanCount++ } catch {}
+            }
+        }
+        if ($orphanCount -gt 0) {
+            $healed += "Killed $orphanCount orphaned agency processes"
+            Write-Host "[$ts] [self-heal] Killed $orphanCount orphaned agency.exe processes" -ForegroundColor Yellow
+        }
+    }
+
+    # Log to self-heal log
+    if ($healed.Count -gt 0) {
+        $logFile = "$env:USERPROFILE\.squad\ralph-self-heal.log"
+        $entry = "$(Get-Date -Format 'o') | HEALED | Round=$Round | Actions: $($healed -join '; ')"
+        Add-Content -Path $logFile -Value $entry
+    }
+
+    return $healed
+}
+
+# Self-healing watchdog: post-failure remediation (Issue #988)
+# Tiered response based on consecutive failure count
+function Invoke-PostFailureRemediation {
+    param([int]$ConsecutiveFailures, [int]$Round)
+    $ts = Get-Date -Format 'HH:mm:ss'
+    $actions = @()
+
+    if ($ConsecutiveFailures -ge 3 -and $ConsecutiveFailures -lt 6) {
+        # Tier 1: Reset CB + clear rate pool cooldown
+        $cbFile = Join-Path (Get-Location) ".squad/ralph-circuit-breaker.json"
+        @{
+            state = "closed"; preferredModel = "claude-sonnet-4.6"; currentModel = "claude-sonnet-4.6"
+            fallbackChain = @("claude-sonnet-4.5","gpt-5.4-mini","gpt-5-mini","gpt-4.1")
+            lastRateLimitHit = $null; cooldownMinutes = 10; consecutiveSuccesses = 0
+            requiredSuccessesToClose = 2; totalFallbacks = 0; totalRecoveries = 0
+        } | ConvertTo-Json -Depth 3 | Set-Content $cbFile -Encoding utf8
+
+        $ratePool = "$env:USERPROFILE\.squad\rate-pool.json"
+        if (Test-Path $ratePool) {
+            $pool = Get-Content $ratePool -Raw | ConvertFrom-Json
+            $pool.cooldown_until = $null
+            $pool | ConvertTo-Json -Depth 5 | Set-Content $ratePool -Encoding utf8
+        }
+        $actions += "Tier1: Reset CB + cleared rate pool cooldown"
+        Write-Host "[$ts] [self-heal] Tier 1 remediation: reset CB and rate pool" -ForegroundColor Yellow
+    }
+
+    if ($ConsecutiveFailures -ge 6 -and $ConsecutiveFailures -lt 9) {
+        # Tier 2: Re-probe auth + kill orphans
+        $env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
+        $ghCheck = & gh api user --jq '.login' 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $actions += "Tier2: GH auth still broken after re-probe"
+        } else {
+            $actions += "Tier2: GH auth OK ($ghCheck)"
+        }
+
+        # Kill orphans
+        $allAgency = Get-Process -Name agency -ErrorAction SilentlyContinue
+        $killed = 0
+        foreach ($proc in $allAgency) {
+            $parent = (Get-CimInstance Win32_Process -Filter "ProcessId=$($proc.Id)" -ErrorAction SilentlyContinue).ParentProcessId
+            if ($parent -ne $PID) {
+                try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; $killed++ } catch {}
+            }
+        }
+        $actions += "Tier2: Killed $killed orphaned processes"
+        Write-Host "[$ts] [self-heal] Tier 2 remediation: auth re-probe + orphan cleanup ($killed killed)" -ForegroundColor Yellow
+    }
+
+    if ($ConsecutiveFailures -ge 9 -and $ConsecutiveFailures -lt 15) {
+        # Tier 3: Full heal — all of above + git pull latest
+        $actions += "Tier3: Full self-heal attempted"
+        Write-Host "[$ts] [self-heal] Tier 3: Full self-heal -- resetting everything" -ForegroundColor Red
+        # Pull latest from remote (non-destructive)
+        git stash 2>$null
+        git pull --rebase origin (git rev-parse --abbrev-ref HEAD) 2>$null
+        git stash pop 2>$null
+    }
+
+    if ($ConsecutiveFailures -ge 15) {
+        # Tier 4: Give up — pause 1 hour
+        $actions += "Tier4: Pausing 1 hour after $ConsecutiveFailures failures"
+        Write-Host "[$ts] [self-heal] Tier 4: GIVING UP -- pausing 1 hour" -ForegroundColor Red
+        Start-Sleep -Seconds 3600
+    }
+
+    # Log
+    if ($actions.Count -gt 0) {
+        $logFile = "$env:USERPROFILE\.squad\ralph-self-heal.log"
+        $entry = "$(Get-Date -Format 'o') | REMEDIATION | Round=$Round | Failures=$ConsecutiveFailures | $($actions -join '; ')"
+        Add-Content -Path $logFile -Value $entry
+    }
+
+    return $actions
+}
+
+# Function to test if this machine can handle an issue's needs:* labels (Issue #987)
+function Test-MachineCapability {
+    param(
+        [string[]]$IssueLabels
+    )
+
+    $capFile = Join-Path $env:USERPROFILE ".squad\machine-capabilities.json"
+    if (-not (Test-Path $capFile)) {
+        # No manifest yet — optimistic: assume capable
+        return @{ CanHandle = $true; Reason = "No capability manifest found — assuming capable" }
+    }
+
+    try {
+        $manifest = Get-Content $capFile -Raw -Encoding utf8 | ConvertFrom-Json
+    } catch {
+        return @{ CanHandle = $true; Reason = "Could not parse capability manifest — assuming capable" }
+    }
+
+    $machineCaps = @($manifest.capabilities)
+    $needsLabels = $IssueLabels | Where-Object { $_ -match '^needs:' }
+
+    if (-not $needsLabels -or $needsLabels.Count -eq 0) {
+        # Issue has no needs:* labels — any machine can handle it
+        return @{ CanHandle = $true; Reason = "No needs:* labels on issue" }
+    }
+
+    $missingCaps = [System.Collections.Generic.List[string]]::new()
+    foreach ($label in $needsLabels) {
+        $capName = $label -replace '^needs:', ''
+        if ($capName -notin $machineCaps) {
+            $missingCaps.Add($capName)
+        }
+    }
+
+    if ($missingCaps.Count -eq 0) {
+        return @{ CanHandle = $true; Reason = "All required capabilities present" }
+    } else {
+        return @{
+            CanHandle = $false
+            Reason    = "Missing capabilities: $($missingCaps -join ', ')"
+        }
     }
 }
 
@@ -1119,6 +1341,25 @@ while ($true) {
         }
     }
 
+    # Step -0.5: Machine capability discovery (Issue #987 — run once per startup, then every 50 rounds)
+    $capDiscoveryScript = Join-Path (Get-Location) "scripts\discover-machine-capabilities.ps1"
+    if (($round -eq 1 -or $round % 50 -eq 0) -and (Test-Path $capDiscoveryScript)) {
+        Write-Host "[$timestamp] [cap-discover] Running machine capability scan..." -ForegroundColor Cyan
+        try {
+            & $capDiscoveryScript | Out-Null
+            $capFile = Join-Path $env:USERPROFILE ".squad\machine-capabilities.json"
+            if (Test-Path $capFile) {
+                $capManifest = Get-Content $capFile -Raw -Encoding utf8 | ConvertFrom-Json
+                Write-Host "[$timestamp] [cap-discover] Capabilities: $($capManifest.capabilities -join ', ')" -ForegroundColor Green
+                if ($capManifest.missing.Count -gt 0) {
+                    Write-Host "[$timestamp] [cap-discover] Missing: $($capManifest.missing -join ', ')" -ForegroundColor Yellow
+                }
+            }
+        } catch {
+            Write-Host "[$timestamp] [cap-discover] Warning: capability scan failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+
     # Step 0: Run scheduled tasks via Squad Scheduler
     # The scheduler reads .squad/schedule.json and evaluates all triggers
     Write-Host "[$timestamp] Evaluating Squad schedule..." -ForegroundColor Yellow
@@ -1418,8 +1659,18 @@ Max parallelism: $($budgetStatus.MaxParallelism) agent(s).
 
         [System.IO.File]::WriteAllText($promptFile, $effectivePrompt, [System.Text.Encoding]::UTF8)
         
+        # Self-healing pre-round health check (Issue #988)
+        $healActions = Invoke-PreRoundHealthCheck -Round $round
+        if ($healActions.Count -gt 0) {
+            Write-Host "[$displayTime] [self-heal] Pre-round healed $($healActions.Count) issue(s): $($healActions -join ', ')" -ForegroundColor Yellow
+        }
+
         # Model circuit breaker: select model based on rate-limit state
         $modelForRound = Get-CurrentModel
+        if ([string]::IsNullOrWhiteSpace($modelForRound)) {
+            $modelForRound = "claude-sonnet-4.6"
+            Write-Host "[$displayTime] [model-cb] WARNING: model was null/empty, falling back to $modelForRound" -ForegroundColor Yellow
+        }
         Write-Host "[$displayTime] [model-cb] Using model: $modelForRound (state: $((Get-CircuitBreakerState).state))" -ForegroundColor DarkCyan
         
         # Create a thin wrapper script that reads the prompt from file and calls agency
@@ -1561,6 +1812,11 @@ exit `$LASTEXITCODE
         $reason = if ($logStatus -eq "TIMEOUT") { "TIMEOUT (round exceeded ${roundTimeoutMinutes}m)" } else { "Consecutive failures threshold ($consecutiveFailures)" }
         Write-Host "[$timestamp] $reason — sending Teams alert..." -ForegroundColor Yellow
         Send-TeamsAlert -Round $round -ConsecutiveFailures $consecutiveFailures -ExitCode $exitCode -Metrics $metrics
+    }
+
+    # Self-healing remediation based on failure tier (Issue #988)
+    if ($consecutiveFailures -ge 3) {
+        Invoke-PostFailureRemediation -ConsecutiveFailures $consecutiveFailures -Round $round
     }
     
     # --- Graceful shutdown: exit after round if sentinel was detected (#847) ---

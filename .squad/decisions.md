@@ -25251,3 +25251,1043 @@ Replace `GH_TOKEN` extraction and `gh auth switch` with `GH_CONFIG_DIR` as the p
 
 Should `GH_TOKEN` extraction be kept as a fallback for CI environments where config dirs may not persist? Recommend yes — document as legacy fallback, not primary path.
 
+
+
+---
+
+# DevBox + Squad Places Integration Plan (Issue #910)
+
+**Date:** 2026-03-18  
+**Author:** B'Elanna  
+**Status:** ✅ Staged — waiting on Tamir for OAuth credentials
+
+## What Was Decided
+
+Squad Places (bradygaster/squad-social-network) will run on the DevBox.
+All squad agents will connect to it via cross-machine coordination + Dev Tunnel.
+
+## Infrastructure Created
+
+| Artifact | Purpose |
+|----------|---------|
+| `scripts/devbox-squad-places-setup.ps1` | Full automation: clone, Redis, build, start, register |
+| `.squad/cross-machine/tasks/devbox-squad-places-910.yaml` | Cross-machine task queued for DevBox |
+| `.squad/cross-machine/config.json` (updated) | Added DEVBOX to known_machines, Squad Places URL |
+
+## Squad Places URL (when running)
+
+`http://localhost:5000` on DevBox → exposed via Dev Tunnel
+
+## Agent Integration
+
+Each agent reads hub URL from `.squad/cross-machine/config.json`:
+- Key: `config.known_machines.DEVBOX.squad_places_url`
+
+## Blockers
+
+1. GitHub OAuth App (Tamir to create)
+2. `gh auth login` on DevBox (Tamir to run)
+3. DevBox hostname confirmation (need `$env:COMPUTERNAME` from DevBox)
+
+## Related
+
+- Issue: #910
+- DEVBOX_TUNNEL_STATUS.md — previous connection established 2026-03-11
+- Scripts: devbox-ssh-setup.ps1, devbox-keep-alive.ps1 (v2.1), devbox-startup.ps1
+
+
+---
+
+# Decision: Ralph QoS — Adaptive Rate Limiting
+
+**Date:** 2026-07-16
+**Author:** B'Elanna (Infrastructure)
+**Requested by:** Tamir Dresher
+**Status:** Implemented
+
+## Context
+
+Copilot model API rate limits were being hit regularly. We'd already reduced from 2 Ralphs to 1, but needed further API pressure reduction.
+
+## Decision
+
+1. **Default polling interval increased from 5min to 10min** — halves API call frequency immediately
+2. **Adaptive backoff added** — on rate-limit hit, polling interval doubles (max 30min); after 2 consecutive successes, halves back toward default
+3. **Usage stats dashboard** — per-round metrics tracked to `~/.squad/ralph-usage-stats.json` with 24h rolling summaries
+
+## Key Design Choices
+
+- **Adaptive backoff is SEPARATE from the model circuit breaker** — backoff adjusts polling INTERVAL, circuit breaker adjusts MODEL. Both operate independently.
+- Usage stats capped at 200 rounds to prevent file growth
+- API calls estimated from round duration (~2 calls/30s) as proxy metric
+
+## Impact
+
+- ~50% reduction in API calls from interval change alone
+- Rate-limit recovery is automatic and gradual (no manual intervention needed)
+- Usage dashboard enables data-driven decisions about future interval tuning
+
+## Files Changed
+
+- `ralph-watch.ps1` — `$defaultIntervalMinutes`, `Write-UsageStats`, `Get-AdaptiveInterval`, sleep logic
+- `~/.squad/ralph-config.json` — `intervalSeconds: 600`
+- `~/.squad/ralph-usage-stats.json` — new dashboard file (created on first round)
+
+
+---
+
+# Content Company Research Strategy — TAM Research Publications Pipeline
+
+**Date:** 2026-07-23  
+**Author:** Picard (Lead)  
+**Issue:** [#927](https://github.com/tamirdresher_microsoft/tamresearch1/issues/927)  
+**Status:** ✅ ADOPTED  
+**Brand:** TechAI Explained  
+
+---
+
+## Executive Summary
+
+The tamresearch1 repo contains 15+ research publications. After reviewing each for personal/Microsoft-internal content, **9 are publishable** and represent a significant content pipeline opportunity. The highest-value items center on AI agent systems (Squad framework), DevOps metrics (Rework Rate), Hebrew voice cloning (academic-grade), and Kubernetes infrastructure migration.
+
+Recommended revenue split: **60% free community content** (drives traffic/brand) + **40% paid deep dives** (Gumroad guides, courses, bundles).
+
+---
+
+## Part 1: Research Inventory & Publishing Classification
+
+### ✅ PUBLISHABLE (9 items)
+
+| # | File | Topic | Type | Content Format |
+|---|------|--------|------|----------------|
+| 1 | `research/squad-framework-evolution-full.md` | Squad AI Agent Framework — platform evolution, Copilot integration, 10 contribution proposals | Deep tech | Blog series + paid course |
+| 2 | `research/squad-framework-evolution-onepager.md` | Squad Framework one-pager: 3 major blind spots + 10 contributions | Executive summary | LinkedIn article + lead magnet |
+| 3 | `research/squad-framework-gap-analysis.md` | Upstream squad vs. research squad feature-by-feature comparison | Comparative analysis | Blog post + paid appendix |
+| 4 | `research/squad-framework-contribution-plan.md` | 7 PRs roadmap for open-source bradygaster/squad | Open source guide | Blog post + GitHub repo |
+| 5 | `research/rework-rate-squad-integration.md` | Rework Rate: The 5th DORA metric — integration with AI squad systems | DevOps metric | Blog + Gumroad guide |
+| 6 | `research/copilot-sdk-evaluation.md` | GitHub Copilot SDK evaluation (Technical Preview) — agentic execution for CI/CD | SDK evaluation | Blog post + integration guide |
+| 7 | `research/hebrew-voice-cloning-paper-draft.md` | Human-quality Hebrew TTS via multi-stage voice conversion (0.9389 similarity) | Academic paper draft | arXiv + blog + course |
+| 8 | `research/ingress-nginx-eol-migration-plan.md` | Ingress-NGINX EOL → Kubernetes Gateway API migration (URGENT — EOL March 2026) | Infrastructure guide | Blog post + migration checklist (Gumroad) |
+| 9 | `research/gaming-marketing-strategy.md` | AI-powered gaming marketing strategy with full channel playbook | Marketing strategy | Blog post highlights + paid playbook |
+
+### 🔴 INTERNAL-ONLY (do NOT publish — Microsoft internal tools)
+
+| File | Reason |
+|------|--------|
+| `research/bluebird-research-report.md` | Microsoft Bluebird is an internal Microsoft AI tool — confidential |
+| `research/inspectorx-ai-pr-reviewer.md` | InspectorX is an internal Microsoft team tool (Posture AI Tools team) |
+
+### 🟡 PERSONAL (do NOT publish as-is)
+
+| File | Reason |
+|------|--------|
+| `research/book-outline.md` | Book outline with Tamir as named author — personal project, needs rebrand before any excerpt |
+| `PATENT_RESEARCH_REPORT.md` | Patent strategy for Tamir's Squad system — personal IP strategy document |
+| `research/597-dotnet-rocks-voice-research.md` | Voice cloning of real .NET Rocks hosts — copyright/consent issues |
+| `research/active/dotnet-rocks-voice-cloning/` | Same as above |
+
+---
+
+## Part 2: Content Pipeline Workflow
+
+```
+Research Doc
+    │
+    ▼
+[Content Brief] ← Troi scans doc, extracts 3 angles (free/paid/viral)
+    │
+    ├──► FREE TRACK: Blog Post (dev.to, Medium, LinkedIn)
+    │         └──► YouTube video (slides + code demo)
+    │                   └──► Newsletter (summary + product CTA)
+    │
+    └──► PAID TRACK: Deep-dive guide (Gumroad PDF)
+              └──► Course module (Udemy/Gumroad video course)
+                        └──► Revenue hook in every free piece → paid product
+```
+
+### Agents Responsible
+
+| Step | Agent | Action |
+|------|-------|--------|
+| Content Brief | Troi | Extract angles, write brief, identify audience |
+| Blog Post | Troi | Draft blog in brand voice |
+| YouTube Script | Troi | Full script with visual cues |
+| Slides | Geordi | Build branded slides (Deep Navy / Cyan theme) |
+| Gumroad Guide | Troi | Long-form paid PDF guide |
+| Publish | Geordi | Auto-publish via Playwright/API |
+| Monitor | Ralph | Track views, conversions, revenue |
+
+---
+
+## Part 3: Immediate Action Items — Top 3 Quick Wins
+
+### 🥇 Quick Win #1: "The Rework Rate: AI's 5th DORA Metric" 
+
+**Why first:** Timely, developer audience, connects AI + DevOps = high engagement. Rework Rate is a NEW metric — low competition, high search intent. Ready content exists.
+
+**Content plan:**
+- **Free:** Blog post on dev.to + LinkedIn article: "Why 4 DORA Metrics Aren't Enough for AI-Assisted Teams"
+- **Paid:** Gumroad guide ($12): "Rework Rate Measurement Playbook: DORA Metrics for AI-Native Teams" (20-page PDF with implementation templates)
+- **Revenue hook:** Every free post links to the guide
+
+**Source:** `research/rework-rate-squad-integration.md`  
+**Estimated time:** 2 days to publish
+
+---
+
+### 🥈 Quick Win #2: "Kubernetes Ingress-NGINX is Dead — Here's Your Migration Guide"
+
+**Why second:** EOL already happened (March 16, 2026). Every devops team running k8s needs this NOW. High urgency = high traffic.
+
+**Content plan:**
+- **Free:** Blog post: "Ingress-NGINX Reached EOL — Your Migration Checklist to Kubernetes Gateway API"
+- **Paid:** Gumroad bundle ($19): Full migration guide + YAML templates + validation scripts
+- **YouTube:** Short explainer (5 min): "Your Ingress-NGINX is Unsupported — Here's What to Do"
+
+**Source:** `research/ingress-nginx-eol-migration-plan.md`  
+**Estimated time:** 1-2 days to publish
+
+---
+
+### 🥉 Quick Win #3: "Building AI Agent Teams with Squad Framework" (Blog Series)
+
+**Why third:** This is TechAI Explained's core topic. The Squad framework research is deep and comprehensive — 4 documents that can fuel a multi-week blog series + a course.
+
+**Content plan:**
+- **Free:** 4-part blog series:
+  1. "What Is the Squad Framework? Multi-Agent AI for Real Teams"
+  2. "Squad vs. Custom AI Agents: A Gap Analysis"
+  3. "The 3 Things Missing From Every AI Agent Framework"
+  4. "How to Contribute to Open Source AI Agent Frameworks"
+- **Paid:** Gumroad course ($49): "Build Your AI Engineering Squad: A Hands-On Guide" (video + PDF workbook)
+- **LinkedIn:** Executive one-pager as LinkedIn article (instant credibility)
+
+**Source:** `research/squad-framework-evolution-full.md`, `squad-framework-evolution-onepager.md`, `squad-framework-gap-analysis.md`, `squad-framework-contribution-plan.md`  
+**Estimated time:** 1 week for full series
+
+---
+
+## Part 4: Revenue Model
+
+| Content | Distribution | Price | Volume Estimate | Monthly Revenue |
+|---------|-------------|-------|-----------------|-----------------|
+| Rework Rate Blog | Free (dev.to/LinkedIn) | $0 | 5k-10k reads | $0 direct, drives paid |
+| Rework Rate Guide | Gumroad | $12 | 30-50 sales | $360-600 |
+| Ingress-NGINX Blog | Free (dev.to/YouTube) | $0 | 10k-20k reads | $0 direct |
+| Ingress-NGINX Bundle | Gumroad | $19 | 50-100 sales | $950-1,900 |
+| Squad Blog Series | Free (dev.to/LinkedIn) | $0 | 8k-15k reads | $0 direct |
+| Squad Course | Gumroad | $49 | 20-40 sales | $980-1,960 |
+| Hebrew Voice Cloning | Free (arXiv/blog) + Paid course | $0/$39 | 20 course sales | $780 |
+| Copilot SDK Guide | Free blog + Gumroad | $0/$15 | 25 sales | $375 |
+
+**Projected Monthly Revenue (Month 1):** $3,445–$5,615  
+**Projected Monthly Revenue (Month 3, with compounding traffic):** $6,000–$10,000
+
+---
+
+## Part 5: Content Cadence
+
+| Week | Action |
+|------|--------|
+| Week 1 | Publish Ingress-NGINX migration blog + Gumroad bundle |
+| Week 1 | Publish Rework Rate blog post + Gumroad guide |
+| Week 2 | Publish Squad Blog Post #1 + LinkedIn one-pager |
+| Week 3 | Publish Squad Blog Post #2 + #3 |
+| Week 4 | Publish Squad Blog Post #4 + launch Squad Course on Gumroad |
+| Week 5 | Hebrew Voice Cloning: arXiv preprint + blog + course |
+| Week 6 | Copilot SDK blog + guide |
+| Ongoing | Gaming Marketing playbook, monitor all revenue |
+
+---
+
+## Notes for Troi
+
+- Brand is **TechAI Explained** — never use Tamir's name in titles/thumbnails (Decision 32)
+- Every piece needs a revenue hook (Decision 32 Rule 5)
+- Rebrand all slides to Deep Navy/Cyan before using (Decision 32 Rule 6)
+- Self-publish via automation — no manual uploads (Decision 32 Rule 3)
+- Track which content drives Gumroad conversions via UTM links
+
+
+---
+
+### 2026-03-18T00-55-24: User directive
+**By:** Tamir Dresher (via Copilot)
+**What:** At the end of the voice cloning research, create an academic-level publication covering all work done, methodologies, experiments, discoveries, and results. Publish it.
+**Why:** User request — the research has produced novel findings (ensemble voting, VTLN discovery, SeedVC-only path, human-quality pipeline) worthy of formal publication.
+
+
+---
+
+### 2026-03-18T07-07-56Z: User directive — GitHub issue tracking
+**By:** Tamir Dresher (via Copilot)
+**What:** Always keep track of and manage ALL work with GitHub issues. Every piece of work must have a GitHub issue tracking it. Create issues BEFORE starting work, update them with progress, close with summary. Never do work without an issue.
+**Why:** User request — captured for team memory. Enables analysis, reporting, and retrospectives.
+
+
+---
+
+### 2026-03-18T07-26-00Z: User directive — OneDrive curation
+**By:** Tamir Dresher (via Copilot)
+**What:** Keep only the BEST audio files in OneDrive. Too many files — curate to top quality only. Always compare new outputs against the original real podcast. Have a human-like quality reviewer agent evaluate and give feedback on every new audio.
+**Why:** User request — quality over quantity, clean file management
+
+
+---
+
+### 2026-03-18T07-07-56Z: User directive — OneDrive sync
+**By:** Tamir Dresher (via Copilot)
+**What:** Always keep the latest podcast episodes synced to BOTH personal OneDrives (C:\Users\tamirdresher\OneDrive - Microsoft\tamresearch1-audio\ and C:\Users\tamirdresher\OneDrive\tamresearch1-audio\). Every new audio file must be copied there immediately after creation.
+**Why:** User request — captured for team memory
+
+
+---
+
+# Decision: Squad-for-Kids Upstream (Parent → Child) Architecture
+
+**Date:** 2026-03-18  
+**Decision Status:** 🔵 PROPOSED — Needs Picard Review  
+**Raised By:** @copilot (Issue #860)  
+**Impact:** Medium — New cross-repo squad capability; personal/family scope  
+**Issue:** [#860](https://github.com/tamirdresher_microsoft/tamresearch1/issues/860)
+
+---
+
+## Context
+
+Tamir's `tamirdresher/squad-for-kids` is a personal side-project — a learning squad for his actual kids. The request is for an "upstream capability" where:
+
+- tamresearch1 (HQ / parent squad) can **push** directives, rules, tasks, and recurrent procedures to squad-for-kids
+- Kids' squad agents **cannot override** parent directives
+- Kids' Ralph watches the parent repo and auto-pulls any updates
+- Parents can assign chores/tasks and set recurring procedures through squad infrastructure
+
+---
+
+## Design: Parent-to-Child Squad Protocol
+
+### Conceptual Model
+
+```
+tamresearch1 (Parent/HQ)              tamirdresher/squad-for-kids (Child)
+────────────────────────────          ─────────────────────────────────────
+.squad/kids-directives/          ──→  .squad/parent-directives.md  (read-only)
+  rules.md                            .squad/parent-directives-state.json
+  tasks.md                            .squad/upstream.json  (points to HQ)
+  procedures.md                       Ralph watch → checks parent on schedule
+  schedule.json
+```
+
+### 1. Files in tamresearch1 (Parent — "pushes" side)
+
+#### `.squad/kids-directives/rules.md`
+Parent-enforced rules for the kids' squad agents. Examples:
+- Screen time limits: "No task scheduling past 9 PM on school nights"
+- Content boundaries: "No social media automation tasks"
+- Safety rules: "Always confirm before any external API calls"
+- Override protection: "These rules supersede any local decisions.md entries"
+
+#### `.squad/kids-directives/tasks.md`
+Tasks parents assign. Format:
+```markdown
+## Active Tasks
+
+| ID | Task | Assigned To | Due | Status |
+|----|------|-------------|-----|--------|
+| PT-001 | Clean your room | all | 2026-03-20 | ⏳ pending |
+| PT-002 | Finish math homework | all | 2026-03-19 | ⏳ pending |
+```
+
+#### `.squad/kids-directives/procedures.md`
+Recurring procedures parents define:
+```markdown
+## Recurring Procedures
+
+| Name | Schedule | Description |
+|------|----------|-------------|
+| Morning Check-in | daily 08:00 | Report yesterday's completed tasks |
+| Weekly Review | weekly Sunday 18:00 | Show weekly progress to parent |
+| Homework Guardian | weekdays 15:00 | Ralph reminds about pending homework |
+```
+
+#### `.squad/kids-directives/schedule.json`
+Machine-readable schedule for kids' Ralph to consume:
+```json
+{
+  "version": "1.0",
+  "lastUpdated": "2026-03-18T00:00:00Z",
+  "procedures": [
+    {"id": "morning-checkin", "cron": "0 8 * * *", "action": "report-completed-tasks"},
+    {"id": "weekly-review", "cron": "0 18 * * 0", "action": "weekly-parent-report"}
+  ]
+}
+```
+
+---
+
+### 2. Files in squad-for-kids (Child — "pulls" side)
+
+#### `.squad/upstream.json` (NEW)
+```json
+{
+  "upstreams": [
+    {
+      "name": "tamresearch1-parent",
+      "type": "git",
+      "source": "https://github.com/tamirdresher_microsoft/tamresearch1",
+      "role": "parent",
+      "directivesPath": ".squad/kids-directives/",
+      "checkFrequency": "daily",
+      "ref": "main",
+      "added_at": "2026-03-18T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### `.squad/parent-directives.md` (NEW — auto-synced, read-only for kids)
+Auto-generated by Ralph on sync. Contains merged content from all `kids-directives/` files. Prefixed with:
+```markdown
+<!-- AUTO-SYNCED FROM tamresearch1 — DO NOT EDIT MANUALLY -->
+<!-- Last sync: <timestamp> -->
+<!-- Override protection: ACTIVE — these rules cannot be modified by local agents -->
+```
+
+#### `.squad/parent-directives-state.json` (NEW)
+Tracks sync state:
+```json
+{
+  "lastSynced": "2026-03-18T00:00:00Z",
+  "lastCommitSha": "abc123...",
+  "version": "1.0"
+}
+```
+
+---
+
+### 3. Enforcement Mechanism
+
+#### In squad-for-kids `.github/CODEOWNERS`:
+```
+/.squad/parent-directives.md @tamirdresher_microsoft
+/.squad/parent-directives-state.json @tamirdresher_microsoft
+/.squad/kids-directives/ @tamirdresher_microsoft
+```
+
+This means any PR that tries to modify `parent-directives.md` requires the parent's approval — kids can't sneak in overrides via PRs.
+
+#### In squad-for-kids `.github/copilot-instructions.md` (or `.squad/copilot-instructions.md`):
+```markdown
+## Parent Directives — Inviolable Rules
+
+The file `.squad/parent-directives.md` contains rules set by the parent (tamresearch1 HQ).
+These rules:
+- **Cannot be overridden** by anything in `.squad/decisions.md`
+- **Cannot be dismissed** by agent reasoning
+- **Take precedence** over ALL local squad configuration
+- Are automatically enforced — no agent may proceed with work that violates them
+
+If a user requests something that conflicts with parent directives, politely explain the restriction and offer alternatives that comply.
+```
+
+---
+
+### 4. Ralph Watch Extension in squad-for-kids
+
+Kids' Ralph gets a new watch target:
+
+```json
+{
+  "watches": [
+    {
+      "name": "parent-directives",
+      "repo": "tamirdresher_microsoft/tamresearch1",
+      "path": ".squad/kids-directives/",
+      "checkFrequency": "daily",
+      "onChange": "sync-parent-directives",
+      "auth": "tamirdresher"
+    }
+  ]
+}
+```
+
+On change detected:
+1. Ralph pulls latest `kids-directives/` content
+2. Generates updated `parent-directives.md`
+3. Commits as: `chore: sync parent directives from tamresearch1 [skip ci]`
+4. If new tasks exist → creates GitHub issues in squad-for-kids with label `parent-task`
+5. Posts a Teams notification: "📋 Parent updated directives — {summary of changes}"
+
+---
+
+### 5. Parent Task Flow
+
+```
+tamresearch1 HQ (parent)              squad-for-kids (child)
+─────────────────────────             ──────────────────────────
+Add task to kids-directives/tasks.md  →  Ralph detects change
+                                      →  Creates issue with label `parent-task`
+                                      →  Kids agents pick it up (cannot close without completing)
+Kid completes task                    ←  Issues closed → Ralph at HQ detects
+                                      ←  Updates tasks.md status to ✅ done
+                                      ←  Optionally notifies parent via Teams
+```
+
+---
+
+## What the Kids Can and Can't Do
+
+| Action | Kids Can? | Reason |
+|--------|-----------|--------|
+| Add their own tasks/decisions | ✅ Yes | Local autonomy within boundaries |
+| Override parent rules | ❌ No | CODEOWNERS + agent instruction |
+| Mark parent-assigned tasks done | ✅ Yes | Completing work = allowed |
+| Dismiss parent tasks without completing | ❌ No | `parent-task` issues require parent approval to close |
+| Modify the sync mechanism | ❌ No | Protected by CODEOWNERS |
+| Add custom agents/skills | ✅ Yes | Within content boundaries |
+
+---
+
+## Files to Create (Action Items)
+
+### In tamresearch1:
+- [ ] `.squad/kids-directives/rules.md` — Initial parent rules
+- [ ] `.squad/kids-directives/tasks.md` — Task list template
+- [ ] `.squad/kids-directives/procedures.md` — Recurring procedures
+- [ ] `.squad/kids-directives/schedule.json` — Machine-readable schedule
+- [ ] `.squad/kids-directives/README.md` — Explains the system to Tamir
+
+### In squad-for-kids:
+- [ ] `.squad/upstream.json` — Points to tamresearch1 as parent
+- [ ] `.squad/parent-directives.md` — Initial sync (empty/placeholder)
+- [ ] `.squad/parent-directives-state.json` — Initial sync state
+- [ ] `.github/CODEOWNERS` — Protects parent-directive files
+- [ ] `.github/copilot-instructions.md` — Adds enforcement language
+- [ ] Ralph watch configuration for parent monitoring
+
+---
+
+## Decision
+
+**Implement this design in two phases:**
+
+**Phase 1 (tamresearch1 side):** Create the `kids-directives/` folder with initial rules and task templates. Document the protocol.
+
+**Phase 2 (squad-for-kids side):** Add `upstream.json`, `parent-directives.md`, CODEOWNERS, and Copilot instructions. Configure Ralph watch.
+
+**Needs:** Picard architectural review before implementation.
+
+
+---
+
+# Decision: Issue Status Label Redesign
+
+**Date:** 2026-06-07  
+**Author:** Picard  
+**Status:** Implemented  
+**GitHub Issue:** tamirdresher_microsoft/tamresearch1#929
+
+---
+
+## Problem
+
+`status:pending-user` had become a catch-all for anything waiting on Tamir, accumulating 36+ open issues with no signal about *what kind* of action is needed. The label gave no actionable information — Tamir couldn't glance at the label and know whether he needed to review a PR, approve an access request, make a strategic call, or just wait.
+
+### Root Cause Analysis (from issue audit)
+
+Scanning all 36 `status:pending-user` issues revealed four distinct patterns:
+
+| Pattern | Count | Example |
+|---------|-------|---------|
+| PR or document review needed | 15 | `[Teams] DK8S PR review request` |
+| Concrete one-off action needed | 6 | `[Action] Approve/Deny access`, expiring roles |
+| Strategic decision / go-no-go | 10 | `Evaluate CosyVoice 2 for Hebrew TTS` |
+| Waiting on external party | 5 | `[Email] DK8S migration dependencies` |
+
+The single label was hiding this structure, making Tamir's inbox feel undifferentiated even though the required actions were completely different in nature and urgency.
+
+---
+
+## Decision: New Status Taxonomy
+
+Replace `status:pending-user` with four precise labels:
+
+### `status:needs-review` 🟠
+**Color:** `#F9A825` (amber)  
+**Meaning:** Tamir needs to read something and give feedback or approve it — a PR, document, plan, or analysis. The squad has done prep work; now it needs human eyes.  
+**Examples:** PR review requests from colleagues, review a squad-produced document, sign off on a plan.
+
+### `status:needs-decision` 🟣
+**Color:** `#9B30CC` (purple)  
+**Meaning:** Tamir must make a directional call before work can proceed. There's no obvious answer — it requires judgment, strategy, or personal preference.  
+**Examples:** "Should we pursue this research direction?", "Which approach should we take?", "Is this worth our time?".
+
+### `status:needs-action` 🔴
+**Color:** `#D73A4A` (red)  
+**Meaning:** Tamir must physically DO something specific — approve/deny an access request, reply to an email, fill out a form, renew a role. One-shot concrete tasks.  
+**Examples:** Access approvals, expiring memberships, form submissions.
+
+### `status:waiting-external` 🔵
+**Color:** `#0075CA` (blue)  
+**Meaning:** The squad or Tamir has done everything they can. Now we're waiting on someone or something outside the squad — an external team, an API, a vendor.  
+**Examples:** Waiting on an email reply, waiting on a third-party service, blocked by another team's dependency.
+
+### `status:scheduled` 🔷
+**Color:** `#21759B` (teal)  
+**Meaning:** Planned and accepted but not yet started — sitting in the queue deliberately.  
+**Examples:** Backlog items with a clear intention to do them.
+
+### Retained Labels (no change)
+
+| Label | Meaning |
+|-------|---------|
+| `status:in-progress` | Squad actively working on this |
+| `status:blocked` | Blocked on a dependency or technical issue |
+| `status:done` | Complete |
+| `status:postponed` | Deliberately deferred |
+
+---
+
+## Migration Performed
+
+All 36 `status:pending-user` issues were re-labeled on 2026-06-07:
+
+- **15 issues** → `status:needs-review` (PR and document review requests)
+- **10 issues** → `status:needs-decision` (research evaluations, strategic go/no-go calls)
+- **6 issues** → `status:needs-action` (approvals, expiring roles, one-off tasks)
+- **5 issues** → `status:waiting-external` (email threads, external team dependencies)
+
+The old `status:pending-user` label is retained for backward compatibility but should no longer be used for new issues.
+
+---
+
+## Workflow Changes
+
+### For squad agents creating issues that need Tamir
+
+Before: always add `status:pending-user`  
+After: pick the most precise label:
+
+```
+Is Tamir reviewing something someone else produced?  → status:needs-review
+Does Tamir need to choose between options?           → status:needs-decision  
+Does Tamir need to do a specific concrete task?      → status:needs-action
+Is everyone just waiting for an external event?      → status:waiting-external
+```
+
+### For Tamir scanning his inbox
+
+- **Red (`needs-action`)** → High urgency, often time-sensitive. Do it.
+- **Amber (`needs-review`)** → Colleague/squad needs feedback. Schedule time.
+- **Purple (`needs-decision`)** → Strategic. Can batch-process in a thinking session.
+- **Blue (`waiting-external`)** → Low attention needed. Monitor periodically.
+
+---
+
+## Label Reference Card
+
+| Label | Color | When to use |
+|-------|-------|-------------|
+| `status:needs-review` | 🟠 amber | Review a PR, doc, or plan |
+| `status:needs-decision` | 🟣 purple | Make a strategic or directional call |
+| `status:needs-action` | 🔴 red | Do a specific concrete thing |
+| `status:waiting-external` | 🔵 blue | Waiting on external person/system |
+| `status:in-progress` | 🟡 yellow | Squad actively working |
+| `status:blocked` | 🔴 dark red | Hard blocked on dependency |
+| `status:scheduled` | 🔷 teal | Planned, not yet started |
+| `status:postponed` | 🟡 yellow | Deliberately deferred |
+| `status:done` | 🟢 green | Complete |
+
+
+---
+
+# Decision: Break up `status:pending-user` into Granular Status Labels
+
+**Date:** 2026-03-18  
+**Author:** Picard  
+**Related Issue:** #929  
+**Status:** Pending Tamir approval
+
+---
+
+## Problem
+
+`status:pending-user` was a catch-all label that accumulated issues of very different natures:
+- Items requiring Tamir's explicit decision before work can start
+- Items requiring a specific action (reply to email, approve a form, rotate a key)
+- Items waiting for external parties (review by a third party, external approval)
+- Purely informational items (FYI, nothing to do)
+
+This made the label meaningless as a triage signal. When Tamir opened the `pending-user` view, everything looked equally urgent and undifferentiated.
+
+---
+
+## Current State (as of 2026-03-18)
+
+The granular labels **have already been created** in a prior session:
+
+| Label | Description | Color |
+|-------|-------------|-------|
+| `status:needs-action` | Tamir must take a specific action (email, form, etc) | 🔴 #D73A4A |
+| `status:needs-decision` | Tamir must make a call before work can proceed | 🟣 #9B30CC |
+| `status:needs-review` | Tamir needs to review a PR, doc, or plan | 🟡 #F9A825 |
+| `status:waiting-external` | Waiting on someone or something outside the squad | 🔵 #0075CA |
+| `status:postponed` | Deferred - waiting for external trigger | 🟡 #FBCA04 |
+
+Only **4 issues** still carry `status:pending-user`:
+
+| Issue | Title | Correct Label |
+|-------|-------|---------------|
+| #948 | [URGENT] Adir Atias - validate post-merge build/release | `status:needs-action` ✅ already has it |
+| #946 | [Alert] Dependabot Critical Security PRs — ArgoRollouts | `status:needs-action` ✅ already has it |
+| #937 | [Action] Rotate exposed Gemini API keys | `status:needs-action` ✅ already has it |
+| #794 | [Email] Ori Troyna — GitHub Proxima 1ES approval question | `status:needs-action` ⚠️ needs to be added |
+
+---
+
+## Proposal
+
+### Phase 1 — Migrate remaining issues (squad can do this)
+1. For issues #948, #946, #937: remove `status:pending-user` (they already have the correct specific label)
+2. For issue #794: add `status:needs-action`, then remove `status:pending-user`
+
+### Phase 2 — Retire `status:pending-user`
+- Once all issues are migrated, delete the `status:pending-user` label
+- OR keep it as a temporary holding label but document it as "inbox only — must be triaged within 24h"
+
+### Phase 3 — Update squad workflows
+- Update Ralph's issue creation logic to use granular labels directly (not `status:pending-user`)
+- Update `.squad/labels.yml` with the new taxonomy and usage guidelines
+- Add triage rule: any new issue landing in `status:pending-user` must be moved to a specific label within 24h
+
+---
+
+## Label Usage Guide
+
+| Situation | Label to use |
+|-----------|-------------|
+| Squad needs Tamir to make a design/direction call | `status:needs-decision` |
+| Tamir needs to click, reply, fill a form, rotate a key, approve something | `status:needs-action` |
+| Tamir needs to read and comment on a PR/doc/plan | `status:needs-review` |
+| Awaiting response from external person/team/system | `status:waiting-external` |
+| Work is defined but blocked on time/future event | `status:postponed` |
+| Squad is working on it | `status:in-progress` |
+
+---
+
+## Decision Required from Tamir
+
+1. ✅ **Approve migration** of the 4 remaining issues off `status:pending-user`
+2. ✅ **Approve deletion** of the `status:pending-user` label once migration is complete  
+   **OR** keep it as "inbox only" with a 24h triage SLA
+3. ✅ **Approve updating Ralph** to use granular labels going forward
+
+**Recommendation:** Delete `status:pending-user` entirely. The taxonomy is now clear enough that every new issue should land directly on the right label.
+
+
+---
+
+# Decision: Family Email Pipeline via Squad Email
+
+**Date:** 2026-03-18  
+**Agent:** Kes (Communications & Scheduling)  
+**Issue:** #259  
+**Status:** Pending activation (Tamir action required)
+
+## Context
+
+Issue #259 requested a way for Tamir's wife (Gabi) to send requests to the squad — print jobs, calendar events, reminders — via email. The issue was stuck for 8 days due to:
+- M365 admin access blocked (can't create shared mailbox)
+- Gmail signup blocked by phone verification
+- Multiple Ralph automation rounds failed on CAPTCHAs
+
+## Decision
+
+**Reuse the existing squad email** (`td-squad-ai-team@outlook.com`) as the family request inbox, with Graph API inbox rules for automatic routing based on @keywords in the subject line.
+
+### Why This Over Alternatives
+
+| Option | Outcome |
+|--------|---------|
+| New M365 shared mailbox | ❌ Blocked by admin policies |
+| New Gmail account | ❌ Blocked by phone verification CAPTCHA |
+| New Outlook.com account | ❌ Blocked by PerimeterX CAPTCHA |
+| **Reuse existing squad email** | ✅ Already authenticated, Graph API available |
+
+### Routing Rules
+
+| # | Trigger | Action |
+|---|---------|--------|
+| 1 | From Gabi + subject "@print" | Forward to Dresherhome@hpeprint.com |
+| 2 | From Gabi + subject "@calendar" | Forward to tamirdresher@microsoft.com |
+| 3 | From Gabi + subject "@reminder" | Forward to tamirdresher@microsoft.com |
+| 4 | From Gabi (catch-all) | Forward to tamirdresher@microsoft.com |
+
+## Deliverables
+
+- [x] `scripts/squad-email/Setup-FamilyEmailRules.ps1` — Graph API rule creation script
+- [x] `.squad/email-pipeline/FAMILY_EMAIL_GUIDE.md` — Updated with @keyword routing docs
+- [x] Issue #259 commented with activation instructions
+- [ ] Rules activated (requires Tamir to run setup script once)
+
+## Activation
+
+Tamir runs once:
+```powershell
+pwsh scripts/squad-email/Setup-FamilyEmailRules.ps1
+```
+This does device code auth + creates all 4 inbox rules automatically.
+
+## Risks & Mitigations
+
+- **Risk:** Squad email gets spam → Gabi's emails buried  
+  **Mitigation:** Rules trigger on `fromContains: gabrielayael@gmail.com` specifically
+
+- **Risk:** @keyword forgotten → email still forwarded  
+  **Mitigation:** Rule 4 catches all Gabi emails as [FAMILY] general
+
+- **Risk:** Graph API token expires  
+  **Mitigation:** Setup script handles token refresh; re-run if needed
+
+
+---
+
+# Decision: Family Request Pipeline — Email + WhatsApp
+
+**Date:** 2026-06-23  
+**Author:** Kes (Communications & Scheduling)  
+**Issue:** #259  
+**Status:** Implemented
+
+## Context
+
+Tamir wants his wife Gabi to be able to send requests (print jobs, calendar reminders, shopping lists, todos) that the squad automatically processes. Two input channels were established.
+
+## Decision
+
+### Email Pipeline (td-squad-ai-team@outlook.com)
+- Inbox rules auto-route based on content
+- Print requests → Dresherhome@hpeprint.com
+- Calendar/reminder → GitHub issue with `squad,family-request` labels
+
+### WhatsApp Pipeline (new)
+- Ralph monitors WhatsApp Web every 3rd round via Playwright
+- Watches for messages from contact "gabi"
+- Keywords: print, calendar, reminder, buy, todo
+- Creates GitHub issues with `squad,family-request` labels
+- Print requests forwarded to HP printer email
+- Graceful degradation: skips if WhatsApp Web needs QR reconnection
+
+## Implementation
+
+- Added `WHATSAPP FAMILY MONITORING` section to Ralph prompt in `ralph-watch.ps1`
+- Frequency: every 3rd round (to avoid excessive WhatsApp checks)
+- Deduplication: checks existing open `family-request` issues before creating new ones
+- Notification: Teams message to Tamir after processing family requests
+
+## Risks & Mitigations
+
+- **WhatsApp Web session expiry:** Ralph logs a warning and skips — doesn't block the round
+- **Duplicate issues:** Explicit dedup check against open `family-request` labeled issues
+- **False positives:** Keyword matching is simple; may trigger on casual messages containing "buy" or "print" — acceptable for family context
+
+
+---
+
+# Decision: proxy-claude Added to Squad Toolbelt
+
+**Date:** 2026-03-18  
+**Author:** Picard  
+**Issue:** #928  
+**Status:** Decided
+
+## Decision
+
+Add proxy-claude to the squad skill library as an optional execution vehicle for Claude Code agentic sessions via Copilot license. **Not a replacement for the current Copilot CLI stack — an additive capability.**
+
+## Rationale
+
+proxy-claude is a Microsoft-internal tool (aep-edge-microsoft org) that enables Claude Code (Anthropic's agentic terminal CLI) to run through a GitHub Copilot license. It is policy-compliant, production-grade, and directly applicable for heavy autonomous coding tasks.
+
+Key patterns we're adopting into our knowledge base:
+1. **Singleton token management with health endpoint** — usable in ralph-watch health checks
+2. **Anthropic↔OpenAI translation layer** — reference if we ever need direct Anthropic API format routing through Copilot
+3. **Token resilience with exponential backoff** — pattern for any long-lived OAuth token in our agents
+
+## What Changes
+
+- Added `PROXY_CLAUDE_ASSESSMENT.md` with full analysis
+- Added `.squad/skills/proxy-claude/SKILL.md` with usage guide and squad integration patterns
+- No changes to existing agent stack, ralph-watch, or squad config
+
+## When to Deploy
+
+When a squad task requires heavy autonomous multi-file coding work and we want Claude Code's full agentic loop (vs Copilot chat completions). Use `proxy-claude --yolo` for fully automated agent sessions.
+
+
+---
+
+# Decision: status:pending-user Retired — Migration Complete
+
+**Date:** 2026-06-07  
+**Author:** Picard  
+**Status:** ✅ Implemented  
+**GitHub Issue:** tamirdresher_microsoft/tamresearch1#929
+
+---
+
+## Decision
+
+Retired `status:pending-user` as an active label. Migrated all remaining issues to the new granular status taxonomy designed in prior sessions.
+
+## What Was Done
+
+1. **Migrated 4 remaining issues** off `status:pending-user`:
+   - #948 `[URGENT] Adir Atias - validate post-merge build/release` → already had `status:needs-action`, removed old label
+   - #946 `[Alert] Dependabot Critical Security PRs — ArgoRollouts` → already had `status:needs-action`, removed old label
+   - #937 `[Action] Rotate exposed Gemini API keys` → already had `status:needs-action`, removed old label
+   - #794 `[Email] Ori Troyna — GitHub Proxima 1ES approval question` → added `status:needs-action`, removed old label
+
+2. **Updated `.squad/routing.md`** with the full status label taxonomy and a quick-decision guide for agents.
+
+3. **Label `status:pending-user` is now empty** — zero open issues carry it.
+
+## New Taxonomy (labels already exist in repo)
+
+| Label | Use When |
+|-------|----------|
+| `status:needs-action` | Tamir must physically do something |
+| `status:needs-decision` | Tamir must make a strategic/directional call |
+| `status:needs-review` | Tamir needs to read and give feedback |
+| `status:waiting-external` | Waiting on external party — no action from Tamir needed |
+| `status:in-progress` | Squad actively working |
+| `status:blocked` | Hard-blocked on dependency |
+| `status:scheduled` | Planned, not yet started |
+| `status:postponed` | Deliberately deferred |
+| `status:done` | Complete |
+
+## Recommendation for Tamir
+
+- Keep `status:pending-user` label in the repo as a deprecated tombstone (for traceability) but **do not use it for new issues**.
+- Update Ralph's issue creation templates to use granular labels directly.
+- Agent instructions in `.squad/routing.md` now document the correct label to use for each situation.
+
+
+---
+
+# Seven Decision: AWS Blogs Added to Tech News Scanner
+
+**Date:** 2026-03-18
+**Issue:** #931
+
+## What Changed
+
+scripts/tech-news-scanner.js now monitors 5 AWS blog RSS feeds as part of the daily tech news scan:
+
+1. **AWS Architecture Blog** — all articles, score 80
+2. **AWS News Blog** — all articles (launch announcements), score 85
+3. **AWS Compute Blog** — keyword-filtered, score 75
+4. **AWS Developer Tools Blog** — keyword-filtered, score 70
+5. **AWS Containers Blog** — keyword-filtered, score 75
+
+20+ AWS keywords were added to the global `KEYWORDS` array so AWS stories on HackerNews/Reddit are also captured.
+
+## Impact on Squad
+
+- Daily Tech News Digest will include AWS architecture patterns, service announcements, and operational insights
+- Architecture Blog and News Blog items bypass the keyword filter (all content is relevant)
+- Source label in digest shows `cloud/aws` category
+- Documentation: `AWS_BLOGS_WATCHLIST.md`
+
+## Maintenance
+
+To add more AWS blogs (e.g. Security, Networking, ML), append to the `AWS_BLOGS` array in `tech-news-scanner.js` — no other code changes needed.
+
+
+---
+
+# Decision: Hebrew Voice Cloning Academic Paper Draft
+
+**Date:** 2026-07-17  
+**Author:** Seven (Research & Docs)  
+**Status:** DRAFT COMPLETE  
+
+## Summary
+
+Drafted an academic research paper (`research/hebrew-voice-cloning-paper-draft.md`) covering the team's Hebrew voice cloning pipeline work. The paper follows ACM/IEEE conference format targeting INTERSPEECH/ICASSP/arXiv.
+
+## Key Decisions
+
+1. **Paper structure:** 7 main sections + 3 appendices + 32 references, ~6,000 words (~8 pages in conference format)
+2. **Novel contributions framed as 7 items:** ensemble voting, VTLN finding, SVC-free path, per-speaker cfg, 7-stage pipeline, cross-speaker differentiation, and Hebrew VC evaluation
+3. **50 TODO items remain** requiring experimental data: specific resemblyzer scores per configuration, DNSMOS values, per-speaker cfg curves, processing times, and MOS study results
+4. **Related work covers 32 cited papers/systems** from INTERSPEECH, ICASSP, NeurIPS, and arXiv (2018–2026)
+
+## Action Required
+
+- Data team: Fill in TODO items with actual experimental measurements
+- Podcaster: Verify pipeline stage descriptions match implementation
+- Any team member with access to resemblyzer scoring logs: Provide per-configuration scores for Tables 1, 4, 5, 6
+
+
+---
+
+# Decision: GH_CONFIG_DIR auto-detection via prompt hook
+
+**Date:** 2026-03-18
+**Author:** Worf
+**Issue:** #938
+
+## Decision
+
+Implemented `Set-GhContext` in `scripts/Set-GhContext.ps1` as an **active** dot-source script (prompt hook is no longer commented out). When dot-sourced from `$PROFILE`, it automatically wraps the prompt function and sets `GH_CONFIG_DIR` based on CWD patterns.
+
+## Key choices
+
+- **EMU config path:** `$env:APPDATA\GitHub CLI` — the actual path in use (NOT `$HOME\.config\gh-emu` from the blog post)
+- **Public repos:** `Remove-Item Env:\GH_CONFIG_DIR` — clears the var so `gh` uses its default (`~/.config/gh`), rather than setting a non-existent path
+- **No match:** leaves `GH_CONFIG_DIR` unchanged so explicit overrides survive `cd` into non-matched dirs
+- **Prompt wrapper:** uses `$_ghCtx_originalPrompt` (private-ish variable) to avoid polluting the environment
+
+## Files changed
+
+- `scripts/Set-GhContext.ps1` — updated with active prompt hook + fixed public path handling
+- `Microsoft.PowerShell_profile.ps1` — new profile template at repo root
+- `.squad/docs/powershell-profile-snippets.md` — setup documentation
+
+## Affects
+
+Any agent issuing `gh` commands should ensure `GH_CONFIG_DIR` is set correctly. The `gh-account-helpers.ps1` `gh-emu`/`gh-pub` wrapper functions remain as explicit fallbacks.
+
+
+---
+
+# Decision: Secret Scanning Remediation for google_api_key Alerts
+
+**Date:** 2026-03-18
+**Issue:** #880
+**Agent:** Worf
+
+## Decision
+No new code changes were required for issue #880. Remediation was already complete via PR #646.
+
+## Findings
+- .nano-banana-config.json was removed from git tracking in commit 3c79f1 (PR #646)
+- .gitignore already contains both .nano-banana-config.json and *-config.json
+- The file does not exist in the working tree
+
+## Outstanding Action (Manual)
+API key rotation must be performed manually by the repo owner at:
+https://aistudio.google.com/app/apikey
+
+After rotation, GitHub secret scanning alerts #2 and #3 should be dismissed as "Revoked".
+
+## Risk Assessment
+Low — free-tier Gemini dev key, no production data access, limited quota exposure.
+
+## History Rewrite Decision
+NOT recommended. Disruption to team history outweighs benefit for a free-tier dev key. Key rotation is sufficient mitigation.
+
+
+---
+

@@ -1,6 +1,7 @@
 #!/usr/bin/env pwsh
 # Podcaster — converts markdown/text to audio MP3
 # Tries edge-tts (neural quality) first, falls back to Windows System.Speech
+# Supports OpenAI TTS engines (tts-1, tts-1-hd) for higher-quality English narration.
 #
 # Usage:
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md
@@ -15,6 +16,14 @@
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Deliver -DeliverTo user@example.com
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -NaturalSpeech
 #   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -PodcastMode -NaturalSpeech -BackchannelFrequency 0.4
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Engine tts-1-hd
+#   ./scripts/podcaster.ps1 -InputFile RESEARCH_REPORT.md -Engine tts-1-hd -Voice nova
+#
+# TTS Engines:
+#   edge-tts  (default) — Microsoft Edge neural voices, free, offline-capable
+#   tts-1               — OpenAI TTS standard quality; requires OPENAI_API_KEY
+#   tts-1-hd            — OpenAI TTS HD quality; best English narration; requires OPENAI_API_KEY
+#   system              — Windows System.Speech fallback (lowest quality)
 
 param(
     [Parameter(Mandatory=$true)]
@@ -33,7 +42,11 @@ param(
     [switch]$NaturalSpeech,
     [double]$BackchannelFrequency = 0.30,
     [ValidateSet("en", "he")]
-    [string]$Language = "en"
+    [string]$Language = "en",
+    # TTS engine selection. Default: edge-tts (backward compatible).
+    # Use tts-1 or tts-1-hd for OpenAI TTS (requires OPENAI_API_KEY env var).
+    [ValidateSet("edge-tts", "tts-1", "tts-1-hd", "system")]
+    [string]$Engine = "edge-tts"
 )
 
 $ErrorActionPreference = "Stop"
@@ -97,6 +110,102 @@ function Invoke-EdgeTTS {
         return $false
     } finally {
         Remove-Item $tempText -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Invoke-OpenAITTS {
+    param(
+        [string]$Text,
+        [string]$Output,
+        [string]$Model = "tts-1-hd",
+        # OpenAI voices: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
+        [string]$Voice = "alloy"
+    )
+
+    $apiKey = $env:OPENAI_API_KEY
+    if (-not $apiKey) {
+        Write-Host "  OPENAI_API_KEY environment variable not set — cannot use OpenAI TTS" -ForegroundColor Red
+        return $false
+    }
+
+    $headers = @{
+        "Authorization" = "Bearer $apiKey"
+        "Content-Type"  = "application/json"
+    }
+
+    # OpenAI TTS limit is 4096 chars per request — split into sentence-aware chunks
+    $maxChunk = 4000
+    $chunks   = [System.Collections.Generic.List[string]]::new()
+    $remaining = $Text.Trim()
+
+    while ($remaining.Length -gt 0) {
+        if ($remaining.Length -le $maxChunk) {
+            $chunks.Add($remaining)
+            break
+        }
+        $slice = $remaining.Substring(0, $maxChunk)
+        # Find last sentence boundary within the slice
+        $cut = [math]::Max(
+            $slice.LastIndexOf('. '),
+            [math]::Max($slice.LastIndexOf('! '), $slice.LastIndexOf('? '))
+        )
+        if ($cut -le 0) {
+            # Fall back to last newline, then hard-cut
+            $cut = $slice.LastIndexOf("`n")
+            if ($cut -le 0) { $cut = $maxChunk }
+        } else {
+            $cut += 1   # include the trailing space so the boundary char stays in this chunk
+        }
+        $chunks.Add($remaining.Substring(0, $cut).Trim())
+        $remaining = $remaining.Substring($cut).Trim()
+    }
+
+    Write-Host "  OpenAI TTS: $($chunks.Count) chunk(s), model=$Model, voice=$Voice" -ForegroundColor Gray
+
+    if ($chunks.Count -eq 1) {
+        try {
+            $body = @{ model = $Model; input = $chunks[0]; voice = $Voice } | ConvertTo-Json -Compress
+            Invoke-WebRequest -Uri "https://api.openai.com/v1/audio/speech" `
+                -Method POST -Headers $headers -Body $body -OutFile $Output -ErrorAction Stop | Out-Null
+            return $true
+        } catch {
+            Write-Host "  OpenAI TTS failed: $($_.Exception.Message)" -ForegroundColor Yellow
+            return $false
+        }
+    }
+
+    # Multiple chunks — need ffmpeg to concatenate
+    $ffmpeg = Get-Command ffmpeg -ErrorAction SilentlyContinue
+    if (-not $ffmpeg) {
+        Write-Host "  ffmpeg is required to concatenate multi-chunk OpenAI TTS output. Install ffmpeg and retry." -ForegroundColor Red
+        return $false
+    }
+
+    $tempDir   = Join-Path $env:TEMP "podcaster_oai_$(Get-Random)"
+    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+    $tempFiles = [System.Collections.Generic.List[string]]::new()
+
+    try {
+        for ($i = 0; $i -lt $chunks.Count; $i++) {
+            $chunkFile = Join-Path $tempDir "chunk_$i.mp3"
+            $body      = @{ model = $Model; input = $chunks[$i]; voice = $Voice } | ConvertTo-Json -Compress
+            Write-Host "  Rendering chunk $($i+1)/$($chunks.Count)..." -ForegroundColor Gray
+            Invoke-WebRequest -Uri "https://api.openai.com/v1/audio/speech" `
+                -Method POST -Headers $headers -Body $body -OutFile $chunkFile -ErrorAction Stop | Out-Null
+            $tempFiles.Add($chunkFile)
+        }
+
+        # Build ffmpeg concat list
+        $listFile = Join-Path $tempDir "filelist.txt"
+        $tempFiles | ForEach-Object { "file '$_'" } | Set-Content $listFile -Encoding UTF8
+        & ffmpeg -f concat -safe 0 -i $listFile -c copy $Output -y -loglevel quiet 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "ffmpeg concat failed (exit $LASTEXITCODE)" }
+        return $true
+    } catch {
+        Write-Host "  OpenAI TTS failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        return $false
+    } finally {
+        Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -184,6 +293,7 @@ if (-not $OutputFile) {
 
 Write-Host "Input:  $inputPath"
 Write-Host "Output: $OutputFile"
+Write-Host "Engine: $Engine" -ForegroundColor Gray
 
 # Conversation mode: delegate to the two-voice Python script
 if ($ConversationMode) {
@@ -295,8 +405,20 @@ if ($plainText.Length -gt 100000) {
 $success = $false
 
 if (-not $ForceFallback) {
-    Write-Host "`nTrying edge-tts (neural quality)..." -ForegroundColor Cyan
-    $success = Invoke-EdgeTTS -Text $plainText -Output $OutputFile -Voice $Voice -Rate $Rate -Volume $Volume
+    if ($Engine -in @("tts-1", "tts-1-hd")) {
+        # Map edge-tts default voice → OpenAI default; otherwise use caller-supplied value
+        $oaiVoice = if ($Voice -eq "en-US-JennyNeural") { "alloy" } else { $Voice }
+        Write-Host "`nUsing OpenAI TTS (model: $Engine, voice: $oaiVoice)..." -ForegroundColor Cyan
+        $success = Invoke-OpenAITTS -Text $plainText -Output $OutputFile -Model $Engine -Voice $oaiVoice
+        if (-not $success) {
+            Write-Host "  OpenAI TTS failed — falling back to edge-tts" -ForegroundColor Yellow
+        }
+    }
+
+    if (-not $success -and $Engine -ne "system") {
+        Write-Host "`nTrying edge-tts (neural quality)..." -ForegroundColor Cyan
+        $success = Invoke-EdgeTTS -Text $plainText -Output $OutputFile -Voice $Voice -Rate $Rate -Volume $Volume
+    }
 }
 
 if (-not $success) {

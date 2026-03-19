@@ -17,7 +17,7 @@ env:
 jobs:
   detect-drift:
     name: Detect Configuration Drift
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       helm_drift: ${{ steps.detect.outputs.helm_drift }}
       kustomize_drift: ${{ steps.detect.outputs.kustomize_drift }}
@@ -31,24 +31,20 @@ jobs:
       
       - name: Detect Helm/Kustomize changes
         id: detect
-        shell: pwsh
+        shell: bash
         run: |
-          if (Test-Path scripts\drift-detection\detect-helm-kustomize-changes.sh) {
+          if [ -f scripts/drift-detection/detect-helm-kustomize-changes.sh ]; then
             bash scripts/drift-detection/detect-helm-kustomize-changes.sh
-          } else {
-            Write-Output "Script not found, skipping detection"
-          }
-          
+          else
+            echo "Script not found, skipping detection"
+          fi
+
           # Load results
-          if (Test-Path "$env:RUNNER_TEMP/drift-detection/changes.env") {
-            Get-Content "$env:RUNNER_TEMP/drift-detection/changes.env" | ForEach-Object {
-              if ($_ -match '^([^=]+)=(.*)$') {
-                $name = $matches[1]
-                $value = $matches[2]
-                "$name=$value" >> $env:GITHUB_OUTPUT
-              }
-            }
-          }
+          if [ -f "$RUNNER_TEMP/drift-detection/changes.env" ]; then
+            while IFS='=' read -r name value; do
+              echo "${name}=${value}" >> "$GITHUB_OUTPUT"
+            done < "$RUNNER_TEMP/drift-detection/changes.env"
+          fi
       
       - name: Upload drift detection results
         uses: actions/upload-artifact@v4
@@ -59,7 +55,7 @@ jobs:
 
   validate-manifests:
     name: Validate Manifests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: detect-drift
     if: needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true'
     
@@ -86,25 +82,25 @@ jobs:
           version: 'v1.28.0'
       
       - name: Install conftest (OPA policy testing)
-        shell: pwsh
+        shell: bash
         run: |
-          if (-not (Get-Command conftest -ErrorAction SilentlyContinue)) {
-            Write-Output "Installing conftest..."
-            Invoke-WebRequest -Uri "https://github.com/open-policy-agent/conftest/releases/download/v0.49.1/conftest_0.49.1_Windows_x86_64.zip" -OutFile conftest.zip
-            Expand-Archive -Path conftest.zip -DestinationPath . -Force
-            Move-Item conftest.exe C:\Windows\System32\ -Force
-          }
+          if ! command -v conftest &> /dev/null; then
+            echo "Installing conftest..."
+            curl -sLO "https://github.com/open-policy-agent/conftest/releases/download/v0.49.1/conftest_0.49.1_Linux_x86_64.tar.gz"
+            tar xzf conftest_0.49.1_Linux_x86_64.tar.gz
+            sudo mv conftest /usr/local/bin/
+          fi
           conftest --version
       
       - name: Render and validate manifests
         id: validate
-        shell: pwsh
+        shell: bash
         run: |
-          if (Test-Path scripts\drift-detection\render-and-validate.sh) {
+          if [ -f scripts/drift-detection/render-and-validate.sh ]; then
             bash scripts/drift-detection/render-and-validate.sh
-          } else {
-            Write-Output "Script not found, skipping validation"
-          }
+          else
+            echo "Script not found, skipping validation"
+          fi
         continue-on-error: true
       
       - name: Upload rendered manifests
@@ -117,14 +113,14 @@ jobs:
       
       - name: Check validation result
         if: steps.validate.outcome == 'failure'
-        shell: pwsh
+        shell: bash
         run: |
-          Write-Output "::error::Manifest validation failed - security issues detected"
+          echo "::error::Manifest validation failed - security issues detected"
           exit 1
 
   generate-report:
     name: Generate Compliance Report
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [detect-drift, validate-manifests]
     if: always() && (needs.detect-drift.outputs.helm_drift == 'true' || needs.detect-drift.outputs.kustomize_drift == 'true')
     permissions:
@@ -153,17 +149,17 @@ jobs:
       
       - name: Generate compliance delta report
         id: report
-        shell: pwsh
+        shell: bash
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
-          if (Test-Path scripts\drift-detection\compliance-delta-report.sh) {
+          if [ -f scripts/drift-detection/compliance-delta-report.sh ]; then
             bash scripts/drift-detection/compliance-delta-report.sh
-          } else {
-            Write-Output "Script not found, skipping report generation"
-          }
+          else
+            echo "Script not found, skipping report generation"
+          fi
         continue-on-error: true
       
       - name: Upload compliance report
@@ -221,7 +217,7 @@ jobs:
       
       - name: Fail if validation failed
         if: needs.validate-manifests.result == 'failure'
-        shell: pwsh
+        shell: bash
         run: |
-          Write-Output "::error::Drift validation failed - see compliance report for details"
+          echo "::error::Drift validation failed - see compliance report for details"
           exit 1

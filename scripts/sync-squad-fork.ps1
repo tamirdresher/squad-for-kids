@@ -23,6 +23,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# sync-squad-fork syncs tamirdresher/squad (personal fork) — needs the PUBLIC gh account
+$env:GH_CONFIG_DIR = "$HOME\.config\gh-pub"
+
 $fork     = 'tamirdresher/squad'
 $upstream = 'bradygaster/squad'
 

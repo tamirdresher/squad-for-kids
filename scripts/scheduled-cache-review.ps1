@@ -1,4 +1,4 @@
-﻿# Scheduled Cache Review Automation
+# Scheduled Cache Review Automation
 # Checks if a cache review is due and creates the issue automatically
 # Called by ralph-watch.ps1 monthly
 
@@ -7,6 +7,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
 
 # Check if it's the first day of the month OR force mode
 $today = Get-Date

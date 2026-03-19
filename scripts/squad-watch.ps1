@@ -41,6 +41,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Continue'
 
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
+
 # --- Require PowerShell 7+ ---
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     Write-Host "ERROR: squad-watch requires PowerShell 7+ (pwsh). Current: $($PSVersionTable.PSVersion)" -ForegroundColor Red

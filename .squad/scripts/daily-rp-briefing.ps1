@@ -13,6 +13,9 @@ param(
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
+
 $ErrorActionPreference = "Continue"
 
 # Check if it's a weekend

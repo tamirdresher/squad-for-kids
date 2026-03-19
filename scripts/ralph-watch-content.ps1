@@ -49,6 +49,9 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
+
 # --- Paths ---
 $squadDir   = Join-Path $env:USERPROFILE ".squad"
 $stateFile  = Join-Path $squadDir "content-watch-state.json"

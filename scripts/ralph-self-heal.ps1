@@ -26,6 +26,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
 $script:LogPrefix = "[ralph-self-heal]"
 $script:LogFile = Join-Path $env:USERPROFILE ".squad\ralph-self-heal.log"
 

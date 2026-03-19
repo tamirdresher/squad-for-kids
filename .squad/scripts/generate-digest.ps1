@@ -50,6 +50,9 @@ param(
 $ErrorActionPreference = 'Stop'
 $InformationPreference = 'Continue'
 
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
+
 # Map period to days
 $periodDays = if ($Period -eq 'daily') { 1 } elseif ($Period -eq 'weekly') { 7 } else { [int]$Period }
 

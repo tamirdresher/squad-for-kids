@@ -9,6 +9,9 @@ param(
     [switch]$DryRun = $false
 )
 
+# Ensure gh uses the EMU account (tamirdresher_microsoft) — required for squad repo access
+$env:GH_CONFIG_DIR = "$env:APPDATA\GitHub CLI"
+
 # ============================================================================
 # CRON PARSER
 # ============================================================================

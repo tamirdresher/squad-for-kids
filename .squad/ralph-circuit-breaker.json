@@ -1,17 +1,17 @@
 {
-  "state": "half-open",
+  "totalRecoveries": 0,
+  "requiredSuccessesToClose": 2,
+  "totalFallbacks": 0,
+  "state": "closed",
   "preferredModel": "claude-sonnet-4.6",
+  "lastRateLimitHit": null,
+  "cooldownMinutes": 10,
   "currentModel": "claude-sonnet-4.6",
+  "consecutiveSuccesses": 0,
   "fallbackChain": [
     "claude-sonnet-4.5",
     "gpt-5.4-mini",
     "gpt-5-mini",
     "gpt-4.1"
-  ],
-  "lastRateLimitHit": "2026-03-19T07:11:00.290105+02:00",
-  "cooldownMinutes": 10,
-  "consecutiveSuccesses": 0,
-  "requiredSuccessesToClose": 2,
-  "totalFallbacks": 8,
-  "totalRecoveries": 0
+  ]
 }

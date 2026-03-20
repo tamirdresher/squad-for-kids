@@ -34,6 +34,15 @@ if (Test-Path "$ghConfigCandidate\hosts.yml") {
 $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
 
+# Cooperative rate limit manager (Issue #1165)
+$rateLimitManagerPath = Join-Path $PSScriptRoot "scripts" "rate-limit-manager.ps1"
+if (Test-Path $rateLimitManagerPath) {
+    . $rateLimitManagerPath
+    Write-Verbose "[ralph-watch] Loaded rate-limit-manager.ps1"
+} else {
+    Write-Warning "[ralph-watch] rate-limit-manager.ps1 not found — rate limiting disabled"
+}
+
 # Set window/tab title (works in Windows Terminal, cmd, and pwsh)
 $ralphTitle = "Ralph Watch - tamresearch1"
 $Host.UI.RawUI.WindowTitle = $ralphTitle
@@ -1706,15 +1715,11 @@ while ($true) {
         Write-Host "[$displayTime] [health] $($healthResult.Warnings.Count) warning(s): $($healthResult.Warnings -join ' | ')" -ForegroundColor Magenta
     }
 
-    # ── CDD: Cascade Dependency Detector — sequential mode check (Issue #1168) ──
-    # If a 429 cascade put "ralph" in sequential mode, throttle to single-issue processing
-    $cddSequentialMode = $false
-    try {
-        if (Get-Command Test-SequentialModeActive -ErrorAction SilentlyContinue) {
-            $cddSequentialMode = Test-SequentialModeActive -AgentId "ralph"
-        }
-    } catch {
-        Write-Host "[$displayTime] [cdd] Sequential mode check failed: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    # Step -0.25: Register agent with rate pool (Issue #1165)
+    if (Get-Command Register-Agent -ErrorAction SilentlyContinue) {
+        $agentId = "ralph-$env:COMPUTERNAME"
+        Register-Agent -AgentId $agentId -AgentName "Ralph" -Priority "P2"
+        Write-Verbose "[$displayTime] [rate-limit] Registered agent '$agentId' as P2"
     }
 
     # Step -0.5: Machine capability discovery (Issue #987 — run once per startup, then every 50 rounds)

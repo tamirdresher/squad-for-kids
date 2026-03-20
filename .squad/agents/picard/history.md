@@ -378,6 +378,31 @@ packages/squad-sdk/src/
 4. Monitor monthly spend; alert if exceeds $300
 5. Track quality/cost metrics over Q2 2026 to validate current assignments
 
+### 2026-03-20: Issue #1148 — Mooncake China Region Audit (P1)
+
+**Assignment:** Audit BasePlatformRP endpoints for China North 1 / China East 1 regions being decommissioned July 1, 2026.
+
+**Scope:** Determine if BasePlatformRP has active endpoints in deprecated Mooncake regions; if so, plan migration.
+
+**Findings:**
+- **Status:** INCONCLUSIVE — Audit blocked by repository/ARM access
+- **Root Cause:** BasePlatformRP source (`mtp-microsoft/Infra.K8s.BasePlatformRP`) not accessible in this session; requires ARM control plane access or GitHub credentials
+- **Workaround Path:** Provided two options for Tamir:
+  1. Direct ARM query (fastest: 30 min) using PowerShell CLI
+  2. Check related ADO work items (#36955411, #35009131, #35009124) which may have ARM-side audit results
+
+**Deliverable:**
+- Audit report: `.squad/audits/1148-china-region-audit-report.md` (methodology, next steps, success criteria)
+- GitHub comment on #1148 with findings and recommended action path
+
+**Key Insight — ARM-Side Dependency:**
+When auditing resource provider region support, always check ARM control plane first (faster, more reliable than searching source code). Related ADO items often have parallel audit work already in progress.
+
+**Timeline:** July 1, 2026 hard deadline. Target migration completion June 15 (2 weeks before).
+
+**Owner Decision Required:** YES — If endpoints exist in CN1/CE1, Tamir must decide: migration timeline + customer communication plan.
+
+**Status:** Audit report complete. Issue comment posted. Awaiting Tamir's action on ARM query or ADO item review. This is a P1 blocker with external deadline.
 ---
 
 ### KEDA Autoscaling Implementation Plan (Issue #1134)

@@ -26,3 +26,10 @@ TBD - Q2 work incoming
 - Applied `escHtml()` to URL values used in href attributes (line 1030)
 
 **Key Learning:** When sanitizing HTML for use in attributes, ALWAYS escape double quotes. Standard HTML entity escaping (`< > &`) is insufficient for attribute contexts. CodeQL caught this vulnerability correctly.
+*Learnings will accumulate here during Q2.*
+
+### 2026-03-20 Round 2: CodeQL Fix
+
+**Task:** Fix PR #1145 CodeQL failure  
+**Action:** New CI runs queued  
+**Status:** ⏳ Awaiting CI verification

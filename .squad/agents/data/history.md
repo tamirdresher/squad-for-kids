@@ -995,3 +995,13 @@ Android Discord App ◄──WebSocket──► Discord Gateway
 - Google Gemini 2.0 Flash Exp model with multimodal generation (TEXT + IMAGE)
 - PowerShell REST API calls to `generativelanguage.googleapis.com`
 - Adaptive Card 1.4 spec for Teams webhook integration
+
+## Recent Work (2026-03-20 Ralph Round 2)
+
+**Issue #1166 (Predictive Circuit Breaker):** ✅ PR #1200 created
+- Branch: squad/1166-predictive-circuit-breaker
+- Decision #47 merged to decisions.md
+- Rate-limit probing architecture: tiered thresholds (5%/15%/30%) + trend analysis
+- Avoids cascade by opening circuit before 429
+
+**PR #1191 (Schema validation):** ⚠️ Still failing, requires iteration

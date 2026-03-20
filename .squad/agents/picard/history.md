@@ -508,3 +508,11 @@ For rate-limit metrics, the upstream solution covers 100% of requirements and re
 7. Add PrometheusRule alerts (GitHubRateLimitLow, GitHubRateLimitExhausted)
 
 **Status:** Implementation complete, PR open. Production deployment pending review.
+## Recent Work (2026-03-20 Ralph Rounds 1-2)
+
+**Round 1:**
+- Issue #425 (Monitor Eyal shared links): Branch created, PR #1199 created in Round 2
+- Issue #1070 (Weekend Sprint status check): ⚠️ In progress, monitoring for completion
+
+**Round 2 Follow-up:**
+- PR #1199 created for issue #425

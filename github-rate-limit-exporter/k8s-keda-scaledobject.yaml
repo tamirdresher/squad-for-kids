@@ -1,0 +1,91 @@
+---
+# ScaledObject Example 1: Scale based on remaining rate limit threshold
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: github-rate-limit-exporter-remaining
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: github-rate-limit-exporter
+    kind: Deployment
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      metricName: github_rate_limit_remaining
+      threshold: "100"
+      query: |
+        github_rate_limit_remaining{resource="core"}
+    # Scale up when remaining < 100
+    # This triggers when metric falls below threshold
+
+---
+# ScaledObject Example 2: Scale based on usage ratio
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: github-rate-limit-exporter-ratio
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: github-rate-limit-exporter
+    kind: Deployment
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      metricName: github_rate_limit_usage_ratio
+      threshold: "0.5"
+      query: |
+        (github_rate_limit_used{resource="core"} / github_rate_limit_limit{resource="core"})
+    # Scale up when usage ratio > 50%
+    # This represents (used / limit) percentage
+
+---
+# ScaledObject Example 3: Advanced - Scale based on multiple resources
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: github-rate-limit-exporter-advanced
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: github-rate-limit-exporter
+    kind: Deployment
+  minReplicaCount: 1
+  maxReplicaCount: 15
+  fallback:
+    failureThreshold: 3
+    replicas: 2
+  pollingInterval: 60
+  cooldownPeriod: 300
+  triggers:
+  # Trigger 1: Core rate limit usage
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      metricName: github_core_usage_ratio
+      threshold: "0.6"
+      query: |
+        (github_rate_limit_used{resource="core"} / github_rate_limit_limit{resource="core"}) * 100
+  # Trigger 2: Search rate limit usage
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      metricName: github_search_usage_ratio
+      threshold: "0.7"
+      query: |
+        (github_rate_limit_used{resource="search"} / github_rate_limit_limit{resource="search"}) * 100
+  # Trigger 3: GraphQL rate limit usage
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      metricName: github_graphql_usage_ratio
+      threshold: "0.8"
+      query: |
+        (github_rate_limit_used{resource="graphql"} / github_rate_limit_limit{resource="graphql"}) * 100

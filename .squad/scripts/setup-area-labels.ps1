@@ -10,12 +10,16 @@ param(
 )
 
 $labels = @(
-    @{ name="area:platform"; description="Work in src/platform/ — B'Elanna primary"; color="0075ca" },
-    @{ name="area:api";      description="Work in src/api/ — Data primary";           color="0075ca" },
-    @{ name="area:frontend"; description="Work in src/frontend/ — TBD primary";       color="0075ca" },
-    @{ name="area:shared";   description="Cross-cutting shared code";                 color="0075ca" },
-    @{ name="area:infra";    description="Infrastructure, CI/CD — B'Elanna primary";  color="0075ca" },
-    @{ name="area:docs";     description="Documentation changes — Seven primary";      color="0075ca" }
+    @{ name="area:platform";          description="Work in src/platform/ — B'Elanna primary";         color="0075ca" },
+    @{ name="area:api";               description="Work in src/api/ — Data primary";                  color="0075ca" },
+    @{ name="area:frontend";          description="Work in src/frontend/ — TBD primary";              color="0075ca" },
+    @{ name="area:shared";            description="Cross-cutting shared code — Picard escalation";    color="0075ca" },
+    @{ name="area:infra";             description="Infrastructure, CI/CD, deployment — B'Elanna";     color="0075ca" },
+    @{ name="area:docs";              description="Documentation changes — Seven primary";             color="0075ca" },
+    @{ name="area:platform:infra";    description="src/platform/infra/ — B'Elanna primary";           color="0075ca" },
+    @{ name="area:platform:security"; description="Auth + secrets in platform — Worf primary";        color="0075ca" },
+    @{ name="area:api:breaking";      description="Breaking API changes — Data + Picard review";      color="0075ca" },
+    @{ name="area:api:security";      description="Auth middleware in API — Worf primary";            color="0075ca" }
 )
 
 foreach ($label in $labels) {

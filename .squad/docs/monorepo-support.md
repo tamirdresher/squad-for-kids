@@ -1,504 +1,505 @@
-# Monorepo Support Guide
+# Monorepo Support — Per-Area Squad Config Guide
 
-> **Full reference for per-area Squad configuration in large repositories.**
-> If you are setting up Squad for the first time, start with [Quick Start](#quick-start).
-> Cross-references: `scripts/find-squad-config.ps1` (issue #1146) · `.squad/mcp-servers.md`
-
----
-
-## Quick Start
-
-If your repo is a monorepo with multiple teams or product areas, Squad can be configured to respect area boundaries:
-
-1. **Lightweight:** Drop a `.squad-context.md` file into any subdirectory to give Squad context about that area.
-2. **Formal:** Create a `.squads/` directory beside your area code for a full subsquad config (roster, routing,
-   decisions log).
-3. **Automated:** Add `area:*` labels to issues and PRs so the routing engine dispatches to the right area agents.
-
-You don't need all three layers. Start with Layer 1. Add layers as your team grows.
+> **Full guide** for configuring Squad in a large monorepo where different teams own different
+> subdirectories. Summarised in `.squad/routing.md` (Per-Area Routing section) — read that first
+> for the quick reference, then come here for the complete picture.
 
 ---
 
-## The Three Layers
+## Why This Matters
 
-### Layer 1: `.squad-context.md` — Lightweight per-area context (start here)
+In a standard single-team repo, everything lives at `.squad/` and all agents share one routing
+table, one roster, and one decisions log. That works well up to ~10 engineers on a single product.
 
-A single Markdown file that tells agents *who owns this area*, *what it does*, and *how to route work here*.
-It requires zero tooling and zero setup beyond creating the file.
+In a **monorepo** — `src/platform/`, `src/api/`, `src/frontend/`, etc. — the root `.squad/` becomes
+a bottleneck:
+- Routing rules mix platform-team concerns with API-team concerns
+- Decisions from one area clutter another area's log
+- Agents working in `src/api/` load irrelevant platform context on every spawn
 
-**When to use Layer 1 only:**
-- Your repo has 2–5 areas with low cross-area churn
-- You want squad awareness without managing a subsquad roster
-- You are piloting monorepo support before committing to a full setup
+Squad solves this with **three layers of per-area config**, each with different weight and scope:
 
-### Layer 2: Per-area `.squads/` directory — Full subsquad config
+| Layer | File | Effort | When to use |
+|-------|------|--------|-------------|
+| 1 | `<area>/.squad-context.md` | Minimal | Any subdirectory that wants context awareness |
+| 2 | `<area>/.squads/` | Medium | Team-owned area needing its own roster + routing |
+| 3 | Directory-aware dispatch | Framework | Automatic once Layers 1-2 are in place |
 
-A directory placed alongside your area code containing a complete squad config scoped to that area.
-Inherits all root `.squad/` rules; area files override on conflicts (except security gates — see
-[Merge Rules](#inheritance--merge-rules)).
-
-**When to use Layer 2:**
-- Your area has its own dedicated roster of agents
-- You need area-specific routing rules (e.g., all `area:api` PRs require a Data review)
-- You maintain area-scoped decisions that should not pollute the root log
-
-### Layer 3: Directory-aware dispatch — Labels and automation
-
-GitHub `area:*` labels on issues and PRs, combined with the routing engine, ensure work reaches the right
-area agents automatically without any human triage step.
-
-**When to use Layer 3:**
-- You have CI or event-driven workflows that auto-label PRs by changed paths
-- You want to enforce area ownership (e.g., `area:platform:security` always involves Worf)
-- Multiple teams contribute simultaneously and need independent queues
+Layers are **additive** — you can adopt Layer 1 today without committing to Layer 2. The root
+`.squad/` is always "HQ" and all area configs inherit from it.
 
 ---
 
-## Schema Reference
+## Layer 1: `.squad-context.md` — Lightweight Area Context
 
-### `.squad-context.md` format
+### What It Is
 
-Place this file in any subdirectory. Agents walking the directory tree will find and respect it.
+A single Markdown file placed inside a subdirectory that tells agents:
+
+- Who owns this area
+- What the key files are
+- Any routing hints specific to this area
+- Any constraints agents must respect here
+
+It does **not** change the agent roster or routing rules — it only adds context that agents load
+when working in this directory tree.
+
+### Convention
+
+Place a `.squad-context.md` at the **root of the area** you want to describe:
+
+```
+src/
+  platform/
+    .squad-context.md   ← describes platform area
+    auth/
+    infra/
+  api/
+    .squad-context.md   ← describes api area
+    handlers/
+    middleware/
+```
+
+When an agent is spawned for a task touching `src/platform/auth/handler.go`, Squad walks up the
+directory tree from `src/platform/auth/` and loads the nearest `.squad-context.md` it finds —
+which is `src/platform/.squad-context.md`.
+
+### Format
 
 ```markdown
-# Squad Context — <Area Name>
+# Area: Platform
 
-## Owner
-- **Primary agent:** <AgentName> (e.g., B'Elanna)
-- **Backup agent:** <AgentName>
-- **Human DRI:** <GitHub username or team>
+**Owner:** B'Elanna  
+**Label:** `area:platform`  
+**Primary path:** `src/platform/`
 
-## Purpose
-One paragraph describing what this area does and why it exists.
+## What This Area Does
+
+The platform layer handles infrastructure provisioning, cluster lifecycle, and the internal
+service mesh. Changes here affect ALL other areas — treat with care.
 
 ## Key Files
-- `<path>` — <what it does>
-- `<path>` — <what it does>
+
+| File | Purpose |
+|------|---------|
+| `src/platform/cluster/manager.go` | Core cluster lifecycle |
+| `src/platform/infra/provisioner.go` | Resource provisioning entry point |
+| `src/platform/auth/middleware.go` | Auth middleware shared by all services |
 
 ## Routing Hints
-- PRs touching `<pattern>` should involve <AgentName>
-- Breaking changes require Picard review
-- Security-sensitive paths: <list if any>
 
-## Area Label
-`area:<slug>` — used on issues and PRs to trigger area routing
+- **Security changes** (anything under `auth/`) → always involve Worf
+- **Cluster changes** → B'Elanna is primary, Picard for architecture decisions
+- **Breaking changes** → apply `area:platform:breaking` label and require Picard sign-off
 
-## Notes
-Any freeform context that doesn't fit above.
+## Constraints
+
+- Never merge platform changes during peak hours (09:00-17:00 UTC on weekdays) without explicit approval
+- All changes to `infra/` require a linked ADO work item
+- Helm chart changes trigger the `helm-validate` skill automatically
+
+## Related Decisions
+
+See `.squad/decisions/` for platform-specific decisions tagged `area:platform`.
 ```
 
-**Required fields:** `Owner.Primary agent`, `Purpose`, `Area Label`
-**Optional fields:** Everything else
+### Rules
+
+1. File must be named exactly `.squad-context.md` (dot-prefixed, no variations)
+2. The `**Label:**` field must match a label in `.squad/routing.md`'s area label schema
+3. Keep it short — this is a **context file**, not a design doc
+4. Do not duplicate root `.squad/routing.md` content; only add area-specific overrides
 
 ---
 
-### Area `team.md` format
+## Layer 2: Per-Area `.squads/` — Full Subsquad Config
 
-Placed at `<area>/.squads/team.md`. Declares which root agents are active in this area and whether any
-area-specific agent overrides apply.
+### What It Is
+
+A `.squads/` directory placed inside an area that provides a **full squad configuration** scoped
+to that area. It can contain its own team roster, routing overrides, and decisions log — all
+inheriting from (and overriding) the root `.squad/`.
+
+### Structure
+
+```
+src/platform/
+  .squads/
+    team.md          ← area agent roster (references root agents by name)
+    routing.md       ← area routing overrides
+    decisions/       ← area-scoped decisions log
+      inbox/         ← incoming decisions (merged by Scribe)
+```
+
+You only need to create the files that differ from the root config. The root `.squad/` remains
+the source of truth for anything not explicitly overridden.
+
+### `team.md` — Area Roster
+
+The area roster lists which root agents are **active in this area** and may add area-specific
+notes. It does **not** introduce new agents — all agents are defined in the root `.squad/agents/`.
 
 ```markdown
-# <Area Name> — Team
+# Platform Team
 
-> Inherits all agents from root `.squad/agents/`. This file declares area-level overrides only.
+> Subset of root squad focused on `src/platform/`.
 
-## Active in This Area
+| Name | Role | Active Here |
+|------|------|-------------|
+| B'Elanna | Infrastructure Expert | ✅ Primary |
+| Worf | Security & Cloud | ✅ Security gate |
+| Data | Code Expert | ✅ Go code reviews |
+| Picard | Lead | ✅ Architecture only |
+| Seven | Research & Docs | ✅ Platform docs |
+| Crusher | Content Safety | ✅ HQ mandate — cannot be removed |
 
-| Agent | Role in Area | Override? |
-|-------|-------------|-----------|
-| Data | Primary code reviewer | No |
-| B'Elanna | Infrastructure changes | No |
-| Worf | Security gate (mandatory) | No |
-| Seven | Area documentation | No |
-
-## Area-Specific Overrides
-
-<!-- Only needed if an agent behaves differently in this area. -->
-<!-- Example: a specialized routing rule or a different primary agent. -->
-
-## Agents NOT Active Here
-
-| Agent | Reason |
-|-------|--------|
-| Podcaster | No audio content in this area |
-| Troi | No blog content in this area |
-
-## Notes
-Any context about team structure, contacts, or on-call rotation for this area.
+<!-- agents not listed here are not dispatched for platform-area tasks -->
 ```
 
----
+**Inheritance rule:** Agents in the root `.squad/team.md` that are **not listed** in an area
+`team.md` are still available but will not be auto-dispatched. They can always be invoked
+explicitly.
 
-### Area `routing.md` format
+**HQ mandates (cannot be overridden):**
+- Crusher (content safety) is always active regardless of area roster
+- Worf is always active for security-tagged issues regardless of area roster
 
-Placed at `<area>/.squads/routing.md`. Defines routing rules that *add to* root routing (never replace).
+### `routing.md` — Area Routing Overrides
+
+Follows the same format as root `.squad/routing.md`. Area rules are applied **on top of** root
+rules — they do not replace them.
 
 ```markdown
-# <Area Name> — Routing
+# Platform Area Routing
 
-> These rules apply **in addition to** root `.squad/routing.md`.
-> HQ security gates (Worf, Crusher) cannot be overridden here.
+> Overrides for `src/platform/`. All root routing rules still apply.
 
-## Area Label
+## Work Type → Agent (Platform Overrides)
 
-`area:<slug>`
+| Work Type | Primary | Secondary |
+|-----------|---------|----------|
+| Cluster lifecycle changes | B'Elanna | Picard (arch) |
+| Auth middleware (`auth/`) | Worf | Data |
+| Helm chart changes | B'Elanna | — |
+| Platform docs | Seven | B'Elanna |
 
-## Routing Table
+## Area Label Rules
 
-| Work Type | Route To | Notes |
-|-----------|----------|-------|
-| All code changes | Data | Primary reviewer |
-| Infrastructure changes | B'Elanna | Required for k8s changes |
-| Breaking API changes | Data + Picard | Both must sign off |
-| Security changes | Worf | Mandatory, cannot be skipped |
+When an issue or PR carries `area:platform`:
+- Auto-assign B'Elanna as primary reviewer
+- Require Worf sign-off if the diff touches `auth/`
+- Ping Picard if the PR description contains "architecture" or "breaking"
 
-## Auto-Label Rules
+## Override Semantics
 
-Paths that trigger this area label automatically:
-- `src/<area>/**`
-- `tests/<area>/**`
-- `docs/<area>/**`
-
-## Cross-Area Rules
-
-When a PR touches this area AND another area:
-1. Apply all routing rules for both areas (union)
-2. Picard arbitrates if agent assignments conflict
-3. Both area routing.md files are evaluated; neither takes priority
+These rules ADD TO root routing. They do not replace it. If a rule here conflicts
+with a root HQ rule (e.g., Crusher gate), the HQ rule wins.
 ```
+
+### `decisions/` — Area-Scoped Decisions Log
+
+Same structure as root `.squad/decisions/`:
+
+```
+src/platform/.squads/decisions/
+  inbox/
+    belanna-cluster-timeout.md   ← new decision submitted by B'Elanna
+  0001-cluster-node-pools.md     ← merged decision
+  0002-helm-version-pin.md
+```
+
+Area decisions are **not merged** into the root log. They live permanently at
+`src/<area>/.squads/decisions/`. Cross-area decisions (affecting multiple areas) go into the
+root `.squad/decisions/`.
+
+### Inheritance and Override Semantics Summary
+
+```
+Root .squad/          ← Always loaded (HQ)
+  ↓  inherits
+Area .squads/         ← Loaded when task touches this area
+  ↓  overrides (additive)
+Effective config for this task
+```
+
+| Config element | Merge behaviour |
+|----------------|----------------|
+| `team.md` roster | Area list **restricts** auto-dispatch; root agents still available on-demand |
+| `routing.md` rules | Area rules **add to** root rules; conflicts resolved in favour of HQ |
+| `decisions/` | Area decisions stay in area; root decisions apply everywhere |
+| HQ mandates (Crusher, Worf security gate) | **Cannot be overridden** by any area config |
 
 ---
 
-## Config Discovery Algorithm
+## Layer 3: Directory-Aware Agent Dispatch
 
-When an agent is given a file path, issue, or PR, it discovers which area config applies using this algorithm:
+### How It Works
+
+When Squad receives a task (issue, PR, or explicit agent invocation), the dispatch logic:
+
+1. Identifies the **area** from the task's `area:*` label, or infers it from changed file paths
+2. Walks up the directory tree from the first changed file to find the nearest `.squads/` directory
+3. Loads that area's config **on top of** the root config
+4. Spawns agents according to the effective (merged) config
+
+This is transparent to agents — they receive a fully merged config and don't need to know whether
+they're working in a root-only or area-overridden context.
+
+### Area Detection Order
+
+1. **Explicit `area:*` label** on the issue/PR → use the label's registered path from routing.md
+2. **Changed files** (PR diff or issue body) → find common prefix, walk up for `.squads/`
+3. **Fallback** → use root `.squad/` only
+
+### Area Label Schema
+
+Defined in `.squad/routing.md`. Labels must be registered there before area dispatch will work.
+
+| Label | Area path | Primary agent |
+|-------|-----------|---------------|
+| `area:platform` | `src/platform/` | B'Elanna |
+| `area:platform:infra` | `src/platform/infra/` | B'Elanna |
+| `area:platform:security` | Auth + secrets in platform | Worf |
+| `area:api` | `src/api/` | Data |
+| `area:api:breaking` | Breaking API changes | Data + Picard |
+| `area:api:security` | Auth middleware | Worf |
+
+To register a new area, add a row to the routing.md table and create the corresponding
+`.squad-context.md` (at minimum).
+
+### Multi-Area Tasks
+
+When a PR or issue spans multiple areas:
 
 ```
-function find-squad-config(target_path):
-    dir = directory_of(target_path)
-    while dir is not repo_root:
-        if exists(dir + "/.squads/"):
-            return load_squads_config(dir + "/.squads/")    # Layer 2
-        if exists(dir + "/.squad-context.md"):
-            return load_context(dir + "/.squad-context.md") # Layer 1
-        dir = parent(dir)
-    return load_root_config(repo_root + "/.squad/")         # Root (always present)
+PR touches: src/platform/auth/ AND src/api/middleware/
+→ Load: platform area config + api area config
+→ Union the routing requirements
+→ Dispatch: B'Elanna (platform primary) + Data (api primary) + Worf (both security gates)
 ```
 
-**Key properties:**
-- **Nearest-wins:** The config closest to the changed file takes precedence on conflicts.
-- **Always inherits root:** Area configs layer on top of root; they never replace it.
-- **Full subtree coverage:** A config at `src/platform/` covers `src/platform/auth/` too, unless a more
-  specific config exists at `src/platform/auth/`.
-- **Multi-path PRs:** If a PR touches paths covered by two different area configs, both are applied (union).
-  See [Cross-Area Work](#cross-area-work).
+The union is additive — if both areas require Worf, Worf is dispatched once, not twice.
 
-### Using `find-squad-config.ps1`
+---
+
+## `find-squad-config.ps1` — Config Discovery Script
+
+### Overview
+
+`scripts/find-squad-config.ps1` is the canonical way to discover which area config applies to
+a given file path. It is used by Ralph, agents, and CI tooling to avoid hardcoding paths.
+
+> **Note:** This script is being created in issue #1146. The interface below is the spec.
+
+### Usage
 
 ```powershell
-# Which area owns this file?
-.\scripts\find-squad-config.ps1 -Path "src/platform/auth/handler.go" -ShowArea
+# Which area config applies to this file?
+.\scripts\find-squad-config.ps1 -Path "src/platform/auth/handler.go"
 
-# List all registered area configs in the repo
+# Output:
+# Area    : platform
+# Label   : area:platform
+# Config  : src/platform/.squads/
+# Context : src/platform/.squad-context.md
+# Agents  : B'Elanna (primary), Worf (security gate)
+
+# Show just the area label (useful in scripts)
+.\scripts\find-squad-config.ps1 -Path "src/api/handlers/users.go" -ShowArea
+# area:api
+
+# List all registered areas
 .\scripts\find-squad-config.ps1 -All
 
-# Validate all area configs against schema
-.\scripts\find-squad-config.ps1 -ValidateAll
+# Output:
+# Label               Path                  Config              Context
+# ----                ----                  ------              -------
+# area:platform       src/platform/         src/platform/.squads/  src/platform/.squad-context.md
+# area:api            src/api/              src/api/.squads/        src/api/.squad-context.md
 ```
 
-> Script tracked in issue #1146.
+### How It Works
+
+1. Starting from the given `-Path`, walk up the directory tree
+2. At each level, check for `.squads/` (full area config) or `.squad-context.md` (lightweight)
+3. Return the first match with full metadata
+4. If no area config is found, return root `.squad/` as the effective config
+
+### Integration Points
+
+| Where | How it's used |
+|-------|--------------|
+| Ralph's issue picker | `find-squad-config.ps1 -Path <changed-file> -ShowArea` to apply area label automatically |
+| PR auto-labeller | Runs on every PR to apply `area:*` labels from changed file paths |
+| Agent spawn prompt | Included in spawned agent context so the agent knows its area config |
+| CI workflow | Validates that changed files have a registered area (warns if not) |
 
 ---
 
-## Inheritance & Merge Rules
+## Worked Examples
 
-### What area configs can do
+### Example 1: Adding Layer 1 Context to a New Area
 
-| Rule type | Area can add | Area can override | Area can remove |
-|-----------|-------------|-------------------|-----------------|
-| Routing assignments | ✅ | ✅ (non-security) | ❌ |
-| Agent roster (active/inactive) | ✅ | ✅ | ❌ (cannot deactivate HQ gates) |
-| Decisions log scope | ✅ | N/A | N/A |
-| Area label definition | ✅ | ✅ | ❌ |
-| HQ security gates (Worf, Crusher) | — | ❌ | ❌ |
-| Root status label taxonomy | — | ❌ | ❌ |
+**Scenario:** The frontend team wants agents working in `src/frontend/` to know who owns it and
+what the key files are.
 
-### Security gate invariant
+**Step 1:** Create `src/frontend/.squad-context.md`:
 
-**Worf (security) and Crusher (content safety) cannot be bypassed by any area config.**
-
-Even if an area `.squads/routing.md` does not mention Worf, any change tagged `area:*:security` or any
-publishable content will still invoke the HQ security gate. This is enforced at the routing engine level,
-not by convention.
-
-### Field-level merge semantics
-
-When a field exists in both root config and area config:
-
-| Field | Merge strategy |
-|-------|----------------|
-| Routing table rows | Union (area rows added to root rows) |
-| Agent active list | Union (area can add agents; cannot remove root-required ones) |
-| Area label | Area definition wins |
-| Model assignments | Area can override per-agent model for work in this area |
-| Decisions log | Separate log; area decisions do not appear in root log |
-
-### Conflict resolution order
-
-```
-1. Area config (nearest to changed file)
-2. Parent area config (if nested areas exist)
-3. Root .squad/ config
-4. HQ invariants (security gates — always win, regardless of order)
-```
-
----
-
-## Cross-Area Work
-
-When a single issue or PR spans multiple areas:
-
-1. **Auto-detect:** The routing engine applies all `area:*` labels matching the touched paths.
-2. **Union routing:** All routing requirements from all touched areas are applied. If area A requires Data
-   and area B requires B'Elanna, both are dispatched.
-3. **Conflict arbitration:** If area A and area B have conflicting routing rules for the same agent slot,
-   **Picard** arbitrates. A comment is left on the issue explaining the conflict and resolution.
-4. **Decisions scoping:** Decisions made during cross-area work are written to the *root* decisions log
-   (not any area log), tagged with all relevant area labels.
-5. **Security gates always fire:** Even if only one of the two areas is security-sensitive, the security
-   gate fires for the entire PR.
-
----
-
-## Examples: Real Repo Structures
-
-### Example 1 — Flat Repo (Single Team, No Areas)
-
-```
-my-repo/
-├── src/
-├── tests/
-├── .squad/          ← All squad config lives here (root only)
-│   ├── agents/
-│   ├── decisions.md
-│   └── routing.md
-└── README.md
-```
-
-**No area config needed.** All agents work from root config. This is the default.
-
----
-
-### Example 2 — Frontend / Backend Split
-
-Two teams share a monorepo. Each has a lightweight `.squad-context.md`.
-
-```
-my-repo/
-├── frontend/
-│   ├── src/
-│   ├── .squad-context.md   ← Layer 1: identifies frontend area, routes UI PRs to Troi/Seven
-│   └── tests/
-├── backend/
-│   ├── src/
-│   ├── .squad-context.md   ← Layer 1: identifies backend area, routes API PRs to Data
-│   └── tests/
-├── .squad/                 ← Root config (inherited by both areas)
-│   ├── agents/
-│   ├── routing.md
-│   └── decisions.md
-└── README.md
-```
-
-**`frontend/.squad-context.md`:**
 ```markdown
-# Squad Context — Frontend
+# Area: Frontend
 
-## Owner
-- **Primary agent:** Seven
-- **Backup agent:** Troi
-- **Human DRI:** @frontend-team
+**Owner:** Troi (content), Data (code)  
+**Label:** `area:frontend`  
+**Primary path:** `src/frontend/`
 
-## Purpose
-React SPA — user interface layer. Talks to backend via REST API.
+## What This Area Does
+
+React/TypeScript web application. Handles all user-facing UI.
 
 ## Key Files
-- `frontend/src/components/` — Shared UI components
-- `frontend/src/pages/` — Page-level components
+
+| File | Purpose |
+|------|---------|
+| `src/frontend/app/layout.tsx` | Root layout |
+| `src/frontend/components/` | Shared component library |
+| `src/frontend/api/client.ts` | API client (generated — do not hand-edit) |
 
 ## Routing Hints
-- CSS/design changes can involve Troi for voice/style review
-- Accessibility changes involve Crusher (content safety gate)
 
-## Area Label
-`area:frontend`
+- CSS/component changes → Data (code) + Troi (UX review)
+- API client regeneration → Data only
+- Copy/content changes → Troi primary
+
+## Constraints
+
+- Do not modify `api/client.ts` directly — regenerate from OpenAPI spec
+- All component changes need a Storybook story update
 ```
 
-**`backend/.squad-context.md`:**
+**Step 2:** Register the area label in `.squad/routing.md`:
+
 ```markdown
-# Squad Context — Backend
-
-## Owner
-- **Primary agent:** Data
-- **Backup agent:** B'Elanna
-- **Human DRI:** @backend-team
-
-## Purpose
-Go REST API serving the frontend. Postgres database. JWT auth.
-
-## Key Files
-- `backend/src/api/` — HTTP handlers
-- `backend/src/db/` — Database layer
-
-## Routing Hints
-- Auth changes are security-sensitive — tag `area:backend:security`
-- Database migrations require B'Elanna review
-
-## Area Label
-`area:backend`
+| `area:frontend` | `src/frontend/` | Data (code), Troi (UX) |
 ```
+
+That's it for Layer 1. Agents working in `src/frontend/` now auto-load this context.
 
 ---
 
-### Example 3 — Microservices (Full Layer 2 Config per Service)
+### Example 2: Adding Layer 2 Full Subsquad Config
 
-Large platform with multiple services, each with its own subsquad config.
+**Scenario:** The API team is large enough to have its own routing rules and decisions log.
+
+**Directory structure to create:**
 
 ```
-platform/
-├── services/
-│   ├── auth-service/
-│   │   ├── src/
-│   │   ├── .squad-context.md      ← Layer 1: quick context
-│   │   ├── .squads/               ← Layer 2: full subsquad config
-│   │   │   ├── team.md            ← Agent roster for auth area
-│   │   │   ├── routing.md         ← Auth-specific routing rules
-│   │   │   └── decisions/         ← Auth-scoped decision log
-│   │   └── tests/
-│   ├── payments-service/
-│   │   ├── src/
-│   │   ├── .squad-context.md
-│   │   ├── .squads/
-│   │   │   ├── team.md
-│   │   │   ├── routing.md         ← Payments: ALL changes require Worf sign-off
-│   │   │   └── decisions/
-│   │   └── tests/
-│   └── notification-service/
-│       ├── src/
-│       ├── .squad-context.md      ← Layer 1 only (simpler service)
-│       └── tests/
-├── shared/
-│   ├── .squad-context.md          ← Shared libraries context
-│   └── src/
-└── .squad/                        ← Root config
-    ├── agents/
-    ├── routing.md
-    └── decisions.md
+src/api/
+  .squad-context.md          ← already exists from Layer 1
+  .squads/
+    team.md
+    routing.md
+    decisions/
+      inbox/
 ```
 
-**`services/auth-service/.squads/routing.md`:**
+**`src/api/.squads/team.md`:**
+
 ```markdown
-# Auth Service — Routing
+# API Team
 
-> All root routing rules apply. These are additive.
-
-## Area Label
-`area:auth`
-
-## Routing Table
-| Work Type | Route To | Notes |
-|-----------|----------|-------|
-| All changes | Worf | Security review mandatory |
-| Token/session logic | Worf + Data | Both must approve |
-| Test changes only | Data | Worf not required for tests-only PRs |
-
-## Auto-Label Rules
-Paths triggering `area:auth`:
-- `services/auth-service/**`
+| Name | Role | Active Here |
+|------|------|-------------|
+| Data | Code Expert | ✅ Primary |
+| Picard | Lead | ✅ Breaking-change decisions |
+| Worf | Security & Cloud | ✅ Auth middleware |
+| Seven | Research & Docs | ✅ API docs |
+| Crusher | Content Safety | ✅ HQ mandate |
 ```
 
----
+**`src/api/.squads/routing.md`:**
 
-## FAQ
+```markdown
+# API Area Routing
 
-### "Where do I put context for my team's area?"
+## Work Type → Agent
 
-**Short answer:** Create `.squad-context.md` in your area's root directory.
+| Work Type | Primary | Secondary |
+|-----------|---------|----------|
+| Endpoint changes | Data | — |
+| Breaking API changes | Data | Picard (required sign-off) |
+| Auth middleware | Worf | Data |
+| OpenAPI spec updates | Data | Seven (docs) |
 
-**Long answer:** The file can live at any level of the directory tree. If your area is `src/platform/`, put
-it at `src/platform/.squad-context.md`. If you have sub-areas, you can add more `.squad-context.md` files
-deeper in the tree — the nearest one wins. See [Config Discovery Algorithm](#config-discovery-algorithm).
+## Label Rules
 
----
+- `area:api:breaking` → always require Picard comment before merge
+- Changes to `middleware/auth*` → auto-add `area:api:security` label
+```
 
-### "Can I restrict which agents work in my area?"
-
-**Partially.** You can:
-- ✅ Declare an agent as "not active" in your area's `team.md` (prevents them from being auto-dispatched)
-- ✅ Override agent routing preferences for your area
-- ❌ Remove HQ security gates (Worf, Crusher) — these are mandatory and cannot be overridden
-
-If you want to *add* an agent to your area roster that isn't in the root config, that's also supported via
-`team.md`. See [Area `team.md` format](#area-teammd-format).
-
----
-
-### "What happens when a PR touches two areas?"
-
-Both area configs are applied simultaneously (union semantics). All routing requirements from both areas
-are combined. If there's a conflict, Picard arbitrates and comments on the PR with the resolution.
-
-For decisions made during cross-area work, they go to the **root** decisions log (tagged with both area
-labels), not to either area's scoped log.
-
-See [Cross-Area Work](#cross-area-work) for the full rules.
+**Result:** Issues and PRs labelled `area:api` now use this config. Root HQ rules still apply —
+Crusher and Worf security gates cannot be bypassed.
 
 ---
 
-### "How do decisions get scoped to an area?"
+### Example 3: Multi-Area PR Dispatch
 
-Area-scoped decisions live in `<area>/.squads/decisions/`. The format is identical to root decisions, but
-they only appear in the area's decision log — not in the root `.squad/decisions.md`.
+**Scenario:** A PR adds JWT refresh token support, touching both `src/platform/auth/` and
+`src/api/middleware/auth.go`.
 
-**When to use area decisions vs root decisions:**
+**What happens:**
 
-| Use area decisions for... | Use root decisions for... |
-|--------------------------|--------------------------|
-| API contract choices for one service | Cross-cutting architecture decisions |
-| Auth implementation choices | Changes to squad routing rules |
-| Area-specific tooling | Security policies |
-| Local performance trade-offs | Agent roster changes |
-
-Agents automatically write to the correct log based on which area config is active when the decision
-is made.
-
----
-
-## Appendix: File Checklist
-
-When setting up Squad for a new area, use this checklist:
-
-### Layer 1 (Minimal Setup)
-- [ ] `.squad-context.md` created in area root
-- [ ] `Owner.Primary agent` field filled in
-- [ ] `Area Label` field defined (e.g., `area:payments`)
-- [ ] `area:*` label created in GitHub with a description
-
-### Layer 2 (Full Subsquad)
-- [ ] `.squads/` directory created
-- [ ] `.squads/team.md` — agent roster defined
-- [ ] `.squads/routing.md` — area routing rules defined
-- [ ] `.squads/decisions/` directory created (can be empty)
-- [ ] Root `.squad/routing.md` updated with area label in the Area Label Schema table
-- [ ] CI/CD path-based label rule added (optional but recommended)
-
-### Layer 3 (Automation)
-- [ ] GitHub Actions workflow auto-labels PRs by path
-- [ ] Routing engine configured to read `area:*` labels (done at root level, no per-area setup needed)
-- [ ] `scripts/find-squad-config.ps1` tested against area paths
+1. PR is opened → CI runs `find-squad-config.ps1` on each changed file
+2. Script detects: `area:platform:security` (platform auth) and `area:api:security` (API auth)
+3. Both labels are applied to the PR automatically
+4. Dispatch unions the configs:
+   - B'Elanna (platform primary)
+   - Data (api primary)
+   - Worf (both security gates → dispatched once)
+   - Picard (api:security cross-cutting concern)
+5. All four agents review; Worf's security sign-off is required before merge
 
 ---
 
-*Maintained by: Seven (Research & Docs)*
-*Last updated: 2026-Q2*
-*Related: `scripts/find-squad-config.ps1` (#1146) · `.squad/mcp-servers.md` (#1151) · Design: #1012*
+## Quick Reference
+
+### "Do I need per-area config?"
+
+```
+Is this a single-team repo or small monorepo (<5 areas)?
+  → No. Root .squad/ is sufficient.
+
+Does a subdirectory have its own team, routing needs, or decisions?
+  → Yes. Start with Layer 1 (.squad-context.md).
+
+Does the area need its own agent roster or decisions log?
+  → Yes. Add Layer 2 (.squads/).
+```
+
+### File Checklist per Area
+
+| File | Layer | Required? |
+|------|-------|-----------|
+| `<area>/.squad-context.md` | 1 | Recommended for any named area |
+| `<area>/.squads/team.md` | 2 | Only if roster differs from root |
+| `<area>/.squads/routing.md` | 2 | Only if routing rules differ |
+| `<area>/.squads/decisions/` | 2 | Only if area has its own decision log |
+
+### Override Cheatsheet
+
+| You want to… | How |
+|-------------|-----|
+| Add context without changing routing | Layer 1 only |
+| Restrict which agents auto-dispatch | Area `team.md` (list only relevant agents) |
+| Add routing rules for this area | Area `routing.md` (additive) |
+| Prevent root routing rules from applying | ❌ Not supported — area rules are additive |
+| Override a HQ security gate | ❌ Not supported — HQ mandates are absolute |
+| Track decisions only for this area | Area `decisions/` directory |
+
+---
+
+## See Also
+
+- `.squad/routing.md` — root routing rules and area label schema (quick reference)
+- `.squad/team.md` — full agent roster
+- `scripts/find-squad-config.ps1` — config discovery script (issue #1146)
+- Issue [#1012](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1012) — original design proposal

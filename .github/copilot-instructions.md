@@ -52,3 +52,16 @@ When reviewing squad member PRs:
 - Use issue comments for questions
 - Tag humans when blocked or uncertain
 - Update issue status with progress notes
+
+## Debugging Failed Copilot Sessions
+
+When a `squad:copilot` task produces unexpected results or gets stuck:
+1. Check the session log URL (posted by Ralph when task starts)
+2. Expand the subagent activity logs to see what files were researched
+3. Look for setup step failures in the initialization logs
+4. Check if the agent firewall blocked a needed dependency
+
+Before escalating to the squad lead, always check:
+- Did Copilot read `.squad/routing.md`?
+- Did Copilot read the relevant agent charter (`.squad/agents/{agent}/charter.md`)?
+- Were all setup steps successful?

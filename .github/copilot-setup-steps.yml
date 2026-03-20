@@ -1,0 +1,15 @@
+steps:
+  - name: Install squad CLI deps
+    run: |
+      if [ -f package.json ]; then npm ci; fi
+
+  - name: Load squad routing rules
+    run: cat .squad/routing.md || echo "No routing.md found"
+
+  - name: Verify GH CLI auth
+    run: gh auth status
+
+  - name: Check squad config
+    run: |
+      echo "=== Squad Team ===" && cat .squad/team.md || echo "No team.md"
+      echo "=== Node version ===" && node --version || echo "No node"

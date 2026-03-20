@@ -1,0 +1,28 @@
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { BitwardenShadowConfig } from "../types.js";
+import { BitwardenClient } from "../bitwarden-client.js";
+
+export interface ShadowItemArgs { item_id: string; target_collection?: string; }
+
+export async function shadowItem(config: BitwardenShadowConfig, args: ShadowItemArgs): Promise<CallToolResult> {
+  try {
+    const { item_id, target_collection } = args;
+    if (!item_id?.trim()) return err("item_id is required");
+    const client = new BitwardenClient(config.session);
+    const collection = await client.resolveCollection(target_collection ?? config.shadowCollectionId);
+    let item;
+    try { item = await client.getItem(item_id); }
+    catch { return err(`Item "${item_id}" not found.`); }
+    if (!item.organizationId) return err(`"${item.name}" is a personal vault item. Move it to the org vault first.`);
+    if (item.collectionIds.includes(collection.id)) {
+      return ok({ itemId: item.id, itemName: item.name, collectionId: collection.id, collectionName: collection.name, status: "already_shadowed", message: `"${item.name}" already in "${collection.name}".` });
+    }
+    const newIds = [...item.collectionIds, collection.id];
+    await client.updateItemCollections(item, newIds);
+    console.error(`[shadow_item] "${item.name}" added to "${collection.name}"`);
+    return ok({ itemId: item.id, itemName: item.name, collectionId: collection.id, collectionName: collection.name, status: "shadowed", message: `"${item.name}" is now shadowed to "${collection.name}".`, collectionIds: newIds });
+  } catch (error) { return err(`shadow_item failed: ${error instanceof Error ? error.message : String(error)}`); }
+}
+
+function ok(data: Record<string, unknown>): CallToolResult { return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] }; }
+function err(message: string): CallToolResult { return { content: [{ type: "text", text: message }], isError: true }; }

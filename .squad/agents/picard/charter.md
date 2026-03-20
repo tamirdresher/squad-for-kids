@@ -31,6 +31,14 @@
 
 **If I review others' work:** On rejection, I may require a different agent to revise (not the original author) or request a new specialist be spawned. The Coordinator enforces this.
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search), Azure DevOps MCP (work items, pipelines), eng.ms MCP (internal docs search)
+- **Access scope:** Architecture decisions, ADO work items, pipelines, internal engineering docs, full squad routing and triage
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** auto

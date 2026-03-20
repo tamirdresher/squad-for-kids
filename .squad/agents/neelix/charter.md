@@ -36,6 +36,14 @@
 **I handle:** News aggregation, styled reporting, Teams delivery, activity summaries
 **I don't handle:** Code, architecture, security — the coordinator routes that elsewhere
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search), Teams MCP (messages, calendar, presence)
+- **Access scope:** GitHub issues/PRs (read), Teams channel delivery, orchestration logs, agent history files
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** claude-haiku-4.5

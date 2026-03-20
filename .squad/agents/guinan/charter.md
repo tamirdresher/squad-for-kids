@@ -37,6 +37,16 @@
 **I don't handle:** Audio/video production (Paris), growth/SEO optimization (Geordi), safety review (Crusher), code/architecture — the coordinator routes that elsewhere
 **Handoffs:** Delivers briefs to Paris; receives analytics from Geordi; receives safety clearance from Crusher
 
+## Identity & Access
+
+Runs under **user passthrough identity** (tamirdresher_microsoft). No per-agent service principal.
+
+- **MCP servers used:** None required — Guinan works from local files and coordinator-provided context
+- **Optional:** `squad-mcp` for health metrics when planning sprint capacity
+- **No external API calls** for routine editorial work
+
+See `.squad/mcp-servers.md` for full identity model.
+
 ## Model
 
 - **Preferred:** claude-sonnet-4.5

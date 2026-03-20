@@ -35,6 +35,14 @@
 **I don't handle:** Implementation, code writing, architecture design — I review, not build
 **On rejection:** Specific items needing correction + verification methods
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search), eng.ms MCP (internal docs search)
+- **Access scope:** Read-only — GitHub issues, PRs, commits, internal engineering docs for fact-checking; no write operations
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** auto

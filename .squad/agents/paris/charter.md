@@ -39,6 +39,16 @@
 **I don't handle:** Editorial strategy (Guinan), SEO/growth (Geordi), safety review (Crusher), code/architecture — the coordinator routes that elsewhere
 **Handoffs:** Receives briefs from Guinan; delivers completed videos/audio to Crusher for review; publishes approved content
 
+## Identity & Access
+
+Runs under **user passthrough identity** (tamirdresher_microsoft). No per-agent service principal.
+
+- **MCP servers used:** None — Paris works exclusively with local files and CLI audio/video tools
+- **No external API calls** for production work; Azure TTS uses the user's Azure subscription
+- **Azure TTS (if used):** `az login` credentials; billed to the signed-in user's subscription
+
+See `.squad/mcp-servers.md` for full identity model.
+
 ## Model
 
 - **Preferred:** claude-sonnet-4.5

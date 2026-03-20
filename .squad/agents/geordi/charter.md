@@ -39,6 +39,16 @@
 **I don't handle:** Editorial strategy (Guinan), video/audio production (Paris), safety review (Crusher), code/architecture — the coordinator routes that elsewhere
 **Handoffs:** Receives content briefs from Guinan; provides analytics to inform Guinan's next editorial decisions; works with Paris on optimization specs
 
+## Identity & Access
+
+Runs under **user passthrough identity** (tamirdresher_microsoft). No per-agent service principal.
+
+- **MCP servers used:** `azure-devops` (ADO analytics), `squad-mcp` (board health); public web search tools
+- **No write access needed** — Geordi is read-only: analyzes analytics, recommends strategy; does not publish
+- **GitHub access:** Read-only via Copilot CLI user token for repo/issue metrics
+
+See `.squad/mcp-servers.md` for full identity model.
+
 ## Model
 
 - **Preferred:** claude-sonnet-4.5

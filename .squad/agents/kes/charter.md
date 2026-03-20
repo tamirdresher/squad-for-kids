@@ -38,11 +38,12 @@
 
 ## Identity & Access
 
-- **Runs under:** User passthrough (	amirdresher_microsoft Entra ID session)
-- **MCP servers used:** Teams MCP, Calendar MCP, Mail MCP, WorkIQ MCP, Playwright MCP, GitHub MCP
-- **Access scope:** Full Teams chat/channel access, full mailbox read/write/send, full calendar read/write, M365 Copilot workplace intelligence (read). Playwright for web-based automation fallback.
-- **Elevated permissions required:** No — but Kes has the widest blast radius of any agent. Sending emails and Teams messages are irreversible actions under the user's identity. All recipients see 	amirdresher_microsoft as the sender. Always confirm before executing send operations outside of well-defined automation flows.
-- **Audit note:** All Teams messages, emails, and calendar invites appear in Microsoft 365 audit logs as sent by 	amirdresher_microsoft. See .squad/mcp-servers.md for the full identity model.
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search), Teams MCP (messages, calendar, presence), SharePoint/OneDrive MCP (files, documents), Playwright MCP (browser automation)
+- **Access scope:** Calendar events, emails, Teams messages, contact lookup, OneDrive files — all on behalf of tamirdresher@microsoft.com
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** claude-haiku-4.5

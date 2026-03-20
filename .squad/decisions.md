@@ -25,7 +25,13 @@ The WA Monitor (wa-monitor-dotnet) watches WhatsApp messages. ALL agents must re
 
 **Printing Rule:** When Gabi, Yonatan, or Shira send a file for printing, create a task to email the file to `dresherhome@hpeprint.com` (HP ePrint printer at home). Trigger keywords: print, הדפסה, מדפסת, תדפיס, להדפיס.
 
-**General Monitoring:** All other chats should be monitored for anything Tamir should know about. Notify him via Teams so he won't forget important messages.
+**General Monitoring:** All other chats should be monitored for anything Tamir should know about. Notify him via Teams webhook so he won't forget important messages.
+
+**⚠️ NOTIFICATION RULE:** ALL notifications MUST go through Teams webhooks ONLY. Files are in `C:\Users\tamirdresher\.whatsapp-monitor\webhooks\*.url`. NEVER post to Teams chats directly — those chats have external people who should NOT see private WhatsApp content.
+
+**Printing Rule for Eyal:** Same as Gabi/Yonatan/Shira — files sent by Eyal should also be forwarded to the printer email.
+
+**Skill docs:** Full WA monitor docs at `.squad/skills/whatsapp-monitor/README.md`
 
 ### Session Sharing
 

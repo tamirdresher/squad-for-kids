@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Squad.DK8SApp</RootNamespace>
+    <AssemblyName>Squad.DK8SApp</AssemblyName>
+    <!--
+      Squad DK8S Application ConfigGen project.
+      Generates DK8S deployment manifests for Squad AI agents
+      (Picard, B'Elanna, Ralph, Worf, Data, Seven) using the
+      ConfigurationGeneration.* NuGet packages.
+      Issue: #1038
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Core ConfigGen infrastructure -->
+    <PackageReference Include="ConfigurationGeneration.Generator" Version="*" />
+    <PackageReference Include="ConfigurationGeneration.Dk8sApplication" Version="*" />
+    <PackageReference Include="ConfigurationGeneration.K8S" Version="*" />
+    <PackageReference Include="ConfigurationGeneration.Infra" Version="*" />
+    <!-- Pre-built environment base classes (DEV/STG/PRD) -->
+    <PackageReference Include="ConfigurationGeneration.Environments" Version="*" />
+  </ItemGroup>
+
+</Project>

@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("WhatsAppMonitor.Tests")]
 
 namespace WhatsAppMonitor;
 
@@ -10,9 +13,35 @@ public sealed class WhatsAppMonitorOptions
 {
     /// <summary>
     /// Contact display names to monitor (case-insensitive partial match).
-    /// If empty, all messages are surfaced.
+    /// Only used when <see cref="EnableGeneralMonitoring"/> is <c>false</c>.
+    /// When empty and general monitoring is off, all messages are surfaced.
     /// </summary>
     public IReadOnlyList<string> ContactFilter { get; init; } = [];
+
+    /// <summary>
+    /// Priority contacts that trigger an immediate Teams notification.
+    /// When empty the built-in defaults (Gabi, Yonatan, Shira, Eyal + Hebrew aliases) are used.
+    /// Only meaningful when <see cref="EnableGeneralMonitoring"/> is <c>true</c>.
+    /// </summary>
+    public IReadOnlyList<string> PriorityContacts { get; init; } = [];
+
+    /// <summary>
+    /// When <c>true</c>, ALL chats are monitored:
+    /// <list type="bullet">
+    ///   <item>Priority contacts → immediate notification (green card).</item>
+    ///   <item>Urgent/Tamir-mention/question from anyone else → immediate alert (amber card).</item>
+    ///   <item>Everything else → batched into a periodic summary (blue card).</item>
+    /// </list>
+    /// When <c>false</c> (default), original behaviour: only <see cref="ContactFilter"/> contacts
+    /// are surfaced and every match triggers an immediate notification.
+    /// </summary>
+    public bool EnableGeneralMonitoring { get; init; } = false;
+
+    /// <summary>
+    /// How often the non-urgent general message batch is flushed as a summary notification.
+    /// Default: 1 hour. Only meaningful when <see cref="EnableGeneralMonitoring"/> is <c>true</c>.
+    /// </summary>
+    public TimeSpan SummaryInterval { get; init; } = TimeSpan.FromHours(1);
 
     /// <summary>How long to wait for QR scan before giving up. Default: 5 minutes.</summary>
     public TimeSpan QrScanTimeout { get; init; } = TimeSpan.FromMinutes(5);
@@ -30,6 +59,12 @@ public sealed class WhatsAppMonitorOptions
 
     /// <summary>Teams webhook URL. When set, notifications are posted automatically.</summary>
     public string? TeamsWebhookUrl { get; init; }
+
+    /// <summary>
+    /// When set, enables automatic forwarding of print requests from priority contacts
+    /// to the configured HP ePrint email address.
+    /// </summary>
+    public PrinterForwardingOptions? PrinterForwarding { get; init; }
 }
 
 /// <summary>
@@ -59,6 +94,8 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
     private readonly WhatsAppMonitorOptions _options;
     private readonly ILogger<WhatsAppWebMonitor> _logger;
     private readonly TeamsNotifier? _notifier;
+    private readonly GeneralMessageBatcher? _batcher;
+    private PrinterForwardingService? _printerForwarder;
 
     private IPlaywright? _playwright;
     private IBrowser? _browser;
@@ -94,7 +131,20 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
         _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<WhatsAppWebMonitor>.Instance;
 
         if (!string.IsNullOrWhiteSpace(options.TeamsWebhookUrl))
+        {
             _notifier = new TeamsNotifier(options.TeamsWebhookUrl, null);
+
+            if (options.EnableGeneralMonitoring)
+            {
+                _batcher = new GeneralMessageBatcher(
+                    _notifier,
+                    options.SummaryInterval,
+                    logger);
+            }
+        }
+
+        if (options.PrinterForwarding is not null)
+            _printerForwarder = new PrinterForwardingService(options.PrinterForwarding);
     }
 
     // ── public methods ────────────────────────────────────────────────────────
@@ -235,8 +285,10 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
             if (string.IsNullOrWhiteSpace(dto.Contact) || string.IsNullOrWhiteSpace(dto.Text))
                 continue;
 
-            // Apply contact filter
-            if (_options.ContactFilter.Count > 0)
+            // When general monitoring is disabled (legacy mode), apply the contact filter.
+            // In general monitoring mode we intentionally process every contact so the
+            // classifier can decide routing.
+            if (!_options.EnableGeneralMonitoring && _options.ContactFilter.Count > 0)
             {
                 bool matched = _options.ContactFilter.Any(f =>
                     dto.Contact.Contains(f, StringComparison.OrdinalIgnoreCase));
@@ -255,7 +307,10 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
             {
                 Contact = dto.Contact,
                 Text = dto.Text,
-                ChatTitle = dto.ChatTitle
+                ChatTitle = dto.ChatTitle,
+                HasAttachment = dto.HasAttachment,
+                AttachmentType = dto.AttachmentType,
+                AttachmentFileName = dto.AttachmentFileName
             };
 
             _logger.LogInformation("New message from {Contact}: {Text}", msg.Contact, msg.Text);
@@ -264,10 +319,29 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
 
             if (_notifier is not null)
             {
-                try { await _notifier.NotifyAsync(msg, ct); }
+                try
+                {
+                    if (_options.EnableGeneralMonitoring)
+                        await RouteMessageAsync(msg, ct);
+                    else
+                        await _notifier.NotifyAsync(msg, ct);
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Teams notification failed for message from {Contact}", msg.Contact);
+                }
+            }
+
+            // Printer forwarding: forward file attachments with print keywords to HP ePrint
+            if (_printerForwarder is not null)
+            {
+                try
+                {
+                    await _printerForwarder.TryForwardToPrinterAsync(msg, _page, ct);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Printer forwarding failed for message from {Contact}", msg.Contact);
                 }
             }
         }
@@ -287,6 +361,40 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
                 _logger.LogError(ex, "Exception in MessageReceived handler");
             }
         });
+    }
+
+    /// <summary>
+    /// Routes a message through the intelligent filtering pipeline:
+    /// <list type="bullet">
+    ///   <item>Priority contact → immediate Teams notification (green).</item>
+    ///   <item>Urgent/relevant from anyone → immediate alert (amber).</item>
+    ///   <item>Everything else → queued for the next hourly summary (blue).</item>
+    /// </list>
+    /// </summary>
+    private async Task RouteMessageAsync(WhatsAppMessage msg, CancellationToken ct)
+    {
+        var category = MessageClassifier.Classify(msg, _options.PriorityContacts);
+
+        switch (category)
+        {
+            case MessageCategory.Priority:
+                _logger.LogInformation(
+                    "Priority contact {Contact} — notifying immediately", msg.Contact);
+                await _notifier!.NotifyAsync(msg, ct);
+                break;
+
+            case MessageCategory.UrgentGeneral:
+                _logger.LogInformation(
+                    "Urgent/relevant message from {Contact} — sending alert", msg.Contact);
+                await _notifier!.NotifyAlertAsync(msg, ct);
+                break;
+
+            case MessageCategory.General:
+                _logger.LogDebug(
+                    "General message from {Contact} — adding to batch queue", msg.Contact);
+                _batcher?.Add(msg);
+                break;
+        }
     }
 
     // ── JS extraction script ──────────────────────────────────────────────────
@@ -315,8 +423,27 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
                 const msgEl = row.querySelector('span[class*="last-msg"], ._ao3f, span[dir="ltr"]');
                 const text = msgEl?.textContent?.trim() || '';
 
+                // Attachment detection: check for file/image/audio/video icon spans in the row
+                const attachIconSelectors = [
+                    'span[data-icon="doc"]',
+                    'span[data-icon="img"]',
+                    'span[data-icon="audio"]',
+                    'span[data-icon="video"]',
+                    'span[data-icon="ptt"]',
+                    'span[data-icon="sticker"]'
+                ];
+                let hasAttachment = false;
+                let attachmentType = '';
+                for (const sel of attachIconSelectors) {
+                    const el = row.querySelector(sel);
+                    if (el) { hasAttachment = true; attachmentType = el.getAttribute('data-icon') || ''; break; }
+                }
+                // Try to extract a filename from a nested span (document previews)
+                const fileNameEl = row.querySelector('span._ao3e._aou_');
+                const attachmentFileName = fileNameEl?.textContent?.trim() || null;
+
                 if (contact && text) {
-                    results.push({ contact, text, chatTitle: contact });
+                    results.push({ contact, text, chatTitle: contact, hasAttachment, attachmentType, attachmentFileName });
                 }
             }
             return results;
@@ -330,6 +457,9 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
         public string Contact { get; set; } = string.Empty;
         public string Text { get; set; } = string.Empty;
         public string? ChatTitle { get; set; }
+        public bool HasAttachment { get; set; }
+        public string? AttachmentType { get; set; }
+        public string? AttachmentFileName { get; set; }
     }
 
     // ── IAsyncDisposable ──────────────────────────────────────────────────────
@@ -343,6 +473,12 @@ public sealed class WhatsAppWebMonitor : IAsyncDisposable
 
         if (_notifier is not null)
             await _notifier.DisposeAsync();
+
+        if (_batcher is not null)
+            await _batcher.DisposeAsync();
+
+        if (_printerForwarder is not null)
+            await _printerForwarder.DisposeAsync();
 
         if (_page is not null)
             await _page.CloseAsync();

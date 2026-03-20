@@ -684,14 +684,137 @@ $html | Out-File $archivePath -Encoding utf8
 Write-Host "📁 Archived to: $archivePath"
 
 if ($DryRun) {
-    Write-Host "🏃 DRY RUN — skipping email send."
+    Write-Host "🏃 DRY RUN — skipping email and Teams send."
     Write-Host "   Report contains: $totalIssuesCreated issues created, $totalIssuesClosed closed, $totalPRs PRs, $totalCommits commits"
     exit 0
 }
 
+# ============================================================================
+# SEND TEAMS WEBHOOK — Adaptive Card summary
+# ============================================================================
+
+$teamsWebhookFile = Join-Path $env:USERPROFILE ".squad" "teams-webhook.url"
+if (Test-Path $teamsWebhookFile) {
+    Write-Host "`n📨 Sending Teams summary card..."
+    try {
+        $teamsWebhookUrl = (Get-Content $teamsWebhookFile -Raw -Encoding utf8).Trim()
+
+        if (-not [string]::IsNullOrWhiteSpace($teamsWebhookUrl)) {
+            # Build compact adaptive-card sections
+            $cardSections = @()
+
+            # Header
+            $cardSections += @{
+                type   = "TextBlock"
+                text   = "🏗️ **Squad Daily Report — $reportDate**"
+                size   = "Large"
+                weight = "Bolder"
+                wrap   = $true
+            }
+            $cardSections += @{
+                type  = "TextBlock"
+                text  = "_$($windowStart.ToString("MMM d HH:mm")) → $($windowEnd.ToString("MMM d HH:mm")) Israel_"
+                isSubtle = $true
+                wrap  = $true
+            }
+
+            # Summary stats (FactSet)
+            $facts = @(
+                @{ title = "Issues Created";  value = "$totalIssuesCreated" }
+                @{ title = "Issues Closed";   value = "$totalIssuesClosed" }
+                @{ title = "PRs (Total/Merged)"; value = "$totalPRs / $mergedPRs" }
+                @{ title = "Commits";          value = "$totalCommits" }
+                @{ title = "Repos Scanned";    value = "$($squadRepos.Count + 1)" }
+            )
+            if ($totalFailures -gt 0) {
+                $facts += @{ title = "⚠️ Ralph Failures"; value = "$totalFailures" }
+            }
+            $cardSections += @{
+                type  = "FactSet"
+                facts = $facts
+            }
+
+            # Issues Created highlights (top 5)
+            if ($allIssuesCreated.Count -gt 0) {
+                $cardSections += @{ type = "TextBlock"; text = "**📋 Issues Created**"; weight = "Bolder"; wrap = $true }
+                $top5 = $allIssuesCreated | Select-Object -First 5
+                $issueLines = $top5 | ForEach-Object { "• [$($_.Repo)#$($_.Number)] $($_.Title)" }
+                if ($allIssuesCreated.Count -gt 5) { $issueLines += "  _…and $($allIssuesCreated.Count - 5) more_" }
+                $cardSections += @{ type = "TextBlock"; text = ($issueLines -join "`n"); wrap = $true; spacing = "None" }
+            }
+
+            # Issues Closed highlights (top 5)
+            if ($allIssuesClosed.Count -gt 0) {
+                $cardSections += @{ type = "TextBlock"; text = "**✅ Issues Closed**"; weight = "Bolder"; wrap = $true }
+                $top5c = $allIssuesClosed | Select-Object -First 5
+                $closedLines = $top5c | ForEach-Object { "• [$($_.Repo)#$($_.Number)] $($_.Title)" }
+                if ($allIssuesClosed.Count -gt 5) { $closedLines += "  _…and $($allIssuesClosed.Count - 5) more_" }
+                $cardSections += @{ type = "TextBlock"; text = ($closedLines -join "`n"); wrap = $true; spacing = "None" }
+            }
+
+            # PRs highlights
+            if ($allPRs.Count -gt 0) {
+                $cardSections += @{ type = "TextBlock"; text = "**🔀 Pull Requests**"; weight = "Bolder"; wrap = $true }
+                $prLines = $allPRs | Select-Object -First 5 | ForEach-Object {
+                    $icon = switch ($_.Status) { "Merged" { "🟢" } "Closed" { "🔴" } default { "🔵" } }
+                    "$icon [$($_.Repo)#$($_.Number)] $($_.Title)"
+                }
+                if ($allPRs.Count -gt 5) { $prLines += "  _…and $($allPRs.Count - 5) more_" }
+                $cardSections += @{ type = "TextBlock"; text = ($prLines -join "`n"); wrap = $true; spacing = "None" }
+            }
+
+            # Decisions
+            if ($decisions.Count -gt 0) {
+                $cardSections += @{ type = "TextBlock"; text = "**📝 New Decisions: $($decisions.Count)**"; weight = "Bolder"; wrap = $true }
+                $decLines = $decisions | ForEach-Object { "• $($_.File)" }
+                $cardSections += @{ type = "TextBlock"; text = ($decLines -join "`n"); wrap = $true; spacing = "None" }
+            }
+
+            # Ralph failures warning
+            if ($totalFailures -gt 0) {
+                $cardSections += @{
+                    type            = "TextBlock"
+                    text            = "⚠️ **$totalFailures Ralph failure(s) require attention!**"
+                    color           = "Attention"
+                    weight          = "Bolder"
+                    wrap            = $true
+                }
+            }
+
+            # Build Adaptive Card payload
+            $teamsCard = @{
+                type        = "message"
+                attachments = @(
+                    @{
+                        contentType = "application/vnd.microsoft.card.adaptive"
+                        content     = @{
+                            type      = "AdaptiveCard"
+                            '$schema' = "http://adaptivecards.io/schemas/adaptive-card.json"
+                            version   = "1.4"
+                            body      = $cardSections
+                            msteams   = @{ width = "Full" }
+                        }
+                    }
+                )
+            }
+
+            $teamsBody = $teamsCard | ConvertTo-Json -Depth 20 -Compress
+            $teamsResp = Invoke-RestMethod -Uri $teamsWebhookUrl -Method Post `
+                -Body $teamsBody -ContentType "application/json; charset=utf-8" -ErrorAction Stop
+            Write-Host "✅ Teams card sent successfully."
+        } else {
+            Write-Warning "Teams webhook URL file is empty — skipping Teams notification."
+        }
+    } catch {
+        Write-Warning "⚠ Teams webhook send failed: $_  (email will still be sent)"
+    }
+} else {
+    Write-Warning "Teams webhook file not found at $teamsWebhookFile — skipping Teams notification."
+}
+
 # Send via Gmail SMTP directly (body is too large for command-line args)
 $subject = "Squad Daily Report — $reportDate"
-Write-Host "📧 Sending report to $To via Gmail SMTP..."
+Write-Host "`n📧 Sending report to $To via Gmail SMTP..."
 
 try {
     # Get Gmail credentials from Credential Manager

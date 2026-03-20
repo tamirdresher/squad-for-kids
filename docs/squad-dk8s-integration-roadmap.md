@@ -247,18 +247,121 @@ spec:
 
 Updating Squad (new model, new agent, config change) becomes a PR to `dk8s-squad` → ArgoCD detects drift → auto-syncs → agents restart with new config. No manual `kubectl apply`.
 
-### 2.5 Identity: How Agents Authenticate
+### 2.7 Authentication for K8s Pods (#998)
 
-Squad agents need to call external APIs (GitHub, Azure DevOps, Microsoft Graph, Azure OpenAI). On DK8S, authentication uses **Workload Identity** — no secrets stored in pods, no token rotation overhead.
+> **Design source:** [#998](https://github.com/tamirdresher_microsoft/tamresearch1/issues/998) — Design: GitHub Copilot Authentication for K8s Pods  
+> **Related:** [#979](https://github.com/tamirdresher_microsoft/tamresearch1/issues/979) — Rate limit research (defines priority tiers)
 
-| Service | Auth mechanism | Notes |
+Squad agents running as K8s pods need authenticated access to GitHub Copilot APIs. Today, each DevBox has a local `gh auth login` session. In K8s, we need a scalable, secure, and automatable auth mechanism that works across N pods potentially sharing a single Copilot license quota.
+
+#### Option A: GitHub PAT / Copilot Token via K8s Secret
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: squad-github-creds
+type: Opaque
+data:
+  GITHUB_TOKEN: <base64-encoded PAT>
+  COPILOT_TOKEN: <base64-encoded token>
+```
+
+**Pros:** Simple, works immediately, no external dependencies.  
+**Cons:** Static tokens expire and must be rotated manually. PATs have broad scope. No audit trail per-pod. Operationally painful at scale.
+
+#### Option B: Azure Workload Identity → GitHub App (Recommended)
+
+```
+Pod → Workload Identity (federated credential)
+   → Azure AD token
+   → Exchange for GitHub App installation token
+   → Use installation token for Copilot API
+```
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: squad-agent
+  namespace: squad
+  annotations:
+    azure.workload.identity/client-id: "<managed-identity-client-id>"
+    azure.workload.identity/tenant-id: "<tenant-id>"
+```
+
+**Pros:** No static secrets. Automatic token rotation. Per-pod identity via ServiceAccount. Azure-native audit trail. GitHub App scoping limits blast radius.  
+**Cons:** Requires AKS Workload Identity setup. GitHub App must be configured with Copilot API permissions. More complex initial setup.
+
+#### Option C: Sidecar Auth Proxy
+
+A sidecar container in each agent pod handles all GitHub/Copilot auth:
+
+```yaml
+containers:
+  - name: squad-agent
+    image: ghcr.io/tamirdresher/squad-agent:latest
+    env:
+      - name: COPILOT_ENDPOINT
+        value: "http://localhost:8081"  # points to sidecar
+  - name: auth-proxy
+    image: ghcr.io/tamirdresher/squad-auth-proxy:latest
+    ports:
+      - containerPort: 8081
+```
+
+**Pros:** Agent code has zero auth logic. Proxy handles token refresh, rate limit headers, retry-after. Single implementation shared across all agent types. Can implement circuit breaker pattern.  
+**Cons:** Additional container per pod. Network hop latency (localhost, minimal). More images to maintain.
+
+#### **Recommended: Option B + C Combined** (from #998)
+
+Use **Workload Identity** for credential sourcing (no static secrets), and an **auth-proxy sidecar** for token management, rate limiting, and circuit breaking. The sidecar obtains tokens via the pod's Workload Identity, caches them, and presents a simple HTTP endpoint to the agent container.
+
+This approach satisfies both the security requirement (no long-lived secrets in pods) and the operational requirement (agents don't need to implement auth logic).
+
+#### Token Rotation and Secret Management
+
+| Credential | TTL | Rotation Mechanism |
 |---|---|---|
-| Azure OpenAI | Workload Identity → managed identity | RBAC: `Cognitive Services User` on AOI resource |
-| GitHub API | GitHub App installation token | Stored in `ExternalSecret` from Azure Key Vault |
-| Azure DevOps | Workload Identity → AAD token | Uses MSAL with federated credentials |
-| Microsoft Graph | Workload Identity → AAD app | Requires `User.Read`, `Mail.Send` etc. |
+| Workload Identity tokens | 1 hour | Auto-rotated by Azure AD (kubelet handles refresh) |
+| GitHub App installation tokens | 1 hour | Auth-proxy refreshes 5 minutes before expiry |
+| Static fallback secrets (Phase 1 only) | 90 days | External Secrets Operator (ESO) syncs from Azure Key Vault |
 
-**Kubernetes service account setup:**
+**Secret Store options:**
+- **External Secrets Operator (ESO):** Syncs secrets from Azure Key Vault into K8s Secrets. Best for static credentials during Phase 1.
+- **Secret Store CSI Driver:** Mounts Key Vault secrets directly as files in pods. Lower overhead than ESO for read-heavy patterns.
+
+#### Rate Limit Coordination Across N Pods
+
+The current `rate-pool.json` file-based approach doesn't work in K8s (no shared filesystem). Recommendation from #998:
+
+**Redis** — Central rate-pool store. Each auth-proxy sidecar reads/writes quotas via Redis sorted sets. The three-tier priority system from #979 (P0: Picard/Worf, P1: Data/Seven, P2: Ralph/Scribe) maps directly to Redis sorted sets for priority-aware quota allocation.
+
+```yaml
+# Redis ScaledObject for rate pool
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: squad-rate-pool-redis
+spec:
+  scaleTargetRef:
+    name: squad-rate-pool
+  triggers:
+  - type: redis
+    metadata:
+      address: squad-redis:6379
+      listName: squad:priority:queue
+      listLength: "5"
+```
+
+#### Security Posture
+
+- **Network policies:** Agent pods can only reach auth-proxy on `localhost` and rate-pool Redis on cluster IP — no direct egress to GitHub
+- **Pod Security Standards:** Restricted profile — no privilege escalation, read-only root filesystem
+- **Secrets encryption at rest:** AKS etcd encryption enabled for the `squad` namespace
+- **Audit trail:** All GitHub API calls via the proxy, logged to Azure Monitor
+
+#### Kubernetes Service Account Setup
 
 ```yaml
 apiVersion: v1
@@ -289,12 +392,16 @@ EV2 service model for Squad:
 
 ### Success Criteria — Phase 2
 
-- [ ] `charts/squad/` Helm chart deployed to dev cluster
+- [ ] `charts/squad/` Helm chart deployed to dev cluster (ref: [#1000](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1000))
 - [ ] Ralph runs as a persistent Deployment, processing issues from cluster
+- [ ] Capability Discovery DaemonSet deployed; nodes labelled with `squad.io/capability-*` (ref: [#999](https://github.com/tamirdresher_microsoft/tamresearch1/issues/999))
+- [ ] Agent Job templates inject `nodeSelector` from `needs:*` issue labels
 - [ ] KEDA `ScaledObject` scales agent jobs 0→N based on issue queue depth
 - [ ] ArgoCD `Application` manages Squad lifecycle (sync, rollback)
-- [ ] Workload Identity configured — zero secrets in pod specs
-- [ ] ConfigGen generates Squad Helm values (no hand-editing values.yaml)
+- [ ] Workload Identity configured — zero secrets in pod specs (ref: [#998](https://github.com/tamirdresher_microsoft/tamresearch1/issues/998))
+- [ ] Auth-proxy sidecar handles all GitHub/Copilot token management
+- [ ] Redis rate pool operational; three-tier priority respected across N pods
+- [ ] ConfigGen generates Squad Helm values (no hand-editing values.yaml) (ref: [#1038](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1038))
 - [ ] EV2 service model registered and canary rollout tested
 
 ---
@@ -482,8 +589,16 @@ The integration is complete when all of the following are true:
 ## Related Documents
 
 - [`docs/dk8s-squad-usage-standard.md`](docs/dk8s-squad-usage-standard.md) — How DK8S teams use Squad today
-- [`docs/adr/ADR-001-dk8s-squad-usage-standard.md`](docs/adr/ADR-001-dk8s-squad-usage-standard.md) — Architecture decision record
+- [`docs/adr-002-squad-on-kubernetes.md`](docs/adr-002-squad-on-kubernetes.md) — Architecture Decision Record: Squad on Kubernetes
+- [`docs/squad-on-kubernetes-architecture.md`](docs/squad-on-kubernetes-architecture.md) — Detailed K8s architecture design
+- [`docs/squad-on-aks.md`](docs/squad-on-aks.md) — Azure-native AKS deployment guide
+- [`docs/squad-on-dk8s-internal.md`](docs/squad-on-dk8s-internal.md) — Internal DK8S deployment design
+- [Issue #994](https://github.com/tamirdresher_microsoft/tamresearch1/issues/994) — Architecture: Squad-on-Kubernetes (pod-per-agent model, CRD design)
+- [Issue #998](https://github.com/tamirdresher_microsoft/tamresearch1/issues/998) — Design: GitHub Copilot Authentication for K8s Pods
+- [Issue #999](https://github.com/tamirdresher_microsoft/tamresearch1/issues/999) — Design: K8s-Native Capability Routing (node labels)
+- [Issue #1000](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1000) — Prototype: Squad Helm Chart — Deploy Agents to AKS
 - [Issue #1038](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1038) — ConfigGen support (Belanna)
+- [Issue #1059](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1059) — Squad on Kubernetes architecture design
 - [Issue #1061](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1061) — Squad on DK8S internal deployment (Belanna + Picard)
 - [Issue #1064](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1064) — ADC integration evaluation
 - [Issue #752](https://github.com/tamirdresher_microsoft/tamresearch1/issues/752) — Ralph on ADC (in progress)

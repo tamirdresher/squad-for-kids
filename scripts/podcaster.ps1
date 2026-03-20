@@ -246,6 +246,25 @@ function Invoke-SystemSpeech {
 }
 
 # ============================================================================
+# ONEDRIVE SYNC
+# ============================================================================
+
+function Invoke-OneDriveSync {
+    param([string]$AudioPath)
+    $oneDriveBase = Join-Path $env:USERPROFILE "OneDrive - Microsoft"
+    if (-not (Test-Path $oneDriveBase)) { return }
+
+    $squadAudioDir = Join-Path $oneDriveBase "Squad Audio"
+    if (-not (Test-Path $squadAudioDir)) {
+        New-Item -ItemType Directory -Path $squadAudioDir -Force | Out-Null
+    }
+
+    $dest = Join-Path $squadAudioDir (Split-Path $AudioPath -Leaf)
+    Copy-Item -Path $AudioPath -Destination $dest -Force
+    Write-Host "📁 Also saved to OneDrive: $dest" -ForegroundColor Cyan
+}
+
+# ============================================================================
 # DELIVERY
 # ============================================================================
 
@@ -312,6 +331,9 @@ if ($ConversationMode) {
 
     if ($Deliver -and (Test-Path $OutputFile)) {
         Invoke-PodcastDelivery -AudioPath $OutputFile -Title $PodcastTitle -Recipient $DeliverTo
+    }
+    if (-not $PSBoundParameters.ContainsKey('OutputFile') -and (Test-Path $OutputFile)) {
+        Invoke-OneDriveSync -AudioPath $OutputFile
     }
     exit 0
 }
@@ -380,6 +402,9 @@ if ($PodcastMode) {
         if ($Deliver) {
             Invoke-PodcastDelivery -AudioPath $OutputFile -Title $PodcastTitle -Recipient $DeliverTo
         }
+        if (-not $PSBoundParameters.ContainsKey('OutputFile')) {
+            Invoke-OneDriveSync -AudioPath $OutputFile
+        }
     } else {
         Write-Host "`n Failed to generate podcast" -ForegroundColor Red
         exit 1
@@ -434,6 +459,9 @@ if (Test-Path $OutputFile) {
 
     if ($Deliver) {
         Invoke-PodcastDelivery -AudioPath $OutputFile -Title $PodcastTitle -Recipient $DeliverTo
+    }
+    if (-not $PSBoundParameters.ContainsKey('OutputFile')) {
+        Invoke-OneDriveSync -AudioPath $OutputFile
     }
 } else {
     Write-Host "`n Failed to generate audio" -ForegroundColor Red

@@ -268,15 +268,81 @@ We accept that. The alternative (waiting for a global lock before writing any de
 
 ---
 
+## Bonus: Conway's Law, Brook's Law, and the Org Chart That Writes Itself
+
+I said at the start that none of these patterns are new. That's even more true than I implied — some of them predate computers entirely.
+
+**Conway's Law** (1967): *"Organizations which design systems are constrained to produce designs which are a copy of the communication structures of those organizations."*
+
+Mel Conway wrote this before distributed systems were even a field. He was talking about software teams and the systems they build — the interfaces between your modules will mirror the interfaces between your teams. A monolith is what you get when everyone sits in one room. Microservices are what you get when your teams are distributed.
+
+The Squad architecture is Conway's Law working in reverse — and forward — simultaneously. I built agents (Seven, Data, Worf, Picard, Troi, B'Elanna, Ralph, Scribe) each with explicit domain ownership, explicit interfaces (the `squad.config.ts` routing table), and explicit communication protocols (the `decisions/inbox/` inbox model). The agents are the org chart. The org chart is the system architecture. They are the same document.
+
+Every routing rule in `squad.config.ts` is a Conway's Law artifact:
+
+```typescript
+// squad.config.ts — routing table excerpt
+{ 
+  trigger: "security", 
+  agent: "worf",
+  description: "Security & Azure — Security, Azure, and networking"
+},
+{
+  trigger: "documentation",
+  agent: "seven",
+  description: "Research & Docs — Documentation, presentations, and analysis"
+}
+```
+
+This isn't just configuration. It's an explicit statement of team structure, domain ownership, and communication topology. The distributed systems engineer recognizes it as a **static service mesh** — the same thing Istio and Linkerd do dynamically, we do explicitly. The organizational psychologist recognizes it as role clarity reducing coordination cost.
+
+Both are right.
+
+---
+
+**Brook's Law** (1975): *"Adding manpower to a late software project makes it later."*
+
+Fred Brooks wrote this about human teams in *The Mythical Man-Month*. The reason is communication overhead: N people require O(N²) communication channels. Double the team, quadruple the coordination cost.
+
+AI agents are not immune to this. Adding a 9th agent to Squad doesn't add 12.5% more capacity — it adds:
+- One more participant in the `decisions/inbox/` routing
+- One more entry in the heartbeat directory
+- One more actor that can claim tasks, creating more contention
+- One more model endpoint that can fail, widening the circuit-breaker attack surface
+
+This is why `MAX_PARALLEL_AGENTS = 5` isn't just a backpressure mechanism. It's Brooks's Law operationalized. Beyond a certain point, the coordination overhead of more agents exceeds the throughput gain. We've found empirically that 5 parallel agents is near the inflection point for our workload. Below 5, throughput scales linearly. Above 5, we start seeing coordination failures (claim conflicts, duplicate PRs, rate limit exhaustion) that cost more to recover from than the agent saved.
+
+The distributed systems equivalent is **Amdahl's Law** — the theoretical speedup of parallelism is bounded by the serial fraction. For AI agents, "serial fraction" includes: task claiming, git pulls, Teams notifications, and any step where two agents need to agree on state. Those steps don't parallelize. Make them short. Make them rare. But never pretend they don't exist.
+
+---
+
+**Cognitive Load Theory and Bounded Context**
+
+One more lens that turns out to be directly applicable: John Sweller's **cognitive load theory** (1988), operationalized in software by Eric Evans as **bounded context** in Domain-Driven Design (2003).
+
+The core idea: humans can only hold ~7 items in working memory at once. Good system design respects this limit by creating explicit boundaries between knowledge domains. A bounded context says: "within this boundary, these terms have these meanings. Outside this boundary, everything is an interface."
+
+Each Squad agent is a bounded context. Seven doesn't need to know how Worf implements security audits. Worf doesn't need to know how Seven formats documentation. Their boundary is the task description in the issue body. The issue body is the API contract between bounded contexts.
+
+This is why the specialization rules in `squad.config.ts` exist — not just for routing efficiency, but to maintain cognitive coherence. An agent with too broad a domain is a microservice with too many responsibilities: slow, hard to reason about, and fragile at the edges.
+
+The distributed systems parallel: **service isolation**. Each service owns its data. No service reaches into another's database. No agent reads another agent's working files mid-task. The explicit context boundary (the issue body as the interface contract) is what keeps eight autonomous agents from descending into chaos.
+
+---
+
 ## What I Actually Learned
 
-Here's the humbling part: none of these patterns are new. Heartbeats? Lamport clocks paper is from 1978. Circuit breakers? Michael Nygard described them in *Release It!* in 2007. Event sourcing? Greg Young's talks go back to 2010. CAP theorem? Eric Brewer, 1999.
+Here's the humbling part: none of these patterns are new. Heartbeats? Lamport clocks paper is from 1978. Circuit breakers? Michael Nygard described them in *Release It!* in 2007. Event sourcing? Greg Young's talks go back to 2010. CAP theorem? Eric Brewer, 1999. Conway's Law? 1967. Brook's Law? 1975. Bounded context? 2003.
 
 What's new is applying them to AI agents — entities that are nondeterministic, stateless between sessions, capable of generating their own work, and deeply confused about whether they're one process or many. The problems are old. The surface they appear on is new.
 
+And that's the insight worth carrying. When you're struggling with your multi-agent system — two agents doing the same work, stale context causing wrong decisions, a cascade of failures that took down your pipeline at 3 AM — you're not fighting an AI problem. You're fighting a **coordination problem that has been solved, named, and documented, multiple times, across multiple disciplines**.
+
+The distributed systems engineers solved it in code. The organizational psychologists solved it for human teams. The management theorists solved it for companies. The solutions rhyme across all three domains because the underlying problem — *how do independent agents with incomplete information coordinate toward a shared goal?* — is the same problem regardless of whether your agents are microservices, humans, or language models.
+
 The Borg have the Vinculum because they learned — presumably the hard way — that you can't have a collective without coordination infrastructure. Raw parallelism is just noise. The Vinculum turns noise into signal.
 
-My Squad's Vinculum is: heartbeat files, git push as consensus, content-addressed deduplication, circuit breakers, a concurrency limit, and forty years of distributed systems papers sitting in the background making me feel a little less clever than I thought I was.
+My Squad's Vinculum is: heartbeat files, git push as consensus, content-addressed deduplication, circuit breakers, a concurrency limit, bounded-context routing, and forty years of distributed systems papers sitting in the background making me feel a little less clever than I thought I was.
 
 Eight AI agents. One shared codebase. No supervisor. Somehow, it works.
 
@@ -291,5 +357,8 @@ Resistance is futile. But so is trying to coordinate distributed systems without
 > - **Part 3**: [Unimatrix Zero — When Your AI Squad Becomes a Distributed System](/blog/2026/03/18/scaling-ai-part3-distributed)
 > - **Part 4**: [When Eight Ralphs Fight Over One Login](/blog/2026/03/17/scaling-ai-part4-race-conditions)
 > - **Part 5**: The Vinculum — Eight Distributed Systems Lessons My AI Team Taught Me the Hard Way ← You are here
+> - **Coming up**: Rate Limiting & the Tragedy of the Commons at 100 Clients · Consensus Without Infrastructure · State Management at Human Scale
 
-*All code in this post is drawn from real Squad scripts running in production at [tamirdresher_microsoft/tamresearch1](https://github.com/tamirdresher_microsoft/tamresearch1). The Two Generals Problem is unsolvable — that's not a blog post exaggeration, it's a formal proof. I looked it up to make sure.*
+*All code in this post is drawn from real Squad scripts running in production at [tamirdresher_microsoft/tamresearch1](https://github.com/tamirdresher_microsoft/tamresearch1). The Two Generals Problem is unsolvable — that's not a blog post exaggeration, it's a formal proof. I looked it up to make sure. Conway's Law is from 1967, pre-dates distributed computing, and remains the most accurate description of how software teams work that I've ever read.*
+
+*Further reading: Lamport (1978), Brewer (1999), Nygard (2007), Evans (2003), Brooks (1975). All of it applies. None of it is AI-specific. That's the point.*

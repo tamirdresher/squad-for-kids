@@ -1,0 +1,154 @@
+{{/*
+=============================================================================
+ralph-deployment.yaml — Kubernetes Deployment for the Ralph squad agent
+infrastructure/helm/squad/templates/ralph-deployment.yaml
+POC for Squad-on-K8s (Issue #996)
+
+Design:
+  - strategy: Recreate  (Ralph is singleton — no parallel rounds)
+  - Non-root securityContext (runAsUser: 1000 matches Dockerfile UID)
+  - GH_TOKEN from K8s Secret — never in ConfigMap or literal env values
+  - squad.config.ts + routing files from ConfigMap as a volume
+  - EmptyDir for lockfile/heartbeat (per-pod ephemeral scratch space)
+  - Liveness probe conditional on .Values.ralph.healthCheck.enabled
+  - nodeSelector/affinity/tolerations wired from values (maps needs:* labels)
+=============================================================================
+*/}}
+
+{{- if .Values.ralph.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squad.fullname" . }}-ralph
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad.ralph.labels" . | nindent 4 }}
+  annotations:
+    squad.github.com/agent: "ralph"
+    squad.github.com/issue: "996"
+    squad.github.com/role: "monitor"
+spec:
+  replicas: {{ .Values.ralph.replicaCount }}
+  # Singleton monitor — Recreate avoids two Ralphs polling simultaneously
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "squad.ralph.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "squad.ralph.selectorLabels" . | nindent 8 }}
+      annotations:
+        # Force pod restart when config or secret changes
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.ralph.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "squad.serviceAccountName" . }}
+
+      # Security: run as non-root ralph user (UID 1000, matches Dockerfile)
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      containers:
+        - name: ralph
+          image: "{{ .Values.ralph.image.repository }}:{{ .Values.ralph.image.tag }}"
+          imagePullPolicy: {{ .Values.ralph.image.pullPolicy }}
+
+          env:
+            # --- Credentials from K8s Secret (secretKeyRef — never literals) ---
+            - name: GH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "squad.secretName" . }}
+                  key: gh-token
+
+            - name: COPILOT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "squad.secretName" . }}
+                  key: copilot-api-key
+                  optional: true
+
+            # --- Runtime configuration (safe for env literals / ConfigMap) ---
+            - name: GITHUB_REPOSITORY
+              value: {{ .Values.global.repository | quote }}
+
+            - name: RALPH_INTERVAL_SECONDS
+              value: {{ .Values.ralph.intervalSeconds | quote }}
+
+            - name: RALPH_LOG_LEVEL
+              value: {{ .Values.ralph.logLevel | quote }}
+
+            - name: SQUAD_CONFIG_PATH
+              value: "/config/squad.config.ts"
+
+            # GH CLI config directory — must be writable for the ralph user
+            - name: GH_CONFIG_DIR
+              value: "/home/ralph/.config/gh"
+
+          volumeMounts:
+            # Squad config (squad.config.ts, team.md, routing.md) from ConfigMap
+            - name: squad-config
+              mountPath: /config
+              readOnly: true
+            # Writable scratch for Ralph's lockfile and heartbeat files
+            - name: ralph-runtime
+              mountPath: /home/ralph/.squad
+
+          resources:
+            {{- toYaml .Values.ralph.resources | nindent 12 }}
+
+          {{- if .Values.ralph.healthCheck.enabled }}
+          # Liveness probe: verify pwsh >= 7 + gh CLI are operational
+          livenessProbe:
+            exec:
+              command:
+                - pwsh
+                - -NoProfile
+                - -Command
+                - |
+                  if ($PSVersionTable.PSVersion.Major -ge 7 -and
+                      (Get-Command gh -ErrorAction SilentlyContinue)) {
+                    exit 0
+                  } else { exit 1 }
+            initialDelaySeconds: 30
+            periodSeconds: {{ .Values.ralph.healthCheck.intervalSeconds }}
+            timeoutSeconds: {{ .Values.ralph.healthCheck.timeoutSeconds }}
+            failureThreshold: {{ .Values.ralph.healthCheck.failureThreshold }}
+          {{- end }}
+
+      volumes:
+        - name: squad-config
+          configMap:
+            name: {{ include "squad.configMapName" . }}
+        # EmptyDir: lockfile + heartbeat are per-pod ephemeral state
+        - name: ralph-runtime
+          emptyDir: {}
+
+      {{- with .Values.ralph.nodeSelector }}
+      # Maps needs:* GitHub labels to K8s node affinity
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.ralph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.ralph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

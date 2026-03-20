@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-rate-limit-exporter
+  namespace: squad
+  labels:
+    app.kubernetes.io/name: github-rate-limit-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: github-rate-limit-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: github-rate-limit-exporter
+    spec:
+      containers:
+        - name: exporter
+          image: ghcr.io/kalgurn/grl-exporter:latest
+          env:
+            - name: GITHUB_AUTH_TYPE
+              value: "PAT"
+            - name: GITHUB_ACCOUNT_NAME
+              value: "tamirdresher_microsoft"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: squad-runtime-secrets
+                  key: GH_TOKEN
+          ports:
+            - containerPort: 2112
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: github-rate-limit-exporter
+  namespace: squad
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "2112"
+spec:
+  ports:
+    - port: 2112
+      name: metrics
+  selector:
+    app.kubernetes.io/name: github-rate-limit-exporter

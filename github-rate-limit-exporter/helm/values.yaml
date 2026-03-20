@@ -1,0 +1,16 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/kalgurn/grl-exporter
+  tag: latest
+github:
+  authType: PAT
+  secretName: squad-runtime-secrets
+  secretKey: GH_TOKEN
+  accountName: tamirdresher_microsoft
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi

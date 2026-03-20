@@ -743,3 +743,78 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 - GitHub Pages is not available for EMU private repos — don't attempt deployment
 - Self-hosted runner is Windows — use `shell: pwsh`, not `shell: bash`
 - `actions/upload-pages-artifact` depends on Linux/WSL — incompatible with Windows self-hosted
+
+### 2026-03-20: Issue #1203 — Physical World AI Extensions Research (PR #1221)
+
+**Assignment:** Research and prototype ways to extend the AI squad beyond digital/network into the physical world. Focus on low-cost, achievable house automation use cases.
+
+**Work Completed:**
+- ✅ Comprehensive research document: `research/physical-world-ai-extensions.md`
+- ✅ 6 home automation scenarios defined (adaptive lighting, climate optimization, security monitoring, voice control, energy management, presence simulation)
+- ✅ Smart home integration patterns analyzed (WiFi + Zigbee hybrid recommended)
+- ✅ Voice/Teams interface design documented
+- ✅ Security architecture specified (IoT VLAN, network isolation, access control)
+- ✅ Feasibility matrix with cost breakdown (~$240 MVP for full kit)
+- ✅ 2 prototype specifications ready for implementation:
+  - Prototype #1: Smart Lighting with Presence Detection (~$135)
+  - Prototype #2: Temperature Monitoring with HVAC Recommendations (~$20 incremental)
+- ✅ 4-phase scalability roadmap (MVP → Expansion → Intelligence → Advanced Automation)
+- ✅ Branch `squad/1203-physical-ai-extensions` created
+- ✅ PR #1221 opened
+
+**Key Architectural Finding:**
+Squad's multi-agent orchestration patterns translate directly to smart home automation. The same principles of decentralized decision-making, event-driven coordination, and specialized agents apply to physical device control:
+- Ralph → Device state monitoring, sensor event polling
+- Kes → Voice interface, alert routing, status reporting
+- Worf → Security rules, anomaly detection
+- Data → Integration code, API adapters
+- Belanna → Network setup, device provisioning, reliability
+
+**Technology Stack Recommendation:**
+- **Hub:** Home Assistant on Raspberry Pi 4 (centralized control, mature ecosystem)
+- **Protocols:** WiFi + Zigbee hybrid (WiFi for high-bandwidth, Zigbee mesh for sensors)
+- **Integration:** MQTT for event-driven automation, REST API for direct control
+- **Voice:** Microsoft Teams bot as command router (NLP parsing → device mapping → execution)
+
+**Security Architecture:**
+- IoT VLAN with no internet access for sensors
+- Limited ingress from Squad subnet only
+- Home Assistant with long-lived access tokens (rotate monthly)
+- MQTT with TLS + username/password auth
+- Voice commands require Teams user identity verification
+
+**Cost Analysis:**
+- Raspberry Pi 4 (4GB) + Case: $75
+- Zigbee USB Stick (Sonoff 3.0): $25
+- WiFi Smart Bulbs (4x): $40
+- Zigbee Motion Sensors (2x): $30
+- Zigbee Temp Sensors (2x): $20
+- Door/Window Sensors (4x): $35
+- Smart Plug with energy monitoring: $15
+- **Total MVP: $240** (AliExpress budget-friendly pricing)
+
+**Implementation Estimates:**
+- Prototype #1 (Smart Lighting): 2 days
+- Prototype #2 (Temperature Monitoring): 1 day
+- Security baseline setup: 1 day
+- Teams voice integration: 2 days
+- **Total Phase 1: 1-2 weeks**
+
+**Key Patterns Documented:**
+1. **Centralized Hub Pattern:** [AI Squad] <-REST/MQTT-> [Home Assistant] <-Zigbee/WiFi-> [Devices]
+2. **Event-Driven MQTT:** Subscribe to sensor topics, publish control commands
+3. **Voice Command Flow:** Teams Voice → STT → Intent Parser → Device Mapper → Execution → TTS Confirmation
+4. **Network Segmentation:** Main network (Squad servers) separated from IoT VLAN (smart devices)
+
+**Next Steps:**
+1. Order MVP hardware kit from AliExpress
+2. Set up Home Assistant on Raspberry Pi
+3. Configure IoT VLAN for network isolation
+4. Hand off to Data for prototype implementation
+5. Hand off to Worf for security review
+
+**Status:** ✅ Research complete. PR #1221 ready for review. Next owner: Data (implementation) + Worf (security review).
+
+**Key Insight — Physical World as Squad Extension:**
+Smart home automation validates that Squad architecture principles are protocol-agnostic. Whether orchestrating GitHub issues, Azure deployments, or smart lights, the core patterns remain: specialized agents, event-driven coordination, centralized monitoring, and human escalation paths. Physical devices are just another integration point.
+

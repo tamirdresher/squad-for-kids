@@ -401,3 +401,168 @@ The future of agentic AI security is **continuous validation, not static defense
 - `netsh winsock reset` — winsock reset for network stack issues
 
 **Recommendation:** Add these as runbooks in Belanna/Worf toolkit for Windows DevBox/CI remediation.
+
+### 2026-03-19: Issue #1036 — Bitwarden Collection-Scoped API Keys Security Analysis
+
+**Assignment:** Create comprehensive security analysis for collection-scoped API keys feature (upstream contribution to bitwarden/server#7252).
+
+**Work Completed:**
+- ✅ Analyzed proposed collection-scoped API key architecture
+- ✅ Created threat model with 6 attack scenarios (JWT injection, scope bypass, brute-force, key leakage, privilege escalation, persistence)
+- ✅ Conducted attack surface analysis (key generation, VaultApiKeyGrantValidator, Cipher API, data model)
+- ✅ Reviewed auth flow security (SecretsManager ApiKey pattern, JWT issuance, claim validation)
+- ✅ Defined cryptographic requirements (bcrypt/PBKDF2 hashing, RS256 JWT signing, 256-bit entropy)
+- ✅ Designed rate limiting strategy (API generation, auth endpoint, Cipher queries)
+- ✅ Specified audit logging requirements (key lifecycle, auth attempts, 90-day/2-year retention)
+- ✅ Created security testing plan (unit, integration, penetration, fuzzing, static analysis)
+- ✅ Developed implementation checklist (data model, auth flow, API endpoints, rate limiting, audit logging)
+- ✅ Prioritized upstream PR recommendations (must-have, should-have, nice-to-have)
+- ✅ Branch `squad/1036-bitwarden-security-review` pushed
+- ✅ PR #1223 opened with comprehensive analysis
+
+**Key Findings:**
+
+**🔴 CRITICAL Threats:**
+1. **JWT Claim Injection** — Attacker forges JWT with arbitrary `collection_id` to bypass isolation (RS256 signing REQUIRED)
+2. **Scope Bypass** — Missing Cipher filter enforcement leaks Organization-wide data (mandatory collection_id validation REQUIRED)
+3. **API Key Brute-Force** — Weak rate limiting enables credential guessing (IP/key throttling REQUIRED)
+4. **Key Leakage** — Plaintext secrets in logs expose credentials (never log ClientSecret REQUIRED)
+
+**✅ Architecture Strengths:**
+- SecretsManager ApiKey pattern uses `ClientSecretHash` (not plaintext storage)
+- Constant-time hash comparison prevents timing attacks
+- Expiration enforcement (if `ExpireAt` set)
+
+**🔴 Critical Gaps:**
+- No `collection_id` validation during JWT issuance
+- No revocation status check in VaultApiKeyGrantValidator
+- JWT signing algorithm not specified (must enforce RS256/ES256, reject HS256)
+- Cipher API filtering by JWT claim not yet implemented
+- Rate limiting not addressed
+- Audit logging not designed
+
+**Cryptographic Requirements:**
+- **Key generation:** ≥ 256 bits entropy (use `RandomNumberGenerator.Fill()`)
+- **Hashing:** bcrypt (cost 12+) or PBKDF2 (100k+ iterations) — NOT SHA256 alone
+- **JWT signing:** RS256/ES256 with per-organization RSA key pairs — NO HS256 shared secrets
+- **Hash comparison:** Constant-time (existing `CoreHelpers.SecureCompare` is correct)
+
+**Rate Limiting Strategy:**
+- API key generation: 50 keys/Collection, 500 keys/Organization, 10 creations/hour
+- Auth endpoint: 100 req/hour per IP, 10 failed attempts → 1-hour lockout
+- Cipher queries: 1000 req/hour per key, pagination max 1000 Ciphers
+
+**Audit Logging:**
+- Key lifecycle events (creation, deletion) → 2-year retention
+- Auth attempts (success/failure, IP address) → 90-day retention
+- Cipher accesses via API key → 90-day retention
+- Alerting: 10+ failed auths, > 5 IPs/day, > 10k Cipher accesses/day
+
+**Security Testing Plan:**
+1. Unit tests: VaultApiKeyGrantValidator (expiration, invalid secrets), CiphersController (collection filtering, IDOR)
+2. Integration tests: end-to-end auth flow, unauthorized access (403), expired key (401)
+3. Penetration tests: JWT tampering, IDOR, brute-force, timing attacks, key leakage inspection
+4. Fuzzing: auth endpoint, Cipher API, SQL injection payloads
+5. Static analysis: SonarQube, Snyk, Semgrep
+
+**Upstream PR Recommendations:**
+
+**Must-Have (Initial PR):**
+- RS256 JWT signing
+- Mandatory collection_id claim validation (fail-closed)
+- Constant-time hash comparison
+- Per-Collection API key limits (50 keys)
+- Audit logging (key lifecycle + auth attempts)
+- Unit tests (80%+ coverage)
+
+**Should-Have (Production Readiness):**
+- Rate limiting (IP + key-based)
+- Key expiration enforcement (90-day max)
+- Penetration testing
+- Anomaly detection
+- Revocation API
+
+**Nice-to-Have (Future):**
+- Automated key rotation
+- JTI-based per-token revocation
+- IP whitelisting
+- Webhook notifications
+- Usage analytics
+
+**Deliverable:** 📄 `docs/bitwarden-collection-keys-security.md` — 27KB comprehensive security analysis (741 lines)
+
+**Status:** ✅ Complete. Security analysis delivered in PR #1223. Ready for Picard review and implementation prioritization.
+
+## Learnings
+
+### Issue #1036 — Bitwarden Collection-Scoped API Keys Security Analysis (2026-03-19)
+
+**Context:** Security analysis for collection-scoped API keys (upstream contribution to bitwarden/server#7252). Feature adds credential isolation at Collection level for AI agent teams.
+
+**Key Security Principles for Credential Scoping:**
+
+1. **JWT Claims Are Trust Boundaries**  
+   Collection-scoped access depends on `collection_id` JWT claim. This claim is the **primary authorization control**. Attack surface: JWT issuance (VaultApiKeyGrantValidator) and JWT validation (Cipher API endpoints). Both must enforce integrity:
+   - **Issuance:** Validate `CollectionId` exists and caller has permission before issuing JWT
+   - **Validation:** Reject requests without `collection_id` claim (fail-closed, not fallback)
+   - **Signing:** RS256/ES256 asymmetric signing prevents claim forgery (HS256 shared secrets are vulnerable)
+
+2. **Hashing Algorithms Matter for API Keys**  
+   SecretsManager uses `SecretHasher` for `ClientSecretHash`. Critical: verify hashing algorithm is **slow** (bcrypt/PBKDF2), not fast (SHA256/SHA512). Fast hashes enable rainbow table attacks. API keys are high-value credentials (bearer tokens) — require same protection as passwords.
+
+3. **Rate Limiting Is Defense-in-Depth**  
+   Multiple throttling layers prevent abuse:
+   - **Key generation:** Prevent credential proliferation (max 50/Collection)
+   - **Auth endpoint:** Prevent brute-force (IP throttling, key lockout after 10 failures)
+   - **Cipher queries:** Prevent mass exfiltration (1000 req/hour per key)
+   
+   Rate limiting complements cryptographic controls — even strong crypto doesn't stop volumetric attacks.
+
+4. **Audit Logging for Credentials Must Track Lifecycle + Usage**  
+   Two retention tiers:
+   - **Long retention (2 years):** Key creation, deletion — compliance/forensics
+   - **Short retention (90 days):** Auth attempts, Cipher accesses — operational monitoring
+   
+   Alerting on anomalies (10+ failed auths, > 5 IPs/day, > 10k accesses/day) enables real-time threat response.
+
+5. **Constant-Time Comparison Prevents Timing Oracles**  
+   `CoreHelpers.SecureCompare()` in SecretsManager prevents timing attacks on hash comparison. Verify all credential validation uses constant-time algorithms — measuring response time differences can leak valid `client_id` values.
+
+6. **Scope Bypass Is the Most Dangerous Vulnerability**  
+   If Cipher API doesn't validate `collection_id` claim, one valid API key grants access to **all Organization Ciphers**. This is **worse than no scoping** — creates false sense of security. Fail-closed design: reject requests without valid claim, no fallback to Organization-level.
+
+7. **API Keys Are Bearer Tokens**  
+   Unlike username/password (knowledge factor), API keys are **possession-based credentials**. Anyone with the key has full access — no additional auth. This requires:
+   - Never log plaintext `ClientSecret`
+   - Enforce expiration (default 90 days)
+   - Support revocation (manual or automated)
+   - Detect leakage (multi-IP usage alerts)
+
+**Threat Model Methodology:**
+
+When analyzing credential systems:
+1. **Identify trust boundaries** — where credentials are issued, validated, used
+2. **Map attack scenarios** — privilege escalation, scope bypass, credential theft, brute-force, leakage
+3. **Prioritize by impact** — complete isolation bypass (CRITICAL) vs. single-key compromise (HIGH)
+4. **Layer defenses** — cryptography + rate limiting + audit logging + testing
+
+**Security Testing Strategy:**
+
+Multi-layered validation:
+1. **Unit tests** — verify individual security controls (constant-time comparison, expiration)
+2. **Integration tests** — verify end-to-end auth flow and authorization
+3. **Penetration tests** — adversarial testing (JWT tampering, IDOR, brute-force)
+4. **Fuzzing** — discover edge cases and input validation gaps
+5. **Static analysis** — detect hardcoded secrets, weak crypto, SQL injection
+
+**Upstream Contribution Security Posture:**
+
+For security-critical features (credential management, auth systems), upstream PRs must demonstrate:
+- Threat model with attack scenarios
+- Cryptographic design rationale (algorithm choices, key sizes)
+- Rate limiting and abuse prevention
+- Audit logging and alerting
+- Comprehensive testing (unit, integration, penetration)
+- Implementation checklist (fail-closed design, constant-time ops, claim validation)
+
+**Lesson:** Credential scoping features introduce **authorization complexity**. The gap between "scoped credentials issued" and "scoped credentials enforced" is a critical vulnerability. Multi-agent AI systems amplify this risk — compromised agent can pivot across Collections if scope enforcement is weak. Defense-in-depth (crypto + rate limiting + audit + testing) is non-negotiable for credential features.

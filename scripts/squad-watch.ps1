@@ -426,8 +426,24 @@ while (-not $script:ShutdownRequested) {
     $processedCount = 0
 
     if ($issues -and $issues.Count -gt 0) {
-        # Process issues up to maxConcurrentAgents
-        $toProcess = $issues | Select-Object -First $Config.maxConcurrentAgents
+        # CDD: Sequential mode check — throttle parallel spawning (Issue #1168)
+        $maxAgents = $Config.maxConcurrentAgents
+        try {
+            $rlmPath = Join-Path (Get-Location) "scripts\rate-limit-manager.ps1"
+            if ((Test-Path $rlmPath) -and (Get-Command Test-SequentialModeActive -ErrorAction SilentlyContinue)) {
+                # Check if any agent in the current context is in sequential mode
+                $currentAgent = if ($Config.agentId) { $Config.agentId } else { "squad" }
+                if (Test-SequentialModeActive -AgentId $currentAgent) {
+                    $maxAgents = 1
+                    Write-WatchLog "[cdd] Sequential mode ACTIVE — limiting to 1 agent" -Level WARN
+                }
+            }
+        } catch {
+            Write-WatchLog "[cdd] Sequential mode check error: $_" -Level WARN
+        }
+
+        # Process issues up to maxConcurrentAgents (may be throttled by CDD)
+        $toProcess = $issues | Select-Object -First $maxAgents
 
         foreach ($issue in $toProcess) {
             if ($script:ShutdownRequested) { break }

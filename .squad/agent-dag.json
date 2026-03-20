@@ -1,0 +1,14 @@
+{
+  "_comment": "Agent dependency adjacency list for Cascade Dependency Detector (CDD). Edges: from → to[] means 'to' agents consume output from 'from' agent. When 'from' is rate-limited, all downstream agents enter sequential mode.",
+  "nodes": ["picard", "data", "seven", "belanna", "troi", "neelix", "ralph", "scribe", "worf", "kes", "q", "podcaster"],
+  "edges": [
+    { "from": "picard",   "to": ["data", "seven", "belanna", "worf"] },
+    { "from": "ralph",    "to": ["scribe"] },
+    { "from": "neelix",   "to": ["seven"] },
+    { "from": "troi",     "to": ["seven", "podcaster"] },
+    { "from": "q",        "to": ["picard"] },
+    { "from": "data",     "to": ["seven"] },
+    { "from": "belanna",  "to": ["seven"] },
+    { "from": "seven",    "to": ["troi", "neelix"] }
+  ]
+}

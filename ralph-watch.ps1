@@ -1467,6 +1467,17 @@ while ($true) {
         Write-Host "[$displayTime] [health] $($healthResult.Warnings.Count) warning(s): $($healthResult.Warnings -join ' | ')" -ForegroundColor Magenta
     }
 
+    # ── CDD: Cascade Dependency Detector — sequential mode check (Issue #1168) ──
+    # If a 429 cascade put "ralph" in sequential mode, throttle to single-issue processing
+    $cddSequentialMode = $false
+    try {
+        if (Get-Command Test-SequentialModeActive -ErrorAction SilentlyContinue) {
+            $cddSequentialMode = Test-SequentialModeActive -AgentId "ralph"
+        }
+    } catch {
+        Write-Host "[$displayTime] [cdd] Sequential mode check failed: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    }
+
     # Step -0.5: Machine capability discovery (Issue #987 — run once per startup, then every 50 rounds)
     $capDiscoveryScript = Join-Path (Get-Location) "scripts\discover-machine-capabilities.ps1"
     if (($round -eq 1 -or $round % 50 -eq 0) -and (Test-Path $capDiscoveryScript)) {
@@ -1875,6 +1886,15 @@ exit `$LASTEXITCODE
         # Model circuit breaker: update state based on rate limit detection
         if ($got429) {
             Update-CircuitBreakerOnRateLimit
+
+            # CDD: propagate backpressure to downstream agents (Issue #1168)
+            try {
+                if (Get-Command Invoke-CascadeBackpressure -ErrorAction SilentlyContinue) {
+                    Invoke-CascadeBackpressure -RateLimitedAgent "ralph"
+                }
+            } catch {
+                Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [cdd] Backpressure propagation failed: $($_.Exception.Message)" -ForegroundColor DarkYellow
+            }
         } elseif ($exitCode -eq 0) {
             Update-CircuitBreakerOnSuccess
         }

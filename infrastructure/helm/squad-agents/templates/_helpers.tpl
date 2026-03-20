@@ -42,7 +42,7 @@ helm.sh/chart: {{ include "squad-agents.chart" . }}
 {{ include "squad-agents.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-squad.github.com/repository: {{ .Values.global.repository | quote }}
+squad.github.com/repository: {{ .Values.global.repository | replace "/" "_" | quote }}
 {{- end }}
 
 {{/*

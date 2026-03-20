@@ -1,0 +1,36 @@
+{
+  "parent": {
+    "name": "Parent",
+    "role": "parent",
+    "notifications": {
+      "weeklyReport": true,
+      "gradeTransition": true,
+      "achievementAlerts": true,
+      "frustrationAlerts": true,
+      "milestoneAlerts": true
+    },
+    "preferences": {
+      "reportLanguage": "en",
+      "reportFrequency": "weekly",
+      "maxSessionMinutes": 45,
+      "allowedSubjects": "all",
+      "screenTimeReminder": true
+    }
+  },
+  "childSquad": {
+    "repoPath": "C:\\temp\\squad-for-kids",
+    "studentProfile": ".squad/student-profile.json",
+    "teachingPlan": ".squad/teaching-plan.md",
+    "reportsDir": ".squad/reports/"
+  },
+  "upstream": {
+    "type": "parent-child",
+    "syncFrequency": "weekly",
+    "syncItems": [
+      "weekly-report",
+      "grade-transitions",
+      "achievement-notifications",
+      "frustration-alerts"
+    ]
+  }
+}

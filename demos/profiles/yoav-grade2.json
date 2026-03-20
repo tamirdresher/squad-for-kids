@@ -1,0 +1,49 @@
+{
+  "name": "Yoav",
+  "birthDate": "2018-03-12",
+  "age": 7,
+  "grade": 2,
+  "school": null,
+  "location": {
+    "city": "Rishon LeZion",
+    "country": "IL",
+    "state": null
+  },
+  "curriculum": "Israeli Ministry of Education (תכנית הלימודים)",
+  "subjects": [
+    "Mathematics (חשבון)",
+    "Hebrew Language (עברית)",
+    "Reading Comprehension (הבנת הנקרא)",
+    "Science & Technology (מדע וטכנולוגיה)",
+    "English (אנגלית)",
+    "Bible Studies (תנ\"ך)",
+    "Art (אמנות)",
+    "Physical Education (חינוך גופני)",
+    "Social Skills (כישורי חיים)"
+  ],
+  "language": "en",
+  "castUniverse": "Harry Potter",
+  "cast": {
+    "headTeacher": "Hermione Granger",
+    "subjectHelper": "Hagrid",
+    "creativeCoach": "Luna Lovegood",
+    "gamer": "Fred Weasley",
+    "youtuber": "George Weasley",
+    "studyBuddy": "Dobby"
+  },
+  "gradeHistory": [
+    { "grade": 1, "startDate": "2024-09-01" },
+    { "grade": 2, "startDate": "2025-09-01" }
+  ],
+  "nextGradeDate": "2026-09-01",
+  "gamification": {
+    "xp": 0,
+    "level": 1,
+    "levelName": "Rookie",
+    "badges": [],
+    "streakDays": 0,
+    "lastSessionDate": null
+  },
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}

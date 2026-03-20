@@ -3,8 +3,28 @@ name: Squad CI
 on:
   push:
     branches: [main, dev]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.json'
+      - '**.yaml'
+      - '**.yml'
+      - 'test/**'
+      - 'scripts/**'
+      - 'src/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [main, dev]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.json'
+      - '**.yaml'
+      - '**.yml'
+      - 'test/**'
+      - 'scripts/**'
+      - 'src/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 jobs:
   test:

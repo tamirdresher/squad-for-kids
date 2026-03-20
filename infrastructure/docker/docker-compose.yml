@@ -1,0 +1,79 @@
+# docker-compose.yml — Multi-agent local test for Squad-on-K8s POC
+# Usage: docker compose --env-file .env.squad up
+version: "3.9"
+
+networks:
+  squad-net:
+    driver: bridge
+
+volumes:
+  workspace:
+    driver: local
+  secrets:
+    driver: local
+
+services:
+  # ── Ralph: work-monitor agent ──────────────────────────────────────────────
+  ralph:
+    build:
+      context: ../../          # repo root
+      dockerfile: infrastructure/docker/Dockerfile.ralph
+    image: squad/ralph:latest
+    container_name: squad-ralph
+    restart: unless-stopped
+    env_file:
+      - .env.squad
+    environment:
+      AGENT_NAME: ralph
+      GH_CONFIG_DIR: /workspace/.config/gh
+    volumes:
+      # Mount host workspace so ralph can read/write git state
+      - type: bind
+        source: ../../
+        target: /workspace
+        read_only: false
+      # Secrets (GH token etc.) injected via volume
+      - type: volume
+        source: secrets
+        target: /workspace/.config/gh
+    networks:
+      - squad-net
+    # Resource limits (adjust for your machine)
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  # ── GPU agent (commented out by default — uncomment when nvidia runtime available) ──
+  # agent-gpu:
+  #   build:
+  #     context: ../../
+  #     dockerfile: infrastructure/docker/Dockerfile.ralph
+  #   image: squad/ralph:latest
+  #   container_name: squad-agent-gpu
+  #   runtime: nvidia
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env.squad
+  #   environment:
+  #     AGENT_NAME: agent-gpu
+  #     NVIDIA_VISIBLE_DEVICES: all
+  #     GH_CONFIG_DIR: /workspace/.config/gh
+  #   volumes:
+  #     - type: bind
+  #       source: ../../
+  #       target: /workspace
+  #       read_only: false
+  #     - type: volume
+  #       source: secrets
+  #       target: /workspace/.config/gh
+  #   networks:
+  #     - squad-net
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]

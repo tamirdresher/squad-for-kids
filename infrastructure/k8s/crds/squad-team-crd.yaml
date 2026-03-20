@@ -1,0 +1,89 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: squadteams.squad.github.com
+  labels:
+    app.kubernetes.io/part-of: squad
+    app.kubernetes.io/managed-by: belanna
+spec:
+  group: squad.github.com
+  scope: Namespaced
+  names:
+    plural: squadteams
+    singular: squadteam
+    kind: SquadTeam
+    shortNames:
+      - st
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Agents
+          type: integer
+          jsonPath: .status.agentCount
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          required: ["spec"]
+          properties:
+            spec:
+              type: object
+              required: ["agents"]
+              properties:
+                agents:
+                  type: array
+                  description: "List of SquadAgent names that belong to this team"
+                  minItems: 1
+                  items:
+                    type: string
+                routingRules:
+                  type: array
+                  description: "Label-to-agent routing rules; first match wins"
+                  items:
+                    type: object
+                    required: ["label", "agent"]
+                    properties:
+                      label:
+                        type: string
+                        description: "GitHub label that triggers this rule"
+                      agent:
+                        type: string
+                        description: "SquadAgent name to route to"
+                      priority:
+                        type: integer
+                        description: "Lower number = higher priority"
+                        default: 100
+                circuitBreaker:
+                  type: object
+                  description: "Circuit-breaker settings to prevent runaway agent usage"
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: true
+                    failureThreshold:
+                      type: integer
+                      description: "Number of consecutive failures before opening the circuit"
+                      minimum: 1
+                      default: 5
+                    resetAfterSeconds:
+                      type: integer
+                      description: "Seconds to wait before attempting a half-open probe"
+                      minimum: 30
+                      default: 300
+            status:
+              type: object
+              properties:
+                agentCount:
+                  type: integer
+                  description: "Number of agents currently registered in this team"
+                circuitState:
+                  type: string
+                  enum: [Closed, Open, HalfOpen]
+                  description: "Current circuit-breaker state"
+              x-kubernetes-preserve-unknown-fields: true
+      subresources:
+        status: {}

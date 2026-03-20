@@ -1,0 +1,80 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: squadagents.squad.github.com
+  labels:
+    app.kubernetes.io/part-of: squad
+    app.kubernetes.io/managed-by: belanna
+spec:
+  group: squad.github.com
+  scope: Namespaced
+  names:
+    plural: squadagents
+    singular: squadagent
+    kind: SquadAgent
+    shortNames:
+      - sa
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Role
+          type: string
+          jsonPath: .spec.role
+        - name: Model
+          type: string
+          jsonPath: .spec.model
+        - name: MaxRoundsPerHour
+          type: integer
+          jsonPath: .spec.maxRoundsPerHour
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          required: ["spec"]
+          properties:
+            spec:
+              type: object
+              required: ["role", "model"]
+              properties:
+                role:
+                  type: string
+                  description: "Agent role identifier (e.g. ralph, belanna, data)"
+                  minLength: 1
+                model:
+                  type: string
+                  description: "LLM model slug the agent should use (e.g. claude-sonnet-4.5)"
+                  minLength: 1
+                needsLabels:
+                  type: array
+                  description: "GitHub issue/PR labels this agent will act on"
+                  items:
+                    type: string
+                maxRoundsPerHour:
+                  type: integer
+                  description: "Maximum reasoning/tool-use rounds this agent may consume per hour"
+                  minimum: 1
+                  default: 20
+                image:
+                  type: object
+                  description: "Container image override (defaults to chart values)"
+                  properties:
+                    repository:
+                      type: string
+                    tag:
+                      type: string
+                    pullPolicy:
+                      type: string
+                      enum: [Always, IfNotPresent, Never]
+                resources:
+                  type: object
+                  description: "Kubernetes resource requests/limits override"
+                  x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+      subresources:
+        status: {}

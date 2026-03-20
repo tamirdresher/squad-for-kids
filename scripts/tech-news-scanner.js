@@ -40,6 +40,184 @@ const KEYWORDS = [
   'graviton', 'outposts', 'wavelength', 'cloudfront', 'route 53'
 ];
 
+// ─── Relevance scoring ────────────────────────────────────────────────────────
+// HIGH  = directly impacts our work (squads, .NET, K8s, AI agents, Azure, MCP)
+// MEDIUM = adjacent tech worth monitoring
+// LOW    = filtered out of the digest entirely
+const HIGH_RELEVANCE_KEYWORDS = [
+  'squad', 'k8s', 'kubernetes', '.net', 'dotnet', 'c#', 'csharp', 'aspnet', 'blazor', 'aspire',
+  'ai agent', 'ai agents', 'agentic', 'github copilot', 'copilot', 'copilot workspace',
+  'azure', 'aks', 'azure kubernetes', 'mcp', 'model context protocol',
+  'semantic kernel', 'dapr', 'microsoft', 'opentelemetry', 'otel',
+];
+
+const MEDIUM_RELEVANCE_KEYWORDS = [
+  'ai', 'machine learning', 'llm', 'gpt', 'claude', 'openai', 'anthropic', 'gemini',
+  'cloud native', 'cncf', 'docker', 'container', 'helm', 'gitops', 'argocd', 'flux',
+  'github', 'vscode', 'vs code', 'devtools', 'developer tools', 'dev tools',
+  'golang', 'rust', 'typescript', 'nodejs',
+  'aws', 'gcp', 'serverless', 'lambda', 'security', 'cve', 'vulnerab',
+];
+
+function scoreRelevance(story) {
+  const text = `${story.title} ${story.description || ''}`.toLowerCase();
+  if (HIGH_RELEVANCE_KEYWORDS.some(kw => text.includes(kw))) return 'HIGH';
+  if (MEDIUM_RELEVANCE_KEYWORDS.some(kw => text.includes(kw))) return 'MEDIUM';
+  return 'LOW';
+}
+
+function getWhyItMatters(story) {
+  const text = `${story.title} ${story.description || ''}`.toLowerCase();
+  if (text.includes('squad') && (text.includes('release') || text.includes('update') || text.includes('commit'))) {
+    return '⚡ **Direct squad impact** — this is our own tooling evolving.';
+  }
+  if (text.includes('mcp') || text.includes('model context protocol')) {
+    return '🔌 **MCP ecosystem** — affects how our AI agents connect to external tools.';
+  }
+  if (text.includes('ai agent') || text.includes('ai agents') || text.includes('agentic')) {
+    return '🧠 **AI agents** — directly shapes the multi-agent patterns we\'re implementing.';
+  }
+  if (text.includes('kubernetes') || text.includes('k8s') || text.includes('aks')) {
+    return '☸️ **K8s platform** — our deployment infra, fleet management, and AKS upgrade path.';
+  }
+  if (text.includes('.net') || text.includes('dotnet') || text.includes('csharp') || text.includes('c#') || text.includes('aspnet') || text.includes('blazor') || text.includes('aspire')) {
+    return '🔷 **.NET stack** — our primary backend language and runtime.';
+  }
+  if (text.includes('azure')) {
+    return '☁️ **Azure platform** — our cloud home and integration surface.';
+  }
+  if (text.includes('copilot') || (text.includes('github') && text.includes('ai'))) {
+    return '🤖 **GitHub/Copilot** — our dev workflow and AI coding assistant ecosystem.';
+  }
+  if (text.includes('semantic kernel') || text.includes('dapr')) {
+    return '🔗 **Microsoft OSS** — tooling we build on or integrate with directly.';
+  }
+  if (text.includes('security') || text.includes('cve') || text.includes('vulnerab')) {
+    return '🔐 **Security** — action required: check if we\'re exposed.';
+  }
+  if (text.includes('docker') || text.includes('container') || text.includes('helm')) {
+    return '🐳 **Containers/Helm** — runtime and packaging tech we depend on daily.';
+  }
+  if (text.includes('ai') || text.includes('llm') || text.includes('gpt')) {
+    return '🌐 **AI ecosystem** — foundation models powering the features we ship.';
+  }
+  return '📡 **Tech radar** — worth tracking as the ecosystem evolves.';
+}
+
+function generateTldr(story) {
+  const title = story.title;
+  const lower = title.toLowerCase();
+
+  const isRelease = /\bv?\d+\.\d+(\.\d+)?/.test(lower)
+    || lower.includes('release') || lower.includes('launches') || lower.includes('released') || lower.includes('ships');
+
+  if (isRelease) {
+    if (lower.includes('.net') || lower.includes('dotnet') || lower.includes('aspnet') || lower.includes('blazor') || lower.includes('aspire')) {
+      return '.NET ecosystem release — check the changelog for breaking changes and new capabilities affecting our services.';
+    }
+    if (lower.includes('kubernetes') || lower.includes('k8s')) {
+      return 'Kubernetes version drop — important for AKS fleet upgrade planning and compatibility checks.';
+    }
+    if (lower.includes('copilot') || lower.includes('github')) {
+      return 'GitHub/Copilot update — new capabilities may be live in our dev workflow today.';
+    }
+    if (lower.includes('azure')) {
+      return 'Azure service release — review for new features or pricing changes that affect our cloud footprint.';
+    }
+    if (lower.includes('mcp') || lower.includes('model context protocol')) {
+      return 'MCP protocol update — new tools or capabilities our agents can leverage.';
+    }
+    return 'New release worth noting — version bump that may affect our dependencies or toolchain.';
+  }
+
+  if (lower.includes('ai agent') || lower.includes('agentic') || lower.includes('multi-agent')) {
+    return 'AI agent architecture development — directly relevant to our multi-agent squad system design.';
+  }
+  if (lower.includes('mcp') || lower.includes('model context protocol')) {
+    return 'MCP ecosystem update — could change how our agents connect to tools and data sources.';
+  }
+  if (lower.includes('kubernetes') || lower.includes('k8s') || lower.includes('aks')) {
+    return 'K8s ecosystem development — worth a read for the platform engineering side of our work.';
+  }
+  if (lower.includes('azure')) {
+    return 'Azure news affecting our cloud platform — feature, pricing, or capability change worth tracking.';
+  }
+  if (lower.includes('.net') || lower.includes('dotnet') || lower.includes('c#') || lower.includes('aspnet')) {
+    return '.NET/C# development — directly relevant to our backend services and tooling.';
+  }
+  if (lower.includes('security') || lower.includes('cve') || lower.includes('vulnerab') || lower.includes('patch')) {
+    return 'Security advisory — scan our dependencies and infrastructure for exposure before end of day.';
+  }
+  if (lower.includes('copilot')) {
+    return 'Copilot/AI coding tool update — may change our dev productivity or available features.';
+  }
+  if (lower.includes('llm') || lower.includes('gpt') || lower.includes('claude') || lower.includes('openai') || lower.includes('anthropic')) {
+    return 'Foundation model news — context for the AI capabilities we\'re building on top of.';
+  }
+  if (lower.includes('docker') || lower.includes('container') || lower.includes('helm')) {
+    return 'Container ecosystem update — check for anything affecting our build and deployment pipeline.';
+  }
+  return 'Notable development in the tech landscape — worth a skim to stay ahead of the curve.';
+}
+
+// Neelix personality commentary — grouped by relevance tier.
+// Neelix is Star Trek Voyager's enthusiastic chef/morale officer: witty, warm, occasionally
+// over-the-top, always genuine. He loves analogies to food, space travel, and strange aliens.
+const NEELIX_QUIPS = {
+  HIGH: [
+    "Now THIS is what I call a hearty serving of relevance! Straight to the crew's reading list. 🍲",
+    "Captain, I'd put this one on the *essential menu* — as important as keeping the replicators running. 🚀",
+    "Direct hit on our tech stack. The kind of story that separates a well-prepared crew from a hungry one.",
+    "I've seen a lot of strange things in the Delta Quadrant, but THIS level of relevance? Truly remarkable.",
+    "As my Talaxian grandmother always said: when the tech matters, you read it *twice*.",
+    "Computer, flag this for the senior staff briefing. We're on course heading for this one. 🖖",
+    "I wouldn't interrupt the captain's dinner for most things — but for this? Absolutely.",
+    "Call this the plomeek soup of tech news: nourishing, slightly acquired taste, absolutely essential. 🍵",
+  ],
+  MEDIUM: [
+    "A solid side dish — not the main course, but don't you dare skip it.",
+    "Keep this one warm on the back burner. Could be useful before end of quarter. 🔥",
+    "Medium relevance, but in the Delta Quadrant, a 'side dish' has saved this ship more than once.",
+    "The crew should glance at this between missions. Knowledge is the best ration pack.",
+    "Not an emergency, but absolutely worth a coffee-break read. ☕",
+    "Situational awareness, ensign — that's what separates good engineers from great navigators.",
+    "I wouldn't interrupt dinner for this, but I'd mention it over dessert. You've been warned. 🍮",
+    "Think of it as leola root stew: nobody's excited, but later they're grateful they had it.",
+  ],
+};
+
+function getNeelixQuip(relevance) {
+  const quips = NEELIX_QUIPS[relevance] || NEELIX_QUIPS.MEDIUM;
+  // Use a deterministic-ish pick so repeated runs don't change the digest mid-day
+  const seed = (new Date().getDate() + quips.length) % quips.length;
+  return quips[seed];
+}
+
+function generateActionItems(stories) {
+  const actions = [];
+  for (const story of stories) {
+    if (story.relevance !== 'HIGH') continue;
+    const text = story.title.toLowerCase();
+
+    if (/\bv?\d+\.\d+/.test(text) && (text.includes('.net') || text.includes('dotnet'))) {
+      actions.push(`🔷 **Review .NET release**: [${story.title}](${story.url}) — check changelog for breaking changes affecting our services`);
+    } else if (/\bv?\d+\.\d+/.test(text) && (text.includes('kubernetes') || text.includes('k8s'))) {
+      actions.push(`☸️ **Plan K8s upgrade window**: [${story.title}](${story.url}) — assess AKS fleet compatibility`);
+    } else if (text.includes('security') || text.includes('cve') || text.includes('vulnerab')) {
+      actions.push(`🔐 **Security check**: [${story.title}](${story.url}) — verify our stack is not exposed`);
+    } else if (text.includes('mcp') || text.includes('model context protocol')) {
+      actions.push(`🔌 **Evaluate for agent tooling**: [${story.title}](${story.url}) — MCP compatibility and adoption potential`);
+    } else if (text.includes('copilot') && (text.includes('feature') || text.includes('update') || text.includes('new'))) {
+      actions.push(`🤖 **Try new Copilot capability**: [${story.title}](${story.url})`);
+    } else if (text.includes('azure') && (text.includes('aks') || text.includes('kubernetes'))) {
+      actions.push(`☁️ **Azure/AKS review**: [${story.title}](${story.url}) — check impact on our cluster configuration`);
+    } else if (text.includes('squad') && (text.includes('release') || text.includes('update'))) {
+      actions.push(`⚡ **Squad product update**: [${story.title}](${story.url}) — our own tooling, stay current!`);
+    }
+  }
+  return actions.slice(0, 6);
+}
+
 // Brady's Squad repo monitoring config
 const SQUAD_REPO = { owner: 'bradygaster', repo: 'squad' };
 const BRADY_BLOG_URL = 'https://bradygaster.com';
@@ -603,12 +781,31 @@ function sanitizeForPublic(text) {
 
 function formatDigest(stories, squadUpdates = [], { isPublic = false } = {}) {
   const date = new Date().toISOString().split('T')[0];
-  
-  let digest = `# Tech News Digest - ${date}\n\n`;
-  digest += `Found ${stories.length} relevant stories across HackerNews, Reddit, Morning Dew, Architecture Notes, ThoughtWorks Radar, and AWS Blogs.\n\n`;
-  digest += `**Topics covered:** AI, vibecoding, .NET, Go, Kubernetes, cloud native, developer tools, AWS architecture & announcements\n\n`;
 
-  // Squad product updates section — only include in private digests
+  // ── Enrich stories with relevance, TL;DR, and personality ────────────────
+  const enriched = stories
+    .map(story => ({
+      ...story,
+      relevance: scoreRelevance(story),
+      tldr: generateTldr(story),
+      whyItMatters: getWhyItMatters(story),
+      neelixQuip: null, // populated below per tier
+    }))
+    .filter(story => story.relevance !== 'LOW');
+
+  // Attach Neelix quips (deterministic per relevance tier, not per story)
+  enriched.forEach(story => {
+    story.neelixQuip = getNeelixQuip(story.relevance);
+  });
+
+  const highStories   = enriched.filter(s => s.relevance === 'HIGH');
+  const mediumStories = enriched.filter(s => s.relevance === 'MEDIUM');
+  const actionItems   = generateActionItems(enriched);
+
+  let digest = `# 🛸 Tech News Digest — ${date}\n\n`;
+  digest += `> _Curated by your friendly neighbourhood tech chef. Today's menu: ${highStories.length} HIGH-relevance and ${mediumStories.length} MEDIUM-relevance stories (${stories.length - enriched.length} LOW-relevance items quietly composted)._\n\n`;
+
+  // ── Squad product updates — private digests only ──────────────────────────
   if (!isPublic && squadUpdates.length > 0) {
     digest += `---\n\n`;
     digest += `## 🚀 Squad Product Updates (bradygaster/squad)\n\n`;
@@ -625,27 +822,59 @@ function formatDigest(stories, squadUpdates = [], { isPublic = false } = {}) {
   }
 
   digest += `---\n\n`;
-  
-  if (stories.length === 0 && (isPublic || squadUpdates.length === 0)) {
-    digest += `No relevant stories found today.\n`;
+
+  if (enriched.length === 0 && (isPublic || squadUpdates.length === 0)) {
+    digest += `_No relevant stories found today — the Delta Quadrant is quiet. Enjoy the respite._\n`;
     return digest;
   }
 
-  if (stories.length > 0) {
-    digest += `## 📰 Tech News\n\n`;
-    stories.forEach((story, idx) => {
+  // ── HIGH relevance stories ────────────────────────────────────────────────
+  if (highStories.length > 0) {
+    digest += `## 🔴 HIGH Relevance — Read These Now\n\n`;
+    highStories.forEach((story, idx) => {
       digest += `### ${idx + 1}. ${story.title}\n\n`;
-      digest += `- **Source:** ${story.source}\n`;
-      digest += `- **Score:** ${story.score}\n`;
+      digest += `> 💡 **TL;DR:** ${story.tldr}\n\n`;
+      digest += `${story.whyItMatters}\n\n`;
+      digest += `> 🍳 _Neelix says: "${story.neelixQuip}"_\n\n`;
+      digest += `- **Source:** ${story.source}`;
+      if (story.score) digest += ` | **Score:** ${story.score}`;
+      digest += `\n`;
       digest += `- **Link:** ${story.url}\n\n`;
     });
   }
-  
+
+  // ── MEDIUM relevance stories ──────────────────────────────────────────────
+  if (mediumStories.length > 0) {
+    digest += `---\n\n`;
+    digest += `## 🟡 MEDIUM Relevance — Worth a Glance\n\n`;
+    mediumStories.forEach((story, idx) => {
+      digest += `### ${idx + 1}. ${story.title}\n\n`;
+      digest += `> 💡 **TL;DR:** ${story.tldr}\n\n`;
+      digest += `${story.whyItMatters}\n\n`;
+      digest += `> 🍵 _Neelix says: "${story.neelixQuip}"_\n\n`;
+      digest += `- **Source:** ${story.source}`;
+      if (story.score) digest += ` | **Score:** ${story.score}`;
+      digest += `\n`;
+      digest += `- **Link:** ${story.url}\n\n`;
+    });
+  }
+
+  // ── Action items from HIGH-relevance stories ──────────────────────────────
+  if (!isPublic && actionItems.length > 0) {
+    digest += `---\n\n`;
+    digest += `## ✅ Action Items\n\n`;
+    digest += `_Neelix recommends acting on these before next shift:_\n\n`;
+    actionItems.forEach(item => {
+      digest += `- ${item}\n`;
+    });
+    digest += `\n`;
+  }
+
   // Final sanitization pass for public channels
   if (isPublic) {
     digest = sanitizeForPublic(digest);
   }
-  
+
   return digest;
 }
 

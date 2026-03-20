@@ -1,166 +1,244 @@
-# Squad on AKS — Azure-Native Deployment Guide
+# Squad on AKS — Deployment Guide
 
-> Closes #1060 | Relates to #1059 (K8s architecture), #994 (Squad-on-K8s), #997 (AKS + KAITO)
+> Closes #1161 | Relates to #1060, #1059 (K8s architecture), #1136 (AKS Automatic eval), #1159 (Helm aksMode)
 
 ## Overview
 
-This guide covers deploying the Squad AI agent framework on Azure Kubernetes Service (AKS),
-using Azure-native services for identity, secrets, container hosting, and observability.
+Squad agents (Ralph, Picard, Seven, and friends) run on Azure Kubernetes Service (AKS).
+This guide covers **two supported deployment paths**:
 
-**What you'll end up with:**
-- Ralph running as a CronJob (reconciliation loop, every 5 minutes)
-- Picard running as a long-lived Deployment (architecture/decision maker)
-- All secrets sourced from Azure Key Vault via the CSI driver
-- `gh` CLI authenticated via Workload Identity (no PAT tokens in containers)
-- Container images stored in Azure Container Registry (ACR)
-- Logs flowing to Log Analytics; alerts wired through Azure Monitor
+| Path | Tier | Best for | Cost |
+|------|------|----------|------|
+| **Path 1: AKS Standard Free** | Free control plane | Dev, staging, cost-sensitive teams | ~$55–80/mo |
+| **Path 2: AKS Automatic** | Managed everything | Production, zero-ops teams | ~$150–200/mo |
+
+**Choose Standard Free when** you want maximum control, low cost, and are comfortable running
+`helm install` for KEDA, CSI, and managing node pools yourself.
+
+**Choose AKS Automatic when** your team wants to drop the maintenance burden entirely — KEDA,
+the CSI Secrets Store driver, Workload Identity webhook, auto-patching, and node provisioning
+are all built-in and managed by Azure.
+
+Both paths use the same Squad Helm chart (`infrastructure/helm/squad-agents/`). The only
+difference is the `aksMode` flag and a few steps you skip on AKS Automatic.
 
 ---
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Azure Infrastructure Setup](#azure-infrastructure-setup)
-3. [Workload Identity for GitHub Auth](#workload-identity-for-github-auth)
-4. [Azure Key Vault Integration](#azure-key-vault-integration)
-5. [Container Images and ACR](#container-images-and-acr)
-6. [AKS Features to Leverage](#aks-features-to-leverage)
-7. [Helm Chart Deployment](#helm-chart-deployment)
-8. [GitHub Actions CI/CD Pipeline](#github-actions-cicd-pipeline)
-9. [Monitoring and Observability](#monitoring-and-observability)
-10. [Step-by-Step Deployment Walkthrough](#step-by-step-deployment-walkthrough)
-11. [KAITO Consideration for LLM Inference](#kaito-consideration-for-llm-inference)
-12. [Cost Optimization](#cost-optimization)
-13. [Troubleshooting](#troubleshooting)
+1. [Path 1: AKS Standard Free (Development / Low-Cost)](#path-1-aks-standard-free-development--low-cost)
+   - [When to use](#when-to-use)
+   - [Prerequisites](#prerequisites)
+   - [Step 1: Create the cluster](#step-1-create-aks-standard-free-cluster)
+   - [Step 2: Install KEDA](#step-2-install-keda)
+   - [Step 3: Install CSI Secrets Store](#step-3-install-csi-secrets-store-driver)
+   - [Step 4: Configure Workload Identity + Key Vault](#step-4-configure-workload-identity--key-vault)
+   - [Step 5: Deploy Squad Helm chart](#step-5-deploy-squad-helm-chart)
+   - [Step 6: Verify](#step-6-verify)
+2. [Path 2: AKS Automatic (Production / Zero-Ops)](#path-2-aks-automatic-production--zero-ops)
+   - [When to use](#when-to-use-1)
+   - [What's included automatically](#whats-included-automatically)
+   - [Prerequisites](#prerequisites-1)
+   - [Step 1: Create the cluster](#step-1-create-aks-automatic-cluster)
+   - [Step 2: Configure Workload Identity + Key Vault](#step-2-configure-workload-identity--key-vault)
+   - [Step 3: Deploy Squad Helm chart](#step-3-deploy-squad-helm-chart)
+   - [Step 4: Verify](#step-4-verify)
+3. [Cost Comparison Table](#cost-comparison-table)
+4. [Migrating from Standard to Automatic](#migrating-from-standard-to-automatic)
+5. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Prerequisites
+## Path 1: AKS Standard Free (Development / Low-Cost)
 
-### Tools
+### When to use
+
+- You're setting up Squad for the first time and want to keep costs low
+- You need a dev/staging environment for testing new agents or Helm chart changes
+- Your team is comfortable managing KEDA, CSI driver, and node pool taints manually
+- You want Spot VM node pools to further reduce costs
+- Budget constraint: stay under $100/mo
+
+### Prerequisites
+
+Install the following tools before starting:
+
 ```bash
-az --version          # Azure CLI >= 2.56
-kubectl version       # >= 1.29
-helm version          # >= 3.14
-gh --version          # GitHub CLI >= 2.45
-docker --version      # >= 24.0 (for local builds)
+# Azure CLI >= 2.56
+az --version
+
+# kubectl >= 1.29
+kubectl version --client
+
+# Helm >= 3.14
+helm version
+
+# GitHub CLI >= 2.45 (for squad.config.ts repo access)
+gh --version
 ```
 
-### Azure resources (one-time)
-| Resource | Purpose | SKU recommendation |
-|----------|---------|-------------------|
-| AKS cluster | Runs Squad agents | Standard_D4s_v5 system pool + spot worker pools |
-| Azure Container Registry (ACR) | Hosts Squad container images | Standard (Premium for geo-replication) |
-| Azure Key Vault | Stores GH_TOKEN, API keys, webhook URLs | Standard |
-| User-Assigned Managed Identity | Federated credential for GitHub App auth | — |
-| Log Analytics Workspace | Squad logs and metrics | Pay-per-use |
-| Application Insights | Distributed tracing | Connected to Log Analytics |
+Azure permissions required:
+- `Contributor` on the target resource group
+- `Key Vault Secrets Officer` on the Key Vault
+- `AcrPush` on the Azure Container Registry
 
-### Permissions
-- `Contributor` on the resource group (for Bicep/Terraform deployments)
-- `Key Vault Secrets Officer` (to push secrets)
-- `AcrPush` on the ACR (for CI/CD pipeline)
-- `Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/write` (for Workload Identity setup)
+### Step 1: Create AKS Standard Free cluster
 
----
-
-## Azure Infrastructure Setup
-
-Deploy the supporting infrastructure using the provided Bicep template. A skeleton is included
-at `infrastructure/bicep/squad-aks.bicep` (to be fleshed out per #1060 acceptance criteria).
-
-### Quick start — Bicep
+Set your environment variables first — these are reused throughout all steps:
 
 ```bash
-# Set variables
-RESOURCE_GROUP="rg-squad-prod"
+# Core variables
+RESOURCE_GROUP="rg-squad-dev"
 LOCATION="eastus2"
-CLUSTER_NAME="aks-squad-prod"
-ACR_NAME="acrsquadprod"          # globally unique
-KV_NAME="kv-squad-prod"
+CLUSTER_NAME="aks-squad-dev"
+ACR_NAME="acrsquaddev"        # Must be globally unique
+KV_NAME="kv-squad-dev"
 IDENTITY_NAME="id-squad-workload"
-
-# Create resource group
-az group create --name $RESOURCE_GROUP --location $LOCATION
-
-# Deploy infrastructure (Bicep template in infrastructure/bicep/)
-az deployment group create \
-  --resource-group $RESOURCE_GROUP \
-  --template-file infrastructure/bicep/squad-aks.bicep \
-  --parameters \
-    clusterName=$CLUSTER_NAME \
-    acrName=$ACR_NAME \
-    keyVaultName=$KV_NAME \
-    managedIdentityName=$IDENTITY_NAME
+SQUAD_NAMESPACE="squad"
 ```
 
-### AKS cluster node pools
-
-Squad agents benefit from dedicated node pools:
+Create the resource group and cluster:
 
 ```bash
-# System pool (already exists)
-# --node-count 2 --vm-size Standard_D4s_v5
+# Create resource group
+az group create \
+  --name $RESOURCE_GROUP \
+  --location $LOCATION
 
-# Squad monitor pool (Ralph, lightweight)
-az aks nodepool add \
+# Create AKS Standard Free cluster
+# - Free control plane tier (no SLA, fine for dev)
+# - 2 system nodes (D2s_v3: 2 vCPU / 8 GB RAM)
+# - OIDC issuer + Workload Identity webhook enabled at creation time
+az aks create \
   --resource-group $RESOURCE_GROUP \
-  --cluster-name $CLUSTER_NAME \
-  --name squadmonitor \
-  --node-count 1 \
-  --vm-size Standard_D2s_v5 \
-  --labels squad.github.com/pool=monitor \
-  --node-taints squad.github.com/pool=monitor:NoSchedule
-
-# Squad agent pool (Picard, Seven — CPU-intensive reasoning)
-az aks nodepool add \
-  --resource-group $RESOURCE_GROUP \
-  --cluster-name $CLUSTER_NAME \
-  --name squadagent \
+  --name $CLUSTER_NAME \
+  --tier free \
   --node-count 2 \
-  --vm-size Standard_D8s_v5 \
-  --enable-cluster-autoscaler \
-  --min-count 0 \
-  --max-count 5 \
-  --labels squad.github.com/pool=agent \
-  --node-taints squad.github.com/pool=agent:NoSchedule \
-  --priority Spot \
-  --eviction-policy Delete \
-  --spot-max-price -1    # pay-as-you-go spot price
+  --node-vm-size Standard_D2s_v3 \
+  --enable-workload-identity \
+  --enable-oidc-issuer \
+  --network-plugin azure \
+  --network-policy calico \
+  --generate-ssh-keys \
+  --attach-acr $ACR_NAME
+
+# Merge kubeconfig
+az aks get-credentials \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --overwrite-existing
+
+# Confirm connection
+kubectl get nodes
 ```
 
----
+> **Optional: Add a dedicated Squad node pool** (recommended for isolation)
+>
+> ```bash
+> az aks nodepool add \
+>   --resource-group $RESOURCE_GROUP \
+>   --cluster-name $CLUSTER_NAME \
+>   --name squadagent \
+>   --node-count 1 \
+>   --vm-size Standard_D2s_v3 \
+>   --labels agentpool=squad \
+>   --node-taints agentpool=squad:NoSchedule \
+>   --enable-cluster-autoscaler \
+>   --min-count 0 \
+>   --max-count 3
+> ```
+>
+> If you add this pool, pass `--set nodeSelector.agentpool=squad` to Helm (Step 5).
 
-## Workload Identity for GitHub Auth
+### Step 2: Install KEDA
 
-Workload Identity replaces PAT tokens in containers. The `gh` CLI reads the `GH_TOKEN`
-environment variable, which is projected from Azure Key Vault (next section) via the
-CSI driver. The Managed Identity itself is used to *pull that secret* from Key Vault
-without any credential in the Pod spec.
+KEDA is not included in AKS Standard Free. Install via the AKS add-on (managed) or Helm:
 
-### Step 1 — Enable OIDC issuer and Workload Identity on AKS
+**Option A — AKS add-on (recommended, stays up-to-date automatically):**
 
 ```bash
 az aks update \
   --resource-group $RESOURCE_GROUP \
   --name $CLUSTER_NAME \
-  --enable-oidc-issuer \
-  --enable-workload-identity
+  --enable-keda
 
-# Get OIDC issuer URL (needed for federation)
-OIDC_ISSUER=$(az aks show \
-  --resource-group $RESOURCE_GROUP \
-  --name $CLUSTER_NAME \
-  --query "oidcIssuerProfile.issuerUrl" -o tsv)
+# Verify
+kubectl get pods -n kube-system -l app=keda-operator
 ```
 
-### Step 2 — Create user-assigned Managed Identity
+**Option B — Helm (more version control):**
+
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+helm repo update
+
+helm upgrade --install keda kedacore/keda \
+  --namespace keda \
+  --create-namespace \
+  --version 2.14.0 \
+  --set watchNamespace=squad
+
+# Verify
+kubectl get pods -n keda
+```
+
+### Step 3: Install CSI Secrets Store driver
+
+The CSI driver mounts Azure Key Vault secrets as Kubernetes volumes (no Secrets in etcd).
+
+**Option A — AKS add-on (recommended):**
+
+```bash
+az aks enable-addons \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --addons azure-keyvault-secrets-provider
+
+# Verify
+kubectl get pods -n kube-system -l app=secrets-store-csi-driver
+kubectl get pods -n kube-system -l app=csi-secrets-store-provider-azure
+```
+
+**Option B — Helm:**
+
+```bash
+helm repo add csi-secrets-store-provider-azure \
+  https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
+helm repo update
+
+helm upgrade --install csi-secrets-store \
+  csi-secrets-store-provider-azure/csi-secrets-store-provider-azure \
+  --namespace kube-system \
+  --set syncSecret.enabled=true \
+  --set enableSecretRotation=true \
+  --set rotationPollInterval=2m
+```
+
+### Step 4: Configure Workload Identity + Key Vault
+
+This is the same for both paths. Workload Identity allows Squad pods to pull secrets
+from Key Vault without storing any credentials in the cluster.
+
+#### 4a. Create the Key Vault
+
+```bash
+az keyvault create \
+  --resource-group $RESOURCE_GROUP \
+  --name $KV_NAME \
+  --location $LOCATION \
+  --sku standard \
+  --enable-rbac-authorization true
+```
+
+#### 4b. Create the Managed Identity
 
 ```bash
 az identity create \
   --resource-group $RESOURCE_GROUP \
-  --name $IDENTITY_NAME
+  --name $IDENTITY_NAME \
+  --location $LOCATION
 
+# Capture the IDs we'll need
 IDENTITY_CLIENT_ID=$(az identity show \
   --resource-group $RESOURCE_GROUP \
   --name $IDENTITY_NAME \
@@ -170,9 +248,11 @@ IDENTITY_OBJECT_ID=$(az identity show \
   --resource-group $RESOURCE_GROUP \
   --name $IDENTITY_NAME \
   --query principalId -o tsv)
+
+TENANT_ID=$(az account show --query tenantId -o tsv)
 ```
 
-### Step 3 — Grant identity access to Key Vault
+#### 4c. Grant the identity access to Key Vault
 
 ```bash
 KV_ID=$(az keyvault show \
@@ -187,679 +267,607 @@ az role assignment create \
   --scope $KV_ID
 ```
 
-### Step 4 — Federate the identity with the K8s ServiceAccount
+#### 4d. Populate the secrets
 
 ```bash
-# The ServiceAccount name/namespace must match what Helm creates
+# GitHub token — must have: repo, read:org, issues:write
+az keyvault secret set \
+  --vault-name $KV_NAME \
+  --name "squad-gh-token" \
+  --value "ghp_YOURTOKEN"
+
+# Copilot / LLM API key
+az keyvault secret set \
+  --vault-name $KV_NAME \
+  --name "squad-copilot-api-key" \
+  --value "sk-YOUR_API_KEY"
+```
+
+#### 4e. Create the federated identity credential
+
+```bash
+OIDC_ISSUER=$(az aks show \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --query "oidcIssuerProfile.issuerUrl" -o tsv)
+
 az identity federated-credential create \
   --resource-group $RESOURCE_GROUP \
   --identity-name $IDENTITY_NAME \
   --name squad-aks-federation \
-  --issuer $OIDC_ISSUER \
-  --subject "system:serviceaccount:squad:squad-agents" \
+  --issuer "$OIDC_ISSUER" \
+  --subject "system:serviceaccount:${SQUAD_NAMESPACE}:squad-agents" \
   --audiences "api://AzureADTokenExchange"
 ```
 
-### Step 5 — Annotate the K8s ServiceAccount (handled by Helm)
-
-The Helm chart's `values.yaml` has:
-```yaml
-serviceAccount:
-  annotations:
-    azure.workload.identity/client-id: "<IDENTITY_CLIENT_ID>"
-```
-
-Set this at deploy time:
-```bash
-helm upgrade --install squad-agents infrastructure/helm/squad-agents/ \
-  --set serviceAccount.annotations."azure\.workload\.identity/client-id"=$IDENTITY_CLIENT_ID \
-  ...
-```
-
----
-
-## Azure Key Vault Integration
-
-Squad secrets (GitHub token, MCP API keys, webhook URLs) are stored in Key Vault and
-mounted into Pods via the **Secrets Store CSI Driver** (`secrets-store.csi.k8s.io`).
-
-### Install the CSI driver add-on
+#### 4f. Label the namespace for Workload Identity injection
 
 ```bash
-az aks enable-addons \
-  --resource-group $RESOURCE_GROUP \
-  --name $CLUSTER_NAME \
-  --addons azure-keyvault-secrets-provider
+kubectl create namespace $SQUAD_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl label namespace $SQUAD_NAMESPACE \
+  azure.workload.identity/use=true
 ```
 
-### Push secrets to Key Vault
+### Step 5: Deploy Squad Helm chart
 
 ```bash
-# GitHub token (classic PAT or fine-grained — until GitHub App support lands)
-az keyvault secret set \
-  --vault-name $KV_NAME \
-  --name "squad-gh-token" \
-  --value "$GH_TOKEN"
+ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
 
-# Copilot API key
-az keyvault secret set \
-  --vault-name $KV_NAME \
-  --name "squad-copilot-api-key" \
-  --value "$COPILOT_API_KEY"
-
-# Optional: MCP webhook URL
-az keyvault secret set \
-  --vault-name $KV_NAME \
-  --name "squad-mcp-webhook-url" \
-  --value "$MCP_WEBHOOK_URL"
-```
-
-### SecretProviderClass (created by Helm)
-
-The Helm chart generates a `SecretProviderClass` object that the CSI driver reads.
-It maps Key Vault secrets → environment variables projected into each Pod.
-
-```yaml
-# Excerpt from templates/secret-provider-class.yaml
-apiVersion: secrets-store.csi.x-k8s.io/v1
-kind: SecretProviderClass
-metadata:
-  name: squad-secrets
-spec:
-  provider: azure
-  secretObjects:
-    - secretName: squad-runtime-secrets
-      type: Opaque
-      data:
-        - objectName: squad-gh-token
-          key: GH_TOKEN
-        - objectName: squad-copilot-api-key
-          key: COPILOT_API_KEY
-  parameters:
-    usePodIdentity: "false"
-    clientID: "<IDENTITY_CLIENT_ID>"
-    keyvaultName: "<KV_NAME>"
-    objects: |
-      array:
-        - |
-          objectName: squad-gh-token
-          objectType: secret
-        - |
-          objectName: squad-copilot-api-key
-          objectType: secret
-    tenantId: "<TENANT_ID>"
-```
-
----
-
-## Container Images and ACR
-
-### Attach ACR to AKS
-
-```bash
-az aks update \
-  --resource-group $RESOURCE_GROUP \
-  --name $CLUSTER_NAME \
-  --attach-acr $ACR_NAME
-```
-
-This grants the AKS kubelet identity `AcrPull` on the registry — no `imagePullSecrets` needed.
-
-### Image strategy
-
-```
-Base:   mcr.microsoft.com/powershell:7-ubuntu-22.04
-Layer:  Node.js 20 LTS + npm
-Layer:  GitHub CLI (gh)
-Layer:  git, jq, curl, ca-certificates
-Layer:  Copilot CLI extension (gh extension install github/gh-copilot)
-Layer:  Squad app code (squad.config.ts, agent scripts, skills)
-```
-
-The existing `infrastructure/k8s/Dockerfile.ralph` is the starting point.
-For the full squad-agents chart, a single base image is used for all agents
-(Ralph, Picard, Seven, etc.) with the agent type selected via an environment variable.
-
-### Build and push manually
-
-```bash
-ACR_LOGIN_SERVER=$(az acr show \
-  --resource-group $RESOURCE_GROUP \
-  --name $ACR_NAME \
-  --query loginServer -o tsv)
-
-az acr login --name $ACR_NAME
-
-docker build \
-  -f infrastructure/k8s/Dockerfile.ralph \
-  -t $ACR_LOGIN_SERVER/squad-agents:latest \
-  -t $ACR_LOGIN_SERVER/squad-agents:$(git rev-parse --short HEAD) \
-  .
-
-docker push $ACR_LOGIN_SERVER/squad-agents:latest
-docker push $ACR_LOGIN_SERVER/squad-agents:$(git rev-parse --short HEAD)
-```
-
----
-
-## AKS Features to Leverage
-
-### Node pools per agent type
-
-Map Squad agent capabilities to node pool labels + taints:
-
-| Agent | Pool label | VM size | Rationale |
-|-------|-----------|---------|-----------|
-| Ralph | `pool=monitor` | Standard_D2s_v5 | Low CPU, mostly polling/waiting |
-| Picard | `pool=agent` | Standard_D8s_v5 | Reasoning workloads, can use Spot |
-| Seven | `pool=agent` | Standard_D8s_v5 | Document generation, parallel writes |
-| KAITO LLM | `pool=gpu` | Standard_NC6s_v3 | GPU inference (see KAITO section) |
-
-Set in `values.yaml`:
-```yaml
-ralph:
-  nodeSelector:
-    squad.github.com/pool: monitor
-  tolerations:
-    - key: squad.github.com/pool
-      operator: Equal
-      value: monitor
-      effect: NoSchedule
-```
-
-### KEDA for event-driven scaling
-
-[KEDA](https://keda.sh) scales Squad agent Deployments based on GitHub issue queue depth.
-Install via Helm or the AKS KEDA add-on:
-
-```bash
-# Enable KEDA add-on (AKS managed)
-az aks update \
-  --resource-group $RESOURCE_GROUP \
-  --name $CLUSTER_NAME \
-  --enable-keda
-```
-
-Example `ScaledObject` for Picard (scales based on open issues assigned to the agent):
-
-```yaml
-apiVersion: keda.sh/v1alpha1
-kind: ScaledObject
-metadata:
-  name: picard-scaler
-  namespace: squad
-spec:
-  scaleTargetRef:
-    name: picard
-  minReplicaCount: 0          # scale to zero when idle
-  maxReplicaCount: 3
-  triggers:
-    - type: github
-      metadata:
-        owner: tamirdresher_microsoft
-        repo: tamresearch1
-        labels: "squad:picard"
-        state: "open"
-        targetIssueCount: "2"  # scale up when >2 open picard issues
-      authenticationRef:
-        name: github-trigger-auth
-```
-
-> **Note:** KEDA's GitHub scaler requires a PAT or GitHub App token.
-> Store it in Key Vault and reference via `TriggerAuthentication`.
-
-### Azure Monitor integration
-
-```bash
-# Enable Container Insights
-az aks enable-addons \
-  --resource-group $RESOURCE_GROUP \
-  --name $CLUSTER_NAME \
-  --addons monitoring \
-  --workspace-resource-id $LAW_RESOURCE_ID
-```
-
-Squad-specific dashboard elements:
-- Ralph heartbeat metric → custom metric → alert if missing >10 min
-- Pod restart count per agent namespace
-- CPU/memory per agent type (node pool breakdown)
-- Log query: `ContainerLog | where LogEntry contains "ERROR" | project TimeGenerated, ContainerID, LogEntry`
-
----
-
-## Helm Chart Deployment
-
-The Helm chart at `infrastructure/helm/squad-agents/` is specific to AKS and extends
-the base `infrastructure/helm/squad/` chart with Azure-native resources.
-
-### Chart structure
-
-```
-infrastructure/helm/squad-agents/
-├── Chart.yaml
-├── values.yaml
-└── templates/
-    ├── _helpers.tpl
-    ├── namespace.yaml
-    ├── serviceaccount.yaml
-    ├── secret-provider-class.yaml
-    ├── ralph-cronjob.yaml          ← Ralph: CronJob (5-min poll)
-    ├── picard-deployment.yaml      ← Picard: long-running Deployment
-    └── keda-scaledobject.yaml      ← KEDA scaling for Picard
-```
-
-### Deploy
-
-```bash
-# Add the squad namespace
-kubectl create namespace squad --dry-run=client -o yaml | kubectl apply -f -
-
-# Label namespace for Workload Identity webhook injection
-kubectl label namespace squad azure.workload.identity/use=true
-
-# Install / upgrade
-helm upgrade --install squad-agents infrastructure/helm/squad-agents/ \
-  --namespace squad \
-  --values infrastructure/helm/squad-agents/values.yaml \
+helm upgrade --install squad \
+  ./infrastructure/helm/squad-agents \
+  --namespace $SQUAD_NAMESPACE \
+  --create-namespace \
+  --set aksMode=standard \
+  --set nodeSelector.agentpool=squad \
   --set global.acrLoginServer=$ACR_LOGIN_SERVER \
   --set global.keyVaultName=$KV_NAME \
-  --set global.tenantId=$(az account show --query tenantId -o tsv) \
-  --set serviceAccount.annotations."azure\.workload\.identity/client-id"=$IDENTITY_CLIENT_ID \
-  --set ralph.image.tag=$(git rev-parse --short HEAD) \
-  --set picard.image.tag=$(git rev-parse --short HEAD)
+  --set global.tenantId=$TENANT_ID \
+  --set global.repository="tamirdresher_microsoft/tamresearch1" \
+  --set azure.managedIdentityClientId=$IDENTITY_CLIENT_ID \
+  --set keda.enabled=true \
+  --wait --timeout 5m
 ```
 
-### Verify
+> **Note on `aksMode=standard`:** The Helm chart uses this flag to generate post-install
+> NOTES.txt with the full checklist (node pool, CSI driver, KEDA, federated identity).
+> Setting `--set nodeSelector.agentpool=squad` pins all pods to the dedicated Squad node pool.
+> Omit it if you're running on the default system node pool.
+
+### Step 6: Verify
 
 ```bash
+# All Squad pods running
 kubectl get pods -n squad
-kubectl logs -n squad -l app.kubernetes.io/component=ralph --tail=50
+
+# Ralph CronJob scheduled
 kubectl get cronjob -n squad
+
+# Picard Deployment healthy
+kubectl get deployment -n squad
+
+# KEDA ScaledObject reconciled
+kubectl get scaledobject -n squad
+
+# TriggerAuthentication bound
+kubectl get triggerauthentication -n squad
+
+# Secrets mounted (CSI volumes present)
+kubectl describe pod -n squad -l app.kubernetes.io/name=picard | grep -A5 Volumes
+
+# Check Ralph ran successfully (view last job log)
+kubectl get jobs -n squad
+JOB=$(kubectl get jobs -n squad --sort-by=.metadata.creationTimestamp -o name | tail -1)
+kubectl logs -n squad $JOB
+```
+
+Expected output:
+```
+NAME                          READY   STATUS    RESTARTS   AGE
+picard-7d4f9b6c8-xk2vp        1/1     Running   0          3m
+ralph-28491234-z9qrt           0/1     Completed 0          2m
+
+NAME              SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE
+ralph             */5 * * * *   False     0        2m
 ```
 
 ---
 
-## GitHub Actions CI/CD Pipeline
+## Path 2: AKS Automatic (Production / Zero-Ops)
 
-Save as `.github/workflows/squad-agents-deploy.yml`:
+### When to use
 
-```yaml
-name: Squad Agents — Build & Deploy
+- Running Squad in production where reliability matters
+- Your team wants to eliminate manual cluster maintenance (no node pool management, no patching)
+- You're okay with the ~$150–200/mo cost in exchange for zero ops overhead
+- You need auto-healing, automatic node provisioning (Karpenter-based), and built-in monitoring
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'infrastructure/k8s/Dockerfile.ralph'
-      - 'ralph-watch.ps1'
-      - 'squad.config.ts'
-      - 'infrastructure/helm/squad-agents/**'
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: Target environment
-        required: true
-        default: dev
-        type: choice
-        options: [dev, stg, prod]
+### What's included automatically
 
-permissions:
-  id-token: write    # OIDC for Azure login
-  contents: read
+AKS Automatic bundles the following at cluster creation — you do **not** install these manually:
 
-env:
-  RESOURCE_GROUP: rg-squad-prod
-  CLUSTER_NAME: aks-squad-prod
-  ACR_NAME: acrsquadprod
-  HELM_CHART: infrastructure/helm/squad-agents
-  NAMESPACE: squad
+| Component | Standard Free | AKS Automatic |
+|-----------|:---:|:---:|
+| KEDA (event-driven scaling) | ❌ Manual install | ✅ Built-in |
+| CSI Secrets Store + Azure provider | ❌ Manual install | ✅ Built-in |
+| Workload Identity webhook | ❌ Manual (via `--enable-workload-identity`) | ✅ Built-in |
+| Node auto-provisioning | ❌ Manual node pools | ✅ Karpenter-based |
+| OS auto-patching | ❌ Manual `az aks upgrade` | ✅ Automatic |
+| Node pool management | ❌ You create/delete pools | ✅ Managed |
+| Default deny network policy | ❌ Optional | ✅ Enforced |
+| Azure Monitor managed metrics | ❌ Optional add-on | ✅ Built-in |
 
-jobs:
-  build-and-push:
-    name: Build & Push to ACR
-    runs-on: ubuntu-latest
-    outputs:
-      image-tag: ${{ steps.meta.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
+### Prerequisites
 
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: ACR Login
-        run: az acr login --name ${{ env.ACR_NAME }}
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.ACR_NAME }}.azurecr.io/squad-agents
-          tags: |
-            type=sha,prefix=
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-
-      - name: Build & Push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: infrastructure/k8s/Dockerfile.ralph
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/squad-agents:buildcache
-          cache-to: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/squad-agents:buildcache,mode=max
-
-  deploy:
-    name: Helm Deploy to AKS
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'dev' }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Get AKS credentials
-        run: |
-          az aks get-credentials \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --name ${{ env.CLUSTER_NAME }} \
-            --overwrite-existing
-
-      - name: Helm upgrade
-        run: |
-          helm upgrade --install squad-agents ${{ env.HELM_CHART }} \
-            --namespace ${{ env.NAMESPACE }} \
-            --create-namespace \
-            --atomic \
-            --timeout 5m \
-            --set global.acrLoginServer=${{ env.ACR_NAME }}.azurecr.io \
-            --set global.keyVaultName=${{ secrets.KV_NAME }} \
-            --set global.tenantId=${{ secrets.AZURE_TENANT_ID }} \
-            --set serviceAccount.annotations."azure\.workload\.identity/client-id"=${{ secrets.IDENTITY_CLIENT_ID }} \
-            --set ralph.image.tag=${{ needs.build-and-push.outputs.image-tag }} \
-            --set picard.image.tag=${{ needs.build-and-push.outputs.image-tag }}
-
-      - name: Verify rollout
-        run: |
-          kubectl rollout status deployment/picard -n ${{ env.NAMESPACE }} --timeout=2m
-          kubectl get pods -n ${{ env.NAMESPACE }}
-```
-
-> **GitHub Actions OIDC → Azure:** The workflow uses federated credentials
-> (`AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID`) stored as
-> GitHub Actions secrets — no long-lived service principal passwords.
-
----
-
-## Monitoring and Observability
-
-### Log Analytics queries
-
-```kusto
-// Ralph heartbeat gaps (missing heartbeats > 10 min)
-ContainerLog
-| where ContainerGroup startswith "ralph"
-| where LogEntry contains "heartbeat"
-| summarize LastHeartbeat=max(TimeGenerated) by ContainerGroup
-| where LastHeartbeat < ago(10m)
-| project ContainerGroup, LastHeartbeat, GapMinutes=datetime_diff('minute', now(), LastHeartbeat)
-
-// Agent errors in last hour
-ContainerLog
-| where TimeGenerated > ago(1h)
-| where LogEntry contains "ERROR" or LogEntry contains "FATAL"
-| project TimeGenerated, ContainerGroup, LogEntry
-| order by TimeGenerated desc
-
-// CronJob execution history
-KubeEvents
-| where ObjectKind == "Job"
-| where Namespace == "squad"
-| project TimeGenerated, Name, Reason, Message
-| order by TimeGenerated desc
-```
-
-### Alert rules
-
-| Alert | Condition | Severity |
-|-------|-----------|----------|
-| Ralph heartbeat missing | No heartbeat log in 10 min | Critical (Sev 1) |
-| Pod crash loop | `kube_pod_container_status_restarts_total` rate > 3/5min | High (Sev 2) |
-| Image pull failure | `KubeEvents` `Reason=Failed` for `squad` namespace | Medium (Sev 3) |
-| Node pool scaling blocked | Cluster autoscaler can't provision node | High (Sev 2) |
-
----
-
-## Step-by-Step Deployment Walkthrough
-
-> Estimated time: ~45 minutes end-to-end on a fresh Azure subscription.
+Same tools as Path 1:
 
 ```bash
-# 0. Clone repo and set variables
-git clone https://github.com/tamirdresher_microsoft/tamresearch1
-cd tamresearch1
+az --version       # Azure CLI >= 2.56
+kubectl version    # >= 1.29
+helm version       # >= 3.14
+gh --version       # >= 2.45
+```
 
-export RESOURCE_GROUP="rg-squad-prod"
-export LOCATION="eastus2"
-export CLUSTER_NAME="aks-squad-prod"
-export ACR_NAME="acrsquadprod$(openssl rand -hex 4)"  # ensure global uniqueness
-export KV_NAME="kv-squad-$(openssl rand -hex 4)"
-export IDENTITY_NAME="id-squad-workload"
-export NAMESPACE="squad"
+Permissions:
+- `Contributor` on the resource group
+- `Key Vault Secrets Officer`
+- `AcrPush` on ACR
 
-# 1. Create resource group
-az group create --name $RESOURCE_GROUP --location $LOCATION
+### Step 1: Create AKS Automatic cluster
 
-# 2. Create ACR
-az acr create \
-  --resource-group $RESOURCE_GROUP \
-  --name $ACR_NAME \
-  --sku Standard
+```bash
+# Core variables
+RESOURCE_GROUP="rg-squad-prod"
+LOCATION="eastus2"
+CLUSTER_NAME="aks-squad-prod"
+ACR_NAME="acrsquadprod"       # Must be globally unique
+KV_NAME="kv-squad-prod"
+IDENTITY_NAME="id-squad-workload"
+SQUAD_NAMESPACE="squad"
 
-# 3. Create AKS cluster (system pool only to start)
+# Create resource group
+az group create \
+  --name $RESOURCE_GROUP \
+  --location $LOCATION
+
+# Create AKS Automatic cluster
+# --sku automatic enables all built-in managed components
 az aks create \
   --resource-group $RESOURCE_GROUP \
   --name $CLUSTER_NAME \
-  --node-count 2 \
-  --node-vm-size Standard_D4s_v5 \
-  --enable-oidc-issuer \
-  --enable-workload-identity \
-  --attach-acr $ACR_NAME \
+  --sku automatic \
+  --location $LOCATION \
   --generate-ssh-keys \
-  --enable-addons monitoring,azure-keyvault-secrets-provider
+  --attach-acr $ACR_NAME
 
-# 4. Create Key Vault and push secrets
+# Merge kubeconfig
+az aks get-credentials \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --overwrite-existing
+
+# Confirm connection and verify built-in components
+kubectl get nodes
+kubectl get pods -n kube-system | grep -E "keda|secrets-store|workload"
+```
+
+> **No node pool management needed.** AKS Automatic uses node auto-provisioning (NAP) based
+> on Karpenter. Pods are scheduled to right-sized nodes automatically — no `az aks nodepool add`
+> commands required.
+
+### Step 2: Configure Workload Identity + Key Vault
+
+KEDA and CSI are already installed. You only need to wire up the identity and secrets.
+
+#### 2a. Create the Key Vault
+
+```bash
 az keyvault create \
   --resource-group $RESOURCE_GROUP \
   --name $KV_NAME \
-  --enable-rbac-authorization
+  --location $LOCATION \
+  --sku standard \
+  --enable-rbac-authorization true
+```
 
-az keyvault secret set --vault-name $KV_NAME --name "squad-gh-token"        --value "$GH_TOKEN"
-az keyvault secret set --vault-name $KV_NAME --name "squad-copilot-api-key" --value "$COPILOT_API_KEY"
+#### 2b. Create the Managed Identity
 
-# 5. Create Managed Identity and federate
-az identity create --resource-group $RESOURCE_GROUP --name $IDENTITY_NAME
-IDENTITY_CLIENT_ID=$(az identity show -g $RESOURCE_GROUP -n $IDENTITY_NAME --query clientId -o tsv)
-IDENTITY_OBJECT_ID=$(az identity show -g $RESOURCE_GROUP -n $IDENTITY_NAME --query principalId -o tsv)
-KV_ID=$(az keyvault show -g $RESOURCE_GROUP -n $KV_NAME --query id -o tsv)
-OIDC_ISSUER=$(az aks show -g $RESOURCE_GROUP -n $CLUSTER_NAME --query "oidcIssuerProfile.issuerUrl" -o tsv)
+```bash
+az identity create \
+  --resource-group $RESOURCE_GROUP \
+  --name $IDENTITY_NAME \
+  --location $LOCATION
+
+IDENTITY_CLIENT_ID=$(az identity show \
+  --resource-group $RESOURCE_GROUP \
+  --name $IDENTITY_NAME \
+  --query clientId -o tsv)
+
+IDENTITY_OBJECT_ID=$(az identity show \
+  --resource-group $RESOURCE_GROUP \
+  --name $IDENTITY_NAME \
+  --query principalId -o tsv)
+
+TENANT_ID=$(az account show --query tenantId -o tsv)
+```
+
+#### 2c. Grant the identity access to Key Vault
+
+```bash
+KV_ID=$(az keyvault show \
+  --resource-group $RESOURCE_GROUP \
+  --name $KV_NAME \
+  --query id -o tsv)
 
 az role assignment create \
   --assignee-object-id $IDENTITY_OBJECT_ID \
   --assignee-principal-type ServicePrincipal \
   --role "Key Vault Secrets User" \
   --scope $KV_ID
+```
+
+#### 2d. Populate the secrets
+
+```bash
+az keyvault secret set \
+  --vault-name $KV_NAME \
+  --name "squad-gh-token" \
+  --value "ghp_YOURTOKEN"
+
+az keyvault secret set \
+  --vault-name $KV_NAME \
+  --name "squad-copilot-api-key" \
+  --value "sk-YOUR_API_KEY"
+```
+
+#### 2e. Create the federated identity credential
+
+```bash
+# AKS Automatic always has OIDC issuer enabled
+OIDC_ISSUER=$(az aks show \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --query "oidcIssuerProfile.issuerUrl" -o tsv)
 
 az identity federated-credential create \
   --resource-group $RESOURCE_GROUP \
   --identity-name $IDENTITY_NAME \
   --name squad-aks-federation \
-  --issuer $OIDC_ISSUER \
-  --subject "system:serviceaccount:${NAMESPACE}:squad-agents" \
+  --issuer "$OIDC_ISSUER" \
+  --subject "system:serviceaccount:${SQUAD_NAMESPACE}:squad-agents" \
   --audiences "api://AzureADTokenExchange"
+```
 
-# 6. Get kubeconfig
-az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
+#### 2f. Label the namespace
 
-# 7. Build and push Squad container image
-ACR_LOGIN_SERVER=$(az acr show -g $RESOURCE_GROUP -n $ACR_NAME --query loginServer -o tsv)
-az acr login --name $ACR_NAME
-IMAGE_TAG=$(git rev-parse --short HEAD)
+```bash
+kubectl create namespace $SQUAD_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
-docker build \
-  -f infrastructure/k8s/Dockerfile.ralph \
-  -t $ACR_LOGIN_SERVER/squad-agents:$IMAGE_TAG \
-  -t $ACR_LOGIN_SERVER/squad-agents:latest .
+kubectl label namespace $SQUAD_NAMESPACE \
+  azure.workload.identity/use=true
+```
 
-docker push $ACR_LOGIN_SERVER/squad-agents:$IMAGE_TAG
-docker push $ACR_LOGIN_SERVER/squad-agents:latest
+### Step 3: Deploy Squad Helm chart
 
-# 8. Deploy with Helm
-kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-kubectl label namespace $NAMESPACE azure.workload.identity/use=true
+```bash
+ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
 
-TENANT_ID=$(az account show --query tenantId -o tsv)
-
-helm upgrade --install squad-agents infrastructure/helm/squad-agents/ \
-  --namespace $NAMESPACE \
-  --atomic --timeout 5m \
+helm upgrade --install squad \
+  ./infrastructure/helm/squad-agents \
+  --namespace $SQUAD_NAMESPACE \
+  --create-namespace \
+  --set aksMode=automatic \
   --set global.acrLoginServer=$ACR_LOGIN_SERVER \
   --set global.keyVaultName=$KV_NAME \
   --set global.tenantId=$TENANT_ID \
-  --set serviceAccount.annotations."azure\.workload\.identity/client-id"=$IDENTITY_CLIENT_ID \
-  --set ralph.image.tag=$IMAGE_TAG \
-  --set picard.image.tag=$IMAGE_TAG \
-  --set global.repository="tamirdresher_microsoft/tamresearch1"
+  --set global.repository="tamirdresher_microsoft/tamresearch1" \
+  --set azure.managedIdentityClientId=$IDENTITY_CLIENT_ID \
+  --set keda.enabled=true \
+  --wait --timeout 5m
+```
 
-# 9. Verify
-kubectl get pods -n $NAMESPACE
-kubectl logs -n $NAMESPACE -l app.kubernetes.io/component=ralph --tail=30
-kubectl get cronjob -n $NAMESPACE
+> **Note on `aksMode=automatic`:** No `nodeSelector` is passed — AKS Automatic's node
+> auto-provisioner schedules pods on right-sized nodes without explicit pool targeting.
+> The Helm chart omits `nodeSelector` from all Pod specs when `aksMode=automatic`.
 
-echo "Squad deployed. Ralph will run on its first CronJob tick within 5 minutes."
+### Step 4: Verify
+
+```bash
+# All Squad pods running
+kubectl get pods -n squad
+
+# Ralph CronJob scheduled
+kubectl get cronjob -n squad
+
+# Picard Deployment healthy
+kubectl get deployment -n squad
+
+# KEDA ScaledObjects active
+kubectl get scaledobject -n squad
+kubectl describe scaledobject -n squad picard-scaler | grep -A3 "Status:"
+
+# Node auto-provisioner chose an appropriate VM size
+kubectl get nodes -L kubernetes.azure.com/node-image-version
+
+# Check Key Vault secrets mounted
+kubectl exec -n squad deploy/picard -- ls /mnt/secrets-store/
 ```
 
 ---
 
-## KAITO Consideration for LLM Inference
+## Cost Comparison Table
 
-[KAITO (Kubernetes AI Toolchain Operator)](https://github.com/azure/kaito) can host
-open-weight LLM models (Llama, Mistral, Phi) on AKS GPU node pools.
+| Feature | AKS Standard Free | AKS Automatic |
+|---------|:-----------------:|:-------------:|
+| **Estimated monthly cost** | ~$55–80 | ~$150–200 |
+| **Control plane** | Free (no SLA) | Managed (99.9% SLA) |
+| **KEDA** | Manual install (add-on or Helm) | ✅ Built-in |
+| **CSI Secrets Store** | Manual install (add-on or Helm) | ✅ Built-in |
+| **Workload Identity webhook** | Manual (`--enable-workload-identity`) | ✅ Built-in |
+| **Node pool management** | Manual (`az aks nodepool add/delete`) | ✅ Auto-provisioned |
+| **OS patching** | Manual (`az aks upgrade`) | ✅ Automatic |
+| **Node auto-healing** | Limited | ✅ Full |
+| **Network policy** | Optional (Calico/Azure) | ✅ Default deny enforced |
+| **Azure Monitor metrics** | Optional add-on | ✅ Built-in managed Prometheus |
+| **Spot VM support** | ✅ Manual nodepool | ❌ Not supported in Automatic |
+| **Setup steps (Squad)** | ~12 steps | ~7 steps |
+| **Recommended for** | Dev / staging | Production |
+| **Helm flag** | `--set aksMode=standard` | `--set aksMode=automatic` |
+| **nodeSelector required** | Yes (`agentpool=squad`) | No |
 
-### When to use KAITO with Squad
+### Cost breakdown (Standard Free, 2-node D2s_v3)
 
-| Scenario | KAITO | Azure OpenAI / Copilot |
-|----------|-------|----------------------|
-| Offline / air-gapped | ✅ | ❌ |
-| Cost-sensitive at high volume | ✅ (amortized GPU) | ❌ (per-token) |
-| Latest frontier models | ❌ | ✅ |
-| Sub-100ms latency | ❌ (GPU cold start) | ✅ |
-| Compliance (data never leaves tenant) | ✅ | Depends on config |
+| Resource | Monthly |
+|----------|---------|
+| 2× Standard_D2s_v3 nodes (always-on system pool) | ~$140 → with Reserved: ~$55 |
+| Azure Key Vault (< 10k operations) | ~$0.50 |
+| Azure Container Registry (Basic) | ~$5 |
+| Log Analytics (< 1 GB/day) | ~$2 |
+| **Total** | **~$63–80/mo** |
 
-### KAITO workspace example
+### Cost breakdown (AKS Automatic)
 
-```yaml
-# infrastructure/k8s/kaito-workspace.yaml
-apiVersion: kaito.sh/v1alpha1
-kind: Workspace
-metadata:
-  name: squad-llm
-  namespace: squad
-resource:
-  instanceType: "Standard_NC6s_v3"
-  labelSelector:
-    matchLabels:
-      squad.github.com/pool: gpu
-inference:
-  preset:
-    name: "phi-3-mini-4k-instruct"   # small, fast, 4B params
-```
-
-```bash
-# Install KAITO
-helm repo add kaito https://azure.github.io/kaito/
-helm install kaito kaito/kaito-workspace --namespace kaito-system --create-namespace
-
-# Apply workspace
-kubectl apply -f infrastructure/k8s/kaito-workspace.yaml
-
-# Wait for GPU node provisioning (~10 min)
-kubectl get workspace squad-llm -n squad -w
-```
-
-**Recommendation for issue #1060:** Start with Azure OpenAI / Copilot CLI for agent
-reasoning (zero infrastructure, proven). Add KAITO for specific high-volume or
-privacy-sensitive inference tasks as a later optimization.
+| Resource | Monthly |
+|----------|---------|
+| AKS Automatic control plane | ~$73 |
+| Node auto-provisioner base (system nodes) | ~$60–80 |
+| Azure Key Vault | ~$0.50 |
+| Azure Container Registry (Basic) | ~$5 |
+| Log Analytics (managed Prometheus) | ~$10–20 |
+| **Total** | **~$150–180/mo** |
 
 ---
 
-## Cost Optimization
+## Migrating from Standard to Automatic
 
-| Technique | Estimated savings | Notes |
-|-----------|------------------|-------|
-| Spot node pool for agent workers | 60–80% | Use `--priority Spot` on `squadagent` pool |
-| Scale-to-zero with KEDA | Proportional to idle time | Picard/Seven pool scales to 0 replicas when queue empty |
-| Ralph as CronJob (not Deployment) | ~1 CPU always-on → bursty | CronJob = pod only runs during 5-min window |
-| ACR geo-replication only where needed | Standard tier vs Premium | Skip unless multi-region |
-| Reserved Instances for system pool | ~40% | 1-year RI on system node pool VMs |
-| Log Analytics retention | Volume-based | Reduce retention to 30 days for debug logs |
-| Shutdown non-prod clusters at night | Dev/test only | AKS stop/start feature |
+When your Squad deployment outgrows dev and you're ready for production:
+
+### Step 1: Build and push images to production ACR
 
 ```bash
-# Stop a dev cluster overnight
-az aks stop --resource-group $RESOURCE_GROUP --name aks-squad-dev
+# From your current Standard setup
+ACR_PROD="acrsquadprod"
+ACR_DEV="acrsquaddev"
 
-# Start it back up
-az aks start --resource-group $RESOURCE_GROUP --name aks-squad-dev
+# Re-tag and push to prod ACR
+az acr import \
+  --name $ACR_PROD \
+  --source ${ACR_DEV}.azurecr.io/squad-agents:latest \
+  --image squad-agents:latest
+```
+
+### Step 2: Export your current Helm values
+
+```bash
+helm get values squad -n squad > squad-values-backup.yaml
+```
+
+### Step 3: Create the AKS Automatic cluster
+
+Follow [Path 2, Step 1](#step-1-create-aks-automatic-cluster) using a new resource group
+(`rg-squad-prod`) to avoid touching the dev cluster.
+
+### Step 4: Migrate Key Vault secrets
+
+Option A — re-run `az keyvault secret set` commands against the new Key Vault.
+
+Option B — copy secrets between vaults:
+
+```bash
+KV_DEV="kv-squad-dev"
+KV_PROD="kv-squad-prod"
+
+for SECRET in squad-gh-token squad-copilot-api-key; do
+  VALUE=$(az keyvault secret show \
+    --vault-name $KV_DEV \
+    --name $SECRET \
+    --query value -o tsv)
+  az keyvault secret set \
+    --vault-name $KV_PROD \
+    --name $SECRET \
+    --value "$VALUE"
+done
+```
+
+### Step 5: Create the federated identity credential for the new cluster
+
+```bash
+# New OIDC issuer from the Automatic cluster
+OIDC_ISSUER_PROD=$(az aks show \
+  --resource-group rg-squad-prod \
+  --name aks-squad-prod \
+  --query "oidcIssuerProfile.issuerUrl" -o tsv)
+
+az identity federated-credential create \
+  --resource-group rg-squad-prod \
+  --identity-name id-squad-workload \
+  --name squad-aks-prod-federation \
+  --issuer "$OIDC_ISSUER_PROD" \
+  --subject "system:serviceaccount:squad:squad-agents" \
+  --audiences "api://AzureADTokenExchange"
+```
+
+### Step 6: Helm upgrade with aksMode=automatic
+
+```bash
+helm upgrade --install squad \
+  ./infrastructure/helm/squad-agents \
+  --namespace squad \
+  --create-namespace \
+  --set aksMode=automatic \
+  --set global.acrLoginServer=acrsquadprod.azurecr.io \
+  --set global.keyVaultName=kv-squad-prod \
+  --set global.tenantId=$TENANT_ID \
+  --set global.repository="tamirdresher_microsoft/tamresearch1" \
+  --set azure.managedIdentityClientId=$IDENTITY_CLIENT_ID \
+  --set keda.enabled=true \
+  --wait --timeout 5m
+```
+
+### Step 7: Validate and decommission dev cluster
+
+```bash
+# Confirm prod Squad is healthy
+kubectl get pods -n squad
+kubectl get scaledobject -n squad
+
+# Delete dev cluster (after a validation period — recommended: 1 week)
+az aks delete \
+  --resource-group rg-squad-dev \
+  --name aks-squad-dev \
+  --yes --no-wait
 ```
 
 ---
 
 ## Troubleshooting
 
-### gh CLI auth fails in container
+### Standard Free — KEDA ScaledObject not scaling
+
 ```bash
-# Verify GH_TOKEN is mounted
-kubectl exec -n squad <pod-name> -- env | grep GH_TOKEN
-# If empty: check SecretProviderClass and CSI driver logs
-kubectl logs -n kube-system -l app=csi-secrets-store-provider-azure
+# Check KEDA operator logs
+kubectl logs -n keda deploy/keda-operator | tail -50
+
+# Check TriggerAuthentication
+kubectl describe triggerauthentication -n squad squad-trigger-auth
+
+# Verify the GitHub token secret is accessible
+kubectl get secret -n squad squad-runtime-secrets
 ```
 
-### Pod stuck in `Init:0/1`
-The CSI sidecar is waiting to mount Key Vault secrets. Check:
+**Common cause:** The federated credential subject doesn't match the ServiceAccount namespace/name.
+Verify: `az identity federated-credential list --identity-name $IDENTITY_NAME --resource-group $RESOURCE_GROUP`
+
+---
+
+### Standard Free — CSI secret not mounted
+
 ```bash
-kubectl describe pod -n squad <pod-name>
-# Look for events like: "failed to mount secrets store objects"
-# Usually means the Managed Identity doesn't have Key Vault Secrets User role
+# Check SecretProviderClass
+kubectl describe secretproviderclass -n squad squad-keyvault
+
+# Check pod events for CSI mount failures
+kubectl describe pod -n squad <pod-name> | grep -A20 Events
+
+# Check CSI driver logs
+kubectl logs -n kube-system -l app=secrets-store-csi-driver | tail -30
 ```
 
-### Ralph CronJob not triggering
+**Common cause:** `tenantId` or `clientId` mismatch in the SecretProviderClass. Re-check
+`--set global.tenantId=` and `--set azure.managedIdentityClientId=` in your Helm command.
+
+---
+
+### AKS Automatic — Pod stuck in Pending (node provisioning)
+
 ```bash
-kubectl describe cronjob ralph -n squad
-# Check "Last Schedule Time" — if it's never run, check namespace labels
-kubectl get namespace squad --show-labels
-# Must have: azure.workload.identity/use=true
+# Check node provisioner events
+kubectl describe node -l kubernetes.azure.com/node-provisioner=napcontroller | tail -30
+
+# Check pod events
+kubectl describe pod -n squad <pod-name> | grep -A10 Events
 ```
 
-### Image pull errors
+**Common cause:** Pod resource requests exceed what AKS Automatic can provision within the
+configured NodePool constraints. Check `kubectl get nodepool -A` and verify the CPU/memory
+limits in `values.yaml`.
+
+---
+
+### Both paths — Workload Identity token not acquired
+
 ```bash
-kubectl describe pod -n squad <pod-name>
-# If "unauthorized": re-run `az aks update --attach-acr <acr-name>`
-# ACR attachment grants AcrPull to the AKS kubelet managed identity
+# Confirm the namespace label is set
+kubectl get namespace squad --show-labels | grep workload-identity
+
+# Confirm the ServiceAccount annotation is present
+kubectl get serviceaccount -n squad squad-agents -o yaml | grep client-id
+
+# Test token projection manually
+kubectl exec -n squad deploy/picard -- cat /var/run/secrets/azure/tokens/azure-identity-token
+```
+
+**Common cause:** The `azure.workload.identity/use=true` label is missing from the namespace,
+or the `azure.workload.identity/client-id` annotation is missing/wrong on the ServiceAccount.
+
+---
+
+### Both paths — Ralph CronJob not running
+
+```bash
+# Check CronJob spec
+kubectl get cronjob -n squad ralph -o yaml | grep -A5 schedule
+
+# Manually trigger a run for testing
+kubectl create job -n squad ralph-manual-test \
+  --from=cronjob/ralph
+
+# Follow the logs
+kubectl logs -n squad job/ralph-manual-test -f
+```
+
+**Common cause:** `keda.enabled=false` in values causes the KEDA ScaledObject to not be
+deployed, but the CronJob itself runs independently. If you see `Forbid` on overlapping runs,
+a previous run may still be active — check `kubectl get jobs -n squad`.
+
+---
+
+### Both paths — ACR image pull failure (`ImagePullBackOff`)
+
+```bash
+# Verify ACR attachment
+az aks check-acr \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --acr $ACR_NAME
+
+# Re-attach if needed
+az aks update \
+  --resource-group $RESOURCE_GROUP \
+  --name $CLUSTER_NAME \
+  --attach-acr $ACR_NAME
 ```
 
 ---
 
-*Generated as part of #1060 — Squad on AKS: Azure-native deployment*
-*See also: #1059 (K8s architecture), #994 (Squad-on-K8s), #997 (AKS + KAITO)*
+## Reference: Helm Values Quick Reference
+
+| Value | Default | Description |
+|-------|---------|-------------|
+| `aksMode` | `standard` | `standard` or `automatic` — controls nodeSelector and NOTES.txt |
+| `nodeSelector.agentpool` | _(empty)_ | Node pool label; set to `squad` for Standard dedicated pool |
+| `azure.managedIdentityClientId` | `""` | Managed Identity client ID for Workload Identity annotation |
+| `global.keyVaultName` | `""` | Azure Key Vault name for CSI secret mounting |
+| `global.tenantId` | `""` | Azure Tenant ID for CSI driver |
+| `global.acrLoginServer` | `""` | ACR login server (e.g. `acrsquadprod.azurecr.io`) |
+| `global.repository` | `tamirdresher_microsoft/tamresearch1` | GitHub repo for Squad agents |
+| `keda.enabled` | `false` | Enable KEDA ScaledObject for Picard autoscaling |
+| `keda.picard.minReplicaCount` | `0` | Scale-to-zero when no open picard issues |
+| `keda.picard.maxReplicaCount` | `3` | Maximum Picard replicas |
+| `ralph.schedule` | `*/5 * * * *` | CronJob schedule |
+
+Full values reference: [`infrastructure/helm/squad-agents/values.yaml`](../infrastructure/helm/squad-agents/values.yaml)
+
+---
+
+*Last updated: relates to PR #1162 (AKS Automatic eval), PR #1174 (Helm aksMode), Issue #1161 (this guide)*

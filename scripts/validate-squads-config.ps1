@@ -60,9 +60,16 @@ if ($Path) {
     }
     $configFiles = @($Path)
 } else {
-    $configFiles = Get-ChildItem -Path $repoRoot -Recurse -Force -Filter "config.json" | 
+    Write-Host "DEBUG: Searching for .squads/config.json files from repo root: $repoRoot" -ForegroundColor Cyan
+    $allConfigFiles = Get-ChildItem -Path $repoRoot -Recurse -Filter "config.json" -Force
+    Write-Host "DEBUG: Found $($allConfigFiles.Count) total config.json files" -ForegroundColor Cyan
+    $configFiles = $allConfigFiles | 
         Where-Object { $_.Directory.Name -eq ".squads" } |
         Select-Object -ExpandProperty FullName
+    Write-Host "DEBUG: Filtered to $($configFiles.Count) files in .squads directories" -ForegroundColor Cyan
+    foreach ($f in $configFiles) {
+        Write-Host "DEBUG:   - $f" -ForegroundColor Cyan
+    }
 }
 
 if ($configFiles.Count -eq 0) {

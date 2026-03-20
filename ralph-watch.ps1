@@ -83,6 +83,18 @@ trap {
     break 
 }
 
+# ---------------------------------------------------------------------------
+# Cooperative rate-limit coordination (Issue #1165)
+# Dot-source the shared library so all Squad agents share the same quota pool.
+# ---------------------------------------------------------------------------
+$RateLimitManagerPath = Join-Path $PSScriptRoot "scripts/rate-limit-manager.ps1"
+if (Test-Path $RateLimitManagerPath) { . $RateLimitManagerPath }
+
+# Register this Ralph instance in the shared pool (P1 — interactive work)
+if (Get-Command Register-Agent -ErrorAction SilentlyContinue) {
+    Register-Agent -AgentId "ralph-$env:COMPUTERNAME" -Priority 1
+}
+
 $defaultIntervalMinutes = 5
 $intervalMinutes = $defaultIntervalMinutes
 $roundTimeoutMinutes = 20  # Kill round if it exceeds this (prevents hangs)
@@ -1153,7 +1165,12 @@ function Get-StaleIssues {
     
     try {
         # Get all open issues with ralph:*:active labels
-        $issues = gh issue list --json number,labels,comments --limit 100 2>$null | ConvertFrom-Json
+        $issueJson = if (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue) {
+            Invoke-ApiWithRateLimit -ScriptBlock { gh issue list --json number,labels,comments --limit 100 2>$null } -Priority 1 -CallerName "ralph-stale-check"
+        } else {
+            gh issue list --json number,labels,comments --limit 100 2>$null
+        }
+        $issues = $issueJson | ConvertFrom-Json
         
         foreach ($issue in $issues) {
             # Find ralph:*:active labels from other machines
@@ -1194,7 +1211,11 @@ function Get-StaleIssues {
 # Shared rate pool at ~/.squad/rate-pool.json allows multiple Ralph
 # instances to coordinate API budget. Includes circuit breaker,
 # budget tracking, and priority lanes.
+# NOTE: When scripts/rate-limit-manager.ps1 is dot-sourced (Issue #1165),
+# these functions are replaced by the shared library. This block is kept
+# as a self-contained fallback when the library is absent.
 # -------------------------------------------------------------------
+if (-not (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue)) {
 
 $ratePoolPath = Join-Path $env:USERPROFILE ".squad\rate-pool.json"
 $ratePoolWindowMinutes = 60  # Budget window resets every hour
@@ -1452,6 +1473,8 @@ function Test-BudgetAvailable {
 
     return $result
 }
+# END fallback rate-pool block (Issue #1165)
+} # end: if (-not (Get-Command Invoke-ApiWithRateLimit))
 
 function Get-IssuePriority {
     <#
@@ -1856,7 +1879,12 @@ while ($true) {
         try {
             # Find issues with our machine's label
             $myLabel = "ralph:${machineId}:active"
-            $myIssues = gh issue list --label $myLabel --json number --limit 50 2>$null | ConvertFrom-Json
+            $myIssueJson = if (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue) {
+                Invoke-ApiWithRateLimit -ScriptBlock { gh issue list --label $myLabel --json number --limit 50 2>$null } -Priority 1 -CallerName "ralph-heartbeat"
+            } else {
+                gh issue list --label $myLabel --json number --limit 50 2>$null
+            }
+            $myIssues = $myIssueJson | ConvertFrom-Json
             foreach ($issue in $myIssues) {
                 Update-IssueHeartbeat -IssueNumber $issue.number -MachineId $machineId
             }
@@ -1895,7 +1923,8 @@ while ($true) {
     }
 
     # Guard 1: Circuit breaker — if open and cooling down, skip this round
-    if (Test-CircuitBreaker) {
+    # (only when fallback inline pool is active; rate-limit-manager handles this internally)
+    if ((Get-Command Test-CircuitBreaker -ErrorAction SilentlyContinue) -and (Test-CircuitBreaker)) {
         Write-Host "[$displayTime] [rate-pool] Skipping round $round — circuit breaker is OPEN" -ForegroundColor Red
         Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "CIRCUIT_BREAKER" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
         Update-Heartbeat -Round $round -Status "circuit_breaker" -ConsecutiveFailures $consecutiveFailures
@@ -1905,8 +1934,10 @@ while ($true) {
     # Guard 2: Budget check — adjust parallelism or skip if exhausted
     $budgetStatus = $null
     if (-not $skipRound) {
-        $budgetStatus = Test-BudgetAvailable
-        if (-not $budgetStatus.Available) {
+        if (Get-Command Test-BudgetAvailable -ErrorAction SilentlyContinue) {
+            $budgetStatus = Test-BudgetAvailable
+        }
+        if ($budgetStatus -and -not $budgetStatus.Available) {
             Write-Host "[$displayTime] [rate-pool] Skipping round $round — budget exhausted ($($budgetStatus.BudgetPct)%)" -ForegroundColor Red
             Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "BUDGET_EXHAUSTED" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
             Update-Heartbeat -Round $round -Status "budget_exhausted" -ConsecutiveFailures $consecutiveFailures
@@ -1934,7 +1965,9 @@ while ($true) {
     Write-Host "[$displayTime] [rate-pool] Round $round proceeding$ratePoolInfo" -ForegroundColor DarkCyan
 
     # Update rate pool: register this machine's activity for the round
-    Update-RatePool -Tier "standard" -Got429 $false
+    if (Get-Command Update-RatePool -ErrorAction SilentlyContinue) {
+        Update-RatePool -Tier "standard" -Got429 $false
+    }
 
     # Step 2: Run the agency copilot and capture exit code + output
     $exitCode = 0
@@ -2116,7 +2149,12 @@ exit `$LASTEXITCODE
                 }
             }
         }
-        Update-RatePool -Tier "standard" -Got429 $got429
+        if (Get-Command Update-RatePool -ErrorAction SilentlyContinue) {
+            Update-RatePool -Tier "standard" -Got429 $got429
+        } elseif ($got429 -and (Get-Command Register-RateLimitHit -ErrorAction SilentlyContinue)) {
+            # Use new library's 429 registration when rate-limit-manager is present
+            Register-RateLimitHit -Api "github" -AgentId "ralph-$env:COMPUTERNAME"
+        }
 
         # Model circuit breaker: update state based on rate limit detection
         if ($got429) {

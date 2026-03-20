@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "area": {
+    "name": "platform",
+    "displayName": "Platform Infrastructure",
+    "path": "examples/platform-area",
+    "description": "Core platform services, infrastructure, and deployment automation",
+    "owner": "B'Elanna"
+  },
+  "team": {
+    "inheritsRoot": true,
+    "members": [
+      {
+        "name": "B'Elanna",
+        "role": "Infrastructure Lead",
+        "areaSpecialization": "K8s orchestration, Azure infra, CI/CD pipelines"
+      },
+      {
+        "name": "Worf",
+        "role": "Security Gate",
+        "areaSpecialization": "Network policies, secrets management, compliance"
+      },
+      {
+        "name": "Data",
+        "role": "Code Quality",
+        "areaSpecialization": "Go services, testing, performance"
+      }
+    ]
+  },
+  "routing": {
+    "defaultOwner": "B'Elanna",
+    "labels": {
+      "area:platform:infra": {
+        "assignTo": "B'Elanna"
+      },
+      "area:platform:security": {
+        "assignTo": "Worf",
+        "requiresGate": ["B'Elanna"]
+      },
+      "breaking-change": {
+        "requiresGate": ["Picard", "B'Elanna"]
+      }
+    },
+    "paths": {
+      "helm/": {
+        "owner": "B'Elanna",
+        "requiresReview": ["Worf"]
+      },
+      "terraform/": {
+        "owner": "B'Elanna",
+        "requiresReview": ["Worf", "Picard"]
+      },
+      "services/": {
+        "owner": "Data",
+        "requiresReview": ["B'Elanna"]
+      }
+    },
+    "filePatterns": {
+      "**/*.tf": "B'Elanna",
+      "**/Dockerfile": "B'Elanna",
+      "**/*_test.go": "Data",
+      "**/secrets.yaml": "Worf"
+    }
+  },
+  "capabilities": {
+    "required": ["emu-gh"],
+    "preferred": ["azure-speech"]
+  },
+  "conventions": {
+    "codeStyle": "Go with gofmt, Terraform with terraform fmt",
+    "testingFramework": "Go testing package with testify assertions",
+    "ciWorkflow": "platform-ci.yml",
+    "customRules": [
+      "All Helm charts must have schema validation",
+      "Terraform changes require plan output in PR description",
+      "No hardcoded credentials - use Azure Key Vault references",
+      "All services must have health/ready endpoints"
+    ]
+  },
+  "context": {
+    "readme": "examples/platform-area/README.md",
+    "architecture": "examples/platform-area/docs/ARCHITECTURE.md",
+    "keyFiles": [
+      "helm/values.yaml",
+      "terraform/main.tf",
+      "services/gateway/main.go"
+    ]
+  }
+}

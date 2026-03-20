@@ -128,6 +128,63 @@
 
 ## Learnings
 
+### Continuous Monitoring Architecture (Issue #425)
+
+**Context:** Design automated monitoring system for Eyal's Google Group posts to capture valuable technical content for Squad learning and decision-making.
+
+**Architecture Pattern — Stateful Scraper with Knowledge Capture:**
+- **Single-script pipeline**: Fetch → Parse → Analyze → Store → Notify (fail-safe at each stage)
+- **State persistence**: JSON file tracks processed posts/URLs to prevent duplicates across runs
+- **Markdown knowledge base**: Git-friendly, searchable, human-readable (no custom tooling needed)
+- **Relevance scoring**: Filter notifications by impact (HIGH/MEDIUM go to Teams, LOW stored silently)
+- **Zero dependencies**: Node.js stdlib only (https, fs, child_process) — no npm packages for reliability
+
+**Key Design Decisions:**
+1. **Atom feed over API**: Public RSS/Atom feed requires no OAuth, simpler than Google Groups API
+2. **Markdown over database**: Searchable via grep/MCP, version-controlled, no infrastructure overhead
+3. **Rate limiting**: 1-second delay between URL fetches respects external servers, avoids blocks
+4. **Fail-safe processing**: URL fetch errors logged but don't stop pipeline — other links processed
+5. **Hourly schedule**: Balance freshness (~10-50 links/month) with API politeness
+
+**Integration Points:**
+- `schedule.json`: Hourly cron-style execution via Ralph
+- Teams webhook: Same channel as tech-news-scanner for consistency
+- Knowledge base: `.squad/knowledge/eyal-links/` follows existing pattern (markdown, append-only)
+- State file: `.squad/monitoring/eyal-links-state.json` for deduplication
+
+**Alternatives Considered & Rejected:**
+- **Elasticsearch/full-text index**: Overengineered for volume (~10-50 links/month)
+- **Database storage**: Less maintainable, not git-friendly, requires infrastructure
+- **Email forwarding**: No content extraction, relevance scoring, or knowledge capture
+- **Manual review**: Doesn't scale, depends on Tamir checking daily
+
+**Success Metrics:**
+- Captures 100% of Eyal's posts within 1 hour of posting
+- Accurately scores relevance (HIGH: 3+ keyword matches, MEDIUM: 1-2 matches, LOW: 0)
+- Zero false negatives (all URLs extracted and fetched)
+- Knowledge base growth: ~10-50 markdown files/month
+- No duplicate Teams notifications (state file working)
+
+**Reusable Pattern for Future Monitors:**
+This architecture generalizes to any "monitor person X in forum Y" use case:
+1. Identify RSS/Atom feed or API
+2. Filter by author/criteria
+3. Extract structured data (URLs, titles, etc.)
+4. Score relevance for notification filtering
+5. Store in markdown knowledge base
+6. Track state to prevent duplicates
+7. Schedule via `schedule.json`
+
+**Files Created:**
+- `scripts/eyal-links-monitor.js` — 13.8KB monitor script (zero dependencies)
+- `.squad/knowledge/eyal-links/README.md` — Knowledge base documentation
+- `.squad/decisions/inbox/picard-eyal-links-monitor.md` — Architecture decision record
+- `schedule.json` — Added hourly execution entry
+
+**Strategic Value:** Positions Squad to learn from experts (Eyal) without manual intervention. Knowledge accumulates over time, searchable for future architectural decisions. Pattern reusable for monitoring other key contributors in Google Groups, Reddit, HackerNews, etc.
+
+---
+
 ### CLI Features & Agent Orchestration (Issue #454)
 
 **Context:** When evaluating new Copilot CLI features for squad adoption, always prioritize features that:

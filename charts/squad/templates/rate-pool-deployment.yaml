@@ -1,0 +1,43 @@
+{{- if .Values.ratePool.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squad.fullname" . }}-rate-pool
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rate-pool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "squad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: rate-pool
+  template:
+    metadata:
+      labels:
+        {{- include "squad.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: rate-pool
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.ratePool.redis.image }}
+          ports:
+            - containerPort: 6379
+              name: redis
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.ratePool.redis.resources | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+{{- end }}

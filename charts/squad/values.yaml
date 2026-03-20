@@ -1,0 +1,60 @@
+squad:
+  repository: tamirdresher_microsoft/tamresearch1
+  namespace: squad-system
+
+ralph:
+  replicas: 1
+  image: ghcr.io/tamirdresher/squad-ralph:latest
+  roundIntervalSeconds: 300
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+agent:
+  image: ghcr.io/tamirdresher/squad-agent:latest
+  defaultResources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+ratePool:
+  enabled: true
+  redis:
+    image: redis:7-alpine
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+persistence:
+  enabled: true
+  storageClass: azurefile-csi
+  size: 5Gi
+
+github:
+  tokenSecretName: squad-github-token
+  workloadIdentity:
+    enabled: false
+    clientId: ""
+
+copilot:
+  primaryModel: copilot-sonnet
+  fallbackChain:
+    - copilot-gpt
+    - kaito-local
+
+scheduling:
+  capabilityNodes:
+    enabled: false
+    gpuNodeSelector:
+      capability.squad.io/gpu: "true"

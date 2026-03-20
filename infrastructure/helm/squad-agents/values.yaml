@@ -1,0 +1,227 @@
+# =============================================================================
+# values.yaml — Squad Agents Helm chart (AKS-native)
+#
+# Override these in an environment-specific values file or via --set flags.
+# Example:
+#   helm upgrade --install squad-agents ./infrastructure/helm/squad-agents \
+#     --set global.acrLoginServer=acrsquadprod.azurecr.io \
+#     --set global.keyVaultName=kv-squad-prod \
+#     --set global.tenantId=<tenant-id> \
+#     --set serviceAccount.annotations."azure\.workload\.identity/client-id"=<client-id>
+# =============================================================================
+
+# -- Global settings (shared across all agents)
+global:
+  # GitHub repository in owner/repo format
+  repository: "tamirdresher_microsoft/tamresearch1"
+
+  # Kubernetes namespace to deploy into
+  namespace: "squad"
+
+  # Azure Container Registry login server (e.g. acrsquadprod.azurecr.io)
+  # Set at deploy time: --set global.acrLoginServer=...
+  acrLoginServer: ""
+
+  # Azure Key Vault name (secrets are mounted via CSI driver)
+  # Set at deploy time: --set global.keyVaultName=...
+  keyVaultName: ""
+
+  # Azure Tenant ID (required for Key Vault CSI driver)
+  # Set at deploy time: --set global.tenantId=...
+  tenantId: ""
+
+  # Default Squad model
+  defaultModel: "claude-sonnet-4.5"
+  defaultTier: "standard"
+
+# -- ServiceAccount
+# The single ServiceAccount used by all Squad agent pods.
+# Annotated with the Managed Identity client ID for Workload Identity.
+serviceAccount:
+  create: true
+  # Leave empty to auto-generate as "squad-agents"
+  name: ""
+  annotations:
+    # REQUIRED for Workload Identity: set to your Managed Identity client ID
+    # azure.workload.identity/client-id: "<IDENTITY_CLIENT_ID>"
+  # Workload Identity label is applied automatically by the webhook when the
+  # namespace has: azure.workload.identity/use=true
+
+# -- Key Vault secrets (mounted via Secrets Store CSI driver)
+keyVault:
+  # Secret names in Key Vault
+  ghTokenSecretName: "squad-gh-token"
+  copilotApiKeySecretName: "squad-copilot-api-key"
+  # Optional webhook URL secret
+  mcpWebhookUrlSecretName: ""
+
+  # Name of the K8s Secret created by the CSI driver (used in envFrom)
+  k8sSecretName: "squad-runtime-secrets"
+
+# =============================================================================
+# Ralph — Work Monitor (CronJob)
+#
+# Polls GitHub issues on a schedule, dispatches work to specialist agents.
+# Runs as a CronJob rather than a Deployment: cheaper (no always-on pod)
+# and mirrors the existing ralph-watch.ps1 scheduled-task pattern.
+# =============================================================================
+ralph:
+  enabled: true
+
+  # CronJob schedule — every 5 minutes
+  schedule: "*/5 * * * *"
+
+  # Prevent overlapping runs (mirroring the mutex logic in ralph-watch.ps1)
+  concurrencyPolicy: Forbid
+
+  # Retain last 3 successful + 1 failed job
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+
+  # Restart on failure within the same Job run
+  restartPolicy: OnFailure
+  backoffLimit: 2
+
+  # TTL for completed Jobs (cleanup after 1 hour)
+  ttlSecondsAfterFinished: 3600
+
+  image:
+    # Set global.acrLoginServer to construct full image reference
+    repository: "squad-agents"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Environment variables passed to ralph-watch.ps1
+  env:
+    RALPH_LOG_LEVEL: "info"
+    RALPH_INTERVAL_SECONDS: "300"
+    SQUAD_CONFIG_PATH: "/app/squad.config.ts"
+    SQUAD_AGENT_TYPE: "ralph"
+
+  resources:
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "128Mi"
+
+  # Pin to the monitor node pool
+  nodeSelector:
+    squad.github.com/pool: monitor
+
+  tolerations:
+    - key: "squad.github.com/pool"
+      operator: "Equal"
+      value: "monitor"
+      effect: "NoSchedule"
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  # ActiveDeadlineSeconds: kill the pod if it runs longer than 4 minutes
+  # (prevents zombie jobs if ralph-watch.ps1 hangs)
+  activeDeadlineSeconds: 240
+
+# =============================================================================
+# Picard — Lead Agent (Deployment)
+#
+# Long-running Deployment: handles architecture decisions, ADR writing,
+# and coordinates specialist agents. Always available (min 1 replica)
+# but scales up with KEDA when there are open picard-labelled issues.
+# =============================================================================
+picard:
+  enabled: true
+
+  replicaCount: 1
+
+  image:
+    repository: "squad-agents"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  env:
+    PICARD_LOG_LEVEL: "info"
+    SQUAD_CONFIG_PATH: "/app/squad.config.ts"
+    SQUAD_AGENT_TYPE: "picard"
+
+  resources:
+    limits:
+      cpu: "2"
+      memory: "2Gi"
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Pin to the agent node pool (can use Spot VMs)
+  nodeSelector:
+    squad.github.com/pool: agent
+
+  tolerations:
+    - key: "squad.github.com/pool"
+      operator: "Equal"
+      value: "agent"
+      effect: "NoSchedule"
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  # Liveness probe: check that the Picard process is responding
+  livenessProbe:
+    exec:
+      command:
+        - pwsh
+        - -NoProfile
+        - -Command
+        - "if ($PSVersionTable.PSVersion.Major -ge 7) { exit 0 } else { exit 1 }"
+    initialDelaySeconds: 30
+    periodSeconds: 60
+    timeoutSeconds: 10
+    failureThreshold: 3
+
+  readinessProbe:
+    exec:
+      command:
+        - pwsh
+        - -NoProfile
+        - -Command
+        - "if (Test-Path /tmp/picard-ready) { exit 0 } else { exit 1 }"
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# =============================================================================
+# KEDA — Event-driven scaling for Picard
+#
+# Scales the Picard Deployment based on open GitHub issues labelled squad:picard.
+# Requires KEDA to be installed on the cluster:
+#   az aks update --enable-keda  (AKS add-on)
+# =============================================================================
+keda:
+  enabled: false   # Set to true once KEDA add-on is installed
+
+  picard:
+    minReplicaCount: 0    # Scale to zero when no open issues
+    maxReplicaCount: 3
+    # Scale up when there are more than this many open picard-labelled issues
+    targetIssueCount: "2"
+    # Polling interval (seconds)
+    pollingInterval: 60
+    # Cooldown after scale-down
+    cooldownPeriod: 300
+
+# =============================================================================
+# Azure Monitor / Diagnostics
+# =============================================================================
+monitoring:
+  # Annotate pods for Prometheus scraping (if prometheus-operator is installed)
+  prometheus:
+    enabled: false
+    port: 9090
+    path: /metrics
+
+  # Log Analytics workspace resource ID (for future OTel exporter)
+  logAnalyticsWorkspaceId: ""

@@ -1262,15 +1262,6 @@ function formatStoryBlock(story, { isTopStory = false, isPublic = false } = {}) 
 function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } = {}) {
   const date = new Date().toISOString().split('T')[0];
 
-<<<<<<< Updated upstream
-  const highStories   = enrichedStories.filter(s => s.relevance === 'HIGH');
-  const mediumStories = enrichedStories.filter(s => s.relevance === 'MEDIUM');
-  const topStory      = highStories[0] || null;
-  const otherHigh     = highStories.slice(1);
-
-  let digest = `# 🛸 Tech News Digest — ${date}\n\n`;
-  digest += `> _Curated by your friendly neighbourhood tech chef. Today's menu: ${highStories.length} HIGH and ${mediumStories.length} MEDIUM relevance stories — each served with a TL;DR, Neelix commentary, and an action item. ${enrichedStories.length === 0 ? 'Dead quiet today.' : 'Bon appétit.'}_\n\n`;
-=======
   // ── Enrich stories with relevance, TL;DR, personality, and recommendations ─
   const enriched = stories
     .map(story => ({
@@ -1297,7 +1288,6 @@ function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } =
 
   let digest = `# 🛸 Tech News Digest — ${date}\n\n`;
   digest += `> _Curated by your friendly neighbourhood tech chef. Today's menu: ${highStories.length} HIGH and ${mediumStories.length} MEDIUM relevance stories — each with a TL;DR, Neelix's take, and a recommendation. (${stories.length - enriched.length} LOW-relevance items quietly composted.)_\n\n`;
->>>>>>> Stashed changes
 
   // Squad product updates — private digests only
   if (!isPublic && squadUpdates.length > 0) {
@@ -1322,17 +1312,6 @@ function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } =
   // ── TOP STORY — spotlight treatment ─────────────────────────────────────
   if (topStory) {
     digest += `---\n\n`;
-<<<<<<< Updated upstream
-    digest += formatStoryBlock(topStory, { isTopStory: true, isPublic });
-  }
-
-  // ── Other HIGH relevance stories ─────────────────────────────────────────
-  if (otherHigh.length > 0) {
-    digest += `---\n\n`;
-    digest += `## 🔴 HIGH RELEVANCE — Read These\n\n`;
-    otherHigh.forEach(story => {
-      digest += formatStoryBlock(story, { isTopStory: false, isPublic });
-=======
     digest += `## 🏆 TOP STORY\n\n`;
     digest += `### ${topStory.title}\n\n`;
     digest += `> 📖 **TL;DR:** ${topStory.tldr}\n\n`;

@@ -1,20 +1,20 @@
 {
-  "ralph-heartbeat": {
-    "error": "Workflow trigger failed",
-    "result": "failed",
+  "whatsapp-check": {
+    "result": "success",
     "provider": "local-polling",
-    "lastRun": "2026-03-18T20:27:02.9345064Z"
+    "error": null,
+    "lastRun": "2026-03-20T05:29:31.4628164Z"
   },
   "teams-message-monitor": {
-    "error": null,
     "result": "success",
     "provider": "local-polling",
-    "lastRun": "2026-03-18T20:27:02.9345064Z"
+    "error": null,
+    "lastRun": "2026-03-20T05:29:31.4628164Z"
   },
-  "whatsapp-check": {
-    "error": null,
-    "result": "success",
+  "ralph-heartbeat": {
+    "result": "failed",
     "provider": "local-polling",
-    "lastRun": "2026-03-18T20:27:02.9345064Z"
+    "error": "Workflow trigger failed",
+    "lastRun": "2026-03-20T05:29:31.4628164Z"
   }
 }

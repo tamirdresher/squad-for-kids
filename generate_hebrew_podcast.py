@@ -1,10 +1,53 @@
 """
 Hebrew Podcast Generator using Chatterbox Multilingual TTS (Resemble AI)
 Voice cloning from reference samples for two speakers.
+
+Phonikud integration (issue #876):
+  Hebrew text is vowelized (nikud added) before TTS synthesis using
+  scripts/add_phonikud.py.  This dramatically improves pronunciation accuracy
+  for ambiguous words like ספר / מלך / חכם.
+
+  Backends (auto-detected):
+    nakdimon  — pip install nakdimon tensorflow
+    phonikud-onnx — pip install phonikud-onnx + ONNX model file
+  Set PHONIKUD_MODEL_PATH env variable if using phonikud-onnx.
+  If no backend is available, vowelization is silently skipped.
 """
 import os
 import re
 import sys
+from pathlib import Path
+
+# ── Phonikud (Hebrew vowelization) ──────────────────────────────────────────
+# Issue #876: https://github.com/tamirdresher_microsoft/tamresearch1/issues/876
+# Gracefully skip if no backend is installed.
+try:
+    _repo_root = Path(__file__).resolve().parent
+    if str(_repo_root) not in sys.path:
+        sys.path.insert(0, str(_repo_root))
+    from scripts.add_phonikud import vowelize as _vowelize_hebrew, _detect_backend as _phonikud_detect
+    _PHONIKUD_AVAILABLE = _phonikud_detect() is not None
+    if _PHONIKUD_AVAILABLE:
+        print(f"[phonikud] Vowelization enabled (backend: {_phonikud_detect()})")
+    else:
+        print("[phonikud] No backend available — skipping vowelization.")
+        print("  Install: pip install tensorflow  (enables nakdimon)")
+        print("  Or:      pip install phonikud-onnx + set PHONIKUD_MODEL_PATH")
+except Exception as _phonikud_import_err:
+    _PHONIKUD_AVAILABLE = False
+    print(f"[phonikud] Could not load add_phonikud: {_phonikud_import_err}")
+
+
+def _vowelize(text: str) -> str:
+    """Vowelize Hebrew text if a backend is available; otherwise return as-is."""
+    if not _PHONIKUD_AVAILABLE:
+        return text
+    try:
+        return _vowelize_hebrew(text, quiet=True)
+    except Exception as exc:
+        print(f"[phonikud] vowelization failed, using raw text: {exc}")
+        return text
+
 
 # Fix perth watermarker before importing chatterbox
 import perth
@@ -111,6 +154,10 @@ def generate_podcast():
             continue
 
         print(f"\n[{i+1}/{len(turns)}] {speaker}: {text[:50]}...")
+
+        # Apply Hebrew vowelization before synthesis (issue #876)
+        text = _vowelize(text)
+
         try:
             wav = model.generate(
                 text,

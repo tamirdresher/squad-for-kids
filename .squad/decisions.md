@@ -4,6 +4,38 @@
 
 ---
 
+## Decision 46: WhatsApp Monitoring Rules — MANDATORY
+
+**Date:** 2026-03-20  
+**Author:** Tamir Dresher  
+**Status:** Active  
+**Agents:** All (especially Ralph, Kes, Data)
+
+### Monitoring Priorities
+
+The WA Monitor (wa-monitor-dotnet) watches WhatsApp messages. ALL agents must respect these rules:
+
+**Priority Contacts (Urgent):**
+| Contact | Aliases | Priority | Special Rules |
+|---------|---------|----------|---------------|
+| Gabi | גבי, גביק | Urgent | Monitor for tasks, printing requests |
+| Yonatan Dresher | יונתן, יונתן דרשר | Urgent | Monitor for printing requests |
+| Shira Dresher | שירה, שירה דרשר | Urgent | Monitor for printing requests |
+
+**Printing Rule:** When Gabi, Yonatan, or Shira send a file for printing, create a task to email the file to `dresherhome@hpeprint.com` (HP ePrint printer at home). Trigger keywords: print, הדפסה, מדפסת, תדפיס, להדפיס.
+
+**General Monitoring:** All other chats should be monitored for anything Tamir should know about. Notify him via Teams so he won't forget important messages.
+
+### Session Sharing
+
+- WA session credentials stored in GitHub secret `WA_MONITOR_SESSION`
+- Export: `wa-monitor-dotnet/scripts/wa-session-export.ps1`
+- Import: `wa-monitor-dotnet/scripts/wa-session-import.ps1`
+- **Constraint:** Only ONE monitor instance at a time (Signal sessions diverge otherwise)
+- WhatsApp allows max 4 companion devices — monitor uses 1 slot
+
+---
+
 ## Decision 32: Content Production Rules — MANDATORY
 
 **Date:** 2026-03-16  

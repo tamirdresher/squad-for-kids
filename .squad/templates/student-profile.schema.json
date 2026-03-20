@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Squad for Kids — Student Profile",
+  "description": "Stores the kid's identity, curriculum, and learning state. Created during first-time init.",
+  "type": "object",
+  "required": ["name", "birthDate", "age", "grade", "location", "curriculum", "subjects", "language", "castUniverse", "cast", "gradeHistory", "nextGradeDate", "gamification", "createdAt", "updatedAt"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Kid's first name only. No last names."
+    },
+    "birthDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Birth date in YYYY-MM-DD format."
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 4,
+      "maximum": 18,
+      "description": "Calculated age based on birthDate."
+    },
+    "grade": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 12,
+      "description": "Current grade level (0 = Kindergarten)."
+    },
+    "school": {
+      "type": ["string", "null"],
+      "description": "School name if voluntarily provided. Never ask for it."
+    },
+    "location": {
+      "type": "object",
+      "required": ["city", "country"],
+      "properties": {
+        "city": { "type": "string" },
+        "country": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code (e.g., US, IL, UK)."
+        },
+        "state": {
+          "type": ["string", "null"],
+          "description": "State/province if applicable (e.g., for US, Canada, Australia)."
+        }
+      }
+    },
+    "curriculum": {
+      "type": "string",
+      "description": "Name of the curriculum system (e.g., 'US Common Core', 'Israeli Ministry of Education')."
+    },
+    "subjects": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of subjects in the kid's curriculum for their grade."
+    },
+    "language": {
+      "type": "string",
+      "description": "Language code for all interactions (e.g., 'en', 'he', 'es', 'ar')."
+    },
+    "castUniverse": {
+      "type": "string",
+      "description": "The kid's chosen universe for agent casting (e.g., 'Harry Potter', 'Minecraft')."
+    },
+    "cast": {
+      "type": "object",
+      "required": ["headTeacher", "subjectHelper", "creativeCoach", "funAndGames", "studyBuddy"],
+      "properties": {
+        "headTeacher": { "type": "string", "description": "Character name for the Head Teacher role." },
+        "subjectHelper": { "type": "string", "description": "Character name for the Subject Helper role." },
+        "creativeCoach": { "type": "string", "description": "Character name for the Creative Coach role." },
+        "funAndGames": { "type": "string", "description": "Character name for the Fun & Games role." },
+        "studyBuddy": { "type": "string", "description": "Character name for the Study Buddy role." }
+      }
+    },
+    "gradeHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["grade", "startDate"],
+        "properties": {
+          "grade": { "type": "integer" },
+          "startDate": { "type": "string", "format": "date" }
+        }
+      },
+      "description": "History of grade levels with transition dates."
+    },
+    "nextGradeDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Expected date of next grade transition (e.g., next September 1st)."
+    },
+    "gamification": {
+      "type": "object",
+      "required": ["xp", "level", "levelName", "badges", "streakDays"],
+      "properties": {
+        "xp": { "type": "integer", "minimum": 0 },
+        "level": { "type": "integer", "minimum": 1 },
+        "levelName": { "type": "string" },
+        "badges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "earnedDate": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "streakDays": { "type": "integer", "minimum": 0 },
+        "lastSessionDate": { "type": ["string", "null"], "format": "date" }
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

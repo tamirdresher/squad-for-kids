@@ -150,6 +150,52 @@ Parents receive a weekly report:
 
 ## 🚀 Getting Started
 
+### For Parents — Setup Guide
+
+Squad for Kids uses an **adaptive onboarding flow** that makes setup fun for your child. Here's what to expect:
+
+#### Step 1: Start the Agent
+
+```bash
+# Clone the repo (or fork it for your family)
+git clone https://github.com/tamirdresher/squad-for-kids.git
+cd squad-for-kids
+
+# Start a Copilot session with the squad agent
+# The agent file is at .github/agents/squad.agent.md
+```
+
+#### Step 2: First-Time Setup (Your Child Does This!)
+
+When your child starts for the first time, the system will:
+
+1. 🎉 **Welcome them** with a warm, fun greeting
+2. 📝 **Ask their first name** — used everywhere for personalization
+3. 🎂 **Ask their birthday** — to calculate age and auto-detect grade transitions
+4. 🏫 **Ask their grade** — maps to the right curriculum
+5. 🏙️ **Ask their city** — auto-detects country and curriculum system
+6. 🗣️ **Set language** — defaults to their country's language (Hebrew for Israel, etc.)
+7. 🎬 **Ask their favorite movie/show/game** — casts the learning agents as characters they love!
+
+**Privacy:** Only first name, birth date, and city are stored. No last names, addresses, or sensitive data.
+
+#### Step 3: Learning Begins!
+
+Your child gets a personalized team of AI tutors cast as characters from their favorite universe. They can:
+- Study any subject from their curriculum
+- Get homework help (guided, never just answers)
+- Play educational games
+- Earn XP, level up, and collect badges
+- Take brain breaks between study sessions
+
+#### For Parents: What You Get
+
+- **Weekly reports** at `.squad/reports/` — what was learned, strengths, areas to practice
+- **Teaching plan** at `.squad/teaching-plan.md` — current curriculum progress
+- **Full control** — review, adjust, or restart anytime
+
+### Quick Start (Advanced)
+
 ```bash
 # Install the squad
 gh copilot squad install tamirdresher/squad-for-kids
@@ -163,6 +209,34 @@ gh copilot squad configure --age 8 --interests "dinosaurs,space,minecraft" --lan
 # Start learning!
 gh copilot squad chat
 ```
+
+---
+
+## 🧠 System Architecture
+
+The adaptive education platform is powered by these components:
+
+| File | Purpose |
+|------|---------|
+| `.github/agents/squad.agent.md` | **Main agent** — orchestrates init, learning, and all agent interactions |
+| `.squad/student-profile.json` | Kid's profile — identity, curriculum, cast, gamification state |
+| `.squad/teaching-plan.md` | Current learning plan — subjects, progress, weekly schedule |
+| `.squad/reports/weekly-*.md` | Parent reports — weekly summaries of learning progress |
+| `.squad/skills/curriculum-lookup/SKILL.md` | Skill: maps country + grade → curriculum → subjects |
+| `.squad/skills/kid-friendly/SKILL.md` | Skill: age-appropriate communication guidelines |
+| `.squad/templates/student-profile.schema.json` | JSON schema for the student profile |
+| `.squad/templates/teaching-plan-template.md` | Template for new teaching plans |
+| `.squad/templates/weekly-report-template.md` | Template for weekly parent reports |
+
+### Key Adaptive Features
+
+- **🌍 Multi-curriculum:** Auto-detects US Common Core, UK National Curriculum, Israeli Bagrut, Australian ACARA, and more
+- **🎭 Universe casting:** Agents become characters from the kid's favorite franchise
+- **🔄 Grade transitions:** Ralph auto-detects when a kid should move to the next grade
+- **🎮 Gamification:** XP, levels, badges, and streaks to keep kids motivated
+- **🤗 Emotional support:** Study Buddy detects frustration and responds with empathy
+- **📊 Parent reports:** Weekly summaries with strengths, growth areas, and recommendations
+- **🗣️ Multilingual:** Full RTL support for Hebrew, Arabic; works in any language
 
 ---
 

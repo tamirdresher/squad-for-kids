@@ -126,7 +126,7 @@ spec:
                     - ALL
                 readOnlyRootFilesystem: false   # ralph-watch.ps1 writes temp files
 
-          {{- with .Values.ralph.nodeSelector }}
+          {{- with .Values.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}

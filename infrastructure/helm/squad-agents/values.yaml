@@ -2,13 +2,43 @@
 # values.yaml — Squad Agents Helm chart (AKS-native)
 #
 # Override these in an environment-specific values file or via --set flags.
-# Example:
+# Example (AKS Standard with dedicated node pool):
 #   helm upgrade --install squad-agents ./infrastructure/helm/squad-agents \
 #     --set global.acrLoginServer=acrsquadprod.azurecr.io \
 #     --set global.keyVaultName=kv-squad-prod \
 #     --set global.tenantId=<tenant-id> \
-#     --set serviceAccount.annotations."azure\.workload\.identity/client-id"=<client-id>
+#     --set azure.managedIdentityClientId=<client-id> \
+#     --set aksMode=standard \
+#     --set nodeSelector.agentpool=squad
+#
+# Example (AKS Automatic — no node pool setup required):
+#   helm upgrade --install squad-agents ./infrastructure/helm/squad-agents \
+#     --set global.acrLoginServer=acrsquadprod.azurecr.io \
+#     --set global.keyVaultName=kv-squad-prod \
+#     --set global.tenantId=<tenant-id> \
+#     --set azure.managedIdentityClientId=<client-id> \
+#     --set aksMode=automatic
 # =============================================================================
+
+# -- AKS mode: controls deployment-time behaviour and NOTES output.
+# standard:  AKS Standard cluster — uses dedicated node pools, manually installs
+#            CSI driver, sets up KEDA add-on, and configures Workload Identity.
+# automatic: AKS Automatic cluster — node provisioning, patching, CSI driver,
+#            KEDA, and Workload Identity are all managed by Azure.
+aksMode: standard   # or "automatic"
+
+# -- Global node selector applied to ALL agent pods.
+# Leave as {} for AKS Automatic — Azure manages node provisioning.
+# Set to {"agentpool": "squad"} for AKS Standard with a dedicated node pool.
+nodeSelector: {}
+
+# -- Azure identity settings
+azure:
+  # Managed Identity client ID for Workload Identity federation.
+  # Required for Key Vault access; annotated onto the ServiceAccount.
+  # Obtain with: az identity show --name squad-identity \
+  #                --resource-group rg-squad --query clientId -o tsv
+  managedIdentityClientId: ""
 
 # -- Global settings (shared across all agents)
 global:
@@ -36,16 +66,16 @@ global:
 
 # -- ServiceAccount
 # The single ServiceAccount used by all Squad agent pods.
-# Annotated with the Managed Identity client ID for Workload Identity.
+# The Workload Identity annotation is generated automatically from
+# azure.managedIdentityClientId when that value is non-empty.
 serviceAccount:
   create: true
-  # Leave empty to auto-generate as "squad-agents"
+  # Leave empty to auto-generate as "<release-name>-squad-agents"
   name: ""
-  annotations:
-    # REQUIRED for Workload Identity: set to your Managed Identity client ID
-    # azure.workload.identity/client-id: "<IDENTITY_CLIENT_ID>"
-  # Workload Identity label is applied automatically by the webhook when the
-  # namespace has: azure.workload.identity/use=true
+  # Extra annotations merged onto the ServiceAccount (in addition to the
+  # azure.workload.identity/client-id annotation generated from
+  # azure.managedIdentityClientId above).
+  annotations: {}
 
 # -- GitHub repository settings
 # Used by KEDA github trigger (issue count scaler) and other GitHub-aware components.
@@ -116,15 +146,11 @@ ralph:
       cpu: "250m"
       memory: "128Mi"
 
-  # Pin to the monitor node pool
-  nodeSelector:
-    squad.github.com/pool: monitor
+  # Per-agent nodeSelector override (merged with top-level nodeSelector).
+  # Leave as {} to inherit from the top-level nodeSelector value above.
+  nodeSelector: {}
 
-  tolerations:
-    - key: "squad.github.com/pool"
-      operator: "Equal"
-      value: "monitor"
-      effect: "NoSchedule"
+  tolerations: []
 
   affinity: {}
 
@@ -164,15 +190,11 @@ picard:
       cpu: "500m"
       memory: "512Mi"
 
-  # Pin to the agent node pool (can use Spot VMs)
-  nodeSelector:
-    squad.github.com/pool: agent
+  # Per-agent nodeSelector override (merged with top-level nodeSelector).
+  # Leave as {} to inherit from the top-level nodeSelector value above.
+  nodeSelector: {}
 
-  tolerations:
-    - key: "squad.github.com/pool"
-      operator: "Equal"
-      value: "agent"
-      effect: "NoSchedule"
+  tolerations: []
 
   affinity: {}
 
@@ -260,3 +282,35 @@ monitoring:
 
   # Log Analytics workspace resource ID (for future OTel exporter)
   logAnalyticsWorkspaceId: ""
+
+# =============================================================================
+# GitHub Metrics Exporter (optional — requires keda.enabled=true)
+#
+# Lightweight Python pod that exposes GitHub rate-limit and queue-depth
+# metrics for KEDA's Prometheus scaler. Only deployed when both
+# metricsExporter.enabled AND keda.enabled are true.
+# =============================================================================
+metricsExporter:
+  enabled: false
+
+  # Prometheus metrics port
+  port: 9100
+
+  # GitHub issue label to count as "queue depth"
+  squadLabel: "squad:picard"
+
+  # How often to poll the GitHub API (seconds)
+  pollIntervalSeconds: "30"
+
+  resources:
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+
+  # nodeSelector and tolerations are inherited from the top-level nodeSelector.
+  # These per-component overrides are kept for backward compatibility.
+  nodeSelector: {}
+  tolerations: []

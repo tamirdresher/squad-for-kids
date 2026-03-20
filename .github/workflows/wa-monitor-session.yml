@@ -1,0 +1,69 @@
+# wa-monitor-session.yml
+#
+# Imports a WhatsApp Monitor session from the WA_MONITOR_SESSION GitHub secret
+# and starts the monitor headlessly — no QR scan required.
+#
+# Prerequisites
+# ─────────────
+# 1. Run monitor on any machine, complete QR scan.
+# 2. Export: dotnet run --project wa-monitor-dotnet/WhatsAppMonitor.Demo -- --export-session
+#    or:      .\scripts\wa-session-export.ps1 -GhSecret
+# 3. Store blob as GitHub secret WA_MONITOR_SESSION.
+#    Optionally store 32-byte Base64 AES key as WA_SESSION_KEY.
+#
+# Secrets used
+# ────────────
+#   WA_MONITOR_SESSION  Base64 session blob (plain or AES-256-GCM encrypted)
+#   WA_SESSION_KEY      (optional) 32-byte Base64 AES key
+#   TEAMS_WEBHOOK_URL   (optional) Teams notifications webhook
+#   WATCH_CONTACTS      (optional) Comma-separated contact names
+
+name: WA Monitor — session import & start
+
+on:
+  workflow_dispatch:
+    inputs:
+      contacts:
+        description: "Comma-separated contacts to watch (overrides WATCH_CONTACTS secret)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 6 * * *"  # Restart daily at 06:00 UTC
+
+jobs:
+  wa-monitor:
+    name: Import session & run monitor
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore & build
+        run: |
+          dotnet restore wa-monitor-dotnet/WhatsAppMonitor.sln
+          dotnet build wa-monitor-dotnet/WhatsAppMonitor.sln --no-restore -c Release
+
+      - name: Install Playwright system deps
+        run: npx playwright install-deps chromium
+
+      - name: Import WA session
+        env:
+          WA_MONITOR_SESSION: ${{ secrets.WA_MONITOR_SESSION }}
+          WA_SESSION_KEY:     ${{ secrets.WA_SESSION_KEY }}
+        run: |
+          dotnet run --project wa-monitor-dotnet/WhatsAppMonitor.Demo \
+            -c Release -- --import-session
+
+      - name: Run WA Monitor (headless)
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          WATCH_CONTACTS:    ${{ inputs.contacts || secrets.WATCH_CONTACTS || '' }}
+        run: |
+          timeout 55m dotnet run \
+            --project wa-monitor-dotnet/WhatsAppMonitor.Demo \
+            -c Release || true

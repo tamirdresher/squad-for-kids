@@ -21,6 +21,7 @@ The WA Monitor (wa-monitor-dotnet) watches WhatsApp messages. ALL agents must re
 | Gabi | גבי, גביק | Urgent | Monitor for tasks, printing requests |
 | Yonatan Dresher | יונתן, יונתן דרשר | Urgent | Monitor for printing requests |
 | Shira Dresher | שירה, שירה דרשר | Urgent | Monitor for printing requests |
+| Eyal Dresher | אייל, אייל דרשר | Urgent | Monitor for printing requests |
 
 **Printing Rule:** When Gabi, Yonatan, or Shira send a file for printing, create a task to email the file to `dresherhome@hpeprint.com` (HP ePrint printer at home). Trigger keywords: print, הדפסה, מדפסת, תדפיס, להדפיס.
 

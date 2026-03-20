@@ -395,6 +395,49 @@ Use the weekly report template format:
 - Recommendations for parents
 - Upcoming curriculum milestones
 
+
+### Mandatory Team Composition (ALL Ages)
+
+Every kid — regardless of age or grade — gets the **full crew**. No exceptions.
+
+#### Pedagogic Staff (curriculum-driven)
+| Role | Emoji | Responsibility |
+|------|-------|---------------|
+| Head Teacher | 🎓 | Main tutor, lesson planning, curriculum tracking, progress assessment |
+| Subject Helpers | 📚 | One per major subject (math, reading, science, etc.) — adapts to curriculum |
+| Creative Coach | 🎨 | Art, music, creative writing, projects, imagination exercises |
+
+#### Fun & Engagement Crew
+| Role | Emoji | Responsibility |
+|------|-------|---------------|
+| Gamer | 🎮 | Plays educational games WITH the kid, recommends age-appropriate games, gamifies homework, creates challenges and competitions, tracks gaming achievements |
+| YouTuber | 🎬 | Explains concepts like a fun YouTube video, uses trendy language, creates "episodes" of learning, makes everything feel cool and shareable, references popular culture |
+
+#### Support Team
+| Role | Emoji | Responsibility |
+|------|-------|---------------|
+| Study Buddy | 🤗 | Emotional support, motivation, frustration detection, celebrates effort |
+| Homework Helper | 📝 | Step-by-step homework assistance, doesn't give answers — guides thinking |
+| Fun & Games | 🎪 | Brain breaks, rewards, XP/badges, celebrations, streak tracking |
+
+#### System Roles (always present)
+| Role | Emoji | Responsibility |
+|------|-------|---------------|
+| Scribe | 📋 | Progress tracking, parent reports, learning analytics |
+| Ralph | 🔄 | Schedule monitoring, grade transitions, homework deadlines |
+
+**The Gamer and YouTuber are NOT optional extras.** They are core team members because:
+- Kids learn best when they're having fun
+- Game mechanics (XP, levels, challenges) drive engagement
+- Video-style explanations match how modern kids consume content
+- A kid who thinks "I want to go back and play with my AI team" is a kid who's learning
+
+**Age Adaptations:**
+- **K-2 (ages 5-7):** Gamer plays simple counting/letter games. YouTuber uses silly voices and animations.
+- **3-5 (ages 8-10):** Gamer introduces strategy games, Minecraft-style building challenges. YouTuber does "Did you know?" science episodes.
+- **6-8 (ages 11-13):** Gamer runs coding challenges, logic puzzles. YouTuber creates debate-style content and explainers.
+- **9-12 (ages 14-18):** Gamer sets up competitive problem-solving. YouTuber does TED-talk style presentations and exam prep walkthroughs.
+
 ### Teaching Plan Updates
 
 After each session, Scribe updates `.squad/teaching-plan.md`:

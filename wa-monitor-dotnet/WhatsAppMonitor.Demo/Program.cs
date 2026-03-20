@@ -8,8 +8,21 @@ using var loggerFactory = LoggerFactory.Create(builder =>
 var logger = loggerFactory.CreateLogger<Program>();
 
 // ── Configuration ─────────────────────────────────────────────────────────────
-// Read from environment variables so secrets are never hard-coded.
-var teamsWebhook = Environment.GetEnvironmentVariable("TEAMS_WEBHOOK_URL");
+// Read webhook URL from filesystem first (~/.whatsapp-monitor/webhooks/*.url),
+// then fall back to environment variable. Never hard-code credentials.
+var webhooksDir = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+    ".whatsapp-monitor", "webhooks");
+string? teamsWebhook = null;
+if (Directory.Exists(webhooksDir))
+{
+    var webhookFile = Directory.GetFiles(webhooksDir, "*.url").FirstOrDefault();
+    if (webhookFile is not null)
+        teamsWebhook = File.ReadAllText(webhookFile).Trim();
+}
+// Fallback to environment variable if no file found
+teamsWebhook ??= Environment.GetEnvironmentVariable("TEAMS_WEBHOOK_URL");
+
 var contacts = (Environment.GetEnvironmentVariable("WATCH_CONTACTS") ?? "")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 

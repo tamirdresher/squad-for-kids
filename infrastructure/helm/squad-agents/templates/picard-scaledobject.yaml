@@ -1,0 +1,216 @@
+# =============================================================================
+# picard-scaledobject.yaml — KEDA ScaledObject: Composite AND Trigger (Tier 2)
+#
+# Implements composite AND scaling logic for the Picard Deployment:
+#   scale UP only when BOTH conditions are true:
+#     1. work_queue  — open GitHub issues labelled squad:picard  (> 0)
+#     2. rate_headroom — GitHub API rate-limit remaining is above threshold
+#
+# Uses KEDA v2.12+ scalingModifiers.formula (expr language) to combine two
+# named triggers with AND semantics.  The formula resolves to the work-queue
+# depth when both conditions are satisfied, and to 0 otherwise — keeping
+# Picard at minReplicas when the API is exhausted even if work exists.
+#
+# Two modes (controlled by keda.compositeMode):
+#
+#   compositeMode: false  (default — backwards-compatible)
+#     Simple ScaledObject: scales on open issue count alone.
+#     No Prometheus / metrics-exporter dependency.
+#
+#   compositeMode: true   (requires github-metrics-exporter from issue #1154)
+#     Full composite AND ScaledObject: work_queue AND rate_headroom.
+#     The metrics-api trigger calls the Prometheus endpoint exposed by
+#     github-metrics-exporter (github_rate_limit_remaining gauge).
+#
+# KEDA scalingModifiers reference:
+#   https://keda.sh/docs/2.12/concepts/scaling-deployments/#scalingmodifiers
+#
+# Issue: #1160 — Configure KEDA ScaledObject with composite AND trigger
+# =============================================================================
+{{- if .Values.keda.enabled }}
+{{- if .Values.keda.compositeMode }}
+# ---------------------------------------------------------------------------
+# COMPOSITE AND mode — scale only when work exists AND rate-limit headroom OK
+# Requires: github-metrics-exporter (issue #1154) + keda.compositeMode=true
+# ---------------------------------------------------------------------------
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-picard-composite
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keda
+    squad.github.com/tier: "2"
+    squad.github.com/trigger: composite-and
+  annotations:
+    squad.github.com/issue: "1160"
+    squad.github.com/description: >
+      Tier 2 KEDA composite AND scaler for Picard.
+      Scales up only when open picard issues exist AND GitHub rate-limit
+      headroom is above keda.rateLimitThreshold.
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: picard
+
+  minReplicaCount: {{ .Values.keda.picard.minReplicaCount | default 0 }}
+  maxReplicaCount: {{ .Values.keda.picard.maxReplicaCount | default 5 }}
+
+  pollingInterval: {{ .Values.keda.picard.pollingInterval | default 60 }}
+  cooldownPeriod: {{ .Values.keda.picard.cooldownPeriod | default 300 }}
+
+  # ── Composite AND via scalingModifiers.formula ───────────────────────────
+  # formula semantics (expr language):
+  #   - work_queue    = current value of the github trigger (open issue count)
+  #   - rate_headroom = current value of the metrics-api trigger
+  #                     (remaining API calls; high value = headroom available)
+  #
+  # Result:
+  #   • work_queue > 0  AND  rate_headroom > 0  →  return work_queue depth
+  #     (HPA will scale Picard up to handle the backlog)
+  #   • Either condition false                   →  return 0
+  #     (HPA will scale Picard down to minReplicas — blocked)
+  #
+  # target / activationTarget of "1" means:
+  #   • desiredReplicas = formula_result / 1  = formula_result
+  #   • scaler activates when formula_result >= 1
+  advanced:
+    scalingModifiers:
+      formula: "work_queue > 0 && rate_headroom > 0 ? work_queue : 0"
+      target: "1"
+      activationTarget: "1"
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 120
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          policies:
+            - type: Pods
+              value: 2
+              periodSeconds: 30
+
+  triggers:
+    # ── Trigger 1: GitHub open issue count (work queue) ─────────────────────
+    # Queries GitHub Issues API for open issues labelled squad:picard.
+    # Returns the count; used as work_queue in the formula.
+    - type: github
+      name: work_queue
+      metadata:
+        owner: {{ .Values.github.owner | quote }}
+        repo: {{ .Values.github.repo | quote }}
+        # Filter: open issues with the squad:picard label
+        queryParameters: "is:open is:issue label:squad:picard"
+        # Threshold: activate scaler when at least 1 open issue exists
+        threshold: "1"
+      authenticationRef:
+        name: {{ include "squad-agents.fullname" . }}-picard-trigger-auth
+
+    # ── Trigger 2: GitHub rate-limit remaining (headroom gate) ───────────────
+    # Calls the github-metrics-exporter Prometheus endpoint (issue #1154).
+    # Returns `github_rate_limit_remaining` scaled to 0-5000 (raw API count).
+    # The value is compared against rateLimitThreshold:
+    #   remaining > rateLimitThreshold → rate_headroom > 0 → headroom OK
+    #   remaining ≤ rateLimitThreshold → rate_headroom = 0 → blocked
+    - type: metrics-api
+      name: rate_headroom
+      metadata:
+        url: "http://github-metrics-exporter.{{ .Release.Namespace }}.svc.cluster.local:9090/api/v1/query?query=github_rate_limit_remaining"
+        # Path into the Prometheus instant query JSON response:
+        #   { "data": { "result": [ { "value": ["<ts>", "<value>"] } ] } }
+        valueLocation: "data.result.0.value.1"
+        # If remaining API calls exceed this threshold the trigger returns a
+        # positive value, allowing the formula to proceed with scaling.
+        targetValue: {{ .Values.keda.rateLimitThreshold | default 100 | quote }}
+{{- else }}
+# ---------------------------------------------------------------------------
+# SIMPLE mode (default) — scale on open issue count only
+# Backwards-compatible; no extra infrastructure required.
+# Enable composite mode with: keda.compositeMode=true
+# ---------------------------------------------------------------------------
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-picard-issue-scaler
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keda
+    squad.github.com/tier: "1"
+    squad.github.com/trigger: github-issues
+  annotations:
+    squad.github.com/issue: "1160"
+    squad.github.com/description: >
+      Simple KEDA issue-count scaler for Picard.
+      Scales on open GitHub issues labelled squad:picard.
+      Enable keda.compositeMode=true for composite AND logic (issue #1160).
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: picard
+
+  minReplicaCount: {{ .Values.keda.picard.minReplicaCount | default 0 }}
+  maxReplicaCount: {{ .Values.keda.picard.maxReplicaCount | default 5 }}
+
+  pollingInterval: {{ .Values.keda.picard.pollingInterval | default 60 }}
+  cooldownPeriod: {{ .Values.keda.picard.cooldownPeriod | default 300 }}
+
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 120
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          policies:
+            - type: Pods
+              value: 2
+              periodSeconds: 30
+
+  triggers:
+    # Scale up when open issues labelled squad:picard exist.
+    # One replica per issue (up to maxReplicaCount).
+    - type: github
+      name: work_queue
+      metadata:
+        owner: {{ .Values.github.owner | quote }}
+        repo: {{ .Values.github.repo | quote }}
+        queryParameters: "is:open is:issue label:squad:picard"
+        threshold: {{ .Values.keda.picard.targetIssueCount | default "1" | quote }}
+      authenticationRef:
+        name: {{ include "squad-agents.fullname" . }}-picard-trigger-auth
+{{- end }}
+---
+# =============================================================================
+# TriggerAuthentication — GitHub PAT for picard issue scaler
+#
+# Provides the Personal Access Token used by the `github` trigger to call
+# the GitHub Issues API (read:issues scope required).
+# Token is sourced from the squad-runtime-secrets K8s Secret (Key Vault CSI).
+# =============================================================================
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-picard-trigger-auth
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keda
+    squad.github.com/issue: "1160"
+spec:
+  secretTargetRef:
+    - parameter: personalAccessToken
+      name: {{ .Values.keyVault.k8sSecretName }}
+      key: GH_TOKEN
+{{- end }}

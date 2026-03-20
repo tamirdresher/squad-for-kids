@@ -47,6 +47,16 @@ serviceAccount:
   # Workload Identity label is applied automatically by the webhook when the
   # namespace has: azure.workload.identity/use=true
 
+# -- GitHub repository settings
+# Used by KEDA github trigger (issue count scaler) and other GitHub-aware components.
+github:
+  # GitHub org or username that owns the repository
+  # Set at deploy time: --set github.owner=<org>
+  owner: "tamirdresher_microsoft"
+  # GitHub repository name (single repo, no owner prefix)
+  # Set at deploy time: --set github.repo=tamresearch1
+  repo: "tamresearch1"
+
 # -- Key Vault secrets (mounted via Secrets Store CSI driver)
 keyVault:
   # Secret names in Key Vault
@@ -203,15 +213,40 @@ picard:
 keda:
   enabled: false   # Set to true once KEDA add-on is installed
 
+  # ── Composite AND mode (issue #1160) ──────────────────────────────────────
+  # When false (default): simple ScaledObject — scales on open issue count only.
+  # When true: composite AND ScaledObject — scales only when BOTH conditions hold:
+  #   1. Open picard-labelled issues exist (work_queue > 0)
+  #   2. GitHub API rate-limit remaining exceeds rateLimitThreshold (rate_headroom > 0)
+  # Requires github-metrics-exporter (issue #1154) to be deployed.
+  compositeMode: false
+
+  # Minimum GitHub API calls remaining before rate-limit gate blocks scaling.
+  # The metrics-api trigger compares github_rate_limit_remaining against this.
+  # Recommended: 100 (GitHub REST API limit is 5000/hour for authenticated requests)
+  rateLimitThreshold: 100
+
   picard:
     minReplicaCount: 0    # Scale to zero when no open issues
-    maxReplicaCount: 3
+    maxReplicaCount: 5    # Raised from 3 to support composite mode burst capacity
     # Scale up when there are more than this many open picard-labelled issues
-    targetIssueCount: "2"
+    targetIssueCount: "1"
     # Polling interval (seconds)
     pollingInterval: 60
     # Cooldown after scale-down
     cooldownPeriod: 300
+
+  # ── Tier 1: GitHub Actions runner queue trigger (issue #1158) ─────────────
+  # Scales on GitHub Actions self-hosted runner queue depth.
+  # Independent of the issue-count scaler above.
+  githubRunner:
+    enabled: false   # Enable separately once runner pool is configured
+    minReplicas: 1
+    maxReplicas: 10
+    pollingInterval: 30
+    cooldownPeriod: 300
+    runnerScope: "org"
+    targetQueueLength: "1"
 
 # =============================================================================
 # Azure Monitor / Diagnostics

@@ -1,0 +1,53 @@
+# =============================================================================
+# github-rate-scaler.yaml — TriggerAuthentication for GitHub API
+#
+# Provides credentials for all KEDA scalers that hit the GitHub API.
+# Uses the squad-runtime-secrets K8s Secret (populated by the Key Vault
+# CSI driver via the SecretProviderClass defined in squad-agents Helm chart).
+#
+# Related: infrastructure/helm/squad-agents/templates/picard-deployment.yaml
+# Issue:   #1134 — KEDA autoscaling: Scale Squad pods based on Copilot token usage
+# =============================================================================
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: github-rate-trigger-auth
+  namespace: squad
+  labels:
+    app.kubernetes.io/part-of: squad-agents
+    app.kubernetes.io/managed-by: helm
+    squad.github.com/issue: "1134"
+  annotations:
+    squad.github.com/description: >
+      TriggerAuthentication for KEDA GitHub-based scalers.
+      Sourced from the squad-runtime-secrets Secret (Key Vault CSI driver).
+spec:
+  secretTargetRef:
+    # GitHub Personal Access Token (or fine-grained token) with:
+    #   - repo:read (for issue list counts via GitHub Scaler)
+    #   - read:user (for rate_limit endpoint)
+    # Stored in Azure Key Vault key "GH_TOKEN"; synced into the
+    # squad-runtime-secrets K8s Secret by the CSI SecretProviderClass.
+    - parameter: personalAccessToken
+      name: squad-runtime-secrets
+      key: GH_TOKEN
+
+---
+# =============================================================================
+# ClusterTriggerAuthentication — optional cluster-wide variant
+#
+# Uncomment and use authenticationRef.kind: ClusterTriggerAuthentication
+# in squad-scaledobject.yaml if agents run in multiple namespaces.
+# =============================================================================
+# apiVersion: keda.sh/v1alpha1
+# kind: ClusterTriggerAuthentication
+# metadata:
+#   name: github-rate-trigger-auth-cluster
+#   labels:
+#     app.kubernetes.io/part-of: squad-agents
+#     squad.github.com/issue: "1134"
+# spec:
+#   secretTargetRef:
+#     - parameter: personalAccessToken
+#       name: squad-runtime-secrets
+#       key: GH_TOKEN

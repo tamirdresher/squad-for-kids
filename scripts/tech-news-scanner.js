@@ -715,7 +715,7 @@ async function fetchAwsBlog({ name, feedUrl, category, score }) {
 }
 
 async function scanAllSources() {
-  const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_'];
+  const subreddits = ['programming', 'webdev', 'dotnet', 'golang', 'artificial', 'MachineLearning', 'BlackboxAI_', 'GithubCopilot'];
   
   const [hnStories, morningDew, archNotes, twRadar, squadReleases, squadDiscussions, squadCommits, bradyBlog, ...rest] = await Promise.all([
     fetchHackerNews(),

@@ -1,5 +1,15 @@
 name: Helm/Kustomize Drift Detection
 
+# WORKFLOW DISABLED: 2026-03-20
+# Reason: GitHub EMU policy blocks hosted runners (ubuntu-latest). Self-hosted
+# runners with bash/WSL support not yet configured.
+#
+# To re-enable:
+# 1. Configure self-hosted Linux/WSL runners
+# 2. Enable workflow via GitHub UI or API
+# 3. Restore pull_request trigger below
+# See: .squad/decisions/inbox/worf-drift-detection-disabled.md
+
 on:
   # NOTE: pull_request trigger disabled — GitHub Actions hosted runners are not
   # available in this org (EMU policy). To re-enable, configure self-hosted

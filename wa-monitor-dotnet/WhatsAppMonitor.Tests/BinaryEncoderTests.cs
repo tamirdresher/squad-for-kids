@@ -455,4 +455,18 @@ public class BinaryEncoderTests
         // ADJID tag = 247 = 0xF7 should appear
         Assert.Contains((byte)0xF7, data);
     }
+
+    [Fact]
+    public void LidAttribute_StringJID_EncodesAsJIDPair()
+    {
+        // "lid" is a JID attribute key — strings containing '@' must be encoded
+        // as a JIDPair token (0xFA = 250), not as plain Binary8 strings.
+        var node = new BinaryNode
+        {
+            Tag   = "message",
+            Attrs = new Dictionary<string, object?> { ["lid"] = "user@lid" }
+        };
+        var data = BinaryEncoder.Encode(node);
+        Assert.Contains((byte)0xFA, data); // JIDPair tag = 250 = 0xFA
+    }
 }

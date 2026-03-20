@@ -228,7 +228,7 @@ file sealed class Encoder
 
     private static readonly HashSet<string> s_jidAttrKeys =
         new(StringComparer.OrdinalIgnoreCase)
-        { "to", "from", "participant", "jid" };
+        { "to", "from", "participant", "jid", "lid" };
 
     private void WriteAttrValue(string key, object? value)
     {

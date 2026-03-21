@@ -840,6 +840,54 @@
             line-height: 1.6;
         }
 
+        .setup-note {
+            background: #fff8e1;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-right: 4px solid #ffc107;
+        }
+        .setup-warning {
+            background: #fce4ec;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            border-right: 4px solid #e91e63;
+        }
+        .ui-translations {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .ui-translations h4 {
+            margin: 0 0 12px 0;
+            color: var(--primary);
+        }
+        .translation-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .translation-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 1rem;
+        }
+        .translation-table td:first-child {
+            font-family: monospace;
+            direction: ltr;
+            text-align: left;
+            background: #f5f5f5;
+            border-radius: 6px;
+        }
+        .setup-vscode {
+            border-right: 4px solid #9c27b0;
+        }
+
     </style>
 </head>
 <body>
@@ -972,9 +1020,16 @@
                     </li>
                     <li>
                         <span>
+                            <div class="setup-warning">
+                                🖥️ <strong>חשוב:</strong> שלב זה צריך להיעשות ממחשב נייד או נייח — לא מטלפון או טאבלט.
+                            </div>
                             לחצו על הכפתור הירוק:
                             <div class="setup-btn-wrapper">
                                 <a href="https://github.com/codespaces/new?repo=tamirdresher/squad-for-kids" target="_blank" rel="noopener" class="btn btn-green">✨ פתחו את סקוואד לילדים</a>
+                            </div>
+                            <div class="setup-note">
+                                💡 <strong>שימו לב:</strong> כשהדף נפתח, גללו למטה ולחצו על הכפתור הירוק <strong>"Create codespace"</strong> (צור סביבת עבודה).
+                                <br>⏱️ חכו דקה-שתיים עד שהמסך נטען לגמרי.
                             </div>
                         </span>
                     </li>
@@ -988,6 +1043,35 @@
                         <span>תנו לילד את המקלדת! 🎮</span>
                     </li>
                 </ol>
+                <div class="setup-note">
+                    🔄 <strong>חוזרים בפעם הבאה?</strong> לא צריך ליצור מחדש! היכנסו ל-<a href="https://github.com/codespaces" target="_blank">github.com/codespaces</a> ותמצאו שם את סביבת העבודה שכבר יצרתם. פשוט לחצו עליה.
+                </div>
+                <div class="ui-translations">
+                    <h4>🗺️ המסך באנגלית? אל תדאגו!</h4>
+                    <p>הנה מילון קצר למה שתראו על המסך:</p>
+                    <table class="translation-table">
+                        <tr><td><strong>Code</strong></td><td>→</td><td>קוד</td></tr>
+                        <tr><td><strong>Terminal</strong></td><td>→</td><td>שורת פקודה (החלון השחור למטה)</td></tr>
+                        <tr><td><strong>Create codespace</strong></td><td>→</td><td>צור סביבת עבודה</td></tr>
+                        <tr><td><strong>Open in browser</strong></td><td>→</td><td>פתח בדפדפן</td></tr>
+                        <tr><td><strong>Type here</strong></td><td>→</td><td>כתבו כאן</td></tr>
+                        <tr><td><strong>Run</strong></td><td>→</td><td>הפעל</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-card setup-vscode">
+            <h3>💬 דרך VS Code — Copilot Chat (ידידותי יותר)</h3>
+            <p class="setup-desc">במקום לכתוב בטרמינל השחור, אפשר לדבר עם הצוות דרך חלון צ'אט נוח יותר</p>
+            <ol class="setup-steps">
+                <li><span>פתחו את סביבת העבודה (Codespaces או מקומי)</span></li>
+                <li><span>בצד שמאל של המסך, לחצו על אייקון הצ'אט 💬 (או Ctrl+Shift+I)</span></li>
+                <li><span>בחלון הצ'אט שנפתח, כתבו: <code>hi</code></span></li>
+                <li><span>הצוות ידבר אתכם דרך הצ'אט — יותר נוח מהטרמינל!</span></li>
+            </ol>
+            <div class="setup-tip">
+                💡 <strong>טיפ:</strong> Copilot Chat הוא כמו וואטסאפ — פשוט כותבים הודעה ומקבלים תשובה. לא צריך לזכור פקודות.
             </div>
         </div>
 

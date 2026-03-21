@@ -7,18 +7,8 @@
 name: Squad Agents Deploy
 
 on:
-  # Push trigger disabled: GitHub-hosted runners (ubuntu-latest) are blocked by EMU org policy.
-  # Re-enable when a self-hosted runner with Docker + Azure CLI + Helm is configured.
-  # Tracking issue: #1212
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - 'infrastructure/k8s/**'
-  #     - 'infrastructure/helm/**'
-  #     - 'ralph-watch.ps1'
-  #     - 'squad.config.ts'
-  #     - '.squad/team.md'
-  #     - '.squad/routing.md'
+  # push trigger disabled due to EMU policy: GitHub-hosted runners not allowed
+  # Will re-enable when self-hosted runner with Docker + Azure CLI is available
   workflow_dispatch:
     inputs:
       deploy:

@@ -744,6 +744,30 @@ Workflow ran on every push to main and every PR with an Autobuild step. This rep
 - Self-hosted runner is Windows — use `shell: pwsh`, not `shell: bash`
 - `actions/upload-pages-artifact` depends on Linux/WSL — incompatible with Windows self-hosted
 
+---
+
+### 2026-03-20: Issue #1212 — Squad Agents Deploy EMU Runner Policy Fix
+
+**Problem:** `squad-agents-deploy.yml` workflow uses `runs-on: ubuntu-latest` (GitHub-hosted runner), which is disabled by EMU organization policy. Workflow fails on every push to main that touches infrastructure paths, causing alert noise.
+
+**Fix Applied:**
+1. Disabled the `push` trigger (lines 10-18)
+2. Kept `workflow_dispatch` for manual trigger
+3. Added inline comment explaining EMU policy constraint
+
+**Change:** `.github/workflows/squad-agents-deploy.yml`
+- Removed `push` event with path filters
+- Workflow now runs only on manual dispatch until self-hosted runner is available
+
+**Next Steps for Infra Team:**
+- Provision self-hosted runner with: Docker, Azure CLI, kubectl, Helm
+- Register runner to EMU org (GitHub Actions → Runners)
+- Re-enable push trigger with `runs-on: self-hosted`
+- Update both `build` and `deploy` jobs to use self-hosted runner
+
+**Decision Documented:** `.squad/decisions/inbox/belanna-squad-agents-deploy-emu-runner-fix.md`
+
+**Key Learning:** All workflows in EMU repos must respect `runs-on: self-hosted`. GitHub-hosted runners (`ubuntu-latest`, `windows-latest`) are org-policy disabled. Check `.squad/decisions.md` for current runner policy before creating new workflows.
 ### 2026-03-20: Issue #1203 — Physical World AI Extensions Research (PR #1221)
 
 **Assignment:** Research and prototype ways to extend the AI squad beyond digital/network into the physical world. Focus on low-cost, achievable house automation use cases.

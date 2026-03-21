@@ -15,5 +15,17 @@
       "Squad > Squad Tech News"
     ],
     "tracking": ".squad/monitoring/brady-squad-state.json"
+  },
+  {
+    "name": "eyal-links-monitor",
+    "interval": "hourly",
+    "description": "Monitor Eyals shared links in Cloud-Dev-and-Architecture Google Group",
+    "script": "scripts/eyal-links-monitor.js",
+    "mode": "once",
+    "postChannels": [
+      "squads > Tech News"
+    ],
+    "tracking": ".squad/monitoring/eyal-links-state.json",
+    "knowledgeBase": ".squad/knowledge/eyal-links/"
   }
 ]

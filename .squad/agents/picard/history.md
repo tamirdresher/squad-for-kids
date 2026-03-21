@@ -35,6 +35,37 @@
 
 ## Active Context
 
+### 2026-03-21: Issue #948 — Post-Merge Build & Release Validation for Adir Atias (URGENT) (Complete)
+
+**Assignment:** Investigate URGENT request from Adir Atias to validate post-merge official build and release succeeded.
+
+**Findings:**
+1. **Issue Context:** Adir sent URGENT Teams message on 2026-03-18 18:39 UTC requesting validation of post-merge build/release in Microsoft internal ADO (dev.azure.com/microsoft/WDATP)
+2. **Work Scope:** Two merged PRs in `WDATP.Infra.System.ArgoRollouts` repo (DK8S Platform):
+   - PR #15060778: `chore: skip retag in release pipelines, add buildType to app-of-dk8s-apps`
+   - PR #15050396: `refactor: disable CMP image build, use pre-built dk8s-toolkit image`
+3. **Build Status (as of 2026-03-18):** B'Elanna investigated and found:
+   - **Official Keel build FAILED**: CIEng-Infra-AKS-Keel-Official build timeout (2hr, Bash exit 1) — 35+ PRs batched since last success
+   - **KeelCustomers build SUCCEEDED**: CIEng-Infra-AKS-KeelCustomers-official (12 min)
+   - **CloudTest E2E FAILED**: All 8 runs failed — suspected root cause: otel semconv upgrade v1.26.0→v1.39.0 (PR #15093515)
+4. **Blocker Identified (2026-03-19):** Email monitor detected Adir waiting for Tamir's response on ADO PR (Tetragon chart feat branch). **Tamir is blocking the original work by not responding to code review.**
+
+**Root Cause Analysis:**
+- Primary issue: Official pipeline build failed (timeout + E2E failures)
+- Secondary blocker: Tetragon PR code review feedback from Adir pending Tamir's response
+- **Cannot automate:** WDATP is internal Microsoft ADO org — Squad agents lack access to dev.azure.com/microsoft/WDATP build logs
+
+**Recommendation for Tamir:**
+1. Check ADO build link: https://msazure.visualstudio.com/43d6efb2-bec4-470c-bbc6-f3f94732b22f/_build/results?buildId=157318342
+2. Investigate timeout in official Keel build (Bash exit 1 in Build & Test stage)
+3. Check if otel semconv v1.39.0 broke CloudTest E2E
+4. **Respond to Adir's code review feedback** on Tetragon chart PR to unblock
+5. Reply to Adir confirming official build status (FAILED due to timeout + E2E)
+
+**Status:** Investigation complete. **Escalation required to Tamir for manual ADO investigation + code review response.** (This is a pending-user item — cannot be resolved by Squad agents.)
+
+---
+
 ### 2026-03-20: Issue #1058 — Bitwarden Shadow MCP Server Implementation (Complete)
 
 **Assignment:** Design and implement MCP tools for shadowing Bitwarden org vault items to squad collection for read-only cross-collection sharing.
@@ -982,4 +1013,32 @@ Preview package publishing from PRs requires architectural safeguards beyond bas
 - ADO MCP tooling configuration exists but may require explicit session activation
 - PR reviews for complex pipeline infrastructure benefit from human judgment + domain expert co-review
 - Teams-bridged issues may reference external systems (ADO) that need separate tool access
+
+---
+
+## 2026-03-21: Issue #989 — Azure Synapse Spark 3.4 Retirement Alert (Complete)
+
+**Assignment:** Investigate Azure Synapse Spark 3.4 retirement alert. Determine if action is needed and if it affects squad infrastructure.
+
+**Outcome:** ✅ **COMPLETE** — No squad action required. Decision documented.
+
+**Finding:**
+- Issue #989 is a duplicate alert (original: #318, 2026-03-11)
+- ROME-ORION-DEV1 is **NOT squad-managed infrastructure** — zero references in codebase, decisions, or deployment automation
+- Deadline: 2026-03-31 (10 days)
+
+**Decision:** Document that this is an external (personal/client) workspace. No squad assignment.
+
+**Action Items for Tamir:**
+1. Confirm ROME-ORION-DEV1 ownership (personal workspace, client workspace, or deprecated)
+2. If personal: Execute Spark 3.5 migration via Azure Portal by 2026-03-28
+3. If client: Forward alert to them with migration steps
+4. If deprecated: Request Azure workspace deletion
+
+**Decision Record:** `.squad/decisions/inbox/picard-spark34-retirement-989.md`
+
+**Learning:**
+- Alert fatigue pattern: Duplicate infrastructure notifications (issue #318 vs #989) aren't deduped by email system
+- Non-squad-managed resource indicators: No infrastructure-as-code references, no deployment automation, no mentions in agent histories
+- Scope clarity: External/client workspaces must be explicitly owned by Tamir to become squad responsibility
 

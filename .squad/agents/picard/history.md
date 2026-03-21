@@ -1042,3 +1042,38 @@ Preview package publishing from PRs requires architectural safeguards beyond bas
 - Non-squad-managed resource indicators: No infrastructure-as-code references, no deployment automation, no mentions in agent histories
 - Scope clarity: External/client workspaces must be explicitly owned by Tamir to become squad responsibility
 
+
+### 2026-03-21: Issue #1134 — KEDA Autoscaling Phase 1 Deployment Approval
+
+**Assignment**: Coordinate KEDA autoscaling implementation with B'Elanna; approve Phase 1 for production deployment.
+
+**Outcome**: ✅ **APPROVED** — Phase 1 ready for production, Phase 2 can proceed in parallel
+
+**Architecture Review**:
+- **Phase 1 (GitHub API rate limits)**: COMPLETE — composite AND-logic KEDA scaler implemented
+  - Components: github-metrics-exporter.yaml (Prometheus metrics), picard-scaledobject.yaml (KEDA ScaledObject)
+  - Scaling formula: `scale UP IF queue_depth > 0 AND rate_limit_remaining > 500`
+  - Risk: LOW (cron pre-warm mitigates cold start, 30s polling acceptable)
+- **Phase 2 (Copilot API metrics)**: IN PROGRESS (PR #1282)
+  - PowerShell wrapper for gh copilot 429 capture
+  - Metrics exporter extension with Copilot counters
+  - Additive changes — no blocker for Phase 1 deployment
+  
+**Decision**: Phase 1 and Phase 2 are decoupled. Phase 2 extends Phase 1 without breaking changes.
+
+**Coordination**:
+- Assigned deployment to B'Elanna (Infrastructure)
+- Documented Helm deployment command with values
+- Created validation checklist (metrics endpoint, KEDA scaling behavior)
+- Set success criteria: 80% reduction in 429 errors, scale-to-zero during off-hours
+
+**Key Files**:
+- **Decision record**: `.squad/decisions/inbox/picard-keda-phase1-deployment-approval.md`
+- **Infrastructure**: `infrastructure/helm/squad-agents/templates/github-metrics-exporter.yaml`
+- **Infrastructure**: `infrastructure/helm/squad-agents/templates/picard-scaledobject.yaml`
+- **Phase 2 PR**: #1282 (Copilot metrics collection)
+
+**Learning**: Rate-limit-aware autoscaling is a generalizable pattern for API-bound workloads. Treating API quota as a first-class constraint (like CPU/memory) prevents cascading 429 failures.
+
+**Status**: ✅ Complete. Issue #1134 moved to `squad:belanna` for AKS deployment.
+

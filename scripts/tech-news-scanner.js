@@ -1262,23 +1262,14 @@ function formatStoryBlock(story, { isTopStory = false, isPublic = false } = {}) 
 function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } = {}) {
   const date = new Date().toISOString().split('T')[0];
 
-  // ── Enrich stories with relevance, TL;DR, personality, and recommendations ─
-  const enriched = stories
-    .map(story => ({
-      ...story,
-      relevance:       scoreRelevance(story),
-      tldr:            generateTldr(story),
-      whyItMatters:    getWhyItMatters(story),
-      // Backward-compat generic quip (tier + hash)
-      neelixQuip:      getNeelixQuip(scoreRelevance(story), story),
-      // Story-specific opinionated take (issue #1032)
-      neelixTake:      generateNeelixTake(story),
-      // "You should look at this because..." (issue #1032)
-      recommendation:  generateRecommendation(story),
-      // Which keywords triggered this score (issue #1032)
-      matchedKeywords: getMatchedKeywords(story),
-    }))
-    .filter(story => story.relevance !== 'LOW');
+  // ── enrichedStories already scored/filtered by enrichStoriesWithDescriptions ─
+  // Add any fields that enrichStoriesWithDescriptions doesn't generate yet.
+  const enriched = enrichedStories.map(story => ({
+    ...story,
+    neelixTake:      story.neelixTake      || generateNeelixTake(story),
+    recommendation:  story.recommendation  || generateRecommendation(story),
+    matchedKeywords: story.matchedKeywords || getMatchedKeywords(story),
+  }));
 
   const highStories   = enriched.filter(s => s.relevance === 'HIGH');
   const mediumStories = enriched.filter(s => s.relevance === 'MEDIUM');
@@ -1287,7 +1278,7 @@ function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } =
   const actionItems   = generateActionItems(enriched);
 
   let digest = `# 🛸 Tech News Digest — ${date}\n\n`;
-  digest += `> _Curated by your friendly neighbourhood tech chef. Today's menu: ${highStories.length} HIGH and ${mediumStories.length} MEDIUM relevance stories — each with a TL;DR, Neelix's take, and a recommendation. (${stories.length - enriched.length} LOW-relevance items quietly composted.)_\n\n`;
+  digest += `> _Curated by your friendly neighbourhood tech chef. Today's menu: ${highStories.length} HIGH and ${mediumStories.length} MEDIUM relevance stories — each with a TL;DR, Neelix's take, and a recommendation._\n\n`;
 
   // Squad product updates — private digests only
   if (!isPublic && squadUpdates.length > 0) {
@@ -1344,18 +1335,12 @@ function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } =
       if (story.score) digest += ` | **Score:** ${story.score}`;
       digest += `\n`;
       digest += `- **Link:** ${story.url}\n\n`;
->>>>>>> Stashed changes
     });
   }
 
   // ── MEDIUM relevance stories ──────────────────────────────────────────────
   if (mediumStories.length > 0) {
     digest += `---\n\n`;
-<<<<<<< Updated upstream
-    digest += `## 🟡 MEDIUM RELEVANCE — Worth a Glance\n\n`;
-    mediumStories.forEach(story => {
-      digest += formatStoryBlock(story, { isTopStory: false, isPublic });
-=======
     digest += `## 🟡 MEDIUM Relevance — Worth a Glance\n\n`;
     mediumStories.forEach((story, idx) => {
       digest += `### ${idx + 1}. ${story.title}\n\n`;
@@ -1367,7 +1352,6 @@ function formatDigest(enrichedStories, squadUpdates = [], { isPublic = false } =
       if (story.score) digest += ` | **Score:** ${story.score}`;
       digest += `\n`;
       digest += `- **Link:** ${story.url}\n\n`;
->>>>>>> Stashed changes
     });
   }
 

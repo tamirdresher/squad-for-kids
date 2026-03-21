@@ -7,7 +7,7 @@
 | **Duration** | ~2.5 hours (5 parts) |
 | **Level** | Intermediate — familiar with GitHub, new to AI agents |
 | **What You'll Build** | A 4-agent squad that triages issues, writes code, reviews quality, and logs decisions |
-| **You Need** | GitHub account · GitHub Copilot CLI · VS Code · Node.js 20+ |
+| **You Need** | GitHub account · agency copilot CLI (or gh copilot) · VS Code · Node.js 20+ |
 
 ---
 
@@ -34,7 +34,7 @@ Understand what Squad is, why multi-agent beats single-agent, and initialize you
 
 ### 1.1 What Is Squad? (5 min)
 
-Squad is an **AI agent orchestration framework** built on GitHub Copilot CLI. Instead of one AI agent trying to do everything, you create a **team of specialists** — each with its own role, expertise, boundaries, and personality.
+Squad is an **AI agent orchestration framework** built on agency copilot CLI (also compatible with GitHub's gh copilot). Instead of one AI agent trying to do everything, you create a **team of specialists** — each with its own role, expertise, boundaries, and personality.
 
 #### The Single-Agent Problem
 
@@ -99,8 +99,10 @@ node --version
 gh auth status
 # Expected: "Logged in to github.com as <your-username>"
 
-# 3. GitHub Copilot CLI is available
-# (Verify you can run Copilot in your terminal)
+# 3. agency copilot CLI is available
+agency copilot --version
+# Expected: version information
+# Alternative: gh copilot --version (if using GitHub's CLI extension)
 
 # 4. VS Code is installed
 code --version
@@ -370,11 +372,11 @@ Squad supports tiered model selection. Each agent can specify a preference:
 
 ### 2.5 Test Your Agent (5 min — Demo)
 
-With a charter in place, Copilot CLI can now assume the Atlas persona when working on relevant issues.
+With a charter in place, agency copilot can now assume the Atlas persona when working on relevant issues.
 
 #### How Agent Selection Works
 
-When you (or a CI workflow) invoke Copilot CLI on an issue:
+When you (or a CI workflow) invoke agency copilot on an issue:
 
 1. The **coordinator** reads `routing.md` to determine which agent should handle it
 2. The matched agent's `charter.md` is loaded as system context
@@ -874,7 +876,7 @@ jobs:
             console.log(`Routed to: ${label}`);
 ```
 
-> 💡 **In production**, the triage step would invoke Copilot CLI with the lead agent's charter to make smarter routing decisions. This simplified version shows the pattern.
+> 💡 **In production**, the triage step would invoke `agency copilot --agent atlas` (or `gh copilot` with the appropriate agent context) with the lead agent's charter to make smarter routing decisions. This simplified version shows the pattern.
 
 ---
 

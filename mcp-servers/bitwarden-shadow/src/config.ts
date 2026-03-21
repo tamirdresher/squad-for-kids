@@ -1,34 +1,76 @@
+/**
+ * Bitwarden Shadow MCP Server — Configuration Loader
+ *
+ * Loads Bitwarden API credentials from environment variables or a config file.
+ *
+ * Environment variables (highest priority):
+ *   BW_SERVER_URL      — Bitwarden server URL (default: https://vault.bitwarden.com)
+ *   BW_CLIENT_ID       — API client_id  (format: organization.XXXXXX)
+ *   BW_CLIENT_SECRET   — API client_secret
+ *   BW_ORGANIZATION_ID — Organization GUID to operate on
+ *
+ * Config file (fallback): ~/.config/bitwarden-shadow-mcp/config.json
+ *   { "serverUrl": "...", "clientId": "...", "clientSecret": "...", "organizationId": "..." }
+ */
+
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import type { BitwardenShadowConfig } from "./types.js";
+import { z } from "zod";
+import type { BitwardenConfig } from "./types.js";
 
-export async function loadConfig(): Promise<BitwardenShadowConfig> {
-  const session = process.env.BW_SESSION;
-  const shadowCollectionId = process.env.BW_SHADOW_COLLECTION_ID;
-  const adminCollectionId = process.env.BW_ADMIN_COLLECTION_ID;
+const DEFAULT_SERVER_URL = "https://vault.bitwarden.com";
 
-  if (session && shadowCollectionId) {
-    return { session, shadowCollectionId, adminCollectionId };
+const ConfigFileSchema = z.object({
+  serverUrl: z.string().url().optional(),
+  clientId: z.string().min(1),
+  clientSecret: z.string().min(1),
+  organizationId: z.string().min(1),
+});
+
+/**
+ * Load Bitwarden configuration.
+ * Priority: env vars > config file > error
+ */
+export async function loadConfig(): Promise<BitwardenConfig> {
+  const envClientId = process.env.BW_CLIENT_ID;
+  const envClientSecret = process.env.BW_CLIENT_SECRET;
+  const envOrgId = process.env.BW_ORGANIZATION_ID;
+
+  if (envClientId && envClientSecret && envOrgId) {
+    return {
+      serverUrl: process.env.BW_SERVER_URL ?? DEFAULT_SERVER_URL,
+      clientId: envClientId,
+      clientSecret: envClientSecret,
+      organizationId: envOrgId,
+    };
   }
 
+  // Try config file
   try {
-    const configPath = join(homedir(), ".squad", "bitwarden-session.json");
+    const configPath = join(
+      homedir(),
+      ".config",
+      "bitwarden-shadow-mcp",
+      "config.json"
+    );
     const raw = await readFile(configPath, "utf-8");
-    const parsed = JSON.parse(raw) as Record<string, string | undefined>;
-    const fileSession = session ?? parsed["session"];
-    const fileCollectionId = shadowCollectionId ?? parsed["shadowCollectionId"] ?? parsed["folderId"];
-    const fileAdminId = adminCollectionId ?? parsed["adminCollectionId"];
-    if (!fileSession) throw new Error("BW_SESSION not set");
-    if (!fileCollectionId) throw new Error("BW_SHADOW_COLLECTION_ID not set");
-    return { session: fileSession, shadowCollectionId: fileCollectionId, adminCollectionId: fileAdminId };
+    const parsed = ConfigFileSchema.parse(JSON.parse(raw));
+    return {
+      serverUrl: parsed.serverUrl ?? DEFAULT_SERVER_URL,
+      clientId: parsed.clientId,
+      clientSecret: parsed.clientSecret,
+      organizationId: parsed.organizationId,
+    };
   } catch (err) {
-    if (err instanceof Error && (err.message.includes("BW_SESSION") || err.message.includes("BW_SHADOW"))) throw err;
-    console.error(`Config file issue: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(
+      `Failed to load config file: ${err instanceof Error ? err.message : String(err)}`
+    );
   }
 
-  const missing: string[] = [];
-  if (!session) missing.push("BW_SESSION");
-  if (!shadowCollectionId) missing.push("BW_SHADOW_COLLECTION_ID");
-  throw new Error(`Missing: ${missing.join(", ")}. Run setup-bitwarden.ps1.`);
+  throw new Error(
+    "Bitwarden configuration not found.\n" +
+      "Set BW_CLIENT_ID, BW_CLIENT_SECRET, and BW_ORGANIZATION_ID environment variables,\n" +
+      "or create ~/.config/bitwarden-shadow-mcp/config.json"
+  );
 }

@@ -18,6 +18,12 @@
 #      → keeps at least 1 replica warm during business hours (Asia/Jerusalem)
 #      → avoids cold-start latency for the first issue of the day
 #
+#   5. GitHub Actions runner queue trigger (github-runner, issue #1158):
+#      → counts pending Actions workflow jobs for the Squad repo
+#      → 1 replica per targetWorkflowQueueLength queued jobs
+#      → uses ETag caching to minimise GitHub API rate-limit spend
+#      → conditionally rendered when keda.githubRunnerTrigger.enabled=true
+#
 # Architecture:
 #   squad-metrics-exporter ─→ Prometheus metrics ─→ KEDA ScaledObject
 #                                                          │
@@ -29,8 +35,14 @@
 #   - KEDA v2.12+ installed (AKS add-on: az aks update --enable-keda)
 #   - squad-metrics-exporter Deployment running (github-metrics-exporter.yaml)
 #   - keda.enabled=true AND metricsExporter.enabled=true in values.yaml
+#   - (Trigger 5 only) keda.githubRunnerTrigger.enabled=true AND
+#     github-pat-secret created manually:
+#       kubectl create secret generic github-pat-secret \
+#         --namespace squad --from-literal=token=<GITHUB_PAT>
+#     PAT scopes required: repo (Actions read access)
 #
 # Related: #1134 (this issue), #1141 (scaler type research), #1136 (AKS setup)
+#          #1158 (github-runner trigger, Tier 1)
 # =============================================================================
 {{- if .Values.keda.enabled }}
 ---
@@ -145,6 +157,30 @@ spec:
         start: {{ .Values.keda.picard.prewarm.start | quote }}
         end:   {{ .Values.keda.picard.prewarm.end | quote }}
         desiredReplicas: {{ .Values.keda.picard.prewarm.desiredReplicas | quote }}
+    {{- end }}
+
+    # -------------------------------------------------------------------------
+    # Trigger 3 (github-runner): GitHub Actions job queue depth (issue #1158)
+    #
+    # Scale UP: 1 replica per targetWorkflowQueueLength pending Actions jobs.
+    # Scale DOWN: pods removed when the Actions job queue drains to zero.
+    # enableEtags: "true" — ETag caching reduces GitHub API rate-limit spend.
+    # This trigger is additive: KEDA takes the max across all active triggers.
+    # Conditionally rendered — requires keda.githubRunnerTrigger.enabled=true
+    # AND the github-pat-secret to exist in the squad namespace.
+    # See: keda-github-auth.yaml for the TriggerAuthentication resource.
+    # Ref: https://keda.sh/docs/2.19/scalers/github-runner/
+    # -------------------------------------------------------------------------
+    {{- if .Values.keda.githubRunnerTrigger.enabled }}
+    - type: github-runner
+      authenticationRef:
+        name: github-runner-auth
+      metadata:
+        owner: {{ .Values.keda.githubRunnerTrigger.owner | quote }}
+        runnerScope: {{ .Values.keda.githubRunnerTrigger.runnerScope | quote }}
+        repos: {{ .Values.keda.githubRunnerTrigger.repos | quote }}
+        targetWorkflowQueueLength: {{ .Values.keda.githubRunnerTrigger.targetWorkflowQueueLength | quote }}
+        enableEtags: "true"
     {{- end }}
 
 ---

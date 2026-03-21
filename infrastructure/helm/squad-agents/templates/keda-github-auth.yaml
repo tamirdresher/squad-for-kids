@@ -1,0 +1,40 @@
+# =============================================================================
+# keda-github-auth.yaml — TriggerAuthentication for github-runner KEDA scaler
+#
+# Provides PAT credentials for the github-runner scaler (Tier 1, issue #1158).
+# References a manually-created github-pat-secret in the squad namespace.
+#
+# To create the secret:
+#   kubectl create secret generic github-pat-secret \
+#     --namespace squad \
+#     --from-literal=token=<YOUR_GITHUB_PAT>
+#
+# The PAT requires:
+#   - repo scope (read:workflow, read:org) for queue depth queries
+#   - ETag caching is enabled (enableEtags: "true") to reduce rate-limit spend
+#
+# Issue: #1158 — Tier 1: Add built-in github-runner KEDA trigger
+# Reference: https://keda.sh/docs/2.19/scalers/github-runner/
+# =============================================================================
+{{- if .Values.keda.githubRunnerTrigger.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: github-runner-auth
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keda
+  annotations:
+    squad.github.com/issue: "1158"
+    squad.github.com/description: >
+      TriggerAuthentication for the github-runner KEDA scaler.
+      References the github-pat-secret K8s Secret (create manually — see top of file).
+spec:
+  secretTargetRef:
+    # personalAccessToken: fine-grained PAT with Actions read access.
+    # Stored in the github-pat-secret Secret under key "token".
+    - parameter: personalAccessToken
+      name: github-pat-secret
+      key: token
+{{- end }}

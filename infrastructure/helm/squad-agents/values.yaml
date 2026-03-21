@@ -300,6 +300,31 @@ keda:
       end:   "0 20 * * 0-4"  # Sunday–Thursday 20:00
       desiredReplicas: "1"    # Keep 1 replica alive during hours
 
+  # ---------------------------------------------------------------------------
+  # GitHub Actions runner queue trigger (Tier 1, issue #1158)
+  #
+  # Counts pending Actions workflow jobs for the Squad repo and scales Picard
+  # up by 1 replica per targetWorkflowQueueLength queued jobs.
+  # This trigger is ADDITIVE to the existing Prometheus / github scalers —
+  # KEDA takes the maximum across all active triggers.
+  #
+  # Prerequisites:
+  #   1. keda.enabled: true
+  #   2. Create the PAT secret manually (fine-grained PAT, repo scope):
+  #        kubectl create secret generic github-pat-secret \
+  #          --namespace squad \
+  #          --from-literal=token=<GITHUB_PAT>
+  #   3. Set keda.githubRunnerTrigger.enabled: true
+  #
+  # Ref: https://keda.sh/docs/2.19/scalers/github-runner/
+  # ---------------------------------------------------------------------------
+  githubRunnerTrigger:
+    enabled: false
+    owner: "tamirdresher_microsoft"
+    runnerScope: "repo"
+    repos: "tamresearch1"
+    targetWorkflowQueueLength: "1"
+
 # =============================================================================
 # Metrics Exporter — squad-metrics-exporter
 #

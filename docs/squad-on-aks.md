@@ -740,7 +740,108 @@ az aks delete \
 
 ---
 
-## Troubleshooting
+## KEDA Token-Aware Autoscaling (Issue #1134)
+
+Squad agents (especially Picard) consume Copilot API tokens. The free tier has a 50-request/month budget, while the Pro tier has higher limits but rate-limiting can still occur. KEDA's token-aware scaler prevents spinning up pods when the token budget is exhausted, saving compute costs and preventing cascading 429 failures.
+
+### How It Works
+
+The token scaler monitors three metrics via Prometheus:
+
+1. **Copilot token budget** (`copilot_tokens_remaining`) — tracks free tier 50/month quota
+2. **Work queue depth** (`squad_copilot_queue_depth`) — counts open issues labelled `squad:picard`
+3. **GitHub API rate limit** (`github_api_rate_limit_remaining`) — 5000 requests/hour headroom
+
+**Composite AND logic:** KEDA scales UP only when **all three** conditions hold:
+- Open issues exist (work queue > 0)
+- Token budget is sufficient (tokens > threshold)
+- GitHub API rate limit has headroom (remaining > 10%)
+
+**Scale-to-zero:** When any condition fails, Picard pods scale down to 0 and stay down for 5 minutes (cooldownPeriod).
+
+### Enable Token-Aware Scaling
+
+1. **Ensure KEDA is installed:**
+   ```bash
+   az aks show --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME \
+     --query addonProfiles.keda.enabled
+   ```
+
+2. **Deploy the Helm chart with token scaler enabled:**
+   ```bash
+   helm upgrade --install squad-agents ./infrastructure/helm/squad-agents \
+     --namespace squad --create-namespace \
+     --set keda.enabled=true \
+     --set keda.tokenScaler.enabled=true \
+     --set metricsExporter.enabled=true \
+     --set global.acrLoginServer=acrsquadprod.azurecr.io \
+     --set global.keyVaultName=kv-squad-prod \
+     --set global.tenantId=$TENANT_ID \
+     --set azure.managedIdentityClientId=$CLIENT_ID
+   ```
+
+3. **Verify metrics exporters are running:**
+   ```bash
+   kubectl get pods -n squad -l app.kubernetes.io/component=copilot-metrics-exporter
+   kubectl get pods -n squad -l app.kubernetes.io/component=squad-metrics-exporter
+   
+   # Check logs for errors
+   kubectl logs -n squad -l app.kubernetes.io/component=copilot-metrics-exporter --tail=20
+   ```
+
+4. **Verify KEDA ScaledObject is active:**
+   ```bash
+   kubectl get scaledobjects -n squad
+   kubectl describe scaledobject picard-token-scaler -n squad
+   ```
+
+### Token Thresholds (Tunable)
+
+Adjust these values in `values.yaml` or via `--set`:
+
+| Threshold | Default | Free Tier | Pro Tier | Notes |
+|-----------|---------|-----------|----------|-------|
+| `tokenThreshold` | `5` | 5 (10% of 50) | 100 | Min tokens to allow scaling up |
+| `tokenActivationThreshold` | `1` | 1 (critical) | 10 | Below this, never scale up |
+| `rateLimitThreshold` | `500` | 500 (10% of 5000) | 500 | GitHub API headroom floor |
+| `rateLimitActivationThreshold` | `100` | 100 (2%) | 100 | Critical GitHub rate-limit floor |
+
+**Free tier example:** With 50 requests/month (~1.6/day), set `tokenThreshold: 5` to preserve 10% for interactive use. Once tokens drop below 5, Picard scales to 0 and waits for the monthly reset.
+
+### Troubleshooting Token Scaler
+
+**Metrics not updating?**
+```bash
+# Check if copilot-metrics-exporter is polling successfully
+kubectl logs -n squad -l app.kubernetes.io/component=copilot-metrics-exporter -f
+
+# Verify gh copilot status works inside the pod
+kubectl exec -n squad <exporter-pod> -- gh copilot status
+```
+
+**KEDA not scaling?**
+```bash
+# Check if the ScaledObject is active and metrics are available
+kubectl get scaledobject picard-token-scaler -n squad -o yaml
+
+# Check KEDA operator logs
+kubectl logs -n keda deployment/keda-operator -f
+
+# Manually query Prometheus (if installed)
+kubectl exec -n monitoring <prometheus-pod> -- \
+  promtool query instant 'copilot_tokens_remaining'
+```
+
+**Pods stuck at 0 replicas?**
+```bash
+# Check if rate-limit or token thresholds are blocking
+kubectl describe scaledobject picard-token-scaler -n squad | grep -A 10 "Status:"
+
+# Check copilot-metrics-exporter logs for API errors
+kubectl logs -n squad -l app.kubernetes.io/component=copilot-metrics-exporter --tail=50
+```
+
+---
 
 ### Standard Free — KEDA ScaledObject not scaling
 
@@ -862,6 +963,11 @@ az aks update \
 | `global.acrLoginServer` | `""` | ACR login server (e.g. `acrsquadprod.azurecr.io`) |
 | `global.repository` | `tamirdresher_microsoft/tamresearch1` | GitHub repo for Squad agents |
 | `keda.enabled` | `false` | Enable KEDA ScaledObject for Picard autoscaling |
+| `keda.tokenScaler.enabled` | `false` | Enable KEDA token-aware scaler (tracks Copilot token budget) |
+| `keda.tokenScaler.tokenThreshold` | `"5"` | Min tokens to allow scaling (free tier: 50/month) |
+| `metricsExporter.enabled` | `false` | Enable Prometheus metrics exporters for KEDA |
+| `metricsExporter.port` | `9100` | Port for squad-metrics-exporter (GitHub rate limit + queue) |
+| `metricsExporter.copilotMetricsPort` | `9101` | Port for copilot-metrics-exporter (Copilot token budget) |
 | `keda.picard.minReplicaCount` | `0` | Scale-to-zero when no open picard issues |
 | `keda.picard.maxReplicaCount` | `3` | Maximum Picard replicas |
 | `ralph.schedule` | `*/5 * * * *` | CronJob schedule |

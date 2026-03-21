@@ -1,0 +1,394 @@
+# =============================================================================
+# copilot-metrics-exporter.yaml — Copilot Token Usage Metrics Exporter
+#
+# A lightweight Python exporter that tracks Copilot API usage metrics and
+# exposes them as Prometheus gauges for KEDA's token-aware scaling.
+#
+# Metrics exposed on :9101/metrics:
+#   copilot_tokens_remaining    — remaining token budget in current period
+#   copilot_requests_per_minute — current request rate
+#   copilot_rate_limit_hits     — count of 429 responses in last 5 minutes
+#   copilot_queue_depth         — pending tasks waiting for agent processing
+#   copilot_token_burn_rate     — tokens consumed per minute (derivative)
+#
+# Related: #1134 (KEDA token scaler), #998 (Copilot auth for K8s)
+# =============================================================================
+{{- if and .Values.metricsExporter.enabled .Values.keda.enabled }}
+---
+# ConfigMap: Copilot metrics exporter Python script
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: copilot-metrics-exporter-script
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+  annotations:
+    squad.github.com/issue: "1134"
+    squad.github.com/description: "Copilot token usage metrics for KEDA token-aware autoscaling"
+data:
+  exporter.py: |
+    #!/usr/bin/env python3
+    """
+    Copilot Token Usage Metrics Exporter
+    Tracks Copilot API usage and exposes Prometheus metrics for KEDA scaling.
+    Issue #1134: KEDA autoscaling based on Copilot token usage & rate limits
+    """
+    import os
+    import sys
+    import time
+    import json
+    import subprocess
+    from datetime import datetime, timedelta
+    from collections import deque
+    from prometheus_client import start_http_server, Gauge, Counter, Histogram
+
+    # ---------------------------------------------------------------------------
+    # Configuration from environment
+    # ---------------------------------------------------------------------------
+    GH_TOKEN             = os.environ.get("GH_TOKEN", "")
+    GITHUB_REPOSITORY    = os.environ.get("GITHUB_REPOSITORY", "")
+    POLL_INTERVAL        = int(os.environ.get("POLL_INTERVAL_SECONDS", "30"))
+    PORT                 = int(os.environ.get("METRICS_PORT", "9101"))
+    SQUAD_LABEL          = os.environ.get("SQUAD_LABEL", "squad:picard")
+
+    if not GH_TOKEN:
+        print("ERROR: GH_TOKEN is required", flush=True)
+        sys.exit(1)
+
+    # ---------------------------------------------------------------------------
+    # Prometheus metrics for token usage
+    # ---------------------------------------------------------------------------
+    COPILOT_TOKENS_REMAINING = Gauge(
+        "copilot_tokens_remaining",
+        "Remaining Copilot token budget in current billing period",
+        ["tier"],
+    )
+    COPILOT_REQUESTS_PER_MINUTE = Gauge(
+        "copilot_requests_per_minute",
+        "Current rate of Copilot API requests per minute",
+        ["tier"],
+    )
+    COPILOT_RATE_LIMIT_HITS = Counter(
+        "copilot_rate_limit_hits_total",
+        "Cumulative count of HTTP 429 responses from Copilot API",
+    )
+    COPILOT_QUEUE_DEPTH = Gauge(
+        "copilot_queue_depth",
+        "Number of pending tasks waiting for agent processing",
+        ["agent"],
+    )
+    COPILOT_TOKEN_BURN_RATE = Gauge(
+        "copilot_token_burn_rate",
+        "Tokens consumed per minute (derivative of usage trend)",
+        ["tier"],
+    )
+    COPILOT_API_LATENCY = Histogram(
+        "copilot_api_latency_seconds",
+        "Copilot API response latency in seconds",
+        ["operation"],
+    )
+    EXPORTER_ERRORS = Counter(
+        "copilot_metrics_exporter_errors_total",
+        "Cumulative count of errors during metric collection",
+    )
+
+    # ---------------------------------------------------------------------------
+    # Token tracking state (for burn rate calculation)
+    # ---------------------------------------------------------------------------
+    class TokenTracker:
+        def __init__(self, window_size=5):
+            # Rolling window of (timestamp, token_count) tuples
+            self.readings = deque(maxlen=window_size)
+
+        def record(self, tokens_remaining):
+            """Record a token reading."""
+            self.readings.append((time.time(), tokens_remaining))
+
+        def get_burn_rate(self):
+            """Calculate tokens/minute from rolling window."""
+            if len(self.readings) < 2:
+                return 0.0
+            
+            first_ts, first_tokens = self.readings[0]
+            last_ts, last_tokens = self.readings[-1]
+            
+            time_delta_sec = last_ts - first_ts
+            if time_delta_sec <= 0:
+                return 0.0
+            
+            token_delta = first_tokens - last_tokens  # Negative if tokens increase
+            rate_per_min = (token_delta / time_delta_sec) * 60
+            return max(0.0, rate_per_min)  # Clamp to non-negative
+
+    token_trackers = {
+        "free": TokenTracker(),
+        "pro": TokenTracker(),
+    }
+
+    # ---------------------------------------------------------------------------
+    # Collection functions
+    # ---------------------------------------------------------------------------
+    def get_gh_copilot_usage():
+        """
+        Parse 'gh copilot status' output to get token usage.
+        Output format (varies by tier):
+          Free tier:   "You have 50 requests available."
+          Pro tier:    "Unlimited requests available."
+          Rate limit:  "You have 12 requests left. Try again at 2024-01-15T14:30:00Z"
+        """
+        try:
+            result = subprocess.run(
+                ["gh", "copilot", "status"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                env={**os.environ, "GH_TOKEN": GH_TOKEN},
+            )
+            if result.returncode != 0:
+                print(f"[WARN] gh copilot status failed: {result.stderr}", flush=True)
+                return None
+            
+            output = result.stdout.strip()
+            
+            # Parse free tier: "You have 50 requests available."
+            if "You have" in output and "requests available" in output:
+                try:
+                    parts = output.split()
+                    if len(parts) >= 3:
+                        tokens = int(parts[2])
+                        token_trackers["free"].record(tokens)
+                        COPILOT_TOKENS_REMAINING.labels(tier="free").set(tokens)
+                        return tokens
+                except (ValueError, IndexError):
+                    pass
+            
+            # Parse pro tier: "Unlimited requests available."
+            if "Unlimited" in output:
+                COPILOT_TOKENS_REMAINING.labels(tier="pro").set(float('inf'))
+                return float('inf')
+            
+            # Parse rate-limited: "You have 12 requests left. Try again at..."
+            if "requests left" in output:
+                try:
+                    parts = output.split()
+                    if len(parts) >= 3:
+                        tokens = int(parts[2])
+                        token_trackers["pro"].record(tokens)
+                        COPILOT_TOKENS_REMAINING.labels(tier="pro").set(tokens)
+                        return tokens
+                except (ValueError, IndexError):
+                    pass
+            
+            print(f"[WARN] Could not parse copilot status: {output}", flush=True)
+            return None
+        except Exception as exc:
+            EXPORTER_ERRORS.inc()
+            print(f"[ERROR] get_gh_copilot_usage failed: {exc}", flush=True)
+            return None
+
+    def collect_queue_depth(label):
+        """Count open issues with a given squad label."""
+        try:
+            result = subprocess.run(
+                ["gh", "issue", "list", "--repo", GITHUB_REPOSITORY, 
+                 "--label", label, "--state", "open", "--json", "number", "-q", "length(.[])"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                env={**os.environ, "GH_TOKEN": GH_TOKEN},
+            )
+            if result.returncode != 0:
+                print(f"[WARN] gh issue list failed: {result.stderr}", flush=True)
+                return 0
+            
+            count = int(result.stdout.strip())
+            COPILOT_QUEUE_DEPTH.labels(agent="picard").set(count)
+            return count
+        except Exception as exc:
+            EXPORTER_ERRORS.inc()
+            print(f"[ERROR] collect_queue_depth failed: {exc}", flush=True)
+            return 0
+
+    def update_burn_rates():
+        """Update burn rate metrics from token trackers."""
+        for tier, tracker in token_trackers.items():
+            rate = tracker.get_burn_rate()
+            COPILOT_TOKEN_BURN_RATE.labels(tier=tier).set(rate)
+
+    # ---------------------------------------------------------------------------
+    # Main loop
+    # ---------------------------------------------------------------------------
+    def main():
+        start_http_server(PORT)
+        print(f"Copilot metrics exporter started on :{PORT}/metrics", flush=True)
+        print(f"  Repository : {GITHUB_REPOSITORY}", flush=True)
+        print(f"  Squad label: {SQUAD_LABEL}", flush=True)
+        print(f"  Poll interval: {POLL_INTERVAL}s", flush=True)
+
+        iteration = 0
+        while True:
+            try:
+                iteration += 1
+                tokens = get_gh_copilot_usage()
+                collect_queue_depth(SQUAD_LABEL)
+                
+                # Update burn rates every 5 minutes
+                if iteration % 10 == 0:
+                    update_burn_rates()
+                    if tokens is not None:
+                        print(f"[INFO] Tokens remaining: {tokens}, Burn rate: "
+                              f"{token_trackers['free'].get_burn_rate():.2f} tokens/min", flush=True)
+            except Exception as exc:
+                EXPORTER_ERRORS.inc()
+                print(f"[ERROR] Metric collection failed: {exc}", flush=True)
+            
+            time.sleep(POLL_INTERVAL)
+
+    if __name__ == "__main__":
+        main()
+
+  requirements.txt: |
+    requests==2.32.3
+    prometheus_client==0.21.1
+
+  entrypoint.sh: |
+    #!/bin/sh
+    set -e
+    pip install --quiet --no-cache-dir -r /app/requirements.txt
+    exec python /app/exporter.py
+
+---
+# Deployment: runs the exporter as a lightweight always-on pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: copilot-metrics-exporter
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+  annotations:
+    squad.github.com/issue: "1134"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "squad-agents.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: copilot-metrics-exporter
+  template:
+    metadata:
+      labels:
+        {{- include "squad-agents.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: copilot-metrics-exporter
+        azure.workload.identity/use: "true"
+      annotations:
+        # Prometheus auto-scrape (if prometheus-operator is installed)
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.metricsExporter.copilotMetricsPort | quote }}
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "squad-agents.serviceAccountName" . }}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: squad-secrets
+        - name: script
+          configMap:
+            name: copilot-metrics-exporter-script
+            defaultMode: 0755
+
+      containers:
+        - name: exporter
+          # python:3.12-slim — minimal, includes gh CLI
+          image: mcr.microsoft.com/devcontainers/python:3.12
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "/app/entrypoint.sh"]
+
+          env:
+            - name: GITHUB_REPOSITORY
+              value: {{ .Values.global.repository | quote }}
+            - name: SQUAD_LABEL
+              value: {{ .Values.metricsExporter.squadLabel | quote }}
+            - name: POLL_INTERVAL_SECONDS
+              value: {{ .Values.metricsExporter.pollIntervalSeconds | quote }}
+            - name: METRICS_PORT
+              value: {{ .Values.metricsExporter.copilotMetricsPort | quote }}
+            - name: GH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.keyVault.k8sSecretName }}
+                  key: GH_TOKEN
+
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.metricsExporter.copilotMetricsPort }}
+              protocol: TCP
+
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+            - name: script
+              mountPath: "/app"
+              readOnly: true
+
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "256Mi"
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 2
+
+---
+# Service: exposes the exporter for Prometheus scraping
+apiVersion: v1
+kind: Service
+metadata:
+  name: copilot-metrics-exporter
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "squad-agents.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+  ports:
+    - name: metrics
+      port: {{ .Values.metricsExporter.copilotMetricsPort }}
+      targetPort: metrics
+      protocol: TCP
+
+{{- end }}

@@ -228,9 +228,13 @@ picard:
 # =============================================================================
 # KEDA — Event-driven scaling for Picard
 #
-# Scales the Picard Deployment using a composite AND-logic trigger:
-#   scale UP  when: open issues exist  AND  GitHub rate-limit headroom is OK
-#   scale DOWN when: no issues OR rate-limit is nearly exhausted
+# Scales the Picard Deployment using composite AND-logic triggers:
+#   scale UP  when: open issues exist  AND  tokens available  AND  rate limit OK
+#   scale DOWN when: no issues OR tokens critical OR rate-limited
+#
+# Supports two scaling modes:
+#   1. Simple mode (legacy): scales on open issue count only
+#   2. Token-aware mode (recommended): scales on work queue AND token budget
 #
 # Requires:
 #   1. KEDA v2.12+ on the cluster:
@@ -238,8 +242,9 @@ picard:
 #        # OR
 #        helm install keda kedacore/keda  (self-managed, >= 2.12)
 #   2. metricsExporter.enabled=true (squad-metrics-exporter must be running)
+#   3. For token-aware: tokenScaler.enabled=true AND copilot-metrics-exporter running
 #
-# Related: #1134 (KEDA token scaler), #1141 (scaler type research)
+# Related: #1134 (KEDA token scaler), #1160 (composite scaling), #1141 (scaler research)
 # =============================================================================
 keda:
   enabled: false   # Set to true once KEDA add-on is installed and exporter is healthy
@@ -251,6 +256,51 @@ keda:
   #   2. GitHub API rate-limit remaining exceeds rateLimitThreshold (rate_headroom > 0)
   # Requires github-metrics-exporter (issue #1154) to be deployed.
   compositeMode: false
+  
+  # ── Token-aware scaling (issue #1134) ─────────────────────────────────────
+  # Token scaler: scales on work queue AND Copilot token availability.
+  # Prevents spinning up pods when token budget is exhausted (free tier: 50/month).
+  # Requires: keda.enabled=true, metricsExporter.enabled=true, 
+  #           copilot-metrics-exporter Deployment running (port 9101/metrics)
+  tokenScaler:
+    # Enable token-aware scaling (requires copilot-metrics-exporter)
+    enabled: false
+    
+    # Replica bounds: 0 (scale-to-zero) to maxReplicaCount
+    minReplicaCount: 0
+    maxReplicaCount: 5
+    
+    # Polling and cooldown timing
+    pollingInterval: 30      # KEDA evaluates triggers every 30 seconds
+    cooldownPeriod: 300      # 5 minutes idle before scaling to zero (lets tasks drain)
+    
+    # Queue targeting: 1 replica per targetQueuePerReplica issues
+    targetQueuePerReplica: "2"
+    
+    # ─── Token budget thresholds ──────────────────────────────────────────
+    # Free tier: 50 requests/month = ~1.6 requests/day
+    # Pro tier: effectively unlimited, but monitor burn rate
+    
+    # Minimum tokens required to allow scaling UP
+    # Below this, scale to 0 and wait for reset window (monthly)
+    tokenThreshold: "5"
+    
+    # If tokens drop below this, don't even consider scaling
+    tokenActivationThreshold: "1"
+    
+    # ─── GitHub API rate-limit thresholds ─────────────────────────────────
+    # GitHub REST limit: 5000 requests/hour (authenticated)
+    
+    # Minimum rate-limit headroom to allow scaling UP
+    # 500 = 10% headroom (prevents exhaustion)
+    rateLimitThreshold: "500"
+    
+    # If rate-limit drops below this, scale to 0 immediately (backoff)
+    # 100 = ~2% headroom (critical threshold)
+    rateLimitActivationThreshold: "100"
+    
+    # Use GitHub built-in scaler as fallback when metrics unavailable
+    fallbackGithubScaler: true
 
   # Minimum GitHub API calls remaining before rate-limit gate blocks scaling.
   # The metrics-api trigger compares github_rate_limit_remaining against this.
@@ -326,67 +376,51 @@ keda:
     targetWorkflowQueueLength: "1"
 
 # =============================================================================
-# Metrics Exporter — squad-metrics-exporter
+# Metrics Exporter — squad-metrics-exporter & copilot-metrics-exporter
 #
-# Lightweight Python exporter that polls GitHub API and exposes Prometheus
-# metrics used by KEDA's composite scaler triggers.
+# Two lightweight exporters expose Prometheus metrics used by KEDA's scalers:
 #
-# Exposes on :9100/metrics:
-#   github_api_rate_limit_remaining{resource="core|search|..."}
-#   github_api_rate_limit_used{resource="core|..."}
-#   github_api_rate_limit_reset{resource="core|..."}
-#   squad_copilot_queue_depth{label="squad:picard"}
-#   squad_copilot_rate_limit_hits_total
-#   squad_metrics_exporter_errors_total
+# 1. squad-metrics-exporter (port 9100):
+#    • GitHub API rate limit (github_api_rate_limit_remaining)
+#    • Work queue depth (squad_copilot_queue_depth)
 #
-# Enable alongside keda.enabled=true and keda.picard.composite.enabled=true.
+# 2. copilot-metrics-exporter (port 9101):
+#    • Copilot token budget (copilot_tokens_remaining)
+#    • Token burn rate (copilot_token_burn_rate)
+#    • 429 backoff counter (copilot_rate_limit_hits_total)
+#
+# Enable alongside keda.enabled=true for autoscaling.
 # =============================================================================
 metricsExporter:
   enabled: false   # Enable together with keda.enabled
 
-  # GitHub label to count for queue depth metric
+  # GitHub issue label to count as "queue depth"
   squadLabel: "squad:picard"
 
-  # How often to poll GitHub API (seconds). 30s = 2 calls/min = 120/hour.
+  # How often to poll the GitHub API (seconds). 30s = 2 calls/min = 120/hour.
   # Well within the 5000/hour GitHub rate limit.
   pollIntervalSeconds: "30"
 
-  # Port exposed for Prometheus scraping
+  # ─── squad-metrics-exporter port (GitHub rate limit + queue depth) ─────
+  # Prometheus scrapes this endpoint for KEDA composite scalers
   port: 9100
+
+  # ─── copilot-metrics-exporter port (Copilot token budget) ─────────────
+  # Prometheus scrapes this endpoint for KEDA token-aware scalers
+  copilotMetricsPort: 9101
 
   resources:
     limits:
-      cpu: "100m"
-      memory: "128Mi"
+      cpu: "200m"
+      memory: "256Mi"
     requests:
       cpu: "50m"
       memory: "64Mi"
 
-  # Pin to the monitor node pool (same as Ralph — cheap, non-spot)
-  nodeSelector:
-    squad.github.com/pool: monitor
-
-  tolerations:
-    - key: "squad.github.com/pool"
-      operator: "Equal"
-      value: "monitor"
-      effect: "NoSchedule"
-
-  # ── Tier 1: GitHub Actions runner queue trigger (issue #1158) ─────────────
-  # Scales on GitHub Actions self-hosted runner queue depth.
-  # Independent of the issue-count scaler above.
-  # Uses KEDA's built-in github-runner scaler with ETag caching.
-  # Reference: https://keda.sh/docs/2.19/scalers/github-runner/
-  githubRunner:
-    enabled: false   # Enable separately once runner pool is configured
-    minReplicas: 1
-    maxReplicas: 10
-    pollingInterval: 30
-    cooldownPeriod: 300
-    # Runner scope: repo | org | enterprise
-    runnerScope: "repo"
-    # Scale up when queue depth exceeds this value
-    targetQueueLength: "1"
+  # nodeSelector and tolerations are inherited from the top-level nodeSelector.
+  # These per-component overrides are kept for backward compatibility.
+  nodeSelector: {}
+  tolerations: []
 
 # =============================================================================
 # Azure Monitor / Diagnostics
@@ -400,35 +434,3 @@ monitoring:
 
   # Log Analytics workspace resource ID (for future OTel exporter)
   logAnalyticsWorkspaceId: ""
-
-# =============================================================================
-# GitHub Metrics Exporter (optional — requires keda.enabled=true)
-#
-# Lightweight Python pod that exposes GitHub rate-limit and queue-depth
-# metrics for KEDA's Prometheus scaler. Only deployed when both
-# metricsExporter.enabled AND keda.enabled are true.
-# =============================================================================
-metricsExporter:
-  enabled: false
-
-  # Prometheus metrics port
-  port: 9100
-
-  # GitHub issue label to count as "queue depth"
-  squadLabel: "squad:picard"
-
-  # How often to poll the GitHub API (seconds)
-  pollIntervalSeconds: "30"
-
-  resources:
-    limits:
-      cpu: "200m"
-      memory: "128Mi"
-    requests:
-      cpu: "50m"
-      memory: "64Mi"
-
-  # nodeSelector and tolerations are inherited from the top-level nodeSelector.
-  # These per-component overrides are kept for backward compatibility.
-  nodeSelector: {}
-  tolerations: []

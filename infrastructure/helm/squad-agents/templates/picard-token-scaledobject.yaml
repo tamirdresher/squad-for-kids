@@ -1,0 +1,165 @@
+# =============================================================================
+# picard-token-scaledobject.yaml — Token-Aware KEDA ScaledObject
+#
+# Scales Picard Deployment based on BOTH:
+#   1. Work queue depth (open issues labeled squad:picard)
+#   2. Copilot token availability (from copilot-metrics-exporter)
+#   3. Rate-limit headroom (GitHub API rate limits)
+#
+# Composite AND logic (KEDA v2.12+ scalingModifiers):
+#   Scale UP when: queue > 0 AND tokens_remaining > threshold AND rate_limit > threshold
+#   Scale DOWN to 0 when: queue == 0 OR tokens critical OR rate_limit critical
+#
+# Scale-to-zero strategy:
+#   - minReplicaCount: 0 enables scale-to-zero when no work
+#   - cooldownPeriod: 300s (5 min) gives tasks time to drain
+#   - When rate-limited, pods scale down and stay down until reset window passes
+#
+# Prerequisites:
+#   - KEDA v2.12+ installed
+#   - copilot-metrics-exporter Deployment running (port 9101/metrics)
+#   - squad-metrics-exporter Deployment running (port 9100/metrics)
+#   - keda.tokenScaler.enabled=true in values.yaml
+#
+# Related: #1134 (this issue), #1160 (composite scaling), #1158 (runner scaling)
+# =============================================================================
+{{- if and .Values.keda.enabled .Values.keda.tokenScaler.enabled }}
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: picard-token-scaler
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: picard
+    scaling.keda.sh/version: "v2.12"
+  annotations:
+    squad.github.com/issue: "1134"
+    squad.github.com/description: "Token-aware KEDA scaler: scale Picard on work queue AND token availability"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: picard
+
+  minReplicaCount: {{ .Values.keda.tokenScaler.minReplicaCount }}
+  maxReplicaCount: {{ .Values.keda.tokenScaler.maxReplicaCount }}
+  pollingInterval: {{ .Values.keda.tokenScaler.pollingInterval }}
+  cooldownPeriod: {{ .Values.keda.tokenScaler.cooldownPeriod }}
+
+  # ---------------------------------------------------------------------------
+  # scalingModifiers — AND logic (KEDA v2.12+ composite scaling)
+  #
+  # Metrics (s0, s1, s2):
+  #   s0 = copilot_tokens_remaining       (free tier: 0-50, pro: ∞)
+  #   s1 = squad_copilot_queue_depth      (pending issues)
+  #   s2 = github_api_rate_limit_remaining (GitHub API headroom)
+  #
+  # Scaling formula (advanced.scalingModifiers.formula):
+  #   IF queue > 0 AND tokens > token_threshold AND rate_limit > rate_threshold
+  #   THEN return queue_depth
+  #   ELSE return 0 (scale to min)
+  #
+  # Effect:
+  #   • Scales UP: 1 replica per targetQueuePerReplica issues
+  #   • Scales DOWN: when no work OR tokens critical OR rate-limited
+  #   • Backoff: when rate-limited, stays at 0 for cooldownPeriod (300s)
+  # ---------------------------------------------------------------------------
+  advanced:
+    scalingModifiers:
+      formula: >-
+        s1 > 0 && s0 > {{ .Values.keda.tokenScaler.tokenThreshold }} && s2 > {{ .Values.keda.tokenScaler.rateLimitThreshold }} ? s1 : 0
+      target: {{ .Values.keda.tokenScaler.targetQueuePerReplica | quote }}
+
+  triggers:
+    # -------------------------------------------------------------------------
+    # Trigger 0 (s0): Copilot token availability
+    # Metric: copilot_tokens_remaining{tier="free"} or {tier="pro"}
+    # 
+    # For free tier: 50 request/month budget
+    # For pro tier: effectively unlimited, but monitor for rate limits
+    #
+    # activationThreshold: if tokens drop below this, scaling is blocked
+    # -------------------------------------------------------------------------
+    - type: prometheus
+      name: s0
+      metadata:
+        serverAddress: >-
+          http://copilot-metrics-exporter.{{ .Values.global.namespace }}.svc.cluster.local:{{ .Values.metricsExporter.copilotMetricsPort }}
+        query: >-
+          copilot_tokens_remaining{tier="free"}
+        threshold: {{ .Values.keda.tokenScaler.tokenThreshold | quote }}
+        activationThreshold: {{ .Values.keda.tokenScaler.tokenActivationThreshold | quote }}
+        ignoreNullValues: "true"
+
+    # -------------------------------------------------------------------------
+    # Trigger 1 (s1): Work queue depth
+    # Metric: squad_copilot_queue_depth{agent="picard"}
+    # Scale 1 replica per targetQueuePerReplica open issues
+    # -------------------------------------------------------------------------
+    - type: prometheus
+      name: s1
+      metadata:
+        serverAddress: >-
+          http://squad-metrics-exporter.{{ .Values.global.namespace }}.svc.cluster.local:{{ .Values.metricsExporter.port }}
+        query: >-
+          squad_copilot_queue_depth{label={{ .Values.metricsExporter.squadLabel | quote }}}
+        threshold: {{ .Values.keda.tokenScaler.targetQueuePerReplica | quote }}
+        activationThreshold: "1"
+        ignoreNullValues: "true"
+
+    # -------------------------------------------------------------------------
+    # Trigger 2 (s2): GitHub API rate-limit headroom guard
+    # Metric: github_api_rate_limit_remaining{resource="core"}
+    # 
+    # GitHub REST API limit: 5000 requests/hour (authenticated)
+    # Keep threshold at ~10% headroom to prevent exhaustion
+    # rateLimitThreshold: typically 500 (10% of 5000)
+    # -------------------------------------------------------------------------
+    - type: prometheus
+      name: s2
+      metadata:
+        serverAddress: >-
+          http://squad-metrics-exporter.{{ .Values.global.namespace }}.svc.cluster.local:{{ .Values.metricsExporter.port }}
+        query: >-
+          github_api_rate_limit_remaining{resource="core"}
+        threshold: {{ .Values.keda.tokenScaler.rateLimitThreshold | quote }}
+        activationThreshold: {{ .Values.keda.tokenScaler.rateLimitActivationThreshold | quote }}
+        ignoreNullValues: "true"
+
+    # -------------------------------------------------------------------------
+    # Trigger 3: Fallback to simple issue count when metrics unavailable
+    # Uses KEDA's built-in GitHub scaler (no Prometheus required)
+    # Only activated if compositeMetrics are unavailable
+    # -------------------------------------------------------------------------
+    {{- if .Values.keda.tokenScaler.fallbackGithubScaler }}
+    - type: github
+      metadata:
+        owner: {{ .Values.global.repository | splitList "/" | first | quote }}
+        repo: {{ .Values.global.repository | splitList "/" | last | quote }}
+        labels: "squad:picard"
+        state: "open"
+        targetIssueCount: {{ .Values.keda.tokenScaler.targetQueuePerReplica | quote }}
+      authenticationRef:
+        name: github-trigger-auth
+    {{- end }}
+
+---
+# TriggerAuthentication for fallback GitHub scaler (if enabled)
+{{- if .Values.keda.tokenScaler.fallbackGithubScaler }}
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: github-trigger-auth
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+spec:
+  secretTargetRef:
+    - parameter: personalAccessToken
+      name: {{ .Values.keyVault.k8sSecretName }}
+      key: GH_TOKEN
+{{- end }}
+
+{{- end }}

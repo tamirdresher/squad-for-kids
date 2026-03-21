@@ -91,3 +91,49 @@
 - The Week 1-8 progression is critical to honesty — Tamir always shows the rough edges before celebrating wins. Chapter 2 follows same arc: skeptical → frustrated → trusting → converted.
 - Diagram notes are placeholders for production — book will need visual aids for Ralph's loop and compounding curve
 - Chapter 2 bridges from "why systems fail" (Chapter 1) to "how this system works" while setting up "who runs this system" (Chapter 3 personas)
+
+- **2026-03-20 — Rate Limiting Blog Post Fixes (Issue #1281):**
+  - Fixed the rate limiting blog post to address multiple issues identified by Tamir
+  - Added Pattern 7: Multi-machine/multi-node rate limiting section explaining why file-based approach is single-node only and what alternatives work for distributed systems (Redis/Valkey, etcd, sidecar pattern)
+  - Fixed voice throughout: replaced all "we/us" with "I/me" to match Tamir's first-person voice
+  - Removed all Anthropic references, replaced with GitHub Copilot or generic "API" terminology
+  - Changed generic "Kubernetes" to "AKS" and "Azure" throughout to match Tamir's actual stack
+  - Added Reddit thread reference (https://www.reddit.com/r/GithubCopilot/s/N5DH2B8YA0) to "Story" section for context
+  - Clarified that x-ratelimit-remaining headers are only available when making direct API calls, not when using Copilot CLI with `-p` flag
+  - Maintained Tamir's voice: conversational, honest about limitations, first-person, technically detailed but accessible
+  - Key lesson: Be honest about single-node vs multi-node — don't oversell the file-based approach as "distributed" when it isn't
+  - Pattern 7 emphasizes "start simple, migrate when needed" philosophy rather than premature distributed infrastructure
+  - Committed to squad/blog-rate-limiting branch: b4f7c53
+
+- **2026-03-22 — Part 7: Enterprise State Management (New Post):**
+  - Wrote Part 7 of Scaling AI series: "When Git Is Your Database — The Enterprise State Problem Nobody Warned Me About"
+  - **The Problem:** Squad state files (.squad/) mixed with code in PRs — 700+ files, 95% state / 5% code. Agents need approval to remember things. Parallel branches have stale state. JSON merge conflicts.
+  - **Three Approaches Evaluated:**
+    1. Orphan Branch (git worktree) — technically elegant, requires team education. Best for scale.
+    2. Separate Repo — conceptually simple, splits context. Easiest to explain.
+    3. Auto-Merge Bot — minimal setup, but race conditions and compliance approval needed.
+  - **Voice Patterns Applied:**
+    - Opening with Brady conversation about "simplicity is key" philosophy
+    - Story-driven: Tuesday morning PR with 734 files showing the problem
+    - Self-deprecating: "I should have seen it coming"
+    - First-person throughout (I/me/my)
+    - Honest reflection: "None are perfect. All require tradeoffs."
+    - Comparison table for evaluation clarity
+    - Link to Reddit discussion for community engagement
+    - Series navigation box with proper dates and URLs
+  - **SVG Diagrams Created:**
+    - hero.svg — Visual of .squad/ files tangled with code in PR
+    - orphan-branch-architecture.svg — Orphan branch approach with worktree mount
+    - three-approaches.svg — Side-by-side comparison of all 3 approaches
+  - **Publishing Workflow:**
+    - Created branch: posts/scaling-ai-part7-enterprise-state
+    - Committed: 2b87a3c
+    - Pushed to tamirdresher personal account (blog repo)
+    - PR created: https://github.com/tamirdresher/tamirdresher.github.io/pull/49
+  - **Key Learnings:**
+    - Part 7 continues the "scaling problems" arc (Part 4: distributed systems, Part 6: rate limiting, Part 7: state management)
+    - The "Git as database" philosophy works for code but breaks for high-frequency state updates
+    - Different update frequency requires different storage strategy — code changes 1x/day, state changes 50x/day
+    - Orphan branch is the technically correct solution but requires explaining git worktrees
+    - Voice signature: lead with philosophy (Brady conversation), show the pain (734-file PR), evaluate solutions honestly, admit uncertainty ("I'm still figuring out")
+  - Ready for Tamir's review and merge

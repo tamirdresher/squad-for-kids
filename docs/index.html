@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סקוואד לילדים — צוות AI אישי שמלמד את הילד שלך בדמויות שהוא אוהב</title>
+    <meta name="description" content="מערכת AI חינמית שמלמדת ילדים מתמטיקה, קריאה ועוד — עם דמויות מהארי פוטר, פרוזן ומיינקראפט. עברית מלאה, מותאם לתכנית הלימודים הישראלית.">
+    <meta property="og:title" content="סקוואד לילדים — הילד שלך ילמד מהרמיוני גריינג׳ר 🧙‍♀️">
+    <meta property="og:description" content="צוות AI אישי שמלמד את הילד שלך בדמויות שהוא אוהב. בחינם!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tamirdresher.github.io/squad-for-kids/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #FEFCF3;
+            --bg-alt: #FFF8E7;
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --accent-pink: #FF6584;
+            --accent-green: #43B97F;
+            --text: #2D2D3F;
+            --text-light: #6B6B80;
+            --white: #FFFFFF;
+            --shadow-sm: 0 2px 8px rgba(108, 99, 255, 0.08);
+            --shadow-md: 0 4px 20px rgba(108, 99, 255, 0.12);
+            --shadow-lg: 0 8px 40px rgba(108, 99, 255, 0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px 40px;
+            background: linear-gradient(160deg, #F0EDFF 0%, var(--bg) 40%, #FFF0F3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(108,99,255,0.07) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(255,101,132,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .hero-emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: var(--text-light);
+            font-weight: 400;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-width: 260px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.35);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(108, 99, 255, 0.45);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            border: 2px solid rgba(108, 99, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: #F5F3FF;
+            transform: translateY(-2px);
+        }
+
+        .btn-green {
+            background: var(--accent-green);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(67, 185, 127, 0.35);
+            font-size: 1.25rem;
+            padding: 18px 40px;
+        }
+
+        .btn-green:hover {
+            background: #38A06E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(67, 185, 127, 0.45);
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+        }
+
+        .btn-whatsapp:hover {
+            background: #1EBE5A;
+            transform: translateY(-2px);
+        }
+
+        /* ============ SECTIONS ============ */
+        section {
+            padding: 80px 24px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 48px;
+            color: var(--text);
+        }
+
+        .section-title span {
+            color: var(--primary);
+        }
+
+        /* ============ HOW IT WORKS ============ */
+        .how-it-works {
+            background: var(--white);
+        }
+
+        .steps {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 28px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            border-radius: 50%;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-number {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .step h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .step p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+        }
+
+        /* ============ FEATURES ============ */
+        .features {
+            background: linear-gradient(180deg, var(--bg) 0%, #F0EDFF 100%);
+        }
+
+        .features-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feature-item {
+            background: var(--white);
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-check {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-item strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .feature-item p {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        /* ============ DEMO VIDEO ============ */
+        .demo-section {
+            background: var(--white);
+            text-align: center;
+        }
+
+        .demo-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .demo-placeholder {
+            background: linear-gradient(135deg, #2D2D3F 0%, #1a1a2e 100%);
+            border-radius: var(--radius);
+            padding: 60px 24px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .demo-placeholder:hover {
+            transform: scale(1.01);
+        }
+
+        .demo-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(108,99,255,0.2) 0%, transparent 60%);
+        }
+
+        .demo-play-btn {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            box-shadow: 0 4px 30px rgba(108, 99, 255, 0.5);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .demo-placeholder:hover .demo-play-btn {
+            transform: scale(1.1);
+        }
+
+        .demo-text {
+            position: relative;
+            z-index: 1;
+            font-size: 1.15rem;
+            opacity: 0.9;
+        }
+
+        .demo-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.6;
+            margin-top: 8px;
+        }
+
+        /* ============ SETUP ============ */
+        .setup-section {
+            background: linear-gradient(180deg, #F0EDFF 0%, var(--bg) 100%);
+        }
+
+        .setup-card {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .setup-recommended {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--primary);
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .setup-badge {
+            position: absolute;
+            top: -14px;
+            right: 24px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .setup-recommended h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            color: var(--primary);
+        }
+
+        .setup-steps {
+            list-style: none;
+            counter-reset: setup-step;
+        }
+
+        .setup-steps li {
+            counter-increment: setup-step;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(108, 99, 255, 0.08);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            font-size: 1.08rem;
+        }
+
+        .setup-steps li:last-child {
+            border-bottom: none;
+        }
+
+        .setup-steps li::before {
+            content: counter(setup-step);
+            background: var(--primary);
+            color: var(--white);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .setup-steps li a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 2px solid rgba(108, 99, 255, 0.3);
+            transition: border-color 0.2s;
+        }
+
+        .setup-steps li a:hover {
+            border-color: var(--primary);
+        }
+
+        .setup-btn-wrapper {
+            text-align: center;
+            margin: 8px 0;
+        }
+
+        .code-inline {
+            background: #2D2D3F;
+            color: #E8E6FF;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        /* Collapsible */
+        .collapsible {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .collapsible-toggle {
+            background: var(--white);
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 20px 28px;
+            width: 100%;
+            text-align: right;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .collapsible-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .collapsible-toggle .arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 2000px;
+        }
+
+        .collapsible-toggle.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-inner {
+            background: var(--white);
+            border: 1px solid rgba(108, 99, 255, 0.1);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 24px 28px;
+        }
+
+        .collapsible-inner h4 {
+            font-size: 1.1rem;
+            margin: 20px 0 12px;
+            color: var(--primary);
+        }
+
+        .collapsible-inner h4:first-child {
+            margin-top: 0;
+        }
+
+        .collapsible-inner ol {
+            padding-right: 24px;
+        }
+
+        .collapsible-inner li {
+            margin-bottom: 10px;
+            font-size: 1.02rem;
+            color: var(--text-light);
+        }
+
+        /* ============ FAQ ============ */
+        .faq-section {
+            background: var(--white);
+        }
+
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .faq-item {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 20px 24px;
+            text-align: right;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-question .faq-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-arrow {
+            transform: rotate(180deg);
+        }
+
+        .faq-item.open .faq-question {
+            color: var(--primary);
+        }
+
+        /* ============ SHARE ============ */
+        .share-section {
+            background: linear-gradient(180deg, var(--bg) 0%, #F0EDFF 100%);
+            text-align: center;
+        }
+
+        .share-buttons {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .share-buttons .btn {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .btn-telegram {
+            background: #0088CC;
+            color: var(--white);
+        }
+
+        .btn-telegram:hover {
+            background: #0077B5;
+            transform: translateY(-2px);
+        }
+
+        .btn-email-share {
+            background: var(--accent-pink);
+            color: var(--white);
+        }
+
+        .btn-email-share:hover {
+            background: #E8577A;
+            transform: translateY(-2px);
+        }
+
+        .btn-copy {
+            background: var(--white);
+            color: var(--text);
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .btn-copy:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .copy-feedback {
+            display: none;
+            color: var(--accent-green);
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* ============ FOOTER ============ */
+        footer {
+            background: #2D2D3F;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        footer p {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        footer a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            transition: border-color 0.2s;
+        }
+
+        footer a:hover {
+            border-color: var(--white);
+        }
+
+        footer .heart {
+            color: var(--accent-pink);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (min-width: 640px) {
+            .hero-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .share-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                max-width: 700px;
+            }
+
+            .share-buttons .btn {
+                width: auto;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            section {
+                padding: 56px 16px;
+            }
+
+            .step {
+                padding: 20px;
+                gap: 14px;
+            }
+
+            .step-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+            }
+
+            .setup-recommended {
+                padding: 28px 20px;
+            }
+
+            .btn {
+                min-width: 220px;
+                padding: 14px 28px;
+                font-size: 1.05rem;
+            }
+        }
+
+        /* ============ ACCESSIBILITY ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(108, 99, 255, 0.3);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+    <div class="hero-content">
+        <span class="hero-emoji" aria-hidden="true">🧙‍♀️</span>
+        <h1>הילד שלך ילמד מתמטיקה<br>מ<span>הרמיוני גריינג׳ר</span></h1>
+        <p class="hero-subtitle">סקוואד לילדים — צוות AI אישי שמלמד את הילד שלך בדמויות שהוא אוהב</p>
+        <div class="hero-buttons">
+            <a href="#setup" class="btn btn-primary">🚀 בואו נתחיל — בחינם!</a>
+            <a href="#demo" class="btn btn-secondary">📺 צפו בדמו</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how-it-works" id="how">
+    <div class="container">
+        <h2 class="section-title">איך זה <span>עובד?</span></h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-icon">👋</div>
+                <div>
+                    <div class="step-number">שלב 1</div>
+                    <h3>הילד אומר שלום</h3>
+                    <p>הילד פותח את המערכת ומספר את השם, הגיל והכיתה</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-icon">🎬</div>
+                <div>
+                    <div class="step-number">שלב 2</div>
+                    <h3>בוחר עולם אהוב</h3>
+                    <p>הארי פוטר? פרוזן? מיינקראפט? המערכת בונה צוות מהעולם שהילד בחר</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-icon">📚</div>
+                <div>
+                    <div class="step-number">שלב 3</div>
+                    <h3>מתחילים ללמוד!</h3>
+                    <p>הרמיוני מלמדת חשבון, דובי נותן חיבוק כשקשה, פרד הופך שיעורי בית למשחק</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="features" id="features">
+    <div class="container">
+        <h2 class="section-title">למה זה <span>מיוחד?</span></h2>
+        <div class="features-list">
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">✅</span>
+                <div>
+                    <strong>מזהה אוטומטית את תכנית הלימודים</strong>
+                    <p>כותבים "ראשון לציון" והמערכת יודעת שזה ישראל, כיתה ב׳, משרד החינוך</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">✅</span>
+                <div>
+                    <strong>דמויות שהילד אוהב</strong>
+                    <p>לא מורה רובוטית, אלא הרמיוני, אלזה, או סטיב ממיינקראפט</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">✅</span>
+                <div>
+                    <strong>תמיכה רגשית</strong>
+                    <p>כשהילד אומר "אני לא יכול" — דובי לא אומר "תנסה יותר". הוא מחבק ומציע אפשרויות</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">✅</span>
+                <div>
+                    <strong>דוח להורים</strong>
+                    <p>רואים מה הילד למד, מה הוא טוב בו, ומה צריך לתרגל</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">✅</span>
+                <div>
+                    <strong>עברית מלאה</strong>
+                    <p>כולל כתיבה מימין לשמאל, מספרים בעברית, ותכנים ישראליים</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">✅</span>
+                <div>
+                    <strong>בחינם</strong>
+                    <p>לא צריך כרטיס אשראי. בכלל.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ DEMO VIDEO ============ -->
+<section class="demo-section" id="demo">
+    <div class="container">
+        <h2 class="section-title">📺 ראו את זה <span>בפעולה</span></h2>
+        <div class="demo-container">
+            <div class="demo-placeholder" role="button" tabindex="0" aria-label="צפייה בהדגמה">
+                <div class="demo-play-btn" aria-hidden="true">▶</div>
+                <p class="demo-text">ראו איך יואב בן 7 מראשון לציון מקבל צוות מהארי פוטר</p>
+                <p class="demo-subtitle">דמו אנימציה — 2 דקות</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ SETUP ============ -->
+<section class="setup-section" id="setup">
+    <div class="container">
+        <h2 class="section-title">איך מתחילים? <span>3 דקות. בטוח.</span></h2>
+
+        <div class="setup-card">
+            <div class="setup-recommended">
+                <div class="setup-badge">🌟 מומלץ!</div>
+                <h3>הדרך הקלה ביותר</h3>
+                <ol class="setup-steps">
+                    <li>
+                        <span>יש לכם חשבון GitHub? מעולה! אם לא — <a href="https://github.com/signup" target="_blank" rel="noopener">צרו חשבון בחינם</a> (דקה אחת, כמו להירשם לאתר רגיל)</span>
+                    </li>
+                    <li>
+                        <span>
+                            לחצו על הכפתור הירוק:
+                            <div class="setup-btn-wrapper">
+                                <a href="https://github.com/codespaces/new?repo=tamirdresher/squad-for-kids" target="_blank" rel="noopener" class="btn btn-green">✨ פתחו את סקוואד לילדים</a>
+                            </div>
+                        </span>
+                    </li>
+                    <li>
+                        <span>חכו דקה עד שהמסך נטען (תראו ממשק עם טקסט — זה בסדר!)</span>
+                    </li>
+                    <li>
+                        <span>בתחתית המסך יש שורת טקסט — כתבו שם: <span class="code-inline">copilot</span> ולחצו Enter</span>
+                    </li>
+                    <li>
+                        <span>תנו לילד את המקלדת! 🎮</span>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="collapsible">
+            <button class="collapsible-toggle" aria-expanded="false" onclick="toggleCollapsible(this)">
+                💻 התקנה על המחשב (למתקדמים)
+                <span class="arrow" aria-hidden="true">⌄</span>
+            </button>
+            <div class="collapsible-content">
+                <div class="collapsible-inner">
+                    <h4>🪟 Windows</h4>
+                    <ol>
+                        <li>הורידו והתקינו את <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">Visual Studio Code</a> (תוכנה חינמית של מייקרוסופט)</li>
+                        <li>פתחו את התוכנה, לחצו על האייקון של המרובע בצד שמאל (Extensions), וחפשו "GitHub Copilot" — התקינו</li>
+                        <li>הורידו את <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">Git</a> והתקינו (לחצו Next עד הסוף)</li>
+                        <li>פתחו Terminal בתוך VS Code (תפריט Terminal → New Terminal)</li>
+                        <li>כתבו: <span class="code-inline">git clone https://github.com/tamirdresher/squad-for-kids.git</span></li>
+                        <li>פתחו את התיקייה שנוצרה: File → Open Folder → squad-for-kids</li>
+                        <li>ב-Terminal כתבו: <span class="code-inline">copilot</span> ולחצו Enter</li>
+                    </ol>
+
+                    <h4>🍎 Mac</h4>
+                    <ol>
+                        <li>הורידו והתקינו את <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">Visual Studio Code</a></li>
+                        <li>התקינו את התוסף "GitHub Copilot" מתוך Extensions</li>
+                        <li>פתחו Terminal (Spotlight → Terminal) וכתבו: <span class="code-inline">git clone https://github.com/tamirdresher/squad-for-kids.git</span></li>
+                        <li>ב-VS Code: File → Open Folder → squad-for-kids</li>
+                        <li>ב-Terminal כתבו: <span class="code-inline">copilot</span> ולחצו Enter</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq-section" id="faq">
+    <div class="container">
+        <h2 class="section-title">שאלות <span>נפוצות</span></h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>כמה זה עולה? 💰</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">בחינם. באמת. לא צריך כרטיס אשראי, לא צריך מנוי, לא צריך שום דבר. פשוט נכנסים ומתחילים.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>זה בטוח לילדים? 🔒</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">המערכת לא שואלת שם משפחה, כתובת או טלפון. רק שם פרטי, גיל וכיתה. כל השיחות מתנהלות בסביבה סגורה ומוגנת.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>לאיזה גילאים זה מתאים? 🎂</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">כיתה א׳ עד י״ב. המערכת מתאימה את עצמה אוטומטית — ילד בכיתה ב׳ יקבל תרגילים אחרים מילדה בכיתה ז׳.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>הילד שלי לא יודע אנגלית 🌐</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">אין בעיה בכלל! המערכת מדברת עברית מלאה. כל ההוראות, השאלות והתשובות בעברית.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>צריך מחשב? 💻</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">כן, מחשב נייד או נייח עם דפדפן (Chrome, Edge, Firefox). אפשר גם Chromebook. כרגע אי אפשר מהטלפון.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ SHARE ============ -->
+<section class="share-section" id="share">
+    <div class="container">
+        <h2 class="section-title">חברים שלכם <span>צריכים לדעת על זה</span></h2>
+        <div class="share-buttons">
+            <a href="https://wa.me/?text=%D7%94%D7%99%D7%99!%20%D7%92%D7%99%D7%9C%D7%99%D7%AA%D7%99%20%D7%9E%D7%A9%D7%94%D7%95%20%D7%9E%D7%98%D7%95%D7%A8%D7%A3%20%E2%80%94%20%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA%20AI%20%D7%A9%D7%9E%D7%9C%D7%9E%D7%93%D7%AA%20%D7%99%D7%9C%D7%93%D7%99%D7%9D%20%D7%A2%D7%9D%20%D7%93%D7%9E%D7%95%D7%99%D7%95%D7%AA%20%D7%9E%D7%94%D7%90%D7%A8%D7%99%20%D7%A4%D7%95%D7%98%D7%A8%2F%D7%A4%D7%A8%D7%95%D7%96%D7%9F.%20%D7%94%D7%99%D7%9C%D7%93%20%D7%A9%D7%9C%D7%99%20%D7%9E%D7%9E%D7%A9%20%D7%A0%D7%94%D7%A0%D7%94.%20%D7%96%D7%94%20%D7%91%D7%97%D7%99%D7%A0%D7%9D!%20%F0%9F%94%97%20https%3A%2F%2Ftamirdresher.github.io%2Fsquad-for-kids%2F" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 שתפו בוואטסאפ</a>
+            <a href="https://t.me/share/url?url=https%3A%2F%2Ftamirdresher.github.io%2Fsquad-for-kids%2F&text=%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA%20AI%20%D7%97%D7%99%D7%A0%D7%9E%D7%99%D7%AA%20%D7%A9%D7%9E%D7%9C%D7%9E%D7%93%D7%AA%20%D7%99%D7%9C%D7%93%D7%99%D7%9D%20%D7%A2%D7%9D%20%D7%93%D7%9E%D7%95%D7%99%D7%95%D7%AA%20%D7%90%D7%94%D7%95%D7%91%D7%95%D7%AA%20%F0%9F%A7%99%E2%80%8D%E2%99%80%EF%B8%8F" target="_blank" rel="noopener" class="btn btn-telegram">✈️ שתפו בטלגרם</a>
+            <a href="mailto:?subject=%D7%A1%D7%A7%D7%95%D7%95%D7%90%D7%93%20%D7%9C%D7%99%D7%9C%D7%93%D7%99%D7%9D%20%E2%80%94%20%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA%20AI%20%D7%97%D7%99%D7%A0%D7%9E%D7%99%D7%AA%20%D7%9C%D7%99%D7%9C%D7%93%D7%99%D7%9D&body=%D7%94%D7%99%D7%99!%20%D7%92%D7%99%D7%9C%D7%99%D7%AA%D7%99%20%D7%9E%D7%A9%D7%94%D7%95%20%D7%9E%D7%98%D7%95%D7%A8%D7%A3%20%E2%80%94%20%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA%20AI%20%D7%A9%D7%9E%D7%9C%D7%9E%D7%93%D7%AA%20%D7%99%D7%9C%D7%93%D7%99%D7%9D%20%D7%A2%D7%9D%20%D7%93%D7%9E%D7%95%D7%99%D7%95%D7%AA%20%D7%9E%D7%94%D7%90%D7%A8%D7%99%20%D7%A4%D7%95%D7%98%D7%A8%20%D7%95%D7%A4%D7%A8%D7%95%D7%96%D7%9F.%0A%0A%D7%96%D7%94%20%D7%91%D7%97%D7%99%D7%A0%D7%9D!%20%F0%9F%94%97%20https%3A%2F%2Ftamirdresher.github.io%2Fsquad-for-kids%2F" target="_blank" rel="noopener" class="btn btn-email-share">📧 שלחו במייל</a>
+            <button class="btn btn-copy" onclick="copyLink()">🔗 העתיקו קישור</button>
+        </div>
+        <p class="copy-feedback" id="copyFeedback">✅ הקישור הועתק!</p>
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+    <p>נבנה עם <span class="heart">❤️</span> על ידי תמיר דרשר ו-GitHub Copilot</p>
+    <p>קוד פתוח: <a href="https://github.com/tamirdresher/squad-for-kids" target="_blank" rel="noopener">github.com/tamirdresher/squad-for-kids</a></p>
+</footer>
+
+<script>
+    function toggleCollapsible(btn) {
+        const content = btn.nextElementSibling;
+        const isOpen = content.classList.contains('open');
+        content.classList.toggle('open');
+        btn.classList.toggle('open');
+        btn.setAttribute('aria-expanded', !isOpen);
+    }
+
+    function toggleFaq(btn) {
+        const item = btn.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item.open').forEach(openItem => {
+            if (openItem !== item) {
+                openItem.classList.remove('open');
+                openItem.querySelector('.faq-answer').style.maxHeight = '0';
+                openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', !isOpen);
+
+        if (!isOpen) {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+        } else {
+            answer.style.maxHeight = '0';
+        }
+    }
+
+    function copyLink() {
+        const url = 'https://tamirdresher.github.io/squad-for-kids/';
+        navigator.clipboard.writeText(url).then(() => {
+            const feedback = document.getElementById('copyFeedback');
+            feedback.style.display = 'block';
+            setTimeout(() => { feedback.style.display = 'none'; }, 2500);
+        });
+    }
+</script>
+</body>
+</html>

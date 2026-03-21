@@ -1,0 +1,158 @@
+# =============================================================================
+# squad-scaledobject.yaml — KEDA ScaledObject for Squad Agent Pods
+#
+# Scales the "picard" Deployment (Squad lead agent) from 0 to 5 replicas
+# using three composite triggers:
+#
+#   1. GitHub active issue queue depth
+#      KEDA built-in GitHub scaler — counts open issues labelled "squad:active"
+#      Scale factor: 1 pod per 2 open issues
+#
+#   2. GitHub API rate limit headroom
+#      KEDA Prometheus trigger reading from squad-rate-limit-exporter.
+#      Scale DOWN (toward 0) when headroom < 10% of budget.
+#
+#   3. Copilot token usage (Prometheus, optional)
+#      Scrapes the squad-metrics-exporter sidecar (port 9091).
+#      Falls back gracefully if the exporter is not deployed yet.
+#
+# Prerequisites:
+#   - KEDA >= 2.13 installed: az aks update --enable-keda
+#   - github-rate-trigger-auth TriggerAuthentication applied (same directory)
+#   - squad-runtime-secrets K8s Secret populated by Key Vault CSI driver
+#   - (Optional) squad-metrics-exporter for Prometheus triggers (Trigger 2 & 3)
+#
+# Issue: #1134 — KEDA autoscaling: Scale Squad pods based on Copilot token usage
+# =============================================================================
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: squad-agents-token-scaler
+  namespace: squad
+  labels:
+    app.kubernetes.io/part-of: squad-agents
+    app.kubernetes.io/managed-by: helm
+    squad.github.com/issue: "1134"
+  annotations:
+    squad.github.com/description: >
+      Token-aware autoscaler for Squad agent pods. Scales on active issue
+      queue depth AND GitHub API rate-limit headroom. Copilot token usage
+      trigger activates when squad-metrics-exporter is deployed.
+spec:
+  # ── Target ──────────────────────────────────────────────────────────────────
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: picard              # Matches picard Deployment in squad-agents Helm chart
+
+  # ── Replica bounds ──────────────────────────────────────────────────────────
+  # minReplicaCount: 0 enables scale-to-zero. Pods spin up within ~60s when
+  # a trigger fires (pollingInterval below).
+  minReplicaCount: 0
+  maxReplicaCount: 5
+
+  # ── Timing ──────────────────────────────────────────────────────────────────
+  # pollingInterval: how often KEDA evaluates each trigger (seconds)
+  pollingInterval: 30
+
+  # cooldownPeriod: how long to wait after last active trigger before scaling
+  # to zero. 300s (5 min) gives in-flight agent tasks time to complete.
+  cooldownPeriod: 300
+
+  # ── Horizontal Pod Autoscaler behaviour ─────────────────────────────────────
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          # Gradual scale-down: remove 1 pod per stabilization window to avoid
+          # thrashing when multiple issues close in quick succession.
+          stabilizationWindowSeconds: 120
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+        scaleUp:
+          # Rapid scale-up: allow burst of 2 pods immediately when work arrives.
+          stabilizationWindowSeconds: 0
+          policies:
+            - type: Pods
+              value: 2
+              periodSeconds: 30
+
+  # ── Triggers ─────────────────────────────────────────────────────────────────
+  triggers:
+
+    # ── Trigger 1: Active issue queue depth (GitHub built-in scaler) ─────────
+    #
+    # Scale UP: 1 replica per 2 open issues labelled "squad:active".
+    # Scale DOWN: pods are removed when all labelled issues are closed.
+    #
+    # Uses KEDA's built-in GitHub scaler:
+    # https://keda.sh/docs/scalers/github-runner/
+    - type: github
+      metadata:
+        # Repository coordinates — update to match your fork/org
+        owner: "tamirdresher_microsoft"
+        repo:  "tamresearch1"
+        # Only count open issues claimed by the Squad
+        labels: "squad:active"
+        state:  "open"
+        # Desired ratio: 1 replica per N open issues
+        # targetIssueCount: "2" → 4 active issues → 2 replicas
+        targetIssueCount: "2"
+      authenticationRef:
+        name: github-rate-trigger-auth
+
+    # ── Trigger 2: GitHub API rate-limit headroom (Prometheus) ───────────────
+    #
+    # Requires squad-rate-limit-exporter (future: infrastructure/k8s/rate-limit-exporter/)
+    # which polls https://api.github.com/rate_limit and exposes:
+    #   github_rate_limit_remaining{resource="core"}
+    #   github_rate_limit_limit{resource="core"}
+    #
+    # Strategy: when remaining < 10% of limit, return 0 → enable scale-to-zero.
+    # The cooldownPeriod (300s above) keeps pods down until rate limit resets.
+    #
+    # ignoreNullValues: "true" — safe to deploy before exporter exists.
+    - type: prometheus
+      metadata:
+        serverAddress: "http://prometheus-operated.monitoring.svc.cluster.local:9090"
+        metricName: github_rate_limit_remaining_ratio
+        # threshold: replicas = ceil(metricValue / threshold)
+        # When ratio > 0.1 → this trigger is inactive (does not add replicas)
+        # When ratio ≤ 0.1 → trigger returns 0, allowing scale-to-zero
+        threshold: "0.1"
+        # PromQL: ratio of remaining API requests to total limit (0.0 – 1.0)
+        query: >
+          min(
+            github_rate_limit_remaining{resource="core"}
+            /
+            github_rate_limit_limit{resource="core"}
+          )
+        # ignoreNullValues: treat missing metric as healthy so this trigger
+        # never accidentally scales to zero when the exporter is not deployed.
+        ignoreNullValues: "true"
+
+    # ── Trigger 3: Copilot 429 backoff (Prometheus, optional) ────────────────
+    #
+    # Requires squad-metrics-exporter sidecar which tracks HTTP 429 responses
+    # from the Copilot API. Metric:
+    #   copilot_429_responses_total{model,agent,namespace}
+    #
+    # Strategy: when 429 rate exceeds threshold, scale to 0 (backoff).
+    # Pods stay down for cooldownPeriod (300s) before re-evaluating work queue.
+    #
+    # ignoreNullValues: "true" — safe to deploy before exporter exists.
+    - type: prometheus
+      metadata:
+        serverAddress: "http://prometheus-operated.monitoring.svc.cluster.local:9090"
+        metricName: copilot_rate_limit_hit_rate
+        # > 5 per minute triggers scale-down
+        threshold: "5"
+        # 1-minute rolling rate of HTTP 429 responses (converted to per-minute)
+        query: >
+          sum(
+            rate(copilot_429_responses_total{namespace="squad"}[1m])
+          ) * 60
+        # ignoreNullValues: treat missing metric as 0 (no 429s → no scale-down)
+        ignoreNullValues: "true"

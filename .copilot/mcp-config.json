@@ -29,6 +29,23 @@
         "generate"
       ]
     },
+    "bitwarden-shadow": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "mcp-servers/bitwarden-shadow/dist/index.js"
+      ],
+      "env": {
+        "BW_SESSION": "${BW_SESSION}",
+        "BW_SHADOW_COLLECTION_ID": "${BW_SHADOW_COLLECTION_ID}",
+        "BW_ADMIN_COLLECTION_ID": "${BW_ADMIN_COLLECTION_ID}"
+      },
+      "tools": [
+        "shadow_item",
+        "unshadow_item",
+        "list_shadows"
+      ]
+    },
     "EXAMPLE-trello": {
       "command": "npx",
       "args": [

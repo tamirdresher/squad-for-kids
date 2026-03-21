@@ -4,6 +4,45 @@
 
 ---
 
+## Decision 46: WhatsApp Monitoring Rules — MANDATORY
+
+**Date:** 2026-03-20  
+**Author:** Tamir Dresher  
+**Status:** Active  
+**Agents:** All (especially Ralph, Kes, Data)
+
+### Monitoring Priorities
+
+The WA Monitor (wa-monitor-dotnet) watches WhatsApp messages. ALL agents must respect these rules:
+
+**Priority Contacts (Urgent):**
+| Contact | Aliases | Priority | Special Rules |
+|---------|---------|----------|---------------|
+| Gabi | גבי, גביק | Urgent | Monitor for tasks, printing requests |
+| Yonatan Dresher | יונתן, יונתן דרשר | Urgent | Monitor for printing requests |
+| Shira Dresher | שירה, שירה דרשר | Urgent | Monitor for printing requests |
+| Eyal Dresher | אייל, אייל דרשר | Urgent | Monitor for printing requests |
+
+**Printing Rule:** When Gabi, Yonatan, or Shira send a file for printing, create a task to email the file to `dresherhome@hpeprint.com` (HP ePrint printer at home). Trigger keywords: print, הדפסה, מדפסת, תדפיס, להדפיס.
+
+**General Monitoring:** All other chats should be monitored for anything Tamir should know about. Notify him via Teams webhook so he won't forget important messages.
+
+**⚠️ NOTIFICATION RULE:** ALL notifications MUST go through Teams webhooks ONLY. Files are in `C:\Users\tamirdresher\.whatsapp-monitor\webhooks\*.url`. NEVER post to Teams chats directly — those chats have external people who should NOT see private WhatsApp content.
+
+**Printing Rule for Eyal:** Same as Gabi/Yonatan/Shira — files sent by Eyal should also be forwarded to the printer email.
+
+**Skill docs:** Full WA monitor docs at `.squad/skills/whatsapp-monitor/README.md`
+
+### Session Sharing
+
+- WA session credentials stored in GitHub secret `WA_MONITOR_SESSION`
+- Export: `wa-monitor-dotnet/scripts/wa-session-export.ps1`
+- Import: `wa-monitor-dotnet/scripts/wa-session-import.ps1`
+- **Constraint:** Only ONE monitor instance at a time (Signal sessions diverge otherwise)
+- WhatsApp allows max 4 companion devices — monitor uses 1 slot
+
+---
+
 ## Decision 32: Content Production Rules — MANDATORY
 
 **Date:** 2026-03-16  
@@ -26291,3 +26330,43 @@ NOT recommended. Disruption to team history outweighs benefit for a free-tier de
 
 ---
 
+
+---
+# Decision: Squad Overlay Pattern for Multi-Engineer Conflict Resolution
+
+**Date:** 2026-03-27
+**Issue:** #520
+**Agent:** Picard
+**Doc:** `docs/squad-conflict-resolution.md`
+
+## Decision
+Adopt the **Squad Overlay Pattern** to eliminate `.squad/` merge conflicts when multiple
+engineers run Squad agents concurrently in the same repository.
+
+## Chosen Approach
+Split `.squad/` into two tiers:
+- **`.squad/config/`** — slow-moving policy files; require human PR approval as usual.
+- **`.squad/state/<alias>/<session-id>/`** — per-engineer/per-session runtime state; auto-merged
+  via a GitHub Actions bot (`CODEOWNERS` exempt from required reviews).
+
+Scribe reconciles session state directories into the canonical `decisions.md` and `history.md`
+at session end, then archives the session directory. A batched daily PR consolidates state
+changes to reduce approval noise.
+
+## Rejected Alternatives
+- Dedicated `squad-config` branch — defers rather than eliminates the bottleneck.
+- Lock files — conflict on the lock files themselves in a PR workflow.
+- Git sparse-checkout — fragile; requires per-developer local config.
+- "Squad admin merges" — doesn't scale with team size.
+
+## Migration Phases
+1. Namespace new sessions → `.squad/state/<alias>/<session>/` (Week 1)
+2. Scribe reconciliation into canonical files (Week 2)
+3. Migrate slow-moving config to `.squad/config/` (Week 3)
+4. Remove legacy global paths (Week 4+)
+
+## Impact
+- Zero add/add conflicts by construction (disjoint paths per engineer).
+- Product-code PR flow unchanged.
+- Reviewer load drops from N squad PRs/day to ≤1 batched state sync PR/day.
+- Existing `.squad/` files remain canonical during migration (symlinks provided).

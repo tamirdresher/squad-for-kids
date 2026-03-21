@@ -83,8 +83,9 @@ else
 fi
 
 # Export results for downstream scripts
-mkdir -p /tmp/drift-detection
-cat > /tmp/drift-detection/changes.env << EOF
+OUTDIR="${RUNNER_TEMP:-/tmp}/drift-detection"
+mkdir -p "$OUTDIR"
+cat > "$OUTDIR/changes.env" << EOF
 HELM_DRIFT=${HELM_DRIFT}
 KUSTOMIZE_DRIFT=${KUSTOMIZE_DRIFT}
 SECURITY_DRIFT=${SECURITY_DRIFT}

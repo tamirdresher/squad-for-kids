@@ -8,6 +8,7 @@ using Azure;
 using Azure.AI.Inference;
 using CodeReviewArena.Arena;
 using CodeReviewArena.Judges;
+using CodeReviewArena.Tools;
 using CodeReviewArena.UI;
 using Microsoft.Extensions.AI;
 using Spectre.Console;
@@ -25,6 +26,7 @@ string? codeFile = null;
 string? inlineCode = null;
 string context = "Review this C# code snippet";
 string judgeMode = "standard"; // standard | security | all
+bool showToolDemo = false; // --tools: run tool-calling demo before the arena
 
 for (int i = 0; i < args.Length; i++)
 {
@@ -41,6 +43,9 @@ for (int i = 0; i < args.Length; i++)
             break;
         case "--mode" or "-m" when i + 1 < args.Length:
             judgeMode = args[++i];
+            break;
+        case "--tools" or "-t":
+            showToolDemo = true;
             break;
     }
 }
@@ -82,7 +87,7 @@ else if (!Console.IsInputRedirected && args.Length == 0)
     codeSnippet = BuiltInSamples.BuggyUserService;
     context = "UserService.cs — authentication and user management";
     AnsiConsole.MarkupLine("[dim]No code provided — using built-in demo sample.[/]");
-    AnsiConsole.MarkupLine("[dim]Usage: dotnet run -- --file MyCode.cs  or  dotnet run -- --code \"...\"[/]");
+    AnsiConsole.MarkupLine("[dim]Usage: dotnet run -- --file MyCode.cs  |  --code \"...\"  |  --tools (add tool-calling demo)[/]");
 }
 else if (Console.IsInputRedirected)
 {
@@ -102,6 +107,16 @@ display.RenderCodePreview(codeSnippet, context);
 
 using var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
+
+// ── Optional: Tool Calling Demo (--tools flag) ─────────────────────────────
+if (showToolDemo)
+{
+    var toolDemo = new ToolCallDemo(CreateChatClient());
+    await toolDemo.RunAsync(codeSnippet, cts.Token);
+
+    AnsiConsole.MarkupLine("[dim]─── Now handing off to the full Arena for the debate ───[/]");
+    AnsiConsole.WriteLine();
+}
 
 try
 {

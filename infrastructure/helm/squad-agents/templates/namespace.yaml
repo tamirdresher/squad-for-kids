@@ -1,0 +1,9 @@
+{{- if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    azure.workload.identity/use: "true"
+{{- end }}

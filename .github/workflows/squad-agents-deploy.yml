@@ -1,0 +1,112 @@
+# =============================================================================
+# Squad Agents — Build & Deploy to AKS
+#
+# Builds the Ralph container image, pushes to ACR, and deploys via Helm.
+# Triggered on pushes to infrastructure/ or manual dispatch.
+# =============================================================================
+name: Squad Agents Deploy
+
+on:
+  # push trigger disabled due to EMU policy: GitHub-hosted runners not allowed
+  # Will re-enable when self-hosted runner with Docker + Azure CLI is available
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to AKS after build?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  ACR_NAME: acrsquadprod
+  IMAGE_NAME: squad-agents
+  RESOURCE_GROUP: rg-squad-prod
+  CLUSTER_NAME: aks-squad-prod
+  NAMESPACE: squad
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image metadata
+        id: meta
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          echo "version=${SHA}" >> $GITHUB_OUTPUT
+          echo "full-tag=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${SHA}" >> $GITHUB_OUTPUT
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ACR Login
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Build and push image
+        run: |
+          docker build \
+            -f infrastructure/k8s/Dockerfile.ralph \
+            -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} \
+            -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+            .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event.inputs.deploy == 'true' || github.event_name == 'push'
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.CLUSTER_NAME }} \
+            --overwrite-existing
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install squad-agents infrastructure/helm/squad-agents/ \
+            --namespace ${{ env.NAMESPACE }} \
+            --create-namespace \
+            --atomic \
+            --timeout 5m \
+            --set global.acrLoginServer=${{ env.ACR_NAME }}.azurecr.io \
+            --set global.keyVaultName=${{ secrets.KEY_VAULT_NAME }} \
+            --set global.tenantId=${{ secrets.AZURE_TENANT_ID }} \
+            --set ralph.image.tag=${{ needs.build.outputs.image-tag }}
+
+      - name: Verify deployment
+        run: |
+          kubectl get cronjob -n ${{ env.NAMESPACE }}
+          kubectl get pods -n ${{ env.NAMESPACE }}
+          echo "✅ Squad agents deployed successfully"

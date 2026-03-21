@@ -13,6 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<CacheTelemetryOptions>(
     builder.Configuration.GetSection(CacheTelemetryOptions.SectionName));
 
+// PoP Token Validation (MISE V2)
+builder.Services.Configure<PopTokenConfiguration>(
+    builder.Configuration.GetSection(PopTokenConfiguration.SectionName));
+builder.Services.AddScoped<IPopTokenValidationService, PopTokenValidationService>();
+
 // Azure AD / Entra ID Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
@@ -105,6 +110,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowDashboard");
+app.UsePopTokenValidation(); // MISE V2 PoP token validation
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCacheTelemetry();

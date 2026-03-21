@@ -1,0 +1,47 @@
+name: Validate Squad Configs
+
+on:
+  pull_request:
+    paths:
+      - '**/.squads/config.json'
+      - '.squad/schemas/squads-config.schema.json'
+      - 'scripts/validate-squads-config.ps1'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/.squads/config.json'
+      - '.squad/schemas/squads-config.schema.json'
+      - 'scripts/validate-squads-config.ps1'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate .squads/config.json files
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PowerShell
+        shell: pwsh
+        run: |
+          $PSVersionTable
+      
+      - name: Validate squad configurations
+        shell: pwsh
+        run: |
+          ./scripts/validate-squads-config.ps1
+      
+      - name: Report validation success
+        if: success()
+        run: |
+          echo "✓ All .squads/config.json files are valid"
+      
+      - name: Report validation failure
+        if: failure()
+        run: |
+          echo "✗ Squad configuration validation failed"
+          echo "See job logs for details"
+          exit 1

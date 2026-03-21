@@ -1,0 +1,73 @@
+# =============================================================================
+# values-aks-automatic.yaml — AKS Automatic override values
+#
+# Use this file when deploying to an AKS Automatic cluster.
+# AKS Automatic eliminates manual node pool management (Karpenter handles it),
+# includes KEDA built-in, and pre-configures Workload Identity + CSI driver.
+#
+# Deploy:
+#   helm upgrade --install squad-agents infrastructure/helm/squad-agents/ \
+#     --namespace squad --create-namespace \
+#     -f infrastructure/helm/squad-agents/values-aks-automatic.yaml \
+#     --set global.acrLoginServer=<acr>.azurecr.io \
+#     --set global.keyVaultName=<kv-name> \
+#     --set global.tenantId=<tenant-id> \
+#     --set serviceAccount.annotations."azure\.workload\.identity/client-id"=<client-id>
+#
+# What this file changes vs defaults:
+#   1. Clears nodeSelector/tolerations — Karpenter auto-selects optimal nodes
+#   2. Enables KEDA — it's built-in on AKS Automatic (no addon install needed)
+#
+# What you DON'T need to do on AKS Automatic (vs squad-on-aks.md Standard path):
+#   - az aks update --enable-oidc-issuer         (pre-configured)
+#   - az aks update --enable-workload-identity    (pre-configured)
+#   - az aks enable-addons azure-keyvault-secrets-provider  (built-in)
+#   - az aks update --enable-keda                (built-in)
+#   - Create squadmonitor/squadagent node pools   (Karpenter handles)
+#   - Configure cluster autoscaler               (Karpenter handles)
+#   - az aks enable-addons monitoring            (Azure Monitor pre-integrated)
+#
+# Related: issue #1136 (evaluation), #1060 (AKS deployment), #1134 (KEDA scaling)
+# =============================================================================
+
+# -- Ralph CronJob — AKS Automatic overrides
+ralph:
+  # AKS Automatic uses Karpenter (Node Auto-Provisioning) to select and provision
+  # nodes automatically. Manual node pool selectors are not applicable.
+  nodeSelector: {}
+  tolerations: []
+
+# -- Picard Deployment — AKS Automatic overrides
+picard:
+  # Same rationale as Ralph: Karpenter handles node selection.
+  # For cost optimization, consider keeping Picard's resource requests small
+  # so Karpenter bins it onto an existing node before provisioning a new one.
+  nodeSelector: {}
+  tolerations: []
+
+# -- KEDA — Enable: it's built-in on AKS Automatic
+#
+# On AKS Standard, you must run:
+#   az aks update --name <cluster> --enable-keda
+# On AKS Automatic, KEDA is pre-installed. Just set enabled: true.
+keda:
+  enabled: true
+
+  picard:
+    # Scale Picard to zero when no squad:picard issues are open.
+    # Karpenter will deprovision the node automatically once the pod terminates.
+    minReplicaCount: 0
+    maxReplicaCount: 3
+    targetIssueCount: "2"
+    pollingInterval: 60
+    cooldownPeriod: 300
+
+# -- Monitoring — Azure Monitor is pre-integrated on AKS Automatic
+#
+# No manual Log Analytics wiring is required. Enable Prometheus scraping
+# if you want to use a custom squad_pending_tasks metric with KEDA (#1134).
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    path: /metrics

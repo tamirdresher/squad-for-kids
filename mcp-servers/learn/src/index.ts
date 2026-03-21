@@ -212,8 +212,9 @@ server.tool(
       const html = await fetchText(articleUrl);
       // Strip HTML tags for a rough text extraction
       const text = html
-        .replace(/<script[\s\S]*?<\/script>/gi, "")
-        .replace(/<style[\s\S]*?<\/style>/gi, "")
+        .replace(/<script[\s\S]*?<\/script\s*>/gi, "")
+        .replace(/<style[\s\S]*?<\/style\s*>/gi, "")
+        .replace(/<!--[\s\S]*?-->/g, "")
         .replace(/<[^>]+>/g, " ")
         .replace(/\s{2,}/g, " ")
         .trim()
@@ -461,14 +462,17 @@ server.tool(
 
 function decodeHtmlEntities(text: string): string {
   return text
-    .replace(/&amp;/g, "&")
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, "")
+    .replace(/<style[\s\S]*?<\/style\s*>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<[^>]+>/g, "")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&#x27;/g, "'")
     .replace(/&#x2F;/g, "/")
-    .replace(/<[^>]+>/g, "");
+    .replace(/&amp;/g, "&");
 }
 
 // ---------------------------------------------------------------------------

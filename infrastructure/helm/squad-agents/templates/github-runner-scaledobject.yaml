@@ -1,0 +1,105 @@
+# =============================================================================
+# github-runner-scaledobject.yaml — KEDA ScaledObject: GitHub Actions Runner Queue (Tier 1)
+#
+# Scales based on pending GitHub Actions workflow jobs in the queue.
+# Uses KEDA's built-in `github-runner` scaler with ETag caching to minimize
+# API rate-limit consumption.
+#
+# Reference: https://keda.sh/docs/2.19/scalers/github-runner/
+#
+# Features:
+#   - Zero new code: pure YAML config change
+#   - ETag caching on GitHub API calls (avoids burning quota on unchanged data)
+#   - Scales on Actions job queue depth
+#   - Independent of the issue-count scaler (can coexist in the same cluster)
+#
+# Issue: #1158 — Tier 1: Add built-in github-runner KEDA trigger to Squad Helm chart
+# =============================================================================
+{{- if and .Values.keda.enabled .Values.keda.githubRunner.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-github-runner
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keda
+    squad.github.com/tier: "1"
+    squad.github.com/trigger: github-runner
+  annotations:
+    squad.github.com/issue: "1158"
+    squad.github.com/description: >
+      Tier 1 KEDA github-runner scaler for Squad agents.
+      Scales based on pending GitHub Actions workflow jobs in the queue.
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: picard
+
+  minReplicaCount: {{ .Values.keda.githubRunner.minReplicas | default 1 }}
+  maxReplicaCount: {{ .Values.keda.githubRunner.maxReplicas | default 10 }}
+
+  pollingInterval: {{ .Values.keda.githubRunner.pollingInterval | default 30 }}
+  cooldownPeriod: {{ .Values.keda.githubRunner.cooldownPeriod | default 300 }}
+
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 120
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          policies:
+            - type: Pods
+              value: 2
+              periodSeconds: 30
+
+  triggers:
+    # ── GitHub Actions Runner Queue Trigger ──────────────────────────────────
+    # Monitors the pending workflow job queue depth for the configured scope
+    # (repo, org, or enterprise). Uses ETag caching to minimize API calls.
+    - type: github-runner
+      authenticationRef:
+        name: {{ include "squad-agents.fullname" . }}-github-runner-auth
+      metadata:
+        # GitHub owner (org or username)
+        owner: {{ .Values.github.owner | quote }}
+        # Runner scope: repo | org | enterprise
+        runnerScope: {{ .Values.keda.githubRunner.runnerScope | quote }}
+        # Repository name (required when runnerScope=repo)
+        {{- if eq .Values.keda.githubRunner.runnerScope "repo" }}
+        repos: {{ .Values.github.repo | quote }}
+        {{- end }}
+        # Target queue length: scale up when queue depth exceeds this value
+        targetWorkflowQueueLength: {{ .Values.keda.githubRunner.targetQueueLength | quote }}
+        # Enable ETag caching to reduce API rate-limit consumption
+        activationTargetWorkflowQueueLength: "0"
+---
+# =============================================================================
+# TriggerAuthentication — GitHub PAT for github-runner scaler
+#
+# Provides the Personal Access Token used by the `github-runner` trigger to call
+# the GitHub Actions API (requires read:org or read:enterprise scope, depending
+# on runnerScope).
+# Token is sourced from the squad-runtime-secrets K8s Secret (Key Vault CSI).
+# =============================================================================
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-github-runner-auth
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keda
+    squad.github.com/issue: "1158"
+spec:
+  secretTargetRef:
+    - parameter: personalAccessToken
+      name: {{ .Values.keyVault.k8sSecretName }}
+      key: GH_TOKEN
+{{- end }}

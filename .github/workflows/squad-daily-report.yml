@@ -1,0 +1,97 @@
+name: Squad Daily Report
+
+on:
+  schedule:
+    # 3:00 AM UTC = 5:00 AM Israel Standard Time (IST, UTC+2)
+    # During Israeli Summer Time (IDT, UTC+3): 3 AM UTC = 6 AM local — acceptable
+    # Adjust to "0 2 * * *" during March–October if exact 5 AM is required
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (generate but do not send)'
+        type: boolean
+        default: false
+      recipient:
+        description: 'Override recipient email'
+        type: string
+        default: ''
+
+jobs:
+  daily-report:
+    name: Send Daily Squad Report
+    runs-on: self-hosted
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git log queries
+
+      - name: Configure Git identity
+        run: |
+          git config user.email "td-squad-ai-team@outlook.com"
+          git config user.name "Squad Automation"
+
+      - name: Set up Gmail credentials
+        if: ${{ !inputs.dry_run }}
+        shell: pwsh
+        run: |
+          # Store Gmail app password from GitHub secret into Windows Credential Manager
+          $gmailPass = '${{ secrets.SQUAD_GMAIL_PASSWORD }}'
+          if (-not $gmailPass) {
+            Write-Host "::warning::SQUAD_GMAIL_PASSWORD secret not set — dry run will be forced"
+            return
+          }
+          $code = @'
+          using System.Runtime.InteropServices;
+          public class CredWriter {
+            [DllImport("advapi32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+            public static extern bool CredWrite(ref CREDENTIAL cred, uint flags);
+            [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+            public struct CREDENTIAL {
+              public uint Flags; public uint Type; public string TargetName; public string Comment;
+              public System.Runtime.InteropServices.ComTypes.FILETIME LastWritten;
+              public uint CredentialBlobSize; public System.IntPtr CredentialBlob;
+              public uint Persist; public uint AttributeCount; public System.IntPtr Attributes;
+              public string TargetAlias; public string UserName;
+            }
+          }
+          '@
+          Add-Type -TypeDefinition $code -Language CSharp -ErrorAction SilentlyContinue
+          $env:SQUAD_GMAIL_PASSWORD = $gmailPass
+
+      - name: Run Daily Squad Report
+        shell: pwsh
+        env:
+          SQUAD_GMAIL_PASSWORD: ${{ secrets.SQUAD_GMAIL_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_CONFIG_DIR: ${{ github.workspace }}/.gh-config
+        run: |
+          $params = @{}
+          $dryRun = '${{ inputs.dry_run }}' -eq 'true'
+          $recipient = '${{ inputs.recipient }}'
+
+          if ($dryRun -or -not $env:SQUAD_GMAIL_PASSWORD) {
+            $params['-DryRun'] = $true
+            Write-Host "🏃 Running in DRY RUN mode"
+          }
+          if ($recipient) {
+            $params['-To'] = $recipient
+          }
+
+          $paramStr = ($params.Keys | ForEach-Object { "$_ $($params[$_])" }) -join " "
+          Write-Host "📧 Starting daily-squad-report.ps1 $paramStr"
+
+          & "${{ github.workspace }}/scripts/daily-squad-report.ps1" @params
+
+      - name: Upload report archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: squad-daily-report-${{ github.run_id }}
+          path: |
+            ~/.squad/daily-reports/squad-daily-report-*.html
+          if-no-files-found: ignore
+          retention-days: 30

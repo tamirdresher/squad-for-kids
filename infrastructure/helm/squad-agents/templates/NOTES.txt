@@ -1,0 +1,69 @@
+##############################################################################
+# Squad Agents — Helm chart deployed successfully
+##############################################################################
+
+Release  : {{ .Release.Name }}
+Namespace: {{ .Values.global.namespace }}
+AKS Mode : {{ .Values.aksMode }}
+
+{{- if eq .Values.aksMode "automatic" }}
+
+  ✅  AKS Automatic detected — node provisioning, patching, and KEDA are
+      managed by Azure.  No manual node pool setup or CSI driver installation
+      is required.
+
+      Workload Identity and the Secrets Store CSI driver are pre-installed
+      by the AKS Automatic control plane — just supply your Managed Identity
+      client ID:
+
+        azure.managedIdentityClientId = {{ .Values.azure.managedIdentityClientId | default "<set via --set azure.managedIdentityClientId=...>" }}
+
+{{- else }}
+
+  ℹ️   AKS Standard mode. Ensure the following are configured before pods
+      will schedule and access secrets:
+
+      1. Node pool "squad" exists (or update nodeSelector):
+           az aks nodepool add --name squad --cluster-name <cluster> \
+             --resource-group <rg> --node-count 2
+
+      2. Secrets Store CSI driver is installed:
+           az aks addon enable --addon azure-keyvault-secrets-provider \
+             --name <cluster> --resource-group <rg>
+
+      3. Workload Identity is federated to your Managed Identity:
+           azure.managedIdentityClientId = {{ .Values.azure.managedIdentityClientId | default "<set via --set azure.managedIdentityClientId=...>" }}
+
+      4. A SecretProviderClass named "squad-secrets" exists in namespace
+         {{ .Values.global.namespace }} referencing Key Vault: {{ .Values.global.keyVaultName | default "<set global.keyVaultName>" }}
+
+      5. KEDA is installed (required for ScaledObject when keda.enabled=true):
+           az aks update --enable-keda --name <cluster> --resource-group <rg>
+
+{{- end }}
+
+##############################################################################
+# Agents deployed
+##############################################################################
+{{- if .Values.ralph.enabled }}
+  • Ralph  (CronJob)    schedule={{ .Values.ralph.schedule }}
+{{- end }}
+{{- if .Values.picard.enabled }}
+  • Picard (Deployment) replicas={{ .Values.picard.replicaCount }}
+{{- end }}
+{{- if and .Values.keda.enabled .Values.picard.enabled }}
+  • KEDA ScaledObject   min={{ .Values.keda.picard.minReplicaCount }} max={{ .Values.keda.picard.maxReplicaCount }}
+{{- end }}
+
+##############################################################################
+# Useful commands
+##############################################################################
+
+  # Tail Ralph logs (most recent run)
+  kubectl -n {{ .Values.global.namespace }} logs -l squad.github.com/agent=ralph --tail=100
+
+  # Tail Picard logs
+  kubectl -n {{ .Values.global.namespace }} logs -l squad.github.com/agent=picard -f
+
+  # Check ServiceAccount annotation
+  kubectl -n {{ .Values.global.namespace }} get sa {{ include "squad-agents.serviceAccountName" . }} -o yaml

@@ -98,6 +98,54 @@ Machine configuration data gathered for multi-machine Ralph coordination (#346):
 - Stable hostnames available for machine ID strategy
 - EMU authentication constraint identified (PR creation may need fallback to comments)
 
+### 2026-03-20: Issue #1205 — Charity Game Company Technical Architecture Study
+
+**Context:** Created comprehensive technical and economic analysis for a charity-focused mobile gaming company.
+
+**Findings:**
+- **Expo/React Native** is optimal for charity game development: 95% code reuse, strong ecosystem, cost-efficient (single team instead of iOS+Android), OTA updates for rapid iteration
+- **Serverless-first architecture** (Firebase + Lambda) provides best cost/scale tradeoff: $150-500/month at MVP, $3K-$10K at 50K DAU, scales to zero during low usage
+- **Break-even economics at 10K DAU**: $1.04 ARPU (ads + IAP + subscriptions) covers $330 infrastructure + $10K dev maintenance = $10,630/month total cost
+- **Ethical monetization patterns**: Rewarded ads (voluntary, $10-15 eCPM), cosmetic IAP (no pay-to-win), charity subscriptions (50-70% to charity) maintain brand integrity while generating revenue
+- **Technology alternatives considered**: Unity best for 3D but overkill for casual games (50-100MB binaries), Flutter has smaller ecosystem, Native doubles development cost
+- **Cost optimization strategies**: CloudFront caching (90%+ hit rate), Firebase free tier for auth (<50K MAU), reserved instances at scale (30-50% savings), asset compression (WebP reduces CDN costs 50%)
+
+**Architecture Patterns:**
+- **Hybrid serverless backend**: Firebase for realtime (multiplayer, leaderboards), PostgreSQL/RDS for analytics, Redis for session state, Lambda for game logic
+- **Multi-phase scaling**: Start with Firebase free tier + minimal Lambda (MVP), add CDN + Redis at 1K-10K DAU, migrate to dedicated instances at 100K+ DAU
+- **CI/CD with EAS**: Expo Application Services automates iOS/Android builds, automated store submission, OTA updates for JS-only changes (skip app review)
+
+**Key Metrics & Benchmarks:**
+- **Development cost**: $123K-$184K for MVP (4-6 months, 2-3 developers)
+- **Infrastructure scaling**: $0.033-$0.055 per DAU/month (economies of scale from 10K to 100K users)
+- **Ad revenue**: $7,560/month at 10K DAU (rewarded video $10 eCPM, 36K impressions/day)
+- **IAP revenue**: $2,100/month at 10K DAU (3% conversion, $10 ARPPU)
+- **LTV:CAC ratio**: 41.6:1 (excellent — $62.40 LTV / $1.50 CAC with organic + paid UA)
+- **Retention targets**: Day 1 >40%, Day 7 >15%, Day 30 >5%
+
+**Regulatory & Compliance:**
+- COPPA compliance critical for <13 audience: no personal data collection, parental consent flows, age gate required
+- GDPR requirements: data export, right to deletion, explicit consent for data processing
+- No loot boxes to avoid gambling law violations (use transparent pricing for all IAP)
+- Tax automation needed for multi-state/country nexus (TaxJar, Stripe Tax)
+
+**Go-to-Market Strategy:**
+- Phase 1: Soft launch in 1-2 small markets (New Zealand, Philippines) to validate retention & monetization
+- Phase 2: English-speaking markets with $5K-$10K/month UA budget, target 1K DAU
+- Phase 3: Global launch with localization to 10 languages, $20K-$50K UA budget, target 10K DAU
+- Organic growth focus: ASO (keyword optimization), content marketing (impact stories), referral program (viral coefficient >1.2)
+
+**Risk Mitigation:**
+- **Low user acquisition** → A/B test marketing, viral mechanics, influencer partnerships in charity community
+- **Charity partner scandal** → Vet via GiveWell, diversify across 5+ charities, quarterly audits
+- **Platform policy changes** → Diversify revenue (web version), build email list, avoid policy-sensitive mechanics (loot boxes)
+
+**Files Created:**
+- `research/charity-game-company-architecture.md` (36KB, 1096 lines) — Full study with technical architecture, cost breakdowns, revenue projections, scalability roadmap, regulatory considerations
+- PR #1216 opened: `squad/1205-charity-game-architecture` → `main`
+
+**Key Takeaway:** Charity gaming is technically and economically viable at 10K+ DAU scale. Success depends on ethical monetization that maintains charity brand trust while generating sufficient revenue (70% to charity, 30% to operations). Expo/React Native + serverless architecture provides fastest path to market with lowest development cost.
+
 ### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1)
 
 Built Squad MCP Server to expose squad operations as reusable MCP tools for AI assistants.
@@ -995,3 +1043,13 @@ Android Discord App ◄──WebSocket──► Discord Gateway
 - Google Gemini 2.0 Flash Exp model with multimodal generation (TEXT + IMAGE)
 - PowerShell REST API calls to `generativelanguage.googleapis.com`
 - Adaptive Card 1.4 spec for Teams webhook integration
+
+## Recent Work (2026-03-20 Ralph Round 2)
+
+**Issue #1166 (Predictive Circuit Breaker):** ✅ PR #1200 created
+- Branch: squad/1166-predictive-circuit-breaker
+- Decision #47 merged to decisions.md
+- Rate-limit probing architecture: tiered thresholds (5%/15%/30%) + trend analysis
+- Avoids cascade by opening circuit before 429
+
+**PR #1191 (Schema validation):** ⚠️ Still failing, requires iteration

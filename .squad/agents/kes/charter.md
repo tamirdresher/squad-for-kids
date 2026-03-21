@@ -36,6 +36,14 @@
 **I handle:** Calendar, email, meetings, scheduling, people lookup, communications
 **I don't handle:** Code, infrastructure, security, research — route those elsewhere
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search), Teams MCP (messages, calendar, presence), SharePoint/OneDrive MCP (files, documents), Playwright MCP (browser automation)
+- **Access scope:** Calendar events, emails, Teams messages, contact lookup, OneDrive files — all on behalf of tamirdresher@microsoft.com
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** claude-haiku-4.5

@@ -1,0 +1,52 @@
+# Dockerfile.ralph — Containerize ralph-watch.ps1 for Squad-on-K8s POC
+# Base: PowerShell 7.4 on Ubuntu 22.04
+FROM mcr.microsoft.com/powershell:7.4-ubuntu-22.04
+
+LABEL maintainer="squad-belanna" \
+      description="Ralph — Squad work-monitor agent" \
+      version="0.1.0"
+
+# Install system dependencies: git, curl, node.js 20, gh CLI
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git \
+      curl \
+      ca-certificates \
+      gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    # Node.js 20
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+       | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
+       > /etc/apt/sources.list.d/nodesource.list \
+    # GitHub CLI
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+       -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+       > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+      nodejs \
+      gh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+# Copy squad config and scripts (read-only layer; runtime git state comes from volume)
+COPY .squad/ /workspace/.squad/
+COPY scripts/ /workspace/scripts/
+COPY ralph-watch.ps1 /workspace/ralph-watch.ps1
+
+# Ensure ralph-watch.ps1 is executable by pwsh
+RUN chmod +x /workspace/ralph-watch.ps1
+
+# Volume for mutable git state — mount host workspace over this at runtime
+VOLUME ["/workspace"]
+
+# GH_CONFIG_DIR is set so gh CLI picks up credentials from the mounted secrets volume
+ENV GH_CONFIG_DIR=/workspace/.config/gh
+
+# Health: verify pwsh is available
+HEALTHCHECK --interval=60s --timeout=10s --start-period=15s --retries=3 \
+  CMD pwsh -NoProfile -Command "exit 0"
+
+CMD ["pwsh", "-NoProfile", "-File", "/workspace/ralph-watch.ps1"]

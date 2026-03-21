@@ -34,6 +34,15 @@ if (Test-Path "$ghConfigCandidate\hosts.yml") {
 $OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 | Out-Null
 
+# Cooperative rate limit manager (Issue #1165)
+$rateLimitManagerPath = Join-Path $PSScriptRoot "scripts" "rate-limit-manager.ps1"
+if (Test-Path $rateLimitManagerPath) {
+    . $rateLimitManagerPath
+    Write-Verbose "[ralph-watch] Loaded rate-limit-manager.ps1"
+} else {
+    Write-Warning "[ralph-watch] rate-limit-manager.ps1 not found — rate limiting disabled"
+}
+
 # Set window/tab title (works in Windows Terminal, cmd, and pwsh)
 $ralphTitle = "Ralph Watch - tamresearch1"
 $Host.UI.RawUI.WindowTitle = $ralphTitle
@@ -81,6 +90,18 @@ trap {
     Remove-Item $sentinel -Force -ErrorAction SilentlyContinue
     if ($mutex) { try { $mutex.ReleaseMutex() } catch {} ; $mutex.Dispose() }
     break 
+}
+
+# ---------------------------------------------------------------------------
+# Cooperative rate-limit coordination (Issue #1165)
+# Dot-source the shared library so all Squad agents share the same quota pool.
+# ---------------------------------------------------------------------------
+$RateLimitManagerPath = Join-Path $PSScriptRoot "scripts/rate-limit-manager.ps1"
+if (Test-Path $RateLimitManagerPath) { . $RateLimitManagerPath }
+
+# Register this Ralph instance in the shared pool (P1 — interactive work)
+if (Get-Command Register-Agent -ErrorAction SilentlyContinue) {
+    Register-Agent -AgentId "ralph-$env:COMPUTERNAME" -Priority 1
 }
 
 $defaultIntervalMinutes = 5
@@ -253,6 +274,222 @@ function Update-CircuitBreakerOnRateLimit {
 
     Write-Host "[$ts] [model-cb] OPEN: Rate limited! Falling back to $($cb.currentModel)" -ForegroundColor Red
     Save-CircuitBreakerState $cb
+}
+
+# -------------------------------------------------------------------
+# Predictive Circuit Breaker (PCB) — Issue #1166
+# -------------------------------------------------------------------
+# Analyzes rate-limit response headers and opens circuit BEFORE 429
+# State tracked in .squad/rate-limit-headers.json
+# -------------------------------------------------------------------
+
+function Get-RateLimitState {
+    $rlFile = Join-Path $PSScriptRoot ".squad\rate-limit-headers.json"
+    if (Test-Path $rlFile) {
+        try {
+            return Get-Content $rlFile -Raw | ConvertFrom-Json
+        } catch {
+            Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [pcb] Failed to read rate-limit state, using defaults" -ForegroundColor Yellow
+        }
+    }
+    return [ordered]@{
+        remaining = 5000
+        limit = 5000
+        reset = $null
+        used = 0
+        resource = "core"
+        lastUpdated = $null
+        trend = @()
+    }
+}
+
+function Save-RateLimitState($rl) {
+    $rlFile = Join-Path $PSScriptRoot ".squad\rate-limit-headers.json"
+    $rlDir = Split-Path $rlFile -Parent
+    if (-not (Test-Path $rlDir)) { New-Item -ItemType Directory -Path $rlDir -Force | Out-Null }
+    $rl | ConvertTo-Json -Depth 5 | Set-Content $rlFile -Encoding utf8
+}
+
+function Invoke-GitHubAPIWithHeaders {
+    <#
+    .SYNOPSIS
+    Wrapper around 'gh api' that captures rate-limit headers.
+    .PARAMETER Endpoint
+    The GitHub API endpoint (e.g., "user", "repos/owner/repo")
+    .PARAMETER Method
+    HTTP method (GET, POST, etc.). Defaults to GET.
+    .PARAMETER JQ
+    Optional jq filter for the response body.
+    #>
+    param(
+        [string]$Endpoint,
+        [string]$Method = "GET",
+        [string]$JQ = $null
+    )
+    
+    $ts = Get-Date -Format "HH:mm:ss"
+    $tempFile = Join-Path $env:TEMP "gh-response-headers-$([guid]::NewGuid()).txt"
+    
+    try {
+        # Use gh api with --include to get headers in response
+        $args = @("api", $Endpoint, "--method", $Method, "--include")
+        if ($JQ) { $args += @("--jq", $JQ) }
+        
+        $response = & gh @args 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        if ($exitCode -eq 0 -and $response) {
+            # Parse headers from response (gh --include returns headers before body)
+            $lines = $response -split "`n"
+            $headerSection = $true
+            $headers = @{}
+            $body = @()
+            
+            foreach ($line in $lines) {
+                if ($headerSection) {
+                    if ([string]::IsNullOrWhiteSpace($line)) {
+                        $headerSection = $false
+                        continue
+                    }
+                    if ($line -match '^([^:]+):\s*(.+)$') {
+                        $headers[$matches[1].Trim()] = $matches[2].Trim()
+                    }
+                } else {
+                    $body += $line
+                }
+            }
+            
+            # Extract rate-limit headers
+            $rlState = Get-RateLimitState
+            $updated = $false
+            
+            if ($headers.ContainsKey('x-ratelimit-remaining')) {
+                $rlState.remaining = [int]$headers['x-ratelimit-remaining']
+                $updated = $true
+            }
+            if ($headers.ContainsKey('x-ratelimit-limit')) {
+                $rlState.limit = [int]$headers['x-ratelimit-limit']
+                $updated = $true
+            }
+            if ($headers.ContainsKey('x-ratelimit-reset')) {
+                $rlState.reset = $headers['x-ratelimit-reset']
+                $updated = $true
+            }
+            if ($headers.ContainsKey('x-ratelimit-used')) {
+                $rlState.used = [int]$headers['x-ratelimit-used']
+                $updated = $true
+            }
+            if ($headers.ContainsKey('x-ratelimit-resource')) {
+                $rlState.resource = $headers['x-ratelimit-resource']
+                $updated = $true
+            }
+            
+            if ($updated) {
+                $rlState.lastUpdated = (Get-Date).ToString("o")
+                
+                # Update trend (keep last 10 samples)
+                $trend = @($rlState.trend)
+                $trend += [ordered]@{
+                    timestamp = $rlState.lastUpdated
+                    remaining = $rlState.remaining
+                    used = $rlState.used
+                }
+                if ($trend.Count -gt 10) {
+                    $trend = $trend[-10..-1]
+                }
+                $rlState.trend = $trend
+                
+                Save-RateLimitState $rlState
+                
+                $pct = [math]::Round(($rlState.remaining / $rlState.limit) * 100, 1)
+                Write-Host "[$ts] [pcb] Rate limit: $($rlState.remaining)/$($rlState.limit) remaining ($pct%)" -ForegroundColor DarkGray
+            }
+            
+            return ($body -join "`n")
+        }
+        
+        return $null
+    } finally {
+        if (Test-Path $tempFile) {
+            Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+function Test-PredictiveCircuitBreaker {
+    <#
+    .SYNOPSIS
+    Tests if circuit should open BEFORE hitting 429, based on header trends.
+    Returns an object with ShouldOpen (bool) and BackoffMinutes (int).
+    #>
+    $rlState = Get-RateLimitState
+    $ts = Get-Date -Format "HH:mm:ss"
+    
+    # If no data yet, allow
+    if (-not $rlState.lastUpdated) {
+        return [PSCustomObject]@{ ShouldOpen = $false; BackoffMinutes = 0; Reason = "No data" }
+    }
+    
+    $pctRemaining = ($rlState.remaining / $rlState.limit) * 100
+    
+    # Threshold logic based on remaining quota percentage
+    # Critical: < 5% remaining
+    # Warning: < 15% remaining
+    # Caution: < 30% remaining
+    
+    if ($pctRemaining -lt 5) {
+        # Critical - open circuit with long backoff
+        $backoff = 15
+        Write-Host "[$ts] [pcb] CRITICAL: $([math]::Round($pctRemaining, 1))% quota remaining — opening circuit for ${backoff}m" -ForegroundColor Red
+        return [PSCustomObject]@{ 
+            ShouldOpen = $true
+            BackoffMinutes = $backoff
+            Reason = "Critical quota (<5%)"
+            State = "open"
+        }
+    }
+    elseif ($pctRemaining -lt 15) {
+        # Warning - enter half-open-imminent state with medium backoff
+        $backoff = 8
+        Write-Host "[$ts] [pcb] WARNING: $([math]::Round($pctRemaining, 1))% quota remaining — half-open-imminent for ${backoff}m" -ForegroundColor Yellow
+        return [PSCustomObject]@{ 
+            ShouldOpen = $true
+            BackoffMinutes = $backoff
+            Reason = "Low quota (<15%)"
+            State = "half-open-imminent"
+        }
+    }
+    elseif ($pctRemaining -lt 30) {
+        # Caution - light backoff
+        $backoff = 3
+        Write-Host "[$ts] [pcb] CAUTION: $([math]::Round($pctRemaining, 1))% quota remaining — light backoff ${backoff}m" -ForegroundColor DarkYellow
+        return [PSCustomObject]@{ 
+            ShouldOpen = $true
+            BackoffMinutes = $backoff
+            Reason = "Reduced quota (<30%)"
+            State = "half-open-imminent"
+        }
+    }
+    
+    # Analyze trend if we have enough samples
+    if ($rlState.trend -and $rlState.trend.Count -ge 3) {
+        $samples = @($rlState.trend[-3..-1])
+        $rate = ($samples[0].remaining - $samples[-1].remaining) / $samples.Count
+        
+        # If consuming > 100 requests per sample and < 500 remaining, warn
+        if ($rate -gt 100 -and $rlState.remaining -lt 500) {
+            $backoff = 5
+            Write-Host "[$ts] [pcb] TREND: High consumption rate ($([math]::Round($rate, 0))/sample) with $($rlState.remaining) left — backoff ${backoff}m" -ForegroundColor Yellow
+            return [PSCustomObject]@{ 
+                ShouldOpen = $true
+                BackoffMinutes = $backoff
+                Reason = "High consumption trend"
+                State = "half-open-imminent"
+            }
+        }
+    }
+    
+    return [PSCustomObject]@{ ShouldOpen = $false; BackoffMinutes = 0; Reason = "OK" }
 }
 
 # Multi-machine coordination settings (Issue #346)
@@ -937,7 +1174,12 @@ function Get-StaleIssues {
     
     try {
         # Get all open issues with ralph:*:active labels
-        $issues = gh issue list --json number,labels,comments --limit 100 2>$null | ConvertFrom-Json
+        $issueJson = if (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue) {
+            Invoke-ApiWithRateLimit -ScriptBlock { gh issue list --json number,labels,comments --limit 100 2>$null } -Priority 1 -CallerName "ralph-stale-check"
+        } else {
+            gh issue list --json number,labels,comments --limit 100 2>$null
+        }
+        $issues = $issueJson | ConvertFrom-Json
         
         foreach ($issue in $issues) {
             # Find ralph:*:active labels from other machines
@@ -978,7 +1220,11 @@ function Get-StaleIssues {
 # Shared rate pool at ~/.squad/rate-pool.json allows multiple Ralph
 # instances to coordinate API budget. Includes circuit breaker,
 # budget tracking, and priority lanes.
+# NOTE: When scripts/rate-limit-manager.ps1 is dot-sourced (Issue #1165),
+# these functions are replaced by the shared library. This block is kept
+# as a self-contained fallback when the library is absent.
 # -------------------------------------------------------------------
+if (-not (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue)) {
 
 $ratePoolPath = Join-Path $env:USERPROFILE ".squad\rate-pool.json"
 $ratePoolWindowMinutes = 60  # Budget window resets every hour
@@ -1236,6 +1482,8 @@ function Test-BudgetAvailable {
 
     return $result
 }
+# END fallback rate-pool block (Issue #1165)
+} # end: if (-not (Get-Command Invoke-ApiWithRateLimit))
 
 function Get-IssuePriority {
     <#
@@ -1467,6 +1715,13 @@ while ($true) {
         Write-Host "[$displayTime] [health] $($healthResult.Warnings.Count) warning(s): $($healthResult.Warnings -join ' | ')" -ForegroundColor Magenta
     }
 
+    # Step -0.25: Register agent with rate pool (Issue #1165)
+    if (Get-Command Register-Agent -ErrorAction SilentlyContinue) {
+        $agentId = "ralph-$env:COMPUTERNAME"
+        Register-Agent -AgentId $agentId -AgentName "Ralph" -Priority "P2"
+        Write-Verbose "[$displayTime] [rate-limit] Registered agent '$agentId' as P2"
+    }
+
     # Step -0.5: Machine capability discovery (Issue #987 — run once per startup, then every 50 rounds)
     $capDiscoveryScript = Join-Path (Get-Location) "scripts\discover-machine-capabilities.ps1"
     if (($round -eq 1 -or $round % 50 -eq 0) -and (Test-Path $capDiscoveryScript)) {
@@ -1629,7 +1884,12 @@ while ($true) {
         try {
             # Find issues with our machine's label
             $myLabel = "ralph:${machineId}:active"
-            $myIssues = gh issue list --label $myLabel --json number --limit 50 2>$null | ConvertFrom-Json
+            $myIssueJson = if (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue) {
+                Invoke-ApiWithRateLimit -ScriptBlock { gh issue list --label $myLabel --json number --limit 50 2>$null } -Priority 1 -CallerName "ralph-heartbeat"
+            } else {
+                gh issue list --label $myLabel --json number --limit 50 2>$null
+            }
+            $myIssues = $myIssueJson | ConvertFrom-Json
             foreach ($issue in $myIssues) {
                 Update-IssueHeartbeat -IssueNumber $issue.number -MachineId $machineId
             }
@@ -1643,13 +1903,33 @@ while ($true) {
     }
     
     # -------------------------------------------------------------------
-    # Rate Coordination Guards (Issue #825)
+    # Rate Coordination Guards (Issue #825, #1166)
     # Check circuit breaker and budget BEFORE spawning any agents.
     # -------------------------------------------------------------------
     $skipRound = $false
 
+    # Guard 0: Predictive Circuit Breaker (PCB) — Issue #1166
+    # Probe GitHub API to capture rate-limit headers, then check if we should preemptively back off
+    try {
+        $null = Invoke-GitHubAPIWithHeaders -Endpoint "user" -JQ ".login"
+    } catch {
+        Write-Host "[$displayTime] [pcb] Warning: Could not probe rate-limit headers" -ForegroundColor DarkGray
+    }
+    
+    $pcbResult = Test-PredictiveCircuitBreaker
+    if ($pcbResult.ShouldOpen) {
+        Write-Host "[$displayTime] [pcb] PREDICTIVE OPEN: $($pcbResult.Reason) — backing off for $($pcbResult.BackoffMinutes)m (state: $($pcbResult.State))" -ForegroundColor Yellow
+        Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "PCB_BACKOFF" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
+        Update-Heartbeat -Round $round -Status "pcb_backoff" -ConsecutiveFailures $consecutiveFailures
+        
+        # Sleep for the backoff duration, then skip to next round
+        Start-Sleep -Seconds ($pcbResult.BackoffMinutes * 60)
+        continue
+    }
+
     # Guard 1: Circuit breaker — if open and cooling down, skip this round
-    if (Test-CircuitBreaker) {
+    # (only when fallback inline pool is active; rate-limit-manager handles this internally)
+    if ((Get-Command Test-CircuitBreaker -ErrorAction SilentlyContinue) -and (Test-CircuitBreaker)) {
         Write-Host "[$displayTime] [rate-pool] Skipping round $round — circuit breaker is OPEN" -ForegroundColor Red
         Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "CIRCUIT_BREAKER" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
         Update-Heartbeat -Round $round -Status "circuit_breaker" -ConsecutiveFailures $consecutiveFailures
@@ -1659,8 +1939,10 @@ while ($true) {
     # Guard 2: Budget check — adjust parallelism or skip if exhausted
     $budgetStatus = $null
     if (-not $skipRound) {
-        $budgetStatus = Test-BudgetAvailable
-        if (-not $budgetStatus.Available) {
+        if (Get-Command Test-BudgetAvailable -ErrorAction SilentlyContinue) {
+            $budgetStatus = Test-BudgetAvailable
+        }
+        if ($budgetStatus -and -not $budgetStatus.Available) {
             Write-Host "[$displayTime] [rate-pool] Skipping round $round — budget exhausted ($($budgetStatus.BudgetPct)%)" -ForegroundColor Red
             Write-RalphLog -Round $round -Timestamp $timestamp -ExitCode 0 -DurationSeconds 0 -ConsecutiveFailures $consecutiveFailures -Status "BUDGET_EXHAUSTED" -Metrics @{ issuesClosed = 0; prsMerged = 0; agentActions = 0 }
             Update-Heartbeat -Round $round -Status "budget_exhausted" -ConsecutiveFailures $consecutiveFailures
@@ -1688,7 +1970,9 @@ while ($true) {
     Write-Host "[$displayTime] [rate-pool] Round $round proceeding$ratePoolInfo" -ForegroundColor DarkCyan
 
     # Update rate pool: register this machine's activity for the round
-    Update-RatePool -Tier "standard" -Got429 $false
+    if (Get-Command Update-RatePool -ErrorAction SilentlyContinue) {
+        Update-RatePool -Tier "standard" -Got429 $false
+    }
 
     # Step 2: Run the agency copilot and capture exit code + output
     $exitCode = 0
@@ -1870,11 +2154,25 @@ exit `$LASTEXITCODE
                 }
             }
         }
-        Update-RatePool -Tier "standard" -Got429 $got429
+        if (Get-Command Update-RatePool -ErrorAction SilentlyContinue) {
+            Update-RatePool -Tier "standard" -Got429 $got429
+        } elseif ($got429 -and (Get-Command Register-RateLimitHit -ErrorAction SilentlyContinue)) {
+            # Use new library's 429 registration when rate-limit-manager is present
+            Register-RateLimitHit -Api "github" -AgentId "ralph-$env:COMPUTERNAME"
+        }
 
         # Model circuit breaker: update state based on rate limit detection
         if ($got429) {
             Update-CircuitBreakerOnRateLimit
+
+            # CDD: propagate backpressure to downstream agents (Issue #1168)
+            try {
+                if (Get-Command Invoke-CascadeBackpressure -ErrorAction SilentlyContinue) {
+                    Invoke-CascadeBackpressure -RateLimitedAgent "ralph"
+                }
+            } catch {
+                Write-Host "[$((Get-Date -Format 'HH:mm:ss'))] [cdd] Backpressure propagation failed: $($_.Exception.Message)" -ForegroundColor DarkYellow
+            }
         } elseif ($exitCode -eq 0) {
             Update-CircuitBreakerOnSuccess
         }

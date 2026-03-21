@@ -1,0 +1,6 @@
+apiVersion: v2
+name: github-rate-limit-exporter
+description: Prometheus exporter for GitHub API rate limits
+type: application
+version: 1.0.0
+appVersion: "latest"

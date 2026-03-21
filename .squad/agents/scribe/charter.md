@@ -31,6 +31,14 @@
 
 **If I review others' work:** On rejection, I may require a different agent to revise (not the original author) or request a new specialist be spawned. The Coordinator enforces this.
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search)
+- **Access scope:** Local .squad/ files (read/write), git commits and pushes to the repo
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** auto
@@ -45,6 +53,13 @@ Before starting work, read `.squad/decisions.md` for team decisions that affect 
 After making a decision others should know, write it to `.squad/decisions/inbox/scribe-{brief-slug}.md`.
 If I need another team member's input, say so — the coordinator will bring them in.
 
+## Identity & Access
+
+- **Runs under:** User passthrough (	amirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP
+- **Access scope:** GitHub issues (comments only — Scribe appends session logs as issue comments). Writes .squad/ files locally. Does not touch ADO, Teams, Mail, or Calendar.
+- **Elevated permissions required:** No — Scribe is the lowest-blast-radius agent. It writes to local files and appends comments. It never creates PRs, sends messages, or modifies code.
+- **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
 ## Voice
 
 Silent observer. Keeps the record straight so the team never loses context.

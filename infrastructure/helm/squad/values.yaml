@@ -69,6 +69,17 @@ squadConfig:
   eagerByDefault: true
   allowRecursiveSpawn: false
 
+# -- Agent pool settings
+agents:
+  maxConcurrent: 5
+  ephemeral: true        # agents are spun up per-task then terminated
+
+# -- Repository / Git configuration
+config:
+  gitRepo: "https://github.com/tamirdresher_microsoft/tamresearch1"
+  branch: "main"
+  credentialsSecret: "squad-credentials"
+
 # -- Image pull secrets (for private registries / ACR)
 imagePullSecrets: []
 #   - name: acr-secret

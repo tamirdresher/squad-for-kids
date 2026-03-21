@@ -1,0 +1,114 @@
+---
+# Secret containing GitHub token
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-rate-limit-exporter
+  namespace: default
+type: Opaque
+stringData:
+  GITHUB_TOKEN: ""
+
+---
+# Deployment for github-rate-limit-exporter
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-rate-limit-exporter
+  namespace: default
+  labels:
+    app: github-rate-limit-exporter
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: github-rate-limit-exporter
+  template:
+    metadata:
+      labels:
+        app: github-rate-limit-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: github-rate-limit-exporter
+      containers:
+      - name: exporter
+        image: ghcr.io/tamirdresher/github-rate-limit-exporter:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: metrics
+          containerPort: 8080
+          protocol: TCP
+        env:
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-rate-limit-exporter
+              key: GITHUB_TOKEN
+        - name: POLL_INTERVAL
+          value: "30s"
+        - name: PORT
+          value: "8080"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+
+---
+# ServiceAccount for the deployment
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: github-rate-limit-exporter
+  namespace: default
+
+---
+# Service to expose metrics
+apiVersion: v1
+kind: Service
+metadata:
+  name: github-rate-limit-exporter
+  namespace: default
+  labels:
+    app: github-rate-limit-exporter
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: github-rate-limit-exporter

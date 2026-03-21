@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "squad.fullname" . }}-agent-charters
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+data:
+  README.md: |
+    # Agent Charters
+    
+    This ConfigMap contains agent charter markdown files from the repository's
+    `.squad/agents/` directory. These charters define agent identity, capabilities,
+    and working style.
+    
+    Charters are loaded at agent spawn time and injected into the agent's context.
+    
+    **Source:** `.squad/agents/{agent-name}/charter.md` in the repository
+    **Usage:** Mounted as volume in agent Job pods at `/squad-charters/`
+    **Update Process:** Rebuild this ConfigMap when agent charters change in the repo

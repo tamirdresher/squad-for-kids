@@ -1,0 +1,307 @@
+# =============================================================================
+# github-metrics-exporter.yaml — Squad GitHub Rate Limit & Queue Metrics
+#
+# A lightweight Python exporter that polls the GitHub /rate_limit endpoint
+# and counts open squad issues, then exposes them as Prometheus gauges.
+#
+# KEDA's Prometheus scaler reads from this exporter to drive composite
+# AND-logic scaling: scale up ONLY when work exists AND rate limit allows.
+#
+# Metrics exposed on :9100/metrics:
+#   github_api_rate_limit_remaining{resource="core"}
+#   github_api_rate_limit_remaining{resource="search"}
+#   github_api_rate_limit_used{resource="core"}
+#   github_api_rate_limit_reset{resource="core"}
+#   squad_copilot_queue_depth         — open issues labelled squad:picard
+#   squad_copilot_rate_limit_hits     — cumulative 429 responses observed
+#
+# Related: #1134 (KEDA token scaler), #1141 (scaler type research)
+# =============================================================================
+{{- if and .Values.metricsExporter.enabled .Values.keda.enabled }}
+---
+# ConfigMap: Python exporter script (no custom image required)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: squad-metrics-exporter-script
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: metrics-exporter
+  annotations:
+    squad.github.com/issue: "1134"
+    squad.github.com/description: "GitHub rate-limit + queue-depth Prometheus exporter for KEDA"
+data:
+  exporter.py: |
+    #!/usr/bin/env python3
+    """
+    Squad GitHub Rate Limit & Queue Depth Metrics Exporter
+    Polls GitHub API and exposes Prometheus gauges for KEDA scaling.
+    Issue #1134: KEDA autoscaling based on Copilot token usage & rate limits
+    """
+    import os
+    import sys
+    import time
+    import traceback
+    import requests
+    from prometheus_client import start_http_server, Gauge, Counter
+
+    # ---------------------------------------------------------------------------
+    # Configuration from environment
+    # ---------------------------------------------------------------------------
+    GH_TOKEN         = os.environ.get("GH_TOKEN", "")
+    GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "")
+    POLL_INTERVAL    = int(os.environ.get("POLL_INTERVAL_SECONDS", "30"))
+    PORT             = int(os.environ.get("METRICS_PORT", "9100"))
+    SQUAD_LABEL      = os.environ.get("SQUAD_LABEL", "squad:picard")
+    GITHUB_API       = "https://api.github.com"
+
+    if not GH_TOKEN:
+        print("ERROR: GH_TOKEN is required", flush=True)
+        sys.exit(1)
+
+    parts = GITHUB_REPOSITORY.split("/")
+    OWNER = parts[0] if len(parts) >= 2 else ""
+    REPO  = parts[1] if len(parts) >= 2 else ""
+
+    # ---------------------------------------------------------------------------
+    # Prometheus metrics
+    # ---------------------------------------------------------------------------
+    RATE_LIMIT_REMAINING = Gauge(
+        "github_api_rate_limit_remaining",
+        "GitHub API requests remaining in the current window",
+        ["resource"],
+    )
+    RATE_LIMIT_RESET = Gauge(
+        "github_api_rate_limit_reset",
+        "GitHub API rate limit reset time (unix epoch)",
+        ["resource"],
+    )
+    RATE_LIMIT_USED = Gauge(
+        "github_api_rate_limit_used",
+        "GitHub API requests used in the current window",
+        ["resource"],
+    )
+    QUEUE_DEPTH = Gauge(
+        "squad_copilot_queue_depth",
+        "Number of open GitHub issues labelled for squad agent processing",
+        ["label"],
+    )
+    RATE_LIMIT_HITS = Counter(
+        "squad_copilot_rate_limit_hits_total",
+        "Cumulative count of HTTP 429 responses from GitHub API",
+    )
+    EXPORTER_ERRORS = Counter(
+        "squad_metrics_exporter_errors_total",
+        "Cumulative count of errors during metric collection",
+    )
+
+    # ---------------------------------------------------------------------------
+    # Collection functions
+    # ---------------------------------------------------------------------------
+    def build_headers():
+        return {
+            "Authorization": f"Bearer {GH_TOKEN}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+    def collect_rate_limits(headers):
+        """Poll /rate_limit endpoint (does NOT consume quota)."""
+        resp = requests.get(f"{GITHUB_API}/rate_limit", headers=headers, timeout=10)
+        if resp.status_code == 429:
+            RATE_LIMIT_HITS.inc()
+            return
+        resp.raise_for_status()
+        resources = resp.json().get("resources", {})
+        for resource, vals in resources.items():
+            RATE_LIMIT_REMAINING.labels(resource=resource).set(vals.get("remaining", 0))
+            RATE_LIMIT_RESET.labels(resource=resource).set(vals.get("reset", 0))
+            RATE_LIMIT_USED.labels(resource=resource).set(vals.get("used", 0))
+
+    def collect_queue_depth(headers, label):
+        """Count open issues with a given squad label."""
+        resp = requests.get(
+            f"{GITHUB_API}/repos/{OWNER}/{REPO}/issues",
+            headers=headers,
+            params={"state": "open", "labels": label, "per_page": 100},
+            timeout=10,
+        )
+        if resp.status_code == 429:
+            RATE_LIMIT_HITS.inc()
+            return
+        resp.raise_for_status()
+        QUEUE_DEPTH.labels(label=label).set(len(resp.json()))
+
+    # ---------------------------------------------------------------------------
+    # Main loop
+    # ---------------------------------------------------------------------------
+    def main():
+        headers = build_headers()
+        start_http_server(PORT)
+        print(f"Squad metrics exporter started on :{PORT}/metrics", flush=True)
+        print(f"  Repository : {GITHUB_REPOSITORY}", flush=True)
+        print(f"  Squad label: {SQUAD_LABEL}", flush=True)
+        print(f"  Poll interval: {POLL_INTERVAL}s", flush=True)
+
+        while True:
+            try:
+                collect_rate_limits(headers)
+                collect_queue_depth(headers, SQUAD_LABEL)
+            except Exception as exc:
+                EXPORTER_ERRORS.inc()
+                print(f"[ERROR] Metric collection failed: {exc}", flush=True)
+                traceback.print_exc()
+            time.sleep(POLL_INTERVAL)
+
+    if __name__ == "__main__":
+        main()
+
+  requirements.txt: |
+    requests==2.32.3
+    prometheus_client==0.21.1
+
+  entrypoint.sh: |
+    #!/bin/sh
+    set -e
+    pip install --quiet --no-cache-dir -r /app/requirements.txt
+    exec python /app/exporter.py
+
+---
+# Deployment: runs the exporter as a lightweight always-on pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: squad-metrics-exporter
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: metrics-exporter
+  annotations:
+    squad.github.com/issue: "1134"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "squad-agents.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: metrics-exporter
+  template:
+    metadata:
+      labels:
+        {{- include "squad-agents.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: metrics-exporter
+        azure.workload.identity/use: "true"
+      annotations:
+        # Prometheus auto-scrape (if prometheus-operator is installed)
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.metricsExporter.port | quote }}
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "squad-agents.serviceAccountName" . }}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: squad-secrets
+        - name: script
+          configMap:
+            name: squad-metrics-exporter-script
+            defaultMode: 0755
+
+      containers:
+        - name: exporter
+          # python:3.12-slim — minimal, no custom image needed
+          image: python:3.12-slim
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "/app/entrypoint.sh"]
+
+          env:
+            - name: GITHUB_REPOSITORY
+              value: {{ .Values.global.repository | quote }}
+            - name: SQUAD_LABEL
+              value: {{ .Values.metricsExporter.squadLabel | quote }}
+            - name: POLL_INTERVAL_SECONDS
+              value: {{ .Values.metricsExporter.pollIntervalSeconds | quote }}
+            - name: METRICS_PORT
+              value: {{ .Values.metricsExporter.port | quote }}
+            - name: GH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.keyVault.k8sSecretName }}
+                  key: GH_TOKEN
+
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.metricsExporter.port }}
+              protocol: TCP
+
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+            - name: script
+              mountPath: "/app"
+
+          resources:
+            {{- toYaml .Values.metricsExporter.resources | nindent 12 }}
+
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false   # pip install needs to write
+
+      nodeSelector:
+        {{- toYaml .Values.metricsExporter.nodeSelector | nindent 8 }}
+
+      tolerations:
+        {{- toYaml .Values.metricsExporter.tolerations | nindent 8 }}
+
+---
+# Service: stable in-cluster DNS for KEDA's Prometheus scaler
+apiVersion: v1
+kind: Service
+metadata:
+  name: squad-metrics-exporter
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: metrics-exporter
+spec:
+  selector:
+    {{- include "squad-agents.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: metrics-exporter
+  ports:
+    - name: metrics
+      port: {{ .Values.metricsExporter.port }}
+      targetPort: metrics
+      protocol: TCP
+  type: ClusterIP
+{{- end }}

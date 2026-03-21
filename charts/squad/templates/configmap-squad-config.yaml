@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "squad.fullname" . }}-config
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+data:
+  squad.config.json: |
+    {
+      "repository": "{{ .Values.squad.repository }}",
+      "primaryModel": "{{ .Values.copilot.primaryModel }}",
+      "fallbackChain": {{ .Values.copilot.fallbackChain | toJson }},
+      "ratePool": {
+        "enabled": {{ .Values.ratePool.enabled }},
+        {{- if .Values.ratePool.enabled }}
+        "redisUrl": "redis://{{ include "squad.fullname" . }}-rate-pool:6379"
+        {{- end }}
+      },
+      "scheduling": {
+        "capabilityNodes": {
+          "enabled": {{ .Values.scheduling.capabilityNodes.enabled }}
+        }
+      }
+    }

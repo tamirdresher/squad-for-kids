@@ -1,0 +1,143 @@
+# =============================================================================
+# ralph-cronjob.yaml — Ralph Work Monitor as a Kubernetes CronJob
+#
+# Ralph polls GitHub issues every 5 minutes (matching ralph-watch.ps1 schedule).
+# Running as a CronJob rather than a long-lived Deployment is cheaper and
+# cleaner: each poll gets a fresh pod, no need for in-process mutex logic
+# (concurrencyPolicy: Forbid replaces the PowerShell mutex).
+#
+# Secrets are mounted via the Key Vault CSI driver (SecretProviderClass).
+# Auth uses Workload Identity — no PAT token in the pod spec.
+# =============================================================================
+{{- if .Values.ralph.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ralph
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ralph
+    squad.github.com/agent: ralph
+  annotations:
+    squad.github.com/issue: "1060"
+    squad.github.com/description: "Ralph Work Monitor — polls GitHub issues and dispatches work"
+spec:
+  # Every 5 minutes — matches ralph-watch.ps1 polling interval
+  schedule: {{ .Values.ralph.schedule | quote }}
+
+  # Forbid overlapping runs (replaces the PowerShell mutex in ralph-watch.ps1)
+  concurrencyPolicy: {{ .Values.ralph.concurrencyPolicy }}
+
+  # Keep history for debugging
+  successfulJobsHistoryLimit: {{ .Values.ralph.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.ralph.failedJobsHistoryLimit }}
+
+  # Don't start jobs that are more than 60s overdue (e.g. after cluster downtime)
+  startingDeadlineSeconds: 60
+
+  jobTemplate:
+    spec:
+      # Kill the pod if it runs longer than activeDeadlineSeconds
+      activeDeadlineSeconds: {{ .Values.ralph.activeDeadlineSeconds }}
+
+      # Retry on failure
+      backoffLimit: {{ .Values.ralph.backoffLimit }}
+
+      # Clean up completed pods automatically
+      ttlSecondsAfterFinished: {{ .Values.ralph.ttlSecondsAfterFinished }}
+
+      template:
+        metadata:
+          labels:
+            {{- include "squad-agents.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: ralph
+            squad.github.com/agent: ralph
+            # Required for Workload Identity webhook injection
+            azure.workload.identity/use: "true"
+          {{- with .Values.ralph.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          # Use the Workload Identity-annotated ServiceAccount
+          serviceAccountName: {{ include "squad-agents.serviceAccountName" . }}
+
+          restartPolicy: {{ .Values.ralph.restartPolicy }}
+
+          # Security context: run as non-root
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+
+          # CSI volume: mounts Key Vault secrets
+          volumes:
+            - name: secrets-store
+              csi:
+                driver: secrets-store.csi.k8s.io
+                readOnly: true
+                volumeAttributes:
+                  secretProviderClass: squad-secrets
+
+          containers:
+            - name: ralph
+              image: {{ include "squad-agents.imageRef" (dict "Values" .Values "agent" .Values.ralph) }}
+              imagePullPolicy: {{ .Values.ralph.image.pullPolicy }}
+
+              # Inject agent type so the entrypoint script knows what to run
+              env:
+                - name: SQUAD_AGENT_TYPE
+                  value: "ralph"
+                - name: GITHUB_REPOSITORY
+                  value: {{ .Values.global.repository | quote }}
+                {{- range $k, $v := .Values.ralph.env }}
+                - name: {{ $k }}
+                  value: {{ $v | quote }}
+                {{- end }}
+                # Secrets from Key Vault (populated by CSI driver into the K8s Secret)
+                - name: GH_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.keyVault.k8sSecretName }}
+                      key: GH_TOKEN
+                - name: COPILOT_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.keyVault.k8sSecretName }}
+                      key: COPILOT_API_KEY
+                      optional: true
+
+              # Mount the CSI secrets volume (required to trigger secret sync)
+              volumeMounts:
+                - name: secrets-store
+                  mountPath: "/mnt/secrets-store"
+                  readOnly: true
+
+              resources:
+                {{- toYaml .Values.ralph.resources | nindent 16 }}
+
+              # Security: drop all capabilities, read-only root fs
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: false   # ralph-watch.ps1 writes temp files
+
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.ralph.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.ralph.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

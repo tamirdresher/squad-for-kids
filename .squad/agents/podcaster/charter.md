@@ -33,6 +33,14 @@
 **I don't handle:** Code, architecture, security — the coordinator routes that elsewhere
 **Handoffs:** Receives content from Seven (Research); delivers audio to Tamir
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search)
+- **Access scope:** Local files only — reads markdown/text content and writes MP3 audio files; no cloud services required
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Model
 
 - **Preferred:** claude-haiku-4.5

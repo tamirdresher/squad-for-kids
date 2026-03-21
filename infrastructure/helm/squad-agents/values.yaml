@@ -1,0 +1,436 @@
+# =============================================================================
+# values.yaml — Squad Agents Helm chart (AKS-native)
+#
+# Override these in an environment-specific values file or via --set flags.
+# Example (AKS Standard with dedicated node pool):
+#   helm upgrade --install squad-agents ./infrastructure/helm/squad-agents \
+#     --set global.acrLoginServer=acrsquadprod.azurecr.io \
+#     --set global.keyVaultName=kv-squad-prod \
+#     --set global.tenantId=<tenant-id> \
+#     --set azure.managedIdentityClientId=<client-id> \
+#     --set aksMode=standard \
+#     --set nodeSelector.agentpool=squad
+#
+# Example (AKS Automatic — no node pool setup required):
+#   helm upgrade --install squad-agents ./infrastructure/helm/squad-agents \
+#     --set global.acrLoginServer=acrsquadprod.azurecr.io \
+#     --set global.keyVaultName=kv-squad-prod \
+#     --set global.tenantId=<tenant-id> \
+#     --set azure.managedIdentityClientId=<client-id> \
+#     --set aksMode=automatic
+# =============================================================================
+
+# -- AKS mode: controls deployment-time behaviour and NOTES output.
+# standard:  AKS Standard cluster — uses dedicated node pools, manually installs
+#            CSI driver, sets up KEDA add-on, and configures Workload Identity.
+# automatic: AKS Automatic cluster — node provisioning, patching, CSI driver,
+#            KEDA, and Workload Identity are all managed by Azure.
+aksMode: standard   # or "automatic"
+
+# -- Global node selector applied to ALL agent pods.
+# Leave as {} for AKS Automatic — Azure manages node provisioning.
+# Set to {"agentpool": "squad"} for AKS Standard with a dedicated node pool.
+nodeSelector: {}
+
+# -- Azure identity settings
+azure:
+  # Managed Identity client ID for Workload Identity federation.
+  # Required for Key Vault access; annotated onto the ServiceAccount.
+  # Obtain with: az identity show --name squad-identity \
+  #                --resource-group rg-squad --query clientId -o tsv
+  managedIdentityClientId: ""
+
+# -- Global settings (shared across all agents)
+global:
+  # GitHub repository in owner/repo format
+  repository: "tamirdresher_microsoft/tamresearch1"
+
+  # Kubernetes namespace to deploy into
+  namespace: "squad"
+
+  # Azure Container Registry login server (e.g. acrsquadprod.azurecr.io)
+  # Set at deploy time: --set global.acrLoginServer=...
+  acrLoginServer: ""
+
+  # Azure Key Vault name (secrets are mounted via CSI driver)
+  # Set at deploy time: --set global.keyVaultName=...
+  keyVaultName: ""
+
+  # Azure Tenant ID (required for Key Vault CSI driver)
+  # Set at deploy time: --set global.tenantId=...
+  tenantId: ""
+
+  # Default Squad model
+  defaultModel: "claude-sonnet-4.5"
+  defaultTier: "standard"
+
+# -- ServiceAccount
+# The single ServiceAccount used by all Squad agent pods.
+# The Workload Identity annotation is generated automatically from
+# azure.managedIdentityClientId when that value is non-empty.
+serviceAccount:
+  create: true
+  # Leave empty to auto-generate as "<release-name>-squad-agents"
+  name: ""
+  # Extra annotations merged onto the ServiceAccount (in addition to the
+  # azure.workload.identity/client-id annotation generated from
+  # azure.managedIdentityClientId above).
+  annotations: {}
+
+# -- GitHub repository settings
+# Used by KEDA github trigger (issue count scaler) and other GitHub-aware components.
+github:
+  # GitHub org or username that owns the repository
+  # Set at deploy time: --set github.owner=<org>
+  owner: "tamirdresher_microsoft"
+  # GitHub repository name (single repo, no owner prefix)
+  # Set at deploy time: --set github.repo=tamresearch1
+  repo: "tamresearch1"
+
+# -- Key Vault secrets (mounted via Secrets Store CSI driver)
+keyVault:
+  # Secret names in Key Vault
+  ghTokenSecretName: "squad-gh-token"
+  copilotApiKeySecretName: "squad-copilot-api-key"
+  # Optional webhook URL secret
+  mcpWebhookUrlSecretName: ""
+
+  # Name of the K8s Secret created by the CSI driver (used in envFrom)
+  k8sSecretName: "squad-runtime-secrets"
+
+# =============================================================================
+# Ralph — Work Monitor (CronJob)
+#
+# Polls GitHub issues on a schedule, dispatches work to specialist agents.
+# Runs as a CronJob rather than a Deployment: cheaper (no always-on pod)
+# and mirrors the existing ralph-watch.ps1 scheduled-task pattern.
+# =============================================================================
+ralph:
+  enabled: true
+
+  # CronJob schedule — every 5 minutes
+  schedule: "*/5 * * * *"
+
+  # Prevent overlapping runs (mirroring the mutex logic in ralph-watch.ps1)
+  concurrencyPolicy: Forbid
+
+  # Retain last 3 successful + 1 failed job
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+
+  # Restart on failure within the same Job run
+  restartPolicy: OnFailure
+  backoffLimit: 2
+
+  # TTL for completed Jobs (cleanup after 1 hour)
+  ttlSecondsAfterFinished: 3600
+
+  image:
+    # Set global.acrLoginServer to construct full image reference
+    repository: "squad-agents"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Environment variables passed to ralph-watch.ps1
+  env:
+    RALPH_LOG_LEVEL: "info"
+    RALPH_INTERVAL_SECONDS: "300"
+    SQUAD_CONFIG_PATH: "/app/squad.config.ts"
+    SQUAD_AGENT_TYPE: "ralph"
+
+  resources:
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "128Mi"
+
+  # Per-agent nodeSelector override (merged with top-level nodeSelector).
+  # Leave as {} to inherit from the top-level nodeSelector value above.
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  # ActiveDeadlineSeconds: kill the pod if it runs longer than 4 minutes
+  # (prevents zombie jobs if ralph-watch.ps1 hangs)
+  activeDeadlineSeconds: 240
+
+# =============================================================================
+# Picard — Lead Agent (Deployment)
+#
+# Long-running Deployment: handles architecture decisions, ADR writing,
+# and coordinates specialist agents. Always available (min 1 replica)
+# but scales up with KEDA when there are open picard-labelled issues.
+# =============================================================================
+picard:
+  enabled: true
+
+  replicaCount: 1
+
+  image:
+    repository: "squad-agents"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  env:
+    PICARD_LOG_LEVEL: "info"
+    SQUAD_CONFIG_PATH: "/app/squad.config.ts"
+    SQUAD_AGENT_TYPE: "picard"
+
+  resources:
+    limits:
+      cpu: "2"
+      memory: "2Gi"
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Per-agent nodeSelector override (merged with top-level nodeSelector).
+  # Leave as {} to inherit from the top-level nodeSelector value above.
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  # Liveness probe: check that the Picard process is responding
+  livenessProbe:
+    exec:
+      command:
+        - pwsh
+        - -NoProfile
+        - -Command
+        - "if ($PSVersionTable.PSVersion.Major -ge 7) { exit 0 } else { exit 1 }"
+    initialDelaySeconds: 30
+    periodSeconds: 60
+    timeoutSeconds: 10
+    failureThreshold: 3
+
+  readinessProbe:
+    exec:
+      command:
+        - pwsh
+        - -NoProfile
+        - -Command
+        - "if (Test-Path /tmp/picard-ready) { exit 0 } else { exit 1 }"
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# =============================================================================
+# KEDA — Event-driven scaling for Picard
+#
+# Scales the Picard Deployment using composite AND-logic triggers:
+#   scale UP  when: open issues exist  AND  tokens available  AND  rate limit OK
+#   scale DOWN when: no issues OR tokens critical OR rate-limited
+#
+# Supports two scaling modes:
+#   1. Simple mode (legacy): scales on open issue count only
+#   2. Token-aware mode (recommended): scales on work queue AND token budget
+#
+# Requires:
+#   1. KEDA v2.12+ on the cluster:
+#        az aks update --enable-keda      (AKS managed add-on)
+#        # OR
+#        helm install keda kedacore/keda  (self-managed, >= 2.12)
+#   2. metricsExporter.enabled=true (squad-metrics-exporter must be running)
+#   3. For token-aware: tokenScaler.enabled=true AND copilot-metrics-exporter running
+#
+# Related: #1134 (KEDA token scaler), #1160 (composite scaling), #1141 (scaler research)
+# =============================================================================
+keda:
+  enabled: false   # Set to true once KEDA add-on is installed and exporter is healthy
+
+  # ── Composite AND mode (issue #1160) ──────────────────────────────────────
+  # When false (default): simple ScaledObject — scales on open issue count only.
+  # When true: composite AND ScaledObject — scales only when BOTH conditions hold:
+  #   1. Open picard-labelled issues exist (work_queue > 0)
+  #   2. GitHub API rate-limit remaining exceeds rateLimitThreshold (rate_headroom > 0)
+  # Requires github-metrics-exporter (issue #1154) to be deployed.
+  compositeMode: false
+  
+  # ── Token-aware scaling (issue #1134) ─────────────────────────────────────
+  # Token scaler: scales on work queue AND Copilot token availability.
+  # Prevents spinning up pods when token budget is exhausted (free tier: 50/month).
+  # Requires: keda.enabled=true, metricsExporter.enabled=true, 
+  #           copilot-metrics-exporter Deployment running (port 9101/metrics)
+  tokenScaler:
+    # Enable token-aware scaling (requires copilot-metrics-exporter)
+    enabled: false
+    
+    # Replica bounds: 0 (scale-to-zero) to maxReplicaCount
+    minReplicaCount: 0
+    maxReplicaCount: 5
+    
+    # Polling and cooldown timing
+    pollingInterval: 30      # KEDA evaluates triggers every 30 seconds
+    cooldownPeriod: 300      # 5 minutes idle before scaling to zero (lets tasks drain)
+    
+    # Queue targeting: 1 replica per targetQueuePerReplica issues
+    targetQueuePerReplica: "2"
+    
+    # ─── Token budget thresholds ──────────────────────────────────────────
+    # Free tier: 50 requests/month = ~1.6 requests/day
+    # Pro tier: effectively unlimited, but monitor burn rate
+    
+    # Minimum tokens required to allow scaling UP
+    # Below this, scale to 0 and wait for reset window (monthly)
+    tokenThreshold: "5"
+    
+    # If tokens drop below this, don't even consider scaling
+    tokenActivationThreshold: "1"
+    
+    # ─── GitHub API rate-limit thresholds ─────────────────────────────────
+    # GitHub REST limit: 5000 requests/hour (authenticated)
+    
+    # Minimum rate-limit headroom to allow scaling UP
+    # 500 = 10% headroom (prevents exhaustion)
+    rateLimitThreshold: "500"
+    
+    # If rate-limit drops below this, scale to 0 immediately (backoff)
+    # 100 = ~2% headroom (critical threshold)
+    rateLimitActivationThreshold: "100"
+    
+    # Use GitHub built-in scaler as fallback when metrics unavailable
+    fallbackGithubScaler: true
+
+  # Minimum GitHub API calls remaining before rate-limit gate blocks scaling.
+  # The metrics-api trigger compares github_rate_limit_remaining against this.
+  # Recommended: 100 (GitHub REST API limit is 5000/hour for authenticated requests)
+  rateLimitThreshold: 100
+
+  picard:
+    minReplicaCount: 0      # Scale to zero when idle
+    maxReplicaCount: 5      # Maximum Picard replicas (1 per 2 issues)
+    pollingInterval: 30     # How often KEDA polls metrics (seconds)
+    cooldownPeriod: 120     # Seconds idle before scaling to zero
+
+    # Simple (legacy) fallback — used when composite.enabled=false
+    # targetIssueCount is the per-replica issue target for the github scaler
+    targetIssueCount: "2"
+
+    # -------------------------------------------------------------------------
+    # Composite AND-logic (KEDA v2.12+ scalingModifiers)
+    # -------------------------------------------------------------------------
+    composite:
+      # Set to true to activate the AND-logic Prometheus-based triggers.
+      # Requires squad-metrics-exporter to be running.
+      enabled: false  # Enable after verifying exporter is healthy
+
+      # Desired number of open issues per Picard replica.
+      # Formula: desired_replicas = ceil(queue_depth / targetQueuePerReplica)
+      targetQueuePerReplica: "2"
+
+      # GitHub API rate limit remaining below which we refuse to scale up.
+      # 500 out of 5000/hour = 10% headroom floor.
+      # Prevents Picard pods from being created when we're almost rate-limited.
+      rateLimitThreshold: "500"
+
+      # If rate limit drops below this value, deactivate the scaler entirely
+      # (scale to zero regardless of queue depth). 100 = ~2% of hourly quota.
+      rateLimitActivationThreshold: "100"
+
+    # -------------------------------------------------------------------------
+    # Business-hours pre-warm (cron trigger)
+    # Keeps at least 1 Picard replica warm during working hours to eliminate
+    # cold-start latency for the first issue of the day.
+    # -------------------------------------------------------------------------
+    prewarm:
+      enabled: false          # Enable when composite KEDA is active
+      timezone: "Asia/Jerusalem"
+      start: "0 8 * * 0-4"   # Sunday–Thursday 08:00
+      end:   "0 20 * * 0-4"  # Sunday–Thursday 20:00
+      desiredReplicas: "1"    # Keep 1 replica alive during hours
+
+  # ---------------------------------------------------------------------------
+  # GitHub Actions runner queue trigger (Tier 1, issue #1158)
+  #
+  # Counts pending Actions workflow jobs for the Squad repo and scales Picard
+  # up by 1 replica per targetWorkflowQueueLength queued jobs.
+  # This trigger is ADDITIVE to the existing Prometheus / github scalers —
+  # KEDA takes the maximum across all active triggers.
+  #
+  # Prerequisites:
+  #   1. keda.enabled: true
+  #   2. Create the PAT secret manually (fine-grained PAT, repo scope):
+  #        kubectl create secret generic github-pat-secret \
+  #          --namespace squad \
+  #          --from-literal=token=<GITHUB_PAT>
+  #   3. Set keda.githubRunnerTrigger.enabled: true
+  #
+  # Ref: https://keda.sh/docs/2.19/scalers/github-runner/
+  # ---------------------------------------------------------------------------
+  githubRunnerTrigger:
+    enabled: false
+    owner: "tamirdresher_microsoft"
+    runnerScope: "repo"
+    repos: "tamresearch1"
+    targetWorkflowQueueLength: "1"
+
+# =============================================================================
+# Metrics Exporter — squad-metrics-exporter & copilot-metrics-exporter
+#
+# Two lightweight exporters expose Prometheus metrics used by KEDA's scalers:
+#
+# 1. squad-metrics-exporter (port 9100):
+#    • GitHub API rate limit (github_api_rate_limit_remaining)
+#    • Work queue depth (squad_copilot_queue_depth)
+#
+# 2. copilot-metrics-exporter (port 9101):
+#    • Copilot token budget (copilot_tokens_remaining)
+#    • Token burn rate (copilot_token_burn_rate)
+#    • 429 backoff counter (copilot_rate_limit_hits_total)
+#
+# Enable alongside keda.enabled=true for autoscaling.
+# =============================================================================
+metricsExporter:
+  enabled: false   # Enable together with keda.enabled
+
+  # GitHub issue label to count as "queue depth"
+  squadLabel: "squad:picard"
+
+  # How often to poll the GitHub API (seconds). 30s = 2 calls/min = 120/hour.
+  # Well within the 5000/hour GitHub rate limit.
+  pollIntervalSeconds: "30"
+
+  # ─── squad-metrics-exporter port (GitHub rate limit + queue depth) ─────
+  # Prometheus scrapes this endpoint for KEDA composite scalers
+  port: 9100
+
+  # ─── copilot-metrics-exporter port (Copilot token budget) ─────────────
+  # Prometheus scrapes this endpoint for KEDA token-aware scalers
+  copilotMetricsPort: 9101
+
+  resources:
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+
+  # nodeSelector and tolerations are inherited from the top-level nodeSelector.
+  # These per-component overrides are kept for backward compatibility.
+  nodeSelector: {}
+  tolerations: []
+
+# =============================================================================
+# Azure Monitor / Diagnostics
+# =============================================================================
+monitoring:
+  # Annotate pods for Prometheus scraping (if prometheus-operator is installed)
+  prometheus:
+    enabled: false
+    port: 9090
+    path: /metrics
+
+  # Log Analytics workspace resource ID (for future OTel exporter)
+  logAnalyticsWorkspaceId: ""

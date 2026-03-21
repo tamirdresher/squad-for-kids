@@ -1,0 +1,158 @@
+# =============================================================================
+# picard-deployment.yaml — Picard Lead Agent as a Kubernetes Deployment
+#
+# Picard handles architecture decisions, ADR writing, and coordination of
+# specialist agents. Runs as a long-lived Deployment (always available)
+# with KEDA scaling based on open picard-labelled GitHub issues.
+#
+# Unlike Ralph (CronJob), Picard maintains state between invocations
+# via the squad git-based state model (decisions.md, inbox/).
+#
+# Secrets are mounted via the Key Vault CSI driver (SecretProviderClass).
+# Auth uses Workload Identity — no PAT token in the pod spec.
+# =============================================================================
+{{- if .Values.picard.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: picard
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: picard
+    squad.github.com/agent: picard
+  annotations:
+    squad.github.com/issue: "1060"
+    squad.github.com/description: "Picard Lead Agent — architecture, decisions, coordination"
+spec:
+  replicas: {{ .Values.picard.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "squad-agents.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: picard
+      squad.github.com/agent: picard
+
+  # Rolling update: bring up new pod before terminating old one
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      labels:
+        {{- include "squad-agents.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: picard
+        squad.github.com/agent: picard
+        # Required for Workload Identity webhook injection
+        azure.workload.identity/use: "true"
+      {{- with .Values.picard.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      # Use the Workload Identity-annotated ServiceAccount
+      serviceAccountName: {{ include "squad-agents.serviceAccountName" . }}
+
+      # Graceful shutdown: allow 60s for Picard to finish current task
+      terminationGracePeriodSeconds: 60
+
+      # Security context: run as non-root
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      # CSI volume: mounts Key Vault secrets
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: squad-secrets
+
+        # Ephemeral volume for Picard's working files (readiness marker, temp state)
+        - name: picard-workdir
+          emptyDir: {}
+
+      containers:
+        - name: picard
+          image: {{ include "squad-agents.imageRef" (dict "Values" .Values "agent" .Values.picard) }}
+          imagePullPolicy: {{ .Values.picard.image.pullPolicy }}
+
+          env:
+            - name: SQUAD_AGENT_TYPE
+              value: "picard"
+            - name: GITHUB_REPOSITORY
+              value: {{ .Values.global.repository | quote }}
+            - name: SQUAD_MODEL
+              value: {{ .Values.global.defaultModel | quote }}
+            {{- range $k, $v := .Values.picard.env }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
+            # Secrets from Key Vault (populated by CSI driver into the K8s Secret)
+            - name: GH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.keyVault.k8sSecretName }}
+                  key: GH_TOKEN
+            - name: COPILOT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.keyVault.k8sSecretName }}
+                  key: COPILOT_API_KEY
+                  optional: true
+
+          volumeMounts:
+            # Mount secrets volume (required to trigger CSI sync)
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+            # Working directory for readiness marker and temp files
+            - name: picard-workdir
+              mountPath: "/tmp"
+
+          resources:
+            {{- toYaml .Values.picard.resources | nindent 12 }}
+
+          {{- with .Values.picard.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.picard.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          # Security: drop all capabilities
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false   # agent writes to /tmp
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.picard.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.picard.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+{{- end }}
+# Note: KEDA ScaledObject for Picard has been moved to picard-scaledobject.yaml
+# which supports composite AND-logic triggers (queue depth + rate limit).
+# See: infrastructure/helm/squad-agents/templates/picard-scaledobject.yaml

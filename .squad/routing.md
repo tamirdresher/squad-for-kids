@@ -72,9 +72,58 @@ When triaging, the Lead should ask:
 4. **Is it security-sensitive?** Auth, encryption, access control → always 🔴
 5. **Is it medium complexity with specs?** Feature with clear requirements, refactoring with tests → likely 🟡
 
+## Per-Area Routing (Monorepo Support)
+
+Squad supports per-area squad configs for large monorepos. When a task, issue, or PR is associated
+with a specific subdirectory, the nearest `.squad-context.md` or `.squads/` config takes precedence
+for area-specific routing — while still inheriting all root rules.
+
+### Area Label Schema
+
+| Label | Area | Primary Agent |
+|-------|------|---------------|
+| `area:platform` | `src/platform/` | B'Elanna |
+| `area:platform:infra` | `src/platform/infra/` | B'Elanna |
+| `area:platform:security` | Auth + secrets in platform | Worf |
+| `area:api` | `src/api/` | Data |
+| `area:api:breaking` | Breaking API changes | Data + Picard |
+| `area:api:security` | Auth middleware | Worf |
+
+### Area Dispatch Rules
+
+When an issue or PR has an `area:*` label:
+1. Check for a `.squads/routing.md` in the corresponding directory tree.
+2. Apply area routing rules **on top of** root routing (area rules are additive).
+3. HQ security gates (Worf, Crusher) **cannot be overridden** by area routing.
+4. If the issue spans multiple areas, union the routing requirements.
+
+### Discovering Which Area Owns a Path
+
+Use `scripts/find-squad-config.ps1`:
+
+```powershell
+# Which area owns this file?
+.\scripts\find-squad-config.ps1 -Path "src/platform/auth/handler.go" -ShowArea
+
+# List all registered areas
+.\scripts\find-squad-config.ps1 -All
+```
+
+### Per-Area Config Files
+
+Area configs live alongside the code they describe:
+- `src/<area>/.squad-context.md` — lightweight context (owner, key files, routing hints)
+- `src/<area>/.squads/team.md` — area agent roster (references root agents by name)
+- `src/<area>/.squads/routing.md` — area routing overrides
+- `src/<area>/.squads/decisions/` — area-scoped decisions log
+
+Full guide: `.squad/docs/monorepo-support.md`
+
+---
+
 ## Rules
 
-0. **🚨 Project Owner is Tamir Dresher — NOT Brady Gaster.** Brady Gaster is the creator of the upstream Squad framework (`bradygaster/squad`). He is an external collaborator, NOT the owner of this project. ALL notifications, messages, emails, Teams messages, and communications go to **Tamir Dresher**. NEVER address messages to Brady unless Tamir explicitly asks you to contact him for a specific purpose (e.g., patent discussions, upstream contributions). When in doubt, the recipient is always Tamir.
+0. **🚨 Project Owner is Tamir Dresher— NOT Brady Gaster.** Brady Gaster is the creator of the upstream Squad framework (`bradygaster/squad`). He is an external collaborator, NOT the owner of this project. ALL notifications, messages, emails, Teams messages, and communications go to **Tamir Dresher**. NEVER address messages to Brady unless Tamir explicitly asks you to contact him for a specific purpose (e.g., patent discussions, upstream contributions). When in doubt, the recipient is always Tamir.
 1. **Eager by default** — spawn all agents who could usefully start work, including anticipatory downstream work.
 2. **Scribe always runs** after substantial work, always as `mode: "background"`. Never blocks.
 3. **Quick facts → coordinator answers directly.** Don't spawn an agent for "what port does the server run on?"

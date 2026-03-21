@@ -1,0 +1,103 @@
+{
+  "apiVersion": "2023-04-01-preview",
+  "type": "Microsoft.Authorization/resourceProviders",
+  "name": "Microsoft.FedRampDashboard",
+  "location": "global",
+  "properties": {
+    "displayName": "FedRAMP Security Dashboard Resource Provider",
+    "authentication": {
+      "schemes": [
+        {
+          "name": "jwt-bearer",
+          "displayName": "JWT Bearer Token",
+          "description": "Standard Azure AD JWT Bearer token authentication"
+        },
+        {
+          "name": "pop",
+          "displayName": "Proof-of-Possession Token",
+          "description": "MISE V2 PoP token authentication for enhanced security binding"
+        }
+      ]
+    },
+    "tokenAuthConfiguration": {
+      "authenticationScheme": "PoP",
+      "signedRequestScope": "ResourceUri",
+      "cloudSpecificConfigurations": {
+        "public": {
+          "metaRpTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+          "enforcePopTokens": true,
+          "fallbackToBearer": false
+        },
+        "fairfax": {
+          "metaRpTenantId": "cab8a31a-1906-4287-a0d8-4eef66b95f6e",
+          "enforcePopTokens": true,
+          "fallbackToBearer": false
+        },
+        "mooncake": {
+          "metaRpTenantId": "a55a4d5b-9241-49b1-b4ff-befa8db00269",
+          "enforcePopTokens": true,
+          "fallbackToBearer": false
+        },
+        "dogfood": {
+          "metaRpTenantId": "ea8a4392-515e-481f-879e-6571ff2a8a36",
+          "enforcePopTokens": false,
+          "fallbackToBearer": true
+        }
+      }
+    },
+    "resourceTypes": [
+      {
+        "name": "dashboards",
+        "displayName": "FedRAMP Compliance Dashboards",
+        "defaultApiVersion": "2024-03-01",
+        "apiVersions": [
+          "2024-03-01",
+          "2023-12-01",
+          "2023-04-01"
+        ],
+        "endpoints": [
+          {
+            "apiVersion": "2024-03-01",
+            "endpoint": "https://fedramp-dashboard.azure.microsoft.com",
+            "authentication": "PoP"
+          }
+        ]
+      },
+      {
+        "name": "controls",
+        "displayName": "FedRAMP Control Definitions",
+        "defaultApiVersion": "2024-03-01",
+        "endpoints": [
+          {
+            "apiVersion": "2024-03-01",
+            "endpoint": "https://fedramp-dashboard.azure.microsoft.com",
+            "authentication": "PoP"
+          }
+        ]
+      },
+      {
+        "name": "assessments",
+        "displayName": "FedRAMP Assessment Results",
+        "defaultApiVersion": "2024-03-01",
+        "endpoints": [
+          {
+            "apiVersion": "2024-03-01",
+            "endpoint": "https://fedramp-dashboard.azure.microsoft.com",
+            "authentication": "PoP"
+          }
+        ]
+      }
+    ],
+    "authorizations": [
+      {
+        "principalId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "roleId": "MetaRpServicePrincipal",
+        "permissionIds": [
+          "read",
+          "write",
+          "delete"
+        ]
+      }
+    ]
+  }
+}

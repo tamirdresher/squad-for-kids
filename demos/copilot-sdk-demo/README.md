@@ -21,21 +21,39 @@ Finally a **live scoreboard** with per-dimension scores and a verdict banner.
 
 All live-streamed token by token in a split-screen Spectre.Console TUI.
 
+### 🔧 Tool/Function Calling Demo (`--tools`)
+
+Add `--tools` to see **AI tool/function calling** live before the arena:
+
+1. The AI autonomously calls `analyze_code()` — a C# static analyser registered as an `AIFunction`
+2. The terminal shows the tool being invoked and its structured return value (metrics panel)
+3. The AI uses objective data (cyclomatic complexity, security hotspots, code smells) in its grounded review
+
+This is a textbook demo of `AIFunctionFactory.Create()` + `UseFunctionInvocation()` middleware in Microsoft.Extensions.AI.
+
 ---
 
 ## Demo Script (under 3 minutes)
 
 ```
+=== Without --tools (2 minutes) ===
 1. Start the app — the banner renders instantly, setting the stage
-2. The built-in sample (a buggy UserService with SQLi, hardcoded secrets, no logging) loads
-3. Both judges stream their review simultaneously — audience watches two AIs "think" in parallel
-4. Debate round: CodeGuard calls out the SQL injection, DevAdvocate says "at least it works"
+2. The built-in sample (a buggy UserService with SQLi, hardcoded secrets) loads
+3. Both judges stream simultaneously — audience watches two AIs "think" in parallel
+4. Debate round: CodeGuard calls out SQL injection, DevAdvocate says "at least it works"
 5. Consensus fixes appear as a numbered list — audience can follow along
 6. Scoreboard drops — Security: 2/10 ░░░░ gets a gasp every time
 7. "Now let me paste YOUR code" — hand it to an audience member
+
+=== With --tools (adds ~30 seconds before the arena) ===
+1. Spin up the status spinner: "AI is reasoning… watching for tool call…"
+2. "⚡ Tool call detected: analyze_code() invoked by AI!" — audience sees function calling live
+3. "✅ Tool result received" — structured metrics panel renders: complexity, smells, security hotspots
+4. AI writes a data-grounded analysis: "Cyclomatic complexity of 14 indicates…"
+5. Then the full arena runs as above
 ```
 
-**Total runtime:** ~90 seconds per review cycle (depends on model + code length)
+**Total runtime:** ~90s without `--tools`, ~2:30 with `--tools`
 
 ---
 
@@ -55,6 +73,12 @@ dotnet run
 ### Review your own file
 ```bash
 dotnet run -- --file ../../MyService.cs
+```
+
+### Full demo: tool calling + arena
+```bash
+dotnet run -- --tools                        # tool calling demo, then arena (built-in sample)
+dotnet run -- --tools --file MyCode.cs       # tool calling, then arena (your code)
 ```
 
 ### Pipe from stdin
@@ -79,13 +103,16 @@ dotnet run
 
 ```
 CodeReviewArena/
-├── Program.cs                  ← Entry point, IChatClient wiring
+├── Program.cs                  ← Entry point, IChatClient wiring, flag parsing
 ├── Judges/
 │   ├── JudgePersonality.cs     ← Personality definitions & system prompts
 │   └── Judge.cs                ← IChatClient wrapper, streaming, conversation history
 ├── Arena/
 │   ├── ArenaOrchestrator.cs    ← 3-round orchestration (review → debate → consensus)
 │   └── RoundResult.cs          ← Score records and verdict logic
+├── Tools/
+│   ├── CodeMetricsTool.cs      ← AI-callable function: static C# analyser (cyclomatic complexity, smells, CVEs)
+│   └── ToolCallDemo.cs         ← Tool calling demo: AIFunctionFactory + UseFunctionInvocation()
 ├── UI/
 │   └── ArenaDisplay.cs         ← Spectre.Console live dual-panel renderer
 └── Samples/
@@ -105,6 +132,9 @@ CodeReviewArena/
 | Parallel multi-agent execution | `ArenaOrchestrator.RunAsync` — `Task.WhenAll` |
 | System prompt persona injection | `JudgePersonality.SystemPrompt` via `ChatRole.System` |
 | Token streaming into live TUI | `ArenaDisplay.RunLiveDualPanelAsync` |
+| **Tool/function calling** | `Tools/CodeMetricsTool.cs` + `AIFunctionFactory.Create()` |
+| **Auto tool invocation middleware** | `Tools/ToolCallDemo.cs` + `.UseFunctionInvocation()` |
+| **`ChatOptions.Tools` registration** | `ToolCallDemo.RunAsync` — `FunctionCallContent` / `FunctionResultContent` |
 
 ---
 

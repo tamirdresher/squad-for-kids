@@ -1,0 +1,32 @@
+{{- if .Values.serviceAccount.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-agent-spawner
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "squad-agents.fullname" . }}-agent-spawner
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "squad-agents.fullname" . }}-agent-spawner
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "squad-agents.serviceAccountName" . }}
+    namespace: {{ .Values.global.namespace }}
+{{- end }}

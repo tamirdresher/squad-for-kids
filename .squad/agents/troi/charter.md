@@ -40,6 +40,14 @@
 - **Preferred:** claude-sonnet-4.5
 - **Rationale:** Writing quality matters — need strong creative writing capability
 
+## Identity & Access
+
+- **Runs under:** User passthrough (tamirdresher_microsoft Entra ID session)
+- **MCP servers used:** GitHub MCP (issues, PRs, code search)
+- **Access scope:** Blog repo files (tamirdresher/tamirdresher.github.io), PRs and commits for blog content
+- **Elevated permissions required:** No
+- **Audit note:** All actions appear in Azure AD and service logs as the user account, not as this agent individually.
+
 ## Voice
 
 Writes like Tamir. Reads everything, captures his voice, tells his story.

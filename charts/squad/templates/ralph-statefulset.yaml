@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "squad.fullname" . }}-ralph
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ralph
+spec:
+  serviceName: ralph
+  replicas: {{ .Values.ralph.replicas }}
+  selector:
+    matchLabels:
+      {{- include "squad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ralph
+  template:
+    metadata:
+      labels:
+        {{- include "squad.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ralph
+    spec:
+      serviceAccountName: {{ include "squad.fullname" . }}
+      containers:
+        - name: ralph
+          image: {{ .Values.ralph.image }}
+          imagePullPolicy: Always
+          env:
+            - name: SQUAD_REPO
+              value: {{ .Values.squad.repository }}
+            - name: RALPH_MACHINE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RALPH_ROUND_INTERVAL
+              value: {{ .Values.ralph.roundIntervalSeconds | quote }}
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.github.tokenSecretName }}
+                  key: token
+            {{- if .Values.ratePool.enabled }}
+            - name: RATE_POOL_REDIS
+              value: "redis://{{ include "squad.fullname" . }}-rate-pool:6379"
+            {{- end }}
+            - name: COPILOT_PRIMARY_MODEL
+              value: {{ .Values.copilot.primaryModel }}
+            - name: COPILOT_FALLBACK_CHAIN
+              value: {{ join "," .Values.copilot.fallbackChain }}
+          volumeMounts:
+            - name: squad-state
+              mountPath: /squad-state
+          resources:
+            {{- toYaml .Values.ralph.resources | nindent 12 }}
+      volumes:
+        - name: squad-state
+          persistentVolumeClaim:
+            claimName: {{ include "squad.fullname" . }}-state

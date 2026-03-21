@@ -1,0 +1,202 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://squad.dev/schemas/squads-config.schema.json",
+  "title": "Squad Area Configuration",
+  "description": "Schema for per-area .squads/config.json files in monorepo setups",
+  "type": "object",
+  "required": ["version", "area"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema version (must be 1)"
+    },
+    "area": {
+      "type": "object",
+      "required": ["name", "path"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Area identifier (lowercase, hyphen-separated)"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable area name"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9/_-]+$",
+          "description": "Relative path from repo root"
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of this area's purpose"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Primary owner (human or squad member name)"
+        }
+      }
+    },
+    "team": {
+      "type": "object",
+      "description": "Optional team overrides for this area",
+      "properties": {
+        "inheritsRoot": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to inherit root squad team"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "role"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Squad member name (must match root roster if inheritsRoot=true)"
+              },
+              "role": {
+                "type": "string",
+                "description": "Role or title for this member"
+              },
+              "areaSpecialization": {
+                "type": "string",
+                "description": "Why this member is assigned to this area"
+              }
+            }
+          }
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "description": "Area-specific routing rules (additive to root rules)",
+      "properties": {
+        "defaultOwner": {
+          "type": "string",
+          "description": "Default assignee for unlabeled issues in this area"
+        },
+        "labels": {
+          "type": "object",
+          "description": "Label-based routing overrides",
+          "patternProperties": {
+            "^[a-z0-9:-]+$": {
+              "type": "object",
+              "properties": {
+                "assignTo": {
+                  "type": "string",
+                  "description": "Squad member to assign when this label is present"
+                },
+                "requiresGate": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Additional squad members who must review (cannot override HQ security gates)"
+                }
+              }
+            }
+          }
+        },
+        "paths": {
+          "type": "object",
+          "description": "Path-based routing for subfolders",
+          "patternProperties": {
+            ".*": {
+              "type": "object",
+              "properties": {
+                "owner": {
+                  "type": "string"
+                },
+                "requiresReview": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "filePatterns": {
+          "type": "object",
+          "description": "File pattern-based routing (glob patterns)",
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "description": "Squad member to route matching files to"
+            }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "description": "Machine capabilities required for work in this area",
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["whatsapp", "browser", "gpu", "personal-gh", "emu-gh", "teams-mcp", "onedrive", "azure-speech"]
+          },
+          "description": "Capabilities that MUST be present"
+        },
+        "preferred": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Capabilities that improve experience but aren't required"
+        }
+      }
+    },
+    "conventions": {
+      "type": "object",
+      "description": "Area-specific development conventions",
+      "properties": {
+        "codeStyle": {
+          "type": "string"
+        },
+        "testingFramework": {
+          "type": "string"
+        },
+        "ciWorkflow": {
+          "type": "string",
+          "description": "GitHub Actions workflow filename for this area"
+        },
+        "customRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Area-specific rules or patterns"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "description": "Context files and documentation",
+      "properties": {
+        "readme": {
+          "type": "string",
+          "description": "Path to area README"
+        },
+        "architecture": {
+          "type": "string",
+          "description": "Path to architecture docs"
+        },
+        "keyFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Critical files agents should be aware of"
+        }
+      }
+    }
+  }
+}

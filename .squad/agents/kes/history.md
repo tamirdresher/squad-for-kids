@@ -6,10 +6,10 @@
 
 ## Active Context
 
-**Issue #259 Status:** ⏳ PENDING ACTIVATION — Setup script + docs ready, Tamir needs to run `Setup-FamilyEmailRules.ps1` once  
+**Issue #259 Status:** ✅ PR OPEN (#1198) — Family email pipeline ready for merge. Setup script + docs complete, awaiting Tamir review  
 **Issue #471 Status:** ✅ CLOSED — Meeting scheduled and sent  
 **Issue #546 Status:** ⚠️ PARTIAL — Meeting sent to 3/5 attendees; Avery Anderson & Carlo Rivera need manual add  
-**Next:** Once Tamir runs the setup script, verify rules work by sending a test email from gabrielayael@gmail.com
+**Next:** Merge PR #1198, Tamir runs setup script, verify with test email
 
 ## Issue #259: Family Email Pipeline — @Keyword Routing (2026-03-18)
 - **Problem**: Issue stuck 8 days. Previous attempts to create new email accounts failed (M365 admin block, Gmail CAPTCHA, Outlook CAPTCHA).
@@ -27,6 +27,17 @@
 - **Key learning**: When automation can't create accounts due to CAPTCHAs, reuse existing accounts with API-based rules instead. Graph API `mailFolders/inbox/messageRules` endpoint can create Outlook.com rules programmatically without web UI.
 
 ## Learnings
+
+### Issue #259: Family Email Address Pipeline — PR Submitted (2026-Q2 Current)
+- **Final Status**: ✅ PR #1198 OPEN — Family email pipeline implementation complete
+- **Solution Summary**: Reused `td-squad-ai-team@outlook.com` account with Microsoft Graph API inbox rules for @keyword routing
+- **Automation Approach**: Graph API `mailFolders/inbox/messageRules` endpoint enables programmatic rule creation without web UI
+- **Four routing rules**: @print → HP printer, @calendar → Tamir calendar, @reminder → Tamir email, default → [FAMILY] prefix
+- **Setup Script**: `scripts/squad-email/Setup-FamilyEmailRules.ps1` uses device code flow for secure, interactive auth
+- **User Guide**: `.squad/email-pipeline/FAMILY_EMAIL_GUIDE.md` with simple @keyword table and examples
+- **Decision Documented**: `.squad/decisions/inbox/kes-259-family-email-address.md` explains why reusing account was necessary (CAPTCHA blocks automation)
+- **Key Insight**: Cannot automate email account creation (PerimeterX/QR CAPTCHA); workaround is reusing existing account + API-based rules
+- **Integration Ready**: Ralph monitors `td-squad-ai-team` inbox for @print requests; Kes triages other forwarded emails
 
 ### Issue #259: Family Request Pipeline — WhatsApp + Email (2026-06-23)
 - **Task**: Extend wife's request pipeline with WhatsApp monitoring alongside existing email
@@ -106,3 +117,9 @@
 - **Key learning**: WorkIQ couldn't find the original email (only Reaction Digests returned); Outlook COM `Restrict()` with DASL filter was the reliable way to find the thread and extract all To/CC recipients with resolved SMTP addresses
 - **Key learning**: Outlook COM `Recipients.ResolveAll()` successfully resolved all addresses including a DL (idp-lt@service.microsoft.com)
 - **GitHub comment posted**: Issue #471 updated with full meeting details
+
+## Recent Work (2026-03-20 Ralph Rounds 1-2)
+
+**Issue #259 Status Update:** ✅ PR #1198 submitted (2026-03-20 Round 1)
+- Family email address setup
+- CI running, awaiting review completion

@@ -35,6 +35,48 @@
 
 ## Active Context
 
+### 2026-03-20: Issue #1058 — Bitwarden Shadow MCP Server Implementation (Complete)
+
+**Assignment:** Design and implement MCP tools for shadowing Bitwarden org vault items to squad collection for read-only cross-collection sharing.
+
+**Outcome:** ✅ **SUCCESS** — Full implementation with TypeScript MCP server
+
+**Deliverables:**
+- **MCP Server**: `mcp-servers/bitwarden-shadow/` (complete with build pipeline)
+- **Branch**: `squad/1058-bitwarden-shadow-mcp`
+- **Tools Implemented**:
+  1. `shadow_item(item_id)` — Adds org item to shadow collection with personal vault validation
+  2. `unshadow_item(item_id)` — Removes from shadow collection with orphan guard
+  3. `list_shadows(include_available?)` — Lists shadowed items + optional available items
+- **Documentation**: README with security model, setup, and integration guide
+
+**Architecture Decisions:**
+- **No Secret Exposure**: AI sees only `{ itemId, itemName, itemType }` — never passwords/tokens/TOTP
+- **Personal Vault Exclusion**: `shadow_item` validates `organizationId != null` before API call
+- **Orphan Guard**: `unshadow_item` refuses if removing last collection (would orphan item)
+- **Zero Duplication**: Uses Bitwarden's `CollectionCipher` junction table (one cipher, N collections)
+- **Config Flexibility**: Loads from env vars or `~/.squad/bitwarden-session.json`
+- **BitwardenClient Abstraction**: Thin wrapper around `bw` CLI with session token passthrough
+
+**Security Model Verified:**
+- MCP protocol boundary: AI cannot invoke `bw` CLI directly
+- Collection-level access enforced by Bitwarden server (read-only flag)
+- Session token passed as `--session` flag (never in stdout/logs)
+- Personal vault items rejected at validation layer (before any API call)
+
+**Key Learning:**
+- Bitwarden's multi-collection support is production-ready for shadow access patterns
+- MCP server pattern from `squad-mcp` provides solid template (config, tools, types structure)
+- Session token management critical: env > config file > error (never proceed without valid session)
+
+**Dependencies:**
+- Depends on #1036 (collection-scoped API keys) for production squad API key provisioning
+- Parent issue #1057 provided full design spec and shadow flow documentation
+
+**Status:** Implementation complete. Commit `807986f`. Ready for testing with `setup-bitwarden.ps1` workflow.
+
+---
+
 ### 2026-03-13: Issue #473 — Rework Rate Integration Proposal (Complete - Background Task)
 
 **Assignment:** Continue Rework Rate (5th DORA metric) integration proposal for bradygaster/squad; add explicit Azure DevOps support.

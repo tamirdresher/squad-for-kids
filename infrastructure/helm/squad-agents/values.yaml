@@ -375,13 +375,17 @@ metricsExporter:
   # ── Tier 1: GitHub Actions runner queue trigger (issue #1158) ─────────────
   # Scales on GitHub Actions self-hosted runner queue depth.
   # Independent of the issue-count scaler above.
+  # Uses KEDA's built-in github-runner scaler with ETag caching.
+  # Reference: https://keda.sh/docs/2.19/scalers/github-runner/
   githubRunner:
     enabled: false   # Enable separately once runner pool is configured
     minReplicas: 1
     maxReplicas: 10
     pollingInterval: 30
     cooldownPeriod: 300
-    runnerScope: "org"
+    # Runner scope: repo | org | enterprise
+    runnerScope: "repo"
+    # Scale up when queue depth exceeds this value
     targetQueueLength: "1"
 
 # =============================================================================

@@ -1,78 +1,91 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-import type { BitwardenCollection, BitwardenItem } from "./types.js";
+/**
+ * Bitwarden CLI client wrapper
+ * All vault operations go through this module
+ */
 
-const execFileAsync = promisify(execFile);
+import { exec } from "child_process";
+import { promisify } from "util";
+import type { BitwardenItem, BitwardenCollection } from "./types.js";
+
+const execAsync = promisify(exec);
 
 export class BitwardenClient {
-  constructor(private readonly session: string) {}
+  constructor(private readonly sessionToken: string) {}
 
-  private async run(args: string[]): Promise<string> {
-    const argsWithSession = [...args, "--session", this.session];
-    console.error(`[bw] ${args.slice(0, 3).join(" ")} ...`);
-    try {
-      const { stdout } = await execFileAsync("bw", argsWithSession, {
-        maxBuffer: 10 * 1024 * 1024,
-        timeout: 30_000,
-        env: { ...process.env, BW_SESSION: this.session },
-      });
-      return stdout.trim();
-    } catch (err: unknown) {
-      const stderr = typeof err === "object" && err !== null && "stderr" in err
-        ? String((err as { stderr: unknown }).stderr) : "";
-      const code = typeof err === "object" && err !== null && "code" in err
-        ? (err as { code: unknown }).code : "unknown";
-      if (stderr.includes("Vault is locked")) {
-        throw new Error("Bitwarden vault is locked. Run setup-bitwarden.ps1.");
-      }
-      throw new Error(`bw failed (exit ${code}): ${stderr || (err instanceof Error ? err.message : String(err))}`);
-    }
-  }
-
-  async listCollections(): Promise<BitwardenCollection[]> {
-    const raw = await this.run(["list", "collections"]);
-    return JSON.parse(raw) as BitwardenCollection[];
-  }
-
-  async resolveCollection(idOrName: string): Promise<BitwardenCollection> {
-    const collections = await this.listCollections();
-    let match = collections.find((c) => c.id === idOrName);
-    if (match) return match;
-    const lower = idOrName.toLowerCase();
-    match = collections.find((c) => c.name.toLowerCase() === lower);
-    if (match) return match;
-    const partials = collections.filter((c) => c.name.toLowerCase().includes(lower));
-    if (partials.length === 1) return partials[0]!;
-    if (partials.length > 1) {
-      throw new Error(`Ambiguous collection "${idOrName}": ${partials.map((c) => `"${c.name}" (${c.id})`).join(", ")}`);
-    }
-    throw new Error(`Collection "${idOrName}" not found. Available: ${collections.map((c) => `"${c.name}" (${c.id})`).join(", ")}`);
-  }
-
+  /**
+   * Get a vault item by ID
+   * Returns full item metadata but this client never exposes passwords/secrets to callers
+   */
   async getItem(itemId: string): Promise<BitwardenItem> {
-    const raw = await this.run(["get", "item", itemId]);
-    return JSON.parse(raw) as BitwardenItem;
+    const { stdout, stderr } = await execAsync(
+      `bw get item ${itemId} --session ${this.sessionToken}`
+    );
+
+    if (stderr) {
+      console.error(`[bw stderr] ${stderr}`);
+    }
+
+    return JSON.parse(stdout);
   }
 
+  /**
+   * List all items in a specific collection
+   */
   async listItemsInCollection(collectionId: string): Promise<BitwardenItem[]> {
-    const raw = await this.run(["list", "items", "--collectionid", collectionId]);
-    return JSON.parse(raw) as BitwardenItem[];
+    const { stdout, stderr } = await execAsync(
+      `bw list items --collectionid ${collectionId} --session ${this.sessionToken}`
+    );
+
+    if (stderr) {
+      console.error(`[bw stderr] ${stderr}`);
+    }
+
+    return JSON.parse(stdout);
   }
 
-  async updateItemCollections(item: BitwardenItem, newCollectionIds: string[]): Promise<BitwardenItem> {
-    const updated: BitwardenItem = { ...item, collectionIds: newCollectionIds };
-    const encoded = Buffer.from(JSON.stringify(updated)).toString("base64");
-    const raw = await this.run(["edit", "item", item.id, encoded]);
-    return JSON.parse(raw) as BitwardenItem;
+  /**
+   * Get collection details by ID
+   */
+  async getCollection(collectionId: string): Promise<BitwardenCollection> {
+    const { stdout, stderr } = await execAsync(
+      `bw get collection ${collectionId} --session ${this.sessionToken}`
+    );
+
+    if (stderr) {
+      console.error(`[bw stderr] ${stderr}`);
+    }
+
+    return JSON.parse(stdout);
   }
 
-  static itemTypeName(type: number): string {
-    switch (type) {
-      case 1: return "login";
-      case 2: return "note";
-      case 3: return "card";
-      case 4: return "identity";
-      default: return `type-${type}`;
+  /**
+   * Edit a vault item (used to update collectionIds for shadowing)
+   */
+  async editItem(itemId: string, item: BitwardenItem): Promise<BitwardenItem> {
+    const itemJson = JSON.stringify(item);
+    const base64Item = Buffer.from(itemJson).toString("base64");
+
+    const { stdout, stderr } = await execAsync(
+      `bw edit item ${itemId} ${base64Item} --session ${this.sessionToken}`
+    );
+
+    if (stderr) {
+      console.error(`[bw stderr] ${stderr}`);
+    }
+
+    return JSON.parse(stdout);
+  }
+
+  /**
+   * Sync vault with server (useful after remote changes)
+   */
+  async sync(): Promise<void> {
+    const { stderr } = await execAsync(
+      `bw sync --session ${this.sessionToken}`
+    );
+
+    if (stderr) {
+      console.error(`[bw stderr] ${stderr}`);
     }
   }
 }

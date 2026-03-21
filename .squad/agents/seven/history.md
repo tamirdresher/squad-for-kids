@@ -1147,3 +1147,55 @@
 - Draft had strong methodology and references but lacked quantitative tables and the DNSMOS gating contribution
 - Phonikud and specific Azure voice names (AlloyTurbo/FableTurbo) were missing from pipeline description
 - cfg=0.3 optimal finding is the paper's most surprising and citable result
+
+---
+
+### Issue #1185: Blog Post — Squad Machines Capabilities Pitch (March 2026)
+
+**Task:** Draft blog post explaining Squad's multi-machine architecture and capabilities model BEFORE the Kubernetes deployment story. Focus on what Squad machines can DO (monitor issues, dispatch agents, run copilot rounds, coordinate across machines).
+
+**Context:** Part 6 (Unicomplex — K8s deployment) exists but needed a foundation post explaining the multi-machine capability model that K8s translates to node labels and scheduling.
+
+**Deliverable:** `blog-squad-machines-capabilities.md` — 446 lines
+
+**Architecture Covered:**
+1. **Machine Capabilities as Declaration** — Each machine runs `discover-machine-capabilities.ps1` to declare what it CAN do (GPU, browser, WhatsApp, GitHub accounts, Azure Speech)
+2. **Issue Labels as Requirements** — `needs:gpu`, `needs:browser`, `needs:24x7` declare what work REQUIRES
+3. **Ralph's Capability Matching** — Ralph skips issues when local machine lacks required capabilities; claims when match found
+4. **Multi-Machine Coordination Protocol** — GitHub issue comments as distributed locks; first Ralph to comment claims the work
+5. **Cross-Machine Task Queue** — Git-based YAML task queue in `.squad/cross-machine/` for explicit machine-to-machine work delegation
+6. **Automatic Workload Distribution** — GPU work routes to GPU machines, browser work to machines with displays, 24/7 work to VMs
+
+**Key Examples:**
+- Hebrew podcast generation (needs GPU + Azure Speech) → automatically routes to DevBox
+- Browser automation for screenshots (needs browser) → automatically routes to laptop
+- Long-running test suite (needs 24x7) → automatically routes to Azure VM
+- Personal vs. work GitHub isolation through capability-based routing
+
+**Structure:**
+- Problem statement: Why one machine isn't enough
+- Capability discovery and manifests
+- Label-based routing
+- Multi-Ralph coordination via GitHub comments
+- Cross-machine task queue design
+- Real-world scenarios
+- Cost/benefit analysis
+- Transition point to Kubernetes (preview of Part 6)
+
+**Positioning:** This is Part 5 (or 5a) — the foundation before "Assimilating the Cloud" (Part 5b) and "The Unicomplex" (Part 6). Explains the mental model that K8s node labels and pod scheduling translate from.
+
+**Learnings:**
+- The multi-machine model IS the breakthrough — not K8s. K8s just provides better primitives for the same capability-routing pattern.
+- Capability-based routing eliminates manual "remember to run this on the GPU machine" toil.
+- Git as coordination backend (issue comments, task queue YAML files) works surprisingly well at small scale (5-8 machines).
+- The transition point to K8s is when you have 5+ machines OR when you're debugging lock contention/heartbeat files/circuit breakers — i.e., when you've re-implemented half of K8s in PowerShell.
+- Directory structure matters: `.squad/machine-capabilities/`, `.squad/cross-machine/tasks/`, `.squad/cross-machine/results/` make the coordination model visible in the repo.
+
+**Related Files:**
+- `scripts/discover-machine-capabilities.ps1` — capability discovery
+- `scripts/cross-machine-watcher.ps1` — task queue processor
+- `.squad/SCHEDULING.md` — Ralph coordination protocol
+- `.squad/cross-machine/README.md` — task queue documentation
+
+**Series Context:** Bridges Part 3/4 (distributed system failures) to Part 6 (K8s as solution). Explains what the system DOES before explaining how to run it on cloud infrastructure.
+

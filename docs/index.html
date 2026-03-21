@@ -798,6 +798,48 @@
             background: rgba(108, 99, 255, 0.3);
             border-radius: 4px;
         }
+        /* ============ LOCAL/PARENT INSTALL CARDS ============ */
+        .setup-local,
+        .setup-parent {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-sm);
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .setup-local {
+            border-right: 5px solid #3B82F6;
+        }
+
+        .setup-parent {
+            border-right: 5px solid #43B97F;
+        }
+
+        .setup-local h3,
+        .setup-parent h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .setup-local .setup-desc,
+        .setup-parent .setup-desc {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .setup-tip {
+            background: #FFFDE7;
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-top: 20px;
+            font-size: 0.98rem;
+            line-height: 1.6;
+        }
+
     </style>
 </head>
 <body>
@@ -904,11 +946,13 @@
     <div class="container">
         <h2 class="section-title">📺 ראו את זה <span>בפעולה</span></h2>
         <div class="demo-container">
-            <div class="demo-placeholder" role="button" tabindex="0" aria-label="צפייה בהדגמה">
-                <div class="demo-play-btn" aria-hidden="true">▶</div>
-                <p class="demo-text">ראו איך יואב בן 7 מראשון לציון מקבל צוות מהארי פוטר</p>
-                <p class="demo-subtitle">דמו אנימציה — 2 דקות</p>
-            </div>
+            <a href="demo-hebrew.html" target="_blank" class="demo-link" style="display:block;text-decoration:none;">
+                <div class="demo-placeholder" role="button" tabindex="0" aria-label="צפייה בהדגמה">
+                    <div class="demo-play-btn" aria-hidden="true">▶</div>
+                    <p class="demo-text">ראו איך יואב בן 7 מראשון לציון מקבל צוות מהארי פוטר</p>
+                    <p class="demo-subtitle">לחצו לצפייה בדמו אינטראקטיבי — 2 דקות</p>
+                </div>
+            </a>
         </div>
     </div>
 </section>
@@ -944,6 +988,35 @@
                         <span>תנו לילד את המקלדת! 🎮</span>
                     </li>
                 </ol>
+            </div>
+        </div>
+
+        <div class="setup-card setup-local">
+            <h3>💻 התקנה על מחשב הילד (Windows)</h3>
+            <p class="setup-desc">אם אתם מעדיפים שהכל יהיה על המחשב של הילד — בלי אינטרנט אחרי ההתקנה</p>
+            <ol class="setup-steps">
+                <li><span>הורידו והתקינו <a href="https://desktop.github.com/" target="_blank">GitHub Desktop</a> — לחצו "Download for Windows"</span></li>
+                <li><span>התחברו עם חשבון ה-GitHub שלכם</span></li>
+                <li><span>לחצו "Clone a Repository" → כתבו: <code>tamirdresher/squad-for-kids</code> → Clone</span></li>
+                <li><span>הורידו והתקינו <a href="https://nodejs.org/en/download" target="_blank">Node.js</a> (לחצו על הכפתור הירוק הגדול)</span></li>
+                <li><span>הורידו והתקינו <a href="https://github.com/cli/cli/releases/latest" target="_blank">GitHub Copilot CLI</a></span></li>
+                <li><span>פתחו את התיקייה → קליק ימני → "פתח בטרמינל"</span></li>
+                <li><span>כתבו: <code>copilot</code> ולחצו Enter</span></li>
+                <li><span>תנו לילד את המקלדת! 🎮</span></li>
+            </ol>
+        </div>
+
+        <div class="setup-card setup-parent">
+            <h3>👨‍👩‍👧 מחשב ההורה — ניהול וצפייה בהתקדמות</h3>
+            <p class="setup-desc">ההורה מתקין על המחשב שלו ורואה דוחות התקדמות. הילד לומד, ההורה עוקב.</p>
+            <ol class="setup-steps">
+                <li><span>עקבו אחרי שלבי ההתקנה למעלה (Codespaces או Windows)</span></li>
+                <li><span>כתבו: <code>copilot</code> ואז: <code>show me the parent report</code></span></li>
+                <li><span>תראו דוח שבועי: מה הילד למד, איפה הוא חזק, מה צריך לתרגל</span></li>
+                <li><span>כל הנתונים נשמרים ב-GitHub שלכם — רק אתם רואים</span></li>
+            </ol>
+            <div class="setup-tip">
+                💡 <strong>טיפ:</strong> אפשר לפתוח את הפרויקט ב-GitHub ולראות את לוח המשימות — כמו לוח מודעות דיגיטלי עם כל מה שהילד עשה ומה הבא בתור.
             </div>
         </div>
 

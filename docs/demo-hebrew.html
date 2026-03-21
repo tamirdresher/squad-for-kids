@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280,height=720">
+<title>סקוואד לילדים — הקלטת הדגמה (עברית)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cascadia+Code&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1280px; height: 720px;
+    overflow: hidden;
+    background: #0c0c0c;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    direction: ltr;
+  }
+
+  /* ── Title card overlay ── */
+  #title-card {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a1040 100%);
+    opacity: 1;
+    transition: opacity 0.8s ease-out;
+  }
+  #title-card.hidden { opacity: 0; pointer-events: none; }
+  #title-card h1 {
+    font-size: 52px; color: #fff; margin-bottom: 12px;
+    font-family: 'Cascadia Code', monospace;
+    text-shadow: 0 0 40px rgba(88,166,255,0.3);
+    direction: rtl;
+  }
+  #title-card .subtitle {
+    font-size: 18px; color: #8b949e;
+    font-family: 'Cascadia Code', monospace;
+    margin-bottom: 40px;
+    direction: rtl;
+  }
+  #title-card .repo {
+    font-size: 14px; color: #58a6ff;
+    font-family: 'Cascadia Code', monospace;
+    opacity: 0.8;
+  }
+
+  /* ── Window chrome ── */
+  #title-bar {
+    height: 32px;
+    background: linear-gradient(180deg, #2d2d2d 0%, #1e1e1e 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid #333;
+    position: relative; z-index: 10;
+  }
+  #title-bar .tab {
+    background: #0c0c0c;
+    color: #ccc;
+    font-size: 12px;
+    padding: 4px 16px;
+    border-radius: 6px 6px 0 0;
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  #title-bar .tab .icon {
+    width: 14px; height: 14px;
+    background: linear-gradient(135deg, #012456, #1a5fb4);
+    border-radius: 2px;
+    display: inline-block;
+  }
+  #title-bar .window-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 0;
+  }
+  #title-bar .window-controls span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px; height: 32px;
+    color: #999;
+    font-size: 10px;
+    font-family: 'Segoe MDL2 Assets', 'Segoe UI Symbol', sans-serif;
+  }
+  #title-bar .window-controls span:hover { background: #333; }
+  #title-bar .window-controls .close:hover { background: #e81123; color: #fff; }
+
+  /* ── Terminal area ── */
+  #terminal-container {
+    height: calc(720px - 32px - 60px - 6px);
+    background: #0c0c0c;
+    position: relative;
+  }
+  .xterm { padding: 4px 0 0 4px; }
+  .xterm-viewport::-webkit-scrollbar { display: none; }
+
+  /* ── Subtitle bar (RTL Hebrew) ── */
+  #subtitle-bar {
+    height: 60px;
+    background: rgba(0, 0, 0, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+    position: relative; z-index: 10;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  #subtitle-text {
+    font-family: 'Cascadia Code', 'Segoe UI', monospace;
+    font-size: 14px;
+    color: #e6e6e6;
+    text-align: center;
+    line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    max-width: 1100px;
+    direction: rtl;
+    unicode-bidi: plaintext;
+  }
+  #subtitle-text.visible { opacity: 1; }
+
+  /* ── Progress bar ── */
+  #progress-bar-container {
+    height: 6px;
+    background: #1a1a1a;
+    position: relative; z-index: 10;
+  }
+  #progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #16c60c, #58a6ff);
+    transition: width 0.5s linear;
+    border-radius: 0 3px 3px 0;
+  }
+
+  /* ── End card overlay ── */
+  #end-card {
+    position: fixed; inset: 0; z-index: 100;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a1040 100%);
+    opacity: 0;
+    transition: opacity 1.2s ease-in;
+  }
+  #end-card.visible { display: flex; opacity: 1; }
+  #end-card pre {
+    font-family: 'Cascadia Code', monospace;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #cccccc;
+    direction: ltr;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+
+<!-- Title Card -->
+<div id="title-card">
+  <h1>🎓 סקוואד לילדים</h1>
+  <div class="subtitle">פלטפורמת חינוך מותאמת אישית • בנוי עם GitHub Copilot</div>
+  <div class="repo">github.com/tamirdresher/squad-for-kids</div>
+</div>
+
+<!-- Window Chrome -->
+<div id="title-bar">
+  <div class="tab">
+    <span class="icon"></span>
+    Windows PowerShell
+  </div>
+  <div class="window-controls">
+    <span>&#xE921;</span>
+    <span>&#xE922;</span>
+    <span class="close">&#xE8BB;</span>
+  </div>
+</div>
+
+<!-- Terminal -->
+<div id="terminal-container"></div>
+
+<!-- Subtitle Bar -->
+<div id="subtitle-bar">
+  <div id="subtitle-text"></div>
+</div>
+
+<!-- Progress Bar -->
+<div id="progress-bar-container">
+  <div id="progress-bar"></div>
+</div>
+
+<!-- End Card Overlay -->
+<div id="end-card">
+  <pre id="end-card-content"></pre>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-unicode11@0.8.0/lib/addon-unicode11.min.js"></script>
+<script>
+(function() {
+  // ── ANSI helpers ──
+  const RST    = '\x1b[0m';
+  const BOLD   = '\x1b[1m';
+  const DIM    = '\x1b[2m';
+  const GREEN  = '\x1b[38;2;22;198;12m';
+  const CYAN   = '\x1b[38;2;58;150;221m';
+  const YELLOW = '\x1b[38;2;249;241;165m';
+  const RED    = '\x1b[38;2;231;72;86m';
+  const BLUE   = '\x1b[38;2;59;120;255m';
+  const WHITE  = '\x1b[38;2;204;204;204m';
+  const BWHITE = '\x1b[38;2;242;242;242m';
+  const GRAY   = '\x1b[38;2;118;118;118m';
+  const MAGENTA= '\x1b[38;2;180;142;255m';
+
+  // Character signature colors
+  const HERMIONE = '\x1b[38;2;255;215;0m';     // #ffd700
+  const HAGRID   = '\x1b[38;2;205;133;63m';     // #cd853f
+  const LUNA     = '\x1b[38;2;192;192;192m';     // #c0c0c0
+  const FRED     = '\x1b[38;2;255;107;107m';     // #ff6b6b
+  const GEORGE   = '\x1b[38;2;255;165;0m';       // #ffa500
+  const DOBBY    = '\x1b[38;2;177;156;217m';     // #b19cd9
+
+  // ── Terminal init ──
+  const term = new Terminal({
+    cols: 120,
+    rows: 32,
+    fontFamily: "'Cascadia Code', 'Consolas', monospace",
+    fontSize: 14,
+    lineHeight: 1.15,
+    letterSpacing: 0,
+    cursorBlink: true,
+    cursorStyle: 'bar',
+    cursorWidth: 2,
+    smoothScrollDuration: 100,
+    theme: {
+      background: '#0c0c0c',
+      foreground: '#cccccc',
+      cursor: '#cccccc',
+      cursorAccent: '#0c0c0c',
+      selectionBackground: '#264f78',
+      black: '#0c0c0c',
+      red: '#e74856',
+      green: '#16c60c',
+      yellow: '#f9f1a5',
+      blue: '#3b78ff',
+      magenta: '#b4009e',
+      cyan: '#3a96dd',
+      white: '#cccccc',
+      brightBlack: '#767676',
+      brightRed: '#e74856',
+      brightGreen: '#16c60c',
+      brightYellow: '#f9f1a5',
+      brightBlue: '#3b78ff',
+      brightMagenta: '#b4009e',
+      brightCyan: '#61d6d6',
+      brightWhite: '#f2f2f2',
+    },
+    allowTransparency: false,
+    scrollback: 0,
+  });
+
+  const fitAddon = new FitAddon.FitAddon();
+  term.loadAddon(fitAddon);
+
+  try {
+    const unicode11Addon = new Unicode11Addon.Unicode11Addon();
+    term.loadAddon(unicode11Addon);
+    term.unicode.activeVersion = '11';
+  } catch(e) {}
+
+  const container = document.getElementById('terminal-container');
+  term.open(container);
+  fitAddon.fit();
+
+  // ── Subtitle system (RTL Hebrew) ──
+  const subtitleEl = document.getElementById('subtitle-text');
+  let currentSubtitle = '';
+
+  function setSubtitle(text) {
+    if (text === currentSubtitle) return;
+    currentSubtitle = text;
+    subtitleEl.classList.remove('visible');
+    if (!text) return;
+    setTimeout(() => {
+      subtitleEl.textContent = text;
+      subtitleEl.classList.add('visible');
+    }, 300);
+  }
+
+  // ── Progress bar ──
+  const TOTAL_DURATION = 90;
+  let demoStartTime = 0;
+  function updateProgress() {
+    if (!demoStartTime) return;
+    const elapsed = (Date.now() - demoStartTime) / 1000;
+    const pct = Math.min(100, (elapsed / TOTAL_DURATION) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    if (pct < 100) requestAnimationFrame(updateProgress);
+  }
+
+  // ── Timing helpers ──
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  async function typeText(text, charDelay = 50) {
+    for (const ch of text) {
+      term.write(BWHITE + ch + RST);
+      await sleep(charDelay);
+    }
+  }
+
+  function psPrompt(path) {
+    term.write(`${RST}${GREEN}PS ${CYAN}${path}${GREEN}>${RST} `);
+  }
+
+  function copilotPrompt() {
+    term.write(`${GREEN}copilot> ${RST}`);
+  }
+
+  async function printLines(lines, lineDelay = 60) {
+    for (const line of lines) {
+      term.writeln(line);
+      await sleep(lineDelay);
+    }
+  }
+
+  function printLine(line) {
+    term.writeln(line || '');
+  }
+
+  async function agentResponse(lines, lineDelay = 60) {
+    await sleep(600);
+    await printLines(lines, lineDelay);
+  }
+
+  async function userInput(text, charDelay = 55) {
+    copilotPrompt();
+    await typeText(text, charDelay);
+    await sleep(80);
+    term.writeln('');
+  }
+
+  async function loadingAnimation(text, doneText) {
+    const frames = ['\u280B','\u2819','\u2839','\u2838','\u283C','\u2834','\u2826','\u2827','\u2807','\u280F'];
+    let i = 0;
+    for (let f = 0; f < 14; f++) {
+      term.write(`\r${CYAN}${frames[i % frames.length]} ${text}${RST}`);
+      i++;
+      await sleep(70);
+    }
+    term.write(`\r${GREEN}\u2713 ${doneText}${RST}` + ' '.repeat(30) + '\r\n');
+  }
+
+  // ── Hebrew subtitle engine ──
+  let segmentStartTime = 0;
+
+  const SUBTITLES = [
+    { start: 0,  text: 'סקוואד לילדים הופך את GitHub Copilot לצוות למידה אישי עבור ילדים.' },
+    { start: 5,  text: 'ההורה מתקין את הפרויקט — פשוט git clone רגיל.' },
+    { start: 10, text: 'כשהילד כותב ״שלום״, המערכת מזהה שאין פרופיל ומתחילה תהליך הכרות.' },
+    { start: 18, text: 'ארבע שאלות פשוטות: שם, יום הולדת, כיתה, ועיר.' },
+    { start: 28, text: 'מהשם של העיר בלבד, המערכת מזהה אוטומטית מדינה, תכנית לימודים ומקצועות.' },
+    { start: 38, text: 'הילד בוחר את הארי פוטר והמערכת בונה צוות למידה שלם מהעולם הזה.' },
+    { start: 50, text: 'כל דמות מותאמת לתפקיד חינוכי — מורה, עוזר, מאמנת, גיימר, יוטיובר, וחבר.' },
+    { start: 58, text: 'הרמיוני מלמדת חשבון לכיתה ב׳ — עם צפרדעי שוקולד וסוכריות ברטי בוט.' },
+    { start: 68, text: 'כל התוכן מבוסס על תכנית הלימודים של משרד החינוך. למידה מותאמת אישית.' },
+    { start: 76, text: 'סקוואד לילדים. מותאם לתכנית לימודים. מונע דמויות. אינטליגנציה רגשית. קוד פתוח.' },
+  ];
+
+  let subtitleInterval = null;
+
+  function startSubtitleEngine() {
+    segmentStartTime = Date.now();
+    subtitleInterval = setInterval(() => {
+      const elapsed = (Date.now() - segmentStartTime) / 1000;
+      let best = null;
+      for (const s of SUBTITLES) {
+        if (elapsed >= s.start) best = s;
+      }
+      if (best) setSubtitle(best.text);
+    }, 200);
+  }
+
+  function stopSubtitleEngine() {
+    if (subtitleInterval) clearInterval(subtitleInterval);
+    setSubtitle('');
+  }
+
+  // ── MAIN DEMO ──
+  async function runDemo() {
+    // Title card holds for 5 seconds
+    await sleep(5000);
+    document.getElementById('title-card').classList.add('hidden');
+    await sleep(800);
+
+    // Start progress & subtitles
+    demoStartTime = Date.now();
+    updateProgress();
+    startSubtitleEngine();
+
+    // ══════════════════════════════════════════════
+    // PART 1: Setup (0s–8s)
+    // ══════════════════════════════════════════════
+    psPrompt('C:\\Users\\parent\\squad-for-kids');
+    await typeText('copilot', 45);
+    await sleep(80);
+    term.writeln('');
+    await sleep(300);
+    await loadingAnimation('Loading GitHub Copilot CLI...', 'Loading GitHub Copilot CLI... \u2713');
+    await sleep(200);
+    printLine(`${MAGENTA}Squad for Kids agent loaded${RST}`);
+    await sleep(500);
+    printLine('');
+
+    // ══════════════════════════════════════════════
+    // PART 2: Kid onboarding (8s–52s)
+    // ══════════════════════════════════════════════
+
+    // Kid says שלום
+    await userInput('\u05E9\u05DC\u05D5\u05DD');
+    await agentResponse([
+      `${YELLOW}🎉 ברוכים הבאים לסקוואד לילדים! 🎉${RST}`,
+      '',
+      `${WHITE}אני הולך לבנות לך צוות מדהים של עוזרי למידה!${RST}`,
+      `${WHITE}אבל קודם, אני צריך להכיר אותך קצת. מוכן/ה? בוא/י נתחיל! 🚀${RST}`,
+      '',
+      `${CYAN}מה השם שלך?${RST}`,
+    ], 80);
+    await sleep(500);
+    printLine('');
+
+    // Kid types name: יואב
+    await userInput('\u05D9\u05D5\u05D0\u05D1');
+    await agentResponse([
+      `${WHITE}נעים מאוד, ${BOLD}יואב${RST}${WHITE}! 😊${RST}`,
+      `${CYAN}מתי יום ההולדת שלך? 🎂${RST}`,
+    ], 80);
+    await sleep(500);
+    printLine('');
+
+    // Birthday: 12 מרץ 2018
+    await userInput('12 \u05DE\u05E8\u05E5 2018');
+    await agentResponse([
+      `${WHITE}אתה בן 7 — כמעט 8! 🎈${RST}`,
+      `${CYAN}באיזה כיתה אתה?${RST}`,
+    ], 80);
+    await sleep(500);
+    printLine('');
+
+    // Grade: כיתה ב
+    await userInput('\u05DB\u05D9\u05EA\u05D4 \u05D1');
+    await agentResponse([
+      `${WHITE}כיתה ב׳ — מעולה! 📚${RST}`,
+      `${CYAN}באיזה עיר אתה גר? 🏙️${RST}`,
+    ], 80);
+    await sleep(500);
+    printLine('');
+
+    // City: ראשון לציון → curriculum auto-detection
+    await userInput('\u05E8\u05D0\u05E9\u05D5\u05DF \u05DC\u05E6\u05D9\u05D5\u05DF');
+    await agentResponse([
+      `${YELLOW}🇮🇱 זוהה: ישראל — ראשון לציון${RST}`,
+      '',
+      `${GREEN}📚 תכנית לימודים: משרד החינוך הישראלי${RST}`,
+      `${GREEN}📖 מקצועות לכיתה ב׳:${RST}`,
+      `${WHITE}   • חשבון${RST}`,
+      `${WHITE}   • עברית${RST}`,
+      `${WHITE}   • הבנת הנקרא${RST}`,
+      `${WHITE}   • מדע וטכנולוגיה${RST}`,
+      `${WHITE}   • אנגלית${RST}`,
+      `${WHITE}   • תנ״ך${RST}`,
+      `${WHITE}   • אומנות${RST}`,
+      `${WHITE}   • חינוך גופני${RST}`,
+      `${WHITE}   • כישורי חיים${RST}`,
+    ], 55);
+    await sleep(400);
+    printLine('');
+
+    // Favorite question
+    await printLines([
+      `${CYAN}🎬 איזה סרט, סדרה, ספר או משחק הכי אהוב עליך?${RST}`,
+      `${WHITE}(זה הולך להיות ממש מגניב, אני מבטיח! 😎)${RST}`,
+    ], 70);
+    await sleep(600);
+    printLine('');
+
+    // ══════════════════════════════════════════════
+    // Harry Potter — THE BIG REVEAL (38s–52s)
+    // ══════════════════════════════════════════════
+    await userInput('\u05D4\u05D0\u05E8\u05D9 \u05E4\u05D5\u05D8\u05E8');
+    await sleep(800);
+
+    printLine('');
+    const revealHeader = `${YELLOW}${BOLD}🎉✨ יואב, הצוות שלך מוכן! ✨🎉${RST}`;
+    for (const ch of revealHeader) {
+      term.write(ch);
+      await sleep(8);
+    }
+    term.writeln('');
+    await sleep(400);
+    printLine(`${WHITE}הכירו את צוות הלמידה המדהים שלכם:${RST}`);
+    await sleep(500);
+
+    // Hermione
+    printLine('');
+    await printLines([
+      `${HERMIONE}🎓 הרמיוני גריינג'ר — המורה הראשית${RST}`,
+      `${WHITE}   "אני אדאג שתלמד הכל לכיתה ב׳!"${RST}`,
+      `${WHITE}   "ארגון והכנה הם המפתח — בואו נעשה תוכנית!"${RST}`,
+    ], 50);
+    await sleep(300);
+
+    // Hagrid
+    printLine('');
+    await printLines([
+      `${HAGRID}📚 האגריד — עוזר המקצועות${RST}`,
+      `${WHITE}   "אל תדאג, ביחד נגלה הכל!"${RST}`,
+      `${WHITE}   "אני יודע דבר או שניים על יצורים, טבע ואיך העולם עובד!"${RST}`,
+    ], 50);
+    await sleep(300);
+
+    // Luna
+    printLine('');
+    await printLines([
+      `${LUNA}🎨 לונה לאבגוד — מאמנת היצירתיות${RST}`,
+      `${WHITE}   "הדברים שאחרים מוצאים מוזרים הם בדרך כלל הכי מעניינים."${RST}`,
+      `${WHITE}   "בואו ניצור משהו שאף אחד לא ראה קודם!"${RST}`,
+    ], 50);
+    await sleep(300);
+
+    // Fred
+    printLine('');
+    await printLines([
+      `${FRED}🎮 פרד ויזלי — הגיימר${RST}`,
+      `${WHITE}   "מוכן לאתגר? יש לי משחקים שיעשו לך סלטו במוח!"${RST}`,
+    ], 50);
+    await sleep(300);
+
+    // George
+    printLine('');
+    await printLines([
+      `${GEORGE}🎬 ג'ורג' ויזלי — היוטיובר${RST}`,
+      `${WHITE}   "ברוכים הבאים לפרק של היום!"${RST}`,
+    ], 50);
+    await sleep(300);
+
+    // Dobby
+    printLine('');
+    await printLines([
+      `${DOBBY}🤗 דובי — חבר ללמידה${RST}`,
+      `${WHITE}   "דובי פה בשבילך, תמיד! 💙"${RST}`,
+    ], 50);
+    await sleep(400);
+
+    // Profile & plan saved
+    printLine('');
+    await printLines([
+      `${GRAY}📊 הפרופיל נשמר → .squad/student-profile.json${RST}`,
+      `${GRAY}📝 תוכנית למידה נוצרה → .squad/teaching-plan.md${RST}`,
+    ], 80);
+    await sleep(300);
+    printLine('');
+    printLine(`${GREEN}מוכן להתחיל ללמוד? ספר לי מה תרצה לעשות! 🚀${RST}`);
+    await sleep(600);
+    printLine('');
+
+    // ══════════════════════════════════════════════
+    // PART 3: Math lesson with Hermione (58s–75s)
+    // ══════════════════════════════════════════════
+    await userInput('\u05D1\u05D5\u05D0 \u05E0\u05E2\u05E9\u05D4 \u05D7\u05E9\u05D1\u05D5\u05DF!');
+    await agentResponse([
+      `${HERMIONE}🎓 הרמיוני:${RST}${WHITE} בחירה מעולה, יואב!${RST}`,
+      '',
+      `${WHITE}בואו נתחיל עם חימום! 🧙‍♀️${RST}`,
+      '',
+      `${CYAN}📐 אתגר 1:${RST}${WHITE} אם יש לך 7 צפרדעי שוקולד והאגריד נותן לך עוד 8,${RST}`,
+      `${WHITE}כמה צפרדעי שוקולד יש לך עכשיו?${RST}`,
+      '',
+      `${GRAY}קח את הזמן — גם אני תמיד בודקת פעמיים! 📝${RST}`,
+    ], 60);
+    await sleep(600);
+    printLine('');
+
+    // Answer: 15
+    await userInput('15');
+    await agentResponse([
+      `${HERMIONE}🎓 הרמיוני:${RST}${GREEN} 🌟 מבריק!${RST}${WHITE} 7 + 8 = 15 — תשובה נכונה לגמרי!${RST}`,
+      `${WHITE}   🧙‍♀️ +10 נקודות! אתה בדרך להפוך לקוסם מתמטיקה!${RST}`,
+      '',
+      `${CYAN}📐 אתגר 2:${RST}${WHITE} ליואב יש 23 סוכריות ברטי בוט.${RST}`,
+      `${WHITE}   הוא אוכל 9 מהן (בתקווה שלא את אלה עם טעם שעווה! 🤢).${RST}`,
+      `${WHITE}כמה נשארו לו?${RST}`,
+    ], 60);
+    await sleep(600);
+    printLine('');
+
+    // Answer: 14
+    await userInput('14');
+    await agentResponse([
+      `${HERMIONE}🎓 הרמיוני:${RST}${GREEN} 🌟 מושלם!${RST}${WHITE} 23 - 9 = 14! שתיים מתוך שתיים!${RST}`,
+      `${WHITE}   +10 נקודות! סה"כ: 20 נקודות! 🏆${RST}`,
+    ], 60);
+    await sleep(1200);
+
+    // ══════════════════════════════════════════════
+    // PART 4: End card (76s–90s)
+    // ══════════════════════════════════════════════
+    stopSubtitleEngine();
+    setSubtitle('סקוואד לילדים. מותאם לתכנית לימודים. מונע דמויות. אינטליגנציה רגשית. קוד פתוח.');
+
+    await sleep(2500);
+
+    // Show end card overlay
+    const endCard = document.getElementById('end-card');
+    const endContent = document.getElementById('end-card-content');
+
+    const cyanH  = '#3a96dd';
+    const yellowH = '#f9f1a5';
+    const greenH  = '#16c60c';
+    const whiteH  = '#cccccc';
+    const grayH   = '#767676';
+
+    endContent.innerHTML =
+      `<span style="color:${cyanH}">  ┌─────────────────────────────────────────────────────┐</span>\n` +
+      `<span style="color:${cyanH}">  │</span>                                                     <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${yellowH};font-weight:bold">🎓 סקוואד לילדים</span>                                <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${whiteH}">github.com/tamirdresher/squad-for-kids</span>            <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>                                                     <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${greenH}">✅ זיהוי אוטומטי של תכנית לימודים לפי מיקום</span>      <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${greenH}">✅ בניית צוות מעולם אהוב על הילד</span>                  <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${greenH}">✅ תמיכה רגשית מובנית (חבר ללמידה)</span>               <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${greenH}">✅ דשבורד להורים דרך סקוואד upstream</span>              <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${greenH}">✅ מעבר כיתות אוטומטי</span>                             <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${greenH}">✅ יותר מ-10 שפות כולל עברית וערבית</span>               <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>                                                     <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>   <span style="color:${grayH}">בנוי עם GitHub Copilot + Squad Framework</span>       <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  │</span>                                                     <span style="color:${cyanH}">│</span>\n` +
+      `<span style="color:${cyanH}">  └─────────────────────────────────────────────────────┘</span>`;
+
+    endCard.style.display = 'flex';
+    endCard.offsetHeight; // force reflow
+    endCard.classList.add('visible');
+
+    // Fill progress to 100%
+    document.getElementById('progress-bar').style.width = '100%';
+
+    await sleep(7000);
+  }
+
+  // Auto-start 1s after load
+  setTimeout(runDemo, 1000);
+})();
+</script>
+</body>
+</html>

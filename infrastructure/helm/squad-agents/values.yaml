@@ -228,12 +228,21 @@ picard:
 # =============================================================================
 # KEDA — Event-driven scaling for Picard
 #
-# Scales the Picard Deployment based on open GitHub issues labelled squad:picard.
-# Requires KEDA to be installed on the cluster:
-#   az aks update --enable-keda  (AKS add-on)
+# Scales the Picard Deployment using a composite AND-logic trigger:
+#   scale UP  when: open issues exist  AND  GitHub rate-limit headroom is OK
+#   scale DOWN when: no issues OR rate-limit is nearly exhausted
+#
+# Requires:
+#   1. KEDA v2.12+ on the cluster:
+#        az aks update --enable-keda      (AKS managed add-on)
+#        # OR
+#        helm install keda kedacore/keda  (self-managed, >= 2.12)
+#   2. metricsExporter.enabled=true (squad-metrics-exporter must be running)
+#
+# Related: #1134 (KEDA token scaler), #1141 (scaler type research)
 # =============================================================================
 keda:
-  enabled: false   # Set to true once KEDA add-on is installed
+  enabled: false   # Set to true once KEDA add-on is installed and exporter is healthy
 
   # ── Composite AND mode (issue #1160) ──────────────────────────────────────
   # When false (default): simple ScaledObject — scales on open issue count only.
@@ -249,14 +258,94 @@ keda:
   rateLimitThreshold: 100
 
   picard:
-    minReplicaCount: 0    # Scale to zero when no open issues
-    maxReplicaCount: 5    # Raised from 3 to support composite mode burst capacity
-    # Scale up when there are more than this many open picard-labelled issues
-    targetIssueCount: "1"
-    # Polling interval (seconds)
-    pollingInterval: 60
-    # Cooldown after scale-down
-    cooldownPeriod: 300
+    minReplicaCount: 0      # Scale to zero when idle
+    maxReplicaCount: 5      # Maximum Picard replicas (1 per 2 issues)
+    pollingInterval: 30     # How often KEDA polls metrics (seconds)
+    cooldownPeriod: 120     # Seconds idle before scaling to zero
+
+    # Simple (legacy) fallback — used when composite.enabled=false
+    # targetIssueCount is the per-replica issue target for the github scaler
+    targetIssueCount: "2"
+
+    # -------------------------------------------------------------------------
+    # Composite AND-logic (KEDA v2.12+ scalingModifiers)
+    # -------------------------------------------------------------------------
+    composite:
+      # Set to true to activate the AND-logic Prometheus-based triggers.
+      # Requires squad-metrics-exporter to be running.
+      enabled: false  # Enable after verifying exporter is healthy
+
+      # Desired number of open issues per Picard replica.
+      # Formula: desired_replicas = ceil(queue_depth / targetQueuePerReplica)
+      targetQueuePerReplica: "2"
+
+      # GitHub API rate limit remaining below which we refuse to scale up.
+      # 500 out of 5000/hour = 10% headroom floor.
+      # Prevents Picard pods from being created when we're almost rate-limited.
+      rateLimitThreshold: "500"
+
+      # If rate limit drops below this value, deactivate the scaler entirely
+      # (scale to zero regardless of queue depth). 100 = ~2% of hourly quota.
+      rateLimitActivationThreshold: "100"
+
+    # -------------------------------------------------------------------------
+    # Business-hours pre-warm (cron trigger)
+    # Keeps at least 1 Picard replica warm during working hours to eliminate
+    # cold-start latency for the first issue of the day.
+    # -------------------------------------------------------------------------
+    prewarm:
+      enabled: false          # Enable when composite KEDA is active
+      timezone: "Asia/Jerusalem"
+      start: "0 8 * * 0-4"   # Sunday–Thursday 08:00
+      end:   "0 20 * * 0-4"  # Sunday–Thursday 20:00
+      desiredReplicas: "1"    # Keep 1 replica alive during hours
+
+# =============================================================================
+# Metrics Exporter — squad-metrics-exporter
+#
+# Lightweight Python exporter that polls GitHub API and exposes Prometheus
+# metrics used by KEDA's composite scaler triggers.
+#
+# Exposes on :9100/metrics:
+#   github_api_rate_limit_remaining{resource="core|search|..."}
+#   github_api_rate_limit_used{resource="core|..."}
+#   github_api_rate_limit_reset{resource="core|..."}
+#   squad_copilot_queue_depth{label="squad:picard"}
+#   squad_copilot_rate_limit_hits_total
+#   squad_metrics_exporter_errors_total
+#
+# Enable alongside keda.enabled=true and keda.picard.composite.enabled=true.
+# =============================================================================
+metricsExporter:
+  enabled: false   # Enable together with keda.enabled
+
+  # GitHub label to count for queue depth metric
+  squadLabel: "squad:picard"
+
+  # How often to poll GitHub API (seconds). 30s = 2 calls/min = 120/hour.
+  # Well within the 5000/hour GitHub rate limit.
+  pollIntervalSeconds: "30"
+
+  # Port exposed for Prometheus scraping
+  port: 9100
+
+  resources:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+
+  # Pin to the monitor node pool (same as Ralph — cheap, non-spot)
+  nodeSelector:
+    squad.github.com/pool: monitor
+
+  tolerations:
+    - key: "squad.github.com/pool"
+      operator: "Equal"
+      value: "monitor"
+      effect: "NoSchedule"
 
   # ── Tier 1: GitHub Actions runner queue trigger (issue #1158) ─────────────
   # Scales on GitHub Actions self-hosted runner queue depth.

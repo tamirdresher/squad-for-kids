@@ -49,12 +49,12 @@ data:
     # ---------------------------------------------------------------------------
     # Configuration from environment
     # ---------------------------------------------------------------------------
-    GH_TOKEN          = os.environ.get("GH_TOKEN", "")
+    GH_TOKEN         = os.environ.get("GH_TOKEN", "")
     GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "")
-    POLL_INTERVAL     = int(os.environ.get("POLL_INTERVAL_SECONDS", "30"))
-    PORT              = int(os.environ.get("METRICS_PORT", "9100"))
-    SQUAD_LABEL       = os.environ.get("SQUAD_LABEL", "squad:picard")
-    GITHUB_API        = "https://api.github.com"
+    POLL_INTERVAL    = int(os.environ.get("POLL_INTERVAL_SECONDS", "30"))
+    PORT             = int(os.environ.get("METRICS_PORT", "9100"))
+    SQUAD_LABEL      = os.environ.get("SQUAD_LABEL", "squad:picard")
+    GITHUB_API       = "https://api.github.com"
 
     if not GH_TOKEN:
         print("ERROR: GH_TOKEN is required", flush=True)
@@ -278,15 +278,11 @@ spec:
                 - ALL
             readOnlyRootFilesystem: false   # pip install needs to write
 
-      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.metricsExporter.nodeSelector | nindent 8 }}
 
-      {{- with .Values.metricsExporter.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.metricsExporter.tolerations | nindent 8 }}
 
 ---
 # Service: stable in-cluster DNS for KEDA's Prometheus scaler

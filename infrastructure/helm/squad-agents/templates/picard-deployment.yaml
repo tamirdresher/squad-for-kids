@@ -152,53 +152,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
----
-# =============================================================================
-# KEDA ScaledObject for Picard (optional)
-#
-# Scales the Picard Deployment from 0 to N based on open GitHub issues
-# labelled "squad:picard". Set keda.enabled=true in values.yaml to activate.
-# =============================================================================
-{{- if .Values.keda.enabled }}
-apiVersion: keda.sh/v1alpha1
-kind: ScaledObject
-metadata:
-  name: picard-scaler
-  namespace: {{ .Values.global.namespace }}
-  labels:
-    {{- include "squad-agents.labels" . | nindent 4 }}
-    app.kubernetes.io/component: picard
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: picard
-  minReplicaCount: {{ .Values.keda.picard.minReplicaCount }}
-  maxReplicaCount: {{ .Values.keda.picard.maxReplicaCount }}
-  pollingInterval: {{ .Values.keda.picard.pollingInterval }}
-  cooldownPeriod: {{ .Values.keda.picard.cooldownPeriod }}
-  triggers:
-    - type: github
-      metadata:
-        owner: {{ .Values.global.repository | splitList "/" | first | quote }}
-        repo: {{ .Values.global.repository | splitList "/" | last | quote }}
-        labels: "squad:picard"
-        state: "open"
-        targetIssueCount: {{ .Values.keda.picard.targetIssueCount | quote }}
-      authenticationRef:
-        name: github-trigger-auth
----
-# TriggerAuthentication uses the squad-runtime-secrets K8s Secret
-# (already populated by the CSI driver) to authenticate KEDA's GitHub scaler.
-apiVersion: keda.sh/v1alpha1
-kind: TriggerAuthentication
-metadata:
-  name: github-trigger-auth
-  namespace: {{ .Values.global.namespace }}
-spec:
-  secretTargetRef:
-    - parameter: personalAccessToken
-      name: {{ .Values.keyVault.k8sSecretName }}
-      key: GH_TOKEN
 {{- end }}
-{{- end }}
+# Note: KEDA ScaledObject for Picard has been moved to picard-scaledobject.yaml
+# which supports composite AND-logic triggers (queue depth + rate limit).
+# See: infrastructure/helm/squad-agents/templates/picard-scaledobject.yaml

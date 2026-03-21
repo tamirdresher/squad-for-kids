@@ -790,3 +790,196 @@ Documentation-as-code practice paid dividends—47KB guide written in 2 hours be
 
 **Round 2 Follow-up:**
 - PR #1199 created for issue #425
+
+---
+
+### 2026-03-21: Issue #995 — Squad-on-K8s POC Assessment (Blocked)
+
+**Assignment:** Assess readiness for K8s POC testing with non-human user dependency check.
+
+**Outcome:** ✅ **ASSESSMENT COMPLETE** — Issue unblocked with recommendation
+
+**Finding:**
+- Issue #795 (non-human user prerequisite) **does not exist** in repository
+- No CoreIdentity provisioning documentation found
+- **Complete K8s auth design already exists** in `docs/k8s-copilot-auth-design.md`
+- PAT-based Phase 1 testing path is **ready today** without non-human user
+
+**Architecture Review:**
+- `docs/k8s-copilot-auth-design.md`: 3-phase auth strategy (PAT → GitHub App → Workload Identity)
+- `infrastructure/k8s/README.md`: POC-ready Helm chart with Secret-based credentials
+- Pod-per-agent architecture validated in existing design docs
+
+**Decision:** 
+- **Unblock POC testing** — Non-human user not required for Phase 1 validation
+- **Use existing PAT approach** — Same credential model DevBox uses today
+- **Defer GitHub App to Phase 2** — Production concern, not POC blocker
+- **5 of 6 success criteria testable** with current PAT approach
+
+**Deliverables:**
+- Assessment decision: `.squad/decisions/inbox/picard-issue995-assessment.md`
+- Recommendation: Proceed with Phase 1 K8s testing using existing PAT credentials
+
+**Key Learning:**
+- False dependency blocking can delay working infrastructure validation
+- Phase 1 (dev/test) paths should prioritize speed over production hardening
+- Complete auth design was already in place — issue was scope confusion, not missing design
+
+**Status:** Assessment complete. POC testing can proceed with existing credentials approach.
+
+
+---
+
+### 2026-03-21: Issue #977 — WhatsApp Research Simulation Publication (Blocked)
+
+**Assignment:** Retrieve WhatsApp discussion between user and "I" about simulation/research topic; route to research team for academic publication.
+
+**Outcome:** ⏸️ **BLOCKED** — WhatsApp Web requires QR authentication
+
+**Analysis:**
+- **Root Cause:** No active WhatsApp Web session on current machine (CPC-tamir-WCBED Ralph K8s pod)
+- **Infrastructure Available:** wa-monitor-dotnet (.NET 8 companion device) exists but requires QR scan
+- **Recent Attempts:** All WhatsApp checks 2026-03-16 through 03-20 show "pending" status
+- **User Comment:** "Try again. I have one devbox that is connected" (Mar 20, 09:18 UTC)
+
+**WhatsApp Monitor Status:**
+- Monitor supports family contacts (Gabi, Yonatan, Shira, Eyal)
+- Session data location: `C:\Users\tamirdresher\.whatsapp-monitor\session-data\`
+- QR authentication required for WhatsApp Web access
+- No automated conversation history retrieval without active session
+
+**Blocker Resolution Paths:**
+1. **User provides content directly** — Copy/paste WhatsApp discussion content
+2. **QR scan on connected devbox** — Authenticate WhatsApp Web to enable automated retrieval
+
+**Decision:** Posted status update to issue #977 requesting either manual content sharing or QR authentication on connected devbox.
+
+**Next Steps:**
+- Once conversation content obtained → Extract simulation/research hypothesis
+- Route to Seven (Research) for study design and academic publication plan
+- Create publication timeline with methodology, team assignments, target venue
+
+**Key Learning:**
+- WhatsApp Web automation bottleneck: QR authentication is manual, session-dependent
+- Cross-machine session sharing exists but requires at least one authenticated browser session
+- For research discussion retrieval, direct content sharing may be faster than infrastructure setup
+
+
+### 2026-03-21: Issue #845 — ADO PR Review: Preview NuGet Packages from PR Builds
+
+**Assignment:** Review Meir Blachman's ADO PR proposing preview NuGet package publishing from PR builds (ConfigGen).
+
+**Outcome:** ✅ **ARCHITECTURAL APPROVAL WITH CONDITIONS**
+
+**Key Architectural Decisions:**
+
+1. **Feed Isolation Strategy** (Critical)
+   - Separate preview feed required (`ConfigGen-Preview`)
+   - Production feed must remain clean
+   - Prevents accidental production dependencies on ephemeral packages
+
+2. **Versioning Pattern**
+   - Format: `{version}-pr.{pr-number}.{build-id}`
+   - Example: `1.2.3-pr.42.20260317.1`
+   - Ensures traceability and avoids version conflicts with official releases
+
+3. **Security Boundaries**
+   - Fork PRs must be blocked from publishing (supply chain attack vector)
+   - Scoped credentials (feed publish only)
+   - Service connections over PATs
+
+4. **Lifecycle Management**
+   - Auto-deletion: 30 days OR on PR close
+   - Prevents feed bloat and storage costs
+   - Package metadata must indicate "PR Preview - Not for Production"
+
+5. **Build Performance Pattern**
+   - Publish in parallel with tests (non-blocking)
+   - Only publish post-test-pass
+   - Optional: Label-gated publishing (`needs-preview-package`)
+
+6. **Dependency Chain Protection**
+   - Explicit opt-in required via NuGet.config
+   - Documentation: preview packages are ephemeral
+   - Prevents accidental downstream production usage
+
+**Coordination:**
+- B'Elanna spawned simultaneously for infrastructure review
+- Combined review will be posted to ADO PR after B'Elanna validates pipeline specifics
+
+**Architectural Pattern:**
+This establishes a reusable pattern for preview package publishing across ADO projects. Should be documented in `.squad/skills/configgen-support-patterns/` if approved.
+
+**Integration with Team Decisions:**
+- Aligns with multi-org Azure DevOps strategy (Decision history)
+- Follows CI/CD automation principles
+- Security-first approach (fork PR blocking, credential scoping)
+
+**Key Learning:**
+Preview package publishing from PRs requires architectural safeguards beyond basic CI/CD:
+- Feed isolation prevents production pollution
+- Versioning with PR/build IDs enables traceability
+- Fork PR blocking is critical for supply chain security
+- Retention policies prevent cost/bloat accumulation
+
+**Status:** Posted architectural review to #845. Awaiting B'Elanna's infrastructure review for combined ADO PR response.
+
+---
+
+
+### 2026-03-22: Issue #757 — Workshop Command Reference Update
+
+**Assignment:** Update workshop documentation to use "agency copilot" as primary CLI command with "gh copilot" as alternative (per Ralph's request).
+
+**Context:** Workshop review (embedded in issue #757) identified inconsistency between workshop docs (which didn't specify exact CLI command) and ralph-watch.ps1 (which uses `agency copilot --yolo --agent squad`). Workshop attendees need clear, accurate command examples.
+
+**Changes Made:**
+- Updated `docs/workshop-build-your-own-squad.md`:
+  - Prerequisites table: "agency copilot CLI (or gh copilot)" instead of "GitHub Copilot CLI"
+  - Description: "built on agency copilot CLI (also compatible with GitHub's gh copilot)"
+  - Prerequisites check: Added `agency copilot --version` command with gh alternative
+  - Invocation references: Updated "invoke Copilot CLI" → "invoke agency copilot"
+  - Production example: Specified `agency copilot --agent atlas` with gh alternative
+
+**Rationale:**
+- Aligns workshop with actual Squad tooling (ralph-watch uses agency copilot)
+- Provides clear, verifiable commands for workshop prerequisites
+- Maintains compatibility path for users with gh copilot
+- Reduces workshop friction (attendees won't get "command not found" errors)
+
+**Commit:** 046cb28 "Update workshop to use 'agency copilot' as primary CLI with gh copilot as alternative"
+
+**Learning:** Documentation consistency matters for workshops — mismatch between docs and actual tooling creates attendee confusion and wastes facilitation time. Workshop docs should match production patterns.
+
+---
+
+## Learnings
+
+---
+
+### 2026-03-17: Issue #835 — ADO PR #15048379 Review Request (Tooling Blocker)
+
+**Assignment:** Review Azure DevOps PR #15048379 (PipelineSubmitter fix from Ravid Brown, DK8S Core)
+
+**Outcome:** ❌ **BLOCKED** — ADO MCP tools not accessible in session
+
+**Blocker Analysis:**
+- `.squad/mcp-servers.md` documents ADO MCP as built-in Copilot CLI plugin with PR review capabilities
+- MCP config points to `msazure` organization
+- Tools not exposed in current agent execution environment (likely auth/activation issue)
+
+**Human Action Required:**
+1. Direct review in ADO (msazure org, PR #15048379)
+2. OR — Debug ADO MCP session authentication and re-dispatch
+
+**Context for Review:**
+- **PR Focus:** PipelineSubmitter changes to fix hanging in gated pipelines (should fail fast)
+- **Requestor:** Ravid Brown (DK8S Core chat, PTAL)
+- **Co-reviewer:** B'Elanna (Infrastructure) — pipeline infrastructure is her domain
+- **Labels:** `squad:picard`, `squad:belanna`, `status:needs-review`, `teams-bridge`
+
+**Learning:**
+- ADO MCP tooling configuration exists but may require explicit session activation
+- PR reviews for complex pipeline infrastructure benefit from human judgment + domain expert co-review
+- Teams-bridged issues may reference external systems (ADO) that need separate tool access
+

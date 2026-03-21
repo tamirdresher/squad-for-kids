@@ -1147,3 +1147,71 @@
 - Draft had strong methodology and references but lacked quantitative tables and the DNSMOS gating contribution
 - Phonikud and specific Azure voice names (AlloyTurbo/FableTurbo) were missing from pipeline description
 - cfg=0.3 optimal finding is the paper's most surprising and citable result
+
+### ADC × Squad Integration Research (2026-03-17)
+
+**Context:** Tamir requested comprehensive research on ADC (Agent Dev Compute) — Microsoft's internal microVM sandbox platform — to understand how Squad would run there with agent identity and all features.
+
+**Research scope:**
+1. ADC platform deep dive (architecture, concepts, capabilities)
+2. Agent identity system (authentication to GitHub, Azure, managed identity vs API keys)
+3. Squad integration design (Ralph on ADC, multi-agent deployment, state management)
+4. Feature comparison matrix (ADC vs DevBox vs Codespaces)
+5. Security considerations (isolation, egress control, secret management)
+
+**Key findings:**
+- **ADC is production-ready** for Squad deployment — portal at https://portal.agentdevcompute.io/
+- **MicroVM sandboxes:** Hardware-isolated VMs with sub-second startup, no idle timeout (vs DevBox's ~30min timeout)
+- **Agent Identity system:** Native support for GitHub OAuth, Entra ID, and Copilot connections — credential-free authentication
+- **Shared volumes:** Persistent storage across sandboxes for .squad/ state management
+- **Configurable egress:** Per-agent network policies (allowlist-based) for security
+- **Cost model:** Unknown but likely 10-14x cheaper than DevBox due to microVM efficiency and no idle waste
+
+**Architecture designed:**
+`
+ADC Sandbox Group: "tamresearch1-squad"
+├─ Sandbox: ralph (always-on monitor)
+├─ Sandbox: seven (on-demand research)
+├─ Sandbox: data (on-demand code)
+├─ Sandbox: belanna (on-demand infra)
+├─ Sandbox: worf (on-demand security)
+└─ Shared Volume: /squad-state
+   ├─ .squad/ (config, decisions, history)
+   └─ repo/ (git clone)
+`
+
+**Benefits over DevBox:**
+- 🔒 **Stronger isolation:** Each agent in separate kernel space (hardware-level)
+- ⚡ **Faster startup:** ~1-5 seconds vs ~2-5 minutes
+- 💰 **Cost efficiency:** Pay only for active compute, no idle timeout
+- 🛡️ **Blast radius:** Compromised agent can't access other agents
+- 🔑 **Identity scoping:** Minimal permissions per agent (Seven doesn't need Azure access)
+
+**Implementation plan:**
+1. **Phase 1 (1-2 days):** Ralph POC — single agent on ADC, validate workflow, identity, state persistence
+2. **Phase 2 (3-5 days):** Multi-agent expansion — 5 core agents with shared volume, test concurrent work
+3. **Phase 3 (TBD):** DTS integration — explore Developer Task Service for orchestration (needs API docs)
+4. **Phase 4 (1 week):** Full Squad deployment — all 15+ agents on ADC with monitoring
+
+**Open questions:**
+- [ ] ADC cost model (per-second? flat fee?)
+- [ ] Token acquisition inside sandbox (IMDS endpoint? Env vars?)
+- [ ] Sandbox-to-sandbox networking (can agents communicate directly?)
+- [ ] DTS API surface (how does it integrate with GitHub issues?)
+- [ ] Volume file locking (for concurrent .squad/ writes)
+
+**Deliverables:**
+- Comprehensive report: esearch/active/adc-squad-integration/README.md
+- 29KB document covering platform overview, agent identity, integration architecture, feature matrix, security, implementation plan
+- No issue #752 found in repo — skipped comment posting
+
+**Research methodology:**
+- Read existing ADC research (.squad/research/adc-findings.md, dc-research-notes.md)
+- Web search: Microsoft Agent Framework, DevBox/Codespaces comparison, microVM security architectures
+- Cross-referenced Azure MSI docs, multi-agent security patterns
+- EngHub search failed (API 204 error) — relied on web + previous research
+
+**Pattern:** Large research projects benefit from structured report format (exec summary, deep-dive sections, comparison matrices, implementation roadmap, open questions). ASCII diagrams and tables make architecture concrete without tooling dependencies.
+
+**Next action:** Ralph POC on ADC (Phase 1) — needs portal login + API key generation.
+

@@ -1,8 +1,8 @@
 # Monorepo Support — Per-Area Squad Config Guide
 
-> **Full guide** for configuring Squad in a large monorepo where different teams own different
-> subdirectories. Summarised in `.squad/routing.md` (Per-Area Routing section) — read that first
-> for the quick reference, then come here for the complete picture.
+> **Full reference for per-area Squad configuration in large repositories.**
+> If you are setting up Squad for the first time, start with [Quick Start](#quick-start).
+> Cross-references: `scripts/find-squad-config.ps1` (issue #1146) · `.squad/mcp-servers.md` · `area:*` labels setup: `.squad/scripts/setup-area-labels.ps1` (issue #1153)
 
 ---
 
@@ -36,10 +36,14 @@ Layers are **additive** — you can adopt Layer 1 today without committing to La
 
 A single Markdown file placed inside a subdirectory that tells agents:
 
-- Who owns this area
-- What the key files are
-- Any routing hints specific to this area
-- Any constraints agents must respect here
+> **Reference implementation:** [`.squad/.squad-context.md`](./.squad-context.md) — the Squad framework
+> area itself uses this pattern. Use it as a canonical example when creating `.squad-context.md` files for
+> your own areas.
+
+**When to use Layer 1 only:**
+- Your repo has 2–5 areas with low cross-area churn
+- You want squad awareness without managing a subsquad roster
+- You are piloting monorepo support before committing to a full setup
 
 It does **not** change the agent roster or routing rules — it only adds context that agents load
 when working in this directory tree.

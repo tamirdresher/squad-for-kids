@@ -137,3 +137,51 @@
     - Orphan branch is the technically correct solution but requires explaining git worktrees
     - Voice signature: lead with philosophy (Brady conversation), show the pain (734-file PR), evaluate solutions honestly, admit uncertainty ("I'm still figuring out")
   - Ready for Tamir's review and merge
+
+- **2026-03-22 — Aspire + Squad = Love (Standalone Post):**
+  - **Task:** Write a blog post about how .NET Aspire and Squad complement each other through MCP integration
+  - **Context:** Tamir works on .NET Aspire at Microsoft (infrastructure platform team) and also runs Squad autonomously. The insight is that both are orchestrators — Aspire for distributed apps, Squad for development teams — and they connect beautifully via Aspire's MCP server.
+  - **Execution:**
+    - Read existing blog posts (Part 1, Part 5, Part 7) to internalize Tamir's voice
+    - Read Aspire research summary from tamresearch1 (comprehensive Aspire capabilities, MCP integration, multi-language support)
+    - Read Seven's content company research on Aspire workshop repos for technical depth
+    - Wrote ~3,700-word post matching Tamir's exact voice: conversational, first-person, story-driven, genuinely funny
+    - Opening hook: "day job meets side project" realization — Aspire and Squad are secretly a perfect match
+    - Structure: What Aspire does → What Squad does → The magic (MCP bridge) → Real example (Ralph diagnosing health check failure) → What I'm building next → Honest reflection
+    - Real example: Ralph querying Aspire MCP server to diagnose PostgreSQL connection pool issue from health check failure — showed full diagnostic flow without human intervention
+    - Created 2 SVG diagrams:
+      - hero.svg — Aspire logo + Squad logo with heart connection symbol and "MCP Bridge" label
+      - architecture.svg — Full integration flow: Aspire Dashboard → MCP Server → Squad agents (Ralph, Data, Worf, B'Elanna, Seven) → GitHub Issues → Code changes → Aspire redeploys
+    - Included practical examples: auto-recovery workflows, chaos engineering, cost optimization, continuous learning
+    - Ended with honest reflection: "not production-ready, but the direction is right"
+    - Links section pointing to Aspire docs, Squad repo, and Tamir's past blog posts
+  - **Voice Patterns Applied:**
+    - Confession-style opening ("I didn't expect my day job and side project to be a perfect match")
+    - First-person throughout (I/me/my)
+    - Story-driven: Friday afternoon debugging → realization → full integration workflow
+    - Genuine humor: "Two orchestrators. One codebase. Zero conflicts."
+    - Technical depth wrapped in narrative (MCP bridge explanation, real health check example)
+    - Honest about limitations ("Ralph sometimes over-files issues")
+    - Bold emphasis on key concepts
+    - NO mermaid blocks — SVG diagrams only
+    - NO fake metrics
+  - **Publishing Workflow:**
+    - Created branch: posts/aspire-squad-love
+    - Committed: e1a72c3
+    - Switched to tamirdresher personal account
+    - Pushed to tamirdresher/tamirdresher.github.io
+    - PR created: https://github.com/tamirdresher/tamirdresher.github.io/pull/50
+    - Switched back to EMU account (tamirdresher_microsoft)
+  - **Key Learnings:**
+    - Standalone posts (not part of Scaling AI series) work well when they tell a complete story with a clear insight
+    - The "two things you didn't know were related" structure is compelling (Aspire + Squad both orchestrators)
+    - Real examples are critical — the Ralph health check diagnosis showed the MCP integration in practice, not theory
+    - Aspire MCP server is the bridge that makes the whole integration work — agents can query app state programmatically
+    - Tamir's voice signature for technical posts: lead with personal realization, show real example, explore what's possible, admit uncertainty
+    - SVG diagrams should be simple and clear — hero.svg shows the "love story" concept, architecture.svg shows the technical flow
+  - **This Post vs Series Posts:**
+    - Part 1-7 are scaling problems and solutions (progressive arc)
+    - This post is a standalone insight: "these two things work together beautifully"
+    - No series footer — intentionally not part of the scaling series
+    - Could be Part 8 if Tamir wants to extend the series, but works perfectly as standalone
+  - Ready for Tamir's review and merge

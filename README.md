@@ -187,7 +187,13 @@ cd squad-for-kids
 
 ### Step 2: First-Time Setup (Your Child Does This!)
 
-Start a Copilot session with the agent at `.github/agents/squad.agent.md`. The system will:
+Start a Copilot session with the agent at `.github/agents/squad.agent.md`:
+
+1. Open Copilot Chat (click the chat icon 💬 in the sidebar, or press `Ctrl+Shift+I`)
+2. **⚡ Important: Select the "Squad" agent** from the agent dropdown menu at the top of the chat window
+3. Type `hi` and press Enter — the onboarding wizard will start!
+
+The system will:
 
 1. 🎉 **Welcome them** with a warm, fun greeting
 2. 📝 **Ask their first name** — used everywhere for personalization

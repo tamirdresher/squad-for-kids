@@ -178,38 +178,27 @@ Automated study session reminders, homework tracking, and spaced repetition sche
 
 ## 🚀 Quick Start for Parents
 
-### Step 1: Get the Squad
+### Step 1: Open a Workspace
 
-```bash
-git clone https://github.com/tamirdresher/squad-for-kids.git
-cd squad-for-kids
-```
+1. Go to [github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
+2. Click **Code** → **Codespaces** tab → **Create codespace on main**
+3. Wait for VS Code to fully load
 
-### Step 2: First-Time Setup (Your Child Does This!)
+### Step 2: Launch the Squad
 
-Start a Copilot session with the agent at `.github/agents/squad.agent.md`:
-
-1. Open Copilot Chat (click the chat icon 💬 in the sidebar, or press `Ctrl+Shift+I`)
-2. **⚡ Important: Select the "Squad" agent** from the agent dropdown menu at the top of the chat window
-3. Type `hi` and press Enter — the onboarding wizard will start!
-
-The system will:
-
-1. 🎉 **Welcome them** with a warm, fun greeting
-2. 📝 **Ask their first name** — used everywhere for personalization
-3. 🎂 **Ask their birthday** — to calculate age and auto-detect grade transitions
-4. 🏫 **Ask their grade** — maps to the right curriculum
-5. 🏙️ **Ask their city** — auto-detects country and curriculum system
-6. 🗣️ **Set language** — defaults to their country's language
-7. 🎬 **Ask their favorite movie/show/game** — casts the learning agents as characters they love!
+4. Open Copilot Chat — click the chat icon 💬 in the sidebar, or press `Ctrl+Alt+I`
+5. Select the **"squad"** agent from the dropdown at the bottom of the chat window
+6. Click **"Autopilot (Preview)"** at the bottom to enable autonomous mode
+7. Type in Hebrew! Start with: `היי! אני רוצה לבנות משחק!`
 
 ### Step 3: Learning Begins!
 
-Your child gets a personalized team of AI tutors cast as characters from their favorite universe. They can:
-- Study any subject from their curriculum
-- Get homework help (guided, never just answers)
-- Play educational games and earn XP
-- Take brain breaks between study sessions
+Your child gets a personalized team of AI tutors. Here's what they can do:
+- 👋 **Onboarding flow** — name, birthday, pick a universe theme (superheroes, Harry Potter…)
+- 🎮 **Game building** — the squad builds a game together with a superhero theme
+- 📐 **Math homework help** — e.g. 247×18 with step-by-step explanation
+- 🔧 **PC troubleshooting** — the squad helps diagnose and fix issues
+- 💻 **On local machine** — the squad can actually inspect and fix the computer!
 
 ### What Parents Get
 

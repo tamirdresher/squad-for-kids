@@ -994,13 +994,18 @@
     <div class="container">
         <h2 class="section-title">📺 ראו את זה <span>בפעולה</span></h2>
         <div class="demo-container">
-            <a href="demo-hebrew.html" target="_blank" class="demo-link" style="display:block;text-decoration:none;">
-                <div class="demo-placeholder" role="button" tabindex="0" aria-label="צפייה בהדגמה">
-                    <div class="demo-play-btn" aria-hidden="true">▶</div>
-                    <p class="demo-text">ראו איך יואב בן 7 מראשון לציון מקבל צוות מהארי פוטר</p>
-                    <p class="demo-subtitle">לחצו לצפייה בדמו אינטראקטיבי — 2 דקות</p>
-                </div>
-            </a>
+            <video controls playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);margin:0 auto;display:block;">
+                <source src="demo-video-he.mp4" type="video/mp4">
+                הדפדפן שלכם לא תומך בווידאו. <a href="demo-video-he.mp4">לחצו כאן להורדה</a>.
+            </video>
+            <p style="text-align:center;margin-top:16px;color:var(--text-light);font-size:0.95em;">
+                🎬 סרטון הדגמה — 2:13 דקות | יואב בן 7 מקבל צוות הארי פוטר
+            </p>
+            <div style="text-align:center;margin-top:12px;">
+                <a href="demo-hebrew.html" target="_blank" style="color:var(--primary);font-weight:500;text-decoration:none;font-size:0.9em;">
+                    💻 או נסו את ההדגמה האינטראקטיבית →
+                </a>
+            </div>
         </div>
     </div>
 </section>

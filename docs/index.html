@@ -334,6 +334,45 @@
             margin: 0 auto;
         }
 
+        .language-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .language-btn {
+            background: var(--bg-alt);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 10px 20px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .language-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .demo-video-wrapper {
+            display: none;
+        }
+
+        .demo-video-wrapper.active {
+            display: block;
+        }
+
         .demo-placeholder {
             background: linear-gradient(135deg, #2D2D3F 0%, #1a1a2e 100%);
             border-radius: var(--radius);
@@ -994,17 +1033,42 @@
     <div class="container">
         <h2 class="section-title">📺 ראו את זה <span>בפעולה</span></h2>
         <div class="demo-container">
-            <video controls playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);margin:0 auto;display:block;">
-                <source src="demo-video-he.mp4" type="video/mp4">
-                הדפדפן שלכם לא תומך בווידאו. <a href="demo-video-he.mp4">לחצו כאן להורדה</a>.
-            </video>
-            <p style="text-align:center;margin-top:16px;color:var(--text-light);font-size:0.95em;">
-                🎬 סרטון הדגמה — תהליך הצטרפות (שם, יום הולדת, עולם אהוב), בניית משחק עם נושא גיבורי-על, עזרה בשיעורי מתמטיקה (247×18 צעד אחר צעד), פתרון בעיות במחשב — ובמחשב מקומי הצוות באמת יכול לבדוק ולתקן את המחשב!
-            </p>
-            <div style="text-align:center;margin-top:12px;">
-                <a href="demo-hebrew.html" target="_blank" style="color:var(--primary);font-weight:500;text-decoration:none;font-size:0.9em;">
-                    💻 או נסו את ההדגמה האינטראקטיבית →
-                </a>
+            <!-- Language Toggle -->
+            <div class="language-toggle">
+                <button class="language-btn active" onclick="switchDemoLanguage('he')" aria-pressed="true">עברית 🇮🇱</button>
+                <button class="language-btn" onclick="switchDemoLanguage('en')" aria-pressed="false">English 🌍</button>
+            </div>
+
+            <!-- Hebrew Demo Video -->
+            <div class="demo-video-wrapper active" id="demo-he">
+                <video controls playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);margin:0 auto;display:block;">
+                    <source src="demo-video-he.mp4" type="video/mp4">
+                    הדפדפן שלכם לא תומך בווידאו. <a href="demo-video-he.mp4">לחצו כאן להורדה</a>.
+                </video>
+                <p style="text-align:center;margin-top:16px;color:var(--text-light);font-size:0.95em;">
+                    🎬 סרטון הדגמה — תהליך הצטרפות (שם, יום הולדת, עולם אהוב), בניית משחק עם נושא גיבורי-על, עזרה בשיעורי מתמטיקה (247×18 צעד אחר צעד), פתרון בעיות במחשב — ובמחשב מקומי הצוות באמת יכול לבדוק ולתקן את המחשב!
+                </p>
+                <div style="text-align:center;margin-top:12px;">
+                    <a href="demo-hebrew.html" target="_blank" style="color:var(--primary);font-weight:500;text-decoration:none;font-size:0.9em;">
+                        💻 או נסו את ההדגמה האינטראקטיבית →
+                    </a>
+                </div>
+            </div>
+
+            <!-- English Demo Video -->
+            <div class="demo-video-wrapper" id="demo-en">
+                <video controls playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);margin:0 auto;display:block;">
+                    <source src="demo-video-en.mp4" type="video/mp4">
+                    Your browser does not support the video tag. <a href="demo-video-en.mp4">Click here to download</a>.
+                </video>
+                <p style="text-align:center;margin-top:16px;color:var(--text-light);font-size:0.95em;">
+                    🎬 Demo video — Onboarding process (name, birthday, favorite universe), building a game with a superhero theme, help with math homework (247×18 step by step), solving computer problems — and on local computers, the Squad can actually check and fix the computer!
+                </p>
+                <div style="text-align:center;margin-top:12px;">
+                    <a href="demo-hebrew.html" target="_blank" style="color:var(--primary);font-weight:500;text-decoration:none;font-size:0.9em;">
+                        💻 Or try the interactive demo →
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -1272,6 +1336,28 @@
             feedback.style.display = 'block';
             setTimeout(() => { feedback.style.display = 'none'; }, 2500);
         });
+    }
+
+    function switchDemoLanguage(lang) {
+        const heWrapper = document.getElementById('demo-he');
+        const enWrapper = document.getElementById('demo-en');
+        const buttons = document.querySelectorAll('.language-btn');
+
+        if (lang === 'he') {
+            heWrapper.classList.add('active');
+            enWrapper.classList.remove('active');
+            buttons[0].classList.add('active');
+            buttons[0].setAttribute('aria-pressed', 'true');
+            buttons[1].classList.remove('active');
+            buttons[1].setAttribute('aria-pressed', 'false');
+        } else {
+            enWrapper.classList.add('active');
+            heWrapper.classList.remove('active');
+            buttons[1].classList.add('active');
+            buttons[1].setAttribute('aria-pressed', 'true');
+            buttons[0].classList.remove('active');
+            buttons[0].setAttribute('aria-pressed', 'false');
+        }
     }
 </script>
 </body>

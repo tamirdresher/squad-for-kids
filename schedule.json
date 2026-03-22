@@ -27,5 +27,18 @@
     ],
     "tracking": ".squad/monitoring/eyal-links-state.json",
     "knowledgeBase": ".squad/knowledge/eyal-links/"
+  },
+  {
+    "name": "arxiv-daily-scanner",
+    "interval": "daily",
+    "time": "07:00",
+    "description": "Daily arXiv scan (cs.AI/LG/MA/SE/NE) for agent, MCP, k8s, copilot, .NET, aspire papers. Creates a 'Research Digest: YYYY-MM-DD' GitHub issue and posts to Teams.",
+    "script": "scripts/arxiv-scanner.js",
+    "runtime": "node",
+    "postChannels": [
+      "squads > research"
+    ],
+    "tracking": ".squad/monitoring/arxiv-state.json",
+    "issue": 1308
   }
 ]

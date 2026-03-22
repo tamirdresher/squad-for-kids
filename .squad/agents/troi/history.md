@@ -184,4 +184,46 @@
     - This post is a standalone insight: "these two things work together beautifully"
     - No series footer — intentionally not part of the scaling series
     - Could be Part 8 if Tamir wants to extend the series, but works perfectly as standalone
-  - Ready for Tamir's review and merge
+  - Ready for Tamir's review and merge (first version)
+
+- **2026-03-22 — Aspire + Squad Blog Post — COMPLETE REWRITE:**
+  - **Original Issue:** First version incorrectly framed Tamir as working ON the Aspire team at Microsoft
+  - **Correction:** Tamir is an Aspire USER and advocate who teaches Aspire, has 8 repos, full workshop syllabus, and 2 published blog posts
+  - **Key Insight Fixed:** The real angle is "Aspire makes AI agents' lives simpler, not just human devs' lives" — AI agents can spawn entire distributed systems with one Program.cs and query the whole system via MCP
+  - **Execution:**
+    - Read both existing Aspire blog posts for voice and technical foundation:
+      - 2025-12-16: "Scaling AI Agents with Aspire: The Missing Isolation Layer" — THE foundation post showing Aspire gives AI agents superpowers
+      - 2025-11-15: "Seamless Private NPM Feeds in .NET Aspire" — solving npm auth
+    - Completely rewrote the post with correct framing (Tamir as platform team member who uses Aspire, teaches workshops, advocates for it)
+    - Structure: Problem AI agents have with distributed systems → Why Aspire changes everything (spawn systems, query via MCP, understand topology) → Real example (Ralph diagnosing Postgres pool exhaustion) → What I'm building → Why this stack works → Honest reflection
+    - Real example kept from original (Ralph + PostgreSQL connection pool diagnosis) but reframed as user experience, not insider knowledge
+    - Referenced Tamir's actual Aspire work: workshops, GitHub repos, previous blog posts
+    - Key thesis: Before Aspire+MCP, agents saw files. After Aspire+MCP, agents see systems. That's transformative.
+    - Links to: Aspire workshop repo, previous Aspire blog posts, Squad repo, Part 1 of scaling series
+  - **Voice Patterns Applied:**
+    - Opening: "I've been teaching Aspire for over a year" (establishes credibility as user/teacher)
+    - First-person throughout (I teach, I use, my squad)
+    - Story-driven: agents' problem with distributed systems → Aspire solves it → real diagnostic example
+    - Technical depth: MCP integration, actual tool calls, system-level observability
+    - Honest reflection: "not production-ready, but the direction is right"
+    - References to real Aspire work: workshops, repos, teaching
+  - **What Changed from Original:**
+    - ❌ WRONG: "I work on .NET Aspire at Microsoft"
+    - ✅ RIGHT: "My platform team at Microsoft uses Aspire" + "I teach Aspire workshops"
+    - ❌ WRONG: "day job meets side project"
+    - ✅ RIGHT: "Aspire gives AI agents superpowers — they can see systems, not just files"
+    - ❌ WRONG: Insider perspective on Aspire team decisions
+    - ✅ RIGHT: User/advocate perspective on what Aspire enables for AI agents
+    - Added references to: Aspire workshop repo, previous Aspire blog posts, teaching experience
+    - Kept: Real Ralph example (PostgreSQL diagnosis), MCP integration architecture, what I'm building
+  - **Publishing:**
+    - Branch: posts/aspire-squad-love (updated in place)
+    - Commit: ba88c8f (rewrite with correct framing)
+    - PR #50: https://github.com/tamirdresher/tamirdresher.github.io/pull/50 (updated)
+  - **Key Learnings:**
+    - CRITICAL: Always verify user's actual relationship to technologies before writing
+    - Tamir is Aspire USER (teaches, advocates, has workshops) NOT Aspire team member
+    - The real insight: "Aspire makes AI agents' lives simpler" is more powerful than "two orchestrators work together"
+    - Previous Aspire blog post (isolation layer) is THE foundation — this post builds on that thesis
+    - References to actual work (workshops, repos, teaching) establish credibility
+  - Ready for Tamir's review and merge (now with correct framing)

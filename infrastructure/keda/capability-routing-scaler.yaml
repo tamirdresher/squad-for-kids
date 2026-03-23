@@ -1,0 +1,47 @@
+---
+# GPU Pool Autoscaler — scales GPU node pool based on GPU pod demand
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: gpu-pool-scaler
+  namespace: squad-system
+  labels:
+    app.kubernetes.io/name: squad-capability-routing
+    app.kubernetes.io/component: autoscaling
+spec:
+  scaleTargetRef:
+    name: gpu-pool-placeholder
+    kind: Deployment
+  minReplicaCount: 0
+  maxReplicaCount: 3
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: kubernetes-workload
+      metadata:
+        podSelector: "squad.io/needs-gpu=true"
+        value: "1"
+
+---
+# Browser Pool Autoscaler — scales browser node pool based on browser pod demand
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: browser-pool-scaler
+  namespace: squad-system
+  labels:
+    app.kubernetes.io/name: squad-capability-routing
+    app.kubernetes.io/component: autoscaling
+spec:
+  scaleTargetRef:
+    name: browser-pool-placeholder
+    kind: Deployment
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: kubernetes-workload
+      metadata:
+        podSelector: "squad.io/needs-browser=true"
+        value: "1"

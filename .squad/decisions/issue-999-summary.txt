@@ -1,0 +1,161 @@
+═══════════════════════════════════════════════════════════════════════════════
+ISSUE #999: K8S-NATIVE CAPABILITY ROUTING — DESIGN COMPLETE & APPROVED
+═══════════════════════════════════════════════════════════════════════════════
+
+EXECUTIVE SUMMARY
+─────────────────
+
+Issue #999 proposes mapping GitHub issue `needs:*` labels to Kubernetes node labels
+for pod scheduling. Example: `needs:gpu` → `nodeSelector: {nvidia.com/gpu: "true"}`.
+
+STATUS: ✅ Design Complete & Ready for Implementation
+EFFORT: 4–5 weeks (6 phased implementation phases)
+
+KEY DECISIONS RATIFIED
+──────────────────────
+
+1. Node Labels (not Pod Labels)
+   └─ Capabilities are infrastructure properties, not workload declarations
+
+2. Hybrid Approach: Static Node Pool + Dynamic DaemonSet
+   ├─ GPU, memory tier → node pool labels (fast, AKS config)
+   └─ Browser, secrets, mounts → DaemonSet discovery (responsive)
+
+3. Hard Requirements via nodeSelector
+   └─ `needs:*` labels → Pod stays pending if requirement unsatisfied
+   └─ Future: `prefers:*` labels → affinity rules (optional, weighted)
+
+4. Label Namespace: squad.io/capability-*
+   └─ Consistent, collision-free, easy to audit
+
+5. RBAC: Capability discoverer gets nodes/patch
+   └─ Minimal necessary permission; Phase 2: add admission webhook
+
+DELIVERABLES CREATED
+────────────────────
+
+Design Documents (Complete):
+  ✅ docs/k8s-capability-routing.md
+  ✅ docs/squad-on-k8s/capability-routing.md
+
+Kubernetes Manifests (Ready for Deployment):
+  ✅ infrastructure/k8s/capability-discovery-daemonset.yaml
+     - DaemonSet + RBAC + ServiceAccount for capability discovery
+     
+  ✅ infrastructure/k8s/capability-mapping-configmap.yaml
+     - Operator config mapping needs:* labels to K8s selectors
+     
+  ✅ infrastructure/keda/capability-routing-scaler.yaml
+     - KEDA ScaledObjects for GPU/browser node pool autoscaling
+
+Implementation Guides:
+  ✅ .squad/implementations/issue-999-implementation-guide.md
+     - 6-phase rollout plan with success criteria
+     
+  ✅ .squad/decisions/issue-999-decision-record.md
+     - Decision record with rationale and alternatives
+
+IMPLEMENTATION ROADMAP
+──────────────────────
+
+Phase 1 (1–2w): Capability-Discoverer Image
+  Owner: [TBD — Infrastructure/Belanna]
+  Deliverable: squad/capability-discoverer container image
+  Components:
+    • Browser probe (Playwright/Chromium)
+    • WhatsApp session detection
+    • Azure Speech SDK detection
+    • GitHub token secret presence (personal-gh, emu-gh)
+    • Teams MCP config detection
+    • OneDrive FUSE mount check
+    • Memory tier classification
+    • Node label patching (K8s API)
+    • Health endpoints (/healthz, /readyz)
+
+Phase 2 (1–2w): Squad Operator Integration
+  Owner: [TBD — Operator Development]
+  Blocked by: Phase 1
+  Changes:
+    • Load capability-mapping ConfigMap
+    • Parse needs:* labels from SquadRound CR
+    • Inject nodeSelector + tolerations + resource limits
+    • Add KEDA labels for autoscaling triggers
+
+Phase 3 (1w): AKS Node Pool Setup
+  Owner: [TBD — Infrastructure/Belanna]
+  Blocked by: Phase 2
+  Pools:
+    • general-pool (Standard_D4s_v5, always-on)
+    • gpu-pool (Standard_NC4as_T4_v3, scale-to-zero)
+    • browser-pool (Standard_D8s_v5, scale-to-zero)
+    • highmem-pool (Standard_E16s_v5, scale-to-zero)
+
+Phase 4 (2 days): DaemonSet Deployment & Verification
+  Owner: [TBD — Infrastructure/Belanna]
+  Blocked by: Phase 3
+  Steps:
+    • kubectl apply capability-discovery-daemonset.yaml
+    • kubectl apply capability-mapping-configmap.yaml
+    • kubectl apply capability-routing-scaler.yaml
+    • Verify: kubectl get nodes --show-labels | grep squad.io
+
+Phase 5 (1w): Ralph Integration
+  Owner: [TBD — Ralph Agent / Scheduling]
+  Blocked by: Phase 4
+  Changes:
+    • Dual-source capability checks (K8s labels + JSON fallback)
+    • Prefer K8s queries if in-cluster ($env:KUBERNETES_SERVICE_HOST)
+    • Backward compatibility for bare metal
+
+Phase 6 (1 day): Deprecation
+  Owner: [TBD]
+  Blocked by: Phase 5
+  Changes:
+    • Deprecate discover-machine-capabilities.ps1
+    • Remove JSON fallback (Phase 6+)
+    • Archive legacy docs
+
+LABEL MAPPING REFERENCE
+───────────────────────
+
+GitHub Issue Label          │ K8s Node Label                │ Discovery Source
+──────────────────────────────────────────────────────────────────────────────
+needs:gpu                   │ nvidia.com/gpu: "true"        │ NVIDIA device plugin
+needs:browser               │ squad.io/capability-browser   │ DaemonSet
+needs:whatsapp              │ squad.io/capability-whatsapp  │ DaemonSet
+needs:azure-speech          │ squad.io/capability-azure-... │ DaemonSet
+needs:personal-gh           │ squad.io/capability-personal- │ Secret mount
+needs:emu-gh                │ squad.io/capability-emu-gh    │ Secret mount
+needs:teams-mcp             │ squad.io/capability-teams-mcp │ DaemonSet
+needs:onedrive              │ squad.io/capability-onedrive  │ DaemonSet
+needs:high-memory           │ squad.io/memory-tier: high    │ Node pool label
+
+VERIFICATION
+────────────
+
+After Phase 4 deployment, verify with:
+
+  # Check node labels
+  kubectl get nodes --show-labels | grep squad.io
+
+  # Check specific node capabilities
+  kubectl describe node <name> | grep -A20 Labels
+
+  # Test scheduling with GPU requirement
+  kubectl run test-pod --image=busybox \
+    --overrides='{"spec":{"nodeSelector":{"nvidia.com/gpu":"true"}}}'
+  kubectl get pod test-pod -o wide
+
+See: docs/k8s-capability-routing.md §7 "Testing Capability Routing"
+
+NEXT STEPS
+──────────
+
+1. Schedule Phase 1 assignment (capability-discoverer image)
+2. Begin operator integration design doc review
+3. Prepare AKS cluster for node pool setup
+
+Point of Contact: Picard (Lead)
+Questions? Check docs/k8s-capability-routing.md or .squad/decisions/issue-999-decision-record.md
+
+═══════════════════════════════════════════════════════════════════════════════

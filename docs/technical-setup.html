@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>סקוואד לילדים — הוראות טכניות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── CSS Variables ── */
+    :root {
+      --primary: #6C63FF;
+      --primary-dark: #5A52D5;
+      --primary-light: #E8E6FF;
+      --accent-pink: #FF6584;
+      --accent-green: #43B97F;
+      --bg: #FEFCF3;
+      --bg-alt: #FFF8E7;
+      --bg-tech: #F4F3FF;
+      --white: #FFFFFF;
+      --text: #2D2D3F;
+      --text-light: #6B6B80;
+      --code-bg: #1E1E2E;
+      --code-text: #CDD6F4;
+      --shadow-sm: 0 2px 8px rgba(108, 99, 255, 0.08);
+      --shadow-md: 0 4px 20px rgba(108, 99, 255, 0.12);
+      --shadow-lg: 0 8px 40px rgba(108, 99, 255, 0.15);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: linear-gradient(160deg, #F0EDFF 0%, var(--bg) 50%, #FFF0F3 100%);
+      padding: 24px 0 60px;
+      border-bottom: 1px solid rgba(108, 99, 255, 0.1);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 8px 16px;
+      border-radius: 50px;
+      transition: all 0.25s ease;
+      background: rgba(108, 99, 255, 0.06);
+    }
+    .back-link:hover {
+      background: rgba(108, 99, 255, 0.14);
+      transform: translateX(4px);
+    }
+
+    .header-content {
+      text-align: center;
+      margin-top: 32px;
+    }
+    .header-content h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .header-content .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Table of Contents ── */
+    .toc {
+      background: var(--white);
+      border: 1px solid rgba(108, 99, 255, 0.12);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin: -30px auto 40px;
+      max-width: 860px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      z-index: 2;
+    }
+    .toc h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--primary);
+    }
+    .toc ul { list-style: none; }
+    .toc li { margin-bottom: 8px; }
+    .toc a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .toc a:hover { background: var(--primary-light); }
+    .toc .toc-emoji { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* ── Sections ── */
+    .section {
+      padding: 60px 0;
+    }
+    .section:nth-child(even) {
+      background: linear-gradient(180deg, var(--bg-tech) 0%, var(--bg) 100%);
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-bottom: 28px;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .badge-recommended {
+      background: linear-gradient(135deg, #43B97F, #2EA86B);
+      color: white;
+    }
+    .badge-advanced {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    /* ── Steps ── */
+    .steps { counter-reset: step-counter; }
+
+    .step {
+      background: var(--white);
+      border: 1px solid rgba(108, 99, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 24px 28px 24px 28px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      transition: all 0.25s ease;
+      counter-increment: step-counter;
+      padding-right: 70px;
+    }
+    .step:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .step::before {
+      content: counter(step-counter);
+      position: absolute;
+      right: 22px;
+      top: 22px;
+      width: 36px;
+      height: 36px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .step p, .step ul {
+      font-size: 0.95rem;
+      color: var(--text-light);
+    }
+    .step ul { padding-right: 20px; margin-top: 6px; }
+    .step li { margin-bottom: 4px; }
+
+    /* ── Code Blocks ── */
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+
+    .code-block {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 12px 0;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      direction: ltr;
+      text-align: left;
+      overflow-x: auto;
+      border: 1px solid rgba(108, 99, 255, 0.2);
+    }
+    .code-block .prompt { color: #A6E3A1; }
+    .code-block .comment { color: #6C7086; }
+
+    /* ── Info Box / Note ── */
+    .note {
+      background: #FFF9E6;
+      border-right: 4px solid #F5C542;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+    }
+    .note strong { color: #B8860B; }
+
+    .info-box {
+      background: var(--primary-light);
+      border-right: 4px solid var(--primary);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+    }
+    .info-box strong { color: var(--primary-dark); }
+
+    .success-box {
+      background: #E8F8F0;
+      border-right: 4px solid var(--accent-green);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+    }
+    .success-box strong { color: #2E8B57; }
+
+    /* ── Translation Table ── */
+    .translation-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin: 16px 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .translation-table th {
+      background: var(--primary);
+      color: white;
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    .translation-table td {
+      padding: 10px 18px;
+      border-bottom: 1px solid rgba(108, 99, 255, 0.08);
+      font-size: 0.9rem;
+    }
+    .translation-table tr:nth-child(even) td { background: var(--bg-tech); }
+    .translation-table tr:last-child td { border-bottom: none; }
+    .translation-table .en-term {
+      direction: ltr;
+      text-align: left;
+      font-family: 'Courier New', Courier, monospace;
+      color: var(--primary-dark);
+      font-weight: 500;
+    }
+
+    /* ── Collapsible / Details ── */
+    details {
+      background: var(--white);
+      border: 1px solid rgba(108, 99, 255, 0.1);
+      border-radius: var(--radius);
+      margin: 16px 0;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    details summary {
+      padding: 18px 24px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+      list-style: none;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::before {
+      content: '◀';
+      font-size: 0.75rem;
+      transition: transform 0.25s ease;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    details[open] summary::before { transform: rotate(-90deg); }
+    details summary:hover { background: var(--primary-light); }
+    details .details-content { padding: 0 24px 24px; }
+
+    /* ── Cards Grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .card {
+      background: var(--white);
+      border: 1px solid rgba(108, 99, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .card-icon { font-size: 2rem; margin-bottom: 10px; }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .card p { font-size: 0.9rem; color: var(--text-light); }
+
+    /* ── Links ── */
+    a { color: var(--primary); }
+    a:hover { color: var(--primary-dark); }
+
+    .link-button {
+      display: inline-block;
+      padding: 10px 24px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+      margin: 4px 0;
+    }
+    .link-button:hover {
+      background: var(--primary-dark);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .link-button-outline {
+      display: inline-block;
+      padding: 10px 24px;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
+    .link-button-outline:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(108, 99, 255, 0.2), transparent);
+      margin: 40px 0;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: var(--text);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .site-footer a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .site-footer a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .step { padding-right: 60px; }
+      .step::before { width: 30px; height: 30px; font-size: 0.85rem; right: 16px; top: 20px; }
+      .toc { padding: 20px; margin: -20px 16px 30px; }
+      .section { padding: 40px 0; }
+      .cards-grid { grid-template-columns: 1fr; }
+      details summary { padding: 14px 18px; font-size: 0.95rem; }
+      details .details-content { padding: 0 18px 18px; }
+      .translation-table th, .translation-table td { padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ HEADER ════════ -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="back-link">→ חזרה לדף הראשי</a>
+      <div class="header-content">
+        <h1>🔧 הוראות טכניות</h1>
+        <p class="subtitle">דף זה מיועד למשתמשים מתקדמים שרוצים להבין את הצד הטכני</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════ TABLE OF CONTENTS ════════ -->
+  <nav class="container">
+    <div class="toc">
+      <h2>📑 תוכן עניינים</h2>
+      <ul>
+        <li><a href="#codespace"><span class="toc-emoji">🌟</span> אפשרות א׳: Codespace (מומלץ!)</a></li>
+        <li><a href="#fork"><span class="toc-emoji">🍴</span> אפשרות ב׳: Fork — העותק שלכם</a></li>
+        <li><a href="#local-windows"><span class="toc-emoji">💻</span> אפשרות ג׳: התקנה על Windows</a></li>
+        <li><a href="#local-vscode"><span class="toc-emoji">🔨</span> אפשרות ד׳: התקנה מתקדמת (VS Code)</a></li>
+        <li><a href="#parent-dashboard"><span class="toc-emoji">👨‍👩‍👧</span> ניהול וצפייה בהתקדמות</a></li>
+        <li><a href="#privacy"><span class="toc-emoji">🔒</span> פרטיות ובטיחות</a></li>
+        <li><a href="#costs"><span class="toc-emoji">💰</span> GitHub Actions ועלויות</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ════════ OPTION A: CODESPACE ════════ -->
+  <section id="codespace" class="section">
+    <div class="container">
+      <span class="badge badge-recommended">🌟 מומלץ!</span>
+      <h2 class="section-title">אפשרות א׳: Codespace — הדרך הקלה ביותר</h2>
+      <p class="section-subtitle">אין צורך להתקין כלום. הכול רץ בענן, ישירות בדפדפן.</p>
+
+      <div class="steps">
+        <div class="step">
+          <h3>צרו חשבון GitHub</h3>
+          <p>אם עדיין אין לכם חשבון, היכנסו ל-<a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a> וצרו חשבון חינמי.</p>
+        </div>
+
+        <div class="step">
+          <h3>פתחו מחשב נייד או נייח</h3>
+          <div class="note">
+            <strong>⚠️ חשוב:</strong> יש לבצע את כל השלבים ממחשב נייד או נייח (לא מטלפון!). הטלפון לא תומך ב-Codespaces באופן מלא.
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>היכנסו לריפוזיטורי וצרו Codespace</h3>
+          <p>עברו לכתובת:</p>
+          <div class="code-block">
+            <span class="prompt">→</span> github.com/tamirdresher/squad-for-kids
+          </div>
+          <ul>
+            <li>לחצו על הכפתור הירוק <code>Code</code></li>
+            <li>עברו ללשונית <code>Codespaces</code></li>
+            <li>לחצו <code>Create codespace on main</code></li>
+          </ul>
+        </div>
+
+        <div class="step">
+          <h3>המתינו 1-2 דקות</h3>
+          <p>סביבת עבודה מלאה (VS Code בדפדפן) תיטען אוטומטית. תראו עורך קוד עם חלון טרמינל בתחתית.</p>
+        </div>
+
+        <div class="step">
+          <h3>פתחו את Copilot Chat</h3>
+          <p>לחצו על אייקון הצ׳אט 💬 בסרגל הצד, או השתמשו בקיצור:</p>
+          <div class="code-block">Ctrl + Alt + I</div>
+        </div>
+
+        <div class="step">
+          <h3>בחרו את הסוכן "squad"</h3>
+          <p>בתחתית חלון הצ׳אט, לחצו על התפריט ובחרו את הסוכן <code>squad</code> מהרשימה.</p>
+        </div>
+
+        <div class="step">
+          <h3>הפעילו Autopilot</h3>
+          <p>לחצו על הכפתור <code>Autopilot (Preview)</code> בחלון הצ׳אט. זה מאפשר לסוכן לפעול באופן עצמאי.</p>
+        </div>
+
+        <div class="step">
+          <h3>תנו לילד/ה להתחיל! 🎉</h3>
+          <p>כתבו בעברית! אפשר להתחיל עם:</p>
+          <div class="code-block">
+            <span class="prompt">💬</span> היי! אני רוצה לבנות משחק!
+          </div>
+          <p>הסוכן ידריך את הילד/ה צעד אחר צעד.</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="info-box">
+        <strong>💡 חזרה לעבודה קיימת:</strong>
+        נכנסתם בעבר ורוצים להמשיך? פשוט גשו ל-<a href="https://github.com/codespaces" target="_blank" rel="noopener">github.com/codespaces</a> ותמצאו את סביבת העבודה הקיימת שלכם.
+      </div>
+
+      <!-- Translation Table -->
+      <details>
+        <summary>📖 מילון מונחים — תרגום כפתורים מאנגלית</summary>
+        <div class="details-content">
+          <p>ממשק GitHub הוא באנגלית. הנה תרגום של הכפתורים והמונחים שתפגשו:</p>
+          <table class="translation-table">
+            <thead>
+              <tr>
+                <th>מה רואים (אנגלית)</th>
+                <th>מה זה אומר (עברית)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="en-term">Code</td>
+                <td>כפתור ירוק — פתיחת אפשרויות הורדה/Codespace</td>
+              </tr>
+              <tr>
+                <td class="en-term">Codespaces</td>
+                <td>לשונית סביבת העבודה בענן</td>
+              </tr>
+              <tr>
+                <td class="en-term">Create codespace on main</td>
+                <td>צרו סביבת עבודה חדשה</td>
+              </tr>
+              <tr>
+                <td class="en-term">Terminal</td>
+                <td>חלון פקודות (בתחתית המסך)</td>
+              </tr>
+              <tr>
+                <td class="en-term">Extensions</td>
+                <td>הרחבות / תוספים</td>
+              </tr>
+              <tr>
+                <td class="en-term">Fork</td>
+                <td>עותק אישי של הפרויקט</td>
+              </tr>
+              <tr>
+                <td class="en-term">Repository</td>
+                <td>מאגר קוד (ריפוזיטורי)</td>
+              </tr>
+              <tr>
+                <td class="en-term">Commit</td>
+                <td>שמירת שינויים (כמו "שמירה" בגיט)</td>
+              </tr>
+              <tr>
+                <td class="en-term">Pull Request</td>
+                <td>בקשה לשלב שינויים</td>
+              </tr>
+              <tr>
+                <td class="en-term">Actions</td>
+                <td>פעולות אוטומטיות (CI/CD)</td>
+              </tr>
+              <tr>
+                <td class="en-term">Sign in / Sign up</td>
+                <td>התחברות / הרשמה</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════ OPTION B: FORK ════════ -->
+  <section id="fork" class="section">
+    <div class="container">
+      <h2 class="section-title">🍴 אפשרות ב׳: Fork — העותק שלכם</h2>
+      <p class="section-subtitle">שליטה מלאה: כל הקוד, ההיסטוריה והדוחות — ברשות שלכם.</p>
+
+      <div class="info-box">
+        <strong>מה זה Fork?</strong>
+        Fork הוא עותק מלא של הפרויקט שנמצא בחשבון GitHub שלכם. כל מה שהילד/ה יוצר/ת — קוד, פרויקטים, דוחות התקדמות — נשמר אצלכם. אתם הבעלים.
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <h3>צרו Fork</h3>
+          <p>גשו ל-<a href="https://github.com/tamirdresher/squad-for-kids" target="_blank" rel="noopener">github.com/tamirdresher/squad-for-kids</a> ולחצו על כפתור <code>Fork</code> בפינה הימנית העליונה.</p>
+        </div>
+
+        <div class="step">
+          <h3>ודאו שאתם ב-Fork שלכם</h3>
+          <p>אחרי ה-Fork, בדקו שהכתובת בדפדפן מראה:</p>
+          <div class="code-block">
+            <span class="prompt">✅</span> github.com/<strong>YOUR-USERNAME</strong>/squad-for-kids
+          </div>
+          <p>ולא:</p>
+          <div class="code-block">
+            <span class="comment">// ❌ לא זה!</span><br>
+            github.com/tamirdresher/squad-for-kids
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>צרו Codespace מה-Fork שלכם</h3>
+          <p>כמו באפשרות א׳ — לחצו <code>Code</code> → <code>Codespaces</code> → <code>Create codespace on main</code>, אבל מתוך ה-Fork שלכם.</p>
+        </div>
+
+        <div class="step">
+          <h3>בחרו squad + Autopilot</h3>
+          <p>פתחו Copilot Chat, בחרו את הסוכן <code>squad</code> והפעילו <code>Autopilot</code>.</p>
+        </div>
+
+        <div class="step">
+          <h3>הילד/ה מתחיל/ה לכתוב! 🚀</h3>
+          <p>בדיוק כמו באפשרות א׳ — רק שעכשיו הכול שמור בחשבון שלכם.</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- What parents can see -->
+      <details>
+        <summary>👀 מה ההורים יכולים לראות?</summary>
+        <div class="details-content">
+          <div class="cards-grid">
+            <div class="card">
+              <div class="card-icon">📋</div>
+              <h3>פרופיל הלומד</h3>
+              <p>קובץ <code>student-profile.json</code> מכיל את ההעדפות, הרמה, והנושאים שהילד/ה למד/ה.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">📊</div>
+              <h3>דוחות התקדמות</h3>
+              <p>תיקיית <code>.squad/reports/</code> מכילה דוחות שבועיים על הפעילות והלמידה.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">📝</div>
+              <h3>תוכנית לימודים</h3>
+              <p>קובץ <code>.squad/teaching-plan.md</code> מתאר את התוכנית המותאמת אישית.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">📜</div>
+              <h3>היסטוריית שינויים</h3>
+              <p>כל commit ב-Git שומר מה השתנה, מתי, ואיך — תיעוד מלא של הדרך.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Sync Fork -->
+      <details>
+        <summary>🔄 עדכון ה-Fork (סנכרון עם המקור)</summary>
+        <div class="details-content">
+          <p>מדי פעם, הפרויקט המקורי מתעדכן עם שיפורים חדשים. כדי לקבל אותם:</p>
+          <ol style="padding-right: 20px; margin: 12px 0;">
+            <li>גשו ל-Fork שלכם ב-GitHub</li>
+            <li>אם יש הודעה <code>This branch is X commits behind</code> — לחצו <code>Sync fork</code></li>
+            <li>לחצו <code>Update branch</code></li>
+          </ol>
+          <div class="note">
+            <strong>💡 טיפ:</strong> העדכון לא ימחק את העבודה של הילד/ה. הוא רק מוסיף את השיפורים החדשים מהפרויקט המקורי.
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════ OPTION C: LOCAL INSTALL (WINDOWS) ════════ -->
+  <section id="local-windows" class="section">
+    <div class="container">
+      <h2 class="section-title">💻 אפשרות ג׳: התקנה על מחשב הילד (Windows)</h2>
+      <p class="section-subtitle">עבודה מקומית עם GitHub Desktop — פשוט וידידותי.</p>
+
+      <div class="steps">
+        <div class="step">
+          <h3>הורידו GitHub Desktop</h3>
+          <p>גשו ל-<a href="https://desktop.github.com/" target="_blank" rel="noopener">desktop.github.com</a> והורידו את האפליקציה.</p>
+        </div>
+
+        <div class="step">
+          <h3>התחברו לחשבון GitHub</h3>
+          <p>פתחו את GitHub Desktop ובצעו Sign In עם חשבון GitHub שלכם.</p>
+        </div>
+
+        <div class="step">
+          <h3>שכפלו (Clone) את הפרויקט</h3>
+          <p>בחרו <code>Clone a repository</code> וחפשו:</p>
+          <div class="code-block">tamirdresher/squad-for-kids</div>
+          <p>בחרו תיקיית יעד במחשב ולחצו <code>Clone</code>.</p>
+        </div>
+
+        <div class="step">
+          <h3>הורידו Node.js</h3>
+          <p>גשו ל-<a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> והורידו את הגרסה ה-LTS (המומלצת).</p>
+        </div>
+
+        <div class="step">
+          <h3>הורידו GitHub Copilot CLI</h3>
+          <p>עקבו אחר ההוראות ב-<a href="https://docs.github.com/en/copilot" target="_blank" rel="noopener">docs.github.com/en/copilot</a> להתקנת Copilot CLI.</p>
+        </div>
+
+        <div class="step">
+          <h3>פתחו טרמינל בתיקיית הפרויקט</h3>
+          <p>לחצו קליק ימני על תיקיית הפרויקט ובחרו <strong>"Open in Terminal"</strong> (או "פתח בטרמינל").</p>
+        </div>
+
+        <div class="step">
+          <h3>הפעילו את Copilot</h3>
+          <p>בטרמינל, כתבו:</p>
+          <div class="code-block">
+            <span class="prompt">$</span> copilot
+          </div>
+          <p>ולחצו Enter.</p>
+        </div>
+
+        <div class="step">
+          <h3>בחרו את הסוכן "Squad"</h3>
+          <p>מתוך הרשימה שתופיע, בחרו <code>Squad</code>.</p>
+        </div>
+
+        <div class="step">
+          <h3>תנו לילד/ה את המקלדת! ⌨️</h3>
+          <p>הילד/ה יכול/ה לכתוב בעברית ולהתחיל לבנות.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ OPTION D: LOCAL INSTALL (VS CODE) ════════ -->
+  <section id="local-vscode" class="section">
+    <div class="container">
+      <span class="badge badge-advanced">🔨 למתקדמים</span>
+      <h2 class="section-title">אפשרות ד׳: התקנה מתקדמת (VS Code)</h2>
+      <p class="section-subtitle">התקנה מלאה עם VS Code — שליטה מקסימלית.</p>
+
+      <!-- Windows -->
+      <details open>
+        <summary>🪟 Windows</summary>
+        <div class="details-content">
+          <div class="steps">
+            <div class="step">
+              <h3>התקינו VS Code</h3>
+              <p>הורידו מ-<a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a> והתקינו.</p>
+            </div>
+            <div class="step">
+              <h3>התקינו GitHub Copilot Extension</h3>
+              <p>ב-VS Code, לחצו על אייקון ה-Extensions (או <code>Ctrl+Shift+X</code>), חפשו <code>GitHub Copilot</code> ולחצו Install.</p>
+            </div>
+            <div class="step">
+              <h3>התקינו Git</h3>
+              <p>הורידו מ-<a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com</a> והתקינו עם ההגדרות ברירת המחדל.</p>
+            </div>
+            <div class="step">
+              <h3>שכפלו את הפרויקט</h3>
+              <p>פתחו טרמינל ב-VS Code (<code>Ctrl+`</code>) והריצו:</p>
+              <div class="code-block">
+                <span class="prompt">$</span> git clone https://github.com/tamirdresher/squad-for-kids.git<br>
+                <span class="prompt">$</span> cd squad-for-kids
+              </div>
+            </div>
+            <div class="step">
+              <h3>פתחו את התיקייה ב-VS Code</h3>
+              <p>File → Open Folder → בחרו את תיקיית <code>squad-for-kids</code>.</p>
+            </div>
+            <div class="step">
+              <h3>פתחו Copilot Chat ובחרו squad</h3>
+              <p>לחצו <code>Ctrl+Alt+I</code>, בחרו <code>squad</code> מהתפריט, הפעילו Autopilot — והתחילו!</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Mac -->
+      <details>
+        <summary>🍎 macOS</summary>
+        <div class="details-content">
+          <div class="steps">
+            <div class="step">
+              <h3>התקינו VS Code</h3>
+              <p>הורידו מ-<a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a>. גררו לתיקיית Applications.</p>
+            </div>
+            <div class="step">
+              <h3>התקינו GitHub Copilot Extension</h3>
+              <p>ב-VS Code, לחצו <code>⌘+Shift+X</code>, חפשו <code>GitHub Copilot</code> ולחצו Install.</p>
+            </div>
+            <div class="step">
+              <h3>התקינו Git</h3>
+              <p>פתחו Terminal והריצו:</p>
+              <div class="code-block">
+                <span class="prompt">$</span> xcode-select --install
+              </div>
+              <p>זה יתקין את Git (ו-Xcode Command Line Tools).</p>
+            </div>
+            <div class="step">
+              <h3>שכפלו את הפרויקט</h3>
+              <p>בטרמינל של VS Code (<code>⌘+`</code>):</p>
+              <div class="code-block">
+                <span class="prompt">$</span> git clone https://github.com/tamirdresher/squad-for-kids.git<br>
+                <span class="prompt">$</span> cd squad-for-kids
+              </div>
+            </div>
+            <div class="step">
+              <h3>פתחו את התיקייה ב-VS Code</h3>
+              <p>File → Open Folder → בחרו את תיקיית <code>squad-for-kids</code>.</p>
+            </div>
+            <div class="step">
+              <h3>פתחו Copilot Chat ובחרו squad</h3>
+              <p>לחצו <code>⌘+Alt+I</code>, בחרו <code>squad</code>, הפעילו Autopilot — ויאללה!</p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════ PARENT DASHBOARD ════════ -->
+  <section id="parent-dashboard" class="section">
+    <div class="container">
+      <h2 class="section-title">👨‍👩‍👧 ניהול וצפייה בהתקדמות</h2>
+      <p class="section-subtitle">איך לעקוב אחרי מה שהילד/ה עושה — בלי להפריע.</p>
+
+      <details open>
+        <summary>📊 דוח הורים</summary>
+        <div class="details-content">
+          <p>ה-Squad מייצר אוטומטית דוחות התקדמות. כדי לראות אותם:</p>
+          <ol style="padding-right: 20px; margin: 12px 0; line-height: 2;">
+            <li>גשו ל-Fork שלכם ב-GitHub</li>
+            <li>נווטו לתיקייה <code>.squad/reports/</code></li>
+            <li>כל דוח מכיל: נושאים שנלמדו, פרויקטים שנבנו, רמת הקושי, והמלצות</li>
+          </ol>
+          <div class="success-box">
+            <strong>✨ טיפ:</strong> הדוחות נכתבים בעברית וכתובים בשפה שההורים יבינו — לא צריך ידע טכני כדי לקרוא אותם.
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>📌 לוח פרויקטים (GitHub Project Board)</summary>
+        <div class="details-content">
+          <p>ניתן להגדיר לוח פרויקט (Project Board) ב-GitHub כדי לעקוב אחרי משימות:</p>
+          <ul style="padding-right: 20px; margin: 12px 0; line-height: 2;">
+            <li><strong>To Do</strong> — משימות שמחכות</li>
+            <li><strong>In Progress</strong> — מה שהילד/ה עובד/ת עליו עכשיו</li>
+            <li><strong>Done</strong> — מה שהושלם</li>
+          </ul>
+          <p>זה מאפשר לילד/ה ללמוד ניהול פרויקטים — ולהורים לראות סטטוס בזמן אמת.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════ PRIVACY & SAFETY ════════ -->
+  <section id="privacy" class="section">
+    <div class="container">
+      <h2 class="section-title">🔒 פרטיות ובטיחות</h2>
+      <p class="section-subtitle">הנתונים שלכם, השליטה שלכם.</p>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon">🏠</div>
+          <h3>הנתונים אצלכם</h3>
+          <p>כל הקוד, הפרויקטים והדוחות נשמרים ב-Fork/Repo שלכם. אתם הבעלים היחידים.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📉</div>
+          <h3>איסוף מידע מינימלי</h3>
+          <p>הפרויקט לא אוסף מידע אישי. אין מעקב, אין אנליטיקס, אין קוקיז.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛡️</div>
+          <h3>סינון תוכן מותאם גיל</h3>
+          <p>ה-Squad מוגדר עם הנחיות בטיחות לתוכן מתאים לילדים. השיחה מנוהלת ובטוחה.</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top: 24px;">
+        <strong>🔑 שליטת הורים:</strong> כבעלי ה-Fork, אתם יכולים בכל רגע לצפות בהיסטוריית השיחות, לבדוק את הקוד שנוצר, ולמחוק כל מידע. הכול שקוף.
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ GITHUB ACTIONS & COSTS ════════ -->
+  <section id="costs" class="section">
+    <div class="container">
+      <h2 class="section-title">💰 GitHub Actions ועלויות</h2>
+      <p class="section-subtitle">מה בחינם, מה עולה כסף, ומה אפשר לקבל בהנחה.</p>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon">🆓</div>
+          <h3>GitHub Actions — חינם</h3>
+          <p>ל-Repositories ציבוריים (Public), GitHub Actions לגמרי בחינם — כולל 2,000 דקות ריצה.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎓</div>
+          <h3>GitHub Education</h3>
+          <p>תלמידים ומורים מקבלים <strong>Copilot Pro בחינם</strong> דרך <a href="https://education.github.com/" target="_blank" rel="noopener">GitHub Education</a>.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💳</div>
+          <h3>Copilot Pro</h3>
+          <p>למי שלא זכאי ל-Education: Copilot Pro עולה $10/חודש. כולל את כל היכולות הנדרשות.</p>
+        </div>
+      </div>
+
+      <details style="margin-top: 24px;">
+        <summary>⚙️ מידע נוסף על GitHub Actions</summary>
+        <div class="details-content">
+          <p>למידע מפורט על הגדרת GitHub Actions, אוטומציות, ושימושים מתקדמים:</p>
+          <a href="advanced/github-actions-guide-he.md" class="link-button-outline" style="margin-top: 12px;">📄 מדריך GitHub Actions מפורט</a>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════ FOOTER ════════ -->
+  <footer class="site-footer">
+    <div class="container">
+      <p style="font-size: 2rem; margin-bottom: 12px;">🔧</p>
+      <p>
+        <a href="index.html">← חזרה לדף הראשי</a>
+      </p>
+      <p style="margin-top: 12px; font-size: 0.85rem; opacity: 0.7;">
+        סקוואד לילדים — למידת תכנות עם AI
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

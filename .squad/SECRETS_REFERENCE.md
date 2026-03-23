@@ -47,10 +47,12 @@ gh variable get ADC_MCP_ENDPOINT --repo tamirdresher_microsoft/tamresearch1
 
 ### ADC MCP calls
 ```powershell
-# Get API key from credential manager
-$adcKey = "7eca89a390a20a447e76f79a609299b88d042ad7139b3f5df41346cc751b41d7"
-# Or from env if set by workflow
+# Get API key from credential manager (Windows) or env var (CI/CD)
 $adcKey = $env:ADC_API_KEY
+if (-not $adcKey) {
+    $cred = cmdkey /list:ADC_API_KEY 2>$null
+    if ($cred) { $adcKey = (Get-StoredCredential -Target ADC_API_KEY).Password }
+}
 
 # Use with ADC skill
 . .squad/skills/adc-sandbox/adc-mcp.ps1

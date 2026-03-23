@@ -101,7 +101,7 @@ if (Test-Path $RateLimitManagerPath) { . $RateLimitManagerPath }
 
 # Register this Ralph instance in the shared pool (P1 — interactive work)
 if (Get-Command Register-Agent -ErrorAction SilentlyContinue) {
-    Register-Agent -AgentId "ralph-$env:COMPUTERNAME" -Priority 1
+    Register-Agent -AgentId "ralph-$env:COMPUTERNAME" -Priority "P1"
 }
 
 $defaultIntervalMinutes = 5

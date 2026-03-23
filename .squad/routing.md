@@ -121,6 +121,35 @@ Full guide: `.squad/docs/monorepo-support.md`
 
 ---
 
+## Feature Task Protocol
+
+Feature-level tasks follow the **5-phase orchestration pipeline** defined in
+[`.squad/orchestration-pipeline.md`](./.squad/orchestration-pipeline.md).
+
+```
+Phase 1: RESEARCH  → seven / explore agent → .squad/research/<N>-research-summary.md
+Phase 2: PLAN      → picard agent          → .squad/implementations/<N>-plan.md
+Phase 3: IMPLEMENT → data agent            → code changes on branch
+Phase 4: REVIEW    → worf agent            → .squad/reviews/<N>-review-comments.md
+Phase 5: VERIFY    → tests / build         → ✅ PR merged  or  🔁 loop back to Phase 3
+```
+
+**When to apply the full pipeline:**
+
+| Task type | Pipeline? |
+|-----------|-----------|
+| New feature (any size) | ✅ Always |
+| Refactor touching >1 file | ✅ Yes |
+| Bug with unclear root cause | ✅ Yes |
+| Well-defined single-file bug | ❌ Skip to Phase 3–5 |
+| Hotfix / security patch | ⚠️ Skip Phase 1; Worf mandatory at Phase 4 |
+| Docs-only / question | ❌ Route directly to Seven or coordinator |
+
+See `.squad/orchestration-pipeline.md` for full phase definitions, file-naming
+conventions, loop-back rules, and invocation shortcuts.
+
+---
+
 ## Rules
 
 0. **🚨 Project Owner is Tamir Dresher— NOT Brady Gaster.** Brady Gaster is the creator of the upstream Squad framework (`bradygaster/squad`). He is an external collaborator, NOT the owner of this project. ALL notifications, messages, emails, Teams messages, and communications go to **Tamir Dresher**. NEVER address messages to Brady unless Tamir explicitly asks you to contact him for a specific purpose (e.g., patent discussions, upstream contributions). When in doubt, the recipient is always Tamir.
@@ -132,6 +161,54 @@ Full guide: `.squad/docs/monorepo-support.md`
 6. **Anticipate downstream work.** If a feature is being built, spawn the tester to write test cases from requirements simultaneously.
 7. **Issue-labeled work** — when a `squad:{member}` label is applied to an issue, route to that member. The Lead handles all `squad` (base label) triage.
 8. **@copilot routing** — when evaluating issues, check @copilot's capability profile in `team.md`. Route 🟢 good-fit tasks to `squad:copilot`. Flag 🟡 needs-review tasks for PR review. Keep 🔴 not-suitable tasks with squad members.
+
+## Iterative Retrieval Pattern (Issue #1317)
+
+All agent delegation MUST follow the iterative retrieval pattern. This applies to every sub-agent call from the coordinator and from peer agents.
+
+### Delegation: Pass WHY, Not Just WHAT
+
+When spawning a sub-agent, always include **objective context** (the WHY) in the prompt:
+
+```
+BAD:  "Analyze this codebase for security vulnerabilities"
+GOOD: "We're preparing a FedRAMP compliance audit (WHY). Analyze this codebase for security vulnerabilities so we can file the risk register before the Q3 deadline (OBJECTIVE)."
+```
+
+The sub-agent needs to understand:
+1. **What** — the task itself
+2. **Why** — the objective and business/technical reason
+3. **Success criteria** — what "done" looks like so they can self-evaluate their return
+
+### Max 3 Investigation Cycles Per Sub-Agent
+
+Sub-agents may perform at most **3 follow-up investigation cycles** before returning results:
+
+- **Cycle 1:** Initial investigation — gather the primary data needed
+- **Cycle 2:** Fill gaps identified in cycle 1 — targeted follow-up queries
+- **Cycle 3:** Final verification — confirm findings, check edge cases
+- **Stop:** Return results after cycle 3. Do not continue investigating indefinitely.
+
+If the task cannot be adequately completed in 3 cycles, return partial results with a clear note on what additional investigation would be needed and why it wasn't completed.
+
+### Coordinator Evaluates Returns
+
+The coordinator (or delegating agent) **must evaluate** sub-agent returns before accepting them:
+
+1. **Does the return address the WHY?** Not just the WHAT asked — did they solve the underlying objective?
+2. **Is the result complete enough to act on?** Partial results must be flagged as such.
+3. **Are there obvious gaps?** If a cycle was wasted on irrelevant investigation, the coordinator may redirect and re-spawn with a more focused prompt.
+4. **Reject incomplete returns** by re-spawning with the gap explicitly named: "You returned X, but the objective requires Y. Focus your next 3 cycles on Y."
+
+### Template for Delegation
+
+```
+TASK: {specific action requested}
+WHY: {objective — what are we trying to achieve and why does it matter}
+SUCCESS CRITERIA: {what a complete, acceptable return looks like}
+CONSTRAINT: Max 3 investigation cycles. Return results after cycle 3 even if partial.
+```
+9. **Feature-level tasks use the 5-phase pipeline** — any new feature, refactor touching >1 file, or bug with unclear root cause **must** go through the RESEARCH → PLAN → IMPLEMENT → REVIEW → VERIFY pipeline defined in `.squad/orchestration-pipeline.md`. Picard enforces phase ordering. Phases may not be skipped.
 
 ## Work Type → Agent
 

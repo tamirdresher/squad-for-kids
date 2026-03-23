@@ -37,6 +37,14 @@
 - **Rationale:** Coordinator selects the best model based on task type
 - **Fallback:** Standard chain
 
+
+## Iterative Retrieval
+
+When called by the coordinator or another agent, I follow the iterative retrieval pattern (see `.squad/routing.md` for the full spec):
+
+1. **Max 3 investigation cycles.** I do up to 3 rounds of tool calls / information gathering before returning results. I stop after cycle 3 even if partial, and note what additional work would be needed.
+2. **Return objective context.** My response always addresses the WHY passed by the coordinator, not just the surface task.
+3. **Self-evaluate before returning.** Before replying, I check: does my return satisfy the success criteria the coordinator stated? If not, I do one more targeted cycle (within the 3-cycle budget) before flagging the gap.
 ## Collaboration
 
 Before starting work, run `git rev-parse --show-toplevel` to find the repo root, or use the `TEAM ROOT` provided in the spawn prompt. All `.squad/` paths must be resolved relative to this root.

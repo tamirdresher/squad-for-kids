@@ -95,6 +95,19 @@ data:
         "squad_metrics_exporter_errors_total",
         "Cumulative count of errors during metric collection",
     )
+    COPILOT_REQUESTS_TOTAL = Counter(
+        "copilot_requests_total",
+        "Total Copilot API requests",
+        ["agent", "tier"],
+    )
+    COPILOT_RATE_LIMIT_HITS = Counter(
+        "copilot_rate_limit_hits_total",
+        "Cumulative 429 responses from Copilot API",
+    )
+    COPILOT_RETRY_AFTER = Gauge(
+        "copilot_retry_after_seconds",
+        "Copilot API Retry-After header value (last observed)",
+    )
 
     # ---------------------------------------------------------------------------
     # Collection functions
@@ -133,6 +146,38 @@ data:
         resp.raise_for_status()
         QUEUE_DEPTH.labels(label=label).set(len(resp.json()))
 
+    def collect_copilot_metrics():
+        """
+        Read Copilot API metrics from agent-instrumented JSON file.
+        Agents write to %TEMP%/squad-copilot-metrics.json via copilot-wrapper.ps1
+        """
+        import json
+        import os
+        metrics_path = os.path.join(os.environ.get("TEMP", "/tmp"), "squad-copilot-metrics.json")
+        
+        if not os.path.exists(metrics_path):
+            return
+        
+        try:
+            with open(metrics_path, "r") as f:
+                metrics = json.load(f)
+            
+            # Update per-agent counters
+            for agent_id, agent_data in metrics.get("agents", {}).items():
+                tier = agent_data.get("tier", "unknown")
+                requests = agent_data.get("requests", 0)
+                rate_limit_hits = agent_data.get("rate_limit_hits", 0)
+                
+                # Set counter to current value (not increment)
+                COPILOT_REQUESTS_TOTAL.labels(agent=agent_id, tier=tier)._value.set(requests)
+                
+            # Global counters
+            COPILOT_RATE_LIMIT_HITS._value.set(metrics.get("copilot_rate_limit_hits", 0))
+            COPILOT_RETRY_AFTER.set(metrics.get("copilot_retry_after_seconds", 0))
+            
+        except Exception as e:
+            print(f"[WARN] Failed to collect Copilot metrics: {e}", flush=True)
+
     # ---------------------------------------------------------------------------
     # Main loop
     # ---------------------------------------------------------------------------
@@ -148,6 +193,7 @@ data:
             try:
                 collect_rate_limits(headers)
                 collect_queue_depth(headers, SQUAD_LABEL)
+                collect_copilot_metrics()
             except Exception as exc:
                 EXPORTER_ERRORS.inc()
                 print(f"[ERROR] Metric collection failed: {exc}", flush=True)

@@ -1,0 +1,132 @@
+name: Auto-Add Issues to Board
+
+# Automatically adds every new issue to the Squad Work Board project,
+# sets status to "Todo", and ensures the "squad" label is present.
+
+on:
+  issues:
+    types: [opened]
+
+concurrency:
+  group: auto-add-issue-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  issues: write
+  contents: read
+  # Note: GitHub Projects V2 mutations require a token with `project` scope.
+  # GITHUB_TOKEN gets implicit project write access when the repo has
+  # "Allow GitHub Actions to create and approve pull requests" enabled
+  # and the project is linked to the repo. If this workflow fails with
+  # permission errors, set the SQUAD_PROJECT_TOKEN secret (PAT with project scope).
+
+env:
+  PROJECT_ID: 'PVT_kwHOC0L5c84BRG-P'
+  STATUS_FIELD_ID: 'PVTSSF_lAHOC0L5c84BRG-Pzg_CIuc'
+  TODO_OPTION_ID: '0de780a1'
+
+jobs:
+  add-to-board:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Add issue to Squad Work Board and set Todo status
+        uses: actions/github-script@v7
+        env:
+          # Prefer a PAT with project scope; fall back to GITHUB_TOKEN.
+          # GITHUB_TOKEN works if the Actions setting "Allow GitHub Actions to
+          # manage project items" is enabled on the organisation/repo.
+          PROJECT_TOKEN: ${{ secrets.SQUAD_PROJECT_TOKEN || github.token }}
+        with:
+          github-token: ${{ env.PROJECT_TOKEN }}
+          script: |
+            const issueNodeId  = context.payload.issue.node_id;
+            const issueNumber  = context.payload.issue.number;
+            const projectId    = process.env.PROJECT_ID;
+            const statusFieldId = process.env.STATUS_FIELD_ID;
+            const todoOptionId  = process.env.TODO_OPTION_ID;
+
+            core.info(`📋 Issue #${issueNumber} opened — adding to Squad Work Board`);
+
+            // ── Step 1: Add issue to project board ────────────────────────────
+            let itemId;
+            try {
+              const addResult = await github.graphql(`
+                mutation AddIssue($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                    item { id }
+                  }
+                }
+              `, { projectId, contentId: issueNodeId });
+
+              itemId = addResult.addProjectV2ItemById.item.id;
+              core.info(`✅ Added to board (item ID: ${itemId})`);
+            } catch (err) {
+              core.warning(`⚠️ Could not add issue #${issueNumber} to project board: ${err.message}`);
+
+              // If it looks like a permission problem, leave a helpful comment.
+              if (err.message.includes('NOT_AUTHORIZED') || err.message.includes('Must have admin rights')) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: [
+                    '⚠️ **Auto-board workflow**: Could not add this issue to the Squad Work Board.',
+                    '',
+                    'The `GITHUB_TOKEN` does not have `project` scope for GitHub Projects V2.',
+                    'A repository administrator needs to add a `SQUAD_PROJECT_TOKEN` secret',
+                    '(a Personal Access Token with `project` scope) so this workflow can manage board items.',
+                    '',
+                    `Error: \`${err.message}\``
+                  ].join('\n')
+                });
+              }
+              // Don't fail the whole job — label step should still run.
+            }
+
+            // ── Step 2: Set status to "Todo" ──────────────────────────────────
+            if (itemId) {
+              try {
+                await github.graphql(`
+                  mutation SetTodo($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                    updateProjectV2ItemFieldValue(input: {
+                      projectId: $projectId,
+                      itemId: $itemId,
+                      fieldId: $fieldId,
+                      value: { singleSelectOptionId: $optionId }
+                    }) {
+                      projectV2Item { id }
+                    }
+                  }
+                `, {
+                  projectId,
+                  itemId,
+                  fieldId: statusFieldId,
+                  optionId: todoOptionId
+                });
+                core.info(`✅ Status set to "Todo"`);
+              } catch (err) {
+                core.warning(`⚠️ Could not set Todo status on item ${itemId}: ${err.message}`);
+              }
+            }
+
+            // ── Step 3: Ensure "squad" label is present ───────────────────────
+            const currentLabels = context.payload.issue.labels.map(l => l.name);
+            if (currentLabels.includes('squad')) {
+              core.info(`ℹ️ Issue #${issueNumber} already has "squad" label — skipping`);
+            } else {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  labels: ['squad']
+                });
+                core.info(`🏷️ Added "squad" label to issue #${issueNumber}`);
+              } catch (err) {
+                core.warning(`⚠️ Could not add "squad" label: ${err.message}`);
+              }
+            }
+
+            core.info(`✅ Done processing issue #${issueNumber}`);

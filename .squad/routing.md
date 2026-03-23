@@ -161,6 +161,53 @@ conventions, loop-back rules, and invocation shortcuts.
 6. **Anticipate downstream work.** If a feature is being built, spawn the tester to write test cases from requirements simultaneously.
 7. **Issue-labeled work** — when a `squad:{member}` label is applied to an issue, route to that member. The Lead handles all `squad` (base label) triage.
 8. **@copilot routing** — when evaluating issues, check @copilot's capability profile in `team.md`. Route 🟢 good-fit tasks to `squad:copilot`. Flag 🟡 needs-review tasks for PR review. Keep 🔴 not-suitable tasks with squad members.
+9. **Always use git worktrees for branch work.** Never `git checkout` or `git switch` in the main working directory. All branch-based work MUST use `git worktree add` to create an isolated worktree. This prevents conflicts when multiple agents or sessions work in parallel on different branches.
+
+## Git Worktree Convention (Mandatory)
+
+All squad agents and the coordinator **MUST** use git worktrees when working on branches. Never switch branches in the main working directory.
+
+### Why
+- Multiple agents may run concurrently on different branches
+- `git checkout` in a shared directory causes file thrashing and conflicts
+- Worktrees give each branch its own isolated directory — no interference
+- `.squad/` state files use `merge=union` in `.gitattributes` so worktree-local changes merge cleanly
+
+### How
+
+```powershell
+# Create a worktree for a new branch
+git worktree add ../tamresearch1-wt-<issue> -b squad/<issue>-<slug>
+
+# Create a worktree for an existing branch
+git worktree add ../tamresearch1-wt-<issue> squad/<issue>-<slug>
+
+# List active worktrees
+git worktree list
+
+# Remove a worktree after PR is merged
+git worktree remove ../tamresearch1-wt-<issue>
+
+# Prune stale worktrees (branch deleted but directory remains)
+git worktree prune
+```
+
+### Naming Convention
+
+Worktree directories live **beside** the main repo (not inside it):
+```
+C:\Users\tamirdresher\
+  tamresearch1\              ← main worktree (default branch)
+  tamresearch1-wt-550\       ← worktree for issue #550
+  tamresearch1-wt-1398\      ← worktree for issue #1398
+```
+
+### Rules
+1. **Main directory stays on the default branch** — never checkout feature branches here
+2. **One worktree per issue/branch** — use the issue number as the worktree suffix
+3. **Clean up after merge** — `git worktree remove` + `git branch -d` after PR merges
+4. **Resolve `.squad/` paths from repo root** — always `git rev-parse --show-toplevel` first (as per agent charter)
+5. **Ralph monitors worktree health** — stale worktrees (merged branches still checked out) get pruned
 
 ## Iterative Retrieval Pattern (Issue #1317)
 

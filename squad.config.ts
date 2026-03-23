@@ -29,7 +29,18 @@ const config: SquadConfig = {
       {
         workType: 'feature-dev',
         agents: ['@scribe'],
-        confidence: 'high'
+        confidence: 'high',
+        // Feature tasks must use the 5-phase pipeline defined in .squad/orchestration-pipeline.md
+        pipeline: 'five-phase',
+        pipelineRef: '.squad/orchestration-pipeline.md'
+      },
+      {
+        workType: 'refactor',
+        agents: ['@scribe'],
+        confidence: 'high',
+        // Multi-file refactors use the 5-phase pipeline
+        pipeline: 'five-phase',
+        pipelineRef: '.squad/orchestration-pipeline.md'
       },
       {
         workType: 'bug-fix',
@@ -50,7 +61,17 @@ const config: SquadConfig = {
     governance: {
       eagerByDefault: true,
       scribeAutoRuns: false,
-      allowRecursiveSpawn: false
+      allowRecursiveSpawn: false,
+      // Enforce 5-phase pipeline for feature-level work; see .squad/orchestration-pipeline.md
+      enforcePhaseSequencing: true,
+      pipelineRef: '.squad/orchestration-pipeline.md',
+      // Iterative retrieval pattern (Issue #1317): sub-agents may perform at most
+      // maxSubAgentCycles investigation cycles before returning results. The
+      // coordinator evaluates every return before accepting it. Delegation prompts
+      // must include WHY (objective context) not just WHAT.
+      maxSubAgentCycles: 3,
+      requireObjectiveContext: true,
+      coordinatorEvaluatesReturns: true
     }
   },
   

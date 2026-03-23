@@ -101,7 +101,7 @@ if (Test-Path $RateLimitManagerPath) { . $RateLimitManagerPath }
 
 # Register this Ralph instance in the shared pool (P1 — interactive work)
 if (Get-Command Register-Agent -ErrorAction SilentlyContinue) {
-    Register-Agent -AgentId "ralph-$env:COMPUTERNAME" -Priority 1
+    Register-Agent -AgentId "ralph-$env:COMPUTERNAME" -Priority "P1"
 }
 
 $defaultIntervalMinutes = 5
@@ -498,8 +498,45 @@ $heartbeatIntervalSeconds = 120  # 2 minutes
 $staleThresholdMinutes = 15
 $lastHeartbeatTime = Get-Date
 
+# ---------------------------------------------------------------------------
+# ITERATIVE RETRIEVAL PROTOCOL (Issue #1317)
+# When spawning a sub-agent for any issue, use this template for the prompt.
+# Full protocol: .squad/skills/iterative-retrieval/SKILL.md
+#
+# SPAWN PROMPT TEMPLATE:
+# -----------------------------------------------------------------------
+# ## Task
+# {Concrete, bounded description of what to do}
+#
+# ## WHY this matters
+# {Motivation + context — what breaks or degrades if this work is skipped}
+#
+# ## Success criteria
+# - [ ] {Measurable acceptance criterion 1}
+# - [ ] {Measurable acceptance criterion 2}
+#
+# ## Escalation path
+# {What to do when stuck: stop, label status:needs-decision, write to inbox}
+# -----------------------------------------------------------------------
+#
+# 3-CYCLE RULE:
+#   Cycle 1 — initial attempt
+#   Cycle 2 — targeted retry (include what cycle 1 got wrong)
+#   Cycle 3 — final attempt (all context from cycles 1+2)
+#   Cycle 4+ — ESCALATE: label status:needs-decision, write inbox summary, stop
+#
+# COORDINATOR VALIDATION (before accepting output and closing the issue):
+#   [ ] All success criteria met
+#   [ ] PR exists with description matching the issue
+#   [ ] No regressions (build passes, no leftover TODO/FIXME)
+#   [ ] Agent did not silently skip parts of the task
+#   [ ] Any reported uncertainty was resolved or escalated
+# ---------------------------------------------------------------------------
+
 $prompt = @'
 Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round.
+
+ITERATIVE RETRIEVAL (Issue #1317): For every agent you spawn, include Task / WHY / Success criteria / Escalation path sections in the prompt (template above, full skill at .squad/skills/iterative-retrieval/SKILL.md). Max 3 cycles per issue before escalating. Validate outputs against success criteria BEFORE closing an issue.
 
 MULTI-MACHINE COORDINATION (Issue #346): Before spawning an agent for ANY issue, check if it's already assigned:
 1. Use `gh issue view <number> --json assignees` to check if issue is assigned

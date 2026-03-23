@@ -4,6 +4,8 @@
 
 This directory contains the complete implementation for Phase 1 of the FedRAMP Security Dashboard: Data Pipeline Ingestion into Azure Monitor and Cosmos DB.
 
+Feature work follows the [5-phase orchestration pipeline](.squad/process/5-phase-orchestration.md)
+
 ## Directory Structure
 
 ```

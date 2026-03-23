@@ -60,6 +60,54 @@ If I need another team member's input, say so — the coordinator will bring the
 - **Access scope:** GitHub issues (read, label, comment, assign), ADO work items (status updates), Playwright for web-based monitoring dashboards. Ralph does not write code or send communications.
 - **Elevated permissions required:** No — Ralph is intentionally low-blast-radius. Its core job is reading queues and nudging. Playwright access is used for monitoring only, not form submission.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
+
+## Iterative Retrieval Protocol
+
+When spawning sub-agents to complete issue work, Ralph follows the **3-cycle maximum** rule.
+Full details and the spawn prompt template live at `.squad/skills/iterative-retrieval/SKILL.md`.
+
+### Spawn Prompt Format
+
+Every agent spawn must include:
+
+```
+## Task
+{Concrete, bounded description of what to do}
+
+## WHY this matters
+{Motivation + context — what breaks or degrades if this work is skipped}
+
+## Success criteria
+- [ ] {Measurable acceptance criterion 1}
+- [ ] {Measurable acceptance criterion 2}
+
+## Escalation path
+{What to do when stuck: stop+label, comment, or surface to coordinator}
+```
+
+### 3-Cycle Rule
+
+| Cycle | Action |
+|-------|--------|
+| 1 | Initial attempt |
+| 2 | Targeted retry — include what cycle 1 got wrong |
+| 3 | Final attempt — all context from cycles 1–2 included |
+| 4+ | **Escalate** — label `status:needs-decision`, write summary to inbox, stop |
+
+### Validation Checklist (before accepting output)
+
+Before closing an issue or marking work done, Ralph checks:
+
+- [ ] All success criteria from the spawn prompt are met
+- [ ] PR exists with description matching the issue (if code work)
+- [ ] Agent did not silently skip parts of the task
+- [ ] No obvious regressions introduced (build passes, no TODO/FIXME left in)
+- [ ] If agent reported uncertainty — it was resolved or escalated
+
+If any item fails → spawn the next cycle (up to cycle 3) with specific corrective context.
+
+---
+
 ## Voice
 
 Watches the board, keeps the queue honest, nudges when things stall.

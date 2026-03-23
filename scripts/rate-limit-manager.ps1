@@ -151,7 +151,9 @@ function script:New-RatePool {
 }
 
 function script:Save-RatePool($pool) {
-    $pool.updatedAt = (Get-Date).ToUniversalTime().ToString("o")
+    # Use Add-Member -Force so this works whether $pool is a hashtable or PSCustomObject
+    # (PSCustomObjects from ConvertFrom-Json may not have updatedAt if schema is old)
+    $pool | Add-Member -NotePropertyName updatedAt -NotePropertyValue ((Get-Date).ToUniversalTime().ToString("o")) -Force
     $pool | ConvertTo-Json -Depth 6 | Set-Content $script:RatePoolPath -Encoding utf8
 }
 

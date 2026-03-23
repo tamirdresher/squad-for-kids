@@ -121,7 +121,7 @@ jobs:
     runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 5
     permissions:
-      issues: read
+      issues: write
       contents: read
 
     env:
@@ -152,11 +152,11 @@ jobs:
             }
           }
 
-          # For 'opened' events, only act if the issue has a squad label
+          # For 'opened' events: auto-add 'squad' label if missing, then continue to add to board
           if ($action -eq 'opened') {
             if ($labels -notmatch 'squad') {
-              Write-Host "ℹ️ Issue #$issueNumber has no squad label — skipping"
-              exit 0
+              Write-Host "🏷️ Issue #$issueNumber has no squad label — adding it"
+              gh issue edit $issueNumber --repo '${{ github.repository }}' --add-label 'squad' 2>&1
             }
           }
 

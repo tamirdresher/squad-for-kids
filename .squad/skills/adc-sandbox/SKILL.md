@@ -90,16 +90,58 @@ Invoke-WebRequest -Uri "https://management.agentdevcompute.io/mcp" -Headers $h -
 | `deploy_app` | `{contentPackageId, ...}` | Deploy app to sandbox |
 | `create_static_site` | `{contentPackageId}` | Deploy static site |
 
+## Workaround: Creating Sandboxes via deploy_app
+
+`create_sandbox` is blocked (can't see public disk images), but `deploy_app` creates a **new sandbox** from a Dockerfile:
+
+```powershell
+# 1. Create app context tar.gz
+tar -czvf context.tar.gz -C ./my-app .
+
+# 2. Upload content package
+$result = curl.exe -s -X POST "https://management.azuredevcompute.io/contentpackages/upload" `
+    -H "Content-Type: application/gzip" `
+    -H "x-ms-api-key: $key" `
+    --data-binary "@context.tar.gz"
+$pkgId = ($result | ConvertFrom-Json).id
+
+# 3. Deploy (creates sandbox + builds image)
+Invoke-AdcMcp "deploy_app" @{
+    contentPackageId = $pkgId
+    dockerfile = "FROM node:22-slim`nWORKDIR /app`nCOPY . .`nEXPOSE 3000`nCMD [`"node`",`"server.js`"]"
+    exposedPort = 3000
+    imageName = "my-agent"
+}
+# Returns: { sandboxId, diskImageId, appUrl }
+```
+
 ## Known Limitations
-1. **create_sandbox blocked** — MCP API key can't see public disk images. Create sandboxes via portal UI first.
-2. **Agent identity blocked** — AgentBlueprint not configured server-side.
-3. **REST API endpoints** (`/disk-images`, `/connectors`) return 401 with API key — use MCP tools instead.
+1. **create_sandbox** — Use `deploy_app` workaround (see above)
+2. **Agent identity** — `AgentBlueprint` not configured server-side. Need ADC team to enable.
+3. **Volume file ops** — Volume must be mounted to a sandbox before file operations work.
+4. **set_egress_policy** — Fails with generic error. Egress is readable but not settable via MCP.
+5. **REST API** (`/disk-images`, `/connectors`) — 401 with API key, use MCP tools instead.
+
+## Tested Tool Scorecard (25+ working / 50+ total)
+
+### ✅ Working
+list_sandboxes, get_sandbox, get_sandbox_debug, stop_sandbox, resume_sandbox, delete_sandbox,
+execute_command, sandbox_read_file, sandbox_write_file, sandbox_list_dir, sandbox_mkdir, sandbox_stat_file,
+upsert_secret, list_secrets, peek_secret, delete_secret, set_lifecycle_policy,
+list_connections, list_ports, add_port, remove_port, create_volume, list_volumes,
+get_egress_decisions, deploy_app, create_content_package, create_static_site (needs content pkg)
+
+### ❌ Blocked
+create_sandbox (disk image scope), create_agent_identity (AgentBlueprint), create_disk_image,
+get_disk_image, set_egress_policy, volume file ops (unmounted)
 
 ## Existing Sandboxes
 - `d342b3dc` — Running, bare image, 2000m/4Gi, westus2, auto-suspend disabled
-- `b985c374` — Stopped, copilot image, 1000m/2Gi, auto-suspend 300s
+- `b985c374` — Stopped, copilot image (gh/node/python), 1000m/2Gi
 
 ## GitHub Issues
-- tamirdresher_microsoft/adc-research#1 — MCP test results
+- tamirdresher_microsoft/adc-research#1 — MCP test results (15 tools)
 - tamirdresher_microsoft/adc-research#2 — Agent identity blocker
 - tamirdresher_microsoft/adc-research#3 — Connectors inventory
+- tamirdresher_microsoft/adc-research#4 — Squad-on-ADC architecture
+- tamirdresher_microsoft/adc-research#5 — create_sandbox workaround (deploy_app e2e)

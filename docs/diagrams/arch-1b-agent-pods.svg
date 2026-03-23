@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" width="1100" height="560">
+<title>Squad Agent Pods — Detailed View</title>
+<defs>
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#605E5C"/>
+  </marker>
+  <marker id="arrowblue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#0078D4"/>
+  </marker>
+  <marker id="arrowgreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#107C10"/>
+  </marker>
+  <marker id="arrowpurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#8B5CF6"/>
+  </marker>
+  <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+    <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+  </filter>
+  <style>
+    text { font-family: 'Segoe UI', -apple-system, sans-serif; }
+  </style>
+</defs>
+<rect width="1100" height="560" fill="#FFFFFF"/>
+<text x="550.0" y="36" font-size="22" font-weight="700" fill="#002050" text-anchor="middle">Agent Pods — Inside the AKS Cluster</text>
+<text x="550.0" y="56" font-size="13" fill="#605E5C" text-anchor="middle">squad namespace · Kubernetes 1.33 · Workload Identity</text>
+<rect x="40" y="80" width="240" height="220" rx="10" fill="#FFF" stroke="#D83B01" stroke-width="2.5" filter="url(#shadow)"/>
+<rect x="40" y="80" width="240" height="32" rx="10" fill="#D83B01"/>
+<rect x="40" y="100" width="240" height="12" fill="#D83B01"/>
+<text x="160.0" y="102" font-size="14" font-weight="700" fill="#FFF" text-anchor="middle">🔄 Ralph · CronJob</text>
+<text x="58" y="135" font-size="11" fill="#1B1A19">Schedule: */15 * * * *</text>
+<text x="58" y="155" font-size="11" fill="#1B1A19">Duration: ~4 min per cycle</text>
+<text x="58" y="175" font-size="11" fill="#1B1A19">concurrencyPolicy: Forbid</text>
+<text x="58" y="195" font-size="11" fill="#1B1A19">Image: squad-ralph:v10</text>
+<text x="58" y="215" font-size="11" fill="#1B1A19">Polls issues → triages → spawns</text>
+<rect x="58" y="265" width="100" height="20" rx="10" fill="#FFF4EC"/>
+<text x="108.0" y="279" font-size="10" font-weight="600" fill="#D83B01" text-anchor="middle">Work Monitor</text>
+<rect x="175" y="265" width="44" height="20" rx="10" fill="#E6F5E6"/>
+<text x="197.0" y="279" font-size="10" font-weight="600" fill="#107C10" text-anchor="middle">24/7</text>
+<rect x="310" y="80" width="240" height="220" rx="10" fill="#FFF" stroke="#0078D4" stroke-width="2.5" filter="url(#shadow)"/>
+<rect x="310" y="80" width="240" height="32" rx="10" fill="#0078D4"/>
+<rect x="310" y="100" width="240" height="12" fill="#0078D4"/>
+<text x="430.0" y="102" font-size="14" font-weight="700" fill="#FFF" text-anchor="middle">🎖️ Picard · Deployment</text>
+<text x="328" y="135" font-size="11" fill="#1B1A19">Replicas: 0–5 (KEDA scaled)</text>
+<text x="328" y="155" font-size="11" fill="#1B1A19">Role: Lead / Orchestrator</text>
+<text x="328" y="175" font-size="11" fill="#1B1A19">Decomposes complex tasks</text>
+<text x="328" y="195" font-size="11" fill="#1B1A19">Delegates to specialists</text>
+<text x="328" y="215" font-size="11" fill="#1B1A19">Reviews agent output</text>
+<rect x="328" y="265" width="100" height="20" rx="10" fill="#E8F4FD"/>
+<text x="378.0" y="279" font-size="10" font-weight="600" fill="#0078D4" text-anchor="middle">Orchestrator</text>
+<rect x="440" y="265" width="44" height="20" rx="10" fill="#E8EEFB"/>
+<text x="462.0" y="279" font-size="10" font-weight="600" fill="#326CE5" text-anchor="middle">KEDA</text>
+<rect x="580" y="80" width="480" height="220" rx="10" fill="#F3EEFF" stroke="#8B5CF6" stroke-width="1.5"/>
+<text x="820" y="103" font-size="13" font-weight="700" fill="#8B5CF6" text-anchor="middle">Specialist Agents · ScaledJob / On-demand</text>
+<rect x="600" y="115" width="440" height="30" rx="6" fill="#FFF" stroke="#107C10" stroke-width="1.2"/>
+<text x="620" y="135" font-size="12" font-weight="600" fill="#107C10">💻 Data</text>
+<text x="720" y="135" font-size="11" fill="#605E5C">Code · C# · Go · .NET · Clean code</text>
+<rect x="600" y="150" width="440" height="30" rx="6" fill="#FFF" stroke="#8B5CF6" stroke-width="1.2"/>
+<text x="620" y="170" font-size="12" font-weight="600" fill="#8B5CF6">🔬 Seven</text>
+<text x="720" y="170" font-size="11" fill="#605E5C">Research · Docs · Analysis · Presentations</text>
+<rect x="600" y="185" width="440" height="30" rx="6" fill="#FFF" stroke="#B8860B" stroke-width="1.2"/>
+<text x="620" y="205" font-size="12" font-weight="600" fill="#B8860B">🔧 B&apos;Elanna</text>
+<text x="720" y="205" font-size="11" fill="#605E5C">Infrastructure · K8s · Helm · ArgoCD</text>
+<rect x="600" y="220" width="440" height="30" rx="6" fill="#FFF" stroke="#D13438" stroke-width="1.2"/>
+<text x="620" y="240" font-size="12" font-weight="600" fill="#D13438">🛡️ Worf</text>
+<text x="720" y="240" font-size="11" fill="#605E5C">Security · Azure · Networking · Compliance</text>
+<rect x="600" y="255" width="440" height="30" rx="6" fill="#FFF" stroke="#E91E63" stroke-width="1.2"/>
+<text x="620" y="275" font-size="12" font-weight="600" fill="#E91E63">✍️ Troi</text>
+<text x="720" y="275" font-size="11" fill="#605E5C">Blog writing · Voice matching · Storytelling</text>
+<line x1="280" y1="190" x2="310" y2="190" stroke="#D83B01" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="263.0" y="181.0" width="64" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="295.0" y="193.0" font-size="10" fill="#D83B01" text-anchor="middle" font-style="italic">triggers</text>
+<line x1="550" y1="190" x2="580" y2="190" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arrowpurple)"/>
+<rect x="529.5" y="181.0" width="71" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="565.0" y="193.0" font-size="10" fill="#8B5CF6" text-anchor="middle" font-style="italic">delegates</text>
+<rect x="40" y="330" width="1020" height="100" rx="12" fill="#FFF4EC" stroke="#D83B01" stroke-width="2"/>
+<text x="56" y="352" font-size="12" font-weight="700" fill="#D83B01" letter-spacing="0.5">SECOND SQUAD  ⎈  squad-bot namespace · EMU Bot Account</text>
+<rect x="70" y="360" width="220" height="52" rx="8" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="82" y="384.0" font-size="16" fill="#D83B01">💓</text>
+<text x="102" y="384.0" font-size="13" font-weight="600" fill="#1B1A19">Heartbeat CronJob</text>
+<text x="180.0" y="402.0" font-size="11" fill="#605E5C" text-anchor="middle">*/30 · Auth health check</text>
+<rect x="320" y="360" width="220" height="52" rx="8" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="332" y="384.0" font-size="16" fill="#D83B01">🔍</text>
+<text x="352" y="384.0" font-size="13" font-weight="600" fill="#1B1A19">Vuln Sync CronJob</text>
+<text x="430.0" y="402.0" font-size="11" fill="#605E5C" text-anchor="middle">*/6h · Security mirrors</text>
+<rect x="570" y="360" width="220" height="52" rx="8" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="582" y="384.0" font-size="16" fill="#D83B01">🪪</text>
+<text x="602" y="384.0" font-size="13" font-weight="600" fill="#1B1A19">Bot Workload Identity</text>
+<text x="680.0" y="402.0" font-size="11" fill="#605E5C" text-anchor="middle">Separate managed identity</text>
+<rect x="820" y="365" width="163" height="20" rx="10" fill="#FFF4EC"/>
+<text x="901.5" y="379" font-size="10" font-weight="600" fill="#D83B01" text-anchor="middle">Awaiting Copilot Seat</text>
+<rect x="40" y="455" width="1020" height="55" rx="12" fill="#F3F2F1" stroke="#605E5C" stroke-width="2"/>
+<text x="56" y="477" font-size="12" font-weight="700" fill="#605E5C" letter-spacing="0.5">SUPPORT AGENTS (run inside Squad coordinator context)</text>
+<text x="60" y="490" font-size="11" fill="#1B1A19">📋 Scribe — Session logging · Decisions · Cross-agent memory</text>
+<text x="500" y="490" font-size="11" fill="#1B1A19">🔄 Ralph — Backlog monitor · Keep-alive · Issue triage</text>
+<rect x="40" y="518" width="1020" height="32" rx="6" fill="#F3F2F1" stroke="#B3B0AD" stroke-width="0.5"/>
+<text x="70" y="538" font-size="10" fill="#1B1A19"><tspan font-weight="600">🟠 CronJob:</tspan> Scheduled pods</text>
+<text x="330" y="538" font-size="10" fill="#1B1A19"><tspan font-weight="600">🔵 Deployment:</tspan> KEDA-scaled</text>
+<text x="590" y="538" font-size="10" fill="#1B1A19"><tspan font-weight="600">🟣 ScaledJob:</tspan> On-demand per issue</text>
+<text x="850" y="538" font-size="10" fill="#1B1A19"><tspan font-weight="600">🟤 Bot NS:</tspan> Separate identity</text>
+</svg>

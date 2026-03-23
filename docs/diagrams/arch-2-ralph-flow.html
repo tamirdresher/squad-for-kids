@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; padding: 0; background: #fff; display: flex; justify-content: center; }
+svg { max-width: 100%; height: auto; }
+</style></head><body>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" width="1200" height="650">
+<title>Ralph — Issue Processing Flow</title>
+<defs>
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#605E5C"/>
+  </marker>
+  <marker id="arrowblue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#0078D4"/>
+  </marker>
+  <marker id="arrowgreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#107C10"/>
+  </marker>
+  <marker id="arrowpurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#8B5CF6"/>
+  </marker>
+  <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+    <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+  </filter>
+  <style>
+    text { font-family: 'Segoe UI', -apple-system, sans-serif; }
+  </style>
+</defs>
+<rect width="1200" height="650" fill="#FFFFFF"/>
+<text x="600.0" y="36" font-size="22" font-weight="700" fill="#002050" text-anchor="middle">Ralph — Issue Processing Flow</text>
+<text x="600.0" y="56" font-size="13" fill="#605E5C" text-anchor="middle">CronJob fires every 15 minutes · concurrencyPolicy: Forbid · ~4 min per cycle</text>
+<rect x="40" y="90" width="170" height="140" rx="10" fill="#E8EEFB" stroke="#326CE5" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="65" cy="115" r="14" fill="#326CE5"/>
+<text x="65" y="120" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">1</text>
+<text x="90" y="110" font-size="18">⏰</text>
+<text x="125" y="146" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">CronJob</text>
+<text x="125" y="162" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Triggers</text>
+<text x="125" y="190" font-size="10" fill="#605E5C" text-anchor="middle">K8s scheduler fires</text>
+<text x="125" y="205" font-size="10" fill="#605E5C" text-anchor="middle">*/15 * * * *</text>
+<line x1="210" y1="160" x2="230" y2="160" stroke="#326CE5" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="230" y="90" width="170" height="140" rx="10" fill="#E8F4FD" stroke="#0078D4" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="255" cy="115" r="14" fill="#0078D4"/>
+<text x="255" y="120" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">2</text>
+<text x="280" y="110" font-size="18">🐳</text>
+<text x="315" y="146" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Pod</text>
+<text x="315" y="162" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Starts</text>
+<text x="315" y="190" font-size="10" fill="#605E5C" text-anchor="middle">Image: squad-ralph:v10</text>
+<text x="315" y="205" font-size="10" fill="#605E5C" text-anchor="middle">Workload Identity auth</text>
+<line x1="400" y1="160" x2="420" y2="160" stroke="#0078D4" stroke-width="1.5" marker-end="url(#arrowblue)"/>
+<rect x="420" y="90" width="170" height="140" rx="10" fill="#FFF4EC" stroke="#D83B01" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="445" cy="115" r="14" fill="#D83B01"/>
+<text x="445" y="120" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">3</text>
+<text x="470" y="110" font-size="18">🚦</text>
+<text x="505" y="146" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Check</text>
+<text x="505" y="162" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Rate Limits</text>
+<text x="505" y="190" font-size="10" fill="#605E5C" text-anchor="middle">Core: 5000/hr</text>
+<text x="505" y="205" font-size="10" fill="#605E5C" text-anchor="middle">GraphQL: 5000/hr</text>
+<line x1="590" y1="160" x2="610" y2="160" stroke="#D83B01" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="610" y="90" width="170" height="140" rx="10" fill="#F6F8FA" stroke="#24292F" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="635" cy="115" r="14" fill="#24292F"/>
+<text x="635" y="120" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">4</text>
+<text x="660" y="110" font-size="18">📋</text>
+<text x="695" y="146" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Poll GitHub</text>
+<text x="695" y="162" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Issues</text>
+<text x="695" y="190" font-size="10" fill="#605E5C" text-anchor="middle">Filter: squad:* labels</text>
+<text x="695" y="205" font-size="10" fill="#605E5C" text-anchor="middle">Sort by priority</text>
+<line x1="780" y1="160" x2="800" y2="160" stroke="#24292F" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="800" y="90" width="170" height="140" rx="10" fill="#F3EEFF" stroke="#8B5CF6" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="825" cy="115" r="14" fill="#8B5CF6"/>
+<text x="825" y="120" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">5</text>
+<text x="850" y="110" font-size="18">🔀</text>
+<text x="885" y="146" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Triage &</text>
+<text x="885" y="162" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Route</text>
+<text x="885" y="190" font-size="10" fill="#605E5C" text-anchor="middle">Match work type</text>
+<text x="885" y="205" font-size="10" fill="#605E5C" text-anchor="middle">to agent charter</text>
+<line x1="970" y1="160" x2="990" y2="160" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arrowpurple)"/>
+<rect x="990" y="90" width="170" height="140" rx="10" fill="#E6F5E6" stroke="#107C10" stroke-width="2" filter="url(#shadow)"/>
+<circle cx="1015" cy="115" r="14" fill="#107C10"/>
+<text x="1015" y="120" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">6</text>
+<text x="1040" y="110" font-size="18">🚀</text>
+<text x="1075" y="146" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Spawn</text>
+<text x="1075" y="162" font-size="13" font-weight="700" fill="#1B1A19" text-anchor="middle">Agents</text>
+<text x="1075" y="190" font-size="10" fill="#605E5C" text-anchor="middle">Copilot coding agent</text>
+<text x="1075" y="205" font-size="10" fill="#605E5C" text-anchor="middle">per actionable issue</text>
+<polygon points="600,280 680,330 600,380 520,330" fill="#FFF4EC" stroke="#D83B01" stroke-width="2"/>
+<text x="600" y="326" font-size="11" font-weight="600" fill="#1B1A19" text-anchor="middle">Rate Limit</text>
+<text x="600" y="340" font-size="11" font-weight="600" fill="#1B1A19" text-anchor="middle">OK?</text>
+<line x1="680" y1="330" x2="800" y2="330" stroke="#107C10" stroke-width="1.5" marker-end="url(#arrowgreen)"/>
+<rect x="680.0" y="321.0" width="120" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="740.0" y="333.0" font-size="10" fill="#107C10" text-anchor="middle" font-style="italic">✅ Green: proceed</text>
+<rect x="800" y="300" width="180" height="60" rx="8" fill="#E6F5E6" stroke="#107C10" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="812" y="328.0" font-size="16" fill="#107C10">▶️</text>
+<text x="832" y="328.0" font-size="13" font-weight="600" fill="#1B1A19">Process Issues</text>
+<text x="890.0" y="346.0" font-size="11" fill="#605E5C" text-anchor="middle">Full speed</text>
+<line x1="600" y1="380" x2="600" y2="420" stroke="#D13438" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="547.0" y="391.0" width="106" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="600.0" y="403.0" font-size="10" fill="#D13438" text-anchor="middle" font-style="italic">🔴 Red: backoff</text>
+<rect x="520" y="420" width="160" height="50" rx="8" fill="#FFF4EC" stroke="#D13438" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="600.0" y="443.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">Exponential Backoff</text>
+<text x="600.0" y="461.0" font-size="11" fill="#605E5C" text-anchor="middle">Skip this cycle</text>
+<line x1="520" y1="330" x2="350" y2="330" stroke="#D83B01" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="371.5" y="321.0" width="127" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="435.0" y="333.0" font-size="10" fill="#D83B01" text-anchor="middle" font-style="italic">🟡 Amber: throttle</text>
+<rect x="180" y="300" width="170" height="60" rx="8" fill="#FFF4EC" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="265.0" y="328.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">Throttled Mode</text>
+<text x="265.0" y="346.0" font-size="11" fill="#605E5C" text-anchor="middle">1 req/sec, critical only</text>
+<rect x="40" y="470" width="1120" height="150" rx="10" fill="#F3F2F1" stroke="#B3B0AD" stroke-width="1"/>
+<text x="60" y="492" font-size="12" font-weight="700" fill="#1B1A19" letter-spacing="0.5">RALPH OUTPUTS PER CYCLE</text>
+<rect x="60" y="505" width="200" height="95" rx="6" fill="#FFF" stroke="#8B5CF6" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="160.0" y="550.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">🏷️ Issues Triaged</text>
+<text x="160.0" y="568.5" font-size="11" fill="#605E5C" text-anchor="middle">Labels applied</text>
+<text x="160" y="580" font-size="10" fill="#605E5C" text-anchor="middle">Priority set</text>
+<rect x="280" y="505" width="200" height="95" rx="6" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="380.0" y="550.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">🤖 Agents Spawned</text>
+<text x="380.0" y="568.5" font-size="11" fill="#605E5C" text-anchor="middle">Copilot coding agent</text>
+<text x="380" y="580" font-size="10" fill="#605E5C" text-anchor="middle">per actionable issue</text>
+<rect x="500" y="505" width="200" height="95" rx="6" fill="#FFF" stroke="#107C10" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="600.0" y="550.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📝 PRs Created</text>
+<text x="600.0" y="568.5" font-size="11" fill="#605E5C" text-anchor="middle">By spawned agents</text>
+<text x="600" y="580" font-size="10" fill="#605E5C" text-anchor="middle">Linked to issues</text>
+<rect x="720" y="505" width="200" height="95" rx="6" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="820.0" y="550.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">💾 State Updated</text>
+<text x="820.0" y="568.5" font-size="11" fill="#605E5C" text-anchor="middle">ralph-heartbeat.json</text>
+<text x="820" y="580" font-size="10" fill="#605E5C" text-anchor="middle">Persistent Volume</text>
+<rect x="940" y="505" width="200" height="95" rx="6" fill="#FFF" stroke="#326CE5" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="1040.0" y="550.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📊 Metrics Emitted</text>
+<text x="1040.0" y="568.5" font-size="11" fill="#605E5C" text-anchor="middle">Duration, items processed</text>
+<text x="1040" y="580" font-size="10" fill="#605E5C" text-anchor="middle">Error count, rate limit %</text>
+</svg>
+
+</body></html>

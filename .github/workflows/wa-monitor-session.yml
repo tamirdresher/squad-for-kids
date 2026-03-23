@@ -33,7 +33,7 @@ on:
 jobs:
   wa-monitor:
     name: Import session & run monitor
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 60
 
     steps:
@@ -49,9 +49,10 @@ jobs:
           dotnet build wa-monitor-dotnet/WhatsAppMonitor.sln --no-restore -c Release
 
       - name: Install Playwright system deps
-        run: npx playwright install-deps chromium
+        run: npx playwright install chromium
 
       - name: Import WA session
+        shell: bash
         env:
           WA_MONITOR_SESSION: ${{ secrets.WA_MONITOR_SESSION }}
           WA_SESSION_KEY:     ${{ secrets.WA_SESSION_KEY }}
@@ -60,6 +61,7 @@ jobs:
             -c Release -- --import-session
 
       - name: Run WA Monitor (headless)
+        shell: bash
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
           WATCH_CONTACTS:    ${{ inputs.contacts || secrets.WATCH_CONTACTS || '' }}

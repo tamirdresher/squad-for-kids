@@ -708,4 +708,4 @@ Start Phase 1 to unblock #995. Begin Phase 2 in parallel — it's the target sta
 
 ---
 
-*Document generated as part of issue #998. Feedback welcome on the design.*
+*Design document for [#1248](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1248) (docs sub-task of [#998](https://github.com/tamirdresher_microsoft/tamresearch1/issues/998)). Feedback welcome on the design.*

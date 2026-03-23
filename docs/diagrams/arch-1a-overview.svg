@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" width="1100" height="620">
+<title>Squad AI Framework — Architecture Overview</title>
+<defs>
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#605E5C"/>
+  </marker>
+  <marker id="arrowblue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#0078D4"/>
+  </marker>
+  <marker id="arrowgreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#107C10"/>
+  </marker>
+  <marker id="arrowpurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#8B5CF6"/>
+  </marker>
+  <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+    <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+  </filter>
+  <style>
+    text { font-family: 'Segoe UI', -apple-system, sans-serif; }
+  </style>
+</defs>
+<rect width="1100" height="620" fill="#FFFFFF"/>
+<text x="550.0" y="36" font-size="22" font-weight="700" fill="#002050" text-anchor="middle">Squad AI Agent Framework on AKS</text>
+<text x="550.0" y="56" font-size="13" fill="#605E5C" text-anchor="middle">Architecture Overview</text>
+<rect x="40" y="80" width="1020" height="100" rx="12" fill="#F6F8FA" stroke="#24292F" stroke-width="2"/>
+<text x="56" y="102" font-size="12" font-weight="700" fill="#24292F" letter-spacing="0.5">EXTERNAL SYSTEMS</text>
+<rect x="70" y="108" width="210" height="55" rx="8" fill="#FFF" stroke="#24292F" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="82" y="133.5" font-size="16" fill="#24292F">📋</text>
+<text x="102" y="133.5" font-size="13" font-weight="600" fill="#1B1A19">GitHub</text>
+<text x="175.0" y="151.5" font-size="11" fill="#605E5C" text-anchor="middle">Issues · PRs · Webhooks</text>
+<rect x="320" y="108" width="210" height="55" rx="8" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="332" y="133.5" font-size="16" fill="#D83B01">🤖</text>
+<text x="352" y="133.5" font-size="13" font-weight="600" fill="#1B1A19">Copilot API</text>
+<text x="425.0" y="151.5" font-size="11" fill="#605E5C" text-anchor="middle">Coding agent requests</text>
+<rect x="570" y="108" width="210" height="55" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="582" y="133.5" font-size="16" fill="#0078D4">💬</text>
+<text x="602" y="133.5" font-size="13" font-weight="600" fill="#1B1A19">Microsoft Teams</text>
+<text x="675.0" y="151.5" font-size="11" fill="#605E5C" text-anchor="middle">Notifications · Updates</text>
+<rect x="820" y="108" width="210" height="55" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="832" y="133.5" font-size="16" fill="#0078D4">🔧</text>
+<text x="852" y="133.5" font-size="13" font-weight="600" fill="#1B1A19">Azure DevOps</text>
+<text x="925.0" y="151.5" font-size="11" fill="#605E5C" text-anchor="middle">Pipelines · Boards</text>
+<rect x="40" y="210" width="1020" height="220" rx="12" fill="#E8EEFB" stroke="#326CE5" stroke-width="2"/>
+<text x="56" y="232" font-size="12" font-weight="700" fill="#326CE5" letter-spacing="0.5">AKS CLUSTER  ⎈  Kubernetes 1.33</text>
+<rect x="70" y="245" width="300" height="170" rx="8" fill="#FFF" stroke="#326CE5" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="220" y="268" font-size="12" font-weight="700" fill="#326CE5" text-anchor="middle">Scheduling &amp; Scaling</text>
+<rect x="85" y="280" width="130" height="45" rx="8" fill="#E8EEFB" stroke="#326CE5" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="150.0" y="300.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">KEDA</text>
+<text x="150.0" y="318.5" font-size="11" fill="#605E5C" text-anchor="middle">Custom scaler</text>
+<rect x="225" y="280" width="130" height="45" rx="8" fill="#E8EEFB" stroke="#326CE5" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="290.0" y="300.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">CronJobs</text>
+<text x="290.0" y="318.5" font-size="11" fill="#605E5C" text-anchor="middle">*/15 min cycles</text>
+<rect x="85" y="340" width="270" height="40" rx="8" fill="#E6F5E6" stroke="#107C10" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="220.0" y="358.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">Rate Governor</text>
+<text x="220.0" y="376.0" font-size="11" fill="#605E5C" text-anchor="middle">Traffic light · Token pool · Circuit breaker</text>
+<rect x="400" y="245" width="620" height="170" rx="8" fill="#FFF" stroke="#8B5CF6" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="710" y="268" font-size="12" font-weight="700" fill="#8B5CF6" text-anchor="middle">Agent Pods (squad namespace)</text>
+<rect x="420" y="280" width="125" height="60" rx="6" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="482" y="300" font-size="12" font-weight="600" fill="#1B1A19" text-anchor="middle">🔄 Ralph</text>
+<text x="482" y="316" font-size="10" fill="#605E5C" text-anchor="middle">Work Monitor</text>
+<rect x="560" y="280" width="125" height="60" rx="6" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="622" y="300" font-size="12" font-weight="600" fill="#1B1A19" text-anchor="middle">🎖️ Picard</text>
+<text x="622" y="316" font-size="10" fill="#605E5C" text-anchor="middle">Lead / Orchestrator</text>
+<rect x="700" y="280" width="125" height="60" rx="6" fill="#FFF" stroke="#107C10" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="762" y="300" font-size="12" font-weight="600" fill="#1B1A19" text-anchor="middle">💻 Specialists</text>
+<text x="762" y="316" font-size="10" fill="#605E5C" text-anchor="middle">Data · Seven · Worf</text>
+<rect x="840" y="280" width="125" height="60" rx="6" fill="#FFF" stroke="#B8860B" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="902" y="300" font-size="12" font-weight="600" fill="#1B1A19" text-anchor="middle">🔧 B&apos;Elanna</text>
+<text x="902" y="316" font-size="10" fill="#605E5C" text-anchor="middle">Infrastructure</text>
+<rect x="420" y="355" width="580" height="28" rx="5" fill="#E8F4FD" stroke="#0078D4" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="710" y="374" font-size="10" font-weight="600" fill="#0078D4" text-anchor="middle">🔐 Workload Identity — Zero credentials in pods</text>
+<line x1="370" y1="300" x2="400" y2="300" stroke="#326CE5" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="40" y="460" width="1020" height="95" rx="12" fill="#E8F4FD" stroke="#0078D4" stroke-width="2"/>
+<text x="56" y="482" font-size="12" font-weight="700" fill="#0078D4" letter-spacing="0.5">AZURE INFRASTRUCTURE</text>
+<rect x="70" y="488" width="165" height="48" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="152.5" y="517.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">🪪 Managed Identity</text>
+<rect x="255" y="488" width="165" height="48" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="337.5" y="517.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">🔑 Key Vault</text>
+<rect x="440" y="488" width="165" height="48" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="522.5" y="517.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📦 Container Registry</text>
+<rect x="625" y="488" width="165" height="48" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="707.5" y="517.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">💾 Persistent Volume</text>
+<rect x="810" y="488" width="165" height="48" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="892.5" y="517.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📈 Log Analytics</text>
+<line x1="175" y1="163" x2="175" y2="210" stroke="#24292F" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<line x1="425" y1="163" x2="500" y2="245" stroke="#24292F" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<line x1="675" y1="163" x2="710" y2="245" stroke="#0078D4" stroke-width="1.5" marker-end="url(#arrowblue)"/>
+<line x1="300" y1="415" x2="300" y2="460" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowblue)"/>
+<line x1="710" y1="415" x2="710" y2="460" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowblue)"/>
+<rect x="40" y="570" width="1020" height="38" rx="6" fill="#F3F2F1" stroke="#B3B0AD" stroke-width="0.5"/>
+<text x="70" y="593" font-size="10" fill="#1B1A19"><tspan font-weight="600">Solid line:</tspan> Data / control flow</text>
+<text x="270" y="593" font-size="10" fill="#1B1A19"><tspan font-weight="600">Dashed line:</tspan> Auth / secrets</text>
+<text x="470" y="593" font-size="10" fill="#1B1A19"><tspan font-weight="600">🟠:</tspan> Scheduled (CronJob)</text>
+<text x="670" y="593" font-size="10" fill="#1B1A19"><tspan font-weight="600">🔵:</tspan> Scaled (KEDA)</text>
+<text x="870" y="593" font-size="10" fill="#1B1A19"><tspan font-weight="600">🟣:</tspan> On-demand agents</text>
+</svg>

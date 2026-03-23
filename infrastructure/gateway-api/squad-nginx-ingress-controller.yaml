@@ -1,0 +1,51 @@
+# =============================================================================
+# squad-nginx-ingress-controller.yaml
+# Phase 1: AKS Application Routing Add-on NginxIngressController CR
+#
+# This replaces the community ingress-nginx controller (EOL March 16, 2026)
+# with the AKS-managed Application Routing Add-on equivalent.
+#
+# Prerequisites:
+#   az aks approuting enable --resource-group <rg> --name <cluster>
+#
+# Apply with:
+#   kubectl apply -f infrastructure/gateway-api/squad-nginx-ingress-controller.yaml
+# =============================================================================
+apiVersion: approuting.kubernetes.azure.com/v1alpha1
+kind: NginxIngressController
+metadata:
+  name: squad-ingress
+  namespace: app-routing-system
+  labels:
+    app.kubernetes.io/managed-by: squad-helm
+    app.kubernetes.io/component: ingress
+spec:
+  # IngressClass name used in Ingress resources:
+  #   ingressClassName: squad-nginx
+  ingressClassName: squad-nginx
+
+  # Load balancer type: External (public IP) or Internal (private IP for internal traffic)
+  # Use Internal for squad agents communicating within the cluster
+  loadBalancerAnnotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+
+  # TLS configuration — certificates from Azure Key Vault
+  # Uncomment and configure Key Vault secret URI when ready:
+  # defaultSSLCertificate:
+  #   keyVaultURI: https://<keyvault-name>.vault.azure.net/secrets/<cert-name>
+
+  # HTTPS-only enforcement (redirect HTTP → HTTPS)
+  forceSSLRedirect: true
+
+  # Scaling configuration (standard HPA — KEDA not supported on App Routing Add-on)
+  scaling:
+    minReplicas: 2
+    maxReplicas: 10
+
+  # Log format (parity with previous OSS NGINX logging)
+  logFormat: |
+    [$time_local] [remote_addr=$remote_addr] [request=$request] [status=$status]
+    [host=$host] [bytes_sent=$bytes_sent] [req_id=$request_id]
+    [http_user_agent=$http_user_agent] [request_time=$request_time]
+    [upstream_addr=$upstream_addr] [upstream_response_time=$upstream_response_time]
+    [upstream_status=$upstream_status]

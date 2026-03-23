@@ -1,0 +1,23 @@
+# Security-sensitive paths — require review from security-aware reviewers
+# See: docs/research-376-adversarial-security-review.md
+
+# Squad state and routing (agent permissions, decision authority)
+.squad/routing.md                       @tamirdresher
+.squad/team.md                          @tamirdresher
+.squad/decisions.md                     @tamirdresher
+
+# GitHub workflows and CI/CD (supply chain security)
+.github/workflows/                      @tamirdresher
+.github/dependabot.yml                  @tamirdresher
+.github/CODEOWNERS                      @tamirdresher
+
+# Infrastructure and deployment (K8s, Helm, cloud configs)
+infrastructure/                         @tamirdresher
+charts/                                 @tamirdresher
+docs/compliance/                        @tamirdresher
+
+# Secrets and auth configuration
+**/auth*                                @tamirdresher
+**/secret*                              @tamirdresher
+**/credential*                          @tamirdresher
+*.env                                   @tamirdresher

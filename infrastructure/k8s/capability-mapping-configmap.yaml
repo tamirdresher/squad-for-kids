@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: capability-mapping
+  namespace: squad-system
+  labels:
+    app.kubernetes.io/name: squad-capability-routing
+    app.kubernetes.io/component: operator-config
+data:
+  mapping.yaml: |
+    # Capability Mapping: GitHub Issue Labels → K8s Node Selectors
+    # Source: docs/k8s-capability-routing.md
+    # This ConfigMap drives the Squad operator's pod spec injection logic.
+    # Update this map to add new capabilities or modify scheduling behavior.
+
+    capabilities:
+      needs:gpu:
+        nodeSelector:
+          nvidia.com/gpu: "true"
+        tolerations:
+          - key: nvidia.com/gpu
+            operator: Exists
+            effect: NoSchedule
+        resourceLimits:
+          nvidia.com/gpu: "1"
+
+      needs:browser:
+        nodeSelector:
+          squad.io/capability-browser: "true"
+        resourceRequests:
+          cpu: "1000m"
+          memory: "2Gi"
+
+      needs:high-memory:
+        nodeSelector:
+          squad.io/memory-tier: "high"
+        resourceRequests:
+          memory: "8Gi"
+        resourceLimits:
+          memory: "16Gi"
+
+      needs:whatsapp:
+        nodeSelector:
+          squad.io/capability-whatsapp: "true"
+
+      needs:azure-speech:
+        nodeSelector:
+          squad.io/capability-azure-speech: "true"
+
+      needs:personal-gh:
+        nodeSelector:
+          squad.io/capability-personal-gh: "true"
+
+      needs:emu-gh:
+        nodeSelector:
+          squad.io/capability-emu-gh: "true"
+
+      needs:teams-mcp:
+        nodeSelector:
+          squad.io/capability-teams-mcp: "true"
+
+      needs:onedrive:
+        nodeSelector:
+          squad.io/capability-onedrive: "true"
+
+    # Node pool labels for static capabilities
+    # These are applied at AKS node pool creation time
+    node_pools:
+      gpu-pool:
+        labels:
+          squad.io/capability-gpu: "true"
+        taints:
+          - key: nvidia.com/gpu
+            value: "true"
+            effect: NoSchedule
+        vm_size: Standard_NC4as_T4_v3
+
+      browser-pool:
+        labels:
+          squad.io/capability-browser: "true"
+        vm_size: Standard_D8s_v5
+
+      highmem-pool:
+        labels:
+          squad.io/memory-tier: "high"
+        vm_size: Standard_E16s_v5
+
+      general-pool:
+        labels:
+          squad.io/capability-general: "true"
+        vm_size: Standard_D4s_v5

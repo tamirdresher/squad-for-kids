@@ -1,0 +1,115 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: capability-discoverer
+  namespace: squad-system
+  labels:
+    app.kubernetes.io/name: squad-capability-discovery
+    app.kubernetes.io/component: infrastructure
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: squad-node-labeler
+  labels:
+    app.kubernetes.io/name: squad-capability-discovery
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "patch"]
+  - apiGroups: [""]
+    resources: ["nodes/status"]
+    verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: squad-node-labeler-binding
+  labels:
+    app.kubernetes.io/name: squad-capability-discovery
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: squad-node-labeler
+subjects:
+  - kind: ServiceAccount
+    name: capability-discoverer
+    namespace: squad-system
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: squad-capability-discovery
+  namespace: squad-system
+  labels:
+    app.kubernetes.io/name: squad-capability-discovery
+    app.kubernetes.io/component: infrastructure
+    app.kubernetes.io/part-of: squad
+spec:
+  selector:
+    matchLabels:
+      app: squad-capability-discovery
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: squad-capability-discovery
+      annotations:
+        description: "Discovers and labels K8s nodes with Squad capabilities"
+    spec:
+      serviceAccountName: capability-discoverer
+      priorityClassName: system-node-critical
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+        - operator: Exists
+          effect: NoExecute
+      hostNetwork: false
+      containers:
+        - name: discoverer
+          image: acrsquadprod.azurecr.io/squad/capability-discoverer:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: PROBE_INTERVAL_SECONDS
+              value: "300"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          securityContext:
+            privileged: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 30

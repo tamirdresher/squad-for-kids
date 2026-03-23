@@ -1,0 +1,55 @@
+{{- if .Values.keda.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squad.fullname" . }}-picard
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: picard
+spec:
+  replicas: 0  # KEDA controls replicas
+  selector:
+    matchLabels:
+      {{- include "squad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: picard
+  template:
+    metadata:
+      labels:
+        {{- include "squad.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: picard
+        squad.io/agent-name: picard
+    spec:
+      serviceAccountName: {{ include "squad.fullname" . }}
+      containers:
+        - name: picard
+          image: {{ .Values.agent.image }}
+          imagePullPolicy: Always
+          env:
+            - name: SQUAD_REPO
+              value: {{ .Values.squad.repository }}
+            - name: AGENT_NAME
+              value: "picard"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.github.tokenSecretName }}
+                  key: token
+            {{- if .Values.ratePool.enabled }}
+            - name: RATE_POOL_REDIS
+              value: "redis://{{ include "squad.fullname" . }}-rate-pool:6379"
+            {{- end }}
+            - name: COPILOT_PRIMARY_MODEL
+              value: {{ .Values.copilot.primaryModel }}
+            - name: COPILOT_FALLBACK_CHAIN
+              value: {{ join "," .Values.copilot.fallbackChain }}
+          volumeMounts:
+            - name: squad-state
+              mountPath: /squad-state
+          resources:
+            {{- toYaml .Values.agent.defaultResources | nindent 12 }}
+      volumes:
+        - name: squad-state
+          persistentVolumeClaim:
+            claimName: {{ include "squad.fullname" . }}-state
+{{- end }}

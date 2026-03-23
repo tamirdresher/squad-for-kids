@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+body { margin: 0; padding: 0; background: #fff; display: flex; justify-content: center; }
+svg { max-width: 100%; height: auto; }
+</style></head><body>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850" width="1200" height="850">
+<title>Multi-Squad AKS Architecture — Namespace Isolation</title>
+<defs>
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#605E5C"/>
+  </marker>
+  <marker id="arrowblue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#0078D4"/>
+  </marker>
+  <marker id="arrowgreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#107C10"/>
+  </marker>
+  <marker id="arrowpurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#8B5CF6"/>
+  </marker>
+  <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+    <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+  </filter>
+  <style>
+    text { font-family: 'Segoe UI', -apple-system, sans-serif; }
+  </style>
+</defs>
+<rect width="1200" height="850" fill="#FFFFFF"/>
+<text x="600.0" y="36" font-size="22" font-weight="700" fill="#002050" text-anchor="middle">Multi-Squad AKS Architecture</text>
+<text x="600.0" y="56" font-size="13" fill="#605E5C" text-anchor="middle">Namespace Isolation · Workload Identity per Squad · Shared Infrastructure</text>
+<rect x="30" y="70" width="1140" height="510" rx="16" fill="#FAFBFF" stroke="#0078D4" stroke-width="2.5"/>
+<text x="50" y="95" font-size="14" font-weight="700" fill="#0078D4">☁️ AKS Cluster · Kubernetes 1.33 · Autoscaling Node Pools</text>
+<rect x="50" y="110" width="540" height="220" rx="12" fill="#FFF" stroke="#326CE5" stroke-width="2"/>
+<text x="66" y="132" font-size="12" font-weight="700" fill="#326CE5" letter-spacing="0.5">⎈  NAMESPACE: squad</text>
+<rect x="70" y="142" width="155" height="80" rx="6" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="70" y="142" width="155" height="22" rx="6" fill="#D83B01"/><rect x="70" y="155" width="155" height="9" fill="#D83B01"/>
+<text x="147" y="159" font-size="10" font-weight="700" fill="#FFF" text-anchor="middle">🔄 Ralph CronJob</text>
+<text x="82" y="182" font-size="9" fill="#1B1A19">Schedule: */15 * * * *</text>
+<text x="82" y="194" font-size="9" fill="#1B1A19">Image: v10 · ~4min/run</text>
+<text x="82" y="206" font-size="9" fill="#1B1A19">concurrencyPolicy: Forbid</text>
+<rect x="240" y="142" width="155" height="80" rx="6" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="240" y="142" width="155" height="22" rx="6" fill="#0078D4"/><rect x="240" y="155" width="155" height="9" fill="#0078D4"/>
+<text x="317" y="159" font-size="10" font-weight="700" fill="#FFF" text-anchor="middle">🎖️ Picard Deployment</text>
+<text x="252" y="182" font-size="9" fill="#1B1A19">Replicas: 0–5 (KEDA)</text>
+<text x="252" y="194" font-size="9" fill="#1B1A19">Lead / Orchestrator</text>
+<text x="252" y="206" font-size="9" fill="#1B1A19">Spawns specialist agents</text>
+<rect x="410" y="142" width="160" height="80" rx="6" fill="#FFF" stroke="#107C10" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="410" y="142" width="160" height="22" rx="6" fill="#107C10"/><rect x="410" y="155" width="160" height="9" fill="#107C10"/>
+<text x="490" y="159" font-size="10" font-weight="700" fill="#FFF" text-anchor="middle">🤖 Agent Pods</text>
+<text x="422" y="182" font-size="9" fill="#1B1A19">Data · Seven · B'Elanna</text>
+<text x="422" y="194" font-size="9" fill="#1B1A19">Worf · Neelix · Troi</text>
+<text x="422" y="206" font-size="9" fill="#1B1A19">ScaledJob / On-demand</text>
+<rect x="70" y="235" width="240" height="32" rx="5" fill="#E8F4FD" stroke="#0078D4" stroke-width="1"/>
+<text x="190" y="256" font-size="9" font-weight="600" fill="#0078D4" text-anchor="middle">🪪 SA: squad-workload-identity → Identity A</text>
+<rect x="330" y="235" width="240" height="32" rx="5" fill="#F3F2F1" stroke="#605E5C" stroke-width="1"/>
+<text x="450" y="256" font-size="9" font-weight="600" fill="#605E5C" text-anchor="middle">💾 PVC: squad-state · 1Gi managed-premium</text>
+<text x="300" y="310" font-size="9" font-weight="600" fill="#326CE5" text-anchor="middle">Watches: Repository A (personal GitHub)</text>
+<rect x="610" y="110" width="230" height="220" rx="12" fill="#FFF" stroke="#0E7A6E" stroke-width="2"/>
+<text x="626" y="132" font-size="12" font-weight="700" fill="#0E7A6E" letter-spacing="0.5">⎈  NAMESPACE: squad-scaler</text>
+<rect x="630" y="145" width="190" height="65" rx="8" fill="#FFF" stroke="#0E7A6E" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="642" y="175.5" font-size="16" fill="#0E7A6E">📊</text>
+<text x="662" y="175.5" font-size="13" font-weight="600" fill="#1B1A19">KEDA Copilot Scaler</text>
+<text x="725.0" y="193.5" font-size="11" fill="#605E5C" text-anchor="middle">gRPC :6000 · Go</text>
+<rect x="635" y="215" width="58" height="20" rx="10" fill="#E6F5E6"/>
+<text x="664.0" y="229" font-size="10" font-weight="600" fill="#107C10" text-anchor="middle">v0.1.0</text>
+<rect x="710" y="215" width="72" height="20" rx="10" fill="#E6F5E6"/>
+<text x="746.0" y="229" font-size="10" font-weight="600" fill="#107C10" text-anchor="middle">51 tests</text>
+<text x="725" y="260" font-size="9" fill="#605E5C" text-anchor="middle">Polls GitHub API /30s</text>
+<text x="725" y="275" font-size="9" fill="#605E5C" text-anchor="middle">Composite: issues × rate limit</text>
+<rect x="860" y="110" width="280" height="100" rx="12" fill="#FFF" stroke="#605E5C" stroke-width="2"/>
+<text x="876" y="132" font-size="12" font-weight="700" fill="#605E5C" letter-spacing="0.5">⎈  NAMESPACE: keda-system</text>
+<rect x="880" y="145" width="120" height="50" rx="8" fill="#FFF" stroke="#605E5C" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="940.0" y="168.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">Controller</text>
+<text x="940.0" y="186.0" font-size="11" fill="#605E5C" text-anchor="middle">v2.19.0</text>
+<rect x="1010" y="145" width="120" height="50" rx="8" fill="#FFF" stroke="#605E5C" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="1070.0" y="168.0" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">Metrics API</text>
+<text x="1070.0" y="186.0" font-size="11" fill="#605E5C" text-anchor="middle">Aggregator</text>
+<rect x="610" y="350" width="530" height="220" rx="12" fill="#FFF" stroke="#D83B01" stroke-width="2"/>
+<text x="626" y="372" font-size="12" font-weight="700" fill="#D83B01" letter-spacing="0.5">⎈  NAMESPACE: squad-bot  ·  EMU Bot Account</text>
+<rect x="630" y="385" width="150" height="75" rx="6" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="630" y="385" width="150" height="22" rx="6" fill="#D83B01"/><rect x="630" y="398" width="150" height="9" fill="#D83B01"/>
+<text x="705" y="403" font-size="10" font-weight="700" fill="#FFF" text-anchor="middle">💓 Heartbeat</text>
+<text x="642" y="425" font-size="9" fill="#1B1A19">CronJob: */30 * * * *</text>
+<text x="642" y="437" font-size="9" fill="#1B1A19">Auth health check</text>
+<text x="642" y="449" font-size="9" fill="#1B1A19">gh CLI v2.88.1</text>
+<rect x="800" y="385" width="150" height="75" rx="6" fill="#FFF" stroke="#D83B01" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="800" y="385" width="150" height="22" rx="6" fill="#D83B01"/><rect x="800" y="398" width="150" height="9" fill="#D83B01"/>
+<text x="875" y="403" font-size="10" font-weight="700" fill="#FFF" text-anchor="middle">🔍 Vuln Sync</text>
+<text x="812" y="425" font-size="9" fill="#1B1A19">CronJob: */6h</text>
+<text x="812" y="437" font-size="9" fill="#1B1A19">Mirrors security issues</text>
+<text x="812" y="449" font-size="9" fill="#1B1A19">to fork for PRs</text>
+<rect x="970" y="385" width="150" height="75" rx="6" fill="#FFF4EC" stroke="#D83B01" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="1045" y="415" font-size="10" font-weight="600" fill="#D83B01" text-anchor="middle">⏳ Copilot Agent</text>
+<text x="1045" y="435" font-size="9" fill="#605E5C" text-anchor="middle">Awaiting seat</text>
+<text x="1045" y="448" font-size="9" fill="#605E5C" text-anchor="middle">activation</text>
+<rect x="630" y="475" width="240" height="28" rx="5" fill="#E8F4FD" stroke="#0078D4" stroke-width="1"/>
+<text x="750" y="494" font-size="9" font-weight="600" fill="#0078D4" text-anchor="middle">🪪 SA: bot-workload-identity → Identity B</text>
+<text x="750" y="540" font-size="9" font-weight="600" fill="#D83B01" text-anchor="middle">Watches: Repository B (org EMU account)</text>
+<line x1="840" y1="177" x2="860" y2="170" stroke="#605E5C" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<line x1="880" y1="195" x2="725" y2="285" stroke="#0E7A6E" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="774.0" y="231.0" width="57" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="802.5" y="243.0" font-size="10" fill="#0E7A6E" text-anchor="middle" font-style="italic">metrics</text>
+<line x1="395" y1="177" x2="610" y2="177" stroke="#326CE5" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+<rect x="30" y="600" width="1140" height="220" rx="12" fill="#F3F2F1" stroke="#B3B0AD" stroke-width="1"/>
+<text x="50" y="625" font-size="14" font-weight="700" fill="#002050">External Services &amp; Identity Federation</text>
+<rect x="50" y="645" width="155" height="75" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="127.5" y="680.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">☁️ Managed Identity A</text>
+<text x="127.5" y="698.5" font-size="11" fill="#605E5C" text-anchor="middle">Squad personal account</text>
+<rect x="225" y="645" width="155" height="75" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="302.5" y="680.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">☁️ Managed Identity B</text>
+<text x="302.5" y="698.5" font-size="11" fill="#605E5C" text-anchor="middle">Bot EMU account</text>
+<rect x="400" y="645" width="155" height="75" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="477.5" y="680.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">🔑 Azure Key Vault</text>
+<text x="477.5" y="698.5" font-size="11" fill="#605E5C" text-anchor="middle">GH_TOKEN · API keys</text>
+<rect x="575" y="645" width="155" height="75" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="652.5" y="680.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📦 Container Registry</text>
+<text x="652.5" y="698.5" font-size="11" fill="#605E5C" text-anchor="middle">ACR · Squad images</text>
+<rect x="750" y="645" width="155" height="75" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="827.5" y="680.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📈 Log Analytics</text>
+<text x="827.5" y="698.5" font-size="11" fill="#605E5C" text-anchor="middle">Monitoring · Alerts</text>
+<rect x="50" y="740" width="155" height="55" rx="8" fill="#FFF" stroke="#24292F" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="127.5" y="765.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📋 GitHub (Personal)</text>
+<text x="127.5" y="783.5" font-size="11" fill="#605E5C" text-anchor="middle">Issues · PRs · Repos</text>
+<rect x="225" y="740" width="155" height="55" rx="8" fill="#FFF" stroke="#24292F" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="302.5" y="765.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">📋 GitHub (EMU Org)</text>
+<text x="302.5" y="783.5" font-size="11" fill="#605E5C" text-anchor="middle">Enterprise repos</text>
+<rect x="400" y="740" width="155" height="55" rx="8" fill="#FFF" stroke="#0078D4" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="477.5" y="765.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">💬 Microsoft Teams</text>
+<text x="477.5" y="783.5" font-size="11" fill="#605E5C" text-anchor="middle">Notifications · Webhooks</text>
+<rect x="575" y="740" width="155" height="55" rx="8" fill="#FFF" stroke="#8B5CF6" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="652.5" y="765.5" font-size="13" font-weight="600" fill="#1B1A19" text-anchor="middle">🤖 Copilot API</text>
+<text x="652.5" y="783.5" font-size="11" fill="#605E5C" text-anchor="middle">Coding agent requests</text>
+<line x1="127" y1="645" x2="190" y2="310" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowblue)"/>
+<rect x="123.0" y="468.5" width="71" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="158.5" y="480.5" font-size="10" fill="#0078D4" text-anchor="middle" font-style="italic">federates</text>
+<line x1="302" y1="645" x2="750" y2="540" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowblue)"/>
+<rect x="490.5" y="583.5" width="71" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="526.0" y="595.5" font-size="10" fill="#0078D4" text-anchor="middle" font-style="italic">federates</text>
+<line x1="477" y1="580" x2="477" y2="645" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowblue)"/>
+<rect x="448.5" y="603.5" width="57" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="477.0" y="615.5" font-size="10" fill="#0078D4" text-anchor="middle" font-style="italic">secrets</text>
+<line x1="652" y1="580" x2="652" y2="645" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowblue)"/>
+<rect x="627.0" y="603.5" width="50" height="16" rx="3" fill="#FFFFFF" opacity="0.9"/>
+<text x="652.0" y="615.5" font-size="10" fill="#0078D4" text-anchor="middle" font-style="italic">images</text>
+</svg>
+
+</body></html>

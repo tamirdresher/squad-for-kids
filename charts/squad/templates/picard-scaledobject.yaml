@@ -1,0 +1,55 @@
+{{- if and .Values.keda.enabled .Values.keda.tokenScaler.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "squad.fullname" . }}-picard-token-scaler
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ include "squad.fullname" . }}-picard
+  minReplicaCount: {{ .Values.keda.tokenScaler.minReplicaCount }}
+  maxReplicaCount: {{ .Values.keda.tokenScaler.maxReplicaCount }}
+  pollingInterval: {{ .Values.keda.tokenScaler.pollingInterval }}
+  cooldownPeriod: {{ .Values.keda.tokenScaler.cooldownPeriod }}
+  
+  {{- if .Values.keda.tokenScaler.fallbackGithubScaler }}
+  fallback:
+    failureThreshold: 3
+    replicas: 1
+  {{- end }}
+
+  triggers:
+    # Trigger 1: Work queue depth (squad:picard labeled issues)
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.keda.prometheusAddress | quote }}
+        metricName: squad_copilot_queue_depth
+        threshold: {{ .Values.keda.tokenScaler.targetQueuePerReplica | quote }}
+        query: |
+          squad_copilot_queue_depth{label="squad:picard"}
+        ignoreNullValues: "true"
+
+    # Trigger 2: Copilot token availability (scale down when tokens exhausted)
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.keda.prometheusAddress | quote }}
+        metricName: copilot_tokens_remaining
+        threshold: {{ .Values.keda.tokenScaler.tokenThreshold | quote }}
+        query: |
+          copilot_tokens_remaining{tier="free"}
+        ignoreNullValues: "true"
+        activationThreshold: {{ .Values.keda.tokenScaler.tokenActivationThreshold | quote }}
+
+    # Trigger 3: GitHub API rate limit (scale down when rate-limited)
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.keda.prometheusAddress | quote }}
+        metricName: github_api_rate_limit_remaining
+        threshold: {{ .Values.keda.tokenScaler.rateLimitThreshold | quote }}
+        query: |
+          github_api_rate_limit_remaining{resource="core"}
+        ignoreNullValues: "true"
+        activationThreshold: {{ .Values.keda.tokenScaler.rateLimitActivationThreshold | quote }}
+{{- end }}

@@ -1,0 +1,123 @@
+# =============================================================================
+# httproute-squad.yaml
+# Phase 2: Kubernetes Gateway API — HTTPRoute for squad workloads
+#
+# This is the FUTURE state (Q3 2026). Do not apply until Phase 2 begins.
+# Requires: gateway.yaml applied first.
+#
+# Migration guide — Ingress → HTTPRoute equivalents:
+#
+#   OLD (Ingress):
+#     metadata.annotations:
+#       kubernetes.io/ingress.class: nginx
+#       nginx.ingress.kubernetes.io/rewrite-target: /$2
+#     spec.rules[].http.paths[].path: /ralph(/|$)(.*)
+#
+#   NEW (HTTPRoute):
+#     spec.parentRefs[].name: squad-gateway
+#     spec.rules[].matches[].path.type: PathPrefix
+#     spec.rules[].filters[].urlRewrite.path
+#
+# =============================================================================
+
+# --- HTTPRoute: HTTP → HTTPS redirect ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: squad-http-redirect
+  namespace: squad
+  labels:
+    app.kubernetes.io/managed-by: squad-helm
+    app.kubernetes.io/component: gateway-api
+    phase: "2-future"
+spec:
+  parentRefs:
+    - name: squad-gateway
+      namespace: squad
+      sectionName: http  # Attach to the HTTP listener
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+
+---
+# --- HTTPRoute: HTTPS routing for Ralph (monitor/worker agent) ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: squad-ralph-route
+  namespace: squad
+  labels:
+    app.kubernetes.io/managed-by: squad-helm
+    app.kubernetes.io/component: gateway-api
+    app.kubernetes.io/name: ralph
+    phase: "2-future"
+spec:
+  parentRefs:
+    - name: squad-gateway
+      namespace: squad
+      sectionName: https  # Attach to the HTTPS listener
+
+  # Hostname — update with actual cluster FQDN
+  hostnames:
+    - "squad.example.cluster.azure.com"
+
+  rules:
+    # Route: /health → Ralph health endpoint
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /health
+      backendRefs:
+        - name: squad-ralph
+          port: 8080
+
+    # Route: /metrics → Ralph Prometheus metrics
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /metrics
+      backendRefs:
+        - name: squad-ralph
+          port: 8080
+
+    # Route: /api → Squad API (future)
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      # Header-based routing (Gateway API native — no annotations needed)
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            add:
+              - name: X-Forwarded-By
+                value: squad-gateway
+      backendRefs:
+        - name: squad-api
+          port: 8080
+
+---
+# =============================================================================
+# MIGRATION REFERENCE: Ingress → HTTPRoute comparison
+#
+# The table below maps common ingress-nginx patterns to Gateway API equivalents.
+# Use this as a guide when converting existing Ingress resources.
+# =============================================================================
+#
+# Feature              | ingress-nginx Annotation/Field         | Gateway API Equivalent
+# ---------------------|-----------------------------------------|------------------------
+# IngressClass         | kubernetes.io/ingress.class: nginx      | spec.parentRefs[].name: <gateway>
+# Path prefix routing  | pathType: Prefix                        | path.type: PathPrefix
+# Exact path routing   | pathType: Exact                         | path.type: Exact
+# Rewrite target       | nginx.ingress.../rewrite-target: /$2    | filters[].urlRewrite.path
+# SSL redirect         | nginx.ingress.../force-ssl-redirect     | HTTPRoute on :80 with RequestRedirect filter
+# Backend timeout      | nginx.ingress.../proxy-read-timeout     | BackendLBPolicy (Gateway API extension)
+# CORS                 | nginx.ingress.../enable-cors: "true"    | filters[].type: ResponseHeaderModifier
+# Rate limiting        | nginx.ingress.../limit-rps: "10"        | n/a (use HTTPRoute + policy attachment)
+# Custom headers       | nginx.ingress.../configuration-snippet  | filters[].requestHeaderModifier
+# Canary/traffic split | nginx.ingress.../canary-weight: "20"   | backendRefs[].weight: 20
+# Auth URL (external)  | nginx.ingress.../auth-url: <url>        | Gateway API extension (policy attachment)
+# TLS secret           | spec.tls[].secretName                   | spec.listeners[].tls.certificateRefs[].name

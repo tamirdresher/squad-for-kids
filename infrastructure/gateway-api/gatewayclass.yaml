@@ -1,0 +1,32 @@
+# =============================================================================
+# gatewayclass.yaml
+# Phase 2: Kubernetes Gateway API — GatewayClass definition
+#
+# Target implementation: Azure Application Gateway for Containers
+# Controller: alb.networking.azure.io/alb-controller
+#
+# This is the FUTURE state (Q3 2026). Do not apply until Phase 2 begins.
+#
+# Prerequisites:
+#   - Azure Application Gateway for Containers provisioned
+#   - ALB Controller installed: https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/
+#   - CRDs installed: kubectl apply -f https://gateway-api.sigs.k8s.io/experimental/crds
+#
+# Apply with:
+#   kubectl apply -f infrastructure/gateway-api/gatewayclass.yaml
+# =============================================================================
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: azure-alb-external
+  labels:
+    app.kubernetes.io/managed-by: squad-helm
+    app.kubernetes.io/component: gateway-api
+    phase: "2-future"
+spec:
+  # Azure Application Gateway for Containers controller
+  controllerName: alb.networking.azure.io/alb-controller
+  description: |
+    Azure Application Gateway for Containers — external traffic gateway.
+    Replaces ingress-nginx (EOL March 2026) via Kubernetes Gateway API.
+    Phase 2 target for squad-on-aks workloads.

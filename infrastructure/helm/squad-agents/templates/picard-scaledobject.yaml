@@ -74,25 +74,26 @@ spec:
   # Formula semantics (expr language):
   #   s0 = squad_copilot_queue_depth       (open issues count)
   #   s1 = github_api_rate_limit_remaining (GitHub API headroom)
+  #   s2 = copilot_rate_limit_hits_total   (Copilot API 429 count)
   #
   # Logic:
-  #   • If queue > 0 AND rate_limit_remaining > threshold → return queue depth
-  #     → KEDA calculates: desired = ceil(queueDepth / target)
+  #   • If queue > 0 AND rate_limit_remaining > threshold AND copilot_hits < 5
+  #     → return queue depth → KEDA calculates: desired = ceil(queueDepth / target)
   #   • Otherwise → return 0 → KEDA scales to minReplicaCount (0)
   #
   # Example:
-  #   3 open issues, 4500 rate limit remaining, target=2
+  #   3 open issues, 4500 GitHub rate limit remaining, 2 Copilot 429s, target=2
   #   → formula returns 3 → desired = ceil(3/2) = 2 replicas
   #
   #   0 open issues → formula returns 0 → 0 replicas (scale to zero)
-  #   3 open issues, 50 rate limit remaining → formula returns 0 → scale to zero
-  #     (protects against burning the last rate limit tokens)
+  #   3 open issues, 50 GitHub rate limit remaining → formula returns 0
+  #   3 open issues, 10 Copilot 429s → formula returns 0 (Copilot exhausted)
   # ---------------------------------------------------------------------------
   {{- if .Values.keda.picard.composite.enabled }}
   advanced:
     scalingModifiers:
       formula: >-
-        s0 > 0 && s1 > {{ .Values.keda.picard.composite.rateLimitThreshold }} ? s0 : 0
+        s0 > 0 && s1 > {{ .Values.keda.picard.composite.rateLimitThreshold }} && s2 < 5 ? s0 : 0
       target: {{ .Values.keda.picard.composite.targetQueuePerReplica | quote }}
   {{- end }}
 
@@ -128,6 +129,21 @@ spec:
         # Don't activate the scaler at all if rate limit is critically low
         activationThreshold: {{ .Values.keda.picard.composite.rateLimitActivationThreshold | quote }}
 
+    # -------------------------------------------------------------------------
+    # Trigger 2 (s2): Copilot API rate limit hits — Copilot exhaustion guard
+    # Metric: copilot_rate_limit_hits_total
+    # Scale down when Copilot API (not GitHub API) is rate-limited.
+    # -------------------------------------------------------------------------
+    - type: prometheus
+      name: s2
+      metadata:
+        serverAddress: >-
+          http://squad-metrics-exporter.{{ .Values.global.namespace }}.svc.cluster.local:{{ .Values.metricsExporter.port }}
+        query: >-
+          copilot_rate_limit_hits_total
+        threshold: "5"
+        activationThreshold: "5"
+
     {{- else }}
     # -------------------------------------------------------------------------
     # Fallback: simple GitHub issue count scaler (no composite logic)
@@ -145,7 +161,7 @@ spec:
     {{- end }}
 
     # -------------------------------------------------------------------------
-    # Trigger 2 (cron): Pre-warm during business hours
+    # Trigger 3 (cron): Pre-warm during business hours
     # Keeps at least 1 replica alive so the first issue of the day
     # doesn't suffer cold-start latency (pod scheduling + image pull).
     # Schedule matches Asia/Jerusalem working hours (Sun–Thu 08:00–20:00).
@@ -160,7 +176,7 @@ spec:
     {{- end }}
 
     # -------------------------------------------------------------------------
-    # Trigger 3 (github-runner): GitHub Actions job queue depth (issue #1158)
+    # Trigger 4 (github-runner): GitHub Actions job queue depth (issue #1158)
     #
     # Scale UP: 1 replica per targetWorkflowQueueLength pending Actions jobs.
     # Scale DOWN: pods removed when the Actions job queue drains to zero.

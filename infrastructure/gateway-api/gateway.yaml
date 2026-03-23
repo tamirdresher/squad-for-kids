@@ -1,0 +1,51 @@
+# =============================================================================
+# gateway.yaml
+# Phase 2: Kubernetes Gateway API — Gateway instance for squad workloads
+#
+# This is the FUTURE state (Q3 2026). Do not apply until Phase 2 begins.
+# Requires: gatewayclass.yaml applied first.
+#
+# Equivalent ingress-nginx behavior:
+#   - HTTP on port 80 (redirect to HTTPS)
+#   - HTTPS on port 443 (TLS termination)
+#   - Routes from squad namespace allowed
+# =============================================================================
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: squad-gateway
+  namespace: squad
+  labels:
+    app.kubernetes.io/managed-by: squad-helm
+    app.kubernetes.io/component: gateway-api
+    phase: "2-future"
+  annotations:
+    # Azure ALB resource reference — update with actual ALB resource IDs
+    alb.networking.azure.io/alb-id: /subscriptions/<subscription-id>/resourceGroups/<rg>/providers/Microsoft.ServiceNetworking/trafficControllers/<alb-name>
+spec:
+  gatewayClassName: azure-alb-external
+
+  listeners:
+    # HTTP listener — redirects to HTTPS
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+    # HTTPS listener — TLS termination
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          # Reference to TLS certificate stored in Azure Key Vault (via CSI driver)
+          # Update with actual certificate secret name
+          - kind: Secret
+            name: squad-tls-cert
+            namespace: squad
+      allowedRoutes:
+        namespaces:
+          from: Same

@@ -3,8 +3,7 @@ name: Squad Heartbeat — ראלף בודק דופק 💓
 on:
   schedule:
     # כל 6 שעות — בודק שהכל בסדר
-    - cr
-on: '0 */6 * * *'
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:

@@ -1,0 +1,113 @@
+{{- if and .Values.keda.enabled .Values.metricsExporter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squad.fullname" . }}-copilot-metrics-exporter
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "squad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: copilot-metrics-exporter
+  template:
+    metadata:
+      labels:
+        {{- include "squad.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: copilot-metrics-exporter
+    spec:
+      serviceAccountName: {{ include "squad.fullname" . }}
+      containers:
+        - name: exporter
+          image: python:3.11-slim
+          ports:
+            - containerPort: {{ .Values.metricsExporter.copilotMetricsPort }}
+              name: metrics
+              protocol: TCP
+          env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.github.tokenSecretName }}
+                  key: token
+            - name: POLL_INTERVAL
+              value: {{ .Values.metricsExporter.pollIntervalSeconds | quote }}
+            - name: METRICS_PORT
+              value: {{ .Values.metricsExporter.copilotMetricsPort | quote }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+              curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+              echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+              apt-get update && apt-get install -y gh && rm -rf /var/lib/apt/lists/*
+              pip install --no-cache-dir prometheus_client
+              cat > /app/exporter.py << 'EOF'
+              import os
+              import time
+              import subprocess
+              import json
+              from prometheus_client import start_http_server, Gauge, Counter
+
+              # Metrics
+              copilot_tokens_remaining = Gauge('copilot_tokens_remaining', 'Copilot tokens remaining', ['tier'])
+              copilot_rate_limit_hits = Counter('copilot_rate_limit_hits_total', 'Copilot 429 responses')
+              exporter_errors = Counter('copilot_metrics_exporter_errors_total', 'Exporter errors')
+
+              POLL_INTERVAL = int(os.environ['POLL_INTERVAL'])
+              METRICS_PORT = int(os.environ['METRICS_PORT'])
+
+              def collect_copilot_metrics():
+                  try:
+                      # Use gh CLI to check Copilot status (limited info available)
+                      # This is a placeholder - actual implementation depends on available APIs
+                      # For now, we'll mock free tier tracking
+                      
+                      # Default: free tier with 50 tokens/month
+                      # In production, this would integrate with actual Copilot usage tracking
+                      copilot_tokens_remaining.labels(tier='free').set(50)
+                      
+                      print("Copilot metrics collected (placeholder - integrate with actual API)")
+                  except Exception as e:
+                      print(f"Error collecting Copilot metrics: {e}")
+                      exporter_errors.inc()
+
+              if __name__ == '__main__':
+                  start_http_server(METRICS_PORT)
+                  print(f"Copilot metrics exporter started on :{METRICS_PORT}")
+                  while True:
+                      collect_copilot_metrics()
+                      time.sleep(POLL_INTERVAL)
+              EOF
+              python /app/exporter.py
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "squad.fullname" . }}-copilot-metrics-exporter
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.metricsExporter.copilotMetricsPort }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "squad.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: copilot-metrics-exporter
+{{- end }}

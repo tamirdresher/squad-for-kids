@@ -1053,3 +1053,32 @@ Android Discord App ◄──WebSocket──► Discord Gateway
 - Avoids cascade by opening circuit before 429
 
 **PR #1191 (Schema validation):** ⚠️ Still failing, requires iteration
+
+## 2026-03-21: Issue #1281 - Blog Post Technical Corrections
+
+### Context
+Multi-agent task to fix technical inaccuracies in rate-limiting blog post. Worked with Q (fact checker), Troi (voice writer), and Crusher (content safety reviewer).
+
+### Technical Issues Fixed
+1. **Voice**: Changed all "we/us" to "I/me" - user's personal blog should be first-person singular
+2. **Technology stack**: Removed all Anthropic references, specified GitHub Copilot only
+3. **Cloud provider**: Changed generic "Kubernetes" to specific "Azure/AKS"  
+4. **CLI limitations**: Added transparency notes about `gh copilot -p` not exposing rate limit headers
+5. **Multi-machine coordination**: Documented that file-based `rate-pool.json` won't work across AKS pods
+6. **Timeline accuracy**: Changed to actual 2-week testing period, added Reddit discussion reference
+7. **Implementation vs. design**: Distinguished between working single-machine code and design patterns for AKS scale
+
+### Architecture Decisions
+- File-based coordination acceptable for single-machine dev
+- Production AKS deployment requires Azure Redis Cache or Table Storage
+- Lease-based cleanup pattern works but needs distributed leases for multi-pod
+
+### Learnings
+- Blog posts need careful distinction between "implemented and tested" vs. "designed for scale"
+- Technical accuracy matters: can't claim to read API headers when using a CLI that doesn't expose them
+- Multi-machine coordination is fundamentally different from single-process - file locking doesn't scale
+
+### Files
+- `tamirdresher.github.io/_posts/2026-03-20-rate-limiting-multi-agent.md` - Corrected blog post
+- `ISSUE_1281_FIXES.md` - Complete change documentation
+- `CREATE_CORRECTED_BLOG.md` - Change summary with line references

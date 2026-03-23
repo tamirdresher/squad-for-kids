@@ -58,3 +58,35 @@ scheduling:
     enabled: false
     gpuNodeSelector:
       capability.squad.io/gpu: "true"
+
+keda:
+  enabled: false
+  prometheusAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
+  
+  tokenScaler:
+    enabled: false
+    minReplicaCount: 0
+    maxReplicaCount: 5
+    pollingInterval: 30
+    cooldownPeriod: 300
+    
+    # Queue targeting
+    targetQueuePerReplica: "2"
+    
+    # Token thresholds
+    tokenThreshold: "5"
+    tokenActivationThreshold: "1"
+    
+    # Rate limit thresholds
+    rateLimitThreshold: "500"
+    rateLimitActivationThreshold: "100"
+    
+    # Fallback
+    fallbackGithubScaler: true
+
+metricsExporter:
+  enabled: false
+  squadLabel: "squad:picard"
+  pollIntervalSeconds: "30"
+  port: 9100
+  copilotMetricsPort: 9101

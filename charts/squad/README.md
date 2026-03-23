@@ -6,9 +6,12 @@ Deploys Squad AI agents to Kubernetes (AKS). This is a prototype implementation 
 
 This chart deploys:
 - **Ralph StatefulSet**: Work monitor that claims GitHub issues and spawns agent Jobs
+- **Picard Deployment** (optional, KEDA mode): Continuously-running Picard agent scaled by KEDA
 - **Agent Job Template**: On-demand agent pods spawned per issue
 - **Rate Pool (Redis)**: Shared rate limiting across Ralph replicas
 - **Persistent Storage**: Azure Files for `.squad/` state (decisions, histories, round state)
+- **KEDA Autoscaling** (optional): Token-aware autoscaling for Picard deployment
+- **Metrics Exporters** (optional): Prometheus exporters for GitHub rate limits and Copilot token usage
 
 ## Prerequisites
 
@@ -16,6 +19,8 @@ This chart deploys:
 - Helm 3.8+
 - Azure Files CSI driver (for ReadWriteMany PVC)
 - GitHub Personal Access Token with repo scope
+- **KEDA 2.12+** (optional, for autoscaling) - Enable with `az aks update --enable-keda`
+- **Prometheus** (optional, for KEDA metrics) - Required if `keda.enabled=true`
 
 ## Installation
 
@@ -57,6 +62,10 @@ Key `values.yaml` settings:
 | `ratePool.enabled` | Enable shared Redis rate limiting | `true` |
 | `persistence.storageClass` | Storage class for PVC | `azurefile-csi` |
 | `github.workloadIdentity.enabled` | Use Azure Workload Identity | `false` |
+| `keda.enabled` | Enable KEDA autoscaling (deploys Picard Deployment) | `false` |
+| `keda.tokenScaler.enabled` | Enable token-aware scaling triggers | `false` |
+| `keda.tokenScaler.maxReplicaCount` | Maximum Picard replicas | `5` |
+| `metricsExporter.enabled` | Deploy Prometheus metrics exporters | `false` |
 
 ## Architecture
 
@@ -162,6 +171,39 @@ kubectl exec -it -n squad-system squad-rate-pool-xxx -- redis-cli ping
 - **P2**: Rate-pool tracks API usage across replicas
 - **P3**: Capability-based scheduling (GPU nodes)
 - **P4**: Workload Identity for GitHub auth (no PAT)
+- **P5**: KEDA autoscaling with token-aware scaling (see #1134) ✅
+
+## KEDA Autoscaling (Experimental)
+
+Enable token-aware autoscaling for the Picard agent:
+
+```bash
+# 1. Enable KEDA on AKS
+az aks update --resource-group rg-squad --name aks-squad --enable-keda
+
+# 2. Install Prometheus (if not already installed)
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace
+
+# 3. Install Squad with KEDA enabled
+helm install squad ./charts/squad \
+  --namespace squad-system \
+  --set keda.enabled=true \
+  --set keda.tokenScaler.enabled=true \
+  --set metricsExporter.enabled=true
+```
+
+This deploys:
+- **Picard Deployment**: Continuously-running Picard agent (0-5 replicas)
+- **KEDA ScaledObject**: Scales Picard based on:
+  - Queue depth (`squad:picard` labeled issues)
+  - Copilot token availability
+  - GitHub API rate limit headroom
+- **Metrics Exporters**: Expose Prometheus metrics for KEDA triggers
+
+**Scale-to-zero**: When no work is queued OR tokens are exhausted OR rate limits are hit, Picard scales to 0 replicas and waits for conditions to clear.
+
+For detailed setup and troubleshooting, see [docs/keda-token-scaler-implementation.md](../../docs/keda-token-scaler-implementation.md).
 
 ## Links
 

@@ -1077,3 +1077,111 @@ Preview package publishing from PRs requires architectural safeguards beyond bas
 
 **Status**: ✅ Complete. Issue #1134 moved to `squad:belanna` for AKS deployment.
 
+
+### 2026-03-21: Issue #1134 — KEDA Token-Aware Autoscaling (In Progress)
+
+**Assignment:** Lead architect for KEDA autoscaling implementation for Squad agents.
+
+**Architecture Design:**
+1. **Scale Target:** Picard Deployment (0-5 replicas, KEDA-controlled)
+2. **Trigger Architecture:**
+   - **Trigger 1:** Queue depth (`squad:picard` labeled issues) - scale up when work available
+   - **Trigger 2:** Copilot token availability - scale down when tokens exhausted
+   - **Trigger 3:** GitHub API rate limits - scale down when rate-limited
+3. **Metrics Infrastructure:**
+   - `squad-metrics-exporter`: GitHub API rate limits + issue queue depth (Prometheus :9100)
+   - `copilot-metrics-exporter`: Copilot token usage tracking (Prometheus :9101)
+4. **Scale-to-Zero Behavior:**
+   - No work: 0 replicas
+   - Tokens exhausted (free tier): 0 replicas, wait for monthly reset
+   - Rate-limited (<500/5000 remaining): 0 replicas, 5-min cooldown
+   - Work available + tokens + headroom: ceil(queue_depth / 2) replicas
+
+**Implementation:**
+- Created 4 new Helm templates: picard-deployment, picard-scaledobject, squad-metrics-exporter, copilot-metrics-exporter
+- Updated values.yaml with `keda` and `metricsExporter` configuration sections
+- Updated README.md with KEDA setup prerequisites and instructions
+- Branch: `squad/1134-keda-token-scaler` (pushed)
+- PR: Ready for creation at https://github.com/tamirdresher_microsoft/tamresearch1/compare/squad/1134-keda-token-scaler
+
+**Key Design Decisions:**
+- **Deployment vs StatefulSet:** Chose Deployment for Picard (KEDA scales Deployments, not StatefulSets)
+- **Composite Triggers:** All 3 triggers use Prometheus queries (unified observability)
+- **Phased Implementation:** Copilot metrics exporter is placeholder (actual Copilot API tracking requires more research)
+- **Fallback Safety:** `ignoreNullValues: true` on all triggers prevents scale-down when metrics unavailable
+
+**Coordination with B'Elanna:**
+- B'Elanna provided existing github-rate-limit-exporter context (already implemented)
+- Aligned on Prometheus-based architecture (matches existing rate-limit-exporter pattern)
+- Documentation exists: `docs/keda-token-scaler-implementation.md`, `docs/squad-on-k8s/keda-autoscaling.md`
+
+**Next Steps:**
+1. Create PR (draft) for review
+2. Test in dev AKS cluster with KEDA enabled
+3. Validate scale-to-zero behavior
+4. Implement production Copilot token tracking (placeholder currently)
+5. Integration testing with Ralph StatefulSet (coexistence verification)
+
+**Related Issues:** #1059 (Squad on K8s), #998 (Copilot auth), #979 (Rate limits)
+
+
+### 2026-03-21: Issue #999 — K8s-Native Capability Routing Design
+
+**Assignment:** Design Kubernetes-native capability routing system to replace file-based machine capability discovery.
+
+**Outcome:** ✅ **COMPLETE** — Design document published, PR #1286 updated (draft).
+
+**Design Delivered:**
+- **Document:** `docs/k8s-capability-routing-design.md` (5.7KB comprehensive spec)
+- **PR:** #1286 (draft, ready for B'Elanna review)
+- **Branch:** `squad/999-k8s-capability-routing`
+
+**Architecture Decisions:**
+1. **Node labels over pod labels** — Capabilities are infrastructure properties, not workload properties. A node either has a GPU or it doesn't.
+2. **Capability Discovery DaemonSet** — Automated labeling vs manual configuration. DaemonSet probes every 5 minutes and applies/removes labels dynamically.
+3. **Label namespace: `squad.io/capability-*`** — Avoid collisions with other operators. Vendor labels (nvidia.com/gpu) used as-is.
+4. **Hard requirements via nodeSelector** — `needs:gpu` → `nodeSelector: nvidia.com/gpu=true`. Pod stays Pending until satisfied.
+5. **Soft preferences deferred** — `prefers:azure-speech` via nodeAffinity is a Phase 2 enhancement.
+6. **Migration path: hybrid mode** — Ralph checks `$env:KUBERNETES_SERVICE_HOST` to choose K8s node labels vs JSON manifest.
+
+**Label Mapping (Issue → K8s):**
+| Issue Label         | K8s Node Label                     | Discovery Source          |
+|---------------------|------------------------------------|---------------------------|
+| `needs:gpu`         | `nvidia.com/gpu`                   | NVIDIA device plugin      |
+| `needs:browser`     | `squad.io/capability-browser`      | DaemonSet (Playwright)    |
+| `needs:whatsapp`    | `squad.io/capability-whatsapp`     | DaemonSet (session files) |
+| `needs:personal-gh` | `squad.io/capability-personal-gh`  | DaemonSet (secret)        |
+| `needs:emu-gh`      | `squad.io/capability-emu-gh`       | DaemonSet (secret)        |
+
+**AKS Node Pools:**
+- **GPU Pool:** `Standard_NC6s_v3` (0-3 nodes, tainted for GPU-only workloads)
+- **Browser Pool:** `Standard_D4s_v5` (1-10 nodes, Playwright pre-installed)
+- **General Pool:** `Standard_D2s_v5` (2-20 nodes, default for no-capability work)
+
+**Squad Operator Integration:**
+- Golang `capabilityLabelMap` translates `needs:*` to `nodeSelector` entries
+- Future: `prefers:*` → `nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution`
+
+**Security:**
+- DaemonSet requires `nodes/patch` ClusterRole (sensitive — audit regularly)
+- Runs as non-root, read-only root filesystem, no privilege escalation
+
+**Next Steps:**
+1. B'Elanna review (Infrastructure lead)
+2. Implement `squad-capability-discoverer` container image
+3. Deploy DaemonSet to dev AKS cluster
+4. Update Squad operator with scheduling logic
+5. Test with real issues carrying `needs:*` labels
+
+**Key Files:**
+- **Design:** `docs/k8s-capability-routing-design.md`
+- **PR:** #1286
+- **Related:** #987 (predecessor), #1000 (Helm chart), #995 (non-human user testing)
+
+**Learning:**
+- K8s-native capability routing eliminates file-based manifests and uses first-class scheduler primitives.
+- Node labels are the correct abstraction for infrastructure capabilities — not pod labels, not ConfigMaps.
+- DaemonSet pattern for automated discovery scales better than manual node pool labeling.
+- Hybrid mode (K8s + bare-metal) enables phased migration without breaking existing deployments.
+
+**Status:** ✅ Complete. Design ready for review. Implementation deferred to B'Elanna.

@@ -1,0 +1,130 @@
+{{- if and .Values.keda.enabled .Values.metricsExporter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squad.fullname" . }}-squad-metrics-exporter
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: squad-metrics-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "squad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: squad-metrics-exporter
+  template:
+    metadata:
+      labels:
+        {{- include "squad.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: squad-metrics-exporter
+    spec:
+      serviceAccountName: {{ include "squad.fullname" . }}
+      containers:
+        - name: exporter
+          image: python:3.11-slim
+          ports:
+            - containerPort: {{ .Values.metricsExporter.port }}
+              name: metrics
+              protocol: TCP
+          env:
+            - name: GH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.github.tokenSecretName }}
+                  key: token
+            - name: SQUAD_REPO
+              value: {{ .Values.squad.repository }}
+            - name: SQUAD_LABEL
+              value: {{ .Values.metricsExporter.squadLabel | quote }}
+            - name: POLL_INTERVAL
+              value: {{ .Values.metricsExporter.pollIntervalSeconds | quote }}
+            - name: METRICS_PORT
+              value: {{ .Values.metricsExporter.port | quote }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              pip install --no-cache-dir requests prometheus_client
+              cat > /app/exporter.py << 'EOF'
+              import os
+              import time
+              import requests
+              from prometheus_client import start_http_server, Gauge, Counter
+
+              # Metrics
+              github_rate_limit_remaining = Gauge('github_api_rate_limit_remaining', 'GitHub API rate limit remaining', ['resource'])
+              github_rate_limit_reset = Gauge('github_api_rate_limit_reset', 'GitHub API rate limit reset timestamp', ['resource'])
+              squad_queue_depth = Gauge('squad_copilot_queue_depth', 'Open Squad issues', ['label'])
+              exporter_errors = Counter('squad_metrics_exporter_errors_total', 'Exporter errors')
+
+              GH_TOKEN = os.environ['GH_TOKEN']
+              SQUAD_REPO = os.environ['SQUAD_REPO']
+              SQUAD_LABEL = os.environ['SQUAD_LABEL']
+              POLL_INTERVAL = int(os.environ['POLL_INTERVAL'])
+              METRICS_PORT = int(os.environ['METRICS_PORT'])
+
+              def collect_metrics():
+                  headers = {'Authorization': f'token {GH_TOKEN}', 'Accept': 'application/vnd.github+json'}
+                  
+                  # Fetch rate limit
+                  try:
+                      resp = requests.get('https://api.github.com/rate_limit', headers=headers, timeout=10)
+                      resp.raise_for_status()
+                      data = resp.json()
+                      for resource in ['core', 'search', 'graphql']:
+                          if resource in data['resources']:
+                              github_rate_limit_remaining.labels(resource=resource).set(data['resources'][resource]['remaining'])
+                              github_rate_limit_reset.labels(resource=resource).set(data['resources'][resource]['reset'])
+                  except Exception as e:
+                      print(f"Error fetching rate limit: {e}")
+                      exporter_errors.inc()
+                  
+                  # Fetch queue depth
+                  try:
+                      owner, repo = SQUAD_REPO.split('/')
+                      url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+                      params = {'state': 'open', 'labels': SQUAD_LABEL, 'per_page': 100}
+                      resp = requests.get(url, headers=headers, params=params, timeout=10)
+                      resp.raise_for_status()
+                      count = len(resp.json())
+                      squad_queue_depth.labels(label=SQUAD_LABEL).set(count)
+                  except Exception as e:
+                      print(f"Error fetching queue depth: {e}")
+                      exporter_errors.inc()
+
+              if __name__ == '__main__':
+                  start_http_server(METRICS_PORT)
+                  print(f"Squad metrics exporter started on :{METRICS_PORT}")
+                  while True:
+                      collect_metrics()
+                      time.sleep(POLL_INTERVAL)
+              EOF
+              python /app/exporter.py
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "squad.fullname" . }}-squad-metrics-exporter
+  namespace: {{ .Values.squad.namespace }}
+  labels:
+    {{- include "squad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: squad-metrics-exporter
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.metricsExporter.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "squad.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: squad-metrics-exporter
+{{- end }}

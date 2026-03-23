@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad for Kids — 5-Minute Demo Transcript</title>
+<style>
+  :root {
+    --bg: #1e1e2e;
+    --surface: #282a3a;
+    --surface-bright: #313347;
+    --user-bubble: #3b82f6;
+    --user-text: #ffffff;
+    --agent-text: #cdd6f4;
+    --muted: #7f849c;
+    --accent: #f5c542;
+    --green: #a6e3a1;
+    --pink: #f38ba8;
+    --border: #45475a;
+    --font-mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--agent-text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.65;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1e1e2e 0%, #302d5e 50%, #1e1e2e 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 36px 24px 28px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: var(--font-sans);
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .header h1 .emoji { font-style: normal; }
+  .header .subtitle {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #1e1e2e;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── Chat container ── */
+  .chat {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ── Scene divider ── */
+  .scene {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 32px 0 18px;
+  }
+  .scene::before, .scene::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .scene-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+  }
+
+  /* ── Message rows ── */
+  .msg { display: flex; margin: 10px 0; }
+  .msg.user { justify-content: flex-end; }
+  .msg.agent { justify-content: flex-start; }
+
+  /* ── Bubbles ── */
+  .bubble {
+    max-width: 680px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    position: relative;
+  }
+  .msg.user .bubble {
+    background: var(--user-bubble);
+    color: var(--user-text);
+    border-bottom-right-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .msg.agent .bubble {
+    background: var(--surface);
+    color: var(--agent-text);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    font-size: 13.5px;
+  }
+
+  /* ── Role labels inside agent bubbles ── */
+  .role-tag {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .role-tag.system  { background: #585b70; color: #cdd6f4; }
+  .role-tag.hermione { background: #7c2d12; color: #fbbf24; }
+  .role-tag.hagrid  { background: #365314; color: #bef264; }
+  .role-tag.luna    { background: #4c1d95; color: #c4b5fd; }
+  .role-tag.fred    { background: #9a3412; color: #fdba74; }
+  .role-tag.george  { background: #9a3412; color: #fdba74; }
+  .role-tag.dobby   { background: #1e3a5f; color: #93c5fd; }
+  .role-tag.scribe  { background: #374151; color: #d1d5db; }
+
+  /* ── Table in parent report ── */
+  .report-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 13px;
+  }
+  .report-table td {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+  }
+  .report-table td:first-child {
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .report-table td:last-child {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* ── Reveal card ── */
+  .reveal {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-bright) 100%);
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin: 6px 0;
+  }
+  .reveal h2 {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .cast-member {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cast-member:last-child { border-bottom: none; }
+  .cast-name {
+    font-weight: 700;
+    color: #fff;
+    font-size: 14px;
+  }
+  .cast-role {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-left: 6px;
+  }
+  .cast-quote {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 4px;
+    padding-left: 22px;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    max-width: 820px;
+    margin: 48px auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+  }
+  .summary-card h2 {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .summary-item {
+    background: var(--surface-bright);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .summary-item .label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .summary-item .value {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    max-width: 820px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="header">
+  <h1><span class="emoji">🎓</span> Squad for Kids — 5-Minute Demo</h1>
+  <div class="subtitle">Live onboarding transcript &middot; March 21, 2026</div>
+  <div class="badge">Conference Demo</div>
+</div>
+
+<div class="chat">
+
+<!-- ═══════════════ SCENE 1: Welcome ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 1 &middot; Parent Starts &middot; 0:00</span></div>
+
+<div class="msg user"><div class="bubble">hi</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Init Mode</span>
+
+🎉 Welcome to Squad for Kids! 🎉
+
+I'm going to build you your very own team of awesome learning helpers!
+But first, I need to get to know you a little bit. Ready? Let's go! 🚀
+
+What's your first name?</div></div>
+
+<!-- ═══════════════ SCENE 2: Onboarding ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 2 &middot; Kid Onboarding &middot; 0:30</span></div>
+
+<div class="msg user"><div class="bubble">Yoav</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Init Mode</span>
+
+Awesome name, Yoav! 🎉
+
+When's your birthday? 🎂</div></div>
+
+<div class="msg user"><div class="bubble">March 12, 2018</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Init Mode</span>
+
+Cool — so you're 7 years old, almost 8! 🥳
+Your birthday is coming up in just a few days! 🎂🎈
+
+What grade are you in?</div></div>
+
+<div class="msg user"><div class="bubble">2nd grade</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Init Mode</span>
+
+2nd grade — great! 📚
+
+One more — what city do you live in? 🏙️</div></div>
+
+<div class="msg user"><div class="bubble">Rishon LeZion</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Curriculum Discovery</span>
+
+Rishon LeZion — love it! 🇮🇱
+
+I detected your curriculum automatically:
+
+📍 <strong>Country:</strong> Israel
+🏫 <strong>Curriculum:</strong> Israeli Ministry of Education (תכנית הלימודים)
+📚 <strong>Subjects for Grade 2:</strong>
+   • Mathematics (חשבון)
+   • Hebrew Language (עברית)
+   • Reading Comprehension (הבנת הנקרא)
+   • Science &amp; Technology (מדע וטכנולוגיה)
+   • English (אנגלית)
+   • Bible Studies (תנ״ך)
+   • Art (אמנות)
+   • Physical Education (חינוך גופני)
+   • Social Skills (כישורי חיים)</div></div>
+
+<!-- ═══════════════ SCENE 3: Language ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 3 &middot; Language Choice &middot; 1:30</span></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Language</span>
+
+🗣️ Since you're in Israel, I'll talk to you in Hebrew (עברית).
+Would you like that, or would you prefer a different language?</div></div>
+
+<div class="msg user"><div class="bubble">English please</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Language</span>
+
+English it is! 🇬🇧 All your learning sessions will be in English from now on.
+You can change this any time — just say "switch to Hebrew" and I'll switch! 🔄
+
+Now for the fun part… 😎</div></div>
+
+<!-- ═══════════════ SCENE 4: Universe Pick ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 4 &middot; Universe Pick &middot; 2:00</span></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Casting</span>
+
+🎬 One more fun question, Yoav!
+What's your FAVORITE movie, show, book, or game?
+(This is going to be really cool, I promise! 😎)</div></div>
+
+<div class="msg user"><div class="bubble">Harry Potter</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag system">Squad · Casting</span>
+
+⚡ Harry Potter — EXCELLENT choice! ⚡
+
+Hold on… I'm owling Hogwarts right now… 🦉✉️
+
+Casting your squad from the Wizarding World…</div></div>
+
+<!-- ═══════════════ SCENE 5: Team Reveal ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 5 &middot; Team Reveal &middot; 2:45</span></div>
+
+<div class="msg agent"><div class="bubble"><div class="reveal">
+<h2>🎉✨ Yoav, YOUR SQUAD IS READY! ✨🎉</h2>
+
+<div>Meet your amazing learning team:</div>
+
+<div class="cast-member">
+  <div><span style="font-size:18px">🎓</span> <span class="cast-name">Hermione Granger</span> <span class="cast-role">— Your Head Teacher</span></div>
+  <div class="cast-quote">"I'll make sure you learn everything you need for grade 2! Organization and preparation are key — let's make a plan!"</div>
+</div>
+
+<div class="cast-member">
+  <div><span style="font-size:18px">📚</span> <span class="cast-name">Hagrid</span> <span class="cast-role">— Your Science &amp; Subject Helper</span></div>
+  <div class="cast-quote">"Don' worry, we'll figure it out together! I know a thing or two about creatures, nature, and how the world works!"</div>
+</div>
+
+<div class="cast-member">
+  <div><span style="font-size:18px">🎨</span> <span class="cast-name">Luna Lovegood</span> <span class="cast-role">— Your Creative Coach</span></div>
+  <div class="cast-quote">"The things others find strange are usually the most interesting. Let's create something nobody's ever seen before!"</div>
+</div>
+
+<div class="cast-member">
+  <div><span style="font-size:18px">🎮</span> <span class="cast-name">Fred Weasley</span> <span class="cast-role">— Your Gamer</span></div>
+  <div class="cast-quote">"Right then — fancy a challenge? I've got games that'll make your brain do backflips! Wanna play?"</div>
+</div>
+
+<div class="cast-member">
+  <div><span style="font-size:18px">🎬</span> <span class="cast-name">George Weasley</span> <span class="cast-role">— Your YouTuber</span></div>
+  <div class="cast-quote">"Welcome to today's episode! I'm going to explain this so well, even Percy would be impressed. Ready? Action!"</div>
+</div>
+
+<div class="cast-member">
+  <div><span style="font-size:18px">🤗</span> <span class="cast-name">Dobby</span> <span class="cast-role">— Your Study Buddy</span></div>
+  <div class="cast-quote">"Dobby is here to help! Dobby believes in you, and Dobby will always be here when you need a friend. 💙"</div>
+</div>
+
+</div>
+
+Ready to start learning? Just tell me what you'd like to work on! 🚀</div></div>
+
+<!-- ═══════════════ SCENE 6: First Lesson ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 6 &middot; First Lesson &middot; 3:30</span></div>
+
+<div class="msg user"><div class="bubble">Let's do some math!</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag hermione">🎓 Hermione</span>
+
+Excellent choice, Yoav! A proper wizard always knows their numbers! 🧙‍♀️
+
+Let's start with a quick warm-up!
+
+📐 <strong>Challenge 1:</strong> If you have 7 chocolate frogs and Hagrid gives you 8 more, how many chocolate frogs do you have now?
+
+Take your time — even I double-check my arithmetic! 📝</div></div>
+
+<div class="msg user"><div class="bubble">15</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag hermione">🎓 Hermione</span>
+
+🌟 BRILLIANT, Yoav! 7 + 8 = 15 — absolutely correct!
++10 XP! You're on your way to becoming a math wizard! 🧙‍♀️⚡
+
+Ready for the next one?
+
+📐 <strong>Challenge 2:</strong> Yoav has 23 Bertie Bott's Every Flavour Beans.
+He eats 9 of them (hopefully not the earwax ones! 🤢).
+How many does he have left?</div></div>
+
+<!-- ═══════════════ SCENE 7: Parent Report ═══════════════ -->
+<div class="scene"><span class="scene-label">Scene 7 &middot; Parent Report &middot; 4:30</span></div>
+
+<div class="msg user"><div class="bubble">Show me the parent report</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag scribe">📋 Scribe · Weekly Report</span>
+
+📊 <strong>Weekly Learning Report — Yoav</strong>
+
+📈 Week at a Glance:
+
+<table class="report-table">
+<tr><td>Sessions this week</td><td>1</td></tr>
+<tr><td>Total learning time</td><td>~5 minutes</td></tr>
+<tr><td>Subjects covered</td><td>Mathematics</td></tr>
+<tr><td>XP earned</td><td>+20 XP</td></tr>
+<tr><td>Current level</td><td>Level 1: Rookie</td></tr>
+<tr><td>Streak</td><td>1 day 🔥</td></tr>
+</table>
+
+💪 <strong>Strengths:</strong> Quick mental arithmetic, addition confidence
+🎯 <strong>Practice needed:</strong> Will discover as more sessions happen
+💡 <strong>Recommendation:</strong> Yoav responded well to Harry Potter themed
+   problems — keep using character references for engagement!</div></div>
+
+<!-- ═══════════════ END ═══════════════ -->
+<div class="scene"><span class="scene-label">End &middot; Goodbye &middot; 5:00</span></div>
+
+<div class="msg user"><div class="bubble">Thanks, bye!</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag dobby">🤗 Dobby</span>
+
+Dobby was so happy to learn with Yoav today!
+Dobby will be right here whenever you want to come back! 💙</div></div>
+
+<div class="msg agent"><div class="bubble"><span class="role-tag hermione">🎓 Hermione</span>
+
+Great first session, Yoav! See you next time — we have SO much more to explore! ✨
+
+📊 Session saved. +20 XP earned today!</div></div>
+
+</div><!-- /chat -->
+
+<!-- ═══════════════ SUMMARY CARD ═══════════════ -->
+<div class="summary-card">
+  <h2>📋 Demo Summary</h2>
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="label">Runtime</div>
+      <div class="value">~5 min</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Student</div>
+      <div class="value">Yoav, age 7</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Grade</div>
+      <div class="value">2nd</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Curriculum</div>
+      <div class="value">🇮🇱 Israeli MoE</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Universe</div>
+      <div class="value">⚡ Harry Potter</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Language</div>
+      <div class="value">English</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Scenes</div>
+      <div class="value">7</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">XP Earned</div>
+      <div class="value">+20 XP 🌟</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Squad for Kids &middot; Built with GitHub Copilot &middot; github.com/tamirdresher/squad-for-kids &middot; 2026
+</div>
+
+</body>
+</html>

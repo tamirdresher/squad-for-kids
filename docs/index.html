@@ -431,6 +431,43 @@
             margin-top: 8px;
         }
 
+        /* ============ VIDEO GRID ============ */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .video-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .video-card video {
+            width: 100%;
+            display: block;
+            background: #000;
+        }
+
+        .video-card-title {
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            text-align: right;
+            border-top: 1px solid rgba(108, 99, 255, 0.08);
+        }
+
         /* ============ SETUP ============ */
         .setup-section {
             background: linear-gradient(180deg, #F0EDFF 0%, var(--bg) 100%);
@@ -1069,6 +1106,50 @@
                         💻 Or try the interactive demo →
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ ADDITIONAL SAMPLE VIDEOS ============ -->
+<section class="demo-section" id="more-videos" style="background: linear-gradient(180deg, var(--white) 0%, #F0EDFF 100%);">
+    <div class="container">
+        <h2 class="section-title">סרטונים <span>נוספים</span> | More Videos</h2>
+        <div class="video-grid">
+            <!-- Parent Hebrew Video -->
+            <div class="video-card">
+                <video controls playsinline preload="metadata">
+                    <source src="sample-parent-hebrew.mp4" type="video/mp4">
+                    הדפדפן שלכם לא תומך בווידאו. <a href="sample-parent-hebrew.mp4">לחצו כאן להורדה</a>.
+                </video>
+                <div class="video-card-title">🏠 להורים</div>
+            </div>
+
+            <!-- Teacher English Video -->
+            <div class="video-card">
+                <video controls playsinline preload="metadata">
+                    <source src="sample-teacher-english.mp4" type="video/mp4">
+                    Your browser does not support the video tag. <a href="sample-teacher-english.mp4">Click here to download</a>.
+                </video>
+                <div class="video-card-title">🏫 For Educators</div>
+            </div>
+
+            <!-- Developer English Video -->
+            <div class="video-card">
+                <video controls playsinline preload="metadata">
+                    <source src="sample-developer-english.mp4" type="video/mp4">
+                    Your browser does not support the video tag. <a href="sample-developer-english.mp4">Click here to download</a>.
+                </video>
+                <div class="video-card-title">💻 For Developers</div>
+            </div>
+
+            <!-- Teaser Hebrew Video -->
+            <div class="video-card">
+                <video controls playsinline preload="metadata">
+                    <source src="sample-teaser-30s.mp4" type="video/mp4">
+                    הדפדפן שלכם לא תומך בווידאו. <a href="sample-teaser-30s.mp4">לחצו כאן להורדה</a>.
+                </video>
+                <div class="video-card-title">📱 טיזר</div>
             </div>
         </div>
     </div>

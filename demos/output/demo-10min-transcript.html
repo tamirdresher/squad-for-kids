@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad for Kids — Full 10-Minute Demo Transcript</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #1e1e2e;
+    --bg-surface: #272739;
+    --bg-card: #313146;
+    --bg-user: #3b5bdb;
+    --text: #e4e4f0;
+    --text-dim: #9090a8;
+    --text-bright: #ffffff;
+    --border: #3d3d55;
+    --hermione: #f5c542;
+    --fred: #e04040;
+    --george: #e07830;
+    --dobby: #b668e0;
+    --luna: #b8c0d0;
+    --hagrid: #a06830;
+    --ralph: #40c060;
+    --parent: #4090d0;
+    --scene-divider: #4a4a6a;
+    --xp-glow: #f5c542;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ───── Header ───── */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-bottom: 3px solid var(--hermione);
+    padding: 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5c542' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+  .header h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--text-bright);
+    position: relative;
+    letter-spacing: -0.5px;
+  }
+  .header h1 .gold { color: var(--hermione); }
+  .header .subtitle {
+    font-size: 15px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    position: relative;
+  }
+  .header .meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+    position: relative;
+  }
+  .header .meta span { background: var(--bg-surface); padding: 4px 12px; border-radius: 100px; }
+
+  /* ───── Container ───── */
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  /* ───── Scene Divider ───── */
+  .scene {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0 24px;
+  }
+  .scene-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--scene-divider), transparent);
+  }
+  .scene-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    white-space: nowrap;
+    background: var(--bg-surface);
+    border: 1px solid var(--scene-divider);
+    color: var(--text-dim);
+  }
+  .scene-badge .timestamp {
+    color: var(--ralph);
+    margin-left: 6px;
+  }
+
+  /* ───── Chat Messages ───── */
+  .chat { display: flex; flex-direction: column; gap: 14px; }
+
+  .msg {
+    display: flex;
+    gap: 12px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .msg.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .avatar.hermione { background: linear-gradient(135deg, #b8942e, #f5c542); }
+  .avatar.fred     { background: linear-gradient(135deg, #a02020, #e04040); }
+  .avatar.george   { background: linear-gradient(135deg, #a05818, #e07830); }
+  .avatar.dobby    { background: linear-gradient(135deg, #8040a8, #b668e0); }
+  .avatar.luna     { background: linear-gradient(135deg, #808898, #b8c0d0); }
+  .avatar.hagrid   { background: linear-gradient(135deg, #704818, #a06830); }
+  .avatar.ralph    { background: linear-gradient(135deg, #208840, #40c060); }
+  .avatar.parent   { background: linear-gradient(135deg, #2060a0, #4090d0); }
+  .avatar.user     { background: linear-gradient(135deg, #2848a8, #3b5bdb); }
+  .avatar.system   { background: linear-gradient(135deg, #404060, #606080); }
+
+  .bubble {
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    position: relative;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #3b5bdb, #4c6ce0);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.agent .bubble {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.agent .bubble .agent-name {
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .agent-name.hermione { color: var(--hermione); }
+  .agent-name.fred     { color: var(--fred); }
+  .agent-name.george   { color: var(--george); }
+  .agent-name.dobby    { color: var(--dobby); }
+  .agent-name.luna     { color: var(--luna); }
+  .agent-name.hagrid   { color: var(--hagrid); }
+  .agent-name.ralph    { color: var(--ralph); }
+  .agent-name.parent   { color: var(--parent); }
+  .agent-name.system   { color: var(--text-dim); }
+
+  .bubble pre {
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+  }
+  .bubble .xp-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #b8942e, #f5c542);
+    color: #1e1e2e;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-top: 4px;
+  }
+
+  /* ───── System narration ───── */
+  .narration {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-style: italic;
+    padding: 8px 0;
+    opacity: 0.7;
+  }
+  .narration code {
+    background: var(--bg-surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-style: normal;
+    color: var(--ralph);
+    font-size: 11px;
+  }
+
+  /* ───── Table inside bubble ───── */
+  .bubble table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12.5px;
+  }
+  .bubble table td {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+  }
+  .bubble table td:first-child {
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  /* ───── Hebrew / RTL ───── */
+  .rtl { direction: rtl; text-align: right; }
+  .rtl .msg.user { flex-direction: row; align-self: flex-start; }
+  .rtl .msg.agent { flex-direction: row-reverse; align-self: flex-end; }
+  .rtl .msg.user .bubble { border-bottom-right-radius: 16px; border-bottom-left-radius: 4px; }
+  .rtl .msg.agent .bubble { border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; }
+
+  /* ───── Summary Card ───── */
+  .summary-card {
+    margin-top: 60px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 2px solid var(--hermione);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 40px rgba(245,197,66,0.08);
+  }
+  .summary-card h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--hermione);
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .summary-section h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-section ul {
+    list-style: none;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .summary-section.full { grid-column: 1 / -1; }
+  .xp-total {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--hermione);
+    text-shadow: 0 0 30px rgba(245,197,66,0.3);
+    margin: 16px 0;
+  }
+  .xp-label {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  /* ───── Footer ───── */
+  .footer {
+    text-align: center;
+    padding: 40px 20px 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  /* ───── Responsive ───── */
+  @media (max-width: 640px) {
+    .header h1 { font-size: 24px; }
+    .container { padding: 16px 12px 40px; }
+    .msg { max-width: 95%; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<div class="header">
+  <h1>⚡ Squad for Kids — <span class="gold">Full 10-Minute Demo</span></h1>
+  <div class="subtitle">Interactive AI Learning Squad — Conference Presentation Transcript</div>
+  <div class="meta">
+    <span>📅 2026-03-21</span>
+    <span>⏱️ ~10 minutes</span>
+    <span>🎭 13 scenes</span>
+    <span>🧙 Harry Potter Universe</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════ SCENE 1 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 1 — Parent Starts <span class="timestamp">[0:00]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">Parent opens terminal in <code>squad-for-kids</code> repo for the first time</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>hi</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar system">🚀</div>
+    <div class="bubble">
+      <span class="agent-name system">SQUAD INIT</span>
+      <pre>🎉 Welcome to Squad for Kids! 🎉
+
+I'm going to build you your very own team of awesome
+learning helpers! But first, I need to get to know you
+a little bit. Ready? Let's go! 🚀
+
+What's your first name?</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 2 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 2 — Kid Onboarding <span class="timestamp">[0:30]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">Four quick questions build the student profile</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Yoav</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar system">🚀</div>
+    <div class="bubble">
+      <span class="agent-name system">SQUAD INIT</span>
+      <pre>Great name, Yoav! ✨
+When's your birthday? 🎂</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>March 12, 2018</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar system">🚀</div>
+    <div class="bubble">
+      <span class="agent-name system">SQUAD INIT</span>
+      <pre>Awesome — you're 8! 🎈
+What grade are you in?</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>2nd grade</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar system">🚀</div>
+    <div class="bubble">
+      <span class="agent-name system">SQUAD INIT</span>
+      <pre>Grade 2, got it! 📝
+What city do you live in? 🏙️</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Rishon LeZion</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name ralph">RALPH — AUTO-DETECT</span>
+      <pre>🇮🇱 Detected: Israel — Rishon LeZion!
+
+📚 Curriculum: Israeli Ministry of Education (תכנית הלימודים)
+📖 Subjects: Math, Hebrew, Reading, Science, English,
+             Bible Studies, Art, PE, Social Skills
+🗣️ Default language: Hebrew</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 3 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 3 — Language Choice <span class="timestamp">[1:30]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="chat">
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name ralph">RALPH</span>
+      <pre>🗣️ Since you're in Israel, I'll talk to you in
+Hebrew (עברית). Would you like that, or would you
+prefer a different language?</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>English please</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name ralph">RALPH</span>
+      <pre>🇬🇧 No problem! English it is.
+All interactions will be in English. ✅
+
+You can switch to Hebrew anytime — just say
+"switch to Hebrew" or "עבור לעברית"!</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 4 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 4 — Universe Pick <span class="timestamp">[2:00]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">The kid picks a universe — this shapes the entire experience</div>
+<div class="chat">
+
+  <div class="msg agent">
+    <div class="avatar system">🚀</div>
+    <div class="bubble">
+      <span class="agent-name system">SQUAD INIT</span>
+      <pre>🎬 One more fun question, Yoav!
+What's your FAVORITE movie, show, book, or game?
+(This is going to be really cool, I promise! 😎)</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Harry Potter</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar system">🚀</div>
+    <div class="bubble">
+      <span class="agent-name system">SQUAD INIT</span>
+      <pre>⚡ HARRY POTTER! Excellent choice!
+
+Casting your learning squad from the
+Wizarding World... 🧙‍♀️✨</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 5 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 5 — Team Reveal <span class="timestamp">[2:45]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">✨ The Grand Reveal — characters matched to educational roles ✨</div>
+<div class="chat">
+
+  <div class="msg agent">
+    <div class="avatar hermione">⚡</div>
+    <div class="bubble">
+      <span class="agent-name hermione">SQUAD — TEAM REVEAL</span>
+      <pre>🎉✨ Yoav, YOUR SQUAD IS READY! ✨🎉
+
+Meet your amazing learning team:
+
+🎓 Hermione Granger — Your Head Teacher
+   "I'll make sure you learn everything you need for
+    grade 2! Organization and preparation are key —
+    let's make a plan!"
+
+📚 Hagrid — Your Science &amp; Subject Helper
+   "Don' worry, we'll figure it out together! I know
+    a thing or two about creatures, nature, and how
+    the world works!"
+
+🎨 Luna Lovegood — Your Creative Coach
+   "The things others find strange are usually the
+    most interesting. Let's create something nobody's
+    ever seen before!"
+
+🎮 Fred Weasley — Your Gamer
+   "Right then — fancy a challenge? I've got games
+    that'll make your brain do backflips! Wanna play?"
+
+🎬 George Weasley — Your YouTuber
+   "Welcome to today's episode! I'm going to explain
+    this so well, even Percy would be impressed.
+    Ready? Action!"
+
+🤗 Dobby — Your Study Buddy
+   "Dobby is here to help! Dobby believes in you,
+    and Dobby will always be here when you need a
+    friend. 💙"
+
+Ready to start learning? Just tell me what you'd
+like to work on! 🚀</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 6 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 6 — First Lesson <span class="timestamp">[3:30]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">Hermione teaches curriculum-aligned math with Harry Potter theming</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Let's do some math!</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar hermione">🎓</div>
+    <div class="bubble">
+      <span class="agent-name hermione">HERMIONE GRANGER</span>
+      <pre>Excellent choice, Yoav! A proper wizard always
+knows their numbers!
+
+Let's start with a quick warm-up! 🧙‍♀️
+
+📐 Challenge 1: If you have 7 chocolate frogs and
+   Hagrid gives you 8 more, how many chocolate frogs
+   do you have now?
+
+Take your time — even I double-check my arithmetic! 📝</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>15</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar hermione">🎓</div>
+    <div class="bubble">
+      <span class="agent-name hermione">HERMIONE GRANGER</span>
+      <pre>🌟 BRILLIANT, Yoav! 7 + 8 = 15 — absolutely correct!
+   <span class="xp-badge">+10 XP</span>  You're on your way to becoming a math wizard! 🧙‍♀️
+
+   Ready for the next one?
+
+📐 Challenge 2: Yoav has 23 Bertie Bott's Every
+   Flavour Beans. He eats 9 of them (hopefully not
+   the earwax ones! 🤢). How many does he have left?</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>14</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar hermione">🎓</div>
+    <div class="bubble">
+      <span class="agent-name hermione">HERMIONE GRANGER</span>
+      <pre>🌟 PERFECT! 23 − 9 = 14! You're doing wonderfully!
+   <span class="xp-badge">+10 XP</span>
+
+   Two for two — Gryffindor would be proud! 🦁</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 7 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 7 — Parent Report <span class="timestamp">[4:30]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">Parent checks in — auto-generated analytics from the session</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Show me the parent report</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name ralph">RALPH — SCRIBE REPORT</span>
+      <pre>📊 Weekly Learning Report — Yoav
+
+📈 Week at a Glance
+┌─────────────────────┬──────────────────────┐
+│ Sessions this week   │ 1                    │
+│ Total learning time  │ ~5 minutes           │
+│ Subjects covered     │ Mathematics          │
+│ XP earned           │ +20 XP               │
+│ Current level       │ Level 1: Rookie      │
+│ Streak              │ 1 day 🔥             │
+└─────────────────────┴──────────────────────┘
+
+💪 Strengths: Quick mental arithmetic, addition confidence
+🎯 Practice needed: Will discover as more sessions happen
+💡 Recommendation: Yoav responded well to Harry Potter
+   themed problems — keep using character references
+   for engagement!</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 8 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 8 — Gamer: Fred Weasley <span class="timestamp">[5:00]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">🎮 Quidditch Math Challenge — gamified curriculum-aligned math</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>I want to play a game!</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar fred">🎮</div>
+    <div class="bubble">
+      <span class="agent-name fred">FRED WEASLEY</span>
+      <pre>OI! Someone said the magic word — GAME! 🎯
+
+Alright Yoav, here's what we're playing today:
+
+⚡ QUIDDITCH MATH CHALLENGE ⚡
+
+I'm going to throw math problems at you like
+Bludgers, and you have to hit them back with the
+right answers! Score 5 to catch the Golden Snitch! 🏆
+
+Each correct answer = 1 goal.
+Miss = the Bludger gets past you.
+Ready, Keeper?
+
+🏐 Bludger 1: What's 6 × 3?
+   ⏱️ Quick — it's coming fast!</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>18</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar fred">🎮</div>
+    <div class="bubble">
+      <span class="agent-name fred">FRED WEASLEY</span>
+      <pre>WHAM! 💥 You smashed that one! 6 × 3 = 18 — GOAL!
+   Score: Yoav 1 – Bludgers 0
+
+🏐 Bludger 2: What's 45 - 17?
+   ⏱️ Incoming!</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>28</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar fred">🎮</div>
+    <div class="bubble">
+      <span class="agent-name fred">FRED WEASLEY</span>
+      <pre>Another BRILLIANT save! 💪 45 - 17 = 28!
+   Score: Yoav 2 – Bludgers 0
+
+   <span class="xp-badge">+10 XP per goal!</span>  Keep this up and the Quidditch
+   Cup is OURS!
+
+🏐 Bludger 3: What's 8 + 7 + 5?</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>20</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar fred">🎮</div>
+    <div class="bubble">
+      <span class="agent-name fred">FRED WEASLEY</span>
+      <pre>BOOM! 💥 8 + 7 + 5 = 20! Hat trick, Yoav!
+   Score: Yoav 3 – Bludgers 0 🔥</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Can I stop for now?</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar fred">🎮</div>
+    <div class="bubble">
+      <span class="agent-name fred">FRED WEASLEY</span>
+      <pre>Brilliant match, Yoav! Final score:
+   ⚡ Yoav 3 – Bludgers 0 ⚡
+   You'd make a proper Gryffindor Keeper! 🦁
+
+   <span class="xp-badge">+30 XP earned in Quidditch Math!</span>
+   🏆 New personal best!
+
+   Want to play again later? I've got loads more games!</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 9 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 9 — YouTuber: George Weasley <span class="timestamp">[6:00]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">🎬 YouTube-style science lesson — Gen Alpha format, real curriculum</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>George, can you explain why it rains?</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar george">🎬</div>
+    <div class="bubble">
+      <span class="agent-name george">GEORGE WEASLEY</span>
+      <pre>*adjusts camera*
+
+Welcome back to George's WICKED SCIENCE! 🧪
+Episode 47: "Why Water Falls From the Sky
+(And No, It's Not a Charm Gone Wrong)" 💧
+
+*intro music plays in your imagination* 🎵
+
+Okay Yoav, here's the deal. You know how when you
+boil water for tea, steam rises up? ☕💨
+
+That's EVAPORATION — water turning into an invisible
+gas and floating up into the sky. It's like the water
+is saying "I'm outta here!" and zooming upward.
+
+Now, up in the sky it's COLD. Like, Dementor-cold. ❄️
+And when that invisible water gas gets cold enough...
+it turns back into tiny water droplets!
+
+A BILLION of those tiny droplets together = a cloud! ☁️
+
+And when the cloud gets SO full it can't hold any more...
+*drumroll* 🥁
+
+IT RAINS! 🌧️
+
+That's basically a water recycling system that's been
+running for BILLIONS of years. Pretty wicked, right?
+
+🧠 POP QUIZ: What's the word for water turning into gas?
+   (Hint: starts with E!)</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>Evaporation!</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar george">🎬</div>
+    <div class="bubble">
+      <span class="agent-name george">GEORGE WEASLEY</span>
+      <pre>🎉 DING DING DING! EVAPORATION!
+
+If you liked this episode, smash that... well, there's
+no like button, but tell Hermione I taught you something!
+She never believes me. 😤
+
+<span class="xp-badge">+15 XP for Science!</span>
+
+🔔 Next episode: "Where Does the Sun Go at Night?"
+   (Spoiler: it doesn't actually go anywhere!
+    Mind. Blown. 🤯)</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 10 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 10 — Study Buddy: Dobby <span class="timestamp">[7:00]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">🤗 Frustration support — emotional safety first, then options with agency</div>
+<div class="chat">
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>this is hard, I can't do math</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar dobby">🤗</div>
+    <div class="bubble">
+      <span class="agent-name dobby">DOBBY</span>
+      <pre>*sits down next to Yoav*
+
+Dobby hears you, Yoav. And Dobby wants you to know
+something very important:
+
+Math IS hard sometimes. Even Hermione says so!
+And feeling frustrated doesn't mean you're bad at it.
+It means your brain is GROWING. 🌱
+
+You know what? Dobby couldn't do ANYTHING at first.
+But Dobby kept trying, and now look — Dobby helps
+the bravest wizards at Hogwarts! 💪
+
+Here's what we can do right now:
+  1. 🎮 Take a brain break with Fred (play a quick game?)
+  2. 🔄 Try the same math a different way
+  3. 🎨 Do something creative with Luna for a bit
+  4. 💬 Just chat — Dobby is here to listen
+
+What sounds good? There's no wrong answer! 💙</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>let's play a game with Fred</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar dobby">🤗</div>
+    <div class="bubble">
+      <span class="agent-name dobby">DOBBY</span>
+      <pre>That's a WONDERFUL choice! Dobby will tell Fred
+you're ready for some fun! 🎮💫
+
+(Dobby will be right here if you need me later! 💙)</pre>
+    </div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar fred">🎮</div>
+    <div class="bubble">
+      <span class="agent-name fred">FRED WEASLEY</span>
+      <pre>Oi! Dobby says you need a pick-me-up!
+How about something easy and fun — Wizard Trivia! 🧙
+
+Question 1: What's the name of Harry's owl?
+a) Crookshanks  b) Hedwig  c) Scabbers  d) Errol</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 11 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 11 — Grade Transition <span class="timestamp">[7:45]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">⏩ Fast-forward simulation — Ralph detects September → auto grade-up</div>
+<div class="chat">
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name system">SYSTEM</span>
+      <pre>⏩ [Simulating: profile updated to grade 3 — September transition]</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>hi</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name ralph">RALPH — GRADE TRANSITION</span>
+      <pre>*checks calendar* Hold on... 📅
+
+🎉🎊✨ AMAZING NEWS, Yoav!! ✨🎊🎉
+
+You're now in GRADE 3! 🎓
+
+🎓 Hermione is SO proud of you! An entire year of
+   learning completed — that's a LOT of knowledge!
+
+Your team is updating with new exciting subjects
+and topics...
+
+🆕 New this year:
+  - 📐 Geometry (גיאומטריה) — shapes, angles,
+    measurement!
+  - 💻 Computer Science (מדעי המחשב) — coding begins!
+  - 📚 Deeper English — longer reading, writing
+    paragraphs
+
+Your squad is ready for grade 3:
+  🎓 Hermione — Updated lesson plans for grade 3!
+  📚 Hagrid — New science experiments coming!
+  🎮 Fred — Grade 3 challenges unlocked!
+  🎬 George — New episodes filmed!
+  🤗 Dobby — Still here, always! 💙
+
+📊 Your year in review:
+  🏆 Level 6: Champion (2,450 XP!)
+  🎖️ 5 badges earned
+  🔥 Best streak: 12 days
+  📚 Covered: Math, Hebrew, Reading, Science, English
+
+Let's make grade 3 your BEST year yet! 🚀</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 12 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 12 — Parent Squad <span class="timestamp">[8:30]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">👨‍👩‍👦 Upstream parent view — privacy-first dashboard via separate repo</div>
+<div class="chat">
+
+  <div class="msg agent">
+    <div class="avatar parent">📊</div>
+    <div class="bubble">
+      <span class="agent-name system">SYSTEM</span>
+      <pre>📂 Switched to: demos/parent-squad/
+🔗 Parent Squad loaded (upstream connection)</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>How is Yoav doing?</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar parent">📊</div>
+    <div class="bubble">
+      <span class="agent-name parent">PARENT DASHBOARD</span>
+      <pre>📊 Parent Dashboard — Yoav's Learning Progress
+
+Hi! Here's what I know about Yoav's recent learning:
+
+📈 This Week's Summary
+┌─────────────────────────┬──────────────────────────┐
+│ Total sessions          │ 4                        │
+│ Learning time           │ 2 hours 15 minutes       │
+│ Subjects covered        │ Math, Science, English   │
+│ XP earned              │ +185 XP                  │
+│ Current level          │ Level 6: Champion ⭐      │
+│ Streak                 │ 12 days 🔥               │
+└─────────────────────────┴──────────────────────────┘
+
+💪 Strengths
+  • Addition and subtraction — very confident
+  • Science curiosity — asks great questions
+  • Loves the Harry Potter theme — high engagement
+
+🎯 Areas for Practice
+  • Multiplication tables (7s and 8s need more work)
+  • Word problems — understands operations but
+    struggles with identifying which one to use
+
+😊 Engagement &amp; Mood
+  • Overall: HIGH — Yoav looks forward to sessions
+  • One frustration moment with multiplication
+    (Dobby helped!)
+  • Loves Fred's Quidditch Math game
+
+💡 Recommendations
+  1. Practice multiplication during car rides —
+     Yoav is close!
+  2. Visit the Weizmann Institute science museum —
+     he loved the water cycle lesson
+  3. Read Harry Potter chapter books together —
+     boosts both English and reading comprehension
+
+📅 Coming Up
+  • Monday: Math — Introduction to multiplication by 9
+  • Wednesday: Science — Magnets and forces
+  • Friday: Creative project + review game</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SCENE 13 ═══════════ -->
+<div class="scene">
+  <div class="scene-line"></div>
+  <div class="scene-badge">Scene 13 — Hebrew Mode 🇮🇱 <span class="timestamp">[9:15]</span></div>
+  <div class="scene-line"></div>
+</div>
+<div class="narration">עברית — Full Hebrew interface with RTL, Harry Potter characters speak Hebrew</div>
+
+<div class="chat">
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name system">SYSTEM</span>
+      <pre>📂 Returned to: C:\temp\squad-for-kids</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>switch to Hebrew / עבור לעברית</pre></div>
+  </div>
+
+</div>
+
+<div class="chat rtl" dir="rtl">
+
+  <div class="msg agent">
+    <div class="avatar ralph">🔄</div>
+    <div class="bubble">
+      <span class="agent-name ralph">ראלף</span>
+      <pre>🗣️ בסדר, עוברים לעברית!
+
+יואב, הצוות שלך מדבר עכשיו בעברית! 🇮🇱
+
+הכירו את הצוות בעברית:
+
+🎓 הרמיוני גריינג'ר — המורה הראשית
+   "אני אדאג שתלמד הכל לכיתה ב׳!"
+
+📚 האגריד — עוזר המקצועות
+   "אל תדאג, ביחד נגלה הכל!"
+
+🎨 לונה לאבגוד — מאמנת היצירתיות
+   "בוא ניצור משהו שאף אחד לא ראה!"
+
+🎮 פרד ויזלי — הגיימר
+   "מוכן לאתגר?"
+
+🎬 ג'ורג' ויזלי — היוטיובר
+   "ברוכים הבאים לפרק של היום!"
+
+🤗 דובי — חבר ללמידה
+   "דובי פה בשבילך, תמיד! 💙"
+
+מה תרצה ללמוד?</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>בוא נעשה חשבון</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar hermione">🎓</div>
+    <div class="bubble">
+      <span class="agent-name hermione">הרמיוני גריינג'ר</span>
+      <pre>בחירה מעולה, יואב!
+
+בואו נתחיל עם חימום 🧙‍♀️
+
+📐 אתגר 1: אם יש לך 7 צפרדעי שוקולד והאגריד
+   נותן לך עוד 8, כמה צפרדעי שוקולד יש לך עכשיו?
+
+קח את הזמן — גם אני תמיד בודקת פעמיים! 📝</pre>
+    </div>
+  </div>
+
+  <div class="msg user">
+    <div class="avatar user">👤</div>
+    <div class="bubble"><pre>תודה, להתראות!</pre></div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar dobby">🤗</div>
+    <div class="bubble">
+      <span class="agent-name dobby">דובי</span>
+      <pre>דובי כל כך נהנה ללמוד עם יואב היום!
+דובי יהיה פה כשתרצה לחזור! 💙</pre>
+    </div>
+  </div>
+
+  <div class="msg agent">
+    <div class="avatar hermione">🎓</div>
+    <div class="bubble">
+      <span class="agent-name hermione">הרמיוני</span>
+      <pre>מפגש מעולה, יואב! נתראה בפעם הבאה —
+יש לנו עוד כל כך הרבה לגלות! ✨
+
+<span class="xp-badge">📊 המפגש נשמר. נצברו: +20 XP</span></pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ SUMMARY CARD ═══════════ -->
+<div class="summary-card">
+  <h2>📊 Demo Summary — Full 10-Minute Session</h2>
+
+  <div class="xp-total">+125 XP</div>
+  <div class="xp-label">Total Experience Points Earned During Demo</div>
+
+  <div class="summary-grid">
+
+    <div class="summary-section">
+      <h3 style="color: var(--hermione);">🎭 Characters Appeared</h3>
+      <ul>
+        <li>🎓 <strong style="color: var(--hermione);">Hermione Granger</strong> — Head Teacher</li>
+        <li>📚 <strong style="color: var(--hagrid);">Hagrid</strong> — Subject Helper</li>
+        <li>🎨 <strong style="color: var(--luna);">Luna Lovegood</strong> — Creative Coach</li>
+        <li>🎮 <strong style="color: var(--fred);">Fred Weasley</strong> — Gamer</li>
+        <li>🎬 <strong style="color: var(--george);">George Weasley</strong> — YouTuber</li>
+        <li>🤗 <strong style="color: var(--dobby);">Dobby</strong> — Study Buddy</li>
+        <li>🔄 <strong style="color: var(--ralph);">Ralph</strong> — System Agent</li>
+      </ul>
+    </div>
+
+    <div class="summary-section">
+      <h3 style="color: var(--ralph);">⚡ XP Breakdown</h3>
+      <ul>
+        <li>📐 Math Challenge 1 (Hermione) — <strong>+10 XP</strong></li>
+        <li>📐 Math Challenge 2 (Hermione) — <strong>+10 XP</strong></li>
+        <li>🎮 Quidditch Math ×3 goals (Fred) — <strong>+30 XP</strong></li>
+        <li>🧪 Science Pop Quiz (George) — <strong>+15 XP</strong></li>
+        <li>🔄 Grade Transition Year Total — <strong>2,450 XP</strong></li>
+        <li>📊 Parent Report Session — <strong>+20 XP</strong></li>
+        <li>🇮🇱 Hebrew Session Close — <strong>+20 XP</strong></li>
+        <li style="margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px;">
+          <strong style="color: var(--hermione);">Demo Total: +125 XP</strong>
+          <span style="color: var(--text-dim); font-size: 11px;"> (excluding year total)</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="summary-section full">
+      <h3 style="color: var(--parent);">🎬 All 13 Scenes</h3>
+      <ul style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px;">
+        <li>1️⃣ <strong>Parent Starts</strong> — [0:00] Welcome &amp; init</li>
+        <li>2️⃣ <strong>Kid Onboarding</strong> — [0:30] Name, grade, city</li>
+        <li>3️⃣ <strong>Language Choice</strong> — [1:30] English selected</li>
+        <li>4️⃣ <strong>Universe Pick</strong> — [2:00] Harry Potter ⚡</li>
+        <li>5️⃣ <strong>Team Reveal</strong> — [2:45] 6 characters cast</li>
+        <li>6️⃣ <strong>First Lesson</strong> — [3:30] Hermione teaches math</li>
+        <li>7️⃣ <strong>Parent Report</strong> — [4:30] Weekly analytics</li>
+        <li>8️⃣ <strong>Gamer</strong> — [5:00] Fred's Quidditch Math</li>
+        <li>9️⃣ <strong>YouTuber</strong> — [6:00] George explains rain</li>
+        <li>🔟 <strong>Study Buddy</strong> — [7:00] Dobby handles frustration</li>
+        <li>1️⃣1️⃣ <strong>Grade Transition</strong> — [7:45] Auto grade-up to 3</li>
+        <li>1️⃣2️⃣ <strong>Parent Squad</strong> — [8:30] Upstream dashboard</li>
+        <li>1️⃣3️⃣ <strong>Hebrew Mode</strong> — [9:15] Full RTL interface</li>
+      </ul>
+    </div>
+
+    <div class="summary-section full">
+      <h3 style="color: var(--dobby);">💡 Key Insights Demonstrated</h3>
+      <ul style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px;">
+        <li>🌍 Auto curriculum detection from city</li>
+        <li>🎭 Any franchise → educational roles</li>
+        <li>📊 Real-time parent analytics</li>
+        <li>🎮 Gamification = learning in disguise</li>
+        <li>📺 YouTube format for Gen Alpha</li>
+        <li>🤗 Emotional safety &amp; kid agency</li>
+        <li>📅 Zero-friction grade transitions</li>
+        <li>👨‍👩‍👦 Privacy-first parent visibility</li>
+        <li>🇮🇱 True multilingual + RTL support</li>
+        <li>⚡ Powered by GitHub Copilot CLI + Squad</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Squad for Kids — Built with the <a href="https://github.com/tamirdresher/squad-for-kids" style="color: var(--hermione); text-decoration: none;">Squad Framework</a> on GitHub Copilot CLI<br>
+  Transcript generated 2026-03-21 — Conference presentation quality
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

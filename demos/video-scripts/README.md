@@ -46,6 +46,7 @@
 | 18 | Squad Templates | [18-squad-templates.md](18-squad-templates.md) | 4 min | EN | 📝 Scripted |
 | 19 | Starter Projects | [19-starter-projects.md](19-starter-projects.md) | 5 min | EN | 📝 Scripted |
 | 20 | Safety & Content Filtering | [20-safety-content-filtering.md](20-safety-content-filtering.md) | 4 min | EN | 📝 Scripted |
+| 21 | Teen Exam Prep — Bagrut | [21-teen-exam-prep.md](21-teen-exam-prep.md) | 6 min | HE/EN | 📝 Scripted |
 
 ---
 
@@ -54,10 +55,10 @@
 | Category | Count | Combined Duration |
 |----------|-------|-------------------|
 | Core Demos | 8 | ~31 minutes |
-| Feature Demos | 12 | ~47 minutes |
-| **Total** | **20** | **~78 minutes** |
+| Feature Demos | 13 | ~53 minutes |
+| **Total** | **21** | **~84 minutes** |
 
-> Note: Core demos require Hebrew + English versions, effectively doubling to ~62 minutes for core content.
+> Note: Core demos require Hebrew + English versions, effectively doubling to ~62 minutes for core content. Video 21 (Teen Exam Prep) includes both Hebrew and English narration.
 
 ---
 

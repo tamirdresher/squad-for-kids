@@ -72,7 +72,17 @@ function Get-ConversationQueue {
 
 function Save-ConversationQueue($queue) {
     $queue.updated = (Get-Date -Format "o")
-    $queue | ConvertTo-Json -Depth 10 | Set-Content $script:QueueFile -Encoding utf8 -Force
+    # Fix A: wrap in try-catch so a save failure never crashes Ralph's patrol cycle.
+    try {
+        # Atomic write — write to .tmp then Move-Item to avoid race condition
+        # when multiple Ralph instances run simultaneously.
+        $tmpFile = "$($script:QueueFile).tmp"
+        $queue | ConvertTo-Json -Depth 10 | Set-Content $tmpFile -Encoding utf8 -Force
+        Move-Item -Path $tmpFile -Destination $script:QueueFile -Force
+    } catch {
+        Write-Warning "$($script:LogPrefix) Failed to save queue: $_. Queue state not persisted."
+        # Do NOT re-throw — patrol cycle must continue even if save fails.
+    }
 }
 
 function Add-QueueItem {
@@ -110,7 +120,9 @@ function Add-QueueItem {
     }
 
     $queue.items += $item
-    Write-Host "$($script:LogPrefix) ➕ Added to queue: '$($originalMessage.Substring(0, [Math]::Min(60, $originalMessage.Length)))...'" -ForegroundColor Cyan
+    # Bug 1 fix: guard against null $originalMessage before calling .Substring()
+    $preview = if (-not [string]::IsNullOrEmpty($originalMessage)) { $originalMessage.Substring(0, [Math]::Min(60, $originalMessage.Length)) } else { "(no text)" }
+    Write-Host "$($script:LogPrefix) ➕ Added to queue: '$preview...'" -ForegroundColor Cyan
     return $true
 }
 
@@ -122,7 +134,8 @@ function Update-QueueItem {
         [string]$note
     )
 
-    $item = $queue.items | Where-Object { $_.id -eq $itemId }
+    # Fix C: Select-Object -First 1 prevents array assignment when duplicate IDs exist
+    $item = $queue.items | Where-Object { $_.id -eq $itemId } | Select-Object -First 1
     if (-not $item) { return }
 
     $item.lastChecked = (Get-Date -Format "o")
@@ -142,7 +155,13 @@ function Update-QueueItem {
 function Test-HasTriggerWord([string]$text) {
     $lower = $text.ToLower()
     foreach ($word in $script:TriggerWords) {
-        if ($lower.Contains($word.ToLower())) {
+        # Bug 5 fix: use word-boundary regex for 'action:' to avoid false positives
+        # like 'reaction:', 'transaction:', etc.
+        if ($word -eq "action:") {
+            if ($lower -match '\baction:') {
+                return $word
+            }
+        } elseif ($lower.Contains($word.ToLower())) {
             return $word
         }
     }
@@ -206,7 +225,8 @@ function Invoke-TeamsConversationWatcher {
             $summary.checked++
             $note = "Checked at $(Get-Date -Format 'HH:mm:ss')"
             Update-QueueItem -queue $queue -itemId $item.id -action "checked" -note $note
-            Write-Host "[$ts] $($script:LogPrefix) ✅ Checked item '$($item.id.Substring(0,8))...' — thread $($item.threadId)" -ForegroundColor DarkGray
+            # Bug 3 fix: use [Math]::Min to avoid crash when id is shorter than 8 chars
+            Write-Host "[$ts] $($script:LogPrefix) ✅ Checked item '$($item.id.Substring(0, [Math]::Min(8, $item.id.Length)))...' — thread $($item.threadId)" -ForegroundColor DarkGray
         } catch {
             $summary.errors++
             Write-Warning "$($script:LogPrefix) Error checking item $($item.id): $_"
@@ -284,7 +304,8 @@ function Complete-QueueItem {
     param([Parameter(Mandatory)] [string]$ThreadId)
 
     $queue = Get-ConversationQueue
-    $item  = $queue.items | Where-Object { $_.threadId -eq $ThreadId }
+    # Fix B: Select-Object -First 1 prevents array assignment when duplicate threadIds exist
+    $item  = $queue.items | Where-Object { $_.threadId -eq $ThreadId } | Select-Object -First 1
     if (-not $item) {
         Write-Warning "$($script:LogPrefix) Item with threadId '$ThreadId' not found in queue."
         return
@@ -293,7 +314,8 @@ function Complete-QueueItem {
     $item.lastAction = "marked-done"
     $item.history   += @{ timestamp = (Get-Date -Format "o"); action = "done"; note = "Manually completed" }
     Save-ConversationQueue $queue
-    Write-Host "$($script:LogPrefix) ✅ Item $($item.id.Substring(0,8)) marked done." -ForegroundColor Green
+    # Bug 2 fix: use [Math]::Min to avoid crash when id is shorter than 8 chars
+    Write-Host "$($script:LogPrefix) ✅ Item $($item.id.Substring(0, [Math]::Min(8, $item.id.Length))) marked done." -ForegroundColor Green
 }
 
 # ---------------------------------------------------------------------------

@@ -214,6 +214,24 @@
 12. כתבו בעברית! התחילו עם: `היי! אני רוצה לבנות משחק!`
 13. הצוות יקבל את פני הילד, ישאל את שמו וגילו, ויתחיל את ההרפתקה! 🎉
 
+### 🖥️ התקנה על המחשב (חלופה ל-Codespace)
+
+מעדיפים לעבוד על המחשב שלכם במקום Codespace? יש לנו אשף התקנה בפקודה אחת!
+
+**Windows:** פתחו PowerShell והריצו:
+```powershell
+irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1 | iex
+```
+
+**macOS/Linux:** פתחו Terminal והריצו:
+```bash
+curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+```
+
+האשף בודק דרישות מוקדמות, מתקין כלים חסרים, מגדיר את הפרופיל של הילד, ומכין הכל — עם הנחיות ידידותיות בעברית ובאנגלית. לא צריך ידע טכני!
+
+> 📖 **מעדיפים הוראות כתובות?** ראו את [מדריך ההתקנה למחשב](docs/desktop-setup-guide-he.md) להוראות צעד אחרי צעד.
+
 ### מה ההורים מקבלים 👨‍👩‍👧
 
 הFork של הילד הוא מרחב הלמידה האישי שלו. אתם יכולים לראות הכל:

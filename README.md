@@ -213,6 +213,24 @@ Automated study session reminders, homework tracking, and spaced repetition sche
 12. Type in your language! Start with: `היי! אני רוצה לבנות משחק!` (or in English: `Hi! I want to build a game!`)
 13. The squad will greet your child, ask their name and age, and start the adventure! 🎉
 
+### 🖥️ Desktop Setup (alternative to Codespace)
+
+Prefer to work on your own computer instead of a Codespace? We have a one-command setup wizard!
+
+**Windows:** Open PowerShell and run:
+```powershell
+irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1 | iex
+```
+
+**macOS/Linux:** Open Terminal and run:
+```bash
+curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+```
+
+The wizard checks prerequisites, installs missing tools, sets up your child's profile, and gets everything ready — all with friendly bilingual prompts. No technical knowledge needed!
+
+> 📖 **Prefer written instructions?** See the [Desktop Setup Guide](docs/desktop-setup-guide.md) for step-by-step instructions.
+
 ### What Parents Get 👨‍👩‍👧
 
 Your child's fork is their personal learning space. You can see everything:

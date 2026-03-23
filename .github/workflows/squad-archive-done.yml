@@ -31,11 +31,11 @@ jobs:
           $cutoffDate = (Get-Date).AddDays(-$daysThreshold)
           Write-Host "🔍 Looking for Done items older than $daysThreshold days (before $($cutoffDate.ToString('o')))"
 
-          # Fetch all project items via GraphQL (works with EMU accounts unlike gh project item-list)
+          # Fetch all project items via GraphQL using user.projectV2 (more reliable than node(id:) with scoped tokens)
           $query = @'
-          query($projectId: ID!, $after: String) {
-            node(id: $projectId) {
-              ... on ProjectV2 {
+          query($owner: String!, $projectNumber: Int!, $after: String) {
+            user(login: $owner) {
+              projectV2(number: $projectNumber) {
                 items(first: 100, after: $after) {
                   nodes {
                     id
@@ -67,7 +67,7 @@ jobs:
           $after = $null
 
           do {
-            $params = @('-f', "projectId=$($env:PROJECT_ID)", '-f', "query=$query")
+            $params = @('-f', "owner=$($env:PROJECT_OWNER)", '-F', "projectNumber=$($env:PROJECT_NUMBER)", '-f', "query=$query")
             if ($after) {
               $params += @('-f', "after=$after")
             }
@@ -78,7 +78,7 @@ jobs:
             }
 
             $result = $resultJson | ConvertFrom-Json
-            $items = $result.data.node.items
+            $items = $result.data.user.projectV2.items
             $allItems += $items.nodes
             $hasNextPage = $items.pageInfo.hasNextPage
             $after = $items.pageInfo.endCursor

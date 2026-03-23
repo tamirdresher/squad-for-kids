@@ -478,6 +478,238 @@
             margin-top: 8px;
         }
 
+        /* ── Start Here Banner ── */
+        .start-here-banner {
+            background: linear-gradient(135deg, #E8FFE8 0%, #F0FFF0 50%, #E8FFE8 100%);
+            padding: 48px 20px;
+            text-align: center;
+        }
+
+        .start-here-inner {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .start-here-banner h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2D2B55;
+            margin-bottom: 16px;
+        }
+
+        .start-here-banner p {
+            font-size: 1.15rem;
+            color: #6B6B8D;
+            margin-bottom: 24px;
+        }
+
+        .btn-start-here {
+            display: inline-block;
+            background: #2ECC71;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 800;
+            padding: 22px 48px;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(46, 204, 113, 0.35);
+            animation: pulse-green 2s infinite;
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .btn-start-here:hover {
+            background: #27AE60;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(46, 204, 113, 0.5);
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 8px 32px rgba(46, 204, 113, 0.35); }
+            50% { box-shadow: 0 8px 48px rgba(46, 204, 113, 0.55); }
+        }
+
+        /* ── Inline Wizard Accordion ── */
+        .inline-wizard {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .wizard-step-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border-right: 5px solid #2ECC71;
+        }
+
+        .wizard-step-card.step-orange { border-right-color: #F39C12; }
+        .wizard-step-card.step-blue { border-right-color: #3498DB; }
+
+        .wizard-step-header {
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: none;
+            border: none;
+            width: 100%;
+            font-family: 'Heebo', sans-serif;
+            color: var(--text);
+            text-align: right;
+        }
+
+        .wizard-step-header:hover { background: #FAFAFA; }
+
+        .wizard-step-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .wizard-step-badge.green { background: #2ECC71; }
+        .wizard-step-badge.orange { background: #F39C12; }
+        .wizard-step-badge.blue { background: #3498DB; }
+
+        .wizard-step-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .wizard-step-card.open .wizard-step-body {
+            max-height: 600px;
+        }
+
+        .wizard-step-body-inner {
+            padding: 0 24px 24px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .wizard-step-body-inner p {
+            margin-bottom: 10px;
+        }
+
+        .wizard-step-body-inner .note-box {
+            background: #FFF9E6;
+            border: 1px solid #F5E6B8;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        .wizard-step-body-inner .note-box.blue {
+            background: #EBF5FF;
+            border-color: #B8D4F5;
+        }
+
+        .wizard-step-body-inner .btn-codespace {
+            display: block;
+            background: #2ECC71;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            text-align: center;
+            margin: 12px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(46, 204, 113, 0.3);
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .wizard-step-body-inner .btn-codespace:hover {
+            background: #27AE60;
+            transform: translateY(-2px);
+        }
+
+        .wizard-step-body-inner .example-msg {
+            background: #F8F6FF;
+            border: 2px dashed #C8C4FF;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            margin: 12px 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #6C63FF;
+        }
+
+        .wizard-step-body-inner .step-done-text {
+            text-align: center;
+            color: #2ECC71;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-top: 12px;
+        }
+
+        /* ── Video CTA ── */
+        .video-cta-wrapper {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-video-cta {
+            display: inline-block;
+            background: #2ECC71;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 14px 36px;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(46, 204, 113, 0.3);
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .btn-video-cta:hover {
+            background: #27AE60;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(46, 204, 113, 0.4);
+        }
+
+        /* ── Floating Help ── */
+        .floating-help {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 9999;
+            width: 60px;
+            height: 60px;
+            background: #6C63FF;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(108, 99, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .floating-help:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 32px rgba(108, 99, 255, 0.55);
+            background: #5A52E0;
+        }
+
         /* ── Mobile ── */
         @media (max-width: 768px) {
             .hero {
@@ -576,6 +808,68 @@
     <a href="#demo" class="btn-cta">תראו איך זה עובד ←</a>
 </section>
 
+<!-- START HERE Banner -->
+<section class="start-here-banner" id="start-here">
+    <div class="start-here-inner">
+        <h2>🎯 רוצים שהילד יתחיל עכשיו?</h2>
+        <p>לא צריך לדעת כלום על מחשבים. 3 צעדים פשוטים בלבד.</p>
+        <a href="start.html" class="btn-start-here">התחילו כאן — 3 צעדים פשוטים ←</a>
+    </div>
+
+    <div class="inline-wizard" style="margin-top: 36px;">
+        <div class="wizard-step-card open">
+            <button class="wizard-step-header" onclick="toggleWizard(this)">
+                <span class="wizard-step-badge green">①</span>
+                פותחים חשבון (דקתיים)
+            </button>
+            <div class="wizard-step-body">
+                <div class="wizard-step-body-inner">
+                    <p>נכנסים ל-<strong>github.com</strong> ולוחצים <strong>Sign Up</strong></p>
+                    <p>בוחרים שם משתמש, אימייל וסיסמה — כמו להירשם לכל אתר.</p>
+                    <div class="note-box">
+                        💡 ילד מעל גיל 13? תנו לו להירשם בעצמו.<br>
+                        מתחת ל-13? הורה נרשם ומוסיף את הילד.
+                    </div>
+                    <p class="step-done-text">✅ יש לי חשבון — מה עכשיו?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-step-card step-orange">
+            <button class="wizard-step-header" onclick="toggleWizard(this)">
+                <span class="wizard-step-badge orange">②</span>
+                פותחים את חלון הלמידה (דקה)
+            </button>
+            <div class="wizard-step-body">
+                <div class="wizard-step-body-inner">
+                    <p>לוחצים על הכפתור הירוק:</p>
+                    <a href="https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=tamirdresher/squad-for-kids" target="_blank" rel="noopener" class="btn-codespace">🚀 לחצו כאן לפתיחת חלון הלמידה</a>
+                    <p>מחכים 30 שניות עד שהמסך נטען.</p>
+                    <div class="note-box blue">
+                        ℹ️ תראו חלון שנראה כמו עורך טקסט — <strong>זה נורמלי!</strong>
+                    </div>
+                    <p class="step-done-text">✅ נטען? מעולה!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-step-card step-blue">
+            <button class="wizard-step-header" onclick="toggleWizard(this)">
+                <span class="wizard-step-badge blue">③</span>
+                הילד מתחיל לדבר (30 שניות)
+            </button>
+            <div class="wizard-step-body">
+                <div class="wizard-step-body-inner">
+                    <p>בצד ימין יש חלון צ׳אט. הילד כותב שם:</p>
+                    <div class="example-msg">״היי, קוראים לי דניאל ואני בן 9״</div>
+                    <p>המורה ישאל עוד כמה שאלות ויבנה צוות מותאם.</p>
+                    <p class="step-done-text">✅ זהו! הילד מוכן ללמוד 🎉</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- How It Works -->
 <section class="how-section" id="how">
     <div class="container">
@@ -663,6 +957,9 @@
         </div>
 
         <p class="demo-subtitle">תראו איך יואב בן 8 פוגש את הצוות שלו לראשונה</p>
+        <div class="video-cta-wrapper">
+            <a href="start.html" class="btn-video-cta">🟢 התחילו עכשיו ←</a>
+        </div>
     </div>
 </section>
 
@@ -693,6 +990,9 @@
                 </div>
                 <p style="font-size: 0.95rem; color: var(--text-light);">אלזה מלמדת אנגלית עם מילים קסומות ❄️</p>
             </div>
+        </div>
+        <div class="video-cta-wrapper" style="margin-top: 28px;">
+            <a href="start.html" class="btn-video-cta">🟢 התחילו עכשיו ←</a>
         </div>
     </div>
 </section>
@@ -807,6 +1107,22 @@
         document.querySelectorAll('.video-wrapper video').forEach(function(v) {
             v.pause();
         });
+    }
+</script>
+
+<!-- Floating Help Button -->
+<a href="start.html" class="floating-help" title="צריכים עזרה?">❓</a>
+
+<script>
+    function toggleWizard(button) {
+        var card = button.parentElement;
+        var isOpen = card.classList.contains('open');
+        document.querySelectorAll('.wizard-step-card.open').forEach(function(el) {
+            el.classList.remove('open');
+        });
+        if (!isOpen) {
+            card.classList.add('open');
+        }
     }
 </script>
 

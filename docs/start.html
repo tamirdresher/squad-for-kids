@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחילו כאן — סקוואד לילדים</title>
+    <meta name="description" content="3 צעדים פשוטים להפעלת צוות המורים AI לילד שלכם">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FEFCF3;
+            --green: #2ECC71;
+            --green-dark: #27AE60;
+            --orange: #F39C12;
+            --blue: #3498DB;
+            --text: #2D2B55;
+            --text-light: #6B6B8D;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --radius: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 18px;
+            direction: rtl;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            margin: 20px;
+            background: var(--card-bg);
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+        .back-link:hover { transform: translateY(-2px); }
+
+        .wizard-header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        .wizard-header h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .wizard-header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .wizard-steps {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .wizard-step {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border-right: 6px solid var(--green);
+            position: relative;
+        }
+
+        .wizard-step.step-wait {
+            border-right-color: var(--orange);
+        }
+
+        .wizard-step.step-info {
+            border-right-color: var(--blue);
+        }
+
+        .step-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .step-badge.green { background: var(--green); }
+        .step-badge.orange { background: var(--orange); }
+        .step-badge.blue { background: var(--blue); }
+
+        .step-time {
+            display: inline-block;
+            background: #F0F0F0;
+            border-radius: 999px;
+            padding: 4px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .wizard-step h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .wizard-step .instruction {
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .wizard-step .instruction strong {
+            color: var(--green-dark);
+        }
+
+        .wizard-step .note {
+            background: #FFF9E6;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #F5E6B8;
+        }
+
+        .wizard-step .note.note-blue {
+            background: #EBF5FF;
+            border-color: #B8D4F5;
+        }
+
+        .btn-open {
+            display: inline-block;
+            background: var(--green);
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 18px 40px;
+            border-radius: 999px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 24px rgba(46, 204, 113, 0.35);
+            margin: 16px 0;
+            text-align: center;
+            width: 100%;
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .btn-open:hover {
+            background: var(--green-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(46, 204, 113, 0.45);
+        }
+
+        .step-done {
+            display: block;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-top: 16px;
+        }
+
+        .example-box {
+            background: #F8F6FF;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+            border: 2px dashed #C8C4FF;
+            text-align: center;
+        }
+
+        .example-box .example-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #6C63FF;
+            direction: rtl;
+        }
+
+        .success-banner {
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: var(--radius);
+            margin: 0 20px 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .success-banner h2 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .success-banner p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        .lang-switch-start {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid #6C63FF;
+            border-radius: 999px;
+            padding: 6px 18px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #6C63FF;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            transition: all 0.25s ease;
+        }
+        .lang-switch-start:hover {
+            background: #6C63FF;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            body { font-size: 17px; }
+            .wizard-header h1 { font-size: 1.8rem; }
+            .wizard-step { padding: 24px 20px; }
+            .wizard-step h2 { font-size: 1.35rem; }
+            .btn-open { font-size: 1.15rem; padding: 16px 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="en/start.html" class="lang-switch-start">🌍 English</a>
+
+<a href="index.html" class="back-link">→ חזרה לאתר הראשי</a>
+
+<div class="wizard-header">
+    <h1>🟢 מתחילים ב-3 צעדים</h1>
+    <p>בעוד 5 דקות הילד שלכם ידבר עם צוות המורים הפרטיים שלו</p>
+</div>
+
+<div class="wizard-steps">
+
+    <!-- Step 1 -->
+    <div class="wizard-step">
+        <div class="step-badge green">①</div>
+        <span class="step-time">⏱️ דקתיים</span>
+        <h2>פותחים חשבון</h2>
+
+        <p class="instruction">
+            נכנסים לאתר <strong>github.com</strong> ולוחצים <strong>Sign Up</strong>
+        </p>
+        <p class="instruction">
+            בוחרים שם משתמש, אימייל וסיסמה.<br>
+            בדיוק כמו להירשם לכל אתר.
+        </p>
+
+        <div class="note">
+            💡 <strong>ילד מעל גיל 13?</strong> תנו לו להירשם לבד.<br>
+            <strong>מתחת ל-13?</strong> הורה נרשם ומוסיף את הילד.
+        </div>
+
+        <span class="step-done">✅ יש לי חשבון — מה עכשיו?</span>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="wizard-step step-wait">
+        <div class="step-badge orange">②</div>
+        <span class="step-time">⏱️ דקה אחת</span>
+        <h2>פותחים את חלון הלמידה</h2>
+
+        <p class="instruction">לוחצים על הכפתור הירוק הגדול:</p>
+
+        <a href="https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=tamirdresher/squad-for-kids" target="_blank" rel="noopener" class="btn-open">
+            🚀 לחצו כאן לפתיחת חלון הלמידה
+        </a>
+
+        <p class="instruction">
+            מחכים 30 שניות עד שהמסך נטען.
+        </p>
+
+        <div class="note note-blue">
+            ℹ️ תראו חלון שנראה כמו עורך טקסט — <strong>זה נורמלי!</strong><br>
+            זה חלון העבודה של הילד.
+        </div>
+
+        <span class="step-done">✅ נטען? מעולה!</span>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="wizard-step step-info">
+        <div class="step-badge blue">③</div>
+        <span class="step-time">⏱️ 30 שניות</span>
+        <h2>הילד מתחיל לדבר</h2>
+
+        <p class="instruction">
+            בצד ימין יש חלון צ׳אט.<br>
+            הילד כותב שם:
+        </p>
+
+        <div class="example-box">
+            <p class="example-text">״היי, קוראים לי דניאל ואני בן 9״</p>
+        </div>
+
+        <p class="instruction">
+            המורה הפרטי ישאל עוד כמה שאלות:<br>
+            מה אוהבים? באיזו כיתה?<br>
+            ויבנה צוות מותאם אישית.
+        </p>
+
+        <span class="step-done">✅ זהו! הילד מוכן ללמוד 🎉</span>
+    </div>
+
+</div>
+
+<div class="success-banner">
+    <h2>🎉 זה הכל!</h2>
+    <p>הילד כבר מדבר עם הצוות שלו. מדהים, לא?</p>
+</div>
+
+</body>
+</html>

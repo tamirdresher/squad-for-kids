@@ -165,6 +165,22 @@ function Read-RalphConfig {
             return $mins
         }
         $normalSec = if ($cfg.intervalSeconds) { $cfg.intervalSeconds } else { $defaultIntervalMinutes * 60 }
+
+        # Overnight work window: tighter interval between startHour and endHour (local time)
+        if ($cfg.overnightWork -and $cfg.overnightWork.enabled -eq $true) {
+            $currentHour = (Get-Date).Hour
+            $startH = [int]$cfg.overnightWork.startHour
+            $endH   = [int]$cfg.overnightWork.endHour
+            $inWindow = ($startH -lt $endH -and $currentHour -ge $startH -and $currentHour -lt $endH) -or
+                        ($startH -ge $endH -and ($currentHour -ge $startH -or $currentHour -lt $endH))
+            if ($inWindow) {
+                $nightSec = if ($cfg.overnightWork.intervalSeconds) { [int]$cfg.overnightWork.intervalSeconds } else { 120 }
+                $nightMins = [math]::Round($nightSec / 60, 1)
+                Write-Host "[$ts] 🌙 Overnight work window (${startH}:00-${endH}:00) — interval ${nightMins}m" -ForegroundColor DarkCyan
+                return $nightMins
+            }
+        }
+
         $mins = [math]::Round($normalSec / 60, 1)
         Write-Host "[$ts] Config loaded — interval ${mins}m" -ForegroundColor DarkGray
         return $mins

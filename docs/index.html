@@ -964,9 +964,41 @@
             border-right: 4px solid #9c27b0;
         }
 
+        /* ============ LANGUAGE SWITCHER ============ */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.12);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.25s ease;
+        }
+
+        .lang-switcher:hover {
+            box-shadow: 0 8px 40px rgba(108, 99, 255, 0.15);
+            transform: translateY(-1px);
+            color: var(--primary);
+        }
+
     </style>
 </head>
 <body>
+
+<!-- ============ LANGUAGE SWITCHER ============ -->
+<a href="en/index.html" class="lang-switcher" aria-label="Switch to English">
+    🌍 English
+</a>
 
 <!-- ============ HERO ============ -->
 <section class="hero" id="top">

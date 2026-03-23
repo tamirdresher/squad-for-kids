@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squad for Kids — Your Child's Personal AI Learning Team</title>
+    <meta name="description" content="A free, open-source AI system that teaches kids math, reading, coding & more — with characters from Harry Potter, Frozen, and Minecraft. Adaptive, safe, and fun.">
+    <meta property="og:title" content="Squad for Kids — Learning with Hermione Granger 🧙‍♀️">
+    <meta property="og:description" content="A personal AI team that teaches your child through characters they love. Free & open source!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tamirdresher.github.io/squad-for-kids/en/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #FEFCF3;
+            --bg-alt: #FFF8E7;
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --accent-pink: #FF6584;
+            --accent-green: #43B97F;
+            --text: #2D2D3F;
+            --text-light: #6B6B80;
+            --white: #FFFFFF;
+            --shadow-sm: 0 2px 8px rgba(108, 99, 255, 0.08);
+            --shadow-md: 0 4px 20px rgba(108, 99, 255, 0.12);
+            --shadow-lg: 0 8px 40px rgba(108, 99, 255, 0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ============ LANGUAGE SWITCHER ============ */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.25s ease;
+        }
+
+        .lang-switcher:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
+            color: var(--primary);
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px 40px;
+            background: linear-gradient(160deg, #F0EDFF 0%, var(--bg) 40%, #FFF0F3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(108,99,255,0.07) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(255,101,132,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .hero-emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            color: var(--text-light);
+            font-weight: 400;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--white);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-width: 260px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.35);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(108, 99, 255, 0.45);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            border: 2px solid rgba(108, 99, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: #F5F3FF;
+            transform: translateY(-2px);
+        }
+
+        .btn-green {
+            background: var(--accent-green);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(67, 185, 127, 0.35);
+            font-size: 1.2rem;
+            padding: 18px 40px;
+        }
+
+        .btn-green:hover {
+            background: #38A06E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(67, 185, 127, 0.45);
+        }
+
+        /* ============ SECTIONS ============ */
+        section {
+            padding: 80px 24px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 48px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .section-title span {
+            color: var(--primary);
+        }
+
+        /* ============ HOW IT WORKS ============ */
+        .how-it-works {
+            background: var(--white);
+        }
+
+        .steps {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 28px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            border-radius: 50%;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-number {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .step h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .step p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+        }
+
+        /* ============ FEATURES ============ */
+        .features {
+            background: linear-gradient(180deg, var(--bg) 0%, #F0EDFF 100%);
+        }
+
+        .features-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-item {
+            background: var(--white);
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-check {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-item strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .feature-item p {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        /* ============ DEMO VIDEO ============ */
+        .demo-section {
+            background: var(--white);
+            text-align: center;
+        }
+
+        .demo-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ============ VIDEO GRID ============ */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .video-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .video-card video {
+            width: 100%;
+            display: block;
+            background: #000;
+        }
+
+        .video-card-title {
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            text-align: left;
+            border-top: 1px solid rgba(108, 99, 255, 0.08);
+        }
+
+        /* ============ SETUP ============ */
+        .setup-section {
+            background: linear-gradient(180deg, #F0EDFF 0%, var(--bg) 100%);
+        }
+
+        .setup-card {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .setup-recommended {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--primary);
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .setup-badge {
+            position: absolute;
+            top: -14px;
+            left: 24px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .setup-recommended h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            color: var(--primary);
+        }
+
+        .setup-steps {
+            list-style: none;
+            counter-reset: setup-step;
+        }
+
+        .setup-steps li {
+            counter-increment: setup-step;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(108, 99, 255, 0.08);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            font-size: 1.05rem;
+        }
+
+        .setup-steps li:last-child {
+            border-bottom: none;
+        }
+
+        .setup-steps li::before {
+            content: counter(setup-step);
+            background: var(--primary);
+            color: var(--white);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .setup-steps li a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 2px solid rgba(108, 99, 255, 0.3);
+            transition: border-color 0.2s;
+        }
+
+        .setup-steps li a:hover {
+            border-color: var(--primary);
+        }
+
+        .code-inline {
+            background: #2D2D3F;
+            color: #E8E6FF;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .setup-note {
+            background: #fff8e1;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-left: 4px solid #ffc107;
+        }
+
+        .setup-warning {
+            background: #fce4ec;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            border-left: 4px solid #e91e63;
+        }
+
+        .setup-tip {
+            background: #FFFDE7;
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-top: 20px;
+            font-size: 0.98rem;
+            line-height: 1.6;
+        }
+
+        .setup-local,
+        .setup-parent {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-sm);
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .setup-local {
+            border-left: 5px solid #3B82F6;
+        }
+
+        .setup-parent {
+            border-left: 5px solid #43B97F;
+        }
+
+        .setup-local h3,
+        .setup-parent h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .setup-local .setup-desc,
+        .setup-parent .setup-desc {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        /* ============ COLLAPSIBLE ============ */
+        .collapsible {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .collapsible-toggle {
+            background: var(--white);
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 20px 28px;
+            width: 100%;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .collapsible-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .collapsible-toggle .arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 2000px;
+        }
+
+        .collapsible-toggle.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-inner {
+            background: var(--white);
+            border: 1px solid rgba(108, 99, 255, 0.1);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 24px 28px;
+        }
+
+        .collapsible-inner h4 {
+            font-size: 1.1rem;
+            margin: 20px 0 12px;
+            color: var(--primary);
+        }
+
+        .collapsible-inner h4:first-child {
+            margin-top: 0;
+        }
+
+        .collapsible-inner ol {
+            padding-left: 24px;
+        }
+
+        .collapsible-inner li {
+            margin-bottom: 10px;
+            font-size: 1.02rem;
+            color: var(--text-light);
+        }
+
+        /* ============ FAQ ============ */
+        .faq-section {
+            background: var(--white);
+        }
+
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .faq-item {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 20px 24px;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-question .faq-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-arrow {
+            transform: rotate(180deg);
+        }
+
+        .faq-item.open .faq-question {
+            color: var(--primary);
+        }
+
+        /* ============ SHARE ============ */
+        .share-section {
+            background: linear-gradient(180deg, var(--bg) 0%, #F0EDFF 100%);
+            text-align: center;
+        }
+
+        .share-buttons {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .share-buttons .btn {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .btn-twitter {
+            background: #1DA1F2;
+            color: var(--white);
+        }
+
+        .btn-twitter:hover {
+            background: #0D8BD9;
+            transform: translateY(-2px);
+        }
+
+        .btn-email-share {
+            background: var(--accent-pink);
+            color: var(--white);
+        }
+
+        .btn-email-share:hover {
+            background: #E8577A;
+            transform: translateY(-2px);
+        }
+
+        .btn-copy {
+            background: var(--white);
+            color: var(--text);
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .btn-copy:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .copy-feedback {
+            display: none;
+            color: var(--accent-green);
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* ============ FOOTER ============ */
+        footer {
+            background: #2D2D3F;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        footer p {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        footer a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            transition: border-color 0.2s;
+        }
+
+        footer a:hover {
+            border-color: var(--white);
+        }
+
+        footer .heart {
+            color: var(--accent-pink);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (min-width: 640px) {
+            .hero-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .share-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                max-width: 700px;
+            }
+
+            .share-buttons .btn {
+                width: auto;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            section {
+                padding: 56px 16px;
+            }
+
+            .step {
+                padding: 20px;
+                gap: 14px;
+            }
+
+            .step-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+            }
+
+            .setup-recommended {
+                padding: 28px 20px;
+            }
+
+            .btn {
+                min-width: 220px;
+                padding: 14px 28px;
+                font-size: 1.05rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lang-switcher {
+                top: 12px;
+                right: 12px;
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ============ ACCESSIBILITY ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(108, 99, 255, 0.3);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ LANGUAGE SWITCHER ============ -->
+<a href="../index.html" class="lang-switcher" aria-label="Switch to Hebrew">
+    🇮🇱 עברית
+</a>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+    <div class="hero-content">
+        <span class="hero-emoji" aria-hidden="true">🧙‍♀️</span>
+        <h1>Your Child Will Learn Math<br>from <span>Hermione Granger</span></h1>
+        <p class="hero-subtitle">Squad for Kids — A personal AI team that teaches your child through characters they already love</p>
+        <div class="hero-badges">
+            <span class="badge">✨ 100% Free</span>
+            <span class="badge">🔓 Open Source</span>
+            <span class="badge">🛡️ Kid-Safe</span>
+            <span class="badge">🎓 Adaptive</span>
+        </div>
+        <div class="hero-buttons">
+            <a href="#setup" class="btn btn-primary">🚀 Get Started — It's Free!</a>
+            <a href="#parents" class="btn btn-secondary">👨‍👩‍👧 For Parents</a>
+            <a href="#demo" class="btn btn-secondary">📺 Watch Demo</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how-it-works" id="how">
+    <div class="container">
+        <h2 class="section-title">How Does It <span>Work?</span></h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-icon">👋</div>
+                <div>
+                    <div class="step-number">Step 1</div>
+                    <h3>Your Child Says Hello</h3>
+                    <p>They open the system and share their name, age, and grade level</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-icon">🎬</div>
+                <div>
+                    <div class="step-number">Step 2</div>
+                    <h3>Pick a Favorite Universe</h3>
+                    <p>Harry Potter? Frozen? Minecraft? The system builds a team of characters from the world they choose</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-icon">📚</div>
+                <div>
+                    <div class="step-number">Step 3</div>
+                    <h3>Start Learning!</h3>
+                    <p>Hermione teaches math, Teddy gives hugs when it's tough, and Fred turns homework into a game</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="features" id="features">
+    <div class="container">
+        <h2 class="section-title">Why Is This <span>Special?</span></h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">🎯</span>
+                <div>
+                    <strong>Adaptive Learning</strong>
+                    <p>Automatically adjusts to your child's grade level, strengths, and areas for growth</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">🧙‍♀️</span>
+                <div>
+                    <strong>Characters They Love</strong>
+                    <p>Not a robotic tutor — Hermione, Elsa, or Steve from Minecraft make learning feel like play</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">🎮</span>
+                <div>
+                    <strong>Gamified Experience</strong>
+                    <p>XP points, badges, quests, and rewards keep kids motivated and coming back for more</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">💻</span>
+                <div>
+                    <strong>Learn to Code</strong>
+                    <p>Kids can build their own games and projects — real coding, not just drag-and-drop</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">🤗</span>
+                <div>
+                    <strong>Emotional Support</strong>
+                    <p>When your child says "I can't" — Teddy doesn't say "try harder." He hugs and offers choices</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">🛡️</span>
+                <div>
+                    <strong>Safe & Private</strong>
+                    <p>No personal data collected. Everything stays in your private GitHub — only you can see it</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">📊</span>
+                <div>
+                    <strong>Parent Reports</strong>
+                    <p>See what your child learned, where they excel, and what needs more practice</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-check" aria-hidden="true">💵</span>
+                <div>
+                    <strong>Completely Free</strong>
+                    <p>No credit card. No subscription. No hidden fees. Ever.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ DEMO VIDEO ============ -->
+<section class="demo-section" id="demo">
+    <div class="container">
+        <h2 class="section-title">📺 See It <span>In Action</span></h2>
+        <div class="demo-container">
+            <video controls playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);margin:0 auto;display:block;">
+                <source src="../demo-video-en.mp4" type="video/mp4">
+                Your browser does not support the video tag. <a href="../demo-video-en.mp4">Click here to download</a>.
+            </video>
+            <p style="text-align:center;margin-top:16px;color:var(--text-light);font-size:0.95em;">
+                🎬 Demo — Onboarding (name, birthday, favorite universe), building a superhero game, step-by-step math help (247×18), troubleshooting computer problems — and on local installs, the Squad can actually diagnose and fix your computer!
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============ ADDITIONAL SAMPLE VIDEOS ============ -->
+<section class="demo-section" id="more-videos" style="background: linear-gradient(180deg, var(--white) 0%, #F0EDFF 100%);">
+    <div class="container">
+        <h2 class="section-title">More <span>Videos</span></h2>
+        <div class="video-grid">
+            <div class="video-card">
+                <video controls playsinline preload="metadata">
+                    <source src="../sample-teacher-english.mp4" type="video/mp4">
+                    Your browser does not support the video tag. <a href="../sample-teacher-english.mp4">Click here to download</a>.
+                </video>
+                <div class="video-card-title">🏫 For Educators</div>
+            </div>
+            <div class="video-card">
+                <video controls playsinline preload="metadata">
+                    <source src="../sample-developer-english.mp4" type="video/mp4">
+                    Your browser does not support the video tag. <a href="../sample-developer-english.mp4">Click here to download</a>.
+                </video>
+                <div class="video-card-title">💻 For Developers</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ GAME ============ -->
+<section class="demo-section" id="game" style="background: linear-gradient(180deg, #FFF0F3 0%, var(--bg) 100%);">
+    <div class="container">
+        <h2 class="section-title">🎮 Try a <span>Sample Game</span></h2>
+        <p style="font-size:1.15rem;color:var(--text-light);margin-bottom:28px;line-height:1.7;">
+            This is an example of a game the Squad builds with your child — a superhero-themed game, coded together in real time!
+        </p>
+        <a href="../superman-game.html" class="btn btn-green" target="_blank">🦸 Play the Superhero Game</a>
+    </div>
+</section>
+
+<!-- ============ SETUP ============ -->
+<section class="setup-section" id="setup">
+    <div class="container">
+        <h2 class="section-title">Getting Started <span>in 3 Minutes</span></h2>
+
+        <div class="setup-card">
+            <div class="setup-recommended">
+                <div class="setup-badge">🌟 Recommended</div>
+                <h3>The Easiest Way</h3>
+                <ol class="setup-steps">
+                    <li>
+                        <span>Have a GitHub account? Great! If not — <a href="https://github.com/signup" target="_blank" rel="noopener">create a free account</a> (takes 1 minute, just like signing up for any website)</span>
+                    </li>
+                    <li>
+                        <span>
+                            <div class="setup-warning">
+                                🖥️ <strong>Important:</strong> This step must be done from a laptop or desktop — not a phone or tablet.
+                            </div>
+                            Go to <a href="https://github.com/tamirdresher/squad-for-kids" target="_blank" rel="noopener">github.com/tamirdresher/squad-for-kids</a>
+                            <br>Click the green <strong>"Code"</strong> button → <strong>"Codespaces"</strong> tab → <strong>"Create codespace on main"</strong>
+                            <div class="setup-note">
+                                ⏱️ Wait 1–2 minutes for the VS Code environment to fully load.
+                            </div>
+                        </span>
+                    </li>
+                    <li>
+                        <span>Wait until the VS Code interface is fully loaded (you'll see a code editor with files on the side)</span>
+                    </li>
+                    <li>
+                        <span>Open Copilot Chat — click the chat icon 💬 on the side, or press <span class="code-inline">Ctrl+Alt+I</span></span>
+                    </li>
+                    <li>
+                        <span>⚡ <strong>Important!</strong> At the bottom of the chat window, select the <strong>"squad"</strong> agent from the dropdown menu</span>
+                        <div style="margin: 8px 0 8px 20px; padding: 10px 16px; background: #1a1a2e; border-radius: 8px; border-left: 3px solid #50fa7b; font-size: 0.9em;">
+                            🔍 Look at the bottom of the chat panel for a dropdown → select <strong style="color: #50fa7b;">squad</strong>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Click <strong>"Autopilot (Preview)"</strong> at the bottom of the chat window to enable autonomous mode — this lets the Squad work on its own!</span>
+                    </li>
+                    <li>
+                        <span>Start chatting! 🎮 Try: <span class="code-inline">Hey! I want to build a game!</span></span>
+                    </li>
+                </ol>
+                <div class="setup-note">
+                    🔄 <strong>Coming back later?</strong> No need to create a new one! Go to <a href="https://github.com/codespaces" target="_blank">github.com/codespaces</a> and you'll find your existing workspace. Just click on it.
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-card" style="background:var(--white);border-radius:var(--radius);padding:36px 32px;box-shadow:var(--shadow-sm);max-width:700px;margin:20px auto;border-left:4px solid #9c27b0;">
+            <h3>🎯 What the Demo Shows</h3>
+            <p style="color:var(--text-light);margin-bottom:16px;">Here's what your child can do with Squad:</p>
+            <ul style="list-style:none;padding:0;">
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">👋 <strong>Onboarding</strong> — Your child shares their name, birthday, and picks a favorite universe (superheroes, Harry Potter...)</li>
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">🎮 <strong>Build a Game</strong> — Say "I want to build a game!" and the Squad creates a superhero game together</li>
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">📐 <strong>Homework Help</strong> — "What's 247 times 18?" gets a step-by-step explanation</li>
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">🔧 <strong>Computer Troubleshooting</strong> — "My computer is slow" and the Squad helps diagnose and fix it</li>
+                <li style="padding:10px 0;font-size:1.05rem;">💻 <strong>On Local Install</strong> — The Squad can actually check and fix the computer (not just give advice!)</li>
+            </ul>
+        </div>
+
+        <div class="setup-card setup-local">
+            <h3>💻 Install on Your Child's Computer (Windows)</h3>
+            <p class="setup-desc">Prefer everything local on your child's machine? Here's how:</p>
+            <ol class="setup-steps">
+                <li><span>Download and install <a href="https://desktop.github.com/" target="_blank">GitHub Desktop</a> — click "Download for Windows"</span></li>
+                <li><span>Sign in with your GitHub account</span></li>
+                <li><span>Click "Clone a Repository" → type: <code>tamirdresher/squad-for-kids</code> → Clone</span></li>
+                <li><span>Download and install <a href="https://nodejs.org/en/download" target="_blank">Node.js</a> (click the big green button)</span></li>
+                <li><span>Download and install <a href="https://github.com/cli/cli/releases/latest" target="_blank">GitHub Copilot CLI</a></span></li>
+                <li><span>Open the folder → right-click → "Open in Terminal"</span></li>
+                <li><span>Type: <code>copilot</code> and press Enter</span></li>
+                <li><span>⚡ Select the <strong>"Squad"</strong> agent from the Agent menu at the top</span></li>
+                <li><span>Hand the keyboard to your child! 🎮</span></li>
+            </ol>
+        </div>
+
+        <div class="collapsible">
+            <button class="collapsible-toggle" aria-expanded="false" onclick="toggleCollapsible(this)">
+                💻 Advanced: Local Installation (VS Code)
+                <span class="arrow" aria-hidden="true">⌄</span>
+            </button>
+            <div class="collapsible-content">
+                <div class="collapsible-inner">
+                    <h4>🪟 Windows</h4>
+                    <ol>
+                        <li>Download and install <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">Visual Studio Code</a> (free software by Microsoft)</li>
+                        <li>Open VS Code, click the Extensions icon on the left sidebar, search for "GitHub Copilot" — install it</li>
+                        <li>Download <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">Git</a> and install (click Next through the wizard)</li>
+                        <li>Open Terminal inside VS Code (menu: Terminal → New Terminal)</li>
+                        <li>Type: <span class="code-inline">git clone https://github.com/tamirdresher/squad-for-kids.git</span></li>
+                        <li>Open the created folder: File → Open Folder → squad-for-kids</li>
+                        <li>In the Terminal type: <span class="code-inline">copilot</span> and press Enter</li>
+                        <li>⚡ Select the <strong>"Squad"</strong> agent from the menu — that's what activates the learning team</li>
+                    </ol>
+
+                    <h4>🍎 Mac</h4>
+                    <ol>
+                        <li>Download and install <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">Visual Studio Code</a></li>
+                        <li>Install the "GitHub Copilot" extension from Extensions</li>
+                        <li>Open Terminal (Spotlight → Terminal) and type: <span class="code-inline">git clone https://github.com/tamirdresher/squad-for-kids.git</span></li>
+                        <li>In VS Code: File → Open Folder → squad-for-kids</li>
+                        <li>In the Terminal type: <span class="code-inline">copilot</span> and press Enter</li>
+                        <li>⚡ Select the <strong>"Squad"</strong> agent from the menu — that's what activates the learning team</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ PARENTS (FORK) ============ -->
+<section class="setup-section" id="parents" style="background: linear-gradient(180deg, #FFF8E7 0%, var(--bg) 100%);">
+    <div class="container">
+        <h2 class="section-title">👨‍👩‍👧 For Parents — <span>How It Works</span></h2>
+        <p style="text-align:center;font-size:1.15rem;color:var(--text-light);margin-bottom:28px;line-height:1.8;">
+            Your child gets their <strong>own personal copy</strong> of the system. All progress is saved in your GitHub account — private and under your control.
+        </p>
+
+        <div class="setup-card">
+            <div class="setup-recommended">
+                <div class="setup-badge">🍴 Fork = Your Personal Copy</div>
+                <h3>5 Simple Steps</h3>
+                <ol class="setup-steps">
+                    <li>
+                        <span>🍴 <strong>Fork the Repository</strong> — Go to <a href="https://github.com/tamirdresher/squad-for-kids" target="_blank" rel="noopener">the original repo</a> and click the <strong>"Fork"</strong> button in the top-right corner. This creates a personal copy in your account.</span>
+                    </li>
+                    <li>
+                        <span>✅ <strong>Confirm you're on your Fork</strong> — Check that the URL shows <code>your-username/squad-for-kids</code> (not <code>tamirdresher/squad-for-kids</code>)</span>
+                    </li>
+                    <li>
+                        <span>🚀 <strong>Create a Codespace from your Fork</strong> — Click <strong>"Code"</strong> → <strong>"Codespaces"</strong> → <strong>"Create codespace on main"</strong></span>
+                    </li>
+                    <li>
+                        <span>🤖 <strong>Select the Squad Agent</strong> — Open Copilot Chat (💬), select <strong>"squad"</strong> from the dropdown, and enable <strong>"Autopilot"</strong></span>
+                    </li>
+                    <li>
+                        <span>💬 <strong>Your child starts chatting!</strong> — <span class="code-inline">Hey! I want to build a game!</span></span>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="setup-card" style="background:var(--white);border-radius:var(--radius);padding:36px 32px;box-shadow:var(--shadow-sm);max-width:700px;margin:20px auto;">
+            <h3>📊 What Parents Can See</h3>
+            <ul style="list-style:none;padding:0;">
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">📄 <strong>Student Profile</strong> (<code>student-profile.json</code>) — name, age, interests, XP, badges</li>
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">📁 <strong>Weekly Reports</strong> (<code>.squad/reports/</code>) — what was learned, strengths, areas to practice</li>
+                <li style="padding:10px 0;border-bottom:1px solid rgba(108,99,255,0.08);font-size:1.05rem;">📋 <strong>Learning Plan</strong> (<code>.squad/teaching-plan.md</code>) — curriculum progress</li>
+                <li style="padding:10px 0;font-size:1.05rem;">🔄 <strong>Commit History</strong> — every learning session is documented</li>
+            </ul>
+        </div>
+
+        <div class="setup-card" style="background:var(--white);border-radius:var(--radius);padding:36px 32px;box-shadow:var(--shadow-sm);max-width:700px;margin:20px auto;">
+            <h3>🔄 Automatic Updates</h3>
+            <p style="font-size:1.05rem;line-height:1.7;margin-bottom:12px;">
+                When we add new features, templates, or learning content — you can sync them to your Fork:
+            </p>
+            <ol class="setup-steps">
+                <li><span>On your Fork page, look for the <strong>"This branch is X commits behind"</strong> banner</span></li>
+                <li><span>Click <strong>"Sync fork"</strong> → <strong>"Update branch"</strong></span></li>
+                <li><span>✅ Your child's personal data is preserved — only the learning content gets updated!</span></li>
+            </ol>
+        </div>
+
+        <div class="setup-card" style="background:linear-gradient(135deg, #f0fff4 0%, #f0f9ff 100%);border:2px solid rgba(67,185,127,0.2);border-radius:var(--radius);padding:36px 32px;max-width:700px;margin:20px auto;">
+            <h3>🔒 Privacy & Safety</h3>
+            <ul style="list-style:none;padding:0;">
+                <li style="padding:8px 0;font-size:1.05rem;">🔒 All data stays in <strong>your</strong> Fork — only you can see it</li>
+                <li style="padding:8px 0;font-size:1.05rem;">👶 Minimal collection — only first name, age, and city</li>
+                <li style="padding:8px 0;font-size:1.05rem;">🛡️ Age-appropriate content filtering for every age group</li>
+                <li style="padding:8px 0;font-size:1.05rem;">📖 Open source — inspect every line of code yourself</li>
+            </ul>
+            <p style="margin-top:12px;">
+                <a href="../parent-guide.md" style="color:var(--primary);font-weight:700;text-decoration:underline;">📖 Read the full Parent Guide →</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq-section" id="faq">
+    <div class="container">
+        <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>How much does it cost? 💰</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">It's completely free. Really. No credit card, no subscription, no hidden fees. Just sign up and start learning.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>Is it safe for kids? 🔒</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">The system never asks for last names, addresses, or phone numbers. Only first name, age, and grade. All conversations happen in a closed, protected environment. Everything is stored in your private GitHub repository — no third parties involved.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>What ages is it for? 🎂</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">Grades 1 through 12 (ages 6–18). The system automatically adapts — a 2nd grader gets different exercises than a 7th grader. Content difficulty, character personalities, and teaching approaches all adjust to your child's level.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>What subjects does it cover? 📚</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">Math, reading, science, coding, and more. The Squad can also help with homework, build games, troubleshoot computer issues, and teach real programming skills. It adapts to what your child needs and is interested in.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>Do I need to know how to code? 🤔</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">Not at all! The setup takes 3 minutes and requires zero coding knowledge. Just click a few buttons and your child is ready to go. If you want to go deeper, the system is fully open-source and customizable.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>What devices work? 💻</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">Any laptop or desktop with a modern browser (Chrome, Edge, Firefox). Chromebooks work too. Phone and tablet support is not currently available — a keyboard is needed for the best learning experience.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+                    <span>How is this different from ChatGPT? 🤖</span>
+                    <span class="faq-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">Squad for Kids isn't just a chatbot — it's a complete learning team. Each character has a distinct personality and teaching role. The system tracks progress, adapts difficulty, provides emotional support, generates parent reports, and can even build and run real code. It's specifically designed for children, with age-appropriate content filtering and a safe environment.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ SHARE ============ -->
+<section class="share-section" id="share">
+    <div class="container">
+        <h2 class="section-title">Share With <span>Other Parents</span></h2>
+        <div class="share-buttons">
+            <a href="https://twitter.com/intent/tweet?text=Check%20out%20Squad%20for%20Kids%20%E2%80%94%20a%20free%20AI%20learning%20system%20that%20teaches%20kids%20through%20characters%20they%20love%20(Harry%20Potter%2C%20Frozen%2C%20Minecraft)!%20%F0%9F%A7%99%E2%80%8D%E2%99%80%EF%B8%8F%20https%3A%2F%2Ftamirdresher.github.io%2Fsquad-for-kids%2Fen%2F" target="_blank" rel="noopener" class="btn btn-twitter">🐦 Share on X / Twitter</a>
+            <a href="mailto:?subject=Squad%20for%20Kids%20%E2%80%94%20Free%20AI%20Learning%20for%20Kids&body=Hey!%20I%20found%20something%20amazing%20%E2%80%94%20a%20free%20AI%20system%20that%20teaches%20kids%20through%20characters%20from%20Harry%20Potter%2C%20Frozen%2C%20and%20Minecraft.%20My%20kid%20loves%20it!%0A%0ACheck%20it%20out%3A%20https%3A%2F%2Ftamirdresher.github.io%2Fsquad-for-kids%2Fen%2F" target="_blank" rel="noopener" class="btn btn-email-share">📧 Share via Email</a>
+            <button class="btn btn-copy" onclick="copyLink()">🔗 Copy Link</button>
+        </div>
+        <p class="copy-feedback" id="copyFeedback">✅ Link copied!</p>
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+    <p>Built with <span class="heart">❤️</span> by Tamir Dresher &amp; GitHub Copilot</p>
+    <p>Open Source: <a href="https://github.com/tamirdresher/squad-for-kids" target="_blank" rel="noopener">github.com/tamirdresher/squad-for-kids</a></p>
+</footer>
+
+<script>
+    function toggleCollapsible(btn) {
+        const content = btn.nextElementSibling;
+        const isOpen = content.classList.contains('open');
+        content.classList.toggle('open');
+        btn.classList.toggle('open');
+        btn.setAttribute('aria-expanded', !isOpen);
+    }
+
+    function toggleFaq(btn) {
+        const item = btn.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+
+        document.querySelectorAll('.faq-item.open').forEach(openItem => {
+            if (openItem !== item) {
+                openItem.classList.remove('open');
+                openItem.querySelector('.faq-answer').style.maxHeight = '0';
+                openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', !isOpen);
+
+        if (!isOpen) {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+        } else {
+            answer.style.maxHeight = '0';
+        }
+    }
+
+    function copyLink() {
+        const url = 'https://tamirdresher.github.io/squad-for-kids/en/';
+        navigator.clipboard.writeText(url).then(() => {
+            const feedback = document.getElementById('copyFeedback');
+            feedback.style.display = 'block';
+            setTimeout(() => { feedback.style.display = 'none'; }, 2500);
+        });
+    }
+</script>
+</body>
+</html>

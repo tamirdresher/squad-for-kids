@@ -18,7 +18,7 @@ jobs:
   guard:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check for forbidden paths
         uses: actions/github-script@v8

@@ -26,7 +26,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Check test files exist
         run: |
@@ -71,7 +71,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Check markdown syntax
         run: |
@@ -109,7 +109,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Generate FedRAMP controls matrix
         uses: actions/github-script@v8
@@ -244,7 +244,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Detect changes to security controls
         run: |

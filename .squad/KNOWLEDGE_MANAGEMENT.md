@@ -80,6 +80,35 @@ echo "# Seven — History\n\n## Current Quarter (2026-Q2)" > history.md
 
 ---
 
+### Option 5: GitHub Wiki (Long-Term Memory — Implemented 2026-03-23)
+
+**GitHub Wiki: tamresearch1**
+- **URL:** https://github.com/tamirdresher_microsoft/tamresearch1/wiki
+- **Git clone:** `git clone https://github.com/tamirdresher_microsoft/tamresearch1.wiki.git`
+- **Status:** ✅ Active
+
+**What it contains:**
+- ADC Research — MCP API findings, tool scorecard, deploy_app workaround
+- Architecture Patterns — Squad-on-ADC vs Squad-on-AKS comparison
+- Test Results — API and integration test logs
+- Agent Identity — Non-human identity blocker status
+- Tool Catalog — MCP servers, skills inventory
+- Decisions Index — Top 10 key decisions
+
+**How to use:**
+1. **For humans:** Browse wiki at repo → Wiki tab
+2. **For agents:** Use wiki-write skill (`.squad/skills/wiki-write/SKILL.md`)
+   - Helper functions: `. .squad/skills/wiki-write/wiki-helper.ps1`
+   - `Update-WikiPage`, `Append-WikiPage`, `Get-WikiPage`, `Get-WikiPages`
+3. **When to write:** After research, major test sessions, architecture decisions, or reusable patterns
+
+**Relationship to other systems:**
+- `.squad/` files remain **source of truth** (versioned, canonical)
+- Copilot Space is the **semantic search layer** (cross-repo discovery)
+- Wiki is the **durable read layer** (formatted, browsable, agent-writable)
+
+---
+
 ### Option 2: GitHub Code Search (Fallback)
 ```
 site:github.com/tamirdresher_microsoft/tamresearch1/blob/main/.squad
@@ -269,7 +298,7 @@ A: No — they're permanent record. Move to `/archive/` if truly obsolete, but k
 A: Currently: file-based (read markdown). Phase 2 will add vector DB query API.
 
 **Q: Why not just use a wiki?**
-A: We could, but: (1) Wiki duplicates work, (2) loses git history, (3) violates "keep it in GitHub" constraint.
+A: We now do! The wiki serves as a durable read layer. `.squad/` files remain source of truth; the wiki provides browsable, agent-writable long-term memory. See Option 5 above.
 
 ---
 
@@ -281,6 +310,6 @@ A: We could, but: (1) Wiki duplicates work, (2) loses git history, (3) violates 
 
 ---
 
-**Last Updated:** 2026-Q2 (Phase 1 Implementation)  
+**Last Updated:** 2026-Q2 (Phase 1 + Wiki Implementation 2026-03-23)  
 **Owned By:** Seven (Research & Docs)  
 **Review Cadence:** Monthly growth check, quarterly rotation

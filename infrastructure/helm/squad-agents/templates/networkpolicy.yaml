@@ -1,0 +1,73 @@
+# =============================================================================
+# networkpolicy.yaml — Egress network policy for squad agent pods
+#
+# Restricts outbound traffic from agent pods to:
+#   1. GitHub API + GitHub Copilot API (TCP 443, public internet)
+#   2. Azure Key Vault (TCP 443, covered by the public-internet rule)
+#   3. Rate-pool Redis (TCP 6379, in-cluster, squad namespace only)
+#   4. Cluster DNS (UDP/TCP 53)
+#
+# The auth-proxy sidecar communicates with the main container only via
+# localhost — no network policy rules needed for that hop.
+#
+# Set networkPolicy.enabled=true to activate. Requires a CNI plugin that
+# supports NetworkPolicy (Cilium, Calico, Azure NPM — all supported on AKS).
+#
+# Related: #998, design: docs/copilot-k8s-auth-design.md §5.6
+# =============================================================================
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: squad-agent-egress
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+  annotations:
+    squad.github.com/issue: "998"
+    squad.github.com/description: "Restrict squad pod egress: GitHub+Copilot API, Redis, DNS only"
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "squad-agents.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Egress
+  egress:
+    # -------------------------------------------------------------------------
+    # GitHub REST/GraphQL + Copilot completions API, Azure Key Vault (all HTTPS)
+    # Excludes RFC-1918 private ranges to prevent lateral movement.
+    # -------------------------------------------------------------------------
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - "10.0.0.0/8"
+              - "172.16.0.0/12"
+              - "192.168.0.0/16"
+      ports:
+        - protocol: TCP
+          port: 443
+
+    # -------------------------------------------------------------------------
+    # Rate-pool Redis (in-cluster, squad namespace only)
+    # Auth-proxy sidecar writes quota headers here after each Copilot response.
+    # -------------------------------------------------------------------------
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .Values.networkPolicy.redisPodLabelName | quote }}
+      ports:
+        - protocol: TCP
+          port: 6379
+
+    # -------------------------------------------------------------------------
+    # Cluster DNS — required for service discovery (Redis FQDN, etc.)
+    # -------------------------------------------------------------------------
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}

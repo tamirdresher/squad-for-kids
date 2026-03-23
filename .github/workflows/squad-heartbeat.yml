@@ -9,8 +9,7 @@ on: '0 */6 * * *'
 
 jobs:
   heartbeat:
-    runs-
-on: ubuntu-latest
+    runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write

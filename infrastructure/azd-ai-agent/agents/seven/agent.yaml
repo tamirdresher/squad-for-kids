@@ -1,0 +1,50 @@
+# agent.yaml — Seven's Azure AI Foundry agent manifest
+# Issue: #986 — Phase 1
+
+# Agent identity
+name: seven
+display_name: "Seven — Research & Docs"
+description: >
+  Squad Research & Documentation agent. Turns complexity into clarity.
+  Cloud-resident; no filesystem dependencies. Invokable from any trigger.
+
+# Model configuration
+model:
+  name: ${SQUAD_AI_MODEL:-gpt-4o}
+  api_type: azure
+  temperature: 0.3      # factual / analytical output; not creative
+  max_tokens: 4096
+
+# System prompt — loaded from the adjacent file
+system_prompt_file: system-prompt.md
+
+# Tools available to Seven in Azure AI Foundry
+# Note: file_search and code_interpreter are native Foundry tools.
+# MCP-based tools (GitHub, web) wired in Phase 2.
+tools:
+  - type: file_search
+    description: >
+      Search across uploaded reference documents.
+      Used for: searching issue attachments, uploaded research papers.
+
+  - type: code_interpreter
+    description: >
+      Execute lightweight Python for data parsing and analysis.
+      Used for: processing JSON issue data, formatting tables, markdown generation.
+
+# Response format preferences
+response_format:
+  type: text
+  # Seven outputs markdown by default — instructions in system prompt enforce this
+
+# Session / threading
+session_persistence: true     # preserve thread context across invocations
+thread_id_prefix: "squad-seven"   # thread IDs named squad-seven-<issue_number>
+
+# Deployment metadata
+metadata:
+  squad_agent: "true"
+  phase: "1"
+  issue: "986"
+  owner: "belanna"
+  last_updated: "2026-03-23"

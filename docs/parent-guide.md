@@ -12,7 +12,9 @@
 4. [Syncing Updates from Upstream](#syncing-updates-from-upstream)
 5. [Privacy & Safety](#privacy--safety)
 6. [Multiple Children](#multiple-children)
-7. [Troubleshooting](#troubleshooting)
+7. [Costs & Pricing](#costs--pricing)
+8. [GitHub Actions & Automation](#github-actions--automation)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -273,6 +275,58 @@ git checkout -b david-learning
 ```
 
 > 💡 **Tip:** Option A (separate forks) is simpler and keeps things cleanly separated. Option B saves on Codespace resources but requires more technical knowledge.
+
+---
+
+## Costs & Pricing
+
+### What's Free
+
+| Resource | Free Tier | Notes |
+|----------|-----------|-------|
+| GitHub account | Free | Required |
+| GitHub Copilot Free | $0/month | 50 chat messages/month |
+| GitHub Actions (public repo) | Unlimited | All automations free |
+| GitHub Actions (private repo) | 2,000 min/month | ~33 hours |
+| GitHub Codespaces | 120 core-hours/month | ~60 hours of learning |
+
+### What Costs Money
+
+| Resource | Cost | Who Needs It |
+|----------|------|-------------|
+| GitHub Copilot Pro | $10/month | Parents wanting unlimited chat for daily learning |
+| GitHub Copilot (Student/Teacher) | $0/month | Students — apply at [education.github.com](https://education.github.com) |
+
+### Bottom Line
+
+- 🎓 **Students:** $0/month — apply for GitHub Education
+- 👨‍👩‍👧 **Free tier:** $0/month — 50 chat messages (2-3 sessions/week)
+- 💎 **Pro:** $10/month — unlimited (less than 15 minutes of a human tutor)
+
+> 📖 **Full pricing breakdown:** [GitHub Actions & Pricing Guide](advanced/github-actions-guide.md)
+
+---
+
+## GitHub Actions & Automation
+
+Squad for Kids includes automated workflows that run on GitHub's servers — free for public repos.
+
+### Active Workflows
+
+| Workflow | Purpose | Schedule | Cost |
+|----------|---------|----------|------|
+| `squad-heartbeat.yml` | Checks for untriaged issues, reminds about stale PRs | Every 6 hours | Free |
+| `squad-triage.yml` | Categorizes new issues (bug, feature, homework, game) | On issue label | Free |
+| `squad-board-sync.yml` | Keeps project board in sync | On events + weekly | Free |
+| `squad-issue-assign.yml` | Assigns work to squad members or Copilot | On `squad:` label | Free |
+
+### Managing Workflows
+
+- **Disable a workflow:** Go to Actions tab → click workflow → `...` → "Disable workflow"
+- **Run manually:** Most workflows support `workflow_dispatch` — click "Run workflow" button
+- **Add your own:** Create a `.yml` file in `.github/workflows/`
+
+> 📖 **Detailed guide:** [GitHub Actions & Automation Guide](advanced/github-actions-guide.md)
 
 ---
 

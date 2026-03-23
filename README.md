@@ -47,6 +47,28 @@ It's like having a personal school — with the patience of a saint, the creativ
 
 ---
 
+## 💰 Costs — Full Transparency
+
+We believe parents deserve to know exactly what they're getting into. Here's the honest breakdown:
+
+| What | Cost | Notes |
+|------|------|-------|
+| GitHub account | **Free** | Required — [github.com/signup](https://github.com/signup) |
+| GitHub Copilot (Free tier) | **$0/month** | 50 chat messages/month — enough to start |
+| GitHub Copilot Pro | **$10/month** | Unlimited chat — recommended for daily use |
+| GitHub Copilot (Student/Teacher) | **$0/month** | Full Pro access — apply at [education.github.com](https://education.github.com) |
+| GitHub Actions (public repo) | **$0/month** | Unlimited — all automations are free |
+| GitHub Codespaces | **$0/month** | 120 core-hours free — ~60 hours of learning |
+
+**Bottom line:**
+- 🎓 **Students/Teachers:** Everything is **$0/month**
+- 👨‍👩‍👧 **Non-students (Free tier):** **$0/month** — limited to 50 chat messages
+- 💎 **Non-students (Pro):** **$10/month** — unlimited
+
+> 📖 **Full pricing details:** [GitHub Actions & Pricing Guide](docs/advanced/github-actions-guide.md)
+
+---
+
 ## 📦 Templates
 
 ### 🌟 The Dream Team

@@ -79,10 +79,44 @@ Invoke-AdcMcp -Tool "create_sandbox" -Arguments @{
 }
 ```
 
+## Comprehensive Auth Investigation (2026-03-23)
+
+Every possible authentication approach was tested:
+
+| Approach | Result | Root Cause |
+|----------|--------|------------|
+| `az` CLI token | ❌ 400 | Token includes `Directory.AccessAsUser.All` — Agent APIs reject |
+| Portal token (client `74658136`) | ❌ 400 | Same — portal token also has `Directory.AccessAsUser.All` |
+| Device code flow (Graph SDK `14d82eec`) | ❌ Timeout | Conditional Access blocks from Netherlands (DevBox location) |
+| WAM / Interactive auth | ❌ Failed | No GUI available in headless/remote terminal |
+| MSAL.PS device code | ❌ Timeout | Same CA policy blocks device code |
+| OAuth implicit flow | ❌ AADSTS700051 | `response_type=token` not enabled for Graph SDK client |
+| OAuth auth code + PKCE | ❌ AADSTS90094 | **Admin consent required** — tenant policy blocks user self-consent |
+| Portal broker refresh token | ❌ AADSTS65002 | Broker client `c44b4083` not preauthorized for `AgentIdentityBlueprint.Create` |
+| Portal UI | ❌ No button | Agent ID portal is read-only — no "Create Blueprint" UI |
+| Helper app (`a0ae7a27`) | ❌ 403 | Needs admin consent ("only performed by an administrator") |
+
+### Definitive Blocker
+**`AgentIdentityBlueprint.Create` is an admin-consent-only permission in the Microsoft tenant.**
+
+Error: `AADSTS90094: An administrator of Microsoft has set a policy that prevents you from granting
+Microsoft Graph Command Line Tools the permissions it is requesting.`
+
+### Resolution Path
+1. **Request admin consent** from a tenant admin (e.g., via IT helpdesk or admin portal)
+2. **OR** use a different Entra tenant where the user IS an admin
+3. **OR** wait for ADC-Owned Shared Blueprint to be available (avoids BYOAI complexity)
+
+### Portal Observations (Entra Agent ID Preview)
+- MSFT tenant has: 655,871 agents, 8,231 blueprints, 379,042 agent identities, 53 agent users
+- Portal sections: Overview, All agent identities, Agent registry, Agent collections, Sign-in logs
+- Agent registry shows 0 agents for current user — no create functionality in UI
+
 ## Status
 - [x] MSIdentityTools module installed
 - [x] Application permissions identified (30+ agent-related permissions in Graph)
-- [x] Helper app registration created
+- [x] Helper app registration created (`a0ae7a27-1cde-47b2-a3f5-cb37669f39c1`)
 - [x] Self-contained creation script ready
-- [ ] **BLOCKED**: Needs interactive browser auth (device code times out without human)
-- [ ] **BLOCKED**: App permissions need tenant admin consent
+- [x] Portal token extraction verified (MSAL sessionStorage → Bearer token → /me works)
+- [x] All auth approaches exhaustively tested
+- **BLOCKED**: `AgentIdentityBlueprint.Create` requires tenant admin consent (AADSTS90094)

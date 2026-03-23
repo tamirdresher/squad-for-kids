@@ -1,0 +1,54 @@
+# =============================================================================
+# auth-proxy-configmap.yaml — Non-secret configuration for the auth-proxy sidecar
+#
+# Stores GitHub App config (App ID, Installation ID), Key Vault references,
+# and proxy settings. Injected into the auth-proxy container via envFrom.
+#
+# Secret credentials (private key, app-id value, installation-id value) are
+# fetched at runtime from Azure Key Vault via Workload Identity — they never
+# appear in this ConfigMap.
+#
+# Related: #998 (GitHub Copilot auth for K8s pods), design: docs/copilot-k8s-auth-design.md
+# =============================================================================
+{{- if .Values.authProxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: squad-auth-proxy-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "squad-agents.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth-proxy
+  annotations:
+    squad.github.com/issue: "998"
+    squad.github.com/description: "Auth-proxy non-secret config for GitHub App token lifecycle"
+data:
+  # Authentication mode: "github_app" uses Workload Identity + Key Vault (Phase 2/3).
+  # "pat" falls back to a K8s Secret containing GITHUB_TOKEN (Phase 1 / dev env).
+  AUTH_MODE: {{ .Values.authProxy.authMode | quote }}
+
+  # Local port the proxy listens on — agent containers point COPILOT_URL here.
+  PROXY_PORT: {{ .Values.authProxy.port | quote }}
+
+  # Azure Key Vault name (same vault used by the CSI driver for other secrets).
+  KEYVAULT_NAME: {{ .Values.global.keyVaultName | quote }}
+
+  # Names of the Key Vault secrets containing GitHub App credentials.
+  # The proxy fetches these at startup via the pod's Workload Identity.
+  APP_ID_SECRET: {{ .Values.authProxy.keyVault.appIdSecretName | quote }}
+  INSTALLATION_ID_SECRET: {{ .Values.authProxy.keyVault.installationIdSecretName | quote }}
+  PRIVATE_KEY_SECRET: {{ .Values.authProxy.keyVault.privateKeySecretName | quote }}
+
+  # Redis address for rate-pool coordination (#979).
+  # Format: <host>:<port>  (e.g. squad-redis.squad.svc.cluster.local:6379)
+  RATE_POOL_REDIS_ADDR: {{ .Values.authProxy.rateLimitRedisAddr | quote }}
+
+  # Token renewal thresholds
+  # Renew Copilot token this many seconds before its expires_at (~30min TTL).
+  COPILOT_TOKEN_RENEWAL_BUFFER_SECONDS: "300"
+  # Renew installation token this many seconds before its 1h TTL.
+  INSTALL_TOKEN_RENEWAL_BUFFER_SECONDS: "300"
+
+  # Readiness / health probe path
+  HEALTH_PATH: "/healthz"
+{{- end }}

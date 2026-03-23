@@ -107,6 +107,12 @@ spec:
                   name: {{ .Values.keyVault.k8sSecretName }}
                   key: COPILOT_API_KEY
                   optional: true
+            {{- if .Values.authProxy.enabled }}
+            # Route Copilot requests through the auth-proxy sidecar (#998).
+            # The proxy handles token lifecycle; agent code needs no auth logic.
+            - name: COPILOT_URL
+              value: "http://localhost:{{ .Values.authProxy.port }}"
+            {{- end }}
 
           volumeMounts:
             # Mount secrets volume (required to trigger CSI sync)
@@ -137,6 +143,72 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: false   # agent writes to /tmp
+
+        # ── Auth-proxy sidecar (#998) ────────────────────────────────────────
+        # Injected when authProxy.enabled=true. Handles GitHub App JWT signing,
+        # installation token exchange, Copilot token lifecycle, and rate-pool
+        # Redis publishing. Agent container points COPILOT_URL to this proxy.
+        {{- if .Values.authProxy.enabled }}
+        - name: auth-proxy
+          image: {{ include "squad-agents.imageRef" (dict "Values" .Values "agent" .Values.authProxy) }}
+          imagePullPolicy: {{ .Values.authProxy.image.pullPolicy }}
+          ports:
+            - name: proxy
+              containerPort: {{ .Values.authProxy.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: squad-auth-proxy-config
+          {{- if eq .Values.authProxy.authMode "github_app" }}
+          env:
+            # GitHub App credentials fetched from Key Vault via Workload Identity.
+            # Mounted here as env vars so the proxy can read them at startup.
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: squad-github-app-credentials
+                  key: GITHUB_APP_ID
+            - name: GITHUB_APP_INSTALLATION_ID
+              valueFrom:
+                secretKeyRef:
+                  name: squad-github-app-credentials
+                  key: GITHUB_APP_INSTALLATION_ID
+            - name: GITHUB_APP_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: squad-github-app-credentials
+                  key: GITHUB_APP_PRIVATE_KEY
+          {{- end }}
+          volumeMounts:
+            # Proxy also needs the CSI secrets volume to trigger Key Vault sync.
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.authProxy.port }}
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.authProxy.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.authProxy.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+        {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

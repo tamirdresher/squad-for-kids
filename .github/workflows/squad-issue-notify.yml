@@ -17,7 +17,7 @@ jobs:
 
       - name: Get issue details
         id: issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           retries: 3
           retry-exempt-status-codes: 400,401,403,404,422
@@ -53,7 +53,7 @@ jobs:
 
       - name: Send Teams notification
         if: env.TEAMS_WEBHOOK_URL != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.SQUAD_WEBHOOK_WINS || secrets.TEAMS_WEBHOOK_URL }}
           ISSUE_NUMBER: ${{ steps.issue.outputs.number }}

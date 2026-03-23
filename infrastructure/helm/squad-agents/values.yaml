@@ -99,6 +99,86 @@ keyVault:
   k8sSecretName: "squad-runtime-secrets"
 
 # =============================================================================
+# Auth-Proxy Sidecar — GitHub App Token Lifecycle Manager (#998)
+#
+# When enabled, injects a lightweight auth-proxy sidecar into every agent pod.
+# The proxy handles the full GitHub App authentication chain:
+#   1. Fetch GitHub App private key from Azure Key Vault (via Workload Identity)
+#   2. Sign a JWT and exchange for an installation token (1h TTL)
+#   3. Exchange installation token for a Copilot API token (~30min TTL)
+#   4. Serve requests on localhost:8081 — agent containers point COPILOT_URL here
+#   5. Auto-renew tokens 5 minutes before expiry (no pod restarts needed)
+#   6. Forward rate-limit response headers to Redis for rate-pool coordination (#979)
+#
+# Phases:
+#   Phase 1 (dev/test): authProxy.enabled=false — pods use GH_TOKEN from Key Vault directly
+#   Phase 2 (staging):  authProxy.enabled=true, authMode=github_app — GitHub App + proxy
+#   Phase 3 (prod):     Same as Phase 2 + workloadIdentity.enabled=true (already default)
+#
+# Design: docs/copilot-k8s-auth-design.md
+# =============================================================================
+authProxy:
+  # Set to true to inject the auth-proxy sidecar into all agent pods (Phase 2+).
+  # When false, pods use GH_TOKEN and COPILOT_API_KEY directly from Key Vault (Phase 1).
+  enabled: false
+
+  image:
+    # Build and push this image before enabling: see docs/copilot-k8s-auth-design.md §5.4
+    # Full ref is constructed as: <global.acrLoginServer>/<repository>:<tag>
+    repository: "squad-auth-proxy"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Port the proxy listens on. Agent containers receive COPILOT_URL=http://localhost:<port>
+  port: 8081
+
+  # AUTH_MODE controls credential sourcing:
+  #   "github_app" — fetch private key from Key Vault via Workload Identity (Phase 2/3)
+  #   "pat"        — read GITHUB_TOKEN from a K8s Secret (dev fallback, Phase 1)
+  authMode: "github_app"
+
+  # Key Vault secret names for GitHub App credentials.
+  # Upload these once:
+  #   az keyvault secret set --vault-name <vault> --name squad-github-app-id --value <ID>
+  #   az keyvault secret set --vault-name <vault> --name squad-github-app-installation-id --value <ID>
+  #   az keyvault secret set --vault-name <vault> --name squad-github-app-private-key --file ./key.pem
+  keyVault:
+    appIdSecretName: "squad-github-app-id"
+    installationIdSecretName: "squad-github-app-installation-id"
+    privateKeySecretName: "squad-github-app-private-key"
+
+  # Redis address for rate-pool quota publishing (#979).
+  # Example: "squad-redis.squad.svc.cluster.local:6379"
+  # Leave empty to disable Redis publishing (rate-pool headers still captured, just not forwarded).
+  rateLimitRedisAddr: ""
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 200m
+      memory: 64Mi
+
+# =============================================================================
+# Network Policy (#998)
+#
+# When enabled, restricts squad pod egress to:
+#   - GitHub API + Copilot API (TCP 443, public internet)
+#   - Azure Key Vault (TCP 443, covered by above rule)
+#   - Rate-pool Redis (TCP 6379, squad namespace only)
+#   - Cluster DNS (UDP/TCP 53)
+#
+# Requires a CNI that supports NetworkPolicy (Cilium, Calico, Azure NPM).
+# AKS supports all three. AKS Automatic uses Cilium by default.
+# =============================================================================
+networkPolicy:
+  enabled: false   # Enable after verifying CNI support on the target cluster
+
+  # Pod label used to identify the rate-pool Redis pod for in-cluster egress rule.
+  redisPodLabelName: "squad-redis"
+
+# =============================================================================
 # Ralph — Work Monitor (CronJob)
 #
 # Polls GitHub issues on a schedule, dispatches work to specialist agents.

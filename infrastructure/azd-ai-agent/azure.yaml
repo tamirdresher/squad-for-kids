@@ -1,0 +1,49 @@
+# azure.yaml — azd project configuration for Squad AI Foundry agents
+# Issue: #986 — Phase 1 infrastructure
+# Docs: https://devblogs.microsoft.com/azure-sdk/azd-ai-agent-run-invoke/
+
+name: squad-azd-ai-agents
+
+metadata:
+  template: squad-ai-agents@0.1.0
+
+# Bicep infrastructure (Hub, Project, Storage, KV, Log Analytics)
+infra:
+  provider: bicep
+  path: infra
+
+# Hooks — run before provision to ensure the ai.agents extension is present
+hooks:
+  preprovision:
+    posix:
+      shell: sh
+      run: |
+        echo "Checking azd azure.ai.agents extension..."
+        azd extension list | grep -q "azure.ai.agents" || azd extension add azure.ai.agents
+        echo "Extension ready."
+    windows:
+      shell: pwsh
+      run: |
+        Write-Host "Checking azd azure.ai.agents extension..."
+        $installed = azd extension list 2>&1 | Select-String "azure.ai.agents"
+        if (-not $installed) {
+          azd extension add azure.ai.agents
+        }
+        Write-Host "Extension ready."
+
+# Agent services
+# Each entry here maps to a directory under agents/
+# `azd deploy <name>` uploads the agent config to Azure AI Foundry
+services:
+  seven:
+    project: ./agents/seven
+    host: ai.endpoint
+    # language auto-detected — Seven's agent.yaml drives the Foundry deployment
+
+# Environment variable documentation
+# Set these with: azd env set KEY value
+# AZURE_LOCATION          - Azure region (default: eastus2)
+# AZURE_RESOURCE_GROUP    - Target resource group
+# AZURE_SUBSCRIPTION_ID   - Azure subscription (auto-set by azd auth login)
+# SQUAD_AI_MODEL          - Model to use for Seven (default: gpt-4o)
+# SQUAD_ENVIRONMENT       - Environment name: dev | stg | prod (default: dev)

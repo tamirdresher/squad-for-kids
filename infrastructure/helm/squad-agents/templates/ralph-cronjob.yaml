@@ -108,6 +108,11 @@ spec:
                       name: {{ .Values.keyVault.k8sSecretName }}
                       key: COPILOT_API_KEY
                       optional: true
+                {{- if .Values.authProxy.enabled }}
+                # Route Copilot requests through the auth-proxy sidecar (#998).
+                - name: COPILOT_URL
+                  value: "http://localhost:{{ .Values.authProxy.port }}"
+                {{- end }}
 
               # Mount the CSI secrets volume (required to trigger secret sync)
               volumeMounts:
@@ -125,6 +130,58 @@ spec:
                   drop:
                     - ALL
                 readOnlyRootFilesystem: false   # ralph-watch.ps1 writes temp files
+
+            # ── Auth-proxy sidecar (#998) ──────────────────────────────────────
+            {{- if .Values.authProxy.enabled }}
+            - name: auth-proxy
+              image: {{ include "squad-agents.imageRef" (dict "Values" .Values "agent" .Values.authProxy) }}
+              imagePullPolicy: {{ .Values.authProxy.image.pullPolicy }}
+              ports:
+                - name: proxy
+                  containerPort: {{ .Values.authProxy.port }}
+                  protocol: TCP
+              envFrom:
+                - configMapRef:
+                    name: squad-auth-proxy-config
+              {{- if eq .Values.authProxy.authMode "github_app" }}
+              env:
+                - name: GITHUB_APP_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: squad-github-app-credentials
+                      key: GITHUB_APP_ID
+                - name: GITHUB_APP_INSTALLATION_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: squad-github-app-credentials
+                      key: GITHUB_APP_INSTALLATION_ID
+                - name: GITHUB_APP_PRIVATE_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: squad-github-app-credentials
+                      key: GITHUB_APP_PRIVATE_KEY
+              {{- end }}
+              volumeMounts:
+                - name: secrets-store
+                  mountPath: "/mnt/secrets-store"
+                  readOnly: true
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: {{ .Values.authProxy.port }}
+                initialDelaySeconds: 3
+                periodSeconds: 5
+                timeoutSeconds: 2
+                failureThreshold: 3
+              resources:
+                {{- toYaml .Values.authProxy.resources | nindent 16 }}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+            {{- end }}
 
           {{- with .Values.nodeSelector }}
           nodeSelector:

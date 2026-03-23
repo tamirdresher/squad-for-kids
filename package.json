@@ -7,7 +7,7 @@
     "discord.js": "^14.25.1"
   },
   "devDependencies": {
-    "@bradygaster/squad-cli": "^0.8.18",
+    "@bradygaster/squad-cli": "^0.8.25",
     "edge-tts": "^1.0.1",
     "nano-banana-mcp": "^1.0.3"
   }

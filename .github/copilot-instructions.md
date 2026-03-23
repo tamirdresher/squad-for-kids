@@ -3,6 +3,27 @@
 > These instructions activate when ANY user opens Copilot Chat in this repo.
 > The system detects Hebrew input and responds accordingly.
 
+## 🍴 Fork Detection — Personalization Mode
+
+**Check if this is a fork or the original repo:**
+
+At the start of EVERY conversation, silently determine the context:
+
+1. **If this is a FORK** (origin URL does NOT contain `tamirdresher/squad-for-kids`):
+   - This is a **child's personalized environment**
+   - Check for `student-profile.json` — if it exists, greet the child by name
+   - If `student-profile.json` exists and has data, skip the full onboarding and go straight to learning
+   - If `student-profile.json` is empty/template, start the onboarding flow
+   - Personalize everything to this specific child's profile, interests, and level
+
+2. **If this is the ORIGINAL repo** (origin URL contains `tamirdresher/squad-for-kids`):
+   - This is **demo/getting-started mode**
+   - Show the full onboarding experience
+   - Mention that parents should fork the repo for a personalized experience
+   - After the first interaction, suggest: "💡 טיפ: כדי שההתקדמות שלך תישמר, בקשו מההורים שלכם לעשות Fork לריפו הזה!"
+
+3. **Detection method:** Run `git remote get-url origin` silently. If it contains `tamirdresher/squad-for-kids`, it's the original. Otherwise, it's a fork.
+
 ## שפה / Language
 
 - אם המשתמש כותב בעברית — ענה בעברית. תמיד.

@@ -178,34 +178,65 @@ Automated study session reminders, homework tracking, and spaced repetition sche
 
 ## 🚀 Quick Start for Parents
 
-### Step 1: Open a Workspace
+> **Your child gets their own personal copy!** Fork this repo to create a private learning environment. All progress stays in YOUR GitHub account.
+
+### Step 1: Fork This Repo 🍴
 
 1. Go to [github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
-2. Click **Code** → **Codespaces** tab → **Create codespace on main**
-3. Wait for VS Code to fully load
+2. Click the **"Fork"** button in the top-right corner
+   <!-- Screenshot: The Fork button is next to Star and Watch, top-right of the repo page -->
+3. On the "Create a new fork" page, keep the defaults and click **"Create fork"**
+4. ✅ You now have **your own copy** at `github.com/YOUR-USERNAME/squad-for-kids`
 
-### Step 2: Launch the Squad
+> 💡 **Why fork?** Your child's progress (profile, reports, learning history) stays in YOUR GitHub account — private and under your control. You also get updates from the original repo when new features are added.
 
-4. Open Copilot Chat — click the chat icon 💬 in the sidebar, or press `Ctrl+Alt+I`
-5. Select the **"squad"** agent from the dropdown at the bottom of the chat window
-6. Click **"Autopilot (Preview)"** at the bottom to enable autonomous mode
-7. Type in Hebrew! Start with: `היי! אני רוצה לבנות משחק!`
+### Step 2: Open YOUR Fork ⚠️
 
-### Step 3: Learning Begins!
+5. Make sure you're on **your fork** (check the URL — it should say `YOUR-USERNAME/squad-for-kids`, NOT `tamirdresher/squad-for-kids`)
+6. 🖥️ **Important:** Use a laptop or desktop — not a phone or tablet
 
-Your child gets a personalized team of AI tutors. Here's what they can do:
-- 👋 **Onboarding flow** — name, birthday, pick a universe theme (superheroes, Harry Potter…)
-- 🎮 **Game building** — the squad builds a game together with a superhero theme
-- 📐 **Math homework help** — e.g. 247×18 with step-by-step explanation
-- 🔧 **PC troubleshooting** — the squad helps diagnose and fix issues
-- 💻 **On local machine** — the squad can actually inspect and fix the computer!
+### Step 3: Create a Codespace 🚀
 
-### What Parents Get
+7. Click the green **"Code"** button → **"Codespaces"** tab → **"Create codespace on main"**
+   <!-- Screenshot: Green Code button → Codespaces tab → Create codespace on main -->
+8. ⏱️ Wait 1-2 minutes for VS Code to fully load (you'll see a code editor with files on the side)
 
+### Step 4: Select the Squad Agent 🤖
+
+9. Open Copilot Chat — click the chat icon 💬 in the sidebar, or press `Ctrl+Alt+I`
+10. At the bottom of the chat window, select the **"squad"** agent from the dropdown
+    <!-- Screenshot: Bottom of chat → dropdown menu → select "squad" -->
+11. Click **"Autopilot (Preview)"** at the bottom to enable autonomous mode
+
+### Step 5: Start Chatting! 💬
+
+12. Type in your language! Start with: `היי! אני רוצה לבנות משחק!` (or in English: `Hi! I want to build a game!`)
+13. The squad will greet your child, ask their name and age, and start the adventure! 🎉
+
+### What Parents Get 👨‍👩‍👧
+
+Your child's fork is their personal learning space. You can see everything:
+
+- **Student profile** at `student-profile.json` — your child's identity, interests, and progress
 - **Weekly reports** at `.squad/reports/` — what was learned, strengths, areas to practice
 - **Teaching plan** at `.squad/teaching-plan.md` — current curriculum progress
-- **Full control** — review, adjust, or restart anytime
+- **Full commit history** — every learning session is tracked in git
 - **Email notifications** — optional parent report delivery via email
+- **Full control** — review, adjust, or restart anytime
+
+> 📖 **Detailed parent guide:** [docs/parent-guide.md](docs/parent-guide.md) — how to monitor progress, sync updates, manage multiple children, and more.
+
+### 🔄 Coming Back Next Time
+
+No need to create a new Codespace! Go to [github.com/codespaces](https://github.com/codespaces) and you'll find the workspace you already created. Just click on it.
+
+### 🔄 Getting Updates from the Original Repo
+
+When new features, templates, or curriculum content are added to the original repo, you can sync them to your fork:
+
+1. On your fork's GitHub page, you'll see a banner: **"This branch is X commits behind tamirdresher:main"**
+2. Click **"Sync fork"** → **"Update branch"**
+3. Your child's personal data (profile, reports) is safe — only the curriculum and features update!
 
 ---
 

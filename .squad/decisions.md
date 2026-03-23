@@ -26370,3 +26370,17 @@ changes to reduce approval noise.
 - Product-code PR flow unchanged.
 - Reviewer load drops from N squad PRs/day to ≤1 batched state sync PR/day.
 - Existing `.squad/` files remain canonical during migration (symlinks provided).
+
+### Decision XX: Upstream Contributions to bradygaster/squad
+**Date:** 2026-03-22
+**By:** Squad (Coordinator)
+**Status:** Submitted — awaiting review
+
+Contributed 3 features from our production implementation to the upstream Squad project:
+
+1. **Machine Capability Discovery (#514 → PR #520)** — `needs:*` label system + capability filtering SDK module
+2. **Cooperative Rate Limiting (#515 → PR #518)** — Predictive circuit breaker + 6-pattern rate limiting SDK module  
+3. **KEDA External Scaler (#516 → PR #519)** — Documentation template for autoscaling with KEDA
+
+All PRs target `bradygaster/dev` branch with changesets included.
+Tracking in our issue #1330.

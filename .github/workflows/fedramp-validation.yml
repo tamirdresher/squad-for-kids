@@ -229,7 +229,7 @@ jobs:
       - name: Upload compliance artifacts
         if: always() && github.actor != 'dependabot[bot]'
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fedramp-compliance-reports
           path: |

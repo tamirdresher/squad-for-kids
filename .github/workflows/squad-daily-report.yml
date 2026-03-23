@@ -88,7 +88,7 @@ jobs:
 
       - name: Upload report archive
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: squad-daily-report-${{ github.run_id }}
           path: |

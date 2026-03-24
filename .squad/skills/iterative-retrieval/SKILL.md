@@ -94,6 +94,21 @@ If any item fails → do **not** accept. Spawn cycle N+1 (up to cycle 3) with sp
 
 ---
 
+## Mandatory Output Requirement (Research-Then-Execute)
+
+Every research or analysis task completed under this protocol **MUST** end with at least one
+concrete action before the cycle is closed. Acceptable follow-up actions:
+
+- GitHub issue created documenting the findings and next steps
+- PR opened implementing a recommendation
+- Decision recorded in `.squad/decisions/inbox/`
+- Documented recommendation with a named assignee and due date
+
+**Pure analysis reports without actionable follow-up will be rejected by Picard during triage.**
+If no action is warranted, the agent must explicitly state why and get coordinator sign-off.
+
+---
+
 ## Anti-Patterns
 
 - **Spawning without WHY** — agents can't prioritise trade-offs without motivation context.
@@ -101,6 +116,7 @@ If any item fails → do **not** accept. Spawn cycle N+1 (up to cycle 3) with sp
 - **Cycle 4+** — if 3 cycles haven't converged, the problem is in the requirements, not the agent.
 - **Vague success criteria** — "looks good" is not a criterion. Use checkboxes.
 - **Forwarding WHAT without delta** — cycle 2+ prompts must include what cycle 1 got wrong.
+- **Research without action** — delivering analysis with no issue, PR, decision, or assignee is incomplete work.
 
 ---
 

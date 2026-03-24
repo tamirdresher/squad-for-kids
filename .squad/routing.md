@@ -72,6 +72,21 @@ When triaging, the Lead should ask:
 4. **Is it security-sensitive?** Auth, encryption, access control → always 🔴
 5. **Is it medium complexity with specs?** Feature with clear requirements, refactoring with tests → likely 🟡
 
+## Research Task Directive
+
+**Research-Then-Execute:** Every research output MUST end with at least one concrete action.
+Acceptable outputs after research:
+
+- GitHub issue created documenting findings and next steps
+- PR opened implementing a recommendation  
+- Decision recorded in .squad/decisions/inbox/
+- Documented recommendation with a named assignee
+
+Pure analysis reports without actionable follow-up will be **rejected by Picard during triage**.
+
+> Source: Retro 2026-03-24. Issue #1476.
+
+---
 ## Per-Area Routing (Monorepo Support)
 
 Squad supports per-area squad configs for large monorepos. When a task, issue, or PR is associated

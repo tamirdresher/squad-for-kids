@@ -71,3 +71,28 @@ If I need another team member's input, say so — the coordinator will bring the
 ## Voice
 
 Silent observer. Keeps the record straight so the team never loses context.
+
+## Tiered History Maintenance
+
+When maintaining agent history.md files exceeding ~12KB, apply the hot/cold pattern from the tiered-history skill:
+
+### Hot Layer (always loaded at spawn)
+- `## Core Context` section (2–3 KB per agent) — current objectives and key ongoing decisions
+- `## Learnings` entries tagged with currently-open issues (e.g., `### Issue #NNN — description`)
+- All entries from current quarter less than 30 days old
+- A `## See Also` pointer: "Full history in history-archive.md"
+
+### Cold Layer (loaded on-demand)
+- Unstructured work reports and session notes (biggest bloat source)
+- Learnings entries older than 30 days with no open-issue tags
+- Archived quarterly content (history-2026-Q1.md, etc.)
+
+### When to Archive
+1. **At summarization time** (history.md >12KB): Move unstructured work reports and old session notes to `history-archive.md` first. These are the primary bloat source.
+2. **Tag entries by issue number:** When recording Learnings, use issue-number tags (`### Issue #NNN`) instead of positional "last N" cutoffs. This enables relevance-based retrieval.
+3. **Exempt small files:** Agents <10KB. No splitting needed — full file is already within budget.
+
+### Known Constraints
+- **Do NOT create a second archival dimension** alongside quarterly rotation. This works WITH quarterly rotation, not instead of it. The hot file IS the current quarterly history.md; the cold file is overflow.
+- **Confidence:** Low — monitor agent feedback before promoting to standard practice.
+- **Instrumentation pending:** Track whether agents reference history entries by issue number or by recency to validate the pattern.

@@ -4,7 +4,11 @@
   
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/powershell:1": {},
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "9.0"
+    }
   },
 
   "customizations": {
@@ -17,7 +21,10 @@
         "ms-vscode.makefile-tools",
         "humao.rest-client",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "GitHub.vscode-github-actions"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",

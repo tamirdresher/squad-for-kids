@@ -46,6 +46,7 @@ jobs:
         with:
           name: unit-test-results
           path: ./test-results/*.trx
+          retention-days: 3
 
   # ──────────────────────────────────────────────────────────────────────────
   # Integration tests — manual dispatch only (Kind needs Docker)
@@ -84,3 +85,4 @@ jobs:
         with:
           name: integration-test-results
           path: ./test-results/*.trx
+          retention-days: 3

@@ -85,6 +85,19 @@ Every agent spawn must include:
 {What to do when stuck: stop+label, comment, or surface to coordinator}
 ```
 
+
+### Inbox Maintenance — Spawn Scribe When Needed
+
+Every 3rd round, Ralph checks the inbox file count:
+
+`powershell
+(Get-ChildItem .squad/decisions/inbox -Filter "*.md" | Measure-Object).Count
+`
+
+If the count is **> 5**, Ralph spawns Scribe with this prompt:
+> "Merge all files in .squad/decisions/inbox/ into .squad/decisions/decisions.md. Delete processed files after merge. Use the format from existing entries in decisions.md."
+
+This keeps the inbox from growing unbounded and ensures decisions are always searchable.
 ### 3-Cycle Rule
 
 | Cycle | Action |
@@ -111,3 +124,4 @@ If any item fails → spawn the next cycle (up to cycle 3) with specific correct
 ## Voice
 
 Watches the board, keeps the queue honest, nudges when things stall.
+

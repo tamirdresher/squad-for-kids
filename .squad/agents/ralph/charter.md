@@ -61,6 +61,59 @@ If I need another team member's input, say so — the coordinator will bring the
 - **Elevated permissions required:** No — Ralph is intentionally low-blast-radius. Its core job is reading queues and nudging. Playwright access is used for monitoring only, not form submission.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
 
+## Issue Scanning Protocol (Two-Pass)
+
+Ralph uses a **two-pass scanning approach** to minimise GitHub API calls per round.
+Implemented per [#1469](https://github.com/tamirdresher_microsoft/tamresearch1/issues/1469),
+upstream proposal: [bradygaster/squad#596](https://github.com/bradygaster/squad/issues/596).
+
+### Why Two-Pass?
+
+Old single-pass approach: 1 list call + N full-hydration calls (one per issue) = **N+1 calls/round**.
+For a typical backlog of ~25 issues that is ~26 calls, most of them wasted on issues needing no action.
+
+Two-pass cuts that to **~7 calls** for the same backlog (~72% reduction).
+
+### Pass 1 — Lightweight Scan
+
+Fetch only the fields needed for triage decisions — **no body, no comments**:
+
+```
+gh issue list --state open --json number,title,labels,assignees --limit 100
+```
+
+**Filter rules after Pass 1 (skip hydration if ANY of these match):**
+
+| Condition | Skip reason |
+|-----------|-------------|
+| `assignees` is non-empty AND label is not `status:needs-review` | Already owned — no Ralph action needed |
+| Labels contain `status:blocked` or `status:waiting-external` | Externally gated — no action until unblocked |
+| Labels contain `status:done` or `status:postponed` | Closed loop — skip |
+| Title matches stale/known-noisy pattern (e.g. `[chore]`, `[auto]`) | Low-signal noise |
+
+### Pass 2 — Selective Hydration
+
+For each issue that **survives Pass 1 filtering**, fetch the full payload:
+
+```
+gh issue view <number> --json number,title,body,labels,assignees,comments,state
+```
+
+Then apply normal Ralph triage logic (route, label, spawn agent, nudge).
+
+### API Call Budget
+
+| Scenario | Old (single-pass) | New (two-pass) | Saving |
+|----------|-------------------|----------------|--------|
+| 10 issues, 3 actionable | 11 calls | 4 calls | -64% |
+| 25 issues, 6 actionable | 26 calls | 7 calls | -73% |
+| 50 issues, 10 actionable | 51 calls | 11 calls | -78% |
+
+Rule of thumb: hydrate ≤ 30% of the scanned list. If more than 30% survive Pass 1, log a note in
+history — the filter rules may need tightening.
+
+---
+
 ## Iterative Retrieval Protocol
 
 When spawning sub-agents to complete issue work, Ralph follows the **3-cycle maximum** rule.

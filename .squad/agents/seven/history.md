@@ -45,6 +45,12 @@
   - Evaluated 5 coordination approaches for agents on different machines
   - Recommended: Git-based task queue + GitHub Issues supplement
   - Deliverables: Research report, skill documentation, GitHub issue for implementation
+- Waza Research (microsoft/waza) ✅ RESEARCH COMPLETE
+  - Evaluated Go CLI for AI agent skill evaluation (v0.21.0)
+  - Key findings: A/B baseline testing, pairwise LLM judging, trigger accuracy metrics, MCP server
+  - Strong fit for single-skill evaluation; gap for multi-agent orchestration
+  - Recommendation: MAYBE → phased adoption starting with `waza check` on all skills
+  - Deliverable: `.squad/decisions/inbox/seven-waza-research.md`
 
 ## Learnings
 

@@ -619,6 +619,16 @@ For every `needs:X` label on an issue, verify that `X` is in the capabilities ar
 This prevents wasted rounds on issues this machine cannot complete.
 
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
+
+RETRO ENFORCEMENT (every Friday):
+1. On the first round after Friday 14:00 UTC (or the first round of any session if a Friday retro was missed):
+   - Check .squad/log/ for a file matching *retrospective* with a date from this Friday (or the most recent missed Friday)
+   - If NO retro file exists for this Friday: IMMEDIATELY run a retrospective before doing any other work
+   - The retro should: scan orchestration logs since last retro, check closed issues, review decisions, produce insights
+   - Write to .squad/log/{timestamp}-retrospective.md
+   - Post a Teams summary (CHANNEL: wins) with key findings
+2. How to detect missed retro: if today is Saturday-Thursday AND the most recent *retrospective* log file is older than 7 days, a retro was missed. Run it NOW.
+3. After the retro: create GitHub issues for each action item (not markdown tracking — it doesn't work, proven by 0/7 completion rate)
 '@
 
 # Initialize observability paths (per-repo to avoid collisions when running multiple ralphs)
@@ -1054,6 +1064,26 @@ function Test-MachineCapability {
             Reason    = "Missing capabilities: $($missingCaps -join ', ')"
         }
     }
+}
+
+# Function to check if a Friday retro is overdue
+function Test-RetroOverdue {
+    $retroDir = Join-Path $env:USERPROFILE ".squad\log"
+    $retroFiles = Get-ChildItem -Path $retroDir -Filter "*retrospective*" -ErrorAction SilentlyContinue | 
+        Sort-Object LastWriteTime -Descending
+    
+    if (-not $retroFiles) {
+        return @{ Overdue = $true; Reason = "No retrospective files found" }
+    }
+    
+    $lastRetro = $retroFiles[0].LastWriteTime
+    $daysSinceRetro = ((Get-Date) - $lastRetro).TotalDays
+    
+    if ($daysSinceRetro -gt 7) {
+        return @{ Overdue = $true; Reason = "Last retro was $([math]::Floor($daysSinceRetro)) days ago ($($lastRetro.ToString('yyyy-MM-dd')))" }
+    }
+    
+    return @{ Overdue = $false; Reason = "Last retro: $($lastRetro.ToString('yyyy-MM-dd')) ($([math]::Floor($daysSinceRetro)) days ago)" }
 }
 
 # Function to update just the lastHeartbeat timestamp in heartbeat file

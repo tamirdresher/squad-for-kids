@@ -42,6 +42,29 @@
 
 ---
 
+## Retrospective (Weekly)
+
+| Field | Value |
+|-------|-------|
+| **Trigger** | scheduled |
+| **Schedule** | Every Friday 14:00 UTC |
+| **Fallback** | First Ralph round after missed Friday |
+| **Facilitator** | Picard (Lead) |
+| **Participants** | all active agents |
+| **Cadence** | manual (but Ralph enforces the schedule) |
+| **Output** | `.squad/log/{timestamp}-retrospective.md` |
+| **Decisions** | `.squad/decisions/inbox/picard-retro-decisions.md` |
+| **Enabled** | ✅ yes |
+
+**Agenda:**
+1. Scan orchestration logs since last retro
+2. Review closed issues and PRs from the week
+3. Check decisions made and their outcomes
+4. Produce insights and action items
+5. Create GitHub issues for each action item (not markdown — proven tracking method)
+
+---
+
 ## Model Review
 
 | Field | Value |

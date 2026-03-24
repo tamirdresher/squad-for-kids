@@ -1,0 +1,20 @@
+id: aks-outage-triage
+name: AKS Outage Triage
+inputs:
+  prompt: |
+    We're experiencing an AKS cluster outage. Pods are failing to start with "ImagePullBackOff" errors.
+    
+    Use the incident-response skill to determine if this is an Azure-wide issue.
+
+expected_output: |
+    Should check Azure Status for AKS, Container Registry, and related services. Should verify timeline and document findings.
+
+graders:
+  - type: text
+    name: checks_aks_status
+    config:
+      contains: ["AKS", "Kubernetes", "Azure Status"]
+  - type: text
+    name: checks_related_services
+    config:
+      regex_match: "(?i)(container.*registry|ACR|networking)"

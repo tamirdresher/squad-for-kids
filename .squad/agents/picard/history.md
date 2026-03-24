@@ -1,5 +1,9 @@
 # Picard — History
 
+## Current Quarter (2026-Q2)
+
+*This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
+
 ## Core Context
 
 ### Squad Leadership & Architecture
@@ -29,11 +33,10 @@
 **Cross-Agent Dependencies:**
 - Manages overall Squad coordination; works with all agents for design reviews and work routing
 
-## Current Quarter (2026-Q2)
-
-*This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
-
 ## Active Context
+
+
+> **History cap enforced:** 7 older entries moved to history-archive.md. Hot layer capped at 20 entries.
 
 ### 2026-03-21: Issue #948 — Post-Merge Build & Release Validation for Adir Atias (URGENT) (Complete)
 

@@ -1,0 +1,20 @@
+id: blog-intro-paragraph
+name: Blog Post Introduction
+inputs:
+  prompt: |
+    Write an opening paragraph for a blog post about "How I automated my development workflow with AI agents."
+    
+    Use Tamir Dresher's voice: conversational, personal, story-driven, technically deep but accessible.
+
+expected_output: |
+    Should be conversational, use first-person, avoid corporate speak, include personal context or anecdote.
+
+graders:
+  - type: text
+    name: personal_story
+    config:
+      regex_match: "(?i)(remember|realized|discovered|struggled|wondered)"
+  - type: text
+    name: technical_but_accessible
+    config:
+      contains: ["AI", "agent", "workflow"]

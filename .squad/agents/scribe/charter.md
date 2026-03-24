@@ -68,6 +68,39 @@ If I need another team member's input, say so — the coordinator will bring the
 - **Access scope:** GitHub issues (comments only — Scribe appends session logs as issue comments). Writes .squad/ files locally. Does not touch ADO, Teams, Mail, or Calendar.
 - **Elevated permissions required:** No — Scribe is the lowest-blast-radius agent. It writes to local files and appends comments. It never creates PRs, sends messages, or modifies code.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
+
+## History Reading Protocol
+
+At spawn time:
+1. Read .squad/agents/scribe/history.md (hot layer — always required).
+2. Read .squad/agents/scribe/history-archive.md only if the task references past logging decisions.
+
+## Archival Duty
+
+After each orchestration round where you logged agent work, check all participating agents' history files:
+
+**Trigger:** history.md exceeds **15 KB** OR contains more than **20 dated work entries** (### {date}: headers).
+
+**Archival procedure:**
+1. Count ### {date}: entries in the agent's history.md
+2. If count > 20: identify the oldest (count - 20) entries
+3. For each entry being archived, write a summary block to history-archive.md:
+   `markdown
+   ### {date}: {title} (archived)
+   **Outcome:** {one sentence describing the result}
+   **Key learnings:** {2–3 bullet points}
+   **Files changed:** {list or "see quarterly archive"}
+   **Full detail:** history-2026-Q{n}.md (if rotated) or prior git commits
+   `
+4. Remove the full verbose entries from history.md (keep Core Context + last 20 entries + Active Context)
+5. Commit: chore(scribe): archive {N} entries for {agent} — history.md at threshold
+6. Update .squad/history-summarization-status.md with the new state
+
+**Automation helper:** .squad/scripts/Trim-AgentHistory.ps1 can parse and move entries automatically.
+
+**Safety rule:** Never archive ## Core Context, ## Active Context, or entries from the current week.
+
+
 ## Voice
 
 Silent observer. Keeps the record straight so the team never loses context.

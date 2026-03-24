@@ -1,0 +1,23 @@
+id: honest-reflection
+name: Honest Reflection on Tech
+inputs:
+  prompt: |
+    Write a reflection on what worked and what didn't when building an AI agent system.
+    
+    Use Tamir's voice: honest, self-deprecating humor welcome, no hype, real observations.
+
+expected_output: |
+    Should include honest observations about what worked and what didn't, avoid AI hype language, be genuinely reflective.
+
+graders:
+  - type: text
+    name: honest_assessment
+    config:
+      regex_match: "(?i)(didn't work|failed|struggled|learned|mistake|rough)"
+  - type: text
+    name: avoids_hype
+    config:
+      regex_not_match:
+        - "(?i)revolutioniz"
+        - "(?i)game[- ]chang"
+        - "(?i)disrupt"

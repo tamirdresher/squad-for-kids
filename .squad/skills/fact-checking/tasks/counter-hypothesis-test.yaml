@@ -1,0 +1,20 @@
+id: counter-hypothesis-test
+name: Counter-Hypothesis Testing
+inputs:
+  prompt: |
+    Review this technical claim: "Kubernetes always restarts a pod when its liveness probe fails."
+    
+    Generate counter-hypotheses and test them.
+
+expected_output: |
+    Should include tested counter-hypotheses and a verdict with supporting evidence.
+
+graders:
+  - type: text
+    name: has_counter_hypothesis
+    config:
+      regex_match: "(?i)counter[- ]hypothes(is|es)"
+  - type: text
+    name: structured_review
+    config:
+      contains: ["Claims verified:", "Issues found:"]

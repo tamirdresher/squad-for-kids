@@ -1,5 +1,9 @@
 # Seven — History
 
+## Current Quarter (2026-Q2)
+
+*This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
+
 ## Core Context
 
 ### Knowledge Management & Research
@@ -27,10 +31,6 @@
 - `.squad/KNOWLEDGE_MANAGEMENT.md` — Knowledge base documentation
 
 **Research Template:** WorkIQ search → ADO/GitHub validation → Decision record → Team adoption
-
-## Current Quarter (2026-Q2)
-
-*This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
 
 ## Active Context
 
@@ -155,6 +155,9 @@
 - PR #505: Research findings and implementation roadmap
 
 **Pattern:** High-security government cloud research → feasibility assessment with concrete implementation path → architecture proposal that preserves existing patterns while adapting LLM backend
+
+
+> **History cap enforced:** 7 older entries moved to history-archive.md. Hot layer capped at 20 entries.
 
 ### 2026-03-14: Seven — Cross-Machine Agent Coordination Research — Issue #491
 
@@ -1271,4 +1274,3 @@ ADC Sandbox Group: "tamresearch1-squad"
 - `.squad/cross-machine/README.md` — task queue documentation
 
 **Series Context:** Bridges Part 3/4 (distributed system failures) to Part 6 (K8s as solution). Explains what the system DOES before explaining how to run it on cloud infrastructure.
-

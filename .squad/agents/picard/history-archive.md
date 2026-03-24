@@ -1023,3 +1023,37 @@ GitHub's issue primitives are sufficient for distributed coordination:
 - Issue #329: Multi-org ADO access blocker
 - ConfigGen knowledge: .squad/scripts/workiq-queries/configgen.md
 
+### 2026-03-21: Issue #948 — Post-Merge Build & Release Validation for Adir Atias (URGENT) (Complete) (archived)
+**Outcome:** Completed work on 2026-03-21: Issue #948 — Post-Merge Build & Release Validation for Adir Atias (URGENT) (Complete)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-20: Issue #1058 — Bitwarden Shadow MCP Server Implementation (Complete) (archived)
+**Outcome:** ✅ **SUCCESS** — Full implementation with TypeScript MCP server
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-13: Issue #473 — Rework Rate Integration Proposal (Complete - Background Task) (archived)
+**Outcome:** ✅ **SUCCESS** — Background task from Ralph work monitor round
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-13: Issue #454 — Copilot CLI v1.0.5 Adoption Triage (Complete) (archived)
+**Outcome:** - Added `squad:picard` label
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #347 — Power Automate Flow Disabled (Investigation Complete) (archived)
+**Outcome:** - Crafted response from Tamir's perspective acknowledging Joshua's feedback
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-20: Issue #1148 — Mooncake China Region Audit (P1) (archived)
+**Outcome:** Completed work on 2026-03-20: Issue #1148 — Mooncake China Region Audit (P1)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-20: Issue #1070 — Weekend Sprint Status Check (Complete) (archived)
+**Outcome:** ✅ **ALL 11 ISSUES COMPLETED** — Sprint exceeded expectations
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history

@@ -1,0 +1,20 @@
+id: check-package-version
+name: Check Package Version Claim
+inputs:
+  prompt: |
+    Review this claim: "React version 18.2.0 introduced the new useTransition hook."
+    
+    Verify if this is accurate using the fact-checking methodology.
+
+expected_output: |
+    Should include verification status (✅/⚠️/❌), evidence, and verdict.
+
+graders:
+  - type: text
+    name: has_evidence_check
+    config:
+      regex_match: "(?i)(evidence|verify|check)"
+  - type: text
+    name: mentions_react
+    config:
+      contains: ["React", "useTransition"]

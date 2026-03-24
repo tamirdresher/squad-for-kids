@@ -1,0 +1,36 @@
+name: voice-writing-eval
+description: Evaluation suite for voice-writing skill (Tamir Dresher's voice matching)
+skill: voice-writing
+version: "1.0"
+
+config:
+  trials_per_task: 1
+  timeout_seconds: 300
+  parallel: false
+  model: claude-sonnet-4.6
+
+graders:
+  - type: text
+    name: uses_first_person
+    config:
+      regex_match: "\\b(I|my|we|our)\\b"
+  - type: text
+    name: avoids_corporate_speak
+    config:
+      regex_not_match:
+        - "(?i)synergy"
+        - "(?i)leverage"
+        - "(?i)paradigm shift"
+        - "(?i)ecosystem play"
+  - type: text
+    name: conversational_tone
+    config:
+      contains: ["—", "...", "like"]
+  - type: code
+    name: sufficient_length
+    config:
+      assertions:
+        - "len(output) > 300"
+
+tasks:
+  - "tasks/*.yaml"

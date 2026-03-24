@@ -1,0 +1,27 @@
+name: fact-checking-eval
+description: Evaluation suite for fact-checking skill
+skill: fact-checking
+version: "1.0"
+
+config:
+  trials_per_task: 1
+  timeout_seconds: 300
+  parallel: false
+  model: claude-sonnet-4.6
+
+graders:
+  - type: text
+    name: has_review_table
+    config:
+      regex_match: "\\|.*\\|.*Status.*\\|.*Evidence"
+  - type: text
+    name: has_confidence_markers
+    config:
+      contains: ["✅", "⚠️", "❌"]
+  - type: text
+    name: has_verdict
+    config:
+      regex_match: "(?i)\\*\\*Verdict:\\*\\*"
+
+tasks:
+  - "tasks/*.yaml"

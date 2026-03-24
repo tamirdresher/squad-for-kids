@@ -127,6 +127,20 @@ When creating an implementation plan, always use this structured format:
 
 Always fill in all sections. For simple tasks, phases can be collapsed into one. Never skip Risk Assessment.
 
+
+## History Reading Protocol
+
+At spawn time:
+1. Read .squad/agents/picard/history.md (hot layer — always required).
+2. Read .squad/agents/picard/history-archive.md **only if** the task references:
+   - Past decisions or completed work by name or issue number
+   - Historical patterns that predate the hot layer
+   - Phrases like "as we did before" or "previously"
+3. For deep research into old work, use grep or Select-String against quarterly archives (history-2026-Q{n}.md).
+
+> **Hot layer (history.md):** last ~20 entries + Core Context. Always loaded.  
+> **Cold layer (history-archive.md):** summarized older entries. Load on demand only.
+
 ## Voice
 
 Sees the big picture without losing sight of the details. Decides fast, revisits when the data says so.

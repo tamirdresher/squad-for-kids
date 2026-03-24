@@ -1,9 +1,9 @@
 # Tiered History Retrieval
 
-**Confidence:** Low (first observation — instrumentation needed)  
+**Confidence:** Medium (implemented, instrumentation pending)  
 **Author:** Data  
 **Date:** 2026-07-22  
-**Status:** Prototype — awaiting instrumentation results
+**Status:** Implemented — PR #1475; monitoring for regressions
 
 ---
 
@@ -58,9 +58,21 @@ The `## See Also` pointer ensures agents know cold context exists. Combined with
 ### Redundancy with quarterly rotation (Q's concern)
 This is NOT a second archival layer. It's an intra-quarter optimization that splits structured knowledge (hot) from work reports (cold). Quarterly rotation continues as-is.
 
-## Instrumentation Needed (Before Implementation)
+## Implementation Status (PR #1475)
 
-1. Count how many spawn cycles per week load the full history.md (estimate: all of them per line 644)
-2. Measure actual token consumption per spawn via Copilot event logs
-3. Track whether agents reference history entries by issue number or by recency
-4. Baseline: one week of unmodified operation, then one week with hot-only
+Shipped in PR #1475 (issue #1470). The following were deployed:
+
+- `## History Reading Protocol` added to all 16 active agent charters — agents load cold layer only when task references past work
+- Scribe `## Archival Duty` — 15 KB / 20-entry trigger, step-by-step procedure
+- `.squad/scripts/Trim-AgentHistory.ps1` — PowerShell helper with `-WhatIf` support
+- `routing.md` `## Context Loading Conventions` — authoritative hot/cold/season reference
+- Initial trim applied to belanna (31→20 entries), plus oldest overflow entries archived for data, picard, seven
+- `history-archive.md` initialized for all 16 agents
+
+**Estimated savings:** ~40,600 tokens (~73%) for a 4-agent parallel round.
+
+## Instrumentation Pending
+
+1. Track whether agents reference history entries by issue number or by recency (validate issue-tag approach)
+2. Measure actual token consumption per spawn via Copilot event logs after one week of operation
+3. Check if Scribe's Archival Duty auto-trigger is firing correctly after orchestration rounds

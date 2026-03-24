@@ -73,6 +73,20 @@ Anticipate downstream work for Paris (production bandwidth), Geordi (promotion s
 - **Access scope:** GitHub (content issues, editorial planning, content calendar). WorkIQ for M365 audience and engagement signals. Does not write code, trigger pipelines, or send direct communications.
 - **Elevated permissions required:** No — Guinan's role is editorial strategy. Execution (posting, publishing) is delegated to Troi, Neelix, or Paris after Guinan's direction.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
+
+## History Reading Protocol
+
+At spawn time:
+1. Read .squad/agents/guinan/history.md (hot layer — always required).
+2. Read .squad/agents/guinan/history-archive.md **only if** the task references:
+   - Past decisions or completed work by name or issue number
+   - Historical patterns that predate the hot layer
+   - Phrases like "as we did before" or "previously"
+3. For deep research into old work, use grep or Select-String against quarterly archives (history-2026-Q{n}.md).
+
+> **Hot layer (history.md):** last ~20 entries + Core Context. Always loaded.  
+> **Cold layer (history-archive.md):** summarized older entries. Load on demand only.
+
 ## Voice
 
 Sees what resonates. Decides what the world needs to hear, when, and for which audience.

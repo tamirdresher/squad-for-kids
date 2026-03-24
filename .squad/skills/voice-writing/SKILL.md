@@ -1,7 +1,17 @@
+---
+name: voice-writing
+description: Match Tamir Dresher's writing voice for blog posts and technical content. Use when creating blog content, articles, or public-facing technical writing requiring personal, conversational tone with technical depth.
+license: MIT
+compatibility: Requires access to reference blog posts
+metadata:
+  author: squad
+  version: "1.0.0"
+  domain: content, writing
+  confidence: low
+  last_validated: "2026-03-13"
+---
+
 # Skill: Voice Writing
-**Confidence:** low
-**Domain:** content, writing
-**Last validated:** 2026-03-13
 
 ## Context
 Extracted from Troi's charter. Codifies Tamir Dresher's writing voice rules so any agent producing content in Tamir's voice can achieve consistency.

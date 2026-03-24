@@ -1,0 +1,20 @@
+id: keyvault-degradation
+name: Key Vault Degradation Investigation
+inputs:
+  prompt: |
+    Production services are reporting Key Vault authentication timeouts starting 30 minutes ago.
+    
+    Apply the incident response pattern to check if this is infrastructure-related.
+
+expected_output: |
+    Should navigate to Azure Status, check Key Vault service, verify timeline alignment, and document findings.
+
+graders:
+  - type: text
+    name: checks_keyvault
+    config:
+      regex_match: "(?i)key[- ]?vault"
+  - type: text
+    name: timeline_verification
+    config:
+      contains: ["30 minutes", "timeline", "started"]

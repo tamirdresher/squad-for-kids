@@ -89,3 +89,47 @@ Comprehensive learnings and detailed work history. Recent activity tracked in hi
 
 **Key Finding:** EMU token scopes are limited — gh CLI auth requires `read:org` which GCM tokens don't provide. Not a blocker; ralph-watch manages authentication directly.
 
+### 2026-07-22: ClawMongo-Inspired Optimization Exploration (archived)
+**Outcome:** Completed work on 2026-07-22: ClawMongo-Inspired Optimization Exploration
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-07-18: Issue #543 — Telegram Bot Configuration (archived)
+**Outcome:** Completed work on 2026-07-18: Issue #543 — Telegram Bot Configuration
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-06-26: Issue #14 — Clickable Hyperlinks in TUI (archived)
+**Outcome:** Completed work on 2026-06-26: Issue #14 — Clickable Hyperlinks in TUI
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #496 — XTTS Voice Cloning Python 3.12 Incompatibility (archived)
+**Outcome:** Completed work on 2026-03-12: Issue #496 — XTTS Voice Cloning Python 3.12 Incompatibility
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #350 — Machine Config Report Analysis (COMPLETE) (archived)
+**Outcome:** Completed work on 2026-03-12: Issue #350 — Machine Config Report Analysis (COMPLETE)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-20: Issue #1205 — Charity Game Company Technical Architecture Study (archived)
+**Outcome:** Completed work on 2026-03-20: Issue #1205 — Charity Game Company Technical Architecture Study
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1) (archived)
+**Outcome:** Design document with full API contracts
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1) (archived)
+**Outcome:** Completed work on 2026-03-13: Issue #417 — Squad MCP Server (COMPLETE — Phase 1)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-13: Issue #454 — Copilot CLI v1.0.5 Feature Adoption (PLANNING) (archived)
+**Outcome:** Completed work on 2026-03-13: Issue #454 — Copilot CLI v1.0.5 Feature Adoption (PLANNING)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history

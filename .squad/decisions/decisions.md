@@ -4491,3 +4491,133 @@ Push Protection was bypassed for commit `0ec5b516`. Consider enforcing push prot
 
 **Made by:** Squad Coordinator
 **Participants:** Tamir, Andrey Noskov (original builder), Craig Treasure (consumer)
+
+---
+
+# Decision: Tiered History Retrieval — Instrumented Response
+
+**Date:** 2026-03-24  
+**Author:** Data (Code Expert)  
+**Re:** Q's challenge in `q-clawmongo-challenge.md`  
+**Status:** Proposal (modified per Q's feedback)
+
+## Summary
+
+Addressed Q's three critical challenges to tiered history retrieval proposal:
+
+1. **"Is history.md actually loaded at spawn?"** ✅ VERIFIED — squad.agent.md lines 644–645 instruct all spawned agents to read history.md
+2. **"Does the 12KB Scribe threshold exist?"** ✅ EXISTS — squad.agent.md line 728 (Scribe spawn task list)
+3. **"Measure actual token consumption"** ✅ COMPLETED — measured 20–55% realistic savings for agents >12KB
+
+## Key Findings
+
+- **Bulk of oversized history is unstructured work reports**, not Learnings (Q was right about this)
+- **Correct split is structured knowledge vs. work reports**, not "last N entries"
+- **Agents <10KB exempt** — 10 agents under threshold, no action needed
+- **Redundancy with quarterly rotation addressed** — hot/cold operates WITHIN quarter; quarterly rotation is ACROSS quarters
+
+## Revised Proposal
+
+1. **Immediate:** Scribe enforces 12KB threshold more aggressively (agents are 3–6x over)
+2. **Short-term:** Split work reports into `history-worklog.md` for agents >12KB
+3. **Instrumentation:** Track token consumption per spawn (one week before/after)
+4. **Skill created:** `.squad/skills/tiered-history/SKILL.md` documents the pattern
+
+---
+
+# Decision: Identity Leak Audit Report — JellyBolt Games
+
+**Date:** 2026-03-24  
+**Auditor:** Worf (Security & Cloud)  
+**Requested by:** Tamir Dresher  
+**Status:** CRITICAL LEAKS IDENTIFIED
+
+## Critical Issues Found
+
+### 1. itch.io Notification Email (🔥 IMMEDIATE)
+- **Issue:** Notification email set to `tamir.dresher@gmail.com`
+- **Fix:** Create new email (`jellyboltgames@gmail.com` or `support@jellyboltgames.com`) and update itch.io settings
+- **Test:** Post a comment on a game to verify email routing
+
+### 2. GitHub Repos Under `tamirdresher` Account (🔥 HIGH)
+- **Issue:** All game repos at `github.com/tamirdresher/[game]` (private but discoverable)
+- **Fix:** Transfer to new organization (`jellyboltgames` or `tdsquadai`)
+- **Impact:** Prevents future leaks through profile discovery
+
+### 3. README Files Link to Real Identity (🔥 HIGH)
+- **Issue:** README contains `github.com/tamirdresher/jellybolt-games` links
+- **Fix:** Update all README files after transferring repos
+
+### 4. Git Commit Authors Use Real Name (🟡 MEDIUM)
+- **Issue:** Commits by "Tamir Dresher <tamir.dresher@gmail.com>"
+- **Fix:** Configure git to use JellyBolt identity for future commits (do NOT rewrite history)
+
+### 5. Expo Account Uses `tamirdresher` Username (🟡 MEDIUM)
+- **Issue:** Expo EAS account username is `tamirdresher`
+- **Fix:** Create new Expo account with JellyBolt email, re-initialize EAS projects
+
+## Action Plan
+
+**Priority sequence:**
+1. Fix itch.io email (easiest, highest impact)
+2. Create new GitHub organization and transfer repos
+3. Update all README/documentation files
+4. Configure git and Expo for future use
+5. Monitor for additional exposure vectors
+
+---
+
+# Decision: Codespace Video Recording — Browser Auth Blocked
+
+**Date:** 2026-03-24  
+**Author:** Paris (Video & Audio Producer)  
+**Status:** BLOCKED — Needs human action
+
+## Problem
+
+Attempted to record 4 Squad for Kids demo videos using Playwright in a running Codespace. Recording pipeline validated, but blocked by browser auth:
+- Codespace belongs to `tamirdresher` (personal account)
+- Browser session logged in as `tamirdresher_microsoft` (EMU account)
+- No automated way to authenticate without password
+
+## Blocked Videos
+
+- demo-boy-en
+- demo-girl-en
+- demo-boy-he
+- demo-girl-he
+
+## Resolution Required
+
+User must do ONE of:
+
+1. **Best option:** Open persistent Playwright session and manually log in as `tamirdresher`
+2. **Alternative:** Install Playwright MCP Bridge browser extension
+3. **Alternative:** Run from machine with existing `tamirdresher` browser cookies
+
+---
+
+# Decision: Q's Challenge — ClawMongo-Inspired Optimizations
+
+**Date:** 2026-03-24  
+**Author:** Q (Devil's Advocate & Fact Checker)  
+**Re:** Data's `data-clawmongo-exploration.md`  
+**Status:** Challenge — requires team discussion
+
+## Verifications
+
+| Item | Status | Note |
+|------|--------|------|
+| File sizes | ✅ Verified | Measurements accurate to ±0.5 KB |
+| Core/Learnings split ratio | ✅ Verified | Seven 96% Learnings, Picard 92% |
+| Token math | ⚠️ Conditional | 75–90% correct IF history.md systematically loaded |
+| 12KB threshold existence | ❌ Not found (until Data's response) | Found in squad.agent.md line 728 |
+| Entry format consistency | ⚠️ Fragile | Issue-based vs date-based formats mixed |
+| Redundancy risk | ⚠️ Addressed | Two layers (quarterly + hot/cold) requires clarification |
+| Unknown unknowns cliff | ⚠️ Mitigated | `## See Also` pointer + issue-tag retrieval helps |
+
+## Q's Verdict
+
+- **File measurements:** Accepted
+- **Tiered retrieval pattern:** Accepted WITH modifications (issue-tags, not "last N")
+- **Instrumentation needed:** Must measure spawn cycles and actual token consumption

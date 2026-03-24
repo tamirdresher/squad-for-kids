@@ -1,9 +1,4 @@
-name: Squad Board Sync — ילדים
-
-# סנכרון אוטומטי של לוח הפרויקט
-# - הוספת issues חדשים ללוח
-# - העברה ל-Done כשסוגרים issue
-# - העברה ל-Review כש-PR נפתח
+﻿name: Squad Board Sync
 
 on:
   issues:
@@ -11,25 +6,15 @@ on:
   pull_request:
     types: [opened, review_requested, ready_for_review]
   schedule:
-    # סנכרון שבועי כל יום ראשון ב-8:00 בבוקר (שעון ישראל = 5:00 UTC)
     - cron: '0 5 * * 0'
   workflow_dispatch:
 
 env:
-  # NOTE: Update these values after creating your GitHub Project board
-  # PROJECT_ID: 'YOUR_PROJECT_ID'
-  # PROJECT_NUMBER: '1'
-  # PROJECT_OWNER: 'tamirdresher'
-  # STATUS_FIELD_ID: 'YOUR_STATUS_FIELD_ID'
   PLACEHOLDER: 'true'
 
 jobs:
-  # הוספת issues חדשים ללוח
   track-new-issue:
-    if: >
-      github.event_name == 'issues' &&
-      (github.event.action == 'opened' || github.event.action == 'labeled') &&
-      env.PLACEHOLDER != 'true'
+    if: env.PLACEHOLDER != 'true'
     runs-on: ubuntu-latest
     permissions:
       issues: read
@@ -38,16 +23,12 @@ jobs:
       - name: Add issue to board
         shell: bash
         run: |
-          echo "📋 Adding issue #${{ github.event.issue.number }} to board"
+          echo "Adding issue to board"
           # NOTE: Uncomment and configure after setting up project board
           # gh project item-add $PROJECT_NUMBER --owner $PROJECT_OWNER --url ${{ github.event.issue.html_url }}
 
-  # העברת items ל-Done כשסוגרים
   sync-on-close:
-    if: >
-      github.event_name == 'issues' &&
-      github.event.action == 'closed' &&
-      env.PLACEHOLDER != 'true'
+    if: env.PLACEHOLDER != 'true'
     runs-on: ubuntu-latest
     permissions:
       issues: read
@@ -56,15 +37,12 @@ jobs:
       - name: Move to Done
         shell: bash
         run: |
-          echo "✅ Issue #${{ github.event.issue.number }} closed — moving to Done"
+          echo "Issue closed - moving to Done"
           # NOTE: Uncomment after configuring project board IDs
           # gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $DONE_OPTION_ID
 
-  # סנכרון שבועי
   reconcile-board:
-    if: >
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
-      env.PLACEHOLDER != 'true'
+    if: env.PLACEHOLDER != 'true'
     runs-on: ubuntu-latest
     permissions:
       issues: read
@@ -74,7 +52,7 @@ jobs:
       - name: Reconcile board
         shell: bash
         run: |
-          echo "🔍 Weekly board reconciliation"
-          echo "📋 Checking all items for status mismatches..."
+          echo "Weekly board reconciliation"
+          echo "Checking all items for status mismatches..."
           # NOTE: Full reconciliation logic goes here after board setup
-          echo "✅ Reconciliation complete"
+          echo "Reconciliation complete"

@@ -929,7 +929,7 @@ internal static class WaTokens
             /* 059 */ "75",
             /* 060 */ "failure",
             /* 061 */ "ptt_oot_playback",
-            /* 062 */ "AIzaSyDR5yfaG7OG8sMTUj8kfQEb8T9pN8BM6Lk",
+            /* 062 */ "REDACTED",
             /* 063 */ "w",
             /* 064 */ "048",
             /* 065 */ "2201",

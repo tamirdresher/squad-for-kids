@@ -38,6 +38,16 @@
 
 ## Learnings
 
+### 2026-07-22: ClawMongo-Inspired Optimization Exploration
+
+**Context:** Evaluated two optimizations from ClawMongo patterns — tiered history retrieval and two-pass Ralph scanning.
+
+**Findings:**
+- **History files are dominated by Learnings (82–96%):** Core Context is only 2–2.5KB but top 5 agents carry 54–74KB total. Seven, Picard, Data all exceed 65KB (~17K tokens). Hot/cold split would save 75–90% of spawn tokens.
+- **104 open issues makes two-pass Ralph worthwhile:** Existing scripts already avoid fetching bodies in list calls, but comments field and MCP-spawned scans still pull full payloads. Two-pass would reduce per-scan context from ~312KB to ~51KB (84% reduction).
+- **4 agents already have history-archive.md:** belanna, data, picard, seven — but no consistent format or formal hot/cold protocol.
+- **Decision:** Both optimizations recommended. Wrote implementation plan to `.squad/decisions/inbox/data-clawmongo-exploration.md`.
+
 ### 2026-07-18: Issue #543 — Telegram Bot Configuration
 
 **Context:** Configured @tamir_squad_bot via Telegram Bot API after Tamir created it via BotFather.
@@ -1082,3 +1092,21 @@ Multi-agent task to fix technical inaccuracies in rate-limiting blog post. Worke
 - `tamirdresher.github.io/_posts/2026-03-20-rate-limiting-multi-agent.md` - Corrected blog post
 - `ISSUE_1281_FIXES.md` - Complete change documentation
 - `CREATE_CORRECTED_BLOG.md` - Change summary with line references
+
+### 2026-07-22: Issue #1470 — Tiered History Retrieval (Q's Challenge Response)
+
+**Context:** Q challenged my ClawMongo-inspired tiered history proposal. Investigated and addressed all three challenges.
+
+**Key findings:**
+- Spawn loading of history.md: CONFIRMED at squad.agent.md line 644 (Q searched ralph-watch.ps1 instead)
+- 12KB Scribe threshold: EXISTS at squad.agent.md line 728 (Q searched charter.md instead)
+- Actual measurements: 6 agents exceed 12KB; bulk of bloat is unstructured work reports (20-82% per agent), not Learnings entries
+- Original "75-90% savings" overstated; realistic range is 20-55%
+- "Last N entries" heuristic replaced with issue-tag-based retrieval (Q's fragility concern was valid)
+
+**Deliverables:**
+- `.squad/skills/tiered-history/SKILL.md` — hot/cold pattern definition
+- `.squad/decisions/inbox/data-tiered-retrieval-instrumented.md` — decision with evidence
+- Issue #1470 comment with full response
+
+**Pattern:** When making optimization proposals, always cite exact line numbers and verify search scope. Q searched the wrong files but the methodology challenge was sound — measure runtime behavior, not just file sizes.

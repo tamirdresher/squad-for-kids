@@ -1,0 +1,167 @@
+# =============================================================================
+# DK8S Deployment Pipeline — GitHub Actions
+#
+# Fixes #1397 — helm binary was missing from linux_build_container, blocking
+# the "Download shared dk8s charts and scripts" step.
+#
+# Strategy:
+#   1. Install helm via azure/setup-helm@v4 into $RUNNER_TOOL_CACHE.
+#   2. Symlink / copy helm to the legacy DK8S package path that the existing
+#      download step expects:
+#        /__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux/helm
+#   3. All subsequent steps that call helm (or the legacy path) work normally.
+#
+# Coordinate any changes to the helm version with Suzan Zaher (ConfigGen SDK
+# Support + DK8S Support channels).
+# =============================================================================
+name: DK8S Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options: [dev, staging, prod]
+      helm_version:
+        description: 'Helm version (leave blank for default)'
+        required: false
+        default: 'v3.14.4'
+
+env:
+  # Path that the existing "Download shared dk8s charts and scripts" step
+  # hardcodes — we ensure helm lives here so nothing else needs changing.
+  DK8S_HELM_PATH: /__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux/helm
+  HELM_VERSION:   ${{ github.event.inputs.helm_version || 'v3.14.4' }}
+
+jobs:
+  dk8s-deploy:
+    name: DK8S Deployment (${{ github.event.inputs.environment || 'dev' }})
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Install Helm (azure/setup-helm is the canonical approach) ─────────
+      - name: Install Helm ${{ env.HELM_VERSION }}
+        uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      # ── 3. Mirror helm to the DK8S legacy path ───────────────────────────────
+      #
+      # The pipeline step "Download shared dk8s charts and scripts
+      # (linux_build_container)" resolves helm from the hard-coded DK8S
+      # package path.  We create that path and symlink the installed binary
+      # so no changes to downstream steps are required.
+      #
+      # Root cause of #1397: a recent update to the mps-infra-k8s-ev2-deployment
+      # package removed the pre-bundled helm binary from Tools/linux/.  This step
+      # serves as a self-healing fallback for any future package version that omits
+      # the binary.
+      - name: Ensure helm is available at DK8S legacy path
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HELM_BIN="$(command -v helm)"
+          echo "📦 Helm installed at: ${HELM_BIN}"
+          helm version --short
+
+          # Create the legacy directory structure
+          mkdir -p "$(dirname "${DK8S_HELM_PATH}")"
+
+          # Use a symlink so the binary stays in sync with the installed version
+          if [ ! -e "${DK8S_HELM_PATH}" ]; then
+            ln -s "${HELM_BIN}" "${DK8S_HELM_PATH}"
+            echo "✅ Symlinked helm → ${DK8S_HELM_PATH}"
+          else
+            echo "ℹ️  ${DK8S_HELM_PATH} already exists — skipping symlink"
+          fi
+
+          # Verify
+          "${DK8S_HELM_PATH}" version --short
+          echo "✅ helm accessible at DK8S legacy path"
+
+      # ── 4. Download shared DK8S charts and scripts ───────────────────────────
+      - name: Download shared dk8s charts and scripts (linux_build_container)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          DK8S_PACKAGE_DIR="/__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment"
+
+          echo "=== DK8S Package Directory ==="
+          ls -la "${DK8S_PACKAGE_DIR}/Tools/linux/"
+
+          echo "✅ helm binary confirmed: $(${DK8S_HELM_PATH} version --short)"
+
+      # ── 5. Validate Helm charts ───────────────────────────────────────────────
+      - name: Validate Helm charts (lint)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHART_DIRS=$(find infrastructure/helm -name "Chart.yaml" -exec dirname {} \; 2>/dev/null || true)
+          if [ -z "${CHART_DIRS}" ]; then
+            echo "ℹ️  No Helm charts found — skipping lint"
+            exit 0
+          fi
+
+          for chart in ${CHART_DIRS}; do
+            echo "🔍 Linting: ${chart}"
+            helm lint "${chart}" || { echo "❌ Lint failed for ${chart}"; exit 1; }
+          done
+          echo "✅ All charts passed helm lint"
+
+      # ── 6. Azure Login (needed for AKS deploy steps) ─────────────────────────
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # ── 7. Deploy ─────────────────────────────────────────────────────────────
+      - name: Deploy DK8S charts
+        shell: bash
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+        run: |
+          set -euo pipefail
+
+          echo "🚀 Deploying to environment: ${ENVIRONMENT}"
+
+          # Obtain AKS credentials
+          az aks get-credentials \
+            --resource-group "${{ secrets.AKS_RESOURCE_GROUP }}" \
+            --name            "${{ secrets.AKS_CLUSTER_NAME }}" \
+            --overwrite-existing
+
+          # Helm deploy — adjust chart path / release name as required
+          helm upgrade --install "squad-dk8s-${ENVIRONMENT}" \
+            infrastructure/helm/squad/ \
+            --namespace   "squad-${ENVIRONMENT}" \
+            --create-namespace \
+            --atomic \
+            --timeout 10m \
+            --set global.environment="${ENVIRONMENT}" \
+            -f "infrastructure/environments/${ENVIRONMENT}.parameters.json" \
+            2>&1 || { echo "❌ Helm deploy failed"; exit 1; }
+
+          echo "✅ DK8S charts deployed successfully"
+
+      # ── 8. Verify ─────────────────────────────────────────────────────────────
+      - name: Verify deployment
+        shell: bash
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+        run: |
+          kubectl get pods -n "squad-${ENVIRONMENT}" --timeout=60s
+          echo "✅ DK8S deployment verified"

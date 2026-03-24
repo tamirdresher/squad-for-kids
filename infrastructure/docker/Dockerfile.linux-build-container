@@ -1,0 +1,72 @@
+# =============================================================================
+# Dockerfile.linux-build-container
+#
+# The linux_build_container image used by the DK8S CI/CD pipeline.
+#
+# Fixes #1397 — helm binary was not present, causing pipeline failures at:
+#   "Download shared dk8s charts and scripts (linux_build_container)"
+#
+# The helm binary is now installed to /usr/local/bin/helm AND mirrored to
+# the legacy DK8S package path expected by the pipeline:
+#   /__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux/helm
+#
+# Build:
+#   docker build -f infrastructure/docker/Dockerfile.linux-build-container \
+#     -t linux-build-container:latest .
+# =============================================================================
+
+FROM ubuntu:22.04
+
+LABEL maintainer="squad-belanna" \
+      description="DK8S linux_build_container — CI/CD build image with helm" \
+      version="1.0.0"
+
+ARG HELM_VERSION=3.14.4
+ARG KUBECTL_VERSION=1.29.3
+
+# Install base dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl \
+      ca-certificates \
+      git \
+      jq \
+      unzip \
+      gnupg \
+      lsb-release \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Helm ──────────────────────────────────────────────────────────────────────
+# Install helm to standard path
+RUN curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+      | tar -xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
+    && chmod +x /usr/local/bin/helm \
+    && helm version --short
+
+# Mirror helm to the legacy DK8S package path so existing pipeline steps that
+# reference Tools/linux/helm continue to work without modification.
+RUN mkdir -p "/__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux" \
+    && cp /usr/local/bin/helm \
+          "/__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux/helm" \
+    && chmod +x \
+          "/__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux/helm"
+
+# ── kubectl ───────────────────────────────────────────────────────────────────
+RUN curl -fsSLo /usr/local/bin/kubectl \
+      "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" \
+    && chmod +x /usr/local/bin/kubectl \
+    && kubectl version --client --short 2>/dev/null || kubectl version --client
+
+# ── Azure CLI ─────────────────────────────────────────────────────────────────
+RUN curl -fsSL https://aka.ms/InstallAzureCLIDeb | bash \
+    && az version
+
+# Smoke-test all tooling before the image is committed
+RUN helm version --short \
+    && kubectl version --client \
+    && az version \
+    && test -x "/__w/_temp/Dk8sDeployPackages/mps-infra-k8s-ev2-deployment/Tools/linux/helm"
+
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

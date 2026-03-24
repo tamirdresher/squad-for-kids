@@ -333,6 +333,70 @@
             font-weight: 500;
         }
 
+        /* Video Gallery */
+        .gallery-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .gallery-tab {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .gallery-tab.active {
+            background: var(--primary);
+            color: #fff;
+        }
+        .gallery-tab:hover:not(.active) {
+            background: #f0edff;
+        }
+        .gallery-panel {
+            display: none;
+        }
+        .gallery-panel.active {
+            display: block;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .video-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        .video-card video {
+            width: 100%;
+            display: block;
+            background: #000;
+        }
+        .video-card-label {
+            padding: 12px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text);
+        }
+
         /* FAQ */
         .faq-list {
             max-width: 700px;
@@ -916,63 +980,121 @@
         </div>
     </section>
 
-    <!-- Demo Video Section -->
+    <!-- Video Gallery Section -->
     <section id="demo" class="demo-section">
-        <h2 class="section-title">📺 See It In Action</h2>
+        <h2 class="section-title">📺 Video Library</h2>
+        <p class="demo-subtitle" style="margin-bottom: 24px;">All videos in one place — pick a category</p>
 
-        <div class="video-tabs">
-            <button class="video-tab active" onclick="switchVideo('en')">🇺🇸 English</button>
-            <button class="video-tab" onclick="switchVideo('he')">🇮🇱 עברית</button>
+        <div class="gallery-tabs">
+            <button class="gallery-tab active" onclick="switchGallery('real')">🎬 Real Recordings</button>
+            <button class="gallery-tab" onclick="switchGallery('quick')">⚡ Quick Videos</button>
+            <button class="gallery-tab" onclick="switchGallery('full')">🎓 Full Demos</button>
+            <button class="gallery-tab" onclick="switchGallery('audience')">👥 For Different Audiences</button>
+            <button class="gallery-tab" onclick="switchGallery('features')">✨ Features</button>
         </div>
 
-        <div class="video-container">
-            <div id="video-en" class="video-panel active">
-                <video controls preload="metadata">
-                    <source src="../demo-video-en.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-            <div id="video-he" class="video-panel">
-                <video controls preload="metadata">
-                    <source src="../demo-video-he.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-        </div>
-
-        <p class="demo-subtitle">Watch 8-year-old Yoav meet his AI team for the first time</p>
-        <div class="video-cta-wrapper">
-            <a href="start.html" class="btn-video-cta">🟢 Start Now →</a>
-        </div>
-    </section>
-
-    <!-- Boy & Girl Variant Demos -->
-    <section id="demo-variants" class="demo-section" style="padding-top: 40px;">
-        <h2 class="section-title">🎬 See It In Action — For Boys & Girls</h2>
-        <p class="demo-subtitle" style="margin-bottom: 28px;">Every kid sees themselves — with characters they love</p>
-
-        <div style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; max-width: 960px; margin: 0 auto;">
-            <!-- Boy demo -->
-            <div style="flex: 1; min-width: 300px; max-width: 460px;">
-                <h3 style="font-size: 1.3rem; margin-bottom: 12px;">🟢 For Boys — Minecraft Real Recording</h3>
-                <div class="video-container" style="margin-bottom: 8px;">
-                    <video controls preload="metadata" style="width:100%; display:block;">
-                        <source src="../demo-minecraft-real-he.mp4" type="video/mp4">
-                    </video>
+        <!-- 🎬 Real Recordings -->
+        <div id="gallery-real" class="gallery-panel active">
+            <div class="video-grid">
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-minecraft-real-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🟢 Yoav & Minecraft — Steve teaches multiplication</div>
                 </div>
-                <p style="font-size: 0.95rem; color: #6B6B8D;">Steve teaches multiplication with blocks 💎 (Hebrew recording - real Codespace session)</p>
-            </div>
-            <!-- Girl demo -->
-            <div style="flex: 1; min-width: 300px; max-width: 460px;">
-                <h3 style="font-size: 1.3rem; margin-bottom: 12px;">🟣 For Girls — Frozen Real Recording</h3>
-                <div class="video-container" style="margin-bottom: 8px;">
-                    <video controls preload="metadata" style="width:100%; display:block;">
-                        <source src="../demo-frozen-real-he.mp4" type="video/mp4">
-                    </video>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-frozen-real-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🟣 Noa & Frozen — Elsa teaches English</div>
                 </div>
-                <p style="font-size: 0.95rem; color: #6B6B8D;">Elsa teaches English with magical words ❄️ (Hebrew recording - real Codespace session)</p>
             </div>
         </div>
+
+        <!-- ⚡ Quick Videos -->
+        <div id="gallery-quick" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-quick-en.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🇺🇸 Squad in 55 seconds</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-quick-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🇮🇱 Squad in 55 seconds (Hebrew)</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-social-30s.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">📱 30-second teaser</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎓 Full Demos -->
+        <div id="gallery-full" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-video-en.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🇺🇸 Full English demo</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-video-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🇮🇱 Full Hebrew demo</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-onboarding-en.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🇺🇸 First-time onboarding</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../demo-onboarding-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🇮🇱 First-time onboarding (Hebrew)</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../tutorial-video-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">📚 Detailed tutorial (Hebrew)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 👥 For Different Audiences -->
+        <div id="gallery-audience" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../sample-parent-hebrew.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">👨‍👩‍👧 For parents (Hebrew)</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../sample-teacher-english.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">👩‍🏫 For teachers</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../sample-developer-english.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">👨‍💻 For developers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✨ Features -->
+        <div id="gallery-features" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../homework-helper-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">📝 Homework Helper</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../gamification-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🎮 Gamification — Learning through play</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../exam-prep-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">📋 Exam Preparation</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../parent-report-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">📊 Weekly Parent Report</div>
+                </div>
+                <div class="video-card">
+                    <video controls preload="metadata"><source src="../safety-he.mp4" type="video/mp4"></video>
+                    <div class="video-card-label">🔒 Safety & Privacy</div>
+                </div>
+            </div>
+        </div>
+
         <div class="video-cta-wrapper" style="margin-top: 28px;">
             <a href="start.html" class="btn-video-cta">🟢 Start Now →</a>
         </div>
@@ -1101,6 +1223,18 @@
             var tabs = document.querySelectorAll('.video-tab');
             if (lang === 'en') tabs[0].classList.add('active');
             else tabs[1].classList.add('active');
+        }
+
+        function switchGallery(cat) {
+            // Pause all playing videos in gallery
+            document.querySelectorAll('.gallery-panel video').forEach(function(v) { v.pause(); });
+            // Hide all panels
+            document.querySelectorAll('.gallery-panel').forEach(function(p) { p.classList.remove('active'); });
+            // Deactivate all tabs
+            document.querySelectorAll('.gallery-tab').forEach(function(t) { t.classList.remove('active'); });
+            // Activate selected
+            document.getElementById('gallery-' + cat).classList.add('active');
+            event.target.classList.add('active');
         }
 
         // Smooth scroll for CTA

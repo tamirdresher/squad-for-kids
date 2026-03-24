@@ -4466,3 +4466,28 @@ No PR created — the code is already clean. This is purely a credential rotatio
 ## Prevention Note
 
 Push Protection was bypassed for commit `0ec5b516`. Consider enforcing push protection to block future bypasses.
+
+## Kind Aspire Resource — Contribution Strategy (2026-03-24)
+
+**Decision:** Create a generic public Aspire.Hosting.Kind resource, contribute to CommunityToolkit/Aspire (pending Maddy's guidance on upstream vs community)
+
+**Context:**
+- Andrey Noskov built an internal Kind Aspire resource for Celestial/idk8s
+- Meeting March 23 2026 with 20+ attendees agreed on making it public
+- Existing Aspire.Hosting.Kubernetes is for deploying TO K8s (different purpose)
+- No Kind resource exists anywhere in the Aspire ecosystem
+
+**Architecture:**
+- Public: Generic Kind cluster lifecycle (tamirdresher/aspire-kind)
+- Internal: 1P extensions stay in idk8s-infrastructure
+- DK8S: Separate repo for dk8s-specific scenarios
+- NO idk8s/dk8s/Celestial references in public code
+
+**Actions:**
+- [x] Created public repo tamirdresher/aspire-kind
+- [x] Created 7 GitHub issues (#1422-#1428)
+- [ ] Maddy outreach scheduled for week of March 31
+- [ ] Core implementation in progress
+
+**Made by:** Squad Coordinator
+**Participants:** Tamir, Andrey Noskov (original builder), Craig Treasure (consumer)

@@ -1,0 +1,86 @@
+name: Kind Aspire CI
+
+on:
+  push:
+    branches: ["main", "squad/1426-kind-testing-WCBED"]
+    paths:
+      - "src/CommunityToolkit.Aspire.Hosting.Kind/**"
+      - "tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/**"
+      - ".github/workflows/kind-aspire-ci.yml"
+  pull_request:
+    paths:
+      - "src/CommunityToolkit.Aspire.Hosting.Kind/**"
+      - "tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/**"
+      - ".github/workflows/kind-aspire-ci.yml"
+  workflow_dispatch:
+    inputs:
+      run_integration_tests:
+        description: "Run integration tests (requires Docker)"
+        type: boolean
+        default: false
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Unit tests — run on every PR, no Docker required
+  # ──────────────────────────────────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore
+        run: dotnet restore tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj
+
+      - name: Build
+        run: dotnet build tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj --no-restore --configuration Release
+
+      - name: Run unit tests (exclude integration)
+        run: dotnet test tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj --no-build --configuration Release --filter "Category!=Integration" --logger "trx;LogFileName=unit-test-results.trx" --results-directory ./test-results
+
+      - name: Upload test results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: ./test-results/*.trx
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Integration tests — manual dispatch only (Kind needs Docker)
+  # ──────────────────────────────────────────────────────────────────────────
+  integration-tests:
+    name: Integration Tests (Docker / Kind)
+    runs-on: self-hosted
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_integration_tests == true }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          kind version
+
+      - name: Verify Docker is available
+        run: docker info
+
+      - name: Restore
+        run: dotnet restore tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj
+
+      - name: Build
+        run: dotnet build tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj --no-restore --configuration Release
+
+      - name: Run integration tests
+        run: dotnet test tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj --no-build --configuration Release --filter "Category=Integration" --logger "trx;LogFileName=integration-test-results.trx" --results-directory ./test-results
+
+      - name: Upload test results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: ./test-results/*.trx

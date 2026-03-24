@@ -36,4 +36,40 @@ public static class KindClusterBuilderExtensions
         var resource = new KindClusterResource(name);
         return builder.AddResource(resource);
     }
+
+    /// <summary>
+    /// Sets the number of worker nodes in the Kind cluster.
+    /// </summary>
+    /// <param name="builder">The resource builder.</param>
+    /// <param name="nodeCount">The number of worker nodes (must be at least 1).</param>
+    /// <returns>The same <see cref="IResourceBuilder{KindClusterResource}"/> for chaining.</returns>
+    public static IResourceBuilder<KindClusterResource> WithNodeCount(
+        this IResourceBuilder<KindClusterResource> builder,
+        int nodeCount)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentOutOfRangeException.ThrowIfLessThan(nodeCount, 1);
+
+        builder.Resource.NodeCount = nodeCount;
+        return builder;
+    }
+
+    /// <summary>
+    /// Sets the Kubernetes version to use when creating the Kind cluster.
+    /// </summary>
+    /// <param name="builder">The resource builder.</param>
+    /// <param name="kubernetesVersion">
+    /// The Kubernetes version string (e.g. <c>"v1.31.0"</c>).
+    /// Pass <see langword="null"/> to use the default version bundled with the Kind image.
+    /// </param>
+    /// <returns>The same <see cref="IResourceBuilder{KindClusterResource}"/> for chaining.</returns>
+    public static IResourceBuilder<KindClusterResource> WithKubernetesVersion(
+        this IResourceBuilder<KindClusterResource> builder,
+        string? kubernetesVersion)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.Resource.KubernetesVersion = kubernetesVersion;
+        return builder;
+    }
 }

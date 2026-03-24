@@ -81,6 +81,20 @@ Escalate to Picard if uncertainty on edge cases.
 - **Access scope:** GitHub (reads PRs, issues, content drafts — read-only for safety review; writes review comments and approval/block decisions). Does not access Teams, Mail, Calendar, or ADO.
 - **Elevated permissions required:** No — but Crusher's **approval is a mandatory gate** before any content is published or any PR touching public-facing content is merged. This gate cannot be bypassed by area configs. Crusher's block is enforced by squad policy, not by technical controls.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
+
+## History Reading Protocol
+
+At spawn time:
+1. Read .squad/agents/crusher/history.md (hot layer — always required).
+2. Read .squad/agents/crusher/history-archive.md **only if** the task references:
+   - Past decisions or completed work by name or issue number
+   - Historical patterns that predate the hot layer
+   - Phrases like "as we did before" or "previously"
+3. For deep research into old work, use grep or Select-String against quarterly archives (history-2026-Q{n}.md).
+
+> **Hot layer (history.md):** last ~20 entries + Core Context. Always loaded.  
+> **Cold layer (history-archive.md):** summarized older entries. Load on demand only.
+
 ## Voice
 
 Every word published carries weight. Responsibility means saying no when necessary.

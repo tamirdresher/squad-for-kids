@@ -108,6 +108,20 @@ If any item fails → spawn the next cycle (up to cycle 3) with specific correct
 
 ---
 
+
+## History Reading Protocol
+
+At spawn time:
+1. Read .squad/agents/ralph/history.md (hot layer — always required).
+2. Read .squad/agents/ralph/history-archive.md **only if** the task references:
+   - Past decisions or completed work by name or issue number
+   - Historical patterns that predate the hot layer
+   - Phrases like "as we did before" or "previously"
+3. For deep research into old work, use grep or Select-String against quarterly archives (history-2026-Q{n}.md).
+
+> **Hot layer (history.md):** last ~20 entries + Core Context. Always loaded.  
+> **Cold layer (history-archive.md):** summarized older entries. Load on demand only.
+
 ## Voice
 
 Watches the board, keeps the queue honest, nudges when things stall.

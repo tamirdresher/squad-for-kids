@@ -479,4 +479,57 @@ Apply a custom taint to NAP node pools that system pods won't tolerate by defaul
 
 **Status:** No work needed. Issue #2 already closed with all deliverables complete.
 
+### 2026-03-14: Issue #542 — GitHub EMU Auth + SRL Website Deployment (archived)
+**Outcome:** Deployed SRL landing page to `tam-research-website.azurewebsites.net` (Node.js 20, Linux)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
 
+### 2026-07-15: Issue #558 — Ralph Self-Healing (PR #559) (archived)
+**Outcome:** Created `scripts/ralph-self-heal.ps1` — automated gh auth refresh via Playwright device flow
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #345 — NAP System Pod Isolation (Ralph Round 1) (archived)
+**Outcome:** Researched NAP (Node Auto-Provisioning) system pod scheduling behavior
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-11 Completion: squad-monitor Issue #2 NuGet Publish (PR #4) (archived)
+**Outcome:** Completed work on 2026-03-11 Completion: squad-monitor Issue #2 NuGet Publish (PR #4)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-11: Issue #343 — Azure Skills Plugin Integration (archived)
+**Outcome:** Complete. Issue #343 commented and ready for closure. 6 Azure skills available in `.squad/skills/azure/`.
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #345 — NAP System Pod Isolation (Comprehensive Response) (archived)
+**Outcome:** Completed work on 2026-03-12: Issue #345 — NAP System Pod Isolation (Comprehensive Response)
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #337 — IcM Incident 759361753 Cosmos DB Firewall Investigation (archived)
+**Outcome:** Confirmed: No commits modifying Cosmos DB, firewall, network settings, or Azure Policy
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-06-20: Issue #2 — squad-monitor NuGet Tool Packaging (Verified Complete) (archived)
+**Outcome:** Already implemented and merged to main. Branch `squad/2-nuget-publish` was merged. Issue #2 closed.
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-12: Issue #333 — Azure Status Check in Incident Response (archived)
+**Outcome:** Complete. Skill documented and issue closed. This is now a standard incident response procedure for the squad.
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-11: Issue #329 — Multi-Org ADO/MCP Research (archived)
+**Outcome:** Completed work on 2026-03-11: Issue #329 — Multi-Org ADO/MCP Research
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history
+
+### 2026-03-11: DK8S Wizard Explicit Pipeline Triggering Pattern (archived)
+**Outcome:** Completed work on 2026-03-11: DK8S Wizard Explicit Pipeline Triggering Pattern
+**Key learnings:** See full entry in git history or quarterly archive
+**Files changed:** see git history

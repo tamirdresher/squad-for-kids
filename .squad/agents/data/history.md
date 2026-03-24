@@ -1,5 +1,11 @@
 # Data — History
 
+## Current Quarter (2026-Q2)
+
+*This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
+
+## Learnings
+
 ## Core Context
 
 ### Backend & Telemetry Expertise
@@ -32,11 +38,8 @@
 - `assistant_usage`: model, tokens, cost, duration
 - `cli.model_call`: model, token counts, duration_ms (deduplicate with assistant_usage)
 
-## Current Quarter (2026-Q2)
 
-*This file tracks work for 2026 Q2 (April-June). Q1 archive: history-2026-Q1.md*
-
-## Learnings
+> **History cap enforced:** 9 older entries moved to history-archive.md. Hot layer capped at 20 entries.
 
 ### 2026-07-22: ClawMongo-Inspired Optimization Exploration
 

@@ -75,6 +75,20 @@ Track production capacity and communicate bandwidth constraints to Guinan upfron
 - **Access scope:** GitHub (video/audio production files, issues for content tracking). nano-banana for visual asset generation (Gemini API key). Does not access Teams, Mail, Calendar, or ADO.
 - **Elevated permissions required:** No — media production is local. External credential involved is the Gemini API key for image generation. All published content passes through Crusher safety gate.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
+
+## History Reading Protocol
+
+At spawn time:
+1. Read .squad/agents/paris/history.md (hot layer — always required).
+2. Read .squad/agents/paris/history-archive.md **only if** the task references:
+   - Past decisions or completed work by name or issue number
+   - Historical patterns that predate the hot layer
+   - Phrases like "as we did before" or "previously"
+3. For deep research into old work, use grep or Select-String against quarterly archives (history-2026-Q{n}.md).
+
+> **Hot layer (history.md):** last ~20 entries + Core Context. Always loaded.  
+> **Cold layer (history-archive.md):** summarized older entries. Load on demand only.
+
 ## Voice
 
 Takes the vision and makes it real. Every frame matters, every voice resonates.

@@ -409,3 +409,19 @@ Agents can override the platform default model based on their role requirements.
 3. Document decision in `.squad/decisions/inbox/lead-model-change-{agent}.md`
 4. Update `.squad/model-assignments-snapshot.md` with new assignment
 5. Add model preference to agent charter (`.squad/agents/{name}/charter.md`) if persistent override needed
+
+## Context Loading Conventions
+
+### Agent History Loading
+
+Each agent has a two-tier history system. Loading follows these rules at spawn time:
+
+| Layer | File | When to load |
+|-------|------|--------------|
+| **Hot** | .squad/agents/{name}/history.md | **Always** — at every spawn |
+| **Cold** | .squad/agents/{name}/history-archive.md | **On demand** — only when the task references past decisions, old patterns, or prior issue numbers |
+| **Season** | .squad/agents/{name}/history-2026-Q{n}.md | **Deep research only** — audits, retrospectives, full history review |
+
+**Hot layer (history.md):** Contains Core Context + last ~20 dated entries + Active Context. Target ≤15 KB.  
+**Cold layer (history-archive.md):** Summarized older entries (3–5 lines each). Never pre-loaded — use grep/Select-String for targeted lookup.  
+**Archive trigger:** Scribe enforces the 15 KB / 20-entry cap after each orchestration round (see Scribe's Archival Duty).

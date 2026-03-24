@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🍕 משחק שברים — Squad for Kids</title>
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #fd79a8;
+      --accent: #fdcb6e;
+      --success: #00b894;
+      --danger: #d63031;
+      --bg: #f8f0ff;
+      --card: #ffffff;
+      --text: #2d3436;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      color: var(--primary);
+      text-shadow: 2px 2px 0 #e0d5ff;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: #636e72;
+    }
+
+    /* ===== SCOREBOARD ===== */
+    #scoreboard {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .score-chip {
+      background: var(--card);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .score-chip span.val { font-weight: bold; color: var(--primary); font-size: 1.2rem; }
+
+    /* ===== LEVEL BAR ===== */
+    #level-bar {
+      width: 100%;
+      max-width: 600px;
+      background: #e0d5ff;
+      border-radius: 50px;
+      height: 12px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    #level-fill { height: 100%; background: var(--primary); border-radius: 50px; transition: width 0.5s; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 32px;
+      max-width: 640px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    /* ===== LESSON ===== */
+    .lesson-title {
+      font-size: 1.6rem;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .lesson-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .fraction-label {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      border: 3px solid var(--primary);
+      border-radius: 12px;
+      padding: 6px 18px;
+      margin: 4px;
+      vertical-align: middle;
+    }
+
+    .fraction-label .numerator { border-bottom: 3px solid var(--primary); padding-bottom: 4px; width: 100%; text-align: center; }
+    .fraction-label .denominator { padding-top: 4px; text-align: center; }
+
+    .pizza-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .pizza-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pizza-item span {
+      font-size: 1rem;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    /* ===== SVG FRACTIONS ===== */
+    .fraction-svg { cursor: default; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-family: inherit;
+      font-weight: bold;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(108,92,231,0.35); }
+    .btn-primary:hover { box-shadow: 0 6px 16px rgba(108,92,231,0.5); }
+    .btn-success { background: var(--success); color: white; box-shadow: 0 4px 12px rgba(0,184,148,0.35); }
+
+    /* ===== ANSWER CHOICES ===== */
+    #choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .choice-btn {
+      background: #f0eaff;
+      border: 3px solid transparent;
+      border-radius: var(--radius);
+      padding: 14px 10px;
+      font-size: 1.1rem;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      text-align: center;
+    }
+    .choice-btn:hover { background: #e0d5ff; border-color: var(--primary); }
+    .choice-btn.correct { background: #d4f5e9; border-color: var(--success); color: var(--success); }
+    .choice-btn.wrong   { background: #fdecea; border-color: var(--danger); color: var(--danger); }
+
+    /* ===== FEEDBACK ===== */
+    #feedback {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      min-height: 48px;
+      margin: 16px 0;
+      transition: opacity 0.3s;
+    }
+
+    #feedback.correct { color: var(--success); }
+    #feedback.wrong   { color: var(--danger); }
+
+    /* ===== NEXT BUTTON ===== */
+    #next-btn {
+      display: none;
+      margin: 8px auto 0;
+      text-align: center;
+    }
+
+    /* ===== INTRO SCREEN ===== */
+    #intro-screen { text-align: center; }
+    #intro-screen h2 { font-size: 2rem; color: var(--primary); margin-bottom: 16px; }
+    #intro-screen p  { font-size: 1.15rem; margin-bottom: 10px; line-height: 1.7; }
+
+    /* ===== FINISH SCREEN ===== */
+    #finish-screen { text-align: center; display: none; }
+    #finish-screen h2 { font-size: 2.2rem; color: var(--primary); margin-bottom: 12px; }
+    #finish-stars { font-size: 3rem; margin: 12px 0; }
+    #finish-msg { font-size: 1.2rem; margin-bottom: 20px; line-height: 1.7; }
+
+    /* ===== PROGRESS ===== */
+    #progress-text { text-align: center; font-size: 0.95rem; color: #636e72; margin-bottom: 8px; }
+
+    /* ===== LEVEL BADGE ===== */
+    #level-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #6d4c00;
+      border-radius: 50px;
+      padding: 4px 16px;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.8rem; }
+      #choices { grid-template-columns: 1fr; }
+      .card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🍕 משחק שברים</h1>
+  <p>ללמוד שברים זה כיף! בוא/י נתחיל 🎮</p>
+</header>
+
+<div id="scoreboard">
+  <div class="score-chip">⭐ ניקוד: <span class="val" id="score-val">0</span></div>
+  <div class="score-chip">❤️ חיים: <span class="val" id="lives-val">3</span></div>
+  <div class="score-chip">📚 שאלה: <span class="val" id="qnum-val">0</span>/<span class="val" id="qtotal-val">0</span></div>
+</div>
+
+<div id="level-bar"><div id="level-fill" style="width:0%"></div></div>
+
+<!-- ======= INTRO SCREEN ======= -->
+<div class="card" id="intro-screen">
+  <h2>🌟 ברוכים הבאים לעולם השברים!</h2>
+  <p>שבר הוא חלק ממשהו שלם — כמו חתיכה מפיצה! 🍕</p>
+  <p>נלמד יחד מה זה <strong>מונה</strong> ו<strong>מכנה</strong>, איך משווים שברים, ואפילו איך מחברים אותם!</p>
+  <p>יש <strong>3 רמות</strong> ובסוף תקבל/י כוכבים ⭐⭐⭐</p>
+  <br/>
+  <div style="text-align:center">
+    <button class="btn btn-primary" onclick="startGame()">🚀 התחל/י לשחק!</button>
+  </div>
+</div>
+
+<!-- ======= LESSON SCREEN ======= -->
+<div class="card" id="lesson-screen" style="display:none">
+  <div id="level-badge">רמה 1</div>
+  <div id="lesson-content"></div>
+  <div style="text-align:center; margin-top:20px">
+    <button class="btn btn-primary" id="lesson-next-btn" onclick="startQuiz()">בסדר, הבנתי! ▶</button>
+  </div>
+</div>
+
+<!-- ======= QUIZ SCREEN ======= -->
+<div class="card" id="quiz-screen" style="display:none">
+  <div id="level-badge-q">רמה 1</div>
+  <div id="progress-text">שאלה 1 מתוך 5</div>
+  <div id="question-area"></div>
+  <div id="choices"></div>
+  <div id="feedback"></div>
+  <div id="next-btn">
+    <button class="btn btn-primary" onclick="nextQuestion()">הבא ▶</button>
+  </div>
+</div>
+
+<!-- ======= FINISH SCREEN ======= -->
+<div class="card" id="finish-screen">
+  <h2>🎉 סיימת!</h2>
+  <div id="finish-stars"></div>
+  <div id="finish-msg"></div>
+  <button class="btn btn-primary" onclick="restartGame()">🔄 שחק/י שוב</button>
+</div>
+
+<script>
+/* ======================================================
+   DATA: lessons + questions per level
+====================================================== */
+
+const LEVELS = [
+  {
+    name: 'רמה 1 — מה זה שבר?',
+    badge: 'רמה 1 — קל 🟢',
+    lesson: buildLesson1,
+    questions: buildLevel1Questions,
+    count: 5
+  },
+  {
+    name: 'רמה 2 — השוואת שברים',
+    badge: 'רמה 2 — בינוני 🟡',
+    lesson: buildLesson2,
+    questions: buildLevel2Questions,
+    count: 5
+  },
+  {
+    name: 'רמה 3 — חיבור שברים',
+    badge: 'רמה 3 — מאתגר 🔴',
+    lesson: buildLesson3,
+    questions: buildLevel3Questions,
+    count: 5
+  }
+];
+
+/* ======================================================
+   SVG FRACTION PIE GENERATOR
+====================================================== */
+
+function fractionSVG(numerator, denominator, size = 90, color = '#a29bfe', fillColor = '#6c5ce7') {
+  if (denominator === 0) return '';
+  const cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  let paths = '';
+
+  for (let i = 0; i < denominator; i++) {
+    const startAngle = (i / denominator) * 2 * Math.PI - Math.PI / 2;
+    const endAngle   = ((i + 1) / denominator) * 2 * Math.PI - Math.PI / 2;
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    const largeArc = (1 / denominator > 0.5) ? 1 : 0;
+    const fill = i < numerator ? fillColor : color;
+
+    // Draw sector
+    paths += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc},1 ${x2},${y2} Z"
+      fill="${fill}" stroke="white" stroke-width="2"/>`;
+  }
+
+  return `<svg class="fraction-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" stroke="white" stroke-width="2"/>
+    ${paths}
+  </svg>`;
+}
+
+/* Inline SVG fraction fraction-fraction display (bar style) */
+function fractionHTML(n, d) {
+  return `<span class="fraction-label"><span class="numerator">${n}</span><span class="denominator">${d}</span></span>`;
+}
+
+/* ======================================================
+   LESSON BUILDERS
+====================================================== */
+
+function buildLesson1() {
+  return `
+    <div class="lesson-title">📖 שיעור 1: מה זה שבר?</div>
+    <p class="lesson-text">
+      דמיינ/י פיצה שלמה 🍕<br/>
+      אם נחתוך אותה ל־<strong>4 חתיכות שוות</strong> ונאכל <strong>חתיכה אחת</strong>,
+      אכלנו <strong>רבע</strong> מהפיצה — כלומר ${fractionHTML(1,4)}.
+    </p>
+    <p class="lesson-text">
+      בשבר יש שני חלקים:<br/>
+      🔵 <strong>מונה</strong> — כמה חלקים לקחנו (מספר עליון)<br/>
+      🟣 <strong>מכנה</strong> — לכמה חלקים חתכנו (מספר תחתון)
+    </p>
+    <div class="pizza-row">
+      ${[
+        [1,2,'½ — חצי','#fd79a8','#fab1c8'],
+        [1,3,'⅓ — שליש','#55efc4','#00b894'],
+        [1,4,'¼ — רבע','#fdcb6e','#e17055'],
+        [3,4,'¾ — שלושה רבעים','#74b9ff','#0984e3']
+      ].map(([n,d,lbl,f,b]) => `
+        <div class="pizza-item">
+          ${fractionSVG(n, d, 90, b, f)}
+          <span>${lbl}</span>
+          ${fractionHTML(n,d)}
+        </div>
+      `).join('')}
+    </div>
+    <p class="lesson-text">נסה/י לזהות: בשבר ${fractionHTML(2,5)} — המונה הוא <strong>2</strong> והמכנה הוא <strong>5</strong>.</p>
+  `;
+}
+
+function buildLesson2() {
+  return `
+    <div class="lesson-title">📖 שיעור 2: השוואת שברים</div>
+    <p class="lesson-text">
+      איך יודעים איזה שבר גדול יותר? 🤔<br/>
+      כשהמכנה <em>זהה</em> — המונה הגדול יותר הוא השבר הגדול יותר!
+    </p>
+    <div class="pizza-row">
+      ${[
+        [1,4,'¼','#fdcb6e','#e17055'],
+        [3,4,'¾','#74b9ff','#0984e3']
+      ].map(([n,d,lbl,f,b]) => `
+        <div class="pizza-item">
+          ${fractionSVG(n, d, 90, b, f)}
+          <span>${lbl}</span>
+        </div>
+      `).join('')}
+    </div>
+    <p class="lesson-text" style="text-align:center; font-size:1.3rem">
+      ${fractionHTML(3,4)} <strong>&gt;</strong> ${fractionHTML(1,4)}
+    </p>
+    <p class="lesson-text">
+      כשהמכנה <em>שונה</em> — ככל שהמכנה גדול יותר, החלקים <strong>קטנים יותר</strong>:<br/>
+      חצי פיצה גדולה מרבע פיצה:
+    </p>
+    <p class="lesson-text" style="text-align:center; font-size:1.3rem">
+      ${fractionHTML(1,2)} <strong>&gt;</strong> ${fractionHTML(1,4)}
+    </p>
+  `;
+}
+
+function buildLesson3() {
+  return `
+    <div class="lesson-title">📖 שיעור 3: חיבור שברים</div>
+    <p class="lesson-text">
+      כשהמכנה <strong>זהה</strong>, פשוט מחברים את המונים! 🎉
+    </p>
+    <p class="lesson-text" style="text-align:center; font-size:1.4rem">
+      ${fractionHTML(1,4)} + ${fractionHTML(2,4)} = ${fractionHTML(3,4)}
+    </p>
+    <div class="pizza-row">
+      <div class="pizza-item">
+        ${fractionSVG(1,4,80,'#fab1c8','#fd79a8')}
+        <span>${fractionHTML(1,4)}</span>
+      </div>
+      <div class="pizza-item" style="font-size:2rem; align-self:center">+</div>
+      <div class="pizza-item">
+        ${fractionSVG(2,4,80,'#fab1c8','#fd79a8')}
+        <span>${fractionHTML(2,4)}</span>
+      </div>
+      <div class="pizza-item" style="font-size:2rem; align-self:center">=</div>
+      <div class="pizza-item">
+        ${fractionSVG(3,4,80,'#fab1c8','#fd79a8')}
+        <span>${fractionHTML(3,4)}</span>
+      </div>
+    </div>
+    <p class="lesson-text">
+      💡 זוכרים? מחברים רק את <strong>המונים</strong>.<br/>
+      המכנה נשאר <em>אותו דבר</em> — הוא לא משתנה!
+    </p>
+  `;
+}
+
+/* ======================================================
+   QUESTION BUILDERS
+====================================================== */
+
+function buildLevel1Questions() {
+  return shuffle([
+    {
+      qHTML: `<p style="font-size:1.2rem;margin-bottom:8px">מה המכנה של השבר הזה?</p>${fractionHTML(3,5)}`,
+      choices: ['3','5','8','2'],
+      answer: '5',
+      explain: 'המכנה הוא המספר התחתון — 5 (חתכנו ל-5 חלקים).'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem;margin-bottom:8px">מה המונה של השבר הזה?</p>${fractionHTML(2,7)}`,
+      choices: ['7','9','2','5'],
+      answer: '2',
+      explain: 'המונה הוא המספר העליון — 2 (לקחנו 2 חלקים).'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem;margin-bottom:8px">כמה חלקות השבר הזה?</p><br/>${fractionSVG(3,6,110,'#a29bfe','#6c5ce7')}`,
+      choices: ['3','6','2','9'],
+      answer: '6',
+      explain: 'הפיצה חולקה ל-6 חלקים — זה המכנה.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem;margin-bottom:8px">כמה חלקים צבועים?</p><br/>${fractionSVG(2,4,110,'#ffeaa7','#fdcb6e')}`,
+      choices: ['1','4','3','2'],
+      answer: '2',
+      explain: '2 חלקים צבועים — זה המונה.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem;margin-bottom:8px">איזה שבר מתאר את הפיצה הזאת?</p><br/>${fractionSVG(1,2,110,'#81ecec','#00cec9')}`,
+      choices: [fractionHTML(1,3), fractionHTML(1,2), fractionHTML(2,3), fractionHTML(1,4)],
+      answer: fractionHTML(1,2),
+      explain: 'הפיצה חולקה ל-2 חלקים ו-1 צבוע — זה ½.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem;margin-bottom:8px">איזה שבר מתאר את הפיצה הזאת?</p><br/>${fractionSVG(3,4,110,'#55efc4','#00b894')}`,
+      choices: [fractionHTML(1,4), fractionHTML(3,5), fractionHTML(3,4), fractionHTML(2,4)],
+      answer: fractionHTML(3,4),
+      explain: '3 חלקים מתוך 4 — זה ¾.'
+    }
+  ]).slice(0,5);
+}
+
+function buildLevel2Questions() {
+  return shuffle([
+    {
+      qHTML: `<p style="font-size:1.2rem">איזה שבר גדול יותר?</p><div class="pizza-row" style="margin:8px 0">${fractionSVG(1,2,80,'#fab1c8','#fd79a8')} &nbsp;&nbsp; ${fractionSVG(1,4,80,'#74b9ff','#0984e3')}</div>`,
+      choices: [fractionHTML(1,2), fractionHTML(1,4)],
+      answer: fractionHTML(1,2),
+      explain: '½ > ¼ — חצי גדול מרבע.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">איזה שבר גדול יותר? ${fractionHTML(2,5)} ו-${fractionHTML(4,5)}</p>`,
+      choices: [fractionHTML(2,5), fractionHTML(4,5)],
+      answer: fractionHTML(4,5),
+      explain: 'כשהמכנה זהה (5), המונה הגדול מנצח — 4 > 2.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">השלם/י: ${fractionHTML(3,8)} ___ ${fractionHTML(5,8)}</p>`,
+      choices: ['&gt;', '&lt;', '='],
+      answer: '&lt;',
+      explain: '3/8 < 5/8 כי המכנה זהה ו-3 קטן מ-5.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">השלם/י: ${fractionHTML(1,3)} ___ ${fractionHTML(1,6)}</p>`,
+      choices: ['&gt;', '&lt;', '='],
+      answer: '&gt;',
+      explain: '⅓ > ⅙ — כשהמונה זהה, המכנה הקטן נותן חלק גדול יותר.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">מיין מהקטן לגדול: ${fractionHTML(3,4)}, ${fractionHTML(1,4)}, ${fractionHTML(2,4)}</p>`,
+      choices: [
+        `${fractionHTML(1,4)} , ${fractionHTML(2,4)} , ${fractionHTML(3,4)}`,
+        `${fractionHTML(3,4)} , ${fractionHTML(2,4)} , ${fractionHTML(1,4)}`,
+        `${fractionHTML(2,4)} , ${fractionHTML(1,4)} , ${fractionHTML(3,4)}`,
+        `${fractionHTML(1,4)} , ${fractionHTML(3,4)} , ${fractionHTML(2,4)}`
+      ],
+      answer: `${fractionHTML(1,4)} , ${fractionHTML(2,4)} , ${fractionHTML(3,4)}`,
+      explain: 'מכנה זהה — מסדרים לפי המונה: 1, 2, 3.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">אורן אכל ${fractionHTML(2,6)} מהפיצה ונועה אכלה ${fractionHTML(4,6)}. מי אכל יותר?</p>`,
+      choices: ['אורן', 'נועה', 'אכלו שווה'],
+      answer: 'נועה',
+      explain: '4/6 > 2/6 — נועה אכלה יותר.'
+    }
+  ]).slice(0,5);
+}
+
+function buildLevel3Questions() {
+  return shuffle([
+    {
+      qHTML: `<p style="font-size:1.2rem">כמה שווה: ${fractionHTML(1,5)} + ${fractionHTML(2,5)} = ?</p>`,
+      choices: [fractionHTML(3,5), fractionHTML(3,10), fractionHTML(2,5), fractionHTML(1,5)],
+      answer: fractionHTML(3,5),
+      explain: '1+2=3, המכנה נשאר 5 — התשובה היא 3/5.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">כמה שווה: ${fractionHTML(2,8)} + ${fractionHTML(3,8)} = ?</p>`,
+      choices: [fractionHTML(5,8), fractionHTML(5,16), fractionHTML(6,8), fractionHTML(1,8)],
+      answer: fractionHTML(5,8),
+      explain: '2+3=5, המכנה נשאר 8 — התשובה היא 5/8.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">כמה שווה: ${fractionHTML(1,4)} + ${fractionHTML(2,4)} = ?</p><div style="margin-top:8px">${fractionSVG(1,4,75,'#fab1c8','#fd79a8')}+${fractionSVG(2,4,75,'#fab1c8','#fd79a8')}=?</div>`,
+      choices: [fractionHTML(3,4), fractionHTML(3,8), fractionHTML(2,4), fractionHTML(4,4)],
+      answer: fractionHTML(3,4),
+      explain: '1+2=3, המכנה נשאר 4 — התשובה היא 3/4.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">דנה אכלה ${fractionHTML(1,6)} מהעוגה ויובל אכל ${fractionHTML(3,6)}. כמה אכלו ביחד?</p>`,
+      choices: [fractionHTML(4,6), fractionHTML(4,12), fractionHTML(3,6), fractionHTML(2,6)],
+      answer: fractionHTML(4,6),
+      explain: '1+3=4, המכנה נשאר 6 — אכלו 4/6 ביחד.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">מה חסר כדי להגיע ל-${fractionHTML(5,7)}? ${fractionHTML(2,7)} + ? = ${fractionHTML(5,7)}</p>`,
+      choices: [fractionHTML(3,7), fractionHTML(7,7), fractionHTML(2,7), fractionHTML(1,7)],
+      answer: fractionHTML(3,7),
+      explain: '5-2=3, המכנה נשאר 7 — חסר 3/7.'
+    },
+    {
+      qHTML: `<p style="font-size:1.2rem">כמה שווה: ${fractionHTML(3,9)} + ${fractionHTML(4,9)} = ?</p>`,
+      choices: [fractionHTML(7,9), fractionHTML(7,18), fractionHTML(1,9), fractionHTML(12,9)],
+      answer: fractionHTML(7,9),
+      explain: '3+4=7, המכנה נשאר 9 — התשובה היא 7/9.'
+    }
+  ]).slice(0,5);
+}
+
+/* ======================================================
+   GAME STATE
+====================================================== */
+
+let state = {
+  level: 0,
+  score: 0,
+  lives: 3,
+  questions: [],
+  qIndex: 0,
+  answered: false
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function updateHUD() {
+  document.getElementById('score-val').textContent = state.score;
+  document.getElementById('lives-val').textContent = '❤️'.repeat(state.lives);
+  document.getElementById('qnum-val').textContent = state.qIndex + 1;
+  document.getElementById('qtotal-val').textContent = state.questions.length;
+
+  const progress = ((state.level * 5 + state.qIndex) / 15) * 100;
+  document.getElementById('level-fill').style.width = progress + '%';
+}
+
+/* ======================================================
+   FLOW CONTROL
+====================================================== */
+
+function startGame() {
+  state = { level: 0, score: 0, lives: 3, questions: [], qIndex: 0, answered: false };
+  document.getElementById('intro-screen').style.display = 'none';
+  showLesson();
+}
+
+function showLesson() {
+  const lv = LEVELS[state.level];
+  document.getElementById('lesson-screen').style.display = 'block';
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('lesson-content').innerHTML = lv.lesson();
+  document.getElementById('level-badge').textContent = lv.badge;
+  updateHUD();
+}
+
+function startQuiz() {
+  const lv = LEVELS[state.level];
+  state.questions = lv.questions();
+  state.qIndex = 0;
+  state.answered = false;
+
+  document.getElementById('lesson-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('level-badge-q').textContent = lv.badge;
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = state.questions[state.qIndex];
+  document.getElementById('progress-text').textContent =
+    `שאלה ${state.qIndex + 1} מתוך ${state.questions.length}`;
+
+  document.getElementById('question-area').innerHTML = q.qHTML;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = '';
+  document.getElementById('next-btn').style.display = 'none';
+  state.answered = false;
+
+  // Build choices
+  const choicesEl = document.getElementById('choices');
+  const shuffledChoices = shuffle(q.choices);
+  choicesEl.innerHTML = shuffledChoices.map(c =>
+    `<button class="choice-btn" onclick="checkAnswer(this, '${escAttr(c)}')">${c}</button>`
+  ).join('');
+
+  updateHUD();
+}
+
+function escAttr(s) {
+  return s.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+}
+
+function checkAnswer(btn, chosen) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const q = state.questions[state.qIndex];
+  const feedbackEl = document.getElementById('feedback');
+  const allBtns = document.querySelectorAll('.choice-btn');
+
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.innerHTML === q.answer || b.textContent.trim() === q.answer) {
+      b.classList.add('correct');
+    }
+  });
+
+  if (btn.innerHTML === q.answer || btn.textContent.trim() === q.answer) {
+    btn.classList.add('correct');
+    state.score += 10;
+    const msgs = ['כל הכבוד! 🌟', 'מעולה! 🎉', 'נהדר! 🏆', 'מצוין! ⭐', 'וואו! אלוף/ה! 🦸'];
+    feedbackEl.textContent = msgs[Math.floor(Math.random() * msgs.length)] + ' ' + q.explain;
+    feedbackEl.className = 'correct';
+  } else {
+    btn.classList.add('wrong');
+    state.lives = Math.max(0, state.lives - 1);
+    const msgs = ['אל תתייאש/י, נסה/י שוב! 💪', 'כמעט! תנסה/י שוב 💡', 'לא נורא, נלמד יחד! 🤝'];
+    feedbackEl.textContent = msgs[Math.floor(Math.random() * msgs.length)] + ' ' + q.explain;
+    feedbackEl.className = 'wrong';
+  }
+
+  document.getElementById('next-btn').style.display = 'block';
+  updateHUD();
+}
+
+function nextQuestion() {
+  state.qIndex++;
+  if (state.qIndex >= state.questions.length) {
+    // Level done
+    state.level++;
+    if (state.level >= LEVELS.length) {
+      showFinish();
+    } else {
+      showLesson();
+    }
+  } else {
+    showQuestion();
+  }
+}
+
+function showFinish() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('finish-screen').style.display = 'block';
+  document.getElementById('level-fill').style.width = '100%';
+
+  const maxScore = 15 * 10; // 15 questions × 10 pts
+  const pct = state.score / maxScore;
+  let stars, msg;
+  if (pct >= 0.85) {
+    stars = '⭐⭐⭐';
+    msg = `מדהים! קיבלת ${state.score} נקודות! אתה/את אלוף/ה של השברים! 🏆🎊`;
+  } else if (pct >= 0.6) {
+    stars = '⭐⭐';
+    msg = `יפה מאוד! קיבלת ${state.score} נקודות! עוד קצת תרגול ותגיע/י לשלושה כוכבים! 💪`;
+  } else {
+    stars = '⭐';
+    msg = `כל הכבוד על הניסיון! קיבלת ${state.score} נקודות. תנסה/י שוב ותשפר/י! 📚`;
+  }
+
+  document.getElementById('finish-stars').textContent = stars;
+  document.getElementById('finish-msg').textContent = msg;
+}
+
+function restartGame() {
+  document.getElementById('finish-screen').style.display = 'none';
+  document.getElementById('intro-screen').style.display = 'block';
+}
+
+/* ======================================================
+   BOOT
+====================================================== */
+updateHUD();
+</script>
+</body>
+</html>

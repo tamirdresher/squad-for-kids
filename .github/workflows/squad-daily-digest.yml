@@ -16,11 +16,11 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Gather digest data
         id: digest
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const yesterday = new Date();
@@ -99,7 +99,7 @@ jobs:
 
       - name: Send Teams digest
         if: env.TEAMS_WEBHOOK_URL != ''
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.SQUAD_WEBHOOK_GENERAL || secrets.TEAMS_WEBHOOK_URL }}
         with:

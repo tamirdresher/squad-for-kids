@@ -26,7 +26,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       
       - name: Check test files exist
         run: |
@@ -71,7 +71,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       
       - name: Check markdown syntax
         run: |
@@ -109,10 +109,10 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       
       - name: Generate FedRAMP controls matrix
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const fs = require('fs');
@@ -144,7 +144,7 @@ jobs:
             console.log('Compliance matrix generated');
       
       - name: Create compliance summary
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const fs = require('fs');
@@ -229,7 +229,7 @@ jobs:
       - name: Upload compliance artifacts
         if: always() && github.actor != 'dependabot[bot]'
         continue-on-error: true
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: fedramp-compliance-reports
           path: |
@@ -244,7 +244,7 @@ jobs:
     # Skip for Dependabot GitHub Actions version bumps — they don't affect FedRAMP compliance
     if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       
       - name: Detect changes to security controls
         run: |
@@ -317,7 +317,7 @@ jobs:
       
       - name: Create issue comment on validation failure
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             github.rest.issues.createComment({

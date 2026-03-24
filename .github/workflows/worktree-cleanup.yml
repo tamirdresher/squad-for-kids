@@ -1,0 +1,70 @@
+name: Worktree Cleanup on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  notify-worktree-cleanup:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: Extract issue number from branch name
+        id: extract
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          echo "Branch: $BRANCH"
+
+          # Match pattern: squad/{issue-number}-{slug}
+          if [[ "$BRANCH" =~ ^squad/([0-9]+)- ]]; then
+            ISSUE_NUMBER="${BASH_REMATCH[1]}"
+            echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "worktree_path=tamresearch1-wt-${ISSUE_NUMBER}" >> "$GITHUB_OUTPUT"
+            echo "Extracted issue: $ISSUE_NUMBER"
+          else
+            echo "Branch does not match squad pattern — skipping."
+            echo "issue_number=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment on issue to trigger worktree cleanup
+        if: steps.extract.outputs.issue_number != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt('${{ steps.extract.outputs.issue_number }}');
+            const worktreePath = '${{ steps.extract.outputs.worktree_path }}';
+            const prNumber = context.payload.pull_request.number;
+            const prTitle = context.payload.pull_request.title;
+
+            const body = [
+              `## 🧹 Worktree Cleanup Required`,
+              ``,
+              `PR #${prNumber} ("${prTitle}") has been merged.`,
+              ``,
+              `**Expected worktree path:** \`../tamresearch1/${worktreePath}\` (sibling directory of main repo)`,
+              ``,
+              `**Action required:** If you have a local worktree for this issue, please run:`,
+              `\`\`\`powershell`,
+              `cd C:\\Users\\tamirdresher\\source\\repos\\tamresearch1`,
+              `git worktree remove ../tamresearch1/${worktreePath} --force`,
+              `\`\`\``,
+              ``,
+              `> ⚡ This is an automated reminder. If the worktree is not cleaned up within 1 hour,`,
+              `> the next Ralph sweep will flag it as stale and remove it automatically.`,
+              ``,
+              `_Triggered by: \`.github/workflows/worktree-cleanup.yml\`_`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            console.log(`Posted cleanup comment on issue #${issueNumber}`);

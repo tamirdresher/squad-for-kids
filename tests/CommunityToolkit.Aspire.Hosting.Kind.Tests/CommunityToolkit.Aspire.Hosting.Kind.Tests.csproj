@@ -16,7 +16,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Aspire.Hosting" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting" Version="13.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
   </ItemGroup>
 

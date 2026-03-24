@@ -17,20 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
-<<<<<<< HEAD
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.2.0" />
     <ProjectReference Include="..\..\src\CommunityToolkit.Aspire.Hosting.Kind\CommunityToolkit.Aspire.Hosting.Kind.csproj" />
-=======
-    <!-- In a real project, reference the NuGet package:
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Kind" Version="*" />
-    -->
-    <!-- For development, reference the local project: -->
-    <ProjectReference Include="..\..\src\CommunityToolkit.Aspire.Hosting.Kind\CommunityToolkit.Aspire.Hosting.Kind.csproj" />
-    <ProjectReference Include="..\Kind.IntegrationTests\Kind.IntegrationTests.csproj" />
->>>>>>> emu/main
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ on:
 jobs:
   notify-worktree-cleanup:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, windows]
     permissions:
       issues: write
       pull-requests: read
@@ -15,20 +15,19 @@ jobs:
     steps:
       - name: Extract issue number from branch name
         id: extract
+        shell: pwsh
         run: |
-          BRANCH="${{ github.event.pull_request.head.ref }}"
-          echo "Branch: $BRANCH"
-
-          # Match pattern: squad/{issue-number}-{slug}
-          if [[ "$BRANCH" =~ ^squad/([0-9]+)- ]]; then
-            ISSUE_NUMBER="${BASH_REMATCH[1]}"
-            echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
-            echo "worktree_path=tamresearch1-wt-${ISSUE_NUMBER}" >> "$GITHUB_OUTPUT"
-            echo "Extracted issue: $ISSUE_NUMBER"
-          else
-            echo "Branch does not match squad pattern — skipping."
-            echo "issue_number=" >> "$GITHUB_OUTPUT"
-          fi
+          $branch = "${{ github.event.pull_request.head.ref }}"
+          Write-Host "Branch: $branch"
+          if ($branch -match '^squad/(\d+)-') {
+            $issueNumber = $Matches[1]
+            echo "issue_number=$issueNumber" >> $env:GITHUB_OUTPUT
+            echo "worktree_path=tamresearch1-wt-$issueNumber" >> $env:GITHUB_OUTPUT
+            Write-Host "Extracted issue: $issueNumber"
+          } else {
+            Write-Host "Branch does not match squad pattern — skipping."
+            echo "issue_number=" >> $env:GITHUB_OUTPUT
+          }
 
       - name: Comment on issue to trigger worktree cleanup
         if: steps.extract.outputs.issue_number != ''

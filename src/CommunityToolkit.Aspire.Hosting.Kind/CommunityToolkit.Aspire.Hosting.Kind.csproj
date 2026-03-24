@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Description>A .NET Aspire hosting integration for Kind (Kubernetes in Docker) ephemeral clusters.</Description>
-    <PackageTags>kind kubernetes docker hosting aspire communitytoolkit</PackageTags>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="9.3.0" />
-  </ItemGroup>
-
-</Project>
-=======
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -30,4 +13,3 @@
   </ItemGroup>
 
 </Project>
->>>>>>> emu/main

@@ -235,7 +235,7 @@ jobs:
           path: |
             fedramp-controls-matrix.json
             COMPLIANCE_SUMMARY.md
-          retention-days: 7
+          retention-days: 3
           if-no-files-found: warn
 
   check-control-drift:

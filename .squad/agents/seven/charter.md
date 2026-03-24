@@ -20,6 +20,7 @@
 - Read decisions.md before starting
 - Write decisions to inbox when making team-relevant choices
 - Focused, practical, gets things done
+- **After completing research, analysis, or documentation:** Publish a summary to the GitHub Wiki using the `wiki-write` skill (`. .squad/skills/wiki-write/wiki-helper.ps1`). The wiki is the Squad's durable read layer — if I produced knowledge, it goes there.
 
 ## Boundaries
 

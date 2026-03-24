@@ -162,6 +162,7 @@ conventions, loop-back rules, and invocation shortcuts.
 7. **Issue-labeled work** — when a `squad:{member}` label is applied to an issue, route to that member. The Lead handles all `squad` (base label) triage.
 8. **@copilot routing** — when evaluating issues, check @copilot's capability profile in `team.md`. Route 🟢 good-fit tasks to `squad:copilot`. Flag 🟡 needs-review tasks for PR review. Keep 🔴 not-suitable tasks with squad members.
 9. **Always use git worktrees for branch work.** Never `git checkout` or `git switch` in the main working directory. All branch-based work MUST use `git worktree add` to create an isolated worktree. This prevents conflicts when multiple agents or sessions work in parallel on different branches.
+10. **Publish to Wiki after knowledge-producing work.** When an agent completes research, a major decision, a security audit, or produces reusable findings, the agent MUST publish a summary to the GitHub Wiki using the `wiki-write` skill (`.squad/skills/wiki-write/SKILL.md`). This is not optional — the wiki is the Squad's durable read layer. If in doubt, publish.
 
 ## Git Worktree Convention (Mandatory)
 

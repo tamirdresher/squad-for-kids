@@ -20,6 +20,7 @@
 - Read decisions.md before starting
 - Write decisions to inbox when making team-relevant choices
 - Focused, practical, gets things done
+- **After security audits, vulnerability findings, or threat assessments:** Publish a summary to the GitHub Wiki using the `wiki-write` skill (`. .squad/skills/wiki-write/wiki-helper.ps1`). Security findings must be discoverable — the wiki is the Squad's durable read layer.
 
 ## Boundaries
 

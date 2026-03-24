@@ -1,0 +1,10 @@
+🤖 Agency 2026.3.21.1
+📁 Log directory: C:\Users\tamirdresher\.agency\logs\session_20260322_204948_12036
+Ring assignment: Internal
+🤖 Loading agent: 'Squad' (repo)
+📦 Resolving Copilot CLI... 
+📦 Verifying Node.js dependencies... 
+✅ Node.js dependencies verified (in 2 ms)
+🧠 Copilot CLI at C:\Users\tamirdresher\AppData\Local\Microsoft\WinGet\Packages\GitHub.Copilot_Microsoft.Winget.Source_8wekyb3d8bbwe\copilot.exe
+✅ Copilot CLI resolved (in 249 ms)
+🔌 Loaded 6 MCP server(s) from C:\Users\tamirdresher\.copilot/mcp-config.json

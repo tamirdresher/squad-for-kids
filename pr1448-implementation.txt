@@ -1,0 +1,291 @@
+diff --git a/src/CommunityToolkit.Aspire.Hosting.Kind/CommunityToolkit.Aspire.Hosting.Kind.csproj b/src/CommunityToolkit.Aspire.Hosting.Kind/CommunityToolkit.Aspire.Hosting.Kind.csproj
+index bae52102..8a13a397 100644
+--- a/src/CommunityToolkit.Aspire.Hosting.Kind/CommunityToolkit.Aspire.Hosting.Kind.csproj
++++ b/src/CommunityToolkit.Aspire.Hosting.Kind/CommunityToolkit.Aspire.Hosting.Kind.csproj
+@@ -1,7 +1,7 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+ 
+   <PropertyGroup>
+-    <TargetFramework>net9.0</TargetFramework>
++    <TargetFramework>net8.0</TargetFramework>
+     <ImplicitUsings>enable</ImplicitUsings>
+     <Nullable>enable</Nullable>
+     <Description>An Aspire hosting integration for Kind (Kubernetes in Docker) clusters.</Description>
+diff --git a/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterBuilderExtensions.cs b/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterBuilderExtensions.cs
+index 9086adb7..a945367a 100644
+--- a/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterBuilderExtensions.cs
++++ b/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterBuilderExtensions.cs
+@@ -1,4 +1,7 @@
+ using Aspire.Hosting.ApplicationModel;
++using Aspire.Hosting.Lifecycle;
++using Microsoft.Extensions.DependencyInjection;
++using Microsoft.Extensions.DependencyInjection.Extensions;
+ 
+ namespace Aspire.Hosting;
+ 
+@@ -13,8 +16,16 @@ public static class KindClusterBuilderExtensions
+     /// </summary>
+     /// <param name="builder">The <see cref="IDistributedApplicationBuilder"/>.</param>
+     /// <param name="name">
+-    /// The name of the resource. This name will be used as the Kind cluster name
+-    /// when referenced in a dependency.
++    /// The Aspire resource name. Also used as the Kind cluster name when
++    /// <paramref name="clusterName"/> is not provided.
++    /// </param>
++    /// <param name="clusterName">
++    /// The Kind cluster name passed to <c>kind create/delete cluster --name</c>.
++    /// Defaults to <paramref name="name"/> when not specified.
++    /// </param>
++    /// <param name="kubeconfigPath">
++    /// Absolute path where the kubeconfig file will be written.
++    /// Defaults to a file inside <see cref="Path.GetTempPath"/> when not specified.
+     /// </param>
+     /// <returns>A reference to the <see cref="IResourceBuilder{KindClusterResource}"/>.</returns>
+     /// <example>
+@@ -28,12 +39,24 @@ public static class KindClusterBuilderExtensions
+     /// </example>
+     public static IResourceBuilder<KindClusterResource> AddKindCluster(
+         this IDistributedApplicationBuilder builder,
+-        [ResourceName] string name)
++        [ResourceName] string name,
++        string? clusterName = null,
++        string? kubeconfigPath = null)
+     {
+         ArgumentNullException.ThrowIfNull(builder);
+         ArgumentException.ThrowIfNullOrEmpty(name);
+ 
+-        var resource = new KindClusterResource(name);
++        var resolvedClusterName = clusterName ?? name;
++        var resolvedKubeconfigPath = kubeconfigPath
++            ?? Path.Combine(Path.GetTempPath(), $"kind-{resolvedClusterName}-kubeconfig.yaml");
++
++        var resource = new KindClusterResource(name, resolvedClusterName, resolvedKubeconfigPath);
++
++        // Register the lifecycle hook once (TryAddEnumerable avoids duplicate registrations
++        // if AddKindCluster is called more than once).
++        builder.Services.TryAddEnumerable(
++            ServiceDescriptor.Singleton<IDistributedApplicationLifecycleHook, KindClusterLifecycleHook>());
++
+         return builder.AddResource(resource);
+     }
+ }
+diff --git a/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterLifecycleHook.cs b/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterLifecycleHook.cs
+new file mode 100644
+index 00000000..2911056a
+--- /dev/null
++++ b/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterLifecycleHook.cs
+@@ -0,0 +1,142 @@
++using Aspire.Hosting.ApplicationModel;
++using Aspire.Hosting.Lifecycle;
++using Microsoft.Extensions.Logging;
++using System.Diagnostics;
++
++namespace Aspire.Hosting;
++
++/// <summary>
++/// Manages the Kind cluster lifecycle: creates clusters before the application starts
++/// and deletes them when it stops.
++/// </summary>
++internal sealed class KindClusterLifecycleHook : IDistributedApplicationLifecycleHook
++{
++    private readonly ILogger<KindClusterLifecycleHook> _logger;
++
++    public KindClusterLifecycleHook(ILogger<KindClusterLifecycleHook> logger)
++    {
++        _logger = logger;
++    }
++
++    /// <summary>
++    /// Creates all Kind clusters before the distributed application starts.
++    /// Runs: <c>kind create cluster --name {clusterName} --kubeconfig {kubeconfigPath}</c>
++    /// </summary>
++    public async Task BeforeStartAsync(DistributedApplicationModel appModel, CancellationToken cancellationToken = default)
++    {
++        var clusters = appModel.Resources.OfType<KindClusterResource>().ToList();
++        if (clusters.Count == 0)
++        {
++            return;
++        }
++
++        foreach (var cluster in clusters)
++        {
++            _logger.LogInformation("Creating Kind cluster '{ClusterName}' (kubeconfig: {KubeconfigPath})",
++                cluster.ClusterName, cluster.KubeconfigPath);
++
++            var exitCode = await RunCommandAsync(
++                "kind",
++                $"create cluster --name {cluster.ClusterName} --kubeconfig \"{cluster.KubeconfigPath}\"",
++                cancellationToken);
++
++            if (exitCode != 0)
++            {
++                throw new InvalidOperationException(
++                    $"Failed to create Kind cluster '{cluster.ClusterName}'. " +
++                    $"Ensure 'kind' is installed and Docker is running.");
++            }
++
++            _logger.LogInformation("Kind cluster '{ClusterName}' created successfully.", cluster.ClusterName);
++        }
++    }
++
++    /// <summary>
++    /// Runs a basic health check (<c>kubectl get nodes</c>) after resources are created.
++    /// </summary>
++    public async Task AfterResourcesCreatedAsync(DistributedApplicationModel appModel, CancellationToken cancellationToken = default)
++    {
++        var clusters = appModel.Resources.OfType<KindClusterResource>().ToList();
++        if (clusters.Count == 0)
++        {
++            return;
++        }
++
++        foreach (var cluster in clusters)
++        {
++            _logger.LogInformation("Running health check for Kind cluster '{ClusterName}'.", cluster.ClusterName);
++
++            var exitCode = await RunCommandAsync(
++                "kubectl",
++                $"get nodes --kubeconfig \"{cluster.KubeconfigPath}\"",
++                cancellationToken);
++
++            if (exitCode != 0)
++            {
++                _logger.LogWarning(
++                    "Health check failed for Kind cluster '{ClusterName}'. " +
++                    "The cluster may still be initializing.",
++                    cluster.ClusterName);
++            }
++            else
++            {
++                _logger.LogInformation("Kind cluster '{ClusterName}' is healthy.", cluster.ClusterName);
++            }
++        }
++    }
++
++    /// <summary>
++    /// Deletes all Kind clusters before the distributed application stops.
++    /// Runs: <c>kind delete cluster --name {clusterName}</c>
++    /// </summary>
++    public async Task BeforeStopAsync(DistributedApplicationModel appModel, CancellationToken cancellationToken = default)
++    {
++        var clusters = appModel.Resources.OfType<KindClusterResource>().ToList();
++        if (clusters.Count == 0)
++        {
++            return;
++        }
++
++        foreach (var cluster in clusters)
++        {
++            _logger.LogInformation("Deleting Kind cluster '{ClusterName}'.", cluster.ClusterName);
++
++            var exitCode = await RunCommandAsync(
++                "kind",
++                $"delete cluster --name {cluster.ClusterName}",
++                cancellationToken);
++
++            if (exitCode != 0)
++            {
++                // Log a warning rather than throwing — stop should be best-effort.
++                _logger.LogWarning(
++                    "Failed to delete Kind cluster '{ClusterName}' (exit code {ExitCode}). " +
++                    "You may need to run 'kind delete cluster --name {ClusterName}' manually.",
++                    cluster.ClusterName, exitCode, cluster.ClusterName);
++            }
++            else
++            {
++                _logger.LogInformation("Kind cluster '{ClusterName}' deleted.", cluster.ClusterName);
++            }
++        }
++    }
++
++    private static async Task<int> RunCommandAsync(string fileName, string arguments, CancellationToken cancellationToken)
++    {
++        var psi = new ProcessStartInfo
++        {
++            FileName = fileName,
++            Arguments = arguments,
++            RedirectStandardOutput = true,
++            RedirectStandardError = true,
++            UseShellExecute = false,
++            CreateNoWindow = true,
++        };
++
++        using var process = new Process { StartInfo = psi };
++        process.Start();
++
++        await process.WaitForExitAsync(cancellationToken);
++        return process.ExitCode;
++    }
++}
+diff --git a/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterResource.cs b/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterResource.cs
+index 12a43396..ebf502cc 100644
+--- a/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterResource.cs
++++ b/src/CommunityToolkit.Aspire.Hosting.Kind/KindClusterResource.cs
+@@ -3,11 +3,38 @@ namespace Aspire.Hosting.ApplicationModel;
+ /// <summary>
+ /// A resource that represents a Kind (Kubernetes in Docker) cluster.
+ /// </summary>
+-/// <param name="name">The name of the resource.</param>
+-public sealed class KindClusterResource(string name) : Resource(name)
++public sealed class KindClusterResource : Resource, IResourceWithConnectionString
+ {
+     /// <summary>
+-    /// Gets the name of the Kind cluster.
++    /// Gets the Kind cluster name (used with the <c>kind</c> CLI).
+     /// </summary>
+-    public string ClusterName => Name;
++    public string ClusterName { get; }
++
++    /// <summary>
++    /// Gets the absolute path to the kubeconfig file written by <c>kind create cluster</c>.
++    /// </summary>
++    public string KubeconfigPath { get; }
++
++    /// <summary>
++    /// Returns the kubeconfig file path as the connection string so downstream resources
++    /// (e.g. a Helm chart resource) can locate the cluster.
++    /// </summary>
++    public ReferenceExpression ConnectionStringExpression =>
++        ReferenceExpression.Create($"{KubeconfigPath}");
++
++    /// <summary>
++    /// Initializes a new <see cref="KindClusterResource"/>.
++    /// </summary>
++    /// <param name="name">Aspire resource name.</param>
++    /// <param name="clusterName">Name passed to <c>kind create/delete cluster --name</c>.</param>
++    /// <param name="kubeconfigPath">Absolute path where the kubeconfig will be written.</param>
++    public KindClusterResource(string name, string clusterName, string kubeconfigPath)
++        : base(name)
++    {
++        ArgumentException.ThrowIfNullOrEmpty(clusterName);
++        ArgumentException.ThrowIfNullOrEmpty(kubeconfigPath);
++
++        ClusterName = clusterName;
++        KubeconfigPath = kubeconfigPath;
++    }
+ }
+diff --git a/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj b/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj
+index 0e345dbc..c4beec46 100644
+--- a/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj
++++ b/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/CommunityToolkit.Aspire.Hosting.Kind.Tests.csproj
+@@ -1,7 +1,7 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+ 
+   <PropertyGroup>
+-    <TargetFramework>net9.0</TargetFramework>
++    <TargetFramework>net8.0</TargetFramework>
+     <ImplicitUsings>enable</ImplicitUsings>
+     <Nullable>enable</Nullable>
+     <IsPackable>false</IsPackable>
+diff --git a/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/KindClusterBuilderExtensionsTests.cs b/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/KindClusterBuilderExtensionsTests.cs
+index c6eba018..22f4577e 100644
+--- a/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/KindClusterBuilderExtensionsTests.cs
++++ b/tests/CommunityToolkit.Aspire.Hosting.Kind.Tests/KindClusterBuilderExtensionsTests.cs
+@@ -1,6 +1,7 @@
+ using Aspire.Hosting;
+ using Aspire.Hosting.ApplicationModel;
+ using FluentAssertions;
++using Xunit;
+ 
+ namespace CommunityToolkit.Aspire.Hosting.Kind.Tests;
+ 

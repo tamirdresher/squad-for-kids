@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "stateStorage": {
+    "type": "orphan-branch",
+    "branch": "squad/state",
+    "note": "Access with: git fetch origin squad/state:refs/remotes/origin/squad/state && git worktree add .squad-state squad/state"
+  },
+  "notes": {
+    "namespaces": ["data", "worf", "belanna", "picard", "q", "scribe", "ralph"],
+    "refspecBase": "refs/notes/squad/",
+    "fetchRefspec": "refs/notes/*:refs/notes/*",
+    "schema": ".squad/schemas/notes-v1.schema.json"
+  },
+  "ralph": {
+    "promotionEnabled": true,
+    "promotionTiers": {
+      "tier1": {
+        "triggerImmediately": true,
+        "criteria": ["promotionCandidate:true", "type:decision+confidence:high", "type:finding+severity:critical", "type:finding+severity:high"]
+      },
+      "tier2": {
+        "coolingPeriodHours": 24,
+        "criteria": ["type:decision+confidence:medium", "crossAgentValidated"]
+      },
+      "archive": {
+        "criteria": ["type:context", "type:summary", "type:assessment+confidence:low"]
+      }
+    },
+    "archiveOnPrClose": true,
+    "prClosureWindowHours": 48,
+    "watermarkFile": "notes-watermark.json",
+    "failedQueuePath": ".squad/notes-failed-queue",
+    "maxRetries": 5
+  }
+}

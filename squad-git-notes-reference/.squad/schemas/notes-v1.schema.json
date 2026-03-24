@@ -1,0 +1,182 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://squad.example.dev/schemas/notes-v1.schema.json",
+  "title": "Squad Git Note (v1)",
+  "description": "Schema for a single JSONL entry in a refs/notes/squad/* blob. Notes are JSONL: one JSON object per line, no wrapping array.",
+  "type": "object",
+  "required": ["v", "agent", "instanceId", "sessionId", "timestamp", "commitSha", "type", "content"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema version. Increment on breaking changes. Readers should skip entries with v > their supported version."
+    },
+    "agent": {
+      "type": "string",
+      "enum": ["data", "worf", "belanna", "picard", "q", "scribe", "ralph"],
+      "description": "Agent role. Must match the namespace suffix: refs/notes/squad/{agent}"
+    },
+    "instanceId": {
+      "type": "string",
+      "pattern": "^[a-z]+-[A-Za-z0-9_-]+$",
+      "description": "Agent role + machine identifier. Format: {agent}-{machineId}. Used for deduplication and tracing only. Example: data-CPC-tamir-WCBED",
+      "examples": ["data-CPC-tamir-WCBED", "data-TAMIRDRESHER", "worf-CPC-tamir-WCBED"]
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "The Copilot CLI session ID that produced this note. UUIDv4 or the session identifier from squad-monitor."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp. When this note was written. Used as part of the deduplication key."
+    },
+    "commitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-character SHA of the commit this note is attached to. Never short SHA."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["decision", "context", "finding", "assessment", "summary"],
+      "description": "Note type determines promotion eligibility. decision/finding → promoted. context/assessment/summary → archived only."
+    },
+    "content": {
+      "type": "object",
+      "required": ["summary", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "One-line summary. ≤120 chars. This is what appears as the header in decisions.md."
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "Full reasoning. May be multi-paragraph. Explain the WHY, not the WHAT. The WHAT is in the commit diff."
+        },
+        "alternatives": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "What was NOT chosen, and why. Empty array if no alternatives were considered.",
+          "default": []
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"],
+          "description": "Agent's confidence in this note. high → Tier 1 promotion eligible. medium → Tier 2. low → archive only."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "description": "For type=finding only. critical/high → Tier 1 promotion. medium/low/info → archive only."
+        },
+        "promotionCandidate": {
+          "type": "boolean",
+          "default": false,
+          "description": "Explicit promotion flag. Set to true to request Tier 1 promotion regardless of confidence. Use sparingly — agent-flagged promotions are the highest-trust signal."
+        }
+      }
+    },
+    "refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prNumber": {
+          "type": ["integer", "null"],
+          "description": "GitHub PR number. Null if commit is not (yet) in a PR."
+        },
+        "workItemId": {
+          "type": ["integer", "null"],
+          "description": "Azure DevOps work item ID. Null if not linked."
+        },
+        "relatedCommits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "description": "Full SHAs of other commits this decision touches. For context navigation.",
+          "default": []
+        },
+        "supersedes": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Timestamp of the note entry this supersedes. Points to the timestamp field of the earlier entry in the same namespace+commit. If set, Ralph will not promote the older entry."
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+      "description": "Freeform lowercase tags. Used by Ralph for categorization. Examples: auth, jwt, performance, database, security",
+      "default": []
+    }
+  },
+
+  "if": {
+    "properties": { "type": { "const": "finding" } },
+    "required": ["type"]
+  },
+  "then": {
+    "properties": {
+      "content": {
+        "required": ["severity"]
+      }
+    }
+  },
+
+  "examples": [
+    {
+      "v": 1,
+      "agent": "data",
+      "instanceId": "data-CPC-tamir-WCBED",
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "timestamp": "2026-03-25T02:14:00Z",
+      "commitSha": "abc1234567890123456789012345678901234567890",
+      "type": "decision",
+      "content": {
+        "summary": "Use JWT for auth middleware on new /api/reports endpoint",
+        "reasoning": "Existing auth.go already uses JWT (lines 47-89). Adding API key strategy would require refactoring the auth interceptor and introducing a strategy selector. JWT is already tested and working. The marginal security benefit of API keys for this internal endpoint doesn't justify the refactor risk.",
+        "alternatives": [
+          "API key auth — rejected: requires auth interceptor refactor, no measurable security benefit for internal endpoint",
+          "No auth — rejected: out of scope, violates security policy"
+        ],
+        "confidence": "high",
+        "promotionCandidate": true
+      },
+      "refs": {
+        "prNumber": 57,
+        "workItemId": null,
+        "relatedCommits": [],
+        "supersedes": null
+      },
+      "tags": ["auth", "jwt", "api"]
+    },
+    {
+      "v": 1,
+      "agent": "worf",
+      "instanceId": "worf-CPC-tamir-WCBED",
+      "sessionId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "timestamp": "2026-03-25T03:22:00Z",
+      "commitSha": "abc1234567890123456789012345678901234567890",
+      "type": "finding",
+      "content": {
+        "summary": "JWT secret sourced from env var — ensure KeyVault rotation is configured",
+        "reasoning": "The JWT secret in auth.go line 48 is read from JWT_SECRET env var. If this value is rotated in KeyVault, the running service will not pick it up until restart. This is not a vulnerability in this commit, but an operational risk. The existing KeyVault integration (keymanager.go) supports dynamic reload — auth.go should use that.",
+        "alternatives": [],
+        "confidence": "medium",
+        "severity": "medium",
+        "promotionCandidate": false
+      },
+      "refs": {
+        "prNumber": 57,
+        "workItemId": 1042,
+        "relatedCommits": [],
+        "supersedes": null
+      },
+      "tags": ["auth", "jwt", "keyvault", "security"]
+    }
+  ]
+}

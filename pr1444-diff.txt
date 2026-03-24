@@ -1,0 +1,680 @@
+diff --git a/docs/kind-aspire-blog-draft.md b/docs/kind-aspire-blog-draft.md
+new file mode 100644
+index 00000000..d3d7f5de
+--- /dev/null
++++ b/docs/kind-aspire-blog-draft.md
+@@ -0,0 +1,177 @@
++# Spin Up Kubernetes Clusters as Aspire Resources with CommunityToolkit.Aspire.Hosting.Kind
++
++> **Status:** Draft — for .NET Blog / dev.to announcement  
++> **Audience:** .NET developers using Aspire who want local Kubernetes testing  
++> **Word count target:** 600+ words with code examples
++
++---
++
++## TL;DR
++
++We're contributing a new integration to the [.NET Aspire Community Toolkit](https://github.com/CommunityToolkit/Aspire): `CommunityToolkit.Aspire.Hosting.Kind`. It lets you declare an ephemeral [Kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/) cluster directly in your Aspire `AppHost`, with full lifecycle management — no shell scripts, no manual kubeconfig wrangling.
++
++```csharp
++var cluster = builder.AddKindCluster("dev-cluster")
++    .WithHelm("my-api", "./charts/my-api")
++    .WithPortForward(8080, 80);
++```
++
++That's it. Aspire creates the cluster, deploys your Helm chart, and tears it down when you stop the AppHost.
++
++---
++
++## The Gap This Fills
++
++.NET Aspire is excellent at modeling distributed applications — containers, databases, message buses, cloud services. The missing piece for Kubernetes-native teams was **local cluster lifecycle**.
++
++Today you have two options in the Aspire ecosystem:
++
++- **`Aspire.Hosting.Kubernetes`** — publishes your Aspire application _to_ an existing Kubernetes cluster (manifest generation / GitOps flow)
++- **Manual Kind setup** — `kind create cluster` before `dotnet run`, `kind delete cluster` on cleanup; kubeconfig paths differ per developer
++
++`CommunityToolkit.Aspire.Hosting.Kind` fills the gap: it creates ephemeral Kind clusters _as_ Aspire resources, on the same lifecycle as your containers and services.
++
++---
++
++## Origin Story
++
++This started from a meeting in March 2026 between the .NET Aspire team and engineers from the idk8s (Celestial) platform team at Microsoft. Andrey Noskov had already built an internal Kind resource inside the Celestial infrastructure repo — battle-tested across dozens of engineers running ephemeral clusters for service integration tests. The question was: how do we give this to the broader .NET community?
++
++The answer: extract the generic cluster lifecycle, strip out Celestial-specific internals, and contribute it to the Aspire Community Toolkit as `CommunityToolkit.Aspire.Hosting.Kind`.
++
++---
++
++## How It Works
++
++### Cluster lifecycle
++
++When the AppHost starts, the resource:
++
++1. Runs `kind create cluster --name <name> --config <generated-or-custom> --kubeconfig <path>`
++2. Polls `kubectl --kubeconfig <path> get nodes` until all nodes report `Ready`
++3. Optionally runs `helm install` for any charts configured with `.WithHelm(...)`
++4. Reports the cluster as healthy to the Aspire dashboard
++
++When the AppHost stops (or is interrupted):
++
++5. Runs `kind delete cluster --name <name>`
++
++The kubeconfig path is exposed as a connection string so downstream resources can discover it automatically.
++
++### The AppHost integration
++
++```csharp
++var builder = DistributedApplication.CreateBuilder(args);
++
++// Ephemeral Kind cluster — single node, K8s 1.30
++var cluster = builder
++    .AddKindCluster("test-cluster")
++    .WithKubernetesVersion("v1.30.0")
++    .WithHelm("sample-api", "./charts/sample-api", valuesFile: "./values.test.yaml")
++    .WithPortForward(hostPort: 8080, clusterPort: 80)
++    .WithWaitForReady(TimeSpan.FromMinutes(3));
++
++// Integration test project references the cluster
++builder
++    .AddProject<Projects.IntegrationTests>("integration-tests")
++    .WithReference(cluster);
++
++builder.Build().Run();
++```
++
++Your integration test project reads the connection string the usual Aspire way:
++
++```csharp
++// In IntegrationTests/Program.cs or test setup
++var kubeconfig = builder.Configuration.GetConnectionString("test-cluster");
++// → "/tmp/aspire-kind-test-cluster.kubeconfig"
++```
++
++Pass it to your Kubernetes client of choice (official `k8s-client`, `KubernetesClient` NuGet, or run `kubectl --kubeconfig <path>` in shell steps).
++
++### Custom cluster topology
++
++Need multiple workers or a specific network config?
++
++```csharp
++builder.AddKindCluster("multi-node")
++    .WithNodeCount(3)          // 1 control-plane + 2 workers
++    .WithKubernetesVersion("v1.29.4");
++```
++
++Or drop in a full Kind config file:
++
++```csharp
++builder.AddKindCluster("custom")
++    .WithKindConfig("./kind-ha.yaml");
++```
++
++---
++
++## Why Not Just Use docker-compose or TestContainers?
++
++Good question. Here's the breakdown:
++
++| Need | docker-compose | TestContainers | Kind+Aspire |
++|---|---|---|---|
++| Container orchestration | ✅ | ✅ | ✅ |
++| Kubernetes API (CRDs, Operators, Ingress) | ❌ | ⚠️ via Testcontainers.K3s | ✅ full Kind cluster |
++| Aspire dashboard visibility | ❌ | ❌ | ✅ |
++| Helm chart deployment | ❌ | ❌ | ✅ `.WithHelm()` |
++| Shared kubeconfig for services | manual | manual | ✅ connection string |
++
++If you're testing against real Kubernetes primitives — CRDs, admission webhooks, Ingress controllers, RBAC — you need a real cluster, and Kind is the best local option. Wrapping it in Aspire means all your team members get the same experience with zero setup friction.
++
++---
++
++## Prerequisites
++
++- Docker Desktop (or Docker Engine on Linux)
++- Kind CLI: `winget install Kubernetes.kind` or `go install sigs.k8s.io/kind@latest`
++- kubectl
++- .NET 9 SDK
++
++---
++
++## Getting Started
++
++```bash
++dotnet add package CommunityToolkit.Aspire.Hosting.Kind
++```
++
++Minimal AppHost:
++
++```csharp
++var builder = DistributedApplication.CreateBuilder(args);
++builder.AddKindCluster("local");
++builder.Build().Run();
++```
++
++The Aspire dashboard will show the cluster resource. Done.
++
++---
++
++## What's Next
++
++- **`kubectl apply` support** — apply raw manifests alongside Helm charts
++- **Multi-cluster** — multiple named clusters in one AppHost
++- **Cluster reuse** — optional flag to skip teardown for faster dev iterations
++- **Aspire 9+ resource health** — rich status reporting in the dashboard
++
++We're tracking the public contribution at [CommunityToolkit/Aspire #1428](https://github.com/CommunityToolkit/Aspire/issues/1428).
++
++---
++
++## Try It Out
++
++The package is in development. To track progress or contribute:
++
++- Source: [github.com/CommunityToolkit/Aspire](https://github.com/CommunityToolkit/Aspire)
++- This PR: _(link to be added at submission time)_
++- Issues / feedback: tag `area: Hosting.Kind`
++
++We'd love to hear how you're using Kind in your .NET testing workflows — drop a comment or open an issue!
++
++---
++
++*Built by the .NET Aspire Community — contributions welcome.*
+diff --git a/samples/Kind.AppHost/Kind.AppHost.csproj b/samples/Kind.AppHost/Kind.AppHost.csproj
+index b60c5947..b45a9ad0 100644
+--- a/samples/Kind.AppHost/Kind.AppHost.csproj
++++ b/samples/Kind.AppHost/Kind.AppHost.csproj
+@@ -1,20 +1,22 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-  <PropertyGroup>
+-    <OutputType>Exe</OutputType>
+-    <TargetFramework>net9.0</TargetFramework>
+-    <ImplicitUsings>enable</ImplicitUsings>
+-    <Nullable>enable</Nullable>
+-    <IsAspireHost>true</IsAspireHost>
+-    <UserSecretsId>kind-apphost-sample</UserSecretsId>
+-  </PropertyGroup>
+-
+-  <ItemGroup>
+-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
+-  </ItemGroup>
+-
+-  <ItemGroup>
+-    <ProjectReference Include="..\..\src\CommunityToolkit.Aspire.Hosting.Kind\CommunityToolkit.Aspire.Hosting.Kind.csproj" />
+-  </ItemGroup>
+-
+-</Project>
++<Project Sdk="Microsoft.NET.Sdk">
++
++  <PropertyGroup>
++    <OutputType>Exe</OutputType>
++    <TargetFramework>net9.0</TargetFramework>
++    <Nullable>enable</Nullable>
++    <ImplicitUsings>enable</ImplicitUsings>
++    <IsAspireHost>true</IsAspireHost>
++    <UserSecretsId>aspire-kind-sample</UserSecretsId>
++  </PropertyGroup>
++
++  <ItemGroup>
++    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
++    <!-- In a real project, reference the NuGet package:
++    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Kind" Version="*" />
++    -->
++    <!-- For development, reference the local project: -->
++    <ProjectReference Include="..\..\src\CommunityToolkit.Aspire.Hosting.Kind\CommunityToolkit.Aspire.Hosting.Kind.csproj" />
++    <ProjectReference Include="..\Kind.IntegrationTests\Kind.IntegrationTests.csproj" />
++  </ItemGroup>
++
++</Project>
+diff --git a/samples/Kind.AppHost/Program.cs b/samples/Kind.AppHost/Program.cs
+index d37caea9..8635e329 100644
+--- a/samples/Kind.AppHost/Program.cs
++++ b/samples/Kind.AppHost/Program.cs
+@@ -1,6 +1,34 @@
+-var builder = DistributedApplication.CreateBuilder(args);
+-
+-// Add a Kind cluster named "dev-cluster"
+-var cluster = builder.AddKindCluster("dev-cluster");
+-
+-builder.Build().Run();
++// samples/Kind.AppHost/Program.cs
++// Demonstrates CommunityToolkit.Aspire.Hosting.Kind in a realistic scenario:
++//  - Ephemeral Kind cluster with 1 control-plane node
++//  - Helm chart deployment (a simple web API)
++//  - Port-forward so the service is reachable on localhost:8080
++//  - Integration test runner that talks to the deployed service
++
++using CommunityToolkit.Aspire.Hosting.Kind;
++
++var builder = DistributedApplication.CreateBuilder(args);
++
++// ─────────────────────────────────────────────────────────
++// 1. Kind cluster — ephemeral, single-node
++// ─────────────────────────────────────────────────────────
++var cluster = builder
++    .AddKindCluster("demo-cluster")
++    .WithKubernetesVersion("v1.30.0")
++    // Deploy the sample API Helm chart into the cluster
++    .WithHelm("sample-api", chartPath: "../charts/sample-api", valuesFile: "./values.dev.yaml")
++    // Expose the service's port 80 on localhost:8080
++    .WithPortForward(hostPort: 8080, clusterPort: 80)
++    // Give the cluster up to 3 minutes to become ready
++    .WithWaitForReady(TimeSpan.FromMinutes(3));
++
++// ─────────────────────────────────────────────────────────
++// 2. .NET integration tests — run after cluster is ready
++//    The project reads KUBECONFIG / connection-string to
++//    discover the cluster and run API smoke tests.
++// ─────────────────────────────────────────────────────────
++builder
++    .AddProject<Projects.Kind_IntegrationTests>("integration-tests")
++    .WithReference(cluster);
++
++builder.Build().Run();
+diff --git a/samples/Kind.AppHost/values.dev.yaml b/samples/Kind.AppHost/values.dev.yaml
+new file mode 100644
+index 00000000..56d4ccbd
+--- /dev/null
++++ b/samples/Kind.AppHost/values.dev.yaml
+@@ -0,0 +1,21 @@
++// samples/Kind.AppHost/values.dev.yaml
++// Helm values for the sample-api chart in dev/test mode
++
++replicaCount: 1
++
++image:
++  repository: nginx   # placeholder — swap for your real image
++  tag: "1.25"
++  pullPolicy: IfNotPresent
++
++service:
++  type: ClusterIP
++  port: 80
++
++resources:
++  requests:
++    cpu: "100m"
++    memory: "64Mi"
++  limits:
++    cpu: "200m"
++    memory: "128Mi"
+diff --git a/src/CommunityToolkit.Aspire.Hosting.Kind/README.md b/src/CommunityToolkit.Aspire.Hosting.Kind/README.md
+index b7082c41..2aeda782 100644
+--- a/src/CommunityToolkit.Aspire.Hosting.Kind/README.md
++++ b/src/CommunityToolkit.Aspire.Hosting.Kind/README.md
+@@ -1,44 +1,329 @@
+-# CommunityToolkit.Aspire.Hosting.Kind
+-
+-An [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview) hosting integration for [Kind](https://kind.sigs.k8s.io/) (Kubernetes in Docker) clusters.
+-
+-## Overview
+-
+-Kind (Kubernetes in Docker) lets you run local Kubernetes clusters using Docker containers as nodes. This integration allows you to declaratively provision and manage Kind clusters as part of your Aspire distributed application.
+-
+-## Prerequisites
+-
+-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+-- [Aspire 9.x workload](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/setup-tooling)
+-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or compatible container runtime)
+-- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) installed and available on `PATH`
+-
+-## Usage
+-
+-### Add the NuGet package
+-
+-```shell
+-dotnet add package CommunityToolkit.Aspire.Hosting.Kind
+-```
+-
+-### Register a Kind cluster in your AppHost
+-
+-```csharp
+-var builder = DistributedApplication.CreateBuilder(args);
+-
+-var cluster = builder.AddKindCluster("my-cluster");
+-
+-builder.Build().Run();
+-```
+-
+-## Configuration
+-
+-> **Note:** Full configuration options (cluster config file, Kubernetes version, image registry, etc.) will be added in subsequent issues.
+-
+-## Contributing
+-
+-See the [contribution guide](https://github.com/CommunityToolkit/Aspire/blob/main/CONTRIBUTING.md) for the CommunityToolkit.Aspire project.
+-
+-## License
+-
+-[MIT](https://github.com/CommunityToolkit/Aspire/blob/main/LICENSE)
++# CommunityToolkit.Aspire.Hosting.Kind
++
++[![NuGet](https://img.shields.io/nuget/v/CommunityToolkit.Aspire.Hosting.Kind.svg)](https://www.nuget.org/packages/CommunityToolkit.Aspire.Hosting.Kind)
++[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
++
++Aspire hosting extension for [Kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/) — spin up ephemeral local Kubernetes clusters as first-class Aspire resources in your distributed application.
++
++---
++
++## Why use this?
++
++| Scenario | Without Kind resource | With Kind resource |
++|---|---|---|
++| Local K8s testing | Manual `kind create cluster`, separate kubeconfig management | `builder.AddKindCluster("my-cluster")` — fully lifecycle-managed |
++| Dev/test parity | Separate shell scripts per developer | Aspire AppHost defines the cluster alongside your services |
++| CI ephemeral clusters | Bespoke YAML pipelines | Single AppHost, same code locally and in CI |
++| Helm chart validation | `helm install` before running tests | `.WithHelm(...)` — chart deployed automatically at startup |
++
++**CommunityToolkit.Aspire.Hosting.Kind creates ephemeral Kind clusters _as_ Aspire resources.** This is different from `Aspire.Hosting.Kubernetes`, which deploys your Aspire application _to_ an existing cluster. Both complement each other.
++
++---
++
++## Prerequisites
++
++| Tool | Minimum Version | Install |
++|---|---|---|
++| Docker Desktop / Engine | 24.x | [docs.docker.com](https://docs.docker.com/get-docker/) |
++| Kind CLI | 0.23+ | `go install sigs.k8s.io/kind@latest` or `winget install Kubernetes.kind` |
++| kubectl | 1.29+ | [kubernetes.io/docs](https://kubernetes.io/docs/tasks/tools/) |
++| .NET SDK | 9.0+ | [dotnet.microsoft.com](https://dotnet.microsoft.com/download) |
++
++> **Note:** The Kind CLI and Docker must be on `PATH` (or configured with explicit paths). The resource will fail fast with a clear message if they are missing.
++
++---
++
++## Getting Started
++
++### 1. Install the NuGet package
++
++```bash
++dotnet add package CommunityToolkit.Aspire.Hosting.Kind
++```
++
++### 2. Add a Kind cluster to your AppHost
++
++```csharp
++// AppHost/Program.cs
++var builder = DistributedApplication.CreateBuilder(args);
++
++var cluster = builder.AddKindCluster("dev-cluster");
++
++// Your services can reference the cluster's kubeconfig
++var api = builder.AddProject<Projects.MyApi>("api")
++    .WithReference(cluster);
++
++builder.Build().Run();
++```
++
++### 3. Run the AppHost
++
++```bash
++dotnet run --project AppHost
++```
++
++Aspire starts the Kind cluster, waits for it to be ready, and makes the kubeconfig available to downstream resources. The Aspire dashboard shows cluster health.
++
++---
++
++## Configuration Options
++
++### Fluent API
++
++```csharp
++builder.AddKindCluster("dev-cluster")
++    // Number of worker nodes (default: 1 control-plane, 0 workers)
++    .WithNodeCount(3)
++
++    // Kubernetes version for the cluster nodes
++    .WithKubernetesVersion("v1.30.0")
++
++    // Deploy a Helm chart into the cluster at startup
++    .WithHelm("my-app", "./charts/my-app", valuesFile: "./values.dev.yaml")
++
++    // Forward a port from a cluster service to localhost
++    .WithPortForward(hostPort: 8080, clusterPort: 80)
++
++    // How long to wait for cluster readiness (default: 2 minutes)
++    .WithWaitForReady(TimeSpan.FromMinutes(3));
++```
++
++### Using a custom Kind config file
++
++```csharp
++builder.AddKindCluster("dev-cluster")
++    .WithKindConfig("./kind-config.yaml");
++```
++
++**Example `kind-config.yaml`:**
++
++```yaml
++kind: Cluster
++apiVersion: kind.x-k8s.io/v1alpha4
++nodes:
++  - role: control-plane
++  - role: worker
++  - role: worker
++networking:
++  apiServerAddress: "127.0.0.1"
++  apiServerPort: 6443
++```
++
++### Environment variables
++
++| Variable | Default | Description |
++|---|---|---|
++| `KIND_PATH` | `kind` (on PATH) | Explicit path to the Kind binary |
++| `KUBECTL_PATH` | `kubectl` (on PATH) | Explicit path to kubectl |
++| `KUBECONFIG_DIR` | temp directory | Directory where kubeconfig files are written |
++
++---
++
++## API Reference
++
++### `IDistributedApplicationBuilder` extensions
++
++#### `AddKindCluster(string name)`
++
++Creates a new Kind cluster resource.
++
++```csharp
++IResourceBuilder<KindClusterResource> AddKindCluster(
++    this IDistributedApplicationBuilder builder,
++    string name)
++```
++
++**Parameters:**
++
++| Parameter | Description |
++|---|---|
++| `name` | Logical name for the cluster in the Aspire application model. Also used as the Kind cluster name. |
++
++**Returns:** `IResourceBuilder<KindClusterResource>`
++
++---
++
++### `IResourceBuilder<KindClusterResource>` extensions
++
++#### `WithNodeCount(int count)`
++
++Sets the total number of nodes (control-plane + workers).
++
++```csharp
++IResourceBuilder<KindClusterResource> WithNodeCount(int count)
++```
++
++#### `WithKubernetesVersion(string version)`
++
++Specifies the Kubernetes version for cluster nodes.
++
++```csharp
++IResourceBuilder<KindClusterResource> WithKubernetesVersion(string version)
++```
++
++Version must be a valid [Kind node image tag](https://hub.docker.com/r/kindest/node/tags), e.g., `"v1.30.0"`.
++
++#### `WithHelm(string releaseName, string chartPath, string? valuesFile = null)`
++
++Deploys a Helm chart into the cluster after it becomes ready.
++
++```csharp
++IResourceBuilder<KindClusterResource> WithHelm(
++    string releaseName,
++    string chartPath,
++    string? valuesFile = null)
++```
++
++#### `WithPortForward(int hostPort, int clusterPort)`
++
++Establishes a port-forward from the host to the cluster.
++
++```csharp
++IResourceBuilder<KindClusterResource> WithPortForward(int hostPort, int clusterPort)
++```
++
++#### `WithKindConfig(string configPath)`
++
++Uses a custom Kind cluster config file instead of generating one from builder options.
++
++```csharp
++IResourceBuilder<KindClusterResource> WithKindConfig(string configPath)
++```
++
++#### `WithWaitForReady(TimeSpan timeout)`
++
++Configures the maximum time to wait for the cluster to become ready (default: `TimeSpan.FromMinutes(2)`).
++
++```csharp
++IResourceBuilder<KindClusterResource> WithWaitForReady(TimeSpan timeout)
++```
++
++---
++
++### `KindClusterResource`
++
++Represents a Kind cluster in the Aspire application model.
++
++| Property | Type | Description |
++|---|---|---|
++| `Name` | `string` | Cluster name |
++| `KubeconfigPath` | `string` | Path to the generated kubeconfig file |
++| `ConnectionString` | `string` | Kubeconfig path, usable as a connection string |
++
++---
++
++## Connection String
++
++The Kind cluster exposes its kubeconfig path as a connection string. Downstream resources can access it via standard Aspire connection string APIs:
++
++```csharp
++// In your service project
++var kubeconfig = builder.Configuration.GetConnectionString("dev-cluster");
++// kubeconfig = "/tmp/aspire-kind-dev-cluster.kubeconfig"
++```
++
++---
++
++## Lifecycle
++
++```
++AppHost starts
++    │
++    ▼
++kind create cluster --name dev-cluster --config <generated> --kubeconfig <path>
++    │
++    ▼
++kubectl --kubeconfig <path> get nodes   ← health check loop
++    │ (all nodes Ready)
++    ▼
++helm install my-app ./charts/my-app     ← if .WithHelm() configured
++    │
++    ▼
++Aspire dashboard shows cluster as Running
++    │
++    ▼ (AppHost stops / Ctrl+C)
++kind delete cluster --name dev-cluster
++```
++
++---
++
++## Examples
++
++### Minimal — single-node cluster
++
++```csharp
++var builder = DistributedApplication.CreateBuilder(args);
++builder.AddKindCluster("test");
++builder.Build().Run();
++```
++
++### Web API integration test environment
++
++```csharp
++var builder = DistributedApplication.CreateBuilder(args);
++
++var cluster = builder.AddKindCluster("test-cluster")
++    .WithNodeCount(1)
++    .WithKubernetesVersion("v1.30.0")
++    .WithHelm("my-api", "./charts/my-api", "./values.test.yaml")
++    .WithPortForward(8080, 80)
++    .WithWaitForReady(TimeSpan.FromMinutes(3));
++
++// Integration test runner picks up the cluster via the Aspire connection string
++builder.AddProject<Projects.IntegrationTests>("integration-tests")
++    .WithReference(cluster);
++
++builder.Build().Run();
++```
++
++### CI pipeline (GitHub Actions)
++
++```yaml
++- name: Run Aspire AppHost (with Kind)
++  run: dotnet run --project ./AppHost -- --publisher manifest
++  env:
++    DOTNET_ENVIRONMENT: Testing
++```
++
++> Kind requires Docker. Use a runner with Docker available (e.g., `ubuntu-latest` with `runs-on: ubuntu-latest` and Docker pre-installed).
++
++---
++
++## Troubleshooting
++
++### `kind: command not found`
++
++Set `KIND_PATH` to the full path of the Kind binary, or ensure Kind is on `PATH`.
++
++### Cluster creation times out
++
++Increase the wait timeout:
++
++```csharp
++.WithWaitForReady(TimeSpan.FromMinutes(5))
++```
++
++Or pull the Kind node image in advance:
++
++```bash
++docker pull kindest/node:v1.30.0
++```
++
++### Port already in use
++
++Choose a different `hostPort` in `.WithPortForward()`, or check for existing Kind clusters with `kind get clusters`.
++
++---
++
++## Contributing
++
++This package is part of the [.NET Aspire Community Toolkit](https://github.com/CommunityToolkit/Aspire).
++
++- File issues at [CommunityToolkit/Aspire](https://github.com/CommunityToolkit/Aspire/issues)
++- See [`CONTRIBUTING.md`](https://github.com/CommunityToolkit/Aspire/blob/main/CONTRIBUTING.md)
++
++---
++
++## License
++
++MIT — see [LICENSE](../../LICENSE).

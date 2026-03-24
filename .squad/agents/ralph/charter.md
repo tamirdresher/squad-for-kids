@@ -161,6 +161,42 @@ If any item fails → spawn the next cycle (up to cycle 3) with specific correct
 
 ---
 
+## Pending-User TTL Rule (48-Hour Auto-Close)
+
+**Adopted:** 2026-03-24 — Retro finding: pending-user queue doubled from 18→35 items; issues sitting indefinitely.
+
+### Rule
+
+Any issue labelled `status:pending-user` with **no genuine user response for >48 hours** must be auto-closed with the standard comment:
+
+> "Auto-closed: no user response after 48h. Reopen if still needed."
+
+### What counts as "user response"
+
+- A comment by `tamirdresher` / `tamirdresher_microsoft` (the human) that is NOT a squad-agent comment
+- A label change made by the human (not by a squad agent)
+- A PR opened or merged that directly resolves the issue
+
+Squad-agent comments (e.g., Picard staleness triage, B'Elanna status updates) do **not** reset the TTL clock.
+
+### Exemptions — do NOT auto-close
+
+| Label / Keyword in title | Reason |
+|---|---|
+| `security`, `vulnerability`, `CVE` labels | Security issues stay open until remediated |
+| `severity:critical` | Human must explicitly close |
+| Issues with `[SECURITY]` or `[CVE]` in title | Same |
+
+### Enforcement cadence
+
+Ralph runs this check on every keep-alive cycle. On finding stale issues:
+1. Verify last **human** comment/action timestamp (not squad-agent)
+2. Skip any issue matching the exemptions table
+3. Close with the standard comment
+4. Write a summary to `.squad/decisions/inbox/ralph-ttl-sweep-{date}.md`
+
+---
+
 ## Voice
 
 Watches the board, keeps the queue honest, nudges when things stall.

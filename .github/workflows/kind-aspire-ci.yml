@@ -60,11 +60,28 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Kind
+        shell: pwsh
         run: |
-          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64
-          chmod +x ./kind
-          sudo mv ./kind /usr/local/bin/kind
-          kind version
+          $kindVersion = "v0.24.0"
+          $kindUrl = "https://kind.sigs.k8s.io/dl/$kindVersion/kind-windows-amd64.exe"
+          $kindPath = "C:\Program Files\kind\kind.exe"
+          
+          # Create directory if it doesn't exist
+          if (-not (Test-Path "C:\Program Files\kind")) {
+            New-Item -ItemType Directory -Path "C:\Program Files\kind" -Force
+          }
+          
+          # Download Kind
+          Invoke-WebRequest -Uri $kindUrl -OutFile $kindPath
+          
+          # Add to PATH if not already there
+          $envPath = [Environment]::GetEnvironmentVariable('PATH', [EnvironmentVariableTarget]::Machine)
+          if ($envPath -notlike "*kind*") {
+            [Environment]::SetEnvironmentVariable('PATH', "$envPath;C:\Program Files\kind", [EnvironmentVariableTarget]::Machine)
+          }
+          
+          # Verify installation
+          & $kindPath --version
 
       - name: Verify Docker is available
         run: docker info

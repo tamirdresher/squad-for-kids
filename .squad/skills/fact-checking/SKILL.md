@@ -1,7 +1,17 @@
+---
+name: fact-checking
+description: Review and validate claims using counter-hypothesis testing. Use when verifying technical content, checking references, validating API endpoints, or performing quality assurance on deliverables.
+license: MIT
+compatibility: Requires access to external references and APIs
+metadata:
+  author: squad
+  version: "1.0.0"
+  domain: quality, verification
+  confidence: low
+  last_validated: "2026-03-13"
+---
+
 # Skill: Fact Checking
-**Confidence:** low
-**Domain:** quality, verification
-**Last validated:** 2026-03-13
 
 ## Context
 Extracted from Q's charter. Codifies the review output format and methodology so any agent performing fact-checking or review produces consistent, structured output.

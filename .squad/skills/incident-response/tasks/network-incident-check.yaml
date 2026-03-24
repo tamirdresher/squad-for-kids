@@ -1,0 +1,21 @@
+id: network-incident-check
+name: Networking Incident Assessment
+inputs:
+  prompt: |
+    Multiple services are experiencing intermittent connectivity issues. Load balancer health probes are failing.
+    
+    Determine if this is an Azure-wide networking issue.
+
+expected_output: |
+    Should check Azure Status for networking services (Load Balancer, ExpressRoute), verify incident correlation, and provide findings.
+
+graders:
+  - type: text
+    name: checks_networking
+    config:
+      regex_match: "(?i)(networking|load[- ]?balancer|expressroute)"
+  - type: code
+    name: sufficient_detail
+    config:
+      assertions:
+        - "len(output) > 150"

@@ -1,3 +1,16 @@
+---
+name: incident-response
+description: Check Azure Status during incidents to distinguish infrastructure-wide issues from local problems. Use when investigating production outages, service degradations, or ICM incidents.
+license: MIT
+compatibility: Requires web access to Azure Status page
+metadata:
+  author: squad
+  version: "1.0.0"
+  domain: incident-response, reliability, infrastructure
+  confidence: medium
+  last_updated: "2026-03-12"
+---
+
 # Incident Response Skill: Azure Status Check
 
 ## Pattern

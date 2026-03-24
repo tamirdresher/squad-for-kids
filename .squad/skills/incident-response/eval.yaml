@@ -1,0 +1,27 @@
+name: incident-response-eval
+description: Evaluation suite for Azure Status incident response skill
+skill: incident-response
+version: "1.0"
+
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  model: claude-sonnet-4.6
+
+graders:
+  - type: text
+    name: checks_azure_status
+    config:
+      regex_match: "(?i)(azure.*status|status.*azure|azure\\.status\\.microsoft)"
+  - type: text
+    name: has_timeline_check
+    config:
+      contains: ["timeline", "started", "incident"]
+  - type: text
+    name: documents_findings
+    config:
+      regex_match: "(?i)(document|note|findings)"
+
+tasks:
+  - "tasks/*.yaml"

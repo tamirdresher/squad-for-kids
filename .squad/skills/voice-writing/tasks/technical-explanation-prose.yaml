@@ -1,0 +1,25 @@
+id: technical-explanation-prose
+name: Technical Explanation in Prose
+inputs:
+  prompt: |
+    Explain how Kubernetes pod scheduling works, using Tamir's voice.
+    
+    Make it story-driven with technical depth. No bullet points, flowing prose.
+
+expected_output: |
+    Should explain the concept in paragraphs (not bullets), maintain conversational tone, use "I" or "you", be genuinely helpful.
+
+graders:
+  - type: text
+    name: no_bullet_points
+    config:
+      regex_not_match: "^\\s*[-*•]\\s"
+  - type: text
+    name: explains_concept
+    config:
+      contains: ["schedule", "pod", "node"]
+  - type: code
+    name: paragraph_structure
+    config:
+      assertions:
+        - "'\\n\\n' in output"

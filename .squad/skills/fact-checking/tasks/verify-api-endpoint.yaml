@@ -1,0 +1,21 @@
+id: verify-api-endpoint
+name: Verify API Endpoint Claim
+inputs:
+  prompt: |
+    Review this claim: "The GitHub API endpoint https://api.github.com/repos/{owner}/{repo}/issues returns a JSON array of issue objects."
+    
+    Apply the fact-checking methodology to verify this claim.
+
+expected_output: |
+  Should include a review table with Status and Evidence columns, counter-hypotheses tested, and a verdict.
+
+graders:
+  - type: text
+    name: verified_endpoint
+    config:
+      contains: ["api.github.com", "verified", "✅"]
+  - type: code
+    name: has_minimum_output
+    config:
+      assertions:
+        - "len(output) > 200"

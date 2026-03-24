@@ -13,18 +13,25 @@ public class KindClusterResourceTests
     // Constructor / Name
     // ──────────────────────────────────────────────────────────────────────────
 
+    private static KindClusterResource CreateResource(
+        string name = "cluster",
+        string clusterName = "cluster",
+        string kubeconfigPath = "/tmp/kind-cluster-kubeconfig.yaml") =>
+        new(name, clusterName, kubeconfigPath);
+
     [Fact]
     public void Constructor_SetsName()
     {
-        var resource = new KindClusterResource("my-cluster");
+        var resource = CreateResource("my-cluster", "my-cluster", "/tmp/kind-my-cluster-kubeconfig.yaml");
         resource.Name.Should().Be("my-cluster");
     }
 
     [Fact]
-    public void ClusterName_EqualsName()
+    public void ClusterName_IsSetIndependently()
     {
-        var resource = new KindClusterResource("kind-dev");
-        resource.ClusterName.Should().Be(resource.Name);
+        var resource = CreateResource("resource-name", "kind-dev", "/tmp/kind-dev-kubeconfig.yaml");
+        resource.Name.Should().Be("resource-name");
+        resource.ClusterName.Should().Be("kind-dev");
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -32,16 +39,16 @@ public class KindClusterResourceTests
     // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
-    public void DefaultNodeCount_IsOne()
+    public void DefaultNodeCount_IsZero()
     {
-        var resource = new KindClusterResource("cluster");
-        resource.NodeCount.Should().Be(1);
+        var resource = CreateResource();
+        resource.NodeCount.Should().Be(0);
     }
 
     [Fact]
     public void DefaultKubernetesVersion_IsNull()
     {
-        var resource = new KindClusterResource("cluster");
+        var resource = CreateResource();
         resource.KubernetesVersion.Should().BeNull();
     }
 
@@ -55,7 +62,8 @@ public class KindClusterResourceTests
     [InlineData(10)]
     public void NodeCount_CanBeSet(int count)
     {
-        var resource = new KindClusterResource("cluster") { NodeCount = count };
+        var resource = CreateResource();
+        resource.NodeCount = count;
         resource.NodeCount.Should().Be(count);
     }
 
@@ -65,17 +73,16 @@ public class KindClusterResourceTests
     [InlineData("v1.31.0")]
     public void KubernetesVersion_CanBeSet(string version)
     {
-        var resource = new KindClusterResource("cluster") { KubernetesVersion = version };
+        var resource = CreateResource();
+        resource.KubernetesVersion = version;
         resource.KubernetesVersion.Should().Be(version);
     }
 
     [Fact]
     public void KubernetesVersion_CanBeSetToNull()
     {
-        var resource = new KindClusterResource("cluster")
-        {
-            KubernetesVersion = "v1.30.0"
-        };
+        var resource = CreateResource();
+        resource.KubernetesVersion = "v1.30.0";
 
         resource.KubernetesVersion = null;
 
@@ -89,7 +96,7 @@ public class KindClusterResourceTests
     [Fact]
     public void Resource_IsAspireResource()
     {
-        var resource = new KindClusterResource("cluster");
+        var resource = CreateResource();
         resource.Should().BeAssignableTo<Resource>();
     }
 }

@@ -88,7 +88,7 @@ public class KindClusterBuilderExtensionsTests
         var clusterBuilder = builder.AddKindCluster("defaults-cluster");
 
         // Assert
-        clusterBuilder.Resource.NodeCount.Should().Be(1);
+        clusterBuilder.Resource.NodeCount.Should().Be(0);
     }
 
     [Fact]
@@ -137,10 +137,9 @@ public class KindClusterBuilderExtensionsTests
     }
 
     [Theory]
-    [InlineData(0)]
     [InlineData(-1)]
     [InlineData(-100)]
-    public void WithNodeCount_ThrowsWhenNodeCountIsLessThanOne(int invalidCount)
+    public void WithNodeCount_ThrowsWhenNodeCountIsNegative(int invalidCount)
     {
         // Arrange
         var builder = DistributedApplication.CreateBuilder();
@@ -213,18 +212,18 @@ public class KindClusterBuilderExtensionsTests
     }
 
     [Fact]
-    public void WithKubernetesVersion_AcceptsNull_ToUseDefault()
+    public void WithKubernetesVersion_ThrowsOnNull()
     {
         // Arrange
         var builder = DistributedApplication.CreateBuilder();
         var clusterBuilder = builder.AddKindCluster("my-cluster");
         clusterBuilder.WithKubernetesVersion("v1.30.0");
 
-        // Act — reset to default
-        clusterBuilder.WithKubernetesVersion(null);
+        // Act
+        Action act = () => clusterBuilder.WithKubernetesVersion(null!);
 
         // Assert
-        clusterBuilder.Resource.KubernetesVersion.Should().BeNull();
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]

@@ -61,7 +61,7 @@ jobs:
         with:
           name: drift-detection-results
           path: ${{ runner.temp }}/drift-detection/
-          retention-days: 7
+          retention-days: 3
           if-no-files-found: ignore
 
   validate-manifests:
@@ -120,7 +120,7 @@ jobs:
         with:
           name: rendered-manifests
           path: ${{ runner.temp }}/drift-detection/rendered/
-          retention-days: 7
+          retention-days: 3
       
       - name: Check validation result
         if: steps.validate.outcome == 'failure'

@@ -94,4 +94,4 @@ jobs:
           path: |
             ~/.squad/daily-reports/squad-daily-report-*.html
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 3

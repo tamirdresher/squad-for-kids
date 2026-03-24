@@ -3,18 +3,20 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <IsAspireHost>true</IsAspireHost>
-    <UserSecretsId>kind-apphost-sample</UserSecretsId>
+    <UserSecretsId>aspire-kind-sample</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <!-- In a real project, reference the NuGet package:
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Kind" Version="*" />
+    -->
+    <!-- For development, reference the local project: -->
     <ProjectReference Include="..\..\src\CommunityToolkit.Aspire.Hosting.Kind\CommunityToolkit.Aspire.Hosting.Kind.csproj" />
+    <ProjectReference Include="..\Kind.IntegrationTests\Kind.IntegrationTests.csproj" />
   </ItemGroup>
 
 </Project>

@@ -21,6 +21,7 @@
 - Write decisions to inbox when making team-relevant choices
 - Focused, practical, gets things done
 - **For feature-level tasks: enforce the 5-phase pipeline** (RESEARCH → PLAN → IMPLEMENT → REVIEW → VERIFY) as defined in `.squad/orchestration-pipeline.md`. Phases are mandatory and must run in order. If a phase is skipped, reject the work and restart from the skipped phase.
+- **After major decisions or architecture reviews:** Publish a summary to the GitHub Wiki using the `wiki-write` skill (`. .squad/skills/wiki-write/wiki-helper.ps1`). The wiki is the Squad's durable read layer — decisions that affect the team belong there.
 
 ## Boundaries
 

@@ -72,6 +72,21 @@ When triaging, the Lead should ask:
 4. **Is it security-sensitive?** Auth, encryption, access control → always 🔴
 5. **Is it medium complexity with specs?** Feature with clear requirements, refactoring with tests → likely 🟡
 
+## Research Task Directive
+
+**Research-Then-Execute:** Every research output MUST end with at least one concrete action.
+Acceptable outputs after research:
+
+- GitHub issue created documenting findings and next steps
+- PR opened implementing a recommendation  
+- Decision recorded in .squad/decisions/inbox/
+- Documented recommendation with a named assignee
+
+Pure analysis reports without actionable follow-up will be **rejected by Picard during triage**.
+
+> Source: Retro 2026-03-24. Issue #1476.
+
+---
 ## Per-Area Routing (Monorepo Support)
 
 Squad supports per-area squad configs for large monorepos. When a task, issue, or PR is associated
@@ -162,6 +177,7 @@ conventions, loop-back rules, and invocation shortcuts.
 7. **Issue-labeled work** — when a `squad:{member}` label is applied to an issue, route to that member. The Lead handles all `squad` (base label) triage.
 8. **@copilot routing** — when evaluating issues, check @copilot's capability profile in `team.md`. Route 🟢 good-fit tasks to `squad:copilot`. Flag 🟡 needs-review tasks for PR review. Keep 🔴 not-suitable tasks with squad members.
 9. **Always use git worktrees for branch work.** Never `git checkout` or `git switch` in the main working directory. All branch-based work MUST use `git worktree add` to create an isolated worktree. This prevents conflicts when multiple agents or sessions work in parallel on different branches.
+10. **Publish to Wiki after knowledge-producing work.** When an agent completes research, a major decision, a security audit, or produces reusable findings, the agent MUST publish a summary to the GitHub Wiki using the `wiki-write` skill (`.squad/skills/wiki-write/SKILL.md`). This is not optional — the wiki is the Squad's durable read layer. If in doubt, publish.
 
 ## Git Worktree Convention (Mandatory)
 

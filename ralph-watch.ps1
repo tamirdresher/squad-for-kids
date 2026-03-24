@@ -552,7 +552,25 @@ $lastHeartbeatTime = Get-Date
 $prompt = @'
 Ralph, Go! MAXIMIZE PARALLELISM: For every round, identify ALL actionable issues and spawn agents for ALL of them simultaneously as background tasks — do NOT work on issues one at a time. If there are 5 actionable issues, spawn 5 agents in one turn. PR comments, new issues, merges — do as much as possible in parallel per round.
 
-ITERATIVE RETRIEVAL (Issue #1317): For every agent you spawn, include Task / WHY / Success criteria / Escalation path sections in the prompt (template above, full skill at .squad/skills/iterative-retrieval/SKILL.md). Max 3 cycles per issue before escalating. Validate outputs against success criteria BEFORE closing an issue.
+TWO-PASS ISSUE SCANNING (Issue #1469): Use a two-pass pattern to minimize context token usage and API cost:
+
+PASS 1 — LIGHTWEIGHT SCAN (always):
+  Run: gh issue list --json number,title,labels,assignees --limit 200
+  Use this to triage all open issues. An issue is ACTIONABLE if ALL of the following are true:
+    - It has the `squad` label
+    - It does NOT have any of these labels: status:blocked, status:waiting-external, status:postponed, status:scheduled, status:needs-action, status:needs-decision, status:needs-review
+    - It does NOT have a `pending-user` label
+    - It does NOT have a `needs:*` label that this machine is missing (check ~/.squad/machine-capabilities.json)
+    - It is NOT already assigned to someone else
+  Issues that fail any of these checks are SKIPPED — do NOT hydrate them.
+
+PASS 2 — SELECTIVE HYDRATION (only for actionable issues):
+  For each issue that passed the Pass 1 filter, run: gh issue view <number> --json body,comments
+  Only fetch full details for these actionable issues. Never fetch body+comments for skipped issues.
+
+This two-pass approach saves context tokens by avoiding full hydration of blocked/waiting/non-actionable issues. Log: "[two-pass] Pass 1: N issues found, M actionable. Pass 2: hydrating M issues."
+
+ITERATIVE RETRIEVAL (Issue #1317):For every agent you spawn, include Task / WHY / Success criteria / Escalation path sections in the prompt (template above, full skill at .squad/skills/iterative-retrieval/SKILL.md). Max 3 cycles per issue before escalating. Validate outputs against success criteria BEFORE closing an issue.
 
 MULTI-MACHINE COORDINATION (Issue #346): Before spawning an agent for ANY issue, check if it's already assigned:
 1. Use `gh issue view <number> --json assignees` to check if issue is assigned
@@ -619,6 +637,16 @@ For every `needs:X` label on an issue, verify that `X` is in the capabilities ar
 This prevents wasted rounds on issues this machine cannot complete.
 
 IMPORTANT: Only send a Teams message if there are important changes that require my attention — such as new issues needing my decision, PRs ready for review or merged, CI failures, completed work I should know about, or items requiring user action. Do NOT send a Teams message for routine board status checks with no actionable changes.
+
+RETRO ENFORCEMENT (every Friday):
+1. On the first round after Friday 14:00 UTC (or the first round of any session if a Friday retro was missed):
+   - Check .squad/log/ for a file matching *retrospective* with a date from this Friday (or the most recent missed Friday)
+   - If NO retro file exists for this Friday: IMMEDIATELY run a retrospective before doing any other work
+   - The retro should: scan orchestration logs since last retro, check closed issues, review decisions, produce insights
+   - Write to .squad/log/{timestamp}-retrospective.md
+   - Post a Teams summary (CHANNEL: wins) with key findings
+2. How to detect missed retro: if today is Saturday-Thursday AND the most recent *retrospective* log file is older than 7 days, a retro was missed. Run it NOW.
+3. After the retro: create GitHub issues for each action item (not markdown tracking — it doesn't work, proven by 0/7 completion rate)
 '@
 
 # Initialize observability paths (per-repo to avoid collisions when running multiple ralphs)
@@ -1056,6 +1084,26 @@ function Test-MachineCapability {
     }
 }
 
+# Function to check if a Friday retro is overdue
+function Test-RetroOverdue {
+    $retroDir = Join-Path $env:USERPROFILE ".squad\log"
+    $retroFiles = Get-ChildItem -Path $retroDir -Filter "*retrospective*" -ErrorAction SilentlyContinue | 
+        Sort-Object LastWriteTime -Descending
+    
+    if (-not $retroFiles) {
+        return @{ Overdue = $true; Reason = "No retrospective files found" }
+    }
+    
+    $lastRetro = $retroFiles[0].LastWriteTime
+    $daysSinceRetro = ((Get-Date) - $lastRetro).TotalDays
+    
+    if ($daysSinceRetro -gt 7) {
+        return @{ Overdue = $true; Reason = "Last retro was $([math]::Floor($daysSinceRetro)) days ago ($($lastRetro.ToString('yyyy-MM-dd')))" }
+    }
+    
+    return @{ Overdue = $false; Reason = "Last retro: $($lastRetro.ToString('yyyy-MM-dd')) ($([math]::Floor($daysSinceRetro)) days ago)" }
+}
+
 # Function to update just the lastHeartbeat timestamp in heartbeat file
 function Update-HeartbeatTimestamp {
     if (-not (Test-Path $heartbeatFile)) { return }
@@ -1226,28 +1274,37 @@ function Get-StaleIssues {
     $staleIssues = @()
     
     try {
-        # Get all open issues with ralph:*:active labels
+        # TWO-PASS SCANNING (Issue #1469):
+        # Pass 1 — lightweight: fetch only number and labels (no body/comments)
         $issueJson = if (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue) {
-            Invoke-ApiWithRateLimit -ScriptBlock { gh issue list --json number,labels,comments --limit 100 2>$null } -Priority 1 -CallerName "ralph-stale-check"
+            Invoke-ApiWithRateLimit -ScriptBlock { gh issue list --json number,labels --limit 100 2>$null } -Priority 1 -CallerName "ralph-stale-check"
         } else {
-            gh issue list --json number,labels,comments --limit 100 2>$null
+            gh issue list --json number,labels --limit 100 2>$null
         }
         $issues = $issueJson | ConvertFrom-Json
-        
+
         foreach ($issue in $issues) {
             # Find ralph:*:active labels from other machines
             $ralphLabels = $issue.labels | Where-Object { $_.name -match '^ralph:(.+):active$' -and $Matches[1] -ne $MachineId }
-            
+
             if ($ralphLabels) {
+                # Pass 2 — selective hydration: only fetch comments for issues with active ralph labels
+                $issueDetailJson = if (Get-Command Invoke-ApiWithRateLimit -ErrorAction SilentlyContinue) {
+                    Invoke-ApiWithRateLimit -ScriptBlock { gh issue view $issue.number --json comments 2>$null } -Priority 1 -CallerName "ralph-stale-check-hydrate"
+                } else {
+                    gh issue view $issue.number --json comments 2>$null
+                }
+                $issueDetail = $issueDetailJson | ConvertFrom-Json
+
                 # Check last comment timestamp for heartbeat
                 $lastHeartbeat = $null
-                foreach ($comment in ($issue.comments | Sort-Object -Property createdAt -Descending)) {
+                foreach ($comment in ($issueDetail.comments | Sort-Object -Property createdAt -Descending)) {
                     if ($comment.body -match '💓 Heartbeat from \*\*(.+)\*\* at (.+)') {
                         $lastHeartbeat = [datetime]::Parse($Matches[2])
                         break
                     }
                 }
-                
+
                 if ($lastHeartbeat) {
                     $ageMinutes = ((Get-Date) - $lastHeartbeat).TotalMinutes
                     if ($ageMinutes -gt $StaleThresholdMinutes) {

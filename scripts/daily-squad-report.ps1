@@ -885,9 +885,8 @@ public class CredReaderReport
     }
 
     if (-not $gmailPassword) {
-        Write-Error "❌ No Gmail credentials found (key: squad-email-gmail)"
-        exit 1
-    }
+        Write-Warning "⚠ No Gmail credentials found (key: squad-email-gmail) — skipping email (report still generated and Teams notification sent)"
+    } else {
 
     $gmailUser = "tdsquadai@gmail.com"
     $secPass = ConvertTo-SecureString $gmailPassword -AsPlainText -Force
@@ -924,13 +923,9 @@ public class CredReaderReport
     }
 
     if (-not $sent) {
-        Write-Error "❌ All send attempts failed"
-        exit 1
+        Write-Warning "⚠ All email send attempts failed — but report was generated and Teams notification sent (treating as best-effort)"
     }
-} catch {
-    Write-Error "❌ Email send failed: $_"
-    exit 1
-}
+    }
 
 # ============================================================================
 # WRITE DEDUP MARKERS (after successful send)

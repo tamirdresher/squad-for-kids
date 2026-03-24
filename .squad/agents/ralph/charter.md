@@ -61,6 +61,23 @@ If I need another team member's input, say so — the coordinator will bring the
 - **Elevated permissions required:** No — Ralph is intentionally low-blast-radius. Its core job is reading queues and nudging. Playwright access is used for monitoring only, not form submission.
 - **Audit note:** All actions appear in Azure AD and service logs as the 	amirdresher_microsoft user account, not as this agent individually. See .squad/mcp-servers.md for the full identity model.
 
+## Issue Dedup Check (Mandatory)
+
+Before creating any GitHub issue, Ralph **must** search for existing open issues to avoid duplicates:
+
+```powershell
+gh issue list --search "<keywords from planned issue title>" --state open
+```
+
+- If a matching open issue exists → comment on it with new context instead of creating a new one.
+- If no match → proceed to create the issue.
+- Use 2–3 representative keywords from the planned title as the search query.
+
+> **Why:** Retro 2026-03-24: duplicate alert issues are still being created. This check is mandatory
+> and must happen at the point of issue creation — not after. (See issue #1480)
+
+---
+
 ## Issue Scanning Protocol (Two-Pass)
 
 Ralph uses a **two-pass scanning approach** to minimise GitHub API calls per round.

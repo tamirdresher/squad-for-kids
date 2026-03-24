@@ -94,6 +94,25 @@ If any item fails → do **not** accept. Spawn cycle N+1 (up to cycle 3) with sp
 
 ---
 
+## Issue Dedup Check (Mandatory)
+
+Before any agent creates a GitHub issue, it **must** search for existing open issues to avoid
+duplicates. This applies to Ralph, automated triggers, and all squad agents.
+
+```powershell
+# Check for existing open issues before creating a new one
+gh issue list --search "<keywords from your issue title>" --state open
+```
+
+- If an open issue already covers the same problem → **comment on it** instead of creating a new one.
+- If no duplicate → proceed to create the issue.
+- Use 2–3 representative keywords from the planned issue title as the search query.
+
+> **Why:** Retro 2026-03-24 identified duplicate alert issues being created by Ralph and agents.
+> Dedup check is now mandatory at the point of issue creation, not just in automated workflows.
+
+---
+
 ## Mandatory Output Requirement (Research-Then-Execute)
 
 Every research or analysis task completed under this protocol **MUST** end with at least one
@@ -116,6 +135,7 @@ If no action is warranted, the agent must explicitly state why and get coordinat
 - **Cycle 4+** — if 3 cycles haven't converged, the problem is in the requirements, not the agent.
 - **Vague success criteria** — "looks good" is not a criterion. Use checkboxes.
 - **Forwarding WHAT without delta** — cycle 2+ prompts must include what cycle 1 got wrong.
+- **Creating issues without dedup check** — always search before creating. See Issue Dedup Check above.
 - **Research without action** — delivering analysis with no issue, PR, decision, or assignee is incomplete work.
 
 ---

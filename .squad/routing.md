@@ -178,6 +178,7 @@ conventions, loop-back rules, and invocation shortcuts.
 8. **@copilot routing** — when evaluating issues, check @copilot's capability profile in `team.md`. Route 🟢 good-fit tasks to `squad:copilot`. Flag 🟡 needs-review tasks for PR review. Keep 🔴 not-suitable tasks with squad members.
 9. **Always use git worktrees for branch work.** Never `git checkout` or `git switch` in the main working directory. All branch-based work MUST use `git worktree add` to create an isolated worktree. This prevents conflicts when multiple agents or sessions work in parallel on different branches.
 10. **Publish to Wiki after knowledge-producing work.** When an agent completes research, a major decision, a security audit, or produces reusable findings, the agent MUST publish a summary to the GitHub Wiki using the `wiki-write` skill (`.squad/skills/wiki-write/SKILL.md`). This is not optional — the wiki is the Squad's durable read layer. If in doubt, publish.
+11. **Dedup check before creating any GitHub issue.** All agents and automated workflows MUST run `gh issue list --search "<keywords>" --state open` before creating a new issue. If a matching open issue exists, comment on it instead. See `.squad/skills/iterative-retrieval/SKILL.md` for the full protocol.
 
 ## Git Worktree Convention (Mandatory)
 

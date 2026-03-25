@@ -9,12 +9,9 @@ on:
     - cron: '0 5 * * 0'
   workflow_dispatch:
 
-env:
-  PLACEHOLDER: 'true'
-
 jobs:
   track-new-issue:
-    if: env.PLACEHOLDER != 'true'
+    if: false  # Placeholder — enable after configuring GitHub Project board IDs
     runs-on: ubuntu-latest
     permissions:
       issues: read
@@ -28,7 +25,7 @@ jobs:
           # gh project item-add $PROJECT_NUMBER --owner $PROJECT_OWNER --url ${{ github.event.issue.html_url }}
 
   sync-on-close:
-    if: env.PLACEHOLDER != 'true'
+    if: false  # Placeholder — enable after configuring GitHub Project board IDs
     runs-on: ubuntu-latest
     permissions:
       issues: read
@@ -42,7 +39,7 @@ jobs:
           # gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $DONE_OPTION_ID
 
   reconcile-board:
-    if: env.PLACEHOLDER != 'true'
+    if: false  # Placeholder — enable after configuring GitHub Project board IDs
     runs-on: ubuntu-latest
     permissions:
       issues: read

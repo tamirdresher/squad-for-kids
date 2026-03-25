@@ -985,6 +985,14 @@
         <h2 class="section-title">📺 Demo Videos</h2>
         <p class="demo-subtitle" style="margin-bottom: 24px;">Real 1080p recordings from actual Codespace sessions</p>
 
+        <div class="gallery-tabs">
+            <button class="gallery-tab active" onclick="switchGallery('real')">🎬 Real Recordings</button>
+            <button class="gallery-tab" onclick="switchGallery('quick')">⚡ Quick Videos</button>
+            <button class="gallery-tab" onclick="switchGallery('full')">🎥 Full Demos</button>
+            <button class="gallery-tab" onclick="switchGallery('audience')">👥 For Audiences</button>
+            <button class="gallery-tab" onclick="switchGallery('features')">✨ Features</button>
+        </div>
+
         <div id="gallery-real" class="gallery-panel active">
             <div class="video-grid">
                 <div class="video-card">
@@ -994,6 +1002,98 @@
                 <div class="video-card">
                     <video controls preload="metadata"><source src="../demo-frozen-en.mp4" type="video/mp4"></video>
                     <div class="video-card-label">🟣 Emma (8) learns winter vocabulary with Frozen</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-quick" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Squad in 55 seconds</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... 30-second teaser</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-full" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Full English demo</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Detailed tutorial</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-audience" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... For teachers</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... For developers</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... For parents</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-features" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Homework helper</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Gamification</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Exam prep</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Parent reports</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">Coming Soon... Safety</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1004,6 +1004,14 @@
         <h2 class="section-title">📺 סרטוני הדגמה</h2>
         <p class="demo-subtitle" style="margin-bottom: 24px;">הקלטות אמיתיות באיכות 1080p מתוך סביבת Codespace</p>
 
+        <div class="gallery-tabs">
+            <button class="gallery-tab active" onclick="switchGallery('real')">🎬 הקלטות אמיתיות</button>
+            <button class="gallery-tab" onclick="switchGallery('quick')">⚡ סרטונים קצרים</button>
+            <button class="gallery-tab" onclick="switchGallery('full')">🎥 הדגמות מלאות</button>
+            <button class="gallery-tab" onclick="switchGallery('audience')">👥 לקהלים שונים</button>
+            <button class="gallery-tab" onclick="switchGallery('features')">✨ פיצ'רים</button>
+        </div>
+
         <div id="gallery-real" class="gallery-panel active">
             <div class="video-grid">
                 <div class="video-card">
@@ -1013,6 +1021,98 @@
                 <div class="video-card">
                     <video controls preload="metadata"><source src="demo-frozen-he.mp4" type="video/mp4"></video>
                     <div class="video-card-label">🟣 נועה (8) לומדת מילים באנגלית עם פרוזן</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-quick" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... סקוואד ב-55 שניות</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... טיזר 30 שניות</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-full" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... הדגמה מלאה בעברית</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... מדריך מפורט</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-audience" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... למורים</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... למפתחים</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... להורים</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gallery-features" class="gallery-panel">
+            <div class="video-grid">
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... עוזר שיעורי בית</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... גיימיפיקציה</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... הכנה למבחנים</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... דוח להורים</div>
+                    </div>
+                </div>
+                <div class="video-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:#f0f0f0;border-radius:12px;">
+                    <div style="text-align:center;color:#666;">
+                        <div style="font-size:48px;">🎬</div>
+                        <div style="font-size:16px;margin-top:8px;">בקרוב... בטיחות</div>
+                    </div>
                 </div>
             </div>
         </div>

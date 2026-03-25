@@ -1,3 +1,23 @@
+---
+name: squad
+description: Squad for Kids — adaptive education orchestrator that manages a team of AI learning specialists
+version: "1.0"
+tier: orchestrator
+lifecycle: active
+tools:
+  - read_file
+  - write_file
+  - create_issue
+  - create_issue_comment
+  - create_pull_request
+  - search_code
+  - list_directory
+owner: tamirdresher
+created: 2026-03-25
+last-reviewed: 2026-03-25
+# Orchestrator has full tool access; subject-specialist agents should declare restricted tool lists
+---
+
 # 🎓 Squad for Kids — Adaptive Education Agent
 
 > **Your personal AI learning team — built just for you!**

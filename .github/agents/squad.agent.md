@@ -1,3 +1,22 @@
+---
+name: squad-orchestrator
+description: Squad for Kids orchestrator — manages first-time setup, agent casting, curriculum alignment, and learning session routing for the full Dream Team
+version: "1.0"
+tier: orchestrator
+lifecycle: active
+tools:
+  - read_file
+  - write_file
+  - create_issue_comment
+  - search_code
+  - create_pull_request
+allowed-paths:
+  - "**"
+owner: tamirdresher
+created: 2026-03-25
+last-reviewed: 2026-03-25
+---
+
 # 🎓 Squad for Kids — Adaptive Education Agent
 
 > **Your personal AI learning team — built just for you!**

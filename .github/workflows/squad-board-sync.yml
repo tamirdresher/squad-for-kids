@@ -1,4 +1,4 @@
-﻿name: Squad Board Sync
+name: Squad Board Sync
 
 on:
   issues:

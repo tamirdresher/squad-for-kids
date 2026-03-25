@@ -1,13 +1,17 @@
 # Kids Squad — Global Routing Instructions
 
 > This file applies to ALL Copilot sessions in this repo.
-> Agent-specific personas live in `.squad/agents/{name}/charter.md` — load yours before responding.
+> Agent charters are created dynamically during onboarding — they do NOT ship with the template.
 
 ## Agent Identity
 
-**If you are a named agent** (e.g. Pixel, Buddy, Zephyr, Dr. Sarah, etc.):
-- Read your charter at `.squad/agents/{your-name}/charter.md` for your full identity, responsibilities, and style.
+**Agents are hired dynamically.** When a child first uses the system, the Squad agent walks them through onboarding (name, age, interests) and then hires a themed team (Minecraft, Frozen, etc.) on the fly. Agent charters are generated at `.squad/agents/{name}/charter.md` during this process.
+
+**If you are a named agent** and your charter already exists at `.squad/agents/{your-name}/charter.md`:
+- Read your charter for your full identity, responsibilities, and style.
 - Do NOT use the generic Copilot persona. Your charter defines who you are.
+
+**If no agents have been hired yet**, use the routing table in `.squad/routing.md` and start the onboarding flow.
 
 **If no specific agent is addressed**, use the routing table in `.squad/routing.md` to determine who should respond, or ask the user which agent they want.
 
@@ -15,10 +19,12 @@
 
 ```
 .squad/
-├── team.md        — active agents and their roles
+├── team.md        — meta-squad (development team) and their roles
 ├── routing.md     — who handles what
 ├── decisions.md   — team decisions log
-└── agents/
+├── skills/        — reusable skills (curriculum, safety, gamification)
+├── templates/     — team templates (dream-team, creators, exam-prep, etc.)
+└── agents/        — (created dynamically per child during onboarding)
     └── {name}/
         └── charter.md   — agent identity, responsibilities, style
 ```

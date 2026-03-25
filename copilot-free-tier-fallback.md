@@ -10,7 +10,7 @@
 - 🔗 [chat.openai.com](https://chat.openai.com)
 - 📝 נרשמים עם חשבון Google
 - 🇮🇱 תומך בעברית!
-- 💡 **טיפ:** תעתיק את ה-prompt מ-`.squad/agents/` שלך — ה-AI ידע איך לעזור כמו הצוות!
+- 💡 **טיפ:** תשתמש בתבניות מ-`.squad/templates/` — ה-AI ידע איך ליצור צוות מותאם אישית!
 
 ### 2. Google Gemini
 - 🔗 [gemini.google.com](https://gemini.google.com)

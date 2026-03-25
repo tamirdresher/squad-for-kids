@@ -32,7 +32,7 @@ Squad for Kids is a **squad-skills plugin** that provides AI learning teams for 
 - Squad for Kids extends Squad framework via **skills** directory
 - Core safety features in `skills/kids-safety/`
 - Age-specific templates in `skills/kids-templates/`
-- Integration with existing Squad agent charters in `.squad/agents/`
+- Agent charters in `.squad/agents/` are **created dynamically** during onboarding — they do not ship with the template
 
 ---
 
@@ -61,10 +61,10 @@ squad-for-kids/
 │       ├── badges.ts          # Achievement system
 │       └── streak-tracker.ts  # Daily engagement rewards
 ├── .squad/
-│   ├── agents/                # Kid-facing agent charters
-│   │   ├── gamer/             # Pixel - game integration & gamification
-│   │   ├── youtuber/          # Zephyr - video content & learning media
-│   │   └── study-buddy/       # Buddy - homework help & encouragement
+│   ├── agents/                # Created dynamically per child during onboarding
+│   │   └── (hired based on child's interests — Minecraft, Frozen, etc.)
+│   ├── skills/                # Reusable skills (curriculum, safety, gamification)
+│   ├── templates/             # Team templates (dream-team, creators, exam-prep)
 │   └── team.md                # Meta-squad (Maria, Ken, Sal, Dr. Sarah, etc.)
 └── config/
     ├── age-groups.json        # Language complexity, content rules per age

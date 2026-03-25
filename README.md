@@ -29,7 +29,7 @@ It's like having a personal school — with the patience of a saint, the creativ
 2. 🎂 **Enter your grade** — maps to the right curriculum automatically
 3. 🏙️ **Share your city** — auto-detects country, curriculum system, and language
 4. 📚 **Curriculum loads** — US Common Core, UK National, Israeli Bagrut, and more
-5. 🎬 **Pick your universe** — agents become characters from your child's favorite show/game!
+5. 🎬 **Pick your universe** — agents are **hired dynamically** as characters from your child's favorite show/game!
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -281,6 +281,8 @@ When new features, templates, or curriculum content are added to the original re
 ---
 
 ## 🧠 System Architecture
+
+> **Note:** The `.squad/agents/` directory does not exist in the template. Agents are **hired dynamically** during onboarding based on the child's name, age, and interests. The Squad agent generates themed charters (Minecraft, Frozen, etc.) on the fly.
 
 | File | Purpose |
 |------|---------|

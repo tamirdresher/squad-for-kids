@@ -1,11 +1,11 @@
 {
-  "name": "Yoav",
-  "birthDate": "2018-03-12",
+  "name": "Demo Kid",
+  "birthDate": "2018-01-01",
   "age": 7,
   "grade": 2,
   "school": null,
   "location": {
-    "city": "Rishon LeZion",
+    "city": "Example City",
     "country": "IL",
     "state": null
   },

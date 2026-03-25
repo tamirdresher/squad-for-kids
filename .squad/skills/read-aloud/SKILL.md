@@ -92,8 +92,4 @@ Lesson Markdown → Strip formatting → Age-appropriate simplification →
 
 ## Upstream Reference
 
-Adapted from:
-- `tamresearch1/.squad/skills/tts-conversion/SKILL.md` — edge-tts integration, voice selection
-- `tamresearch1/scripts/podcaster-prototype.py` — single-voice TTS pipeline
-- `tamresearch1/scripts/podcaster-conversational.py` — two-voice dialogue generation
-- `tamresearch1/scripts/podcaster.ps1` — orchestration and MP3 output
+Adapted from the production squad's TTS conversion skill, edge-tts integration, and podcaster pipeline. See the squad framework documentation for architecture details.

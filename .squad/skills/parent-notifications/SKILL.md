@@ -85,7 +85,4 @@ Parents can email the squad with these keywords in the subject:
 
 ## Upstream Reference
 
-Adapted from:
-- `tamresearch1/scripts/squad-email/` — email routing, SMTP/Graph API integration
-- `tamresearch1/.squad/email-pipeline/` — family email guide, keyword-based actions
-- `tamresearch1/.squad/kids-directives/procedures.md` — RP-002 Weekly Parent Report pattern
+Adapted from the production squad's internal email pipeline and family email routing system. See the squad framework documentation for architecture details.

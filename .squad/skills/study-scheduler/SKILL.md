@@ -83,7 +83,4 @@ exams:
 
 ## Upstream Reference
 
-Adapted from:
-- `tamresearch1/.squad/skills/kids-study-assistant/` — exam schedule parsing, daily plan generation
-- `tamresearch1/.squad/implementations/squad-scheduler-design.md` — cron triggers, provider model
-- `tamresearch1/scripts/kids-study/` — PowerShell implementation of study plan generation
+Adapted from the production squad's study assistant skill, scheduler design, and study plan generation scripts. See the squad framework documentation for architecture details.

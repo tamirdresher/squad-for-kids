@@ -103,7 +103,7 @@ telegram:
 
 1. Navigate to the scripts directory:
    ```powershell
-   cd C:\temp\tamresearch1\scripts\kids-study
+   cd kids-study
    ```
 
 2. Edit `schedule.yaml` with your exam data:
@@ -240,7 +240,7 @@ Run daily at 7:00 AM:
 
 ```powershell
 $action = New-ScheduledTaskAction -Execute "pwsh.exe" `
-    -Argument "-File C:\temp\tamresearch1\scripts\kids-study\Start-DailyStudyRoutine.ps1"
+    -Argument "-File kids-study\Start-DailyStudyRoutine.ps1"
 
 $trigger = New-ScheduledTaskTrigger -Daily -At 7:00AM
 
@@ -263,7 +263,7 @@ Then run with `-PostToTeams` flag.
 Post to issue using `gh` CLI:
 
 ```powershell
-$planPath = "C:\temp\tamresearch1\scripts\kids-study\daily-plan.md"
+$planPath = "kids-study\daily-plan.md"
 gh issue comment 512 --body-file $planPath
 ```
 
@@ -349,7 +349,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 ## 📝 License
 
-Part of tamresearch1 project. For personal/family use.
+Part of the Squad for Kids project. See [LICENSE](../LICENSE) for details.
 
 ---
 

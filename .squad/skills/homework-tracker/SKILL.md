@@ -125,8 +125,4 @@ When a child starts a session, they see:
 
 ## Upstream Reference
 
-Adapted from:
-- `tamresearch1/ralph-watch.ps1` — persistent monitoring pattern, heartbeat, single-instance guard
-- `tamresearch1/.squad/kids-directives/tasks.md` — task assignment and status tracking format
-- `tamresearch1/.squad/kids-directives/procedures.md` — RP-003 Homework Reminder pattern
-- `tamresearch1/.squad/monitoring/` — structured logging, failure escalation
+Adapted from the production squad's persistent monitoring pattern, task tracking format, and homework reminder procedures. See the squad framework documentation for architecture details.

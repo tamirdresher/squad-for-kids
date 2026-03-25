@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+*.mp4
+*.webm
+*.mp3
+*.wav

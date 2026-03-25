@@ -6,7 +6,7 @@ Built production-ready PowerShell 7 scripts that **actually work** for exam sche
 
 ## 📁 Location
 
-All scripts are at: `C:\temp\tamresearch1\scripts\kids-study\`
+All scripts are in the `kids-study/` directory of this repository.
 
 ## 🚀 Quick Start
 
@@ -31,7 +31,7 @@ students:
 ### 2. Run the Daily Routine
 
 ```powershell
-cd C:\temp\tamresearch1\scripts\kids-study
+cd kids-study
 .\Start-DailyStudyRoutine.ps1
 ```
 
@@ -68,7 +68,7 @@ Run automatically every morning at 7:00 AM:
 
 ```powershell
 $action = New-ScheduledTaskAction -Execute "pwsh.exe" `
-    -Argument "-File C:\temp\tamresearch1\scripts\kids-study\Start-DailyStudyRoutine.ps1"
+    -Argument "-File kids-study\Start-DailyStudyRoutine.ps1"
 
 $trigger = New-ScheduledTaskTrigger -Daily -At 7:00AM
 
@@ -79,7 +79,7 @@ Register-ScheduledTask -TaskName "KidsStudyAssistant" `
 ### Post to GitHub
 
 ```powershell
-gh issue comment 512 --body-file "C:\temp\tamresearch1\scripts\kids-study\daily-plan.md"
+gh issue comment 512 --body-file "kids-study\daily-plan.md"
 ```
 
 ### Post to Teams
@@ -129,7 +129,7 @@ All scripts tested successfully:
 
 ## 📚 Documentation
 
-Full documentation at: `C:\temp\tamresearch1\scripts\kids-study\README.md`
+Full documentation at: `kids-study/README.md`
 
 Squad skill definition: `.squad/skills/kids-study-assistant/SKILL.md`
 

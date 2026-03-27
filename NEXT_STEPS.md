@@ -1,6 +1,6 @@
 # Squad for Kids — Next Steps & Approval Request
 
-**Prepared for:** Tamir Dresher  
+**Prepared for:** tdsquadAI Team  
 **Prepared by:** Picard (Lead)  
 **Date:** 2026-03-20  
 **Context:** Issue #723 architectural planning
@@ -260,3 +260,4 @@ If you don't want to invest 8 weeks, let's scope it down to a proof-of-concept o
 1. Approve/Reject Phase 1
 2. Answers to open questions
 3. Issue assignment (if approved)
+

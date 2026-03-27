@@ -22,7 +22,7 @@
 
 ```
 ┌──────────────────────────────┐
-│  tamirdresher/squad-for-kids │  ← Original repo (curriculum, features, templates)
+│  tdsquadAI/squad-for-kids │  ← Original repo (curriculum, features, templates)
 │  (upstream)                  │
 └──────────┬───────────────────┘
            │ Fork
@@ -40,7 +40,7 @@
 
 **Key concepts:**
 - 🍴 **Fork** = Your own copy of the repo. Changes you make here don't affect the original.
-- 🔄 **Upstream** = The original `tamirdresher/squad-for-kids` repo. You can pull updates from it.
+- 🔄 **Upstream** = The original `tdsquadAI/squad-for-kids` repo. You can pull updates from it.
 - 📝 **Commits** = Every learning session creates a record in your fork's git history.
 
 ---
@@ -54,7 +54,7 @@
 
 ### 1. Fork the Repository
 
-1. Go to [github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
+1. Go to [github.com/tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids)
 2. Click the **"Fork"** button (top-right corner, next to ⭐ Star)
    > 📸 *The Fork button looks like a branching arrow. It's between Watch and Star.*
 3. On the "Create a new fork" page:
@@ -70,10 +70,10 @@ Look at the top-left of the page. It should say:
 
 ```
 YOUR-USERNAME / squad-for-kids
-forked from tamirdresher/squad-for-kids
+forked from tdsquadAI/squad-for-kids
 ```
 
-⚠️ **Common mistake:** Make sure you're NOT on `tamirdresher/squad-for-kids`. If you create a Codespace on the original repo, your child's progress won't be saved to your account.
+⚠️ **Common mistake:** Make sure you're NOT on `tdsquadAI/squad-for-kids`. If you create a Codespace on the original repo, your child's progress won't be saved to your account.
 
 ### 3. Create a Codespace
 
@@ -172,7 +172,7 @@ When we add new features, templates, or curriculum content to the original repo,
 ### Automatic (GitHub UI)
 
 1. Go to your fork on GitHub
-2. Look for the banner: **"This branch is X commits behind tamirdresher:main"**
+2. Look for the banner: **"This branch is X commits behind tdsquadAI:main"**
 3. Click **"Sync fork"**
 4. Click **"Update branch"**
 
@@ -184,7 +184,7 @@ If you prefer the terminal (or if there are merge conflicts):
 
 ```bash
 # Add the upstream remote (one-time setup)
-git remote add upstream https://github.com/tamirdresher/squad-for-kids.git
+git remote add upstream https://github.com/tdsquadAI/squad-for-kids.git
 
 # Fetch and merge updates
 git fetch upstream
@@ -364,8 +364,8 @@ This is rare but can happen. The safest approach:
 ## Need Help?
 
 - 📖 [README](../README.md) — Project overview
-- 🐛 [Open an issue](https://github.com/tamirdresher/squad-for-kids/issues) — Report problems
-- 💬 [Discussions](https://github.com/tamirdresher/squad-for-kids/discussions) — Ask questions
+- 🐛 [Open an issue](https://github.com/tdsquadAI/squad-for-kids/issues) — Report problems
+- 💬 [Discussions](https://github.com/tdsquadAI/squad-for-kids/discussions) — Ask questions
 
 ---
 

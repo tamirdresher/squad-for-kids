@@ -153,7 +153,7 @@ Add section title cards between scenes using OBS text sources or video editor:
 - [ ] Trim dead time at start/end
 - [ ] Add section title overlays
 - [ ] Add intro card: "Squad for Kids — [5/10]-Minute Demo"
-- [ ] Add outro card: "github.com/tamirdresher/squad-for-kids"
+- [ ] Add outro card: "github.com/tdsquadAI/squad-for-kids"
 - [ ] Export at 1080p, H.264, 30fps
 - [ ] File naming: `squad-for-kids-demo-5min.mp4` / `squad-for-kids-demo-10min.mp4`
 

@@ -6,7 +6,7 @@
 
 ## Decision
 
-All development work for Squad for Kids happens in the **private staging repo** (`tamirdresher/squad-for-kids-staging`). The public repo (`tamirdresher/squad-for-kids`) is the **release target** — only reviewed, approved changes get pushed there.
+All development work for Squad for Kids happens in the **private staging repo** (`tdsquadAI/squad-for-kids-staging`). The public repo (`tdsquadAI/squad-for-kids`) is the **release target** — only reviewed, approved changes get pushed there.
 
 ## Workflow
 
@@ -19,8 +19,8 @@ All development work for Squad for Kids happens in the **private staging repo** 
 
 ```bash
 git remote -v
-# origin  = https://github.com/tamirdresher/squad-for-kids-staging.git (private, work here)
-# public  = https://github.com/tamirdresher/squad-for-kids.git (public, push after review)
+# origin  = https://github.com/tdsquadAI/squad-for-kids-staging.git (private, work here)
+# public  = https://github.com/tdsquadAI/squad-for-kids.git (public, push after review)
 ```
 
 ## Push to Public Checklist

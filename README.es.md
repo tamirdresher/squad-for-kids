@@ -122,7 +122,7 @@ Recordatorios automáticos de sesiones de estudio, seguimiento de tareas y progr
 ### Paso 1: Obtener el Equipo
 
 ```bash
-git clone https://github.com/tamirdresher/squad-for-kids.git
+git clone https://github.com/tdsquadAI/squad-for-kids.git
 cd squad-for-kids
 ```
 

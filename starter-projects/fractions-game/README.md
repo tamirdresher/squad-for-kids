@@ -41,4 +41,4 @@ starter-projects/fractions-game/index.html
 
 ---
 
-*נבנה עם ❤️ ב-Squad for Kids — [tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)*
+*נבנה עם ❤️ ב-Squad for Kids — [tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids)*

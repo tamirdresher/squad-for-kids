@@ -205,7 +205,7 @@
 
 ### שלב 1: עשו Fork לריפו 🍴
 
-1. היכנסו ל-[github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
+1. היכנסו ל-[github.com/tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids)
 2. לחצו על כפתור **"Fork"** בפינה הימנית העליונה
    <!-- צילום מסך: כפתור Fork נמצא ליד Star ו-Watch, בפינה הימנית העליונה של דף הריפו -->
 3. בדף "Create a new fork" השאירו את ברירות המחדל ולחצו **"Create fork"**
@@ -215,7 +215,7 @@
 
 ### שלב 2: פתחו את הFork שלכם ⚠️
 
-5. ודאו שאתם על **הFork שלכם** (בדקו את הכתובת — צריך להיות כתוב `שם-המשתמש-שלכם/squad-for-kids`, לא `tamirdresher/squad-for-kids`)
+5. ודאו שאתם על **הFork שלכם** (בדקו את הכתובת — צריך להיות כתוב `שם-המשתמש-שלכם/squad-for-kids`, לא `tdsquadAI/squad-for-kids`)
 6. 🖥️ **חשוב:** יש לפתוח ממחשב נייד או נייח — לא מטלפון או טאבלט
 
 ### שלב 3: צרו Codespace 🚀
@@ -242,12 +242,12 @@
 
 **Windows:** פתחו PowerShell והריצו:
 ```powershell
-irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1 | iex
+irm https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.ps1 | iex
 ```
 
 **macOS/Linux:** פתחו Terminal והריצו:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.sh | bash
 ```
 
 האשף בודק דרישות מוקדמות, מתקין כלים חסרים, מגדיר את הפרופיל של הילד, ומכין הכל — עם הנחיות ידידותיות בעברית ובאנגלית. לא צריך ידע טכני!
@@ -275,7 +275,7 @@ curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/se
 
 כשמתווספות תכונות, תבניות או תכני לימוד חדשים לריפו המקורי, תוכלו לסנכרן אותם לFork שלכם:
 
-1. בדף הFork שלכם ב-GitHub, תראו באנר: **"This branch is X commits behind tamirdresher:main"**
+1. בדף הFork שלכם ב-GitHub, תראו באנר: **"This branch is X commits behind tdsquadAI:main"**
 2. לחצו על **"Sync fork"** → **"Update branch"**
 3. המידע האישי של הילד (פרופיל, דוחות) בטוח — רק תכנית הלימודים והתכונות מתעדכנות!
 

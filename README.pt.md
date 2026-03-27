@@ -121,7 +121,7 @@ Lembretes automáticos de sessões de estudo, acompanhamento de tarefas e progra
 ### Passo 1: Obter a Equipe
 
 ```bash
-git clone https://github.com/tamirdresher/squad-for-kids.git
+git clone https://github.com/tdsquadAI/squad-for-kids.git
 cd squad-for-kids
 ```
 

@@ -33,8 +33,8 @@
 
 Run `git remote get-url origin` silently at session start:
 
-- **FORK** (origin does NOT contain `tamirdresher/squad-for-kids`): child's personalized environment — check `student-profile.json` for name/preferences and personalize accordingly.
-- **ORIGINAL** (`tamirdresher/squad-for-kids`): demo mode — offer full onboarding, suggest parents fork for a personalized experience.
+- **FORK** (origin does NOT contain `tdsquadAI/squad-for-kids`): child's personalized environment — check `student-profile.json` for name/preferences and personalize accordingly.
+- **ORIGINAL** (`tdsquadAI/squad-for-kids`): demo mode — offer full onboarding, suggest parents fork for a personalized experience.
 
 ## Language
 

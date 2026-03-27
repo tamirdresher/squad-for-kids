@@ -311,8 +311,8 @@ GitHub Copilot לא משתמש בקוד או בשיחות שלכם לאימון 
 
 - 📖 [מדריך להורים](../parent-guide-he.md) — מדריך מלא להורים
 - 📖 [README](../../README.he.md) — סקירה כללית של הפרויקט
-- 🐛 [פתחו issue](https://github.com/tamirdresher/squad-for-kids/issues) — דווחו על בעיות
-- 💬 [דיונים](https://github.com/tamirdresher/squad-for-kids/discussions) — שאלו שאלות
+- 🐛 [פתחו issue](https://github.com/tdsquadAI/squad-for-kids/issues) — דווחו על בעיות
+- 💬 [דיונים](https://github.com/tdsquadAI/squad-for-kids/discussions) — שאלו שאלות
 
 ---
 

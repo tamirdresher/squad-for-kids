@@ -1,6 +1,6 @@
 # Agent Identity Design for Squad for Kids
 
-> **Issue:** [#30 - Agent Identity: Foundry Model + Tool Frontmatter Restrictions](https://github.com/tamirdresher/squad-for-kids/issues/30)
+> **Issue:** [#30 - Agent Identity: Foundry Model + Tool Frontmatter Restrictions](https://github.com/tdsquadAI/squad-for-kids/issues/30)
 > **Author:** Seven (Research and Docs)
 > **Date:** 2026-03-25
 > **Status:** Draft - ready for team review
@@ -241,4 +241,4 @@ required-reviewer: true
 - [Azure AI Foundry - Agent Identity](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-identity)
 - [GitHub Copilot - About Custom Agents](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
 - [GitHub Copilot - Creating Custom Agents](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents)
-- [Issue #30](https://github.com/tamirdresher/squad-for-kids/issues/30)
+- [Issue #30](https://github.com/tdsquadAI/squad-for-kids/issues/30)

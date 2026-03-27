@@ -36,7 +36,7 @@
     --start-maximized
 
 # 3. Log into GitHub in the browser
-# 4. Navigate to https://github.com/tamirdresher/squad-for-kids
+# 4. Navigate to https://github.com/tdsquadAI/squad-for-kids
 ```
 
 ### Profile Setup
@@ -55,7 +55,7 @@ No student profile needed — this video shows the initial fork/setup before any
 
 ### Scene 1: The Repo Page [0:00–0:30]
 
-**Screen:** Browser showing `github.com/tamirdresher/squad-for-kids`
+**Screen:** Browser showing `github.com/tdsquadAI/squad-for-kids`
 
 **Narration (EN):**
 > "Every child deserves a personal learning team. Let me show you how to set one up in under two minutes. Start at the Squad for Kids repository on GitHub."

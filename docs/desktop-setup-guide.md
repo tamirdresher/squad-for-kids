@@ -142,7 +142,7 @@ When you "fork" a project on GitHub, you get your own copy. Your child's progres
 
 Open this link in your browser:
 
-👉 **[github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)**
+👉 **[github.com/tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids)**
 
 <!-- Screenshot: The Squad for Kids repository main page showing the README with colorful badges -->
 
@@ -171,10 +171,10 @@ After a few seconds, you'll be redirected to your new fork. Look at the top-left
 
 ```
 YOUR-USERNAME / squad-for-kids
-forked from tamirdresher/squad-for-kids
+forked from tdsquadAI/squad-for-kids
 ```
 
-<!-- Screenshot: The fork page showing "forked from tamirdresher/squad-for-kids" text -->
+<!-- Screenshot: The fork page showing "forked from tdsquadAI/squad-for-kids" text -->
 
 > ⚠️ **Double-check:** Make sure it says YOUR username, not `tamirdresher`. If it says `tamirdresher`, you're looking at the original — go back and fork it!
 
@@ -221,7 +221,7 @@ If asked to confirm, type **`Y`** and press **Enter**.
 Copy and paste this entire command into PowerShell, then press **Enter**:
 
 ```powershell
-irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1 | iex
+irm https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.ps1 | iex
 ```
 
 <!-- Screenshot: PowerShell window with the setup command pasted and ready to run -->
@@ -280,7 +280,7 @@ You can open Terminal in two ways:
 Copy and paste this command into Terminal, then press **Enter**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.sh | bash
 ```
 
 <!-- Screenshot: macOS Terminal with the setup command pasted -->
@@ -316,7 +316,7 @@ Or find **Terminal** in your Applications menu.
 Copy and paste this command into Terminal, then press **Enter**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.sh | bash
 ```
 
 #### 3.3 — Enter Your Password (If Asked)
@@ -645,7 +645,7 @@ New lessons, features, and improvements are added regularly. Here's how to get t
 
 **Option A — From GitHub (easiest):**
 1. Go to your fork on GitHub (`github.com/YOUR-USERNAME/squad-for-kids`)
-2. You'll see a banner saying **"This branch is X commits behind tamirdresher:main"**
+2. You'll see a banner saying **"This branch is X commits behind tdsquadAI:main"**
 3. Click **"Sync fork"** → **"Update branch"**
 4. On your computer, open a terminal in the project folder and run:
    ```bash
@@ -660,7 +660,7 @@ git merge upstream/main
 
 > 💡 **Don't have `upstream` set up?** Run this first:
 > ```bash
-> git remote add upstream https://github.com/tamirdresher/squad-for-kids.git
+> git remote add upstream https://github.com/tdsquadAI/squad-for-kids.git
 > ```
 
 ---
@@ -714,7 +714,7 @@ Not directly — VS Code needs a desktop computer for the full experience. **How
 **Yes!** Each child should have their own fork. Here's how:
 
 1. Create a second GitHub account (or use GitHub Organizations)
-2. Fork `tamirdresher/squad-for-kids` from that account
+2. Fork `tdsquadAI/squad-for-kids` from that account
 3. Each child gets their own personalized Squad, progress tracking, and learning path
 
 > 💡 See the [Parent Guide](parent-guide.md) for detailed multi-child instructions.
@@ -795,7 +795,7 @@ The Squad asks about your child's country and grade during onboarding and adapts
 If you want a completely fresh start:
 
 1. Delete your fork on GitHub (Settings → Danger Zone → Delete this repository)
-2. Re-fork from `tamirdresher/squad-for-kids`
+2. Re-fork from `tdsquadAI/squad-for-kids`
 3. Delete the local folder and re-clone
 
 Or, for a lighter reset — just delete `student-profile.json` and the `.squad/reports/` folder. The Squad will re-onboard your child on the next session.
@@ -811,7 +811,7 @@ Your child now has their very own AI learning team. Here's what to remember:
 | 🔄 **Update regularly** | Sync your fork to get new lessons and features |
 | 📊 **Check reports** | Browse `.squad/reports/` to see weekly progress |
 | 💬 **Encourage exploration** | The Squad adapts — the more your child asks, the better it gets |
-| 🆘 **Need help?** | Open an issue at [github.com/tamirdresher/squad-for-kids/issues](https://github.com/tamirdresher/squad-for-kids/issues) |
+| 🆘 **Need help?** | Open an issue at [github.com/tdsquadAI/squad-for-kids/issues](https://github.com/tdsquadAI/squad-for-kids/issues) |
 
 > 💛 **Thank you for investing in your child's education.** You're giving them a superpower — a personal team of AI teachers that meets them exactly where they are. That's pretty amazing.
 

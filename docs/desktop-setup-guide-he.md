@@ -88,7 +88,7 @@ GitHub הוא אתר שבו מפתחים שומרים קוד — וגם המקו
 
 1. **היכנסו ל-GitHub** — ודאו שאתם מחוברים לחשבון שלכם
 
-2. **לכו לריפו המקורי:** [github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
+2. **לכו לריפו המקורי:** [github.com/tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids)
 
 3. **לחצו על כפתור "Fork"** 🍴
    > 📍 הכפתור נמצא בפינה הימנית העליונה של הדף, ליד כפתורי ⭐ Star ו-👁️ Watch.
@@ -108,10 +108,10 @@ GitHub הוא אתר שבו מפתחים שומרים קוד — וגם המקו
 
 ```
 שם-המשתמש-שלכם / squad-for-kids
-forked from tamirdresher/squad-for-kids
+forked from tdsquadAI/squad-for-kids
 ```
 
-> ⚠️ **טעות נפוצה:** ודאו שאתם על **הFork שלכם** ולא על `tamirdresher/squad-for-kids`. אם תתקינו מהריפו המקורי, ההתקדמות של הילד לא תישמר בחשבון שלכם!
+> ⚠️ **טעות נפוצה:** ודאו שאתם על **הFork שלכם** ולא על `tdsquadAI/squad-for-kids`. אם תתקינו מהריפו המקורי, ההתקדמות של הילד לא תישמר בחשבון שלכם!
 
 ---
 
@@ -134,7 +134,7 @@ forked from tamirdresher/squad-for-kids
 5. **העתיקו את הפקודה הזו** (לחצו על הטקסט ואז `Ctrl+C`):
 
 ```powershell
-irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1 | iex
+irm https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.ps1 | iex
 ```
 
 6. **הדביקו ב-PowerShell** (`Ctrl+V`) ולחצו **Enter**
@@ -175,7 +175,7 @@ irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1
 4. **העתיקו את הפקודה הזו:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.sh | bash
 ```
 
 5. **הדביקו ב-Terminal** (`Cmd+V`) ולחצו **Enter**
@@ -200,7 +200,7 @@ curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/se
 2. **העתיקו והריצו:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.sh | bash
 ```
 
 3. **אם מבקש סיסמה** — הכניסו את סיסמת ה-sudo שלכם
@@ -519,7 +519,7 @@ git restore .
 
 **דרך האתר:**
 1. היכנסו לFork שלכם ב-GitHub
-2. תראו באנר: **"This branch is X commits behind tamirdresher:main"**
+2. תראו באנר: **"This branch is X commits behind tdsquadAI:main"**
 3. לחצו **"Sync fork"** → **"Update branch"**
 
 **דרך שורת הפקודה:**
@@ -670,10 +670,10 @@ git pull upstream main
 - 🔄 עדכנו — עשו Sync Fork מדי פעם לקבלת תכונות חדשות
 - 💬 שתפו — ספרו לנו מה עובד ומה אפשר לשפר!
 
-> 🌟 **יש שאלה שלא נענתה כאן?** פתחו [Issue חדש](https://github.com/tamirdresher/squad-for-kids/issues) ב-GitHub ונשמח לעזור!
+> 🌟 **יש שאלה שלא נענתה כאן?** פתחו [Issue חדש](https://github.com/tdsquadAI/squad-for-kids/issues) ב-GitHub ונשמח לעזור!
 
 ---
 
-*מדריך זה הוא חלק מפרויקט [Squad for Kids](https://github.com/tamirdresher/squad-for-kids) — צוות למידה אישי מבוסס AI לכל ילד וילדה. 💜*
+*מדריך זה הוא חלק מפרויקט [Squad for Kids](https://github.com/tdsquadAI/squad-for-kids) — צוות למידה אישי מבוסס AI לכל ילד וילדה. 💜*
 
 </div>

@@ -121,7 +121,7 @@
 ### ステップ1：チームを入手
 
 ```bash
-git clone https://github.com/tamirdresher/squad-for-kids.git
+git clone https://github.com/tdsquadAI/squad-for-kids.git
 cd squad-for-kids
 ```
 

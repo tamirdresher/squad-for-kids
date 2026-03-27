@@ -24,7 +24,7 @@
 
 ```
 ┌──────────────────────────────┐
-│  tamirdresher/squad-for-kids │  ← ריפו מקורי (תכנית לימודים, תכונות, תבניות)
+│  tdsquadAI/squad-for-kids │  ← ריפו מקורי (תכנית לימודים, תכונות, תבניות)
 │  (upstream)                  │
 └──────────┬───────────────────┘
            │ Fork
@@ -42,7 +42,7 @@
 
 **מושגי מפתח:**
 - 🍴 **Fork** = עותק אישי של הריפו. שינויים שלכם לא משפיעים על המקור.
-- 🔄 **Upstream** = הריפו המקורי `tamirdresher/squad-for-kids`. אפשר למשוך ממנו עדכונים.
+- 🔄 **Upstream** = הריפו המקורי `tdsquadAI/squad-for-kids`. אפשר למשוך ממנו עדכונים.
 - 📝 **Commits** = כל פגישת למידה יוצרת רשומה בהיסטוריה של הFork שלכם.
 
 ---
@@ -56,7 +56,7 @@
 
 ### 1. עשו Fork לריפו
 
-1. היכנסו ל-[github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
+1. היכנסו ל-[github.com/tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids)
 2. לחצו על כפתור **"Fork"** (פינה ימנית עליונה, ליד ⭐ Star)
    > 📸 *כפתור הFork נראה כמו חץ מתפצל. הוא בין Watch ל-Star.*
 3. בדף "Create a new fork":
@@ -72,10 +72,10 @@
 
 ```
 שם-המשתמש-שלכם / squad-for-kids
-forked from tamirdresher/squad-for-kids
+forked from tdsquadAI/squad-for-kids
 ```
 
-⚠️ **טעות נפוצה:** ודאו שאתם לא על `tamirdresher/squad-for-kids`. אם תיצרו Codespace על הריפו המקורי, ההתקדמות של הילד לא תישמר בחשבון שלכם.
+⚠️ **טעות נפוצה:** ודאו שאתם לא על `tdsquadAI/squad-for-kids`. אם תיצרו Codespace על הריפו המקורי, ההתקדמות של הילד לא תישמר בחשבון שלכם.
 
 ### 3. צרו Codespace
 
@@ -174,7 +174,7 @@ forked from tamirdresher/squad-for-kids
 ### אוטומטי (ממשק GitHub)
 
 1. היכנסו לFork שלכם ב-GitHub
-2. חפשו את הבאנר: **"This branch is X commits behind tamirdresher:main"**
+2. חפשו את הבאנר: **"This branch is X commits behind tdsquadAI:main"**
 3. לחצו **"Sync fork"**
 4. לחצו **"Update branch"**
 
@@ -186,7 +186,7 @@ forked from tamirdresher/squad-for-kids
 
 ```bash
 # הוסיפו את הremote של המקור (פעם אחת)
-git remote add upstream https://github.com/tamirdresher/squad-for-kids.git
+git remote add upstream https://github.com/tdsquadAI/squad-for-kids.git
 
 # משכו ומזגו עדכונים
 git fetch upstream
@@ -366,8 +366,8 @@ git checkout -b david-learning
 ## צריכים עזרה?
 
 - 📖 [README](../README.he.md) — סקירה כללית של הפרויקט
-- 🐛 [פתחו issue](https://github.com/tamirdresher/squad-for-kids/issues) — דווחו על בעיות
-- 💬 [דיונים](https://github.com/tamirdresher/squad-for-kids/discussions) — שאלו שאלות
+- 🐛 [פתחו issue](https://github.com/tdsquadAI/squad-for-kids/issues) — דווחו על בעיות
+- 💬 [דיונים](https://github.com/tdsquadAI/squad-for-kids/discussions) — שאלו שאלות
 
 ---
 

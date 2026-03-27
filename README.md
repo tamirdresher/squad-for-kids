@@ -204,7 +204,7 @@ Automated study session reminders, homework tracking, and spaced repetition sche
 
 ### Step 1: Fork This Repo 🍴
 
-1. Go to [github.com/tamirdresher/squad-for-kids](https://github.com/tamirdresher/squad-for-kids)
+1. Go to [github.com/tdsquadAI/squad-for-kids](https://github.com/tdsquadAI/squad-for-kids) (or the official repository URL)
 2. Click the **"Fork"** button in the top-right corner
    <!-- Screenshot: The Fork button is next to Star and Watch, top-right of the repo page -->
 3. On the "Create a new fork" page, keep the defaults and click **"Create fork"**
@@ -214,7 +214,7 @@ Automated study session reminders, homework tracking, and spaced repetition sche
 
 ### Step 2: Open YOUR Fork ⚠️
 
-5. Make sure you're on **your fork** (check the URL — it should say `YOUR-USERNAME/squad-for-kids`, NOT `tamirdresher/squad-for-kids`)
+5. Make sure you're on **your fork** (check the URL — it should say `YOUR-USERNAME/squad-for-kids`, NOT the original org)
 6. 🖥️ **Important:** Use a laptop or desktop — not a phone or tablet
 
 ### Step 3: Create a Codespace 🚀
@@ -241,12 +241,12 @@ Prefer to work on your own computer instead of a Codespace? We have a one-comman
 
 **Windows:** Open PowerShell and run:
 ```powershell
-irm https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.ps1 | iex
+irm https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.ps1 | iex
 ```
 
 **macOS/Linux:** Open Terminal and run:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tamirdresher/squad-for-kids/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tdsquadAI/squad-for-kids/main/setup.sh | bash
 ```
 
 The wizard checks prerequisites, installs missing tools, sets up your child's profile, and gets everything ready — all with friendly bilingual prompts. No technical knowledge needed!
@@ -274,7 +274,7 @@ No need to create a new Codespace! Go to [github.com/codespaces](https://github.
 
 When new features, templates, or curriculum content are added to the original repo, you can sync them to your fork:
 
-1. On your fork's GitHub page, you'll see a banner: **"This branch is X commits behind tamirdresher:main"**
+1. On your fork's GitHub page, you'll see a banner: **"This branch is X commits behind the upstream repository"**
 2. Click **"Sync fork"** → **"Update branch"**
 3. Your child's personal data (profile, reports) is safe — only the curriculum and features update!
 

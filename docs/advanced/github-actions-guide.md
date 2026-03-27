@@ -326,8 +326,8 @@ GitHub Copilot does not use your code or conversations to train AI models. See [
 
 - 📖 [Parent Guide](../parent-guide.md) — Full parent guide
 - 📖 [README](../../README.md) — Project overview
-- 🐛 [Open an issue](https://github.com/tamirdresher/squad-for-kids/issues) — Report problems
-- 💬 [Discussions](https://github.com/tamirdresher/squad-for-kids/discussions) — Ask questions
+- 🐛 [Open an issue](https://github.com/tdsquadAI/squad-for-kids/issues) — Report problems
+- 💬 [Discussions](https://github.com/tdsquadAI/squad-for-kids/discussions) — Ask questions
 
 ---
 
